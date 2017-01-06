@@ -18,11 +18,11 @@ import static java.util.Optional.empty;
  * @param <T> Type of the value to resolve.
  * @since 4.0
  */
-public final class StaticParameterResolver<T> implements ParameterResolver<T> {
+final class StaticParameterResolver<T> implements ParameterResolver<T> {
 
   private T value;
 
-  public StaticParameterResolver(T value) {
+  StaticParameterResolver(T value) {
     this.value = value;
   }
 

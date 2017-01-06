@@ -70,16 +70,11 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     initEvaluator();
     TypedValue typedValue = evaluator.resolveTypedValue(event, Event.builder(event));
 
-    Object value = typedValue.getValue();
-
-    if (isInstance(ValueResolver.class, value)) {
-      value = ((ValueResolver) value).resolve(event);
+    if (isInstance(expectedClass, typedValue.getValue())) {
+      return (T) typedValue.getValue();
     }
 
-    if (isInstance(expectedClass, value)) {
-      return (T) value;
-    }
-    return value != null ? (T) transform(typedValue, expectedDataType, event) : null;
+    return typedValue.getValue() != null ? (T) transform(typedValue, expectedDataType, event) : null;
   }
 
   public Object transform(TypedValue value, DataType expectedDataType, Event event)

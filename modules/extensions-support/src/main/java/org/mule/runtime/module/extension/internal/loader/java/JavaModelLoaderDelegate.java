@@ -123,12 +123,7 @@ public final class JavaModelLoaderDelegate {
     typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
 
     fieldParameterContributors =
-        ImmutableList.of(new InfrastructureFieldContributor(), new FunctionParameterTypeContributor(typeLoader),
-                         new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class,
-                                                               new TypedValueTypeModelProperty()),
-                         new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class,
-                                                               new ParameterResolverTypeModelProperty()));
-
+        ImmutableList.of(new InfrastructureFieldContributor(), new FunctionParameterTypeContributor(typeLoader));
     methodParameterContributors = ImmutableList.of(
                                                    new FunctionParameterTypeContributor(typeLoader),
                                                    new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class,

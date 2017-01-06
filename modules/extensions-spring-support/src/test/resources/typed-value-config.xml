@@ -88,11 +88,4 @@
         <typed-value:source stringValue="#[payload]"/>
         <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
     </flow>
-
-    <flow name="typedValueForStringInsidePojo">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
-        <typed-value:typed-value-for-string-inside-pojo>
-            <typed-value:differed-door address="#[payload]"/>
-        </typed-value:typed-value-for-string-inside-pojo>
-    </flow>
 </mule>

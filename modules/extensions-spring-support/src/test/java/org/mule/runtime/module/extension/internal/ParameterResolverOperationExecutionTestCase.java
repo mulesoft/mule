@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.parameter.resolver;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -22,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatcher;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -32,7 +33,7 @@ import org.mule.test.heisenberg.extension.model.Weapon;
 
 import java.util.Optional;
 
-public class ParameterResolverOperationExecutionTestCase extends AbstractParameterResolverTestCase {
+public class ParameterResolverOperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
