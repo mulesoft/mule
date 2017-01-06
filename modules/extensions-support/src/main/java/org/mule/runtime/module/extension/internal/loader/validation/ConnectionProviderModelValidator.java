@@ -30,7 +30,6 @@ import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.sun.org.apache.xpath.internal.ExtensionsProvider;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -43,8 +42,8 @@ import java.util.Set;
  * This validator makes sure that:
  * <ul>
  * <li>All operations require the same type of connections</li>
- * <li>All the {@link ExtensionsProvider}s are compatible with all the {@link ConfigurationModel}s in the extension</li>
- * <li>All the {@link ExtensionsProvider}s return connections of the same type as expected by the {@link OperationModel}s</li>
+ * <li>All the {@link ConnectionProvider}s return connections of the same type as expected by the {@link OperationModel}s</li>
+ * <li>Transactional connections can not be produced by {@link CachedConnectionProvider}s</li>
  * </ul>
  *
  * @since 4.0
