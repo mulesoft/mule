@@ -9,8 +9,8 @@
     <groupId>org.mule</groupId>
     <artifactId>mule-compatibility-core</artifactId>
     <packaging>jar</packaging>
-    <name>Transports Core Infrastructure</name>
-    <description>Mule core support for transports.</description>
+    <name>Compatibility Core Infrastructure</name>
+    <description>Mule core support for compatibility with 3.x applications.</description>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
