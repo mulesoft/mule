@@ -199,7 +199,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
 
     protected void createTestConnectorWithSingleDispatcherThread(int exhaustedAction) throws MuleException
     {
-        createTestConnectorWithSingleDispatcherThread(1, exhaustedAction, 1, 1);
+        createTestConnectorWithSingleDispatcherThread(1, exhaustedAction, DELAY_TIME, 1);
     }
 
     protected void createTestConnectorWithSingleDispatcherThread(int threads,
