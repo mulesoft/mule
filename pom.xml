@@ -103,7 +103,7 @@
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
-        <module>transports</module>
+        <module>compatibility</module>
     </modules>
 
     <properties>
