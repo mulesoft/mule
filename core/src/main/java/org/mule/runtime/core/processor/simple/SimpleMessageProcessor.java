@@ -9,6 +9,7 @@ package org.mule.runtime.core.processor.simple;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.processor.Processor;
@@ -20,7 +21,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * @since 4.0
  */
 public abstract class SimpleMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, Initialisable {
+    implements Processor, MuleContextAware, Initialisable, Interceptable {
 
   protected MuleContext muleContext;
 

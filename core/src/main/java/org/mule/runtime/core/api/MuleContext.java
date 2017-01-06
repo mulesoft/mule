@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.interception.ProcessorInterceptionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -400,6 +401,11 @@ public interface MuleContext extends Lifecycle {
    * @return locator for accessing runtime object created by the mule configuration.
    */
   ConfigurationComponentLocator getConfigurationComponentLocator();
+
+  /**
+   * @return {@link ProcessorInterceptionManager} to manage processors interception.
+   */
+  ProcessorInterceptionManager getProcessorInterceptorManager();
 
 }
 

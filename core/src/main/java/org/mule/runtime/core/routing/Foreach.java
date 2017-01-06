@@ -15,6 +15,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -52,7 +53,7 @@ import org.w3c.dom.Document;
  * <p>
  * The {@link Event} sent to the next message processor is the same that arrived to foreach.
  */
-public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Processor {
+public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Processor, Interceptable {
 
   public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
   public static final String COUNTER_PROPERTY = "counter";

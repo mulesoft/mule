@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Flux.from;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * of setNext and holds the next message processor as an attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, FlowConstructAware {
+    implements Processor, MuleContextAware, FlowConstructAware, Interceptable {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -7,15 +7,16 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.log4j.Level;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * your needs.
  */
 public class LoggerMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, Initialisable, MuleContextAware, FlowConstructAware {
+    implements Processor, Initialisable, MuleContextAware, FlowConstructAware, Interceptable {
 
   protected transient Logger logger;
 

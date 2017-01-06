@@ -27,6 +27,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -56,7 +57,7 @@ import reactor.core.publisher.Mono;
  * exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements Processor, Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware {
+    implements Processor, Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware, Interceptable {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);

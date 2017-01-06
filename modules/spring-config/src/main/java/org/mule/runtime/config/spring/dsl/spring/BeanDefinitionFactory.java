@@ -34,6 +34,7 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGL
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.ANNOTATION_NAME;
+import static org.mule.runtime.dsl.api.component.ComponentIdentifier.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -42,6 +43,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
+import org.mule.runtime.core.api.interception.ProcessorInterceptionManager;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
@@ -116,17 +118,21 @@ public class BeanDefinitionFactory {
   private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private BeanDefinitionCreator componentModelProcessor;
   private ErrorTypeRepository errorTypeRepository;
+  private ProcessorInterceptionManager processorInterceptionManager;
   private ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
    *        artifact.
    * @param errorTypeRepository
+   * @param processorInterceptionManager manager for processors interception.
    */
   public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               ErrorTypeRepository errorTypeRepository) {
+                               ErrorTypeRepository errorTypeRepository,
+                               ProcessorInterceptionManager processorInterceptionManager) {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.errorTypeRepository = errorTypeRepository;
+    this.processorInterceptionManager = processorInterceptionManager;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
   }
 
@@ -186,6 +192,7 @@ public class BeanDefinitionFactory {
               annotations = (Map<QName, Object>) propertyValue.getValue();
             }
             annotations.put(ANNOTATION_NAME, componentModel.getIdentifier());
+            annotations.put(ANNOTATION_PARAMETERS, componentModel.getParameters());
             //add any error mappings if present
             List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
                 .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
@@ -284,7 +291,8 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
-    CommonBeanDefinitionCreator commonComponentModelProcessor = new CommonBeanDefinitionCreator(objectFactoryClassRepository);
+    CommonBeanDefinitionCreator commonComponentModelProcessor =
+        new CommonBeanDefinitionCreator(objectFactoryClassRepository, processorInterceptionManager);
     propertiesMapBeanDefinitionCreator.setNext(interceptorStackBeanDefinitionCreator);
     interceptorStackBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);
     exceptionStrategyRefBeanDefinitionCreator.setNext(exceptionStrategyRefBeanDefinitionCreator);

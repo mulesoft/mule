@@ -15,6 +15,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -54,7 +55,7 @@ import reactor.core.publisher.Mono;
  * <p/>
  * <b>EIP Reference:</b> <a href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
  */
-public class MessageEnricher extends AbstractMessageProcessorOwner implements Processor {
+public class MessageEnricher extends AbstractMessageProcessorOwner implements Processor, Interceptable {
 
   private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
 

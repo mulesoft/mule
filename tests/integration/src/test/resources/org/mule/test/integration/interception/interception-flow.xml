@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <flow name="loggerProcessorFlow">
+        <logger message="#[payload]" level="INFO"/>
+        <test:assert expression="#[payload == expectedMessage]"/>
+    </flow>
+
+    <flow name="operationProcessorFlow">
+        <file:read path="#[source]" />
+        <test:assert expression="#[payload == expectedMessage]"/>
+    </flow>
+
+    <flow name="customInterceptorProcessorFlow">
+        <custom-interceptor class="org.mule.test.integration.interceptor.MyCustomInterceptor"/>
+        <test:assert expression="#[payload == expectedMessage]"/>
+    </flow>
+
+    <flow name="customInterceptorNotInvokedProcessorFlow">
+        <custom-interceptor class="org.mule.test.integration.interceptor.MyCustomInterceptor"/>
+        <test:assert expression="#[payload == expectedMessage]"/>
+    </flow>
+
+</mule>

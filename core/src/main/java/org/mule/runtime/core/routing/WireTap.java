@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.component.Interceptable;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/WireTap.html">http://www.eaipatterns.com/WireTap.html<a/>
  */
-public class WireTap extends AbstractMessageProcessorOwner implements Processor {
+public class WireTap extends AbstractMessageProcessorOwner implements Processor, Interceptable {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
   protected volatile Processor tap;
