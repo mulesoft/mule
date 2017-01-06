@@ -66,7 +66,7 @@ public class HttpRequesterWsdlRetrieverStrategy extends AbstractInputStreamStrat
     }
 
     @Override
-    public Definition retrieveWsdlFrom() throws WSDLException
+    public Definition retrieveWsdl() throws WSDLException
     {
         try
         {

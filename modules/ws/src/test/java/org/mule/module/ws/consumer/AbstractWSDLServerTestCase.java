@@ -23,25 +23,26 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-public class AbstractWSDLServerTestCase extends FunctionalTestCase{
-	
+public class AbstractWSDLServerTestCase extends FunctionalTestCase
+{
+
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("port");
-    
+
     @Rule
     public DynamicPort dynamicPort2 = new DynamicPort("portNoReply");
-    
+
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
     private MockServer server = new MockServer(dynamicPort.getNumber());
-    
-    
+
+
     @After
     public void after() throws Exception
     {
         server.stop();
     }
-    
+
     /**
      * Implementation of an http fake server
      */

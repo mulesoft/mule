@@ -64,9 +64,6 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.InitializationException;
-
-
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
 {
 
@@ -122,7 +119,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
                     this);
         }
 
-        if(config.isUseConnectorToRetrieveWsdl() && isHttpRequester)
+        if (config.isUseConnectorToRetrieveWsdl() && isHttpRequester)
         {
             wsdlRetrieverStrategy = new HttpRequesterWsdlRetrieverStrategy(url, httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
         }
@@ -134,21 +131,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
     private boolean verifyIsHttpRequester(String url) throws InitialisationException
     {
-        boolean isHttpRequester = false;
-        URL urlProtocol = null;
-        urlProtocol = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
-
-        if (urlProtocol == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
-        }
-
-        // http and https (both begin with http)
-        if (urlProtocol.getProtocol().startsWith(HttpConnector.HTTP))
-        {
-            isHttpRequester = true;
-        }
-        return isHttpRequester;
+        return url.startsWith(HttpConnector.HTTP_URL_PROTOCOL) || url.startsWith(HttpConnector.HTTPS_URL_PROTOCOL);
     }
 
 
@@ -393,7 +376,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         try
         {
-            wsdlDefinition = getWsdlRetrieverStrategy().retrieveWsdlFrom();
+            wsdlDefinition = getWsdlRetrieverStrategy().retrieveWsdl();
         }
         catch (Exception e)
         {

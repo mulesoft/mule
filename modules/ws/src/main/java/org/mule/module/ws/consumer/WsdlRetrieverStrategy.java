@@ -17,5 +17,5 @@ import javax.wsdl.WSDLException;
  */
 public interface WsdlRetrieverStrategy 
 {
-	Definition retrieveWsdlFrom() throws WSDLException;
+	Definition retrieveWsdl() throws WSDLException;
 }

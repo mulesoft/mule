@@ -33,7 +33,7 @@ public class URLRetrieverStrategy extends AbstractInputStreamStrategy
     }
 
     @Override
-    public Definition retrieveWsdlFrom() throws WSDLException
+    public Definition retrieveWsdl() throws WSDLException
     {
         try
         {

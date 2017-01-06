@@ -377,7 +377,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="useConnectorToRetrieveWsdl" type="xsd:boolean" use="optional">
+                <xsd:attribute name="useConnectorToRetrieveWsdl" type="xsd:boolean" use="optional" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
                             Use the HTTP requester provided by the connectorConfig to obtain the wsdl.

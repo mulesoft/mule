@@ -9,7 +9,7 @@
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
 	<http:request-config name="HTTP_Request_Configuration"
-		protocol="HTTPS" host="fake.com" responseTimeout="60000" port="80">
+		protocol="HTTPS" host="fake.com" port="80">
 	</http:request-config>
 
 
