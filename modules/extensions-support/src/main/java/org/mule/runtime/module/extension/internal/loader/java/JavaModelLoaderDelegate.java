@@ -325,7 +325,7 @@ public final class JavaModelLoaderDelegate {
     type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {
       Set<String> optionalParamNames = annotatedParameters.stream()
           .filter(f -> !f.isRequired())
-          .map(f -> f.getAlias())
+          .map(f -> f.getName())
           .collect(toSet());
 
       declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
