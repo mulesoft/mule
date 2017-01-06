@@ -259,7 +259,9 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
         else
         {
-            throw new UnsupportedOperationException("getPayloadAsBytes(), use getPayload(DataType.BYTE_ARRAY_DATA_TYPE)");
+            throw new UnsupportedOperationException(
+                    "getPayloadAsBytes(), There has been an attempt to directly access the payload of a message collection, which is unsupported. " + System.getProperty("line.separator") +
+                                                    "Please retrieve the value from messageList or use getPayload(DataType.BYTE_ARRAY_DATA_TYPE)");
         }
     }
 
@@ -275,7 +277,9 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
         }
         else
         {
-            throw new UnsupportedOperationException("getPayloadAsString(), use getPayload(DataType.STRING_DATA_TYPE)");
+            throw new UnsupportedOperationException(
+                    "getPayloadAsString(), There has been an attempt to directly access the payload of a message collection, which is unsupported. " + System.getProperty("line.separator") +
+                                                    "Please retrieve the value from messageList or use getPayload(DataType.STRING_DATA_TYPE)");
         }
     }
 
