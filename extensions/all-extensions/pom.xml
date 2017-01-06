@@ -252,10 +252,6 @@
                     <artifactId>cxf-rt-frontend-simple</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule</groupId>
-                    <artifactId>mule-metadata-model-xml</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>

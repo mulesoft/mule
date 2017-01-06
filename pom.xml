@@ -193,6 +193,7 @@
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
         <muleMvelVersion>2.1.9-MULE-010</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
@@ -309,6 +310,21 @@
                 <groupId>org.mule</groupId>
                 <artifactId>mule-api</artifactId>
                 <version>${muleApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-metadata-model-xml</artifactId>
+                <version>${muleMetadataModelVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-metadata-model-java</artifactId>
+                <version>${muleMetadataModelVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-metadata-model-json</artifactId>
+                <version>${muleMetadataModelVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.annotation</groupId>
