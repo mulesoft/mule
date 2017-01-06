@@ -19,6 +19,7 @@
 
     <properties>
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.metadata.version>1.0.0-SNAPSHOT</mule.metadata.version>
     </properties>
 
     <modules>
@@ -57,6 +58,24 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-metadata-model-xml</artifactId>
+            <version>${mule.metadata.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-metadata-model-java</artifactId>
+            <version>${mule.metadata.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-metadata-model-json</artifactId>
+            <version>${mule.metadata.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
