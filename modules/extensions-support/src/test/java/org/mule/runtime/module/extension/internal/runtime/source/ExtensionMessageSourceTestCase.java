@@ -46,7 +46,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -295,7 +294,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void failToStart() throws Exception {
     MuleException e = new DefaultMuleException(new Exception());
     doThrow(e).when(source).onStart(any());
-    expectedException.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
+    expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
 
     messageSource.initialise();
     messageSource.start();
@@ -307,8 +306,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     doThrow(new RuntimeException(connectionException)).when(source).onStart(sourceCallback);
 
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
-    assertThat(throwable.getCause(), is(exhaustedBecauseOf(connectionException)));
+    assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
+    assertThat(throwable, is(exhaustedBecauseOf(connectionException)));
     verify(source, times(3)).onStart(sourceCallback);
   }
 
@@ -317,7 +316,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     doThrow(new DefaultMuleException(new IOException(ERROR_MESSAGE))).when(source).onStart(sourceCallback);
 
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(instanceOf(MuleRuntimeException.class)));
+    assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
     assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
     verify(source, times(3)).onStart(sourceCallback);
   }
@@ -357,7 +356,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void startFailsWithRandomException() throws Exception {
     Exception e = new RuntimeException();
     doThrow(e).when(source).onStart(sourceCallback);
-    expectedException.expectCause(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
+    expectedException.expect(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
 
       private Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
 
@@ -502,7 +501,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
       @Override
       public boolean matches(Object item) {
         Throwable exception = (Throwable) item;
-        return exception instanceof RetryPolicyExhaustedException && causeMatcher.matches(exception.getCause());
+        return causeMatcher.matches(exception.getCause());
       }
 
       @Override

@@ -14,6 +14,7 @@ import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionExcepti
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -97,11 +98,15 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     }
   }
 
-  private void startSource() {
+  private void startSource() throws MuleException {
     try {
       retryPolicyTemplate.execute(new SourceRetryCallback(), retryScheduler);
     } catch (Throwable e) {
-      throw new MuleRuntimeException(e);
+      if (e instanceof MuleException) {
+        throw (MuleException) e;
+      } else {
+        throw new MuleRuntimeException(e);
+      }
     }
   }
 

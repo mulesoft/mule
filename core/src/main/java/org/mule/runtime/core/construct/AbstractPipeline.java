@@ -17,7 +17,6 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
@@ -330,9 +329,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     if (muleContext.isStarted()) {
       try {
         startIfStartable(messageSource);
-      }
-      // Let connection exceptions bubble up to trigger the reconnection strategy.
-      catch (ConnectException ce) {
+      } catch (ConnectException ce) {
+        // Let connection exceptions bubble up to trigger the reconnection strategy.
         throw ce;
       } catch (MuleException e) {
         // If the messageSource couldn't be started we would need to stop the pipeline (if possible) in order to leave
