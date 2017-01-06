@@ -185,7 +185,7 @@
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.53</jschVersion>
         <jsonVersion>20140107</jsonVersion>
-        <junitVersion>4.11</junitVersion>
+        <junitVersion>4.12</junitVersion>
         <log4jVersion>2.5</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
