@@ -26,11 +26,11 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNB
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
@@ -75,11 +75,11 @@ final class ObjectTypeSchemaDelegate {
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
    * @param type        the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
-   * @param paramDsl    the {@link ElementDslModel} associated to the parameter, if any is present.
+   * @param paramDsl    the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
    * @param all         the {@link ExplicitGroup group} the generated element should belong to
    */
-  void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ElementDslModel paramDsl,
+  void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ParameterDslConfiguration paramDsl,
                            String description, List<TopLevelElement> all) {
 
     if (paramSyntax.supportsChildDeclaration()) {
@@ -473,7 +473,7 @@ final class ObjectTypeSchemaDelegate {
   private ImmutableParameterModel asParameter(ObjectFieldType field) {
     return new ImmutableParameterModel(field.getKey().getName().getLocalPart(), "", field.getValue(), false, field.isRequired(),
                                        getExpressionSupport(field), getDefaultValue(field).orElse(null),
-                                       getParameterRole(field), ElementDslModel.getDefaultInstance(),
+                                       getParameterRole(field), ParameterDslConfiguration.getDefaultInstance(),
                                        null, getLayoutModel(field).orElse(null), emptySet());
   }
 

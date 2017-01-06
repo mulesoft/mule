@@ -25,8 +25,8 @@ import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.ExceptionMapper;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.dsl.resolver.SingleExtensionImportTypesStrategy;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
 
 import java.util.Optional;
 import java.util.Set;
@@ -65,7 +65,7 @@ class ExtensionErrorsRegistrant {
     Set<ErrorModel> errorTypes = extensionModel.getErrorModels();
     String extensionNamespace = extensionModel.getXmlDslModel().getNamespace();
     String errorExtensionNamespace = getExtensionsErrorNamespace(extensionModel);
-    DslSyntaxResolver syntaxResolver = new DslSyntaxResolver(extensionModel, new SingleExtensionImportTypesStrategy());
+    DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(extensionModel, new SingleExtensionImportTypesStrategy());
 
     ErrorModel connectivityErrorModel = newError(CONNECTIVITY_ERROR_IDENTIFIER, errorExtensionNamespace)
         .withParent(newError(CONNECTIVITY_ERROR_IDENTIFIER, MULE).build()).build();

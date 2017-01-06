@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.config;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -15,12 +14,11 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnect
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;

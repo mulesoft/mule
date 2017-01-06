@@ -45,7 +45,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
@@ -60,9 +60,9 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
@@ -163,7 +163,7 @@ public final class SchemaBuilder {
 
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
     this.dslExtensionContext = dslContext;
-    this.dslResolver = new DslSyntaxResolver(model, dslContext);
+    this.dslResolver = DslSyntaxResolver.getDefault(model, dslContext);
     return this;
   }
 
@@ -504,7 +504,7 @@ public final class SchemaBuilder {
                                           parameterModel.getName(), parameterModel.getDescription(),
                                           parameterModel.getExpressionSupport(), parameterModel.isRequired(),
                                           parameterModel.getDefaultValue(), paramDsl,
-                                          parameterModel.getDslModel());
+                                          parameterModel.getDslConfiguration());
   }
 
   private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
@@ -512,7 +512,7 @@ public final class SchemaBuilder {
                                                              final String name, final String description,
                                                              ExpressionSupport expressionSupport, boolean required,
                                                              Object defaultValue, DslElementSyntax paramDsl,
-                                                             ElementDslModel dslModel) {
+                                                             ParameterDslConfiguration dslModel) {
     return new MetadataTypeVisitor() {
 
       private boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
@@ -695,7 +695,7 @@ public final class SchemaBuilder {
   }
 
   void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
-    DslElementSyntax groupDsl = dslResolver.resolveInlineGroupDsl(group);
+    DslElementSyntax groupDsl = dslResolver.resolveInline(group);
 
     LocalComplexType complexType = objectTypeDelegate.createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
     ExplicitGroup groupSequence = new ExplicitGroup();

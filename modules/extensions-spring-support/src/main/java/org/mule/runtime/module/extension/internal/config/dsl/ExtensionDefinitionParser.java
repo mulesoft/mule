@@ -59,8 +59,8 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValueResolverParsingDelegate;
@@ -869,7 +869,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private boolean acceptsReferences(ParameterModel parameterModel) {
-    return parameterModel.getDslModel().allowsReferences();
+    return parameterModel.getDslConfiguration().allowsReferences();
   }
 
   protected void parseParameterGroup(ParameterGroupModel group) throws ConfigurationException {
@@ -878,7 +878,7 @@ public abstract class ExtensionDefinitionParser {
             .map(ParameterGroupModelProperty::getDescriptor)
             .orElseThrow(() -> new IllegalArgumentException("Incomplete group"));
 
-    DslElementSyntax dslElementSyntax = dslResolver.resolveInlineGroupDsl(group);
+    DslElementSyntax dslElementSyntax = dslResolver.resolveInline(group);
     addParameter(getChildKey(getContainerName(descriptor.getContainer())),
                  new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax, muleContext));
 

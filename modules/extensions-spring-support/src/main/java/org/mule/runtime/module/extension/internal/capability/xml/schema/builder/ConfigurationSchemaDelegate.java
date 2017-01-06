@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MUL
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;

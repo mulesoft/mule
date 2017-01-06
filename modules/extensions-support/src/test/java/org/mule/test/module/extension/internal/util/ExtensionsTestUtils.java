@@ -31,7 +31,7 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -170,7 +170,7 @@ public final class ExtensionsTestUtils {
   private static ParameterModel getParameter() {
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
-    when(parameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
+    when(parameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(parameterModel.getRole()).thenReturn(BEHAVIOUR);
     return parameterModel;
 

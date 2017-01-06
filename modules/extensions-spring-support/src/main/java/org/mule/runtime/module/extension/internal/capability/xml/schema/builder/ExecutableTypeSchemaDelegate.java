@@ -31,8 +31,8 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Extensible;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -100,7 +100,8 @@ abstract class ExecutableTypeSchemaDelegate {
         childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
       } else {
         boolean shouldDeclare = true;
-        if (parameter.getModelProperty(QNameModelProperty.class).isPresent() && !parameter.getDslModel().allowsReferences()) {
+        if (parameter.getModelProperty(QNameModelProperty.class).isPresent()
+            && !parameter.getDslConfiguration().allowsReferences()) {
           shouldDeclare = false;
         }
 

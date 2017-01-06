@@ -16,7 +16,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.extension.api.dsl.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;

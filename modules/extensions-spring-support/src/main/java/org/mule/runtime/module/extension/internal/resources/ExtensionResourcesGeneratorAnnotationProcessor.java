@@ -17,7 +17,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensi
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.dsl.resources.spi.DslResourceFactory;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;

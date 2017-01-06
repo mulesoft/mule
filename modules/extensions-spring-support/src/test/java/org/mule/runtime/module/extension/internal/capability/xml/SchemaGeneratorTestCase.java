@@ -17,7 +17,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.c
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.extension.api.dsl.resolver.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;

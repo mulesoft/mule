@@ -12,7 +12,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.internal.utils.MetadataTypeUtils;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.ClassUtils;
@@ -64,7 +64,7 @@ public class FunctionParameterTypeContributor implements ParameterDeclarerContri
         }
         declarer.ofType(metadataType);
         declarer.withModelProperty(new FunctionParameterTypeModelProperty());
-        declarer.withDsl(ElementDslModel.builder()
+        declarer.withDsl(ParameterDslConfiguration.builder()
             .allowsInlineDefinition(false)
             .allowsReferences(true)
             .allowTopLevelDefinition(false)
