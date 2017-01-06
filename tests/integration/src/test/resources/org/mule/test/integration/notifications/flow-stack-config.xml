@@ -261,5 +261,44 @@
             </processor-chain>
         </scatter-gather>
     </flow>
+
+    <!-- Filter -->
+
+    <flow name="flowChainedFilter">
+        <vm:inbound-endpoint path="in-flowChainedFilter" exchange-pattern="request-response"/>
+        <processor-chain>
+            <expression-filter expression="#[true]"/>
+            <flow-ref name="flow"/>
+        </processor-chain>
+    </flow>
+
+    <flow name="flowChainedFilterManyProcessors">
+        <vm:inbound-endpoint path="in-flowChainedFilterManyProcessors" exchange-pattern="request-response"/>
+        <processor-chain>
+            <expression-filter expression="#[true]"/>
+            <test:component/>
+            <flow-ref name="flow"/>
+        </processor-chain>
+    </flow>
+
+    <!-- For Each -->
+
+    <flow name="flowForEach">
+        <vm:inbound-endpoint path="in-flowForEach" exchange-pattern="request-response"/>
+        <foreach collection="#[['foo', 'bar']]">
+            <test:component/>
+            <flow-ref name="flow"/>
+        </foreach>
+    </flow>
+
+    <!-- For Each + Filter -->
+
+    <flow name="flowForEachFilter">
+        <vm:inbound-endpoint path="in-flowForEachFilter" exchange-pattern="request-response"/>
+        <foreach collection="#[['foo', 'bar']]">
+            <expression-filter expression="#[true]"/>
+            <flow-ref name="flow"/>
+        </foreach>
+    </flow>
     
 </mule>

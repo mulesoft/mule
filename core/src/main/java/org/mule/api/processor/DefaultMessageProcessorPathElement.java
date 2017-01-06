@@ -49,7 +49,10 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     {
         int size = children.size();
         DefaultMessageProcessorPathElement result = new DefaultMessageProcessorPathElement(mp, String.valueOf(size));
-        addChild(result);
+        if (!alreadyAddedChildren(mp))
+        {
+            addChild(result);
+        }
         return result;
     }
 
@@ -66,6 +69,17 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
         return messageProcessor;
     }
 
+    public boolean alreadyAddedChildren(MessageProcessor mp)
+    {
+        for (MessageProcessorPathElement child : children)
+        {
+            if (mp.equals(child.getMessageProcessor()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void addChild(MessageProcessorPathElement mp)
     {
