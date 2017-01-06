@@ -517,31 +517,11 @@ public abstract class ExtensionDefinitionParser {
 
     boolean isExpression = isExpression(value, parser);
 
-    if (isExpression) {
-      if (isExpressionFunction(modelProperties)) {
-        resolver = new ExpressionFunctionValueResolver<>((String) value, expectedType, muleContext);
-      } else if (isParameterResolver(modelProperties, expectedType)) {
-        resolver = new ExpressionBasedParameterResolverValueResolver((String) value, expectedType, muleContext);
-      } else if (isTypedValue(modelProperties, expectedType)) {
-        resolver = new ExpressionTypedValueValueResolver((String) value, expectedClass, muleContext);
-      } else {
-        resolver = new TypeSafeExpressionValueResolver<>((String) value, expectedClass, muleContext);
-      }
-    } else {
+    resolver = isExpression
+        ? getExpressionBasedValueResolver(expectedType, (String) value, modelProperties, expectedClass)
+        : getStaticValueResolver(parameterName, expectedType, value, defaultValue, modelProperties, acceptsReferences,
+                                 expectedClass);
 
-      if (value != null) {
-        resolver =
-            getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass);
-      } else {
-        resolver = new StaticValueResolver<>(defaultValue);
-      }
-
-      if (isParameterResolver(modelProperties, expectedType)) {
-        resolver = new ParameterResolverValueResolverWrapper(resolver);
-      } else if (isTypedValue(modelProperties, expectedType)) {
-        resolver = new TypedValueValueResolverWrapper(resolver);
-      }
-    }
 
     if (resolver.isDynamic() && expressionSupport == NOT_SUPPORTED) {
       throw new IllegalArgumentException(
@@ -554,6 +534,43 @@ public abstract class ExtensionDefinitionParser {
                                                 parameterName));
     }
 
+    return resolver;
+  }
+
+  /**
+   * Generates the {@link ValueResolver} for expression based values
+   */
+  private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
+                                                        Set<ModelProperty> modelProperties, Class<Object> expectedClass) {
+    ValueResolver resolver;
+    if (isExpressionFunction(modelProperties)) {
+      resolver = new ExpressionFunctionValueResolver<>(value, expectedType, muleContext);
+    } else if (isParameterResolver(modelProperties, expectedType)) {
+      resolver = new ExpressionBasedParameterResolverValueResolver(value, expectedType, muleContext);
+    } else if (isTypedValue(modelProperties, expectedType)) {
+      resolver = new ExpressionTypedValueValueResolver(value, expectedClass, muleContext);
+    } else {
+      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, muleContext);
+    }
+    return resolver;
+  }
+
+  /**
+   * Generates the {@link ValueResolver} for non expression based values
+   */
+  private ValueResolver getStaticValueResolver(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+                                               Set<ModelProperty> modelProperties, boolean acceptsReferences,
+                                               Class<Object> expectedClass) {
+    ValueResolver resolver;
+    resolver = value != null
+        ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
+        : new StaticValueResolver<>(defaultValue);
+
+    if (isParameterResolver(modelProperties, expectedType)) {
+      resolver = new ParameterResolverValueResolverWrapper(resolver);
+    } else if (isTypedValue(modelProperties, expectedType)) {
+      resolver = new TypedValueValueResolverWrapper(resolver);
+    }
     return resolver;
   }
 

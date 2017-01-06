@@ -17,9 +17,9 @@
 
     <parameter-resolver:door name="dynamicDoor" address="Address" victim="#[payload]" />
 
-    <parameter-resolver:pojo-with-parameter-resolver-parameter name="dynamicResolver" someExpression="#[payload]" />
+    <parameter-resolver:differed-knockable-door name="dynamicResolver" victim="#[payload]" />
 
-    <parameter-resolver:pojo-with-parameter-resolver-parameter name="staticResolver" someExpression="this is not an expression" />
+    <parameter-resolver:differed-knockable-door name="staticResolver" victim="this is not an expression" />
 
     <flow name="configurationWithDynamicParameterResolvers">
         <set-payload value="this is the payload"/>
@@ -38,18 +38,18 @@
     <flow name="operationWithChildElement">
         <set-payload value="this is the payload"/>
         <parameter-resolver:resolver-operation >
-            <parameter-resolver:pojo-with-resolver someExpression="#[payload]"/>
+            <parameter-resolver:differed-door victim="#[payload]" />
         </parameter-resolver:resolver-operation>
     </flow>
 
     <flow name="operationWithDynamicReferenceElement">
         <set-payload value="this is the payload"/>
-        <parameter-resolver:resolver-operation pojoWithResolver="dynamicResolver" />
+        <parameter-resolver:resolver-operation differedDoor="dynamicResolver" />
     </flow>
 
     <flow name="operationWithStaticReferenceElement">
         <set-payload value="this is the payload"/>
-        <parameter-resolver:resolver-operation pojoWithResolver="staticResolver" />
+        <parameter-resolver:resolver-operation differedDoor="staticResolver" />
     </flow>
 
     <flow name="doorOperation">

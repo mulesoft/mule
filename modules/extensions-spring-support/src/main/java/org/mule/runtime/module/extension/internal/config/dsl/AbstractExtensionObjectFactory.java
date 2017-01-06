@@ -64,7 +64,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -197,7 +196,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
    * @param value the value to expose
-   * @param modelProperties
+   * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */
   protected ValueResolver<?> toValueResolver(Object value, Set<ModelProperty> modelProperties) {
@@ -205,17 +204,32 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
     if (value instanceof ValueResolver) {
       resolver = (ValueResolver<?>) value;
     } else if (value instanceof Collection) {
-      resolver = getCollectionResolver((Collection) value, modelProperties);
+      resolver = getCollectionResolver((Collection) value);
     } else if (value instanceof Map) {
-      resolver = getMapResolver((Map<Object, Object>) value, modelProperties);
-    } else if (modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty)) {
+      resolver = getMapResolver((Map<Object, Object>) value);
+    } else if (isParameterResolver(modelProperties)) {
       resolver = new StaticValueResolver<>(new StaticParameterResolver<>(value));
-    } else if (modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TypedValueTypeModelProperty)) {
+    } else if (isTypedValue(modelProperties)) {
       resolver = new StaticValueResolver<>(new DefaultTypedValue<>(value, DataType.fromObject(value)));
     } else {
       resolver = new StaticValueResolver<>(value);
     }
     return resolver;
+  }
+
+  /**
+   * Wraps the {@code value} into a {@link ValueResolver} of the proper type. For example, {@link Collection} and {@link Map}
+   * instances are exposed as {@link CollectionValueResolver} and {@link MapValueResolver} respectively.
+   * <p>
+   * If {@code value} is already a {@link ValueResolver} then it's returned as is.
+   * <p>
+   * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
+   *
+   * @param value the value to expose
+   * @return a {@link ValueResolver}
+   */
+  protected ValueResolver<?> toValueResolver(Object value) {
+    return toValueResolver(value, emptySet());
   }
 
   @Override
@@ -249,7 +263,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
       Field objectField = getField(objectClass, key);
 
       if (parameters.containsKey(key)) {
-        valueResolver = toValueResolver(parameters.get(key), emptySet());
+        valueResolver = toValueResolver(parameters.get(key));
       } else if (!isParameterGroup) {
         valueResolver = getDefaultValueResolver(field.getAnnotation(DefaultEncodingAnnotation.class).isPresent(),
                                                 () -> getDefaultValue(field).isPresent()
@@ -351,19 +365,26 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
                                                                       key)));
   }
 
-  private ValueResolver<?> getMapResolver(Map<Object, Object> value, Set<ModelProperty> modelProperties) {
-    Map<Object, Object> map = value;
-    Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(map.size());
-    map.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key, emptySet()),
-                                                       (ValueResolver<Object>) toValueResolver(entryValue, emptySet())));
-    return MapValueResolver.of(map.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
+  private ValueResolver<?> getMapResolver(Map<Object, Object> value) {
+    Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(value.size());
+    value.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
+                                                         (ValueResolver<Object>) toValueResolver(entryValue)));
+    return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
   }
 
-  private ValueResolver<?> getCollectionResolver(Collection<T> collection, Set<ModelProperty> modelProperties) {
+  private ValueResolver<?> getCollectionResolver(Collection<T> collection) {
     return CollectionValueResolver
         .of(collection.getClass(), collection
             .stream()
-            .map((value) -> toValueResolver(value, emptySet()))
+            .map((value) -> toValueResolver(value))
             .collect(new ImmutableListCollector<>()));
+  }
+
+  private boolean isTypedValue(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TypedValueTypeModelProperty);
+  }
+
+  private boolean isParameterResolver(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty);
   }
 }
