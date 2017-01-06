@@ -19,7 +19,6 @@
 
     <properties>
         <cxfVersion>2.7.18</cxfVersion>
-        <metadataModelXmlVersion>1.0.0-SNAPSHOT</metadataModelXmlVersion>
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -107,11 +106,6 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-metadata-model-xml</artifactId>
-            <version>${metadataModelXmlVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
