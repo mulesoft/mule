@@ -31,7 +31,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Map;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -116,7 +115,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(runtimeException);
+        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(runtimeException);
       }
     }), eq(event));
   }
@@ -137,7 +136,7 @@ public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCas
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(runtimeException);
+        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(runtimeException);
       }
     }), eq(event));
   }

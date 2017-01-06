@@ -118,8 +118,8 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
   private void ensureRequestGoesThroughProxy(String flowName) throws Exception {
     MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException();
     // Request should go through the proxy.
-    assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
-    assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
+    assertThat(e.getRootCause(), is(instanceOf(IOException.class)));
+    assertThat(e.getRootCause().getMessage(), is("Remotely closed"));
     latch.await(1, SECONDS);
   }
 

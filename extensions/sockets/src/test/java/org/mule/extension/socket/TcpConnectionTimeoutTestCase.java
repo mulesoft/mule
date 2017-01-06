@@ -29,8 +29,8 @@ public class TcpConnectionTimeoutTestCase extends SocketExtensionTestCase {
   public void socketConnectionTimeout() throws Exception {
     final Throwable throwable = catchThrowable(() -> flowRunner("tcp-connection-timeout").withPayload(TEST_STRING).run());
     assertThat(throwable, is(instanceOf(MessagingException.class)));
-    assertThat(((MessagingException) throwable).getCauseException(), is(anyOf(
-                                                                              instanceOf(SocketTimeoutException.class),
-                                                                              instanceOf(ConnectException.class))));
+    assertThat(((MessagingException) throwable).getRootCause(), is(anyOf(
+                                                                         instanceOf(SocketTimeoutException.class),
+                                                                         instanceOf(ConnectException.class))));
   }
 }

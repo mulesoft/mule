@@ -82,7 +82,7 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(exception);
+        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(exception);
       }
     }), argThat(new ArgumentMatcher<Event>() {
 

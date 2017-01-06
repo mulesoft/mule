@@ -49,7 +49,7 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
   @Description("Tries to instantiate a connection with an RPC WSDL and fails.")
   public void rpcWsdlFails() throws Exception {
     URL wsdl = currentThread().getContextClassLoader().getResource("wsdl/rpc.wsdl");
-    Exception e = flowRunner(RPC_CONNETION).withVariable("wsdl", wsdl.getPath()).runExpectingException().getCauseException();
+    Throwable e = flowRunner(RPC_CONNETION).withVariable("wsdl", wsdl.getPath()).runExpectingException().getRootCause();
     assertThat(e.getMessage(), containsString("RPC WSDLs are not supported"));
     assertThat(e, instanceOf(ConnectionException.class));
   }

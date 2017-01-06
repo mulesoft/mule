@@ -103,7 +103,7 @@ public class JaxbSecurityTestCase extends FunctionalTestCase {
 
       fail("Should've thrown exception");
     } catch (MessagingException e) {
-      assertThat(e.getCauseException(), instanceOf(SAXParseException.class));
+      assertThat(e.getRootCause(), instanceOf(SAXParseException.class));
     }
   }
 }

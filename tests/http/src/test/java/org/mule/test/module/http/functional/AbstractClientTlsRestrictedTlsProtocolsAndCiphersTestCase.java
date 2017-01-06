@@ -89,7 +89,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
       sendRequest(serverCipherSuiteDisabled, serverProtocolDisabled);
       fail();
     } catch (MessagingException e) {
-      assertTrue(e.getCauseException() instanceof IOException);
+      assertTrue(e.getRootCause() instanceof IOException);
     }
   }
 
