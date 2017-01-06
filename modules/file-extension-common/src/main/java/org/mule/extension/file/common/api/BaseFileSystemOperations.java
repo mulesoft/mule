@@ -10,21 +10,17 @@ import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import org.mule.extension.file.common.api.exceptions.FileCopyErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileDeleteErrorTypeProvider;
-import org.mule.extension.file.common.api.exceptions.FileListErrorTypeProvider;
-import org.mule.extension.file.common.api.exceptions.FileReadErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.IllegalContentException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
-import org.mule.extension.file.common.api.metadata.FileTreeNodeMetadataResolver;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -35,43 +31,44 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 
 import javax.activation.MimetypesFileTypeMap;
 
 /**
- * Basic set of operations for extensions which perform operations over a generic file system
+ * Basic set of operations and templates for extensions which perform operations over a generic file system
  *
  * @since 4.0
  */
-// TODO: MULE-9215
-public class StandardFileSystemOperations {
+public abstract class BaseFileSystemOperations {
 
   /**
    * Lists all the files in the {@code directoryPath} which match the given {@code matcher}.
    * <p>
    * If the listing encounters a directory, the output list will include its contents depending on the value of the
-   * {@code recursive} parameter.
+   * {@code recursive} parameter. If {@code recursive} is enabled, then all the files in that directory will be
+   * listed immediately after their parent directory.
    * <p>
    * If {@code recursive} is set to {@code true} but a found directory is rejected by the {@code matcher}, then there won't be any
    * recursion into such directory.
    *
-   * @param config the config that is parameterizing this operation
+   * @param config        the config that is parameterizing this operation
    * @param directoryPath the path to the directory to be listed
-   * @param recursive whether to include the contents of sub-directories. Defaults to false.
-   * @param message the {@link Message} on which this operation was triggered
-   * @param matchWith a matcher used to filter the output list
-   * @return a {@link TreeNode} object representing the listed directory
+   * @param recursive     whether to include the contents of sub-directories. Defaults to false.
+   * @param mediaType     The {@link MediaType} of the message that on which this operations is being executed
+   * @param matchWith     a matcher used to filter the output list
+   * @return a {@link List} of {@link Result} objects each one containing each file's content in the payload and metadata in the attributes
    * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
    */
-  @Summary("List all the files from given directory")
-  @OutputResolver(output = FileTreeNodeMetadataResolver.class)
-  @Throws(FileListErrorTypeProvider.class)
-  public TreeNode list(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String directoryPath,
-                       @Optional(defaultValue = "false") boolean recursive, Message message,
-                       @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
+  protected List<Result<InputStream, FileAttributes>> doList(FileConnectorConfig config,
+                                                             FileSystem fileSystem,
+                                                             String directoryPath,
+                                                             boolean recursive,
+                                                             MediaType mediaType,
+                                                             FilePredicateBuilder matchWith) {
     fileSystem.changeToBaseDir();
-    return fileSystem.list(config, directoryPath, recursive, message, getPredicate(matchWith));
+    return fileSystem.list(config, directoryPath, recursive, mediaType, getPredicate(matchWith));
   }
 
   /**
@@ -85,26 +82,24 @@ public class StandardFileSystemOperations {
    * into consideration before blindly relying on this lock.
    * <p>
    * This method also makes a best effort to determine the mime type of the file being read. A {@link MimetypesFileTypeMap} will
-   * be used to make an educated guess on the file's mime type. The user also has the chance to force the output enconding and
+   * be used to make an educated guess on the file's mime type. The user also has the chance to force the output encoding and
    * mimeType through the {@code outputEncoding} and {@code outputMimeType} optional parameters.
    *
-   * @param config the config that is parameterizing this operation
+   * @param config     the config that is parameterizing this operation
    * @param fileSystem a reference to the host {@link FileSystem}
-   * @param message the incoming {@link Message}
-   * @param path the path to the file to be read
-   * @param lock whether or not to lock the file. Defaults to false.
+   * @param path       the path to the file to be read
+   * @param mediaType  The {@link MediaType} of the message that on which this operations is being executed
+   * @param lock       whether or not to lock the file. Defaults to false.
    * @return the file's content and metadata on a {@link FileAttributes} instance
    * @throws IllegalArgumentException if the file at the given path doesn't exists
    */
-  @DataTypeParameters
-  @Summary("Obtains the content and metadata of a file at a given path")
-  @Throws(FileReadErrorTypeProvider.class)
-  public Result<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
-                                                  @Connection FileSystem fileSystem, Message message,
-                                                  @DisplayName("File Path") String path,
-                                                  @Optional(defaultValue = "false") boolean lock) {
+  protected Result<InputStream, FileAttributes> doRead(@UseConfig FileConnectorConfig config,
+                                                       @Connection FileSystem fileSystem,
+                                                       @DisplayName("File Path") String path,
+                                                       MediaType mediaType,
+                                                       @Optional(defaultValue = "false") boolean lock) {
     fileSystem.changeToBaseDir();
-    return fileSystem.read(config, message, path, lock);
+    return fileSystem.read(config, path, mediaType, lock);
   }
 
   /**
@@ -136,16 +131,16 @@ public class StandardFileSystemOperations {
    * This operation also supports locking support depending on the value of the {@code lock} argument, but following the same
    * rules and considerations as described in the read operation.
    *
-   * @param config the {@link FileConnectorConfig} on which the operation is being executed
-   * @param fileSystem a reference to the host {@link FileSystem}
-   * @param path the path of the file to be written
-   * @param content the content to be written into the file. Defaults to the current {@link Message} payload
-   * @param encoding when {@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
-   *        not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
+   * @param config                  the {@link FileConnectorConfig} on which the operation is being executed
+   * @param fileSystem              a reference to the host {@link FileSystem}
+   * @param path                    the path of the file to be written
+   * @param content                 the content to be written into the file. Defaults to the current {@link Message} payload
+   * @param encoding                when {@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
+   *                                not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param lock whether or not to lock the file. Defaults to false
-   * @param mode a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-   * @param event The current {@link Event}
+   * @param lock                    whether or not to lock the file. Defaults to false
+   * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
+   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
@@ -193,13 +188,13 @@ public class StandardFileSystemOperations {
    * As for the {@code sourcePath}, it can either be a file or a directory. If it points to a directory, then it will be copied
    * recursively.
    *
-   * @param config the config that is parameterizing this operation
-   * @param fileSystem a reference to the host {@link FileSystem}
-   * @param sourcePath the path to the file to be copied
-   * @param targetPath the target directory where the file is going to be copied
+   * @param config                  the config that is parameterizing this operation
+   * @param fileSystem              a reference to the host {@link FileSystem}
+   * @param sourcePath              the path to the file to be copied
+   * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param overwrite whether or not overwrite the file if the target destination already exists.
-   * @param event the {@link Event} which triggered this operation
+   * @param overwrite               whether or not overwrite the file if the target destination already exists.
+   * @param event                   the {@link Event} which triggered this operation
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Copies a file in another directory")
@@ -242,13 +237,13 @@ public class StandardFileSystemOperations {
    * As for the {@code sourcePath}, it can either be a file or a directory. If it points to a directory, then it will be moved
    * recursively.
    *
-   * @param config the config that is parameterizing this operation
-   * @param fileSystem a reference to the host {@link FileSystem}
-   * @param sourcePath the path to the file to be copied
-   * @param targetPath the target directory
+   * @param config                  the config that is parameterizing this operation
+   * @param fileSystem              a reference to the host {@link FileSystem}
+   * @param sourcePath              the path to the file to be copied
+   * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param overwrite whether or not overwrite the file if the target destination already exists.
-   * @param event The current {@link Event}
+   * @param overwrite               whether or not overwrite the file if the target destination already exists.
+   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Moves a file to another directory")
@@ -272,8 +267,8 @@ public class StandardFileSystemOperations {
    * thrown.
    *
    * @param fileSystem a reference to the host {@link FileSystem}
-   * @param path the path to the file to be deleted
-   * @param event The current {@link Event}
+   * @param path       the path to the file to be deleted
+   * @param event      The current {@link Event}
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
   @Summary("Deletes a file")
@@ -296,17 +291,18 @@ public class StandardFileSystemOperations {
    * precondition is not honored.
    *
    * @param fileSystem a reference to the host {@link FileSystem}
-   * @param path the path to the file to be renamed
-   * @param to the file's new name
-   * @param overwrite whether or not overwrite the file if the target destination already exists.
-   * @param event The current {@link Event}
+   * @param path       the path to the file to be renamed
+   * @param to         the file's new name
+   * @param overwrite  whether or not overwrite the file if the target destination already exists.
+   * @param event      The current {@link Event}
    */
   @Summary("Renames a file")
   @Throws(FileRenameErrorTypeProvider.class)
   public void rename(@Connection FileSystem fileSystem, @Optional String path,
                      @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
     if (get(to).getNameCount() != 1) {
-      throw new IllegalPathException(format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
+      throw new IllegalPathException(
+                                     format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
                                             to));
     }
 
@@ -318,7 +314,7 @@ public class StandardFileSystemOperations {
   /**
    * Creates a new directory on {@code directoryPath}
    *
-   * @param fileSystem a reference to the host {@link FileSystem}
+   * @param fileSystem    a reference to the host {@link FileSystem}
    * @param directoryPath the new directory's name
    */
   @Summary("Creates a new directory")
@@ -338,7 +334,8 @@ public class StandardFileSystemOperations {
       return ((FileAttributes) message.getAttributes()).getPath();
     }
 
-    throw new IllegalPathException(format("A %s was not specified and a default one could not be obtained from the current message attributes",
+    throw new IllegalPathException(
+                                   format("A %s was not specified and a default one could not be obtained from the current message attributes",
                                           attributeName));
   }
 

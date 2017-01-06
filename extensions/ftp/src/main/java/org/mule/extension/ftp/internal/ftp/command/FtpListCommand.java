@@ -10,16 +10,19 @@ import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.TreeNode;
 import org.mule.extension.file.common.api.command.ListCommand;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -49,8 +52,12 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
    * {@inheritDoc}
    */
   @Override
-  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
-                       Predicate<FileAttributes> matcher) {
+  public List<Result<InputStream, FileAttributes>> list(FileConnectorConfig config,
+                                                        String directoryPath,
+                                                        boolean recursive,
+                                                        MediaType mediaType,
+                                                        Predicate<FileAttributes> matcher) {
+
     FileAttributes directoryAttributes = getExistingFile(directoryPath);
     Path path = Paths.get(directoryAttributes.getPath());
 
@@ -62,9 +69,10 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
       throw exception(format("Could not change working directory to '%s' while trying to list that directory", path));
     }
 
-    TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(directoryAttributes);
+    List<Result<InputStream, FileAttributes>> accumulator = new LinkedList<>();
+
     try {
-      doList(config, path, treeNodeBuilder, recursive, message, matcher);
+      doList(config, path, accumulator, recursive, mediaType, matcher);
 
       if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
         throw exception(format("Failed to list files on directory '%s'", path));
@@ -75,11 +83,15 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
       throw exception(format("Failed to list files on directory '%s'", path), e);
     }
 
-    return treeNodeBuilder.build();
+    return accumulator;
   }
 
-  private void doList(FileConnectorConfig config, Path path, TreeNode.Builder treeNodeBuilder, boolean recursive,
-                      Message message, Predicate<FileAttributes> matcher)
+  private void doList(FileConnectorConfig config,
+                      Path path,
+                      List<Result<InputStream, FileAttributes>> accumulator,
+                      boolean recursive,
+                      MediaType mediaType,
+                      Predicate<FileAttributes> matcher)
       throws IOException {
     LOGGER.debug("Listing directory {}", path);
 
@@ -99,8 +111,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
         }
 
         if (attributes.isDirectory()) {
-          TreeNode.Builder childNodeBuilder = TreeNode.Builder.forDirectory(attributes);
-          treeNodeBuilder.addChild(childNodeBuilder);
+          accumulator.add(Result.<InputStream, FileAttributes>builder().output(null).attributes(attributes).build());
 
           if (recursive) {
             Path recursionPath = path.resolve(attributes.getName());
@@ -108,14 +119,14 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
               throw exception(format("Could not change working directory to '%s' while performing recursion on list operation",
                                      recursionPath));
             }
-            doList(config, recursionPath, childNodeBuilder, recursive, message, matcher);
+            doList(config, recursionPath, accumulator, recursive, mediaType, matcher);
             if (!client.changeToParentDirectory()) {
               throw exception(format("Could not return to parent working directory '%s' while performing recursion on list operation",
                                      recursionPath.getParent()));
             }
           }
         } else {
-          treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(config, message, filePath.toString(), false)));
+          accumulator.add(fileSystem.read(config, filePath.toString(), mediaType, false));
         }
       }
     }

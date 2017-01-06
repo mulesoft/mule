@@ -7,16 +7,15 @@
 package org.mule.extension.file.internal.command;
 
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.extension.file.internal.FileInputStream;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.ReadCommand;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.lock.PathLock;
+import org.mule.extension.file.internal.FileInputStream;
+import org.mule.extension.file.internal.LocalFileSystem;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -40,7 +39,7 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
    * {@inheritDoc}
    */
   @Override
-  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
+  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, String filePath, MediaType mediaType,
                                                   boolean lock) {
     Path path = resolveExistingPath(filePath);
     if (Files.isDirectory(path)) {
@@ -58,8 +57,12 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
     InputStream payload = new FileInputStream(path, pathLock);
     FileAttributes fileAttributes = new LocalFileAttributes(path);
     MediaType fileMediaType =
-        fileSystem.getFileMessageMediaType(message.getPayload().getDataType().getMediaType(), fileAttributes);
-    return Result.<InputStream, FileAttributes>builder().output(payload).mediaType(fileMediaType)
-        .attributes(fileAttributes).build();
+        fileSystem.getFileMessageMediaType(mediaType, fileAttributes);
+
+    return Result.<InputStream, FileAttributes>builder()
+        .output(payload)
+        .mediaType(fileMediaType)
+        .attributes(fileAttributes)
+        .build();
   }
 }

@@ -16,6 +16,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
@@ -33,6 +34,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.Configuration
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
@@ -58,6 +60,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
   private static final ArgumentResolver<Message> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
+  private static final ArgumentResolver<MediaType> MEDIA_TYPE_ARGUMENT_RESOLVER = new MediaTypeArgumentResolver();
   private static final ArgumentResolver<SourceCallbackContext> SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER =
       new SourceCallbackContextArgumentResolver();
   private static final ArgumentResolver<Event> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
@@ -123,6 +126,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = new TypedValueArgumentResolver<>(paramNames.get(i));
       } else if (CompletionCallback.class.isAssignableFrom(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
+      } else if (MediaType.class.equals(parameterType)) {
+        argumentResolver = MEDIA_TYPE_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

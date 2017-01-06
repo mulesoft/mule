@@ -11,7 +11,7 @@ import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_P
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.FileSystem;
-import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * Errors that can be thrown in the
- * {@link StandardFileSystemOperations#list(FileConnectorConfig, FileSystem, String, boolean, Message, FilePredicateBuilder)}
+ * {@link BaseFileSystemOperations#list(FileConnectorConfig, FileSystem, String, boolean, Message, FilePredicateBuilder)}
  * operation.
  *
  * @since 1.0

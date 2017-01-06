@@ -68,14 +68,18 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
                          OperationContainerElement operationsContainer) {
-    declareOperations(extensionDeclarer, declarer, operationsContainer.getOperations(), true);
+    declareOperations(extensionDeclarer, declarer, operationsContainer.getDeclaringClass(), operationsContainer.getOperations(),
+                      true);
   }
 
-  void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
-                         List<MethodElement> operations, boolean supportsConfig) {
+  void declareOperations(ExtensionDeclarer extensionDeclarer,
+                         HasOperationDeclarer declarer,
+                         final Class<?> methodOwnerClass,
+                         List<MethodElement> operations,
+                         boolean supportsConfig) {
 
     for (MethodElement operationMethod : operations) {
-      final Class<?> declaringClass = operationMethod.getDeclaringClass();
+      Class<?> declaringClass = methodOwnerClass != null ? methodOwnerClass : operationMethod.getDeclaringClass();
       checkOperationIsNotAnExtension(declaringClass);
 
       final Method method = operationMethod.getMethod();

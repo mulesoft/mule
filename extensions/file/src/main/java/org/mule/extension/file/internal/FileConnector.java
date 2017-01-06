@@ -14,7 +14,7 @@ import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFilePredicateBuilder;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
-import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.extension.file.common.api.exceptions.FileErrors;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -28,12 +28,12 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
  * File connector used to manipulate file systems mounted on the host operation system.
  * <p>
  * This class serves as both extension definition and configuration. Operations are based on the standard
- * {@link StandardFileSystemOperations}
+ * {@link BaseFileSystemOperations}
  *
  * @since 4.0
  */
 @Extension(name = "File", description = "Connector to manipulate files on a locally mounted file system")
-@Operations({StandardFileSystemOperations.class})
+@Operations({FileOperations.class})
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @ConnectionProviders(LocalFileConnectionProvider.class)
 @Sources(DirectoryListener.class)

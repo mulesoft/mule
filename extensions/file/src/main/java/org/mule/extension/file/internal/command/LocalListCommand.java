@@ -8,17 +8,20 @@ package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.Message;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.TreeNode;
 import org.mule.extension.file.common.api.command.ListCommand;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
+import org.mule.extension.file.internal.LocalFileSystem;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -39,23 +42,32 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
    * {@inheritDoc}
    */
   @Override
-  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
-                       Predicate<FileAttributes> matcher) {
+  public List<Result<InputStream, FileAttributes>> list(FileConnectorConfig config,
+                                                        String directoryPath,
+                                                        boolean recursive,
+                                                        MediaType mediaType,
+                                                        Predicate<FileAttributes> matcher) {
     Path path = resolveExistingPath(directoryPath);
     if (!Files.isDirectory(path)) {
       throw cannotListFileException(path);
     }
 
-    TreeNode.Builder treeNodeBuilder = TreeNode.Builder.forDirectory(new LocalFileAttributes(path));
-    doList(config, path.toFile(), treeNodeBuilder, recursive, message, matcher);
+    List<Result<InputStream, FileAttributes>> accumulator = new LinkedList<>();
+    doList(config, path.toFile(), accumulator, recursive, mediaType, matcher);
 
-    return treeNodeBuilder.build();
+    return accumulator;
   }
 
-  private void doList(FileConnectorConfig config, File parent, TreeNode.Builder treeNodeBuilder, boolean recursive,
-                      Message message, Predicate<FileAttributes> matcher) {
+  private void doList(FileConnectorConfig config,
+                      File parent,
+                      List<Result<InputStream, FileAttributes>> accumulator,
+                      boolean recursive,
+                      MediaType mediaType,
+                      Predicate<FileAttributes> matcher) {
+
     if (!parent.canRead()) {
-      throw new FileAccessDeniedException(format("Could not list files from directory '%s' because access was denied by the operating system",
+      throw new FileAccessDeniedException(
+                                          format("Could not list files from directory '%s' because access was denied by the operating system",
                                                  parent.getAbsolutePath()));
     }
 
@@ -67,14 +79,13 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
       }
 
       if (child.isDirectory()) {
-        TreeNode.Builder childNodeBuilder = TreeNode.Builder.forDirectory(attributes);
-        treeNodeBuilder.addChild(childNodeBuilder);
+        accumulator.add(Result.<InputStream, FileAttributes>builder().output(null).attributes(attributes).build());
 
         if (recursive) {
-          doList(config, child, childNodeBuilder, recursive, message, matcher);
+          doList(config, child, accumulator, recursive, mediaType, matcher);
         }
       } else {
-        treeNodeBuilder.addChild(TreeNode.Builder.forFile(fileSystem.read(config, message, child.getAbsolutePath(), false)));
+        accumulator.add(fileSystem.read(config, child.getAbsolutePath(), mediaType, false));
       }
     }
   }

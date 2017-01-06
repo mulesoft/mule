@@ -6,20 +6,21 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import static org.mule.extension.file.common.api.TreeNode.Builder.forDirectory;
-import static org.mule.extension.file.common.api.TreeNode.Builder.forFile;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.TreeNode;
 import org.mule.extension.file.common.api.command.ListCommand;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
@@ -44,8 +45,12 @@ public final class SftpListCommand extends SftpCommand implements ListCommand {
    * {@inheritDoc}
    */
   @Override
-  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
-                       Predicate<FileAttributes> matcher) {
+  public List<Result<InputStream, FileAttributes>> list(FileConnectorConfig config,
+                                                        String directoryPath,
+                                                        boolean recursive,
+                                                        MediaType mediaType,
+                                                        Predicate<FileAttributes> matcher) {
+
     FileAttributes directoryAttributes = getExistingFile(directoryPath);
     Path path = Paths.get(directoryAttributes.getPath());
 
@@ -53,14 +58,19 @@ public final class SftpListCommand extends SftpCommand implements ListCommand {
       throw cannotListFileException(path);
     }
 
-    TreeNode.Builder treeNodeBuilder = forDirectory(directoryAttributes);
-    doList(config, directoryAttributes.getPath(), treeNodeBuilder, recursive, message, matcher);
+    List<Result<InputStream, FileAttributes>> accumulator = new LinkedList<>();
+    doList(config, directoryAttributes.getPath(), accumulator, recursive, mediaType, matcher);
 
-    return treeNodeBuilder.build();
+    return accumulator;
   }
 
-  private void doList(FileConnectorConfig config, String path, TreeNode.Builder treeNodeBuilder, boolean recursive,
-                      Message message, Predicate<FileAttributes> matcher) {
+  private void doList(FileConnectorConfig config,
+                      String path,
+                      List<Result<InputStream, FileAttributes>> accumulator,
+                      boolean recursive,
+                      MediaType mediaType,
+                      Predicate<FileAttributes> matcher) {
+
     LOGGER.debug("Listing directory {}", path);
     for (SftpFileAttributes file : client.list(path)) {
       if (isVirtualDirectory(file.getName()) || !matcher.test(file)) {
@@ -68,14 +78,13 @@ public final class SftpListCommand extends SftpCommand implements ListCommand {
       }
 
       if (file.isDirectory()) {
-        TreeNode.Builder childNodeBuilder = forDirectory(file);
-        treeNodeBuilder.addChild(childNodeBuilder);
+        accumulator.add(Result.<InputStream, FileAttributes>builder().output(null).attributes(file).build());
 
         if (recursive) {
-          doList(config, file.getPath(), childNodeBuilder, recursive, message, matcher);
+          doList(config, file.getPath(), accumulator, recursive, mediaType, matcher);
         }
       } else {
-        treeNodeBuilder.addChild(forFile(fileSystem.read(config, message, file.getPath(), false)));
+        accumulator.add(fileSystem.read(config, file.getPath(), mediaType, false));
       }
     }
   }
