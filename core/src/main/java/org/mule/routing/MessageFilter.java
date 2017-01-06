@@ -24,6 +24,8 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.config.i18n.CoreMessages;
@@ -187,5 +189,14 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
         }
 
         LifecycleUtils.disposeIfNeeded(filter, LOGGER);
+    }
+
+    @Override
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+    {
+        if (!(next instanceof MessageProcessorChain))
+        {
+            super.addMessageProcessorPathElements(pathElement);
+        }
     }
 }
