@@ -201,8 +201,8 @@ public class ComponentModel {
 
   // TODO MULE-11355: Make the ComponentModel haven an ApplicationElement internally
   public ApplicationElement asElement() {
-    ApplicationElement.Builder builder = ApplicationElement.Builder.getInstance()
-        .withIdentifier(ApplicationElementIdentifier.Builder.getInstance()
+    ApplicationElement.Builder builder = ApplicationElement.builder()
+        .withIdentifier(ApplicationElementIdentifier.builder()
             .withName(this.getIdentifier().getName())
             .withNamespace((String) this.getCustomAttributes().get(XmlCustomAttributeHandler.NAMESPACE_URI))
             .build())

@@ -45,7 +45,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
@@ -504,7 +504,7 @@ public final class SchemaBuilder {
                                           parameterModel.getName(), parameterModel.getDescription(),
                                           parameterModel.getExpressionSupport(), parameterModel.isRequired(),
                                           parameterModel.getDefaultValue(), paramDsl,
-                                          parameterModel.getDslModel());
+                                          parameterModel.getDslConfiguration());
   }
 
   private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
@@ -512,7 +512,7 @@ public final class SchemaBuilder {
                                                              final String name, final String description,
                                                              ExpressionSupport expressionSupport, boolean required,
                                                              Object defaultValue, DslElementSyntax paramDsl,
-                                                             ElementDslModel dslModel) {
+                                                             ParameterDslConfiguration dslModel) {
     return new MetadataTypeVisitor() {
 
       private boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;

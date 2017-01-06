@@ -30,7 +30,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -449,7 +449,7 @@ public final class JavaModelLoaderDelegate {
 
   private void parseXmlHints(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     extensionParameter.getAnnotation(XmlHints.class).ifPresent(
-                                                               hints -> parameter.withDsl(ElementDslModel.builder()
+                                                               hints -> parameter.withDsl(ParameterDslConfiguration.builder()
                                                                    .allowsInlineDefinition(hints.allowInlineDefinition())
                                                                    .allowsReferences(hints.allowReferences())
                                                                    .allowTopLevelDefinition(hints.allowTopLevelDefinition())

@@ -100,7 +100,8 @@ abstract class ExecutableTypeSchemaDelegate {
         childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
       } else {
         boolean shouldDeclare = true;
-        if (parameter.getModelProperty(QNameModelProperty.class).isPresent() && !parameter.getDslModel().allowsReferences()) {
+        if (parameter.getModelProperty(QNameModelProperty.class).isPresent()
+            && !parameter.getDslConfiguration().allowsReferences()) {
           shouldDeclare = false;
         }
 

@@ -18,7 +18,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -76,12 +76,12 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationModel.getName()).thenReturn("dummyOperation");
 
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-    when(validParameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
+    when(validParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(validParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(validParameterModel.getLayoutModel()).thenReturn(Optional.empty());
 
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
-    when(invalidParameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
+    when(invalidParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(invalidParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());
   }

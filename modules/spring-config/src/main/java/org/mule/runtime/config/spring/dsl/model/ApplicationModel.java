@@ -695,7 +695,7 @@ public class ApplicationModel {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  //TODO
+  //TODO MULE-11355: Make the ComponentModel haven an ApplicationElement internally
   public Optional<ApplicationElement> findNamedElement(String name) {
     Optional<ApplicationElement> requestedElement = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {

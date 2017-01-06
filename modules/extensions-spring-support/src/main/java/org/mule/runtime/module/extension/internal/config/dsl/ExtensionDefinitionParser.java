@@ -869,7 +869,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private boolean acceptsReferences(ParameterModel parameterModel) {
-    return parameterModel.getDslModel().allowsReferences();
+    return parameterModel.getDslConfiguration().allowsReferences();
   }
 
   protected void parseParameterGroup(ParameterGroupModel group) throws ConfigurationException {
