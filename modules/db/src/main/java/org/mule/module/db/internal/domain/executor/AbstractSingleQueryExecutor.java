@@ -97,7 +97,8 @@ public abstract class AbstractSingleQueryExecutor extends AbstractExecutor imple
         }
     }
 
-    private interface SQLDelegate {
+    private interface SQLDelegate
+    {
 
         Object run() throws SQLException;
     }
