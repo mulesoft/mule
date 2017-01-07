@@ -123,6 +123,8 @@
                 <include>org.mule:mule-metadata-model-api</include>
                 <include>org.mule:mule-metadata-model-java</include>
                 <include>org.mule:mule-metadata-model-persistence</include>
+                <include>org.mule:mule-metadata-model-xml</include>
+                <include>org.mule:mule-metadata-model-json</include>
                 <!-- extensions API -->
                 <include>org.mule.extensions:mule-extensions-api</include>
                 <include>org.mule.extensions:mule-extensions-api-persistence</include>
@@ -199,6 +201,8 @@
                 <exclude>org.mule:mule-metadata-model-api</exclude>
                 <exclude>org.mule:mule-metadata-model-java</exclude>
                 <exclude>org.mule:mule-metadata-model-persistence</exclude>
+                <exclude>org.mule:mule-metadata-model-xml</exclude>
+                <exclude>org.mule:mule-metadata-model-json</exclude>
                 <!--extensions API-->
                 <exclude>org.mule.extensions:mule-extensions-api</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-persistence</exclude>
