@@ -267,6 +267,7 @@
         <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
+        <formatterGoal>validate</formatterGoal>
     </properties>
 
     <dependencies>
@@ -1580,9 +1581,10 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>apply-format</id>
                             <phase>compile</phase>
                             <goals>
-                                <goal>validate</goal>
+                                <goal>${formatterGoal}</goal>
                             </goals>
                             <configuration>
                                 <skipFormatting>${skipVerifications}</skipFormatting>
