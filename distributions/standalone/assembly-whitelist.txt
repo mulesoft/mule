@@ -283,6 +283,8 @@
 /mule-standalone-${productVersion}/lib/opt/mx4j-tools-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/nailgun-server-0.9.1.jar
 /mule-standalone-${productVersion}/lib/opt/options-1.3.jar
+/mule-standalone-${productVersion}/lib/opt/org.everit.json.schema-1.1.0.jar
+/mule-standalone-${productVersion}/lib/opt/org.everit.osgi.bundles.org.json-1.0.0-v20140107.jar
 /mule-standalone-${productVersion}/lib/opt/plexus-component-annotations-1.6.jar
 /mule-standalone-${productVersion}/lib/opt/plexus-interpolation-1.21.jar
 /mule-standalone-${productVersion}/lib/opt/plexus-utils-3.0.22.jar
@@ -304,6 +306,7 @@
 /mule-standalone-${productVersion}/lib/opt/spring-security-ldap-4.0.4.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-ldap-core-2.0.2.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-4.1.9.RELEASE.jar
+/mule-standalone-${productVersion}/lib/opt/stax-api-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
@@ -311,6 +314,7 @@
 /mule-standalone-${productVersion}/lib/opt/uri-template-0.9.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
 /mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
+/mule-standalone-${productVersion}/lib/opt/xmlbeans-2.6.0.jar
 /mule-standalone-${productVersion}/lib/opt/xmlpull-1.1.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/xpp3_min-1.1.3.4.O.jar
 /mule-standalone-${productVersion}/lib/opt/xstream-1.4.9.jar
