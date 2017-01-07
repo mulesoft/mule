@@ -4,9 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact.classloader.net;
+package org.mule.runtime.module.artifact.classloader.net;
 
-import sun.net.www.ParseUtil;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
+import sun.net.www.ParseUtil;
 
 /**
  * A URL Connection to a Mule Artifact file or an entry in a Mule Artifact file.

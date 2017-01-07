@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
-import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;

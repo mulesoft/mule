@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.launcher;
-
-import org.mule.runtime.module.repository.api.RepositoryService;
+package org.mule.runtime.module.repository.api;
 
 /**
  * Enables {@link RepositoryService} injection.

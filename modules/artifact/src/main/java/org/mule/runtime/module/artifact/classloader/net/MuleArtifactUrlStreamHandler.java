@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact.classloader.net;
+package org.mule.runtime.module.artifact.classloader.net;
 
 import java.io.IOException;
 import java.net.URL;

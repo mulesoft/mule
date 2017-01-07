@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.artifact.classloader.net;
+package org.mule.runtime.module.artifact.classloader.net;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,11 +38,11 @@ import static org.apache.commons.io.IOUtils.contentEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mule.module.artifact.classloader.net.MuleArtifactUrlConnection.CLASSES_FOLDER;
-import static org.mule.module.artifact.classloader.net.MuleArtifactUrlConnection.SEPARATOR;
-import static org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
-import static org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.register;
-import static org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlConnection.CLASSES_FOLDER;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlConnection.SEPARATOR;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.register;
+import static org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
 
 /**
  * Tests urls on a ZIP file that imitates a mule plugin successfully.
