@@ -25,7 +25,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.util.StringUtils;
 

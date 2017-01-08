@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.policy;
 
-import static org.mule.runtime.core.functional.Either.left;
-import static org.mule.runtime.core.functional.Either.right;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 
 import java.util.HashMap;
 import java.util.List;

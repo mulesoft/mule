@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

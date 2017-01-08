@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.tck.ThreadingProfileConfigurationBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;

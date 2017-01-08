@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.client;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 
 import java.io.Serializable;
 import java.util.Map;
