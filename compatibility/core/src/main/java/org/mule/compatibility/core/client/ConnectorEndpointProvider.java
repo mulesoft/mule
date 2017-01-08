@@ -22,8 +22,8 @@ import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
-import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
+import org.mule.runtime.core.api.client.AbstractPriorizableConnectorMessageProcessorProvider;
+import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 
 import java.util.Collections;
 import java.util.HashSet;

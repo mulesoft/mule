@@ -25,19 +25,15 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -217,54 +213,4 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  /**
-   * Placeholder class which makes the default exception handler available.
-   */
-  static public class MuleClientFlowConstruct implements FlowConstruct {
-
-    MuleContext muleContext;
-
-    public MuleClientFlowConstruct(MuleContext muleContext) {
-      this.muleContext = muleContext;
-    }
-
-    @Override
-    public String getName() {
-      return "MuleClient";
-    }
-
-    @Override
-    public String getUniqueIdString() {
-      return muleContext.getUniqueIdString();
-    }
-
-    @Override
-    public String getServerId() {
-      return muleContext.getId();
-    }
-
-    @Override
-    public MessagingExceptionHandler getExceptionListener() {
-      return new DefaultMessagingExceptionStrategy(muleContext);
-    }
-
-    @Override
-    public LifecycleState getLifecycleState() {
-      return null;
-    }
-
-    @Override
-    public FlowConstructStatistics getStatistics() {
-      return null;
-    }
-
-    @Override
-    public MuleContext getMuleContext() {
-      return muleContext;
-    }
-
-    public MessageProcessorChain getMessageProcessorChain() {
-      return null;
-    }
-  }
 }

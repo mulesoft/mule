@@ -954,8 +954,8 @@ public class DefaultMuleContext implements MuleContext {
     this.muleRegistryHelper = muleRegistry;
   }
 
-  public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext) {
-    this.localMuleClient = localMuleContext;
+  public void setLocalMuleClient(MuleClient muleClient) {
+    this.localMuleClient = muleClient;
   }
 
   public void setExtensionManager(ExtensionManager extensionManager) {
