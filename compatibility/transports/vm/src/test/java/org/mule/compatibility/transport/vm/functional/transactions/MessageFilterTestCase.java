@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MessageFilterTestCase extends CompatibilityFunctionalTestCase {
 
-  // Constant copied from org.mule.runtime.core.client.DefaultLocalMuleClient#MESSAGE_FILTERED_ERROR_MESSAGE as that class is not
+  // Constant copied from org.mule.runtime.core.internal.client.DefaultLocalMuleClient#MESSAGE_FILTERED_ERROR_MESSAGE as that class is not
   // visible when the test runs
   private static final String MESSAGE_FILTERED_ERROR_MESSAGE = "message filtered";
 
