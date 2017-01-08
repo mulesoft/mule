@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.serialization;
+package org.mule.runtime.core.internal.serialization;
 
 import org.mule.runtime.core.api.serialization.SerializationException;
 

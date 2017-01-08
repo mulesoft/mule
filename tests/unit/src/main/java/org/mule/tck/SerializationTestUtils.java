@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 
 public abstract class SerializationTestUtils {
 

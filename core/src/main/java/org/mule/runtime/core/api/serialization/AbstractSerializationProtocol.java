@@ -4,13 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.serialization.internal;
+package org.mule.runtime.core.api.serialization;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.serialization.SerializationException;
-import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
