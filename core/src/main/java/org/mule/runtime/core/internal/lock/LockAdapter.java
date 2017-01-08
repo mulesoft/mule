@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.lock;
+package org.mule.runtime.core.internal.lock;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;

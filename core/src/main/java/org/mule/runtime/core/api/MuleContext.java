@@ -40,7 +40,7 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.extension.api.ExtensionManager;
 

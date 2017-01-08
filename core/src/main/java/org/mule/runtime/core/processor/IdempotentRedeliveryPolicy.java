@@ -22,7 +22,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.store.ObjectStorePartition;
 import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 

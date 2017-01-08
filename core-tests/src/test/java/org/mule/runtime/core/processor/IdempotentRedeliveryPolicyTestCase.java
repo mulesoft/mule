@@ -29,8 +29,8 @@ import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.lock.MuleLockFactory;
-import org.mule.runtime.core.util.lock.SingleServerLockProvider;
+import org.mule.runtime.core.internal.lock.MuleLockFactory;
+import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 
 import java.io.Serializable;
 import java.util.HashMap;

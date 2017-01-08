@@ -38,7 +38,7 @@ import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 
 import java.io.File;
 import java.io.FileFilter;

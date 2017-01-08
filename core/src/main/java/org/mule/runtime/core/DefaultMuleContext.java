@@ -107,7 +107,7 @@ import org.mule.runtime.core.util.ServerStartupSplashScreen;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.extension.api.ExtensionManager;
