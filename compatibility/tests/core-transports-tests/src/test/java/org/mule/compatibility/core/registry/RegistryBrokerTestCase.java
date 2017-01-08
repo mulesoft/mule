@@ -10,11 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistryBroker;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.TransientRegistry;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -83,25 +81,6 @@ public class RegistryBrokerTestCase extends AbstractMuleContextEndpointTestCase 
 
     @Override
     protected void doStop() {
-      super.doStop();
-      tracker += name + "-stop ";
-    }
-  }
-
-  class LifecycleTrackerFlow extends Flow {
-
-    public LifecycleTrackerFlow(String name, MuleContext muleContext) {
-      super(name, muleContext);
-    }
-
-    @Override
-    protected void doStart() throws MuleException {
-      super.doStart();
-      tracker += name + "-start ";
-    }
-
-    @Override
-    protected void doStop() throws MuleException {
       super.doStop();
       tracker += name + "-stop ";
     }
