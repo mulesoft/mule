@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.generics;
+package org.mule.runtime.core.internal.util.generics;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

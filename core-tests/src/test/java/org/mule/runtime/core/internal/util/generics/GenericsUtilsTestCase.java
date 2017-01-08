@@ -4,8 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.generics;
+package org.mule.runtime.core.internal.util.generics;
 
+import static org.junit.Assert.assertEquals;
+import org.mule.runtime.core.util.generics.GenericBean;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -19,8 +21,6 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 @SmallTest
 public class GenericsUtilsTestCase extends AbstractMuleTestCase {
