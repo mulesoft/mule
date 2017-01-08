@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.keygenerator;
+package org.mule.runtime.core.internal.keygenerator;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
