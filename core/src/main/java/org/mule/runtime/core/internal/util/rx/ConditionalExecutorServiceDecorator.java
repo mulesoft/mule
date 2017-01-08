@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.rx.internal;
+package org.mule.runtime.core.internal.util.rx;
 
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import org.mule.runtime.api.scheduler.Scheduler;

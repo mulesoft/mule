@@ -9,7 +9,7 @@ package org.mule.tck;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.internal.util.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.internal.util.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Function;
 

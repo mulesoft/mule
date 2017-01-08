@@ -25,19 +25,15 @@ import org.mule.runtime.core.processor.strategy.MultiReactorProcessingStrategyFa
 import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.internal.util.rx.Exceptions.EventDroppedException;
 import org.mule.service.scheduler.internal.DefaultSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.databene.contiperf.PerfTest;
@@ -50,17 +46,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Subscription;
-import reactor.core.Exceptions;
-import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.BlockingSink;
-import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.TopicProcessor;
-import reactor.core.scheduler.Schedulers;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;

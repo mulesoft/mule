@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.rx;
+package org.mule.runtime.core.internal.util.rx;
 
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.Exceptions.unwrap;

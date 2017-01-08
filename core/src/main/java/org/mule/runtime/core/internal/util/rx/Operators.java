@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.rx.internal;
+package org.mule.runtime.core.internal.util.rx;
 
-import static org.mule.runtime.core.util.rx.Exceptions.newEventDroppedException;
 import org.mule.runtime.core.api.Event;
 
 import java.util.function.BiConsumer;
@@ -36,7 +35,7 @@ public final class Operators {
         if (r != null) {
           sink.next(r);
         } else {
-          sink.error(newEventDroppedException(t));
+          sink.error(Exceptions.newEventDroppedException(t));
         }
       }
     };
