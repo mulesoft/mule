@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -20,11 +19,11 @@ import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -117,8 +116,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * component is declared as a singleton, otherwise this will not work.
    */
   protected Object getComponent(FlowConstruct flowConstruct) throws Exception {
-    if (flowConstruct instanceof AbstractPipeline) {
-      AbstractPipeline flow = (AbstractPipeline) flowConstruct;
+    if (flowConstruct instanceof Pipeline) {
+      Pipeline flow = (Pipeline) flowConstruct;
       // Retrieve the first component
       for (Processor processor : flow.getMessageProcessors()) {
         if (processor instanceof Component) {
