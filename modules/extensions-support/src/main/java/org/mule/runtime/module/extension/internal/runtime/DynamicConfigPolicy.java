@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
-import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.api.time.TimeSupplier;
 
 /**
  * A policy for how the platform should handle dynamic configuration instances

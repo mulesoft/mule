@@ -93,7 +93,7 @@ import org.mule.runtime.core.policy.DefaultPolicyManager;
 import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.MuleSecurityManager;
-import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
