@@ -25,7 +25,7 @@ import org.mule.runtime.core.processor.strategy.MultiReactorProcessingStrategyFa
 import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.internal.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.service.scheduler.internal.DefaultSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

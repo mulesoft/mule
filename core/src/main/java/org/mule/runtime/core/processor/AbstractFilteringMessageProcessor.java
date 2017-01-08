@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.internal.util.rx.Exceptions.newEventDroppedException;
+import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;

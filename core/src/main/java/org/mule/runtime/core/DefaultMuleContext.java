@@ -109,7 +109,7 @@ import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.core.internal.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.Serializable;

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util.rx;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.rx.Exceptions;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;

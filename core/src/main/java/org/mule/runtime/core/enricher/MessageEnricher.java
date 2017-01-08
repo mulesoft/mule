@@ -10,7 +10,7 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.internal.util.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.internal.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import java.util.ArrayList;
 import java.util.List;

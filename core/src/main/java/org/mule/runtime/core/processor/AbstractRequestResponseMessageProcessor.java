@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.internal.util.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -14,7 +14,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.internal.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Function;
 
