@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.connectivity;
+package org.mule.runtime.core.internal.connectivity;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
