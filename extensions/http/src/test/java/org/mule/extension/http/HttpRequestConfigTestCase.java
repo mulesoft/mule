@@ -13,21 +13,15 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-import org.junit.Rule;
+import org.junit.Test;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-
-import org.junit.Test;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
 
   private static final String DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME = "requestConfigHttp";
   private static final String DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME = "requestConfigHttps";
-
-  @Rule
-  public DynamicPort clientPort = new DynamicPort("clientPort");
 
   @Override
   protected String getConfigFile() {

@@ -34,9 +34,6 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
 
-  @Rule
-  public DynamicPort port3 = new DynamicPort("port3");
-
   @Override
   protected String getConfigFile() {
     return "http-listener-insecure-config.xml";

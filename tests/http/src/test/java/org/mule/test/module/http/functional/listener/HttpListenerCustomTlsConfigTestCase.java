@@ -27,9 +27,6 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort port3 = new DynamicPort("port3");
 
-  @Rule
-  public DynamicPort port4 = new DynamicPort("port4");
-
   @Override
   protected String getConfigFile() {
     return "http-listener-custom-tls-config.xml";
