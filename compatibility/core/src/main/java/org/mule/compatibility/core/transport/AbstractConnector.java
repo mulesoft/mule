@@ -405,8 +405,10 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       return;
     }
 
-    if (!isConnected()) {
+    if (internalScheduler == null) {
       internalScheduler = createScheduler();
+    }
+    if (!isConnected()) {
       try {
         // startAfterConnect() will get called from the connect() method once connected.
         // This is necessary for reconnection strategies.
@@ -420,7 +422,12 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         throw new EndpointConnectException(e, this);
       }
     } else {
-      startAfterConnect();
+      try {
+        startAfterConnect();
+      } catch (MuleException me) {
+        shutdownInternalScheduler();
+        throw me;
+      }
     }
   }
 

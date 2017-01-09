@@ -8,8 +8,10 @@ package org.mule.compatibility.transport.http;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -23,6 +25,8 @@ public class HttpsInvalidKeystoreTestCase extends CompatibilityFunctionalTestCas
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
 
+  private SystemExceptionHandler originalExceptionListener;
+
   private Throwable exceptionFromSystemExceptionHandler;
 
   public HttpsInvalidKeystoreTestCase() {
@@ -33,6 +37,18 @@ public class HttpsInvalidKeystoreTestCase extends CompatibilityFunctionalTestCas
   @Override
   protected String getConfigFile() {
     return "https-invalid-keystore-config.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    originalExceptionListener = muleContext.getExceptionListener();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    disposeIfNeeded(originalExceptionListener, logger);
+    super.doTearDown();
   }
 
   @Test

@@ -574,7 +574,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     assertNull(connector.getInternalScheduler());
 
     connector.start();
-    assertThat(connector.getInternalScheduler(), nullValue());
+    assertFalse(connector.getInternalScheduler().isShutdown());
+    assertFalse(connector.getInternalScheduler().isTerminated());
 
     connector.dispose();
     assertThat(connector.getInternalScheduler(), nullValue());
