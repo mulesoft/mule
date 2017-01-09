@@ -40,7 +40,7 @@ public class JmsDslModelSerializerTestCase extends AbstractElementModelTestCase 
     this.receiver = createFlow(BRIDGE_RECEIVER_FLOW);
   }
 
-  private Element createFlow(String name){
+  private Element createFlow(String name) {
     Element flow = doc.createElement("flow");
     flow.setAttribute("name", name);
     return flow;
@@ -58,13 +58,13 @@ public class JmsDslModelSerializerTestCase extends AbstractElementModelTestCase 
     doc.getDocumentElement().appendChild(converter.asXml(resolve(getAppElement(applicationModel, "config"))));
 
     getAppElement(applicationModel, SEND_PAYLOAD_FLOW).getNestedComponents()
-      .forEach(c -> sendPayload.appendChild(converter.asXml(resolve(c))));
+        .forEach(c -> sendPayload.appendChild(converter.asXml(resolve(c))));
 
     getAppElement(applicationModel, BRIDGE_FLOW).getNestedComponents()
-      .forEach(c -> bridge.appendChild(converter.asXml(resolve(c))));
+        .forEach(c -> bridge.appendChild(converter.asXml(resolve(c))));
 
     getAppElement(applicationModel, BRIDGE_RECEIVER_FLOW).getNestedComponents()
-      .forEach(c -> receiver.appendChild(converter.asXml(resolve(c))));
+        .forEach(c -> receiver.appendChild(converter.asXml(resolve(c))));
 
     doc.getDocumentElement().appendChild(sendPayload);
     doc.getDocumentElement().appendChild(bridge);

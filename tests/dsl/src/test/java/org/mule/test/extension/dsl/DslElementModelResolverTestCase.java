@@ -166,6 +166,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     ComponentConfiguration requester = flow.getNestedComponents().get(REQUESTER_PATH);
     assertRequestOperationWithFlatParameters(requester);
   }
+
   protected void assertRequestOperationWithFlatParameters(ComponentConfiguration requester) {
     DslElementModel<OperationModel> requesterElement = resolve(requester);
     assertHasParameter(requesterElement.getModel(), "path");

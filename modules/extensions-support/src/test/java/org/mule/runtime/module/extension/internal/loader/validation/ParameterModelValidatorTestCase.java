@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.validator.ParameterModelValidator;
+import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -76,11 +77,13 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationModel.getName()).thenReturn("dummyOperation");
 
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(validParameterModel.getModelProperty(QNameModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(validParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(validParameterModel.getLayoutModel()).thenReturn(Optional.empty());
 
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(invalidParameterModel.getModelProperty(QNameModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(invalidParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());
