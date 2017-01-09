@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -103,9 +104,9 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
         .requiresConnection(connectionParameter.isPresent())
         .transactional(false) // TODO: MULE-10961
         .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
-        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()))
-        .withOutput().ofType(getTypeLoader().load(sourceGenerics.get(0)));
-    source.withOutputAttributes().ofType(getTypeLoader().load(sourceGenerics.get(1)));
+        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
+
+    resolveOutputTypes(source, sourceGenerics);
 
     loader.addExceptionEnricher(sourceType, source);
 
@@ -113,6 +114,11 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     declareSourceCallback(sourceType, source);
 
     sourceDeclarers.put(sourceType.getDeclaringClass(), source);
+  }
+
+  private void resolveOutputTypes(SourceDeclarer source, List<Type> sourceGenerics) {
+    source.withOutput().ofType(getSourceReturnType(sourceGenerics.get(0), getTypeLoader()));
+    source.withOutputAttributes().ofType(getTypeLoader().load(sourceGenerics.get(1)));
   }
 
   /**

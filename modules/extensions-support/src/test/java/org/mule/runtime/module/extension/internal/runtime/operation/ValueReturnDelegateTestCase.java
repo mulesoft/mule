@@ -22,7 +22,7 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new ValueReturnDelegate(muleContext);
+    return new ValueReturnDelegate(componentModel, muleContext);
   }
 
   @Override

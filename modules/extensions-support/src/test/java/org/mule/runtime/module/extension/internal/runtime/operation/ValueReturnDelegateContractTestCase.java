@@ -20,6 +20,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -45,6 +46,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   @Mock
   protected ExecutionContextAdapter operationContext;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  protected ComponentModel componentModel;
 
   protected Event event;
 

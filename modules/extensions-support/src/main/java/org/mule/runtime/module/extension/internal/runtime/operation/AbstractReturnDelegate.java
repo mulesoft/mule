@@ -7,9 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessageCollection;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.DataType;
@@ -20,6 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -33,13 +37,16 @@ import java.util.Optional;
 abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
+  private final boolean returnsListOfMessages;
 
   /**
    * Creates a new instance
    *
-   * @param muleContext the {@link MuleContext} of the owning application
+   * @param componentModel the component which produces the return value
+   * @param muleContext    the {@link MuleContext} of the owning application
    */
-  protected AbstractReturnDelegate(MuleContext muleContext) {
+  protected AbstractReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
+    returnsListOfMessages = returnsListOfMessages(componentModel);
     this.muleContext = muleContext;
   }
 
@@ -48,6 +55,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     if (value instanceof Result) {
       return MuleExtensionUtils.toMessage((Result) value, mediaType);
     } else {
+      if (value instanceof Collection && returnsListOfMessages) {
+        value = toMessageCollection((Collection<Result>) value, mediaType);
+      }
       return Message.builder().payload(value).mediaType(mediaType).attributes(NULL_ATTRIBUTES).build();
     }
   }
@@ -55,7 +65,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * If provided, mimeType and encoding configured as operation parameters will take precedence over what comes with the message's
    * {@link DataType}.
-   * 
+   *
    * @param value
    * @param operationContext
    * @return
@@ -74,7 +84,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     if (mediaType == null) {
-      mediaType = MediaType.ANY;
+      mediaType = ANY;
     }
 
     if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)) {

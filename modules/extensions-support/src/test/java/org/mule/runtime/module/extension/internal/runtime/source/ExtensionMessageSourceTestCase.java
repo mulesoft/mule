@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -37,12 +38,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -68,7 +69,6 @@ import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
-import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
@@ -76,9 +76,10 @@ import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -119,7 +120,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Mock
   private ExtensionModel extensionModel;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private SourceModel sourceModel;
 
   @Mock
@@ -194,6 +195,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     sourceCallback = spy(DefaultSourceCallback.builder()
         .setFlowConstruct(flowConstruct)
+        .setSourceModel(sourceModel)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
         .setProcessContextSupplier(processContextSupplier)
@@ -211,6 +213,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(sourceModel.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(empty());
     when(sourceModel.getModelProperty(SourceCallbackModelProperty.class)).thenReturn(empty());
     setRequires(sourceModel, true, true);
+    when(sourceModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
@@ -240,6 +243,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         .thenReturn(new ImmutableOutputModel("Output", BaseTypeBuilder.create(JAVA).stringType().build(), false, emptySet()));
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class))
         .thenReturn(of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), METADATA_KEY)));
+    when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
 
     messageSource = getNewExtensionMessageSourceInstance();
   }

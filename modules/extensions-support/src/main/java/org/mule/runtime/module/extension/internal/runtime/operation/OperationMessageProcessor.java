@@ -203,7 +203,9 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       return VoidReturnDelegate.INSTANCE;
     }
 
-    return !isTargetPresent() ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
+    return !isTargetPresent()
+        ? new ValueReturnDelegate(operationModel, muleContext)
+        : new TargetReturnDelegate(target, operationModel, muleContext);
   }
 
   private boolean isTargetPresent() {

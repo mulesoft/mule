@@ -32,13 +32,16 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.model.AnyType;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.VoidType;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -75,6 +78,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.PagedOper
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -120,11 +124,13 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
   private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
   private static final String SOURCE_NAME = "ListenPayments";
+  private static final String DEA_SOURCE_NAME = "dea-radio";
   private static final String SOURCE_PARAMETER = "initialBatchNumber";
   private static final String SOURCE_CALLBACK_PARAMETER = "payment";
   private static final String SOURCE_REPEATED_CALLBACK_PARAMETER = "sameNameParameter";
   private static final String SAY_MY_NAME_OPERATION = "sayMyName";
   private static final String GET_ENEMY_OPERATION = "getEnemy";
+  private static final String GET_ALL_ENEMIES_OPERATION = "getAllEnemies";
   private static final String KILL_OPERATION = "kill";
   private static final String KILL_CUSTOM_OPERATION = "killWithCustomMessage";
   private static final String KILL_WITH_WEAPON = "killWithWeapon";
@@ -255,6 +261,30 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertThat(operation.getOutput().getType(), is(instanceOf(AnyType.class)));
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
+  }
+
+  @Test
+  public void listOfResultsOperation() throws Exception {
+    ExtensionDeclarer declarer = loaderFor(HeisenbergWithListOfResultOperations.class)
+        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader()));
+    OperationDeclaration operation = getOperation(declarer.getDeclaration(), "listOfResults");
+
+    MetadataType outputType = operation.getOutput().getType();
+    assertThat(outputType, is(instanceOf(ArrayType.class)));
+    assertMessageType(((ArrayType) outputType).getType(), TYPE_LOADER.load(Integer.class),
+                      TYPE_LOADER.load(IntegerAttributes.class));
+    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
+  }
+
+  @Test
+  public void listOfResultsOperationWithoutGenerics() throws Exception {
+    ExtensionDeclarer declarer = loaderFor(HeisenbergWithListOfResultOperations.class)
+        .declare(new DefaultExtensionLoadingContext(getClass().getClassLoader()));
+    OperationDeclaration operation = getOperation(declarer.getDeclaration(), "listOfResultsWithoutGenerics");
+
+    MetadataType outputType = operation.getOutput().getType();
+    assertThat(outputType, is(instanceOf(ArrayType.class)));
+    assertMessageType(((ArrayType) outputType).getType(), TYPE_BUILDER.anyType().build(), TYPE_BUILDER.voidType().build());
   }
 
   @Test
@@ -425,9 +455,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(31));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(9));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(10));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
+    assertOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_CUSTOM_OPERATION, "");
     assertOperation(extensionDeclaration, KILL_WITH_WEAPON, "");
@@ -471,6 +502,15 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
+    operation = getOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION);
+    assertThat(operation, is(notNullValue()));
+    assertThat(operation.getAllParameters(), hasSize(0));
+    assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
+    assertMessageType(((ArrayType) operation.getOutput().getType()).getType(), TYPE_LOADER.load(String.class),
+                      TYPE_LOADER.load(IntegerAttributes.class));
+    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
+    assertConnected(operation, false);
+    assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, KILL_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -683,9 +723,18 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleMessageSource(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getMessageSources(), hasSize(0));
+    assertThat(extensionDeclaration.getMessageSources(), hasSize(1));
+    SourceDeclaration source = extensionDeclaration.getMessageSources().get(0);
+    assertThat(source.getName(), is(DEA_SOURCE_NAME));
 
-    SourceDeclaration source = extensionDeclaration.getConfigurations().get(0).getMessageSources().get(0);
+    final MetadataType outputType = source.getOutput().getType();
+    assertThat(outputType, is(instanceOf(ArrayType.class)));
+
+    assertMessageType(((ArrayType) outputType).getType(), TYPE_LOADER.load(String.class),
+                      TYPE_LOADER.load(DEAOfficerAttributes.class));
+    assertThat(source.getOutputAttributes().getType(), equalTo(TYPE_LOADER.load(Attributes.class)));
+
+    source = extensionDeclaration.getConfigurations().get(0).getMessageSources().get(0);
     assertThat(source.getName(), is(SOURCE_NAME));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
@@ -809,6 +858,12 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
   }
 
+  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Operations({HeisenbergExtension.class, ListOfResultsOperations.class})
+  public static class HeisenbergWithListOfResultOperations {
+
+  }
+
   public static class DuplicateConfigOperation {
 
     public Long launder(@UseConfig HeisenbergExtension config, @UseConfig HeisenbergExtension config2) {
@@ -820,6 +875,17 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   public static class GenericlessMessageOperation {
 
     public Result noGenerics() {
+      return null;
+    }
+  }
+
+  public static class ListOfResultsOperations {
+
+    public List<Result<Integer, IntegerAttributes>> listOfResults() {
+      return null;
+    }
+
+    public List<Result> listOfResultsWithoutGenerics() {
       return null;
     }
   }

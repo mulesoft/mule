@@ -13,12 +13,14 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.buildMessageType;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
@@ -39,6 +41,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -115,8 +118,12 @@ public final class IntrospectionUtils {
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Method}'s return type. If the {@code method} returns an
-   * {@link Result}, then it returns the type of the {@code Output} generic. If the {@link Result} type is being used in its raw
+   * {@link Result}, then it returns the type of the first generic. If the {@link Result} type is being used in its raw
    * form, then an {@link AnyType} will be returned.
+   * <p>
+   * If the {@code method} returns a collection of {@link Result} instances, then it will
+   * return an {@link ArrayType} which inner value represent a {@link Message} which payload
+   * and attributes matches the types of the Result generics.
    *
    * @param method     the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
@@ -124,14 +131,52 @@ public final class IntrospectionUtils {
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader) {
-    ResolvableType methodType = getMethodType(method);
-    Type type = methodType.getType();
-    if (methodType.getRawClass().equals(Result.class)) {
-      ResolvableType genericType = methodType.getGenerics()[0];
+    return getReturnType(getMethodType(method), typeLoader);
+  }
+
+  /**
+   * Returns the {@link MetadataType} for a source's output.
+   * <p>
+   * If the {@code type} is a collection of {@link Result} instances, then it will
+   * return an {@link ArrayType} which inner value represent a {@link Message} which payload
+   * and attributes matches the types of the Result generics.
+   *
+   * @param returnType the source output type
+   * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
+   * @return a {@link MetadataType}
+   */
+  public static MetadataType getSourceReturnType(Type returnType, ClassTypeLoader typeLoader) {
+    return getReturnType(forType(returnType), typeLoader);
+  }
+
+  private static MetadataType getReturnType(ResolvableType returnType, ClassTypeLoader typeLoader) {
+    Type type = returnType.getType();
+
+    if (returnType.getRawClass().equals(Result.class)) {
+      ResolvableType genericType = returnType.getGenerics()[0];
       if (genericType.getRawClass() != null) {
         type = genericType.getType();
       } else {
         type = null;
+      }
+    }
+
+    if (Collection.class.isAssignableFrom(returnType.getRawClass())) {
+      ResolvableType itemType = returnType.getGenerics()[0];
+      if (Result.class.equals(itemType.getRawClass())) {
+        ResolvableType genericType = itemType.getGenerics()[0];
+        MetadataType outputType = genericType.getRawClass() != null
+            ? typeLoader.load(genericType.getType())
+            : typeBuilder().anyType().build();
+
+        genericType = itemType.getGenerics()[1];
+        MetadataType attributesType = genericType.getRawClass() != null
+            ? typeLoader.load(genericType.getType())
+            : typeBuilder().voidType().build();
+
+        return typeBuilder().arrayType().id(returnType.getRawClass().getName())
+            .of(buildMessageType(typeBuilder(), outputType, attributesType))
+            .build();
       }
     }
 
@@ -144,6 +189,9 @@ public final class IntrospectionUtils {
    * <p>
    * If the {@code method} returns a {@link Result}, then it returns the type of the {@code Attributes} generic. In any other case
    * (including raw uses of {@link Result}) it will return a {@link VoidType}
+   * <p>
+   * If the {@code method} returns a collection of {@link Result}, then this will return {@link VoidType} since the messages in the
+   * main output already contain an attributes for each item.
    *
    * @param method     the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
@@ -151,13 +199,20 @@ public final class IntrospectionUtils {
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType getMethodReturnAttributesType(Method method, ClassTypeLoader typeLoader) {
+    ResolvableType outputType = getMethodType(method);
     Type type = null;
-    ResolvableType methodType = getMethodType(method);
 
-    if (methodType.getRawClass().equals(Result.class)) {
-      ResolvableType genericType = methodType.getGenerics()[1];
+    if (Result.class.equals(outputType.getRawClass())) {
+      ResolvableType genericType = outputType.getGenerics()[1];
       if (genericType.getRawClass() != null) {
         type = genericType.getType();
+      }
+    }
+
+    if (Collection.class.isAssignableFrom(outputType.getRawClass())) {
+      ResolvableType itemType = outputType.getGenerics()[0];
+      if (Result.class.equals(itemType.getRawClass())) {
+        type = null;
       }
     }
 
@@ -235,7 +290,7 @@ public final class IntrospectionUtils {
   }
 
   private static BaseTypeBuilder typeBuilder() {
-    return BaseTypeBuilder.create(JAVA);
+    return create(JAVA);
   }
 
   /**

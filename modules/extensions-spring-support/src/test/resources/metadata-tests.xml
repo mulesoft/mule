@@ -197,4 +197,12 @@
         </metadata:do-query>
     </flow>
 
+    <flow name="listOfMessages">
+        <metadata:list-of-messages />
+    </flow>
+    
+    <flow name="dynamicListOfMessages">
+        <metadata:dynamic-list-of-messages type="PERSON"/>
+    </flow>
+
 </mule>

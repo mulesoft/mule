@@ -51,6 +51,7 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -94,6 +95,18 @@ public class HeisenbergOperations {
 
     return Result.<String, IntegerAttributes>builder().output(config.getEnemies().get(index))
         .mediaType(dt.getMediaType()).attributes(new IntegerAttributes(index)).build();
+  }
+
+  public List<Result<String, IntegerAttributes>> getAllEnemies(@UseConfig HeisenbergExtension config) {
+    List<Result<String, IntegerAttributes>> enemies = new ArrayList<>(config.getEnemies().size());
+    for (int i = 0; i < config.getEnemies().size(); i++) {
+      enemies.add(Result.<String, IntegerAttributes>builder()
+          .output(config.getEnemies().get(i))
+          .attributes(new IntegerAttributes(i))
+          .build());
+    }
+
+    return enemies;
   }
 
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {

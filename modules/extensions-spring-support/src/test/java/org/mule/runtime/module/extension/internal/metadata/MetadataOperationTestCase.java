@@ -36,7 +36,10 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import org.mule.functional.listener.Callback;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -470,6 +473,29 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     TypeMetadataDescriptor param = descriptor.getOutputMetadata().getPayloadMetadata();
     assertThat(param.getType(), is(instanceOf(ObjectType.class)));
     assertThat(((ObjectType) param.getType()).getFields(), hasSize(2));
+  }
+
+  @Test
+  public void operationWhichReturnsListOfMessages() throws Exception {
+    componentId = new ProcessorId("listOfMessages", FIRST_PROCESSOR_INDEX);
+    final MetadataResult<ComponentMetadataDescriptor> result = metadataService.getMetadata(componentId);
+    assertSuccessResult(result);
+    ComponentMetadataDescriptor descriptor = result.get();
+    TypeMetadataDescriptor param = descriptor.getOutputMetadata().getPayloadMetadata();
+    assertThat(param.getType(), is(instanceOf(ArrayType.class)));
+    assertMessageType(((ArrayType) param.getType()).getType(), TYPE_LOADER.load(String.class),
+                      TYPE_LOADER.load(StringAttributes.class));
+  }
+
+  @Test
+  public void operationWhichReturnsDynamicListOfMessages() throws Exception {
+    componentId = new ProcessorId("dynamicListOfMessages", FIRST_PROCESSOR_INDEX);
+    final MetadataResult<ComponentMetadataDescriptor> result = metadataService.getMetadata(componentId);
+    assertSuccessResult(result);
+    ComponentMetadataDescriptor descriptor = result.get();
+    TypeMetadataDescriptor param = descriptor.getOutputMetadata().getPayloadMetadata();
+    assertThat(param.getType(), is(instanceOf(ArrayType.class)));
+    assertMessageType(((ArrayType) param.getType()).getType(), personType, TYPE_BUILDER.voidType().build());
   }
 
   /**

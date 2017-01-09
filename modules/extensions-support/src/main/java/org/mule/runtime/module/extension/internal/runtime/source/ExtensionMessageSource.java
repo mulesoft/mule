@@ -120,6 +120,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
   private SourceCallbackFactory createSourceCallbackFactory() {
     return completionHandlerFactory -> DefaultSourceCallback.builder()
         .setExceptionCallback(this)
+        .setSourceModel(sourceModel)
         .setFlowConstruct(flowConstruct)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
@@ -324,11 +325,6 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
         throw new ValueResolvingException(e.getMessage(), e);
       }
     };
-  }
-
-  private String getConfigName() {
-    ConfigurationProvider configurationProvider = getConfigurationProvider();
-    return configurationProvider != null ? configurationProvider.getName() : null;
   }
 
   @Override
