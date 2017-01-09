@@ -86,6 +86,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.QueryPara
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticFunctionValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
@@ -566,7 +567,9 @@ public abstract class ExtensionDefinitionParser {
         ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
         : new StaticValueResolver<>(defaultValue);
 
-    if (isParameterResolver(modelProperties, expectedType)) {
+    if (isExpressionFunction(modelProperties)) {
+      resolver = new StaticFunctionValueResolverWrapper(resolver);
+    } else if (isParameterResolver(modelProperties, expectedType)) {
       resolver = new ParameterResolverValueResolverWrapper(resolver);
     } else if (isTypedValue(modelProperties, expectedType)) {
       resolver = new TypedValueValueResolverWrapper(resolver);

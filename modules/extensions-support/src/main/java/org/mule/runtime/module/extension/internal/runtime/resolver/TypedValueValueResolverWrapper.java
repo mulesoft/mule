@@ -22,7 +22,7 @@ import org.mule.runtime.core.metadata.DefaultTypedValue;
  * @since 4.0
  * @see TypedValue
  */
-public class TypedValueValueResolverWrapper<T> implements ValueResolver<TypedValue<T>> {
+public final class TypedValueValueResolverWrapper<T> implements ValueResolver<TypedValue<T>> {
 
   private ValueResolver resolver;
 
