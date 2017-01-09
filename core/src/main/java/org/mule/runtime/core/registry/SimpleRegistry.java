@@ -132,10 +132,14 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
     for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
       Class<?> dependencyType = field.getType();
       try {
-        Object dependency = lookupObject(dependencyType);
-        if (dependency != null) {
-          field.setAccessible(true);
-          field.set(object, dependency);
+        field.setAccessible(true);
+        if (MuleContext.class.isAssignableFrom(dependencyType)) {
+          field.set(object, muleContext);
+        } else {
+          Object dependency = lookupObject(dependencyType);
+          if (dependency != null) {
+            field.set(object, dependency);
+          }
         }
       } catch (Exception e) {
         throw new RuntimeException(String.format("Could not inject dependency on field %s of type %s", field.getName(),
