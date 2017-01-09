@@ -29,11 +29,9 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-import com.google.common.collect.ImmutableList;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -64,6 +62,8 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
+import org.mule.runtime.extension.api.declaration.type.annotation.ParameterResolverTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
@@ -86,17 +86,17 @@ import org.mule.runtime.module.extension.internal.loader.java.property.QueryPara
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticFunctionValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticFunctionValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+
+import com.google.common.collect.ImmutableList;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -117,6 +117,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -616,20 +621,20 @@ public abstract class ExtensionDefinitionParser {
           valueResolver = (ValueResolver) delegate.get().parse(value.toString(), objectType, typeDsl.get(), muleContext);
         } else {
           valueResolver = acceptsReferences
-                ? defaultValueResolverParsingDelegate.parse(value.toString(), objectType, null, muleContext)
-                : new StaticValueResolver<>(value);
+              ? defaultValueResolverParsingDelegate.parse(value.toString(), objectType, null, muleContext)
+              : new StaticValueResolver<>(value);
         }
 
         resolverValueHolder.set(valueResolver);
       }
 
-        @Override
-        protected void defaultVisit(MetadataType metadataType) {
-          ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
-              .map(delegate -> delegate.parse(value.toString(), metadataType, null, muleContext))
-              .orElseGet(() -> acceptsReferences
-                  ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null, muleContext)
-                  : new StaticValueResolver<>(value));
+      @Override
+      protected void defaultVisit(MetadataType metadataType) {
+        ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
+            .map(delegate -> delegate.parse(value.toString(), metadataType, null, muleContext))
+            .orElseGet(() -> acceptsReferences
+                ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null, muleContext)
+                : new StaticValueResolver<>(value));
 
         resolverValueHolder.set(delegateResolver);
       }
