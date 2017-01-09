@@ -24,7 +24,7 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.extension.api.ExtensionManager;
@@ -46,7 +46,6 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
-import javafx.util.Pair;
 
 /**
  * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManagerAdapter}
@@ -63,11 +62,13 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Inject
   private MuleContext muleContext;
 
+  @Inject
   private PolicyManager policyManager;
-  private ExtensionManagerAdapter extensionManager;
 
   private final Map<Pair<String, String>, OperationModel> operations = new LinkedHashMap<>();
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
+
+  private ExtensionManagerAdapter extensionManager;
 
   /**
    * {@inheritDoc}
@@ -77,11 +78,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Override
   public void initialise() throws InitialisationException {
     this.extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
-    try {
-      this.policyManager = muleContext.getRegistry().lookupObject(PolicyManager.class);
-    } catch (RegistrationException e) {
-      throw new InitialisationException(createStaticMessage("Cannot obtain Policy Manager"), e, this);
-    }
   }
 
   /**
