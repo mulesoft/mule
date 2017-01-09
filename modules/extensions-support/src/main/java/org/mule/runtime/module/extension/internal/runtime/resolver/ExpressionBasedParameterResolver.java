@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 import java.util.Optional;
-
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 
 /**
  * {@link ParameterResolver} implementation for the parameters that are resolved from an expression

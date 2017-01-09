@@ -20,10 +20,15 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
+
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
+
   @Rule
   public DynamicPort port3 = new DynamicPort("port3");
+
+  @Rule
+  public DynamicPort port4 = new DynamicPort("port4");
 
   @Override
   protected String getConfigFile() {
