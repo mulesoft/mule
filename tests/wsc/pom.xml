@@ -56,6 +56,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
