@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.VoidResult;
+import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
