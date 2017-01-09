@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.agent;
 
-import org.mule.runtime.core.AbstractAgent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;

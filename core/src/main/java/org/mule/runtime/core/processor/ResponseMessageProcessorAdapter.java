@@ -25,12 +25,8 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.util.rx.Exceptions;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
-
-import java.util.function.Function;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import org.reactivestreams.Publisher;
 

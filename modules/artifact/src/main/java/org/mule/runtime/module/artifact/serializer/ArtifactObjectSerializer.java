@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.serialization.internal.JavaExternalSerializerProtocol;
+import org.mule.runtime.core.internal.serialization.JavaExternalSerializerProtocol;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 
 public class ArtifactObjectSerializer implements ObjectSerializer, MuleContextAware {

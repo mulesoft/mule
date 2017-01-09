@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
-import org.mule.runtime.core.time.Time;
+import org.mule.runtime.core.api.time.Time;
 
 /**
  * Contains information about how much time should a dynamic config be idle before it can be considered elegible for expiration

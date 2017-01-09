@@ -10,7 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.client.DefaultLocalMuleClient.MESSAGE_FILTERED_ERROR_MESSAGE;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -29,6 +28,10 @@ import org.slf4j.LoggerFactory;
  * transactional behavior (e.g. ALWAYS_BEGIN).
  */
 public class MessageFilterTestCase extends CompatibilityFunctionalTestCase {
+
+  // Constant copied from org.mule.runtime.core.internal.client.DefaultLocalMuleClient#MESSAGE_FILTERED_ERROR_MESSAGE as that class is not
+  // visible when the test runs
+  private static final String MESSAGE_FILTERED_ERROR_MESSAGE = "message filtered";
 
   protected static final Logger logger = LoggerFactory.getLogger(MessageFilterTestCase.class);
 

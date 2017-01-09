@@ -16,10 +16,10 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryBroker;
-import org.mule.runtime.core.lifecycle.phases.MuleContextDisposePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextInitialisePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStartPhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStopPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.registry.AbstractRegistryBroker;
 
 /**

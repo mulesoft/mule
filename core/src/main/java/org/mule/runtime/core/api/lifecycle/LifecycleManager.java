@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 
 /**
  * The LifecycleManager is responsible for managing the different lifecycle phases of the server and managing the transitions
@@ -16,8 +15,6 @@ import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
  * @since 3.0
  */
 public interface LifecycleManager {
-
-  NotInLifecyclePhase NOT_IN_LIFECYCLE_PHASE = new NotInLifecyclePhase();
 
   /**
    * Applies lifecycle phase to a collection of objects.

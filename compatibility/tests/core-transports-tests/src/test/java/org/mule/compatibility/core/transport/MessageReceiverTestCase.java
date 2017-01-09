@@ -22,7 +22,7 @@ import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.session.NullSessionHandler;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;

@@ -43,7 +43,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessTemplate;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.ClassUtils;

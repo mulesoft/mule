@@ -20,7 +20,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

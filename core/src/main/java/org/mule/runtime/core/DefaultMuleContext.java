@@ -49,6 +49,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
+import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -77,7 +79,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.util.StreamCloserService;
-import org.mule.runtime.core.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
@@ -94,6 +96,7 @@ import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
@@ -107,9 +110,9 @@ import org.mule.runtime.core.util.ServerStartupSplashScreen;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.Serializable;
@@ -954,8 +957,8 @@ public class DefaultMuleContext implements MuleContext {
     this.muleRegistryHelper = muleRegistry;
   }
 
-  public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext) {
-    this.localMuleClient = localMuleContext;
+  public void setLocalMuleClient(MuleClient muleClient) {
+    this.localMuleClient = muleClient;
   }
 
   public void setExtensionManager(ExtensionManager extensionManager) {

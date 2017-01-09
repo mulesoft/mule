@@ -8,7 +8,7 @@ package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.functional.Either.right;
+import static org.mule.runtime.core.api.functional.Either.right;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.dsl.api.component.ComponentIdentifier;
 
 import java.util.Collection;

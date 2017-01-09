@@ -1,0 +1,282 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.core.api;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.MessageTransformer;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.transformer.TransformerUtils;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Provides the same operations previously exposed by {@link Message} but decoupled from Message.
+ *
+ * TODO Redefine this interface as part of Mule 4.0 transformation improvements (MULE-9141)
+ */
+public class TransformationService {
+
+  private static final Logger logger = LoggerFactory.getLogger(TransformationService.class);
+
+  private MuleContext muleContext;
+
+  public TransformationService(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  /**
+   * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
+   * transformers is empty or transformation would be redundant then the same message instances will be returned.
+   * 
+   * @param event the event being processed
+   * @param transformers the transformers to apply to the message payload
+   *
+   * @return the result of transformation
+   * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
+   *         with the message payload
+   */
+  public InternalMessage applyTransformers(final InternalMessage message, final Event event,
+                                           final List<? extends Transformer> transformers)
+      throws MuleException {
+    return applyAllTransformers(message, event, transformers);
+  }
+
+  /**
+   * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
+   * transformers is empty or transformation would be redundant then the same message instances will be returned.
+   * 
+   * @param event the event being processed
+   * @param transformers the transformers to apply to the message payload
+   *
+   * @return the result of transformation
+   * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
+   *         with the message payload
+   */
+  public InternalMessage applyTransformers(final InternalMessage message, final Event event, final Transformer... transformers)
+      throws MuleException {
+    return applyAllTransformers(message, event, asList(transformers));
+  }
+
+  /**
+   * Attempts to obtain the payload of this message with the desired Class type. This will try and resolve a transformer that can
+   * do this transformation. If a transformer cannot be found an exception is thrown. Any transformers added to the registry will
+   * be checked for compatibility
+   * <p/>
+   * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be replaced
+   * with a byte[] representation as part of this operations.
+   * <p/>
+   *
+   * @param outputDataType the desired return type
+   * @return The converted payload of this message. Note that this method will not alter the payload of this message *unless* the
+   *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
+   * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload
+   */
+  public InternalMessage transform(InternalMessage message, DataType outputDataType) throws TransformerException {
+    checkNotNull(message, "Message cannot be null");
+    checkNotNull(outputDataType, "DataType cannot be null");
+
+    return InternalMessage.builder(message).payload(getPayload(message, outputDataType, resolveEncoding(message))).build();
+  }
+
+  /**
+   * Obtains a {@link String} representation of the message payload for logging without throwing exception.
+   * <p/>
+   * If the existing payload is consumable (i.e. can't be read twice) then the existing payload of the message will be replaced
+   * with a byte[] representation as part of this operations.
+   *
+   * @return message payload as object
+   */
+  public String getPayloadForLogging(InternalMessage message) {
+    return getPayloadForLogging(message, resolveEncoding(message));
+  }
+
+  protected Charset resolveEncoding(InternalMessage message) {
+    return message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+  }
+
+  /**
+   * Obtains a {@link String} representation of the message payload for logging without throwing exception. If encoding is
+   * required it will use the encoding set on the message.
+   * <p>
+   * If the existing payload is consumable (i.e. can't be read twice) or an exception occurs during transformation then the an
+   * exeption won't be thrown but rather a description of the payload type will be returned.
+   *
+   * @return message payload as a String or message with the payload type if payload can't be converted to a String
+   */
+  public String getPayloadForLogging(InternalMessage message, Charset encoding) {
+    DataType dataType = message.getPayload().getDataType();
+    if (!dataType.isStreamType()) {
+      try {
+        return getPayload(message, DataType.STRING, encoding);
+      } catch (TransformerException e) {
+        return "Payload could not be converted to a String. Payload type is " + dataType.getType();
+      }
+    }
+    return "Payload is a stream of type: " + dataType.getType();
+  }
+
+  private InternalMessage applyAllTransformers(final InternalMessage message, final Event event,
+                                               final List<? extends Transformer> transformers)
+      throws MuleException {
+    InternalMessage result = message;
+    if (!transformers.isEmpty()) {
+      for (int index = 0; index < transformers.size(); index++) {
+        Transformer transformer = transformers.get(index);
+
+        Class<?> srcCls = result.getPayload().getDataType().getType();
+        DataType originalSourceType = DataType.fromType(srcCls);
+
+        if (transformer.isSourceDataTypeSupported(originalSourceType)) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Using " + transformer + " to transform payload.");
+          }
+          result = transformMessage(result, event, transformer);
+        } else {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
+          }
+
+          if (canSkipTransformer(result, transformers, index)) {
+            continue;
+          }
+
+          // Resolves implicit conversion if possible
+          Transformer implicitTransformer =
+              muleContext.getDataTypeConverterResolver().resolve(originalSourceType, transformer.getSourceDataTypes());
+
+          if (implicitTransformer != null) {
+            if (logger.isDebugEnabled()) {
+              logger.debug("Performing implicit transformation with: " + transformer);
+            }
+            result = transformMessage(result, event, implicitTransformer);
+            result = transformMessage(result, event, transformer);
+          } else {
+            throw new IllegalArgumentException("Cannot apply transformer " + transformer + " on source payload: " + srcCls);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  private boolean canSkipTransformer(InternalMessage message, List<? extends Transformer> transformers, int index) {
+    Transformer transformer = transformers.get(index);
+
+    boolean skipConverter = false;
+
+    if (transformer instanceof Converter) {
+      if (index == transformers.size() - 1) {
+        try {
+          TransformerUtils.checkTransformerReturnClass(transformer, message.getPayload().getValue());
+          skipConverter = true;
+        } catch (TransformerException e) {
+          // Converter cannot be skipped
+        }
+      } else {
+        skipConverter = true;
+      }
+    }
+
+    if (skipConverter) {
+      logger.debug("Skipping converter: " + transformer);
+    }
+
+    return skipConverter;
+  }
+
+  private InternalMessage transformMessage(final InternalMessage message, final Event event, final Transformer transformer)
+      throws MessageTransformerException, TransformerException {
+    Object result;
+
+    if (transformer instanceof MessageTransformer) {
+      result = ((MessageTransformer) transformer).transform(message, event);
+    } else {
+      result = transformer.transform(message);
+    }
+
+    if (result instanceof InternalMessage) {
+      return (InternalMessage) result;
+    } else {
+      // We need to use message from event if it's available in case the transformer mutated the message by creating
+      // a new message instance. This issue goes away once transformers are cleaned up and always return event or
+      // message. See MULE-9342
+      InternalMessage messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
+      return InternalMessage.builder(messagePostTransform).payload(result)
+          .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType())).build();
+    }
+  }
+
+  private MediaType mergeMediaType(InternalMessage message, DataType transformed) {
+    DataType original = message.getPayload().getDataType();
+    MediaType mimeType = ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
+    Charset encoding = transformed.getMediaType().getCharset()
+        .orElse(message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+
+    return DataType.builder().mediaType(mimeType).charset(encoding).build().getMediaType();
+  }
+
+  /**
+   * Attempts to obtain the payload of this message with the desired Class type. This will try and resolve a transformer that can
+   * do this transformation. If a transformer cannot be found an exception is thrown. Any transformers added to the registry will
+   * be checked for compatibility.
+   *
+   * @param resultType the desired return type
+   * @param encoding the encoding to use if required
+   * @return The converted payload of this message. Note that this method will not alter the payload of this message <b>unless</b>
+   *         the payload is an {@link InputStream} in which case the stream will be read and the payload will become the fully
+   *         read stream.
+   * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload.
+   */
+  @SuppressWarnings("unchecked")
+  private <T> T getPayload(InternalMessage message, DataType resultType, Charset encoding) throws TransformerException {
+    // Handle null by ignoring the request
+    if (resultType == null) {
+      throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
+    }
+
+    DataType dataType = DataType.builder(resultType).type(message.getPayload().getDataType().getType()).build();
+
+    // If no conversion is necessary, just return the payload as-is
+    if (resultType.isCompatibleWith(dataType)) {
+      return (T) message.getPayload().getValue();
+    }
+
+    // The transformer to execute on this message
+    Transformer transformer = muleContext.getRegistry().lookupTransformer(dataType, resultType);
+    if (transformer == null) {
+      throw new TransformerException(CoreMessages.noTransformerFoundForMessage(dataType, resultType));
+    }
+
+    // Pass in the message itself
+    Object result = transformer.transform(message, encoding);
+
+    // Unless we disallow Object.class as a valid return type we need to do this extra check
+    if (!resultType.getType().isAssignableFrom(result.getClass())) {
+      throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
+    }
+
+    return (T) result;
+  }
+
+}

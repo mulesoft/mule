@@ -10,7 +10,7 @@ package org.mule.runtime.module.artifact.serializer;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.serialization.SerializationException;
-import org.mule.runtime.core.serialization.internal.AbstractSerializationProtocol;
+import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 
 import java.io.ByteArrayOutputStream;

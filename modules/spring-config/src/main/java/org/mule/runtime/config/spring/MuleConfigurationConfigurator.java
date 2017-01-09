@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 
 import java.util.List;
 

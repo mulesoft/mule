@@ -27,7 +27,6 @@ import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.message.InternalMessage;

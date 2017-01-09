@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.transport.tcp.protocols.AbstractByteProtocol;
 import org.mule.compatibility.transport.tcp.protocols.CustomClassLoadingLengthProtocol;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.ResponseOutputStream;
+import org.mule.compatibility.transport.tcp.protocols.ResponseOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;

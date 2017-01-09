@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -31,7 +30,7 @@ public class TCPTimeoutsTest extends CompatibilityFunctionalTestCase {
 
   @Test
   public void testOutboundResponseTimeoutSet() throws Exception {
-    final MuleClient client = new DefaultLocalMuleClient(muleContext);
+    final MuleClient client = muleContext.getClient();
 
     final InternalMessage result = client.send("vm://testIn", TEST_MESSAGE, null).getRight();
 

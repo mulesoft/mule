@@ -9,7 +9,7 @@ package org.mule.runtime.core.component;
 import static java.util.Collections.singletonList;
 
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.VoidResult;
+import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;

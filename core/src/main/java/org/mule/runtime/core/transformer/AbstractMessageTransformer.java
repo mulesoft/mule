@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ClassUtils;
@@ -121,8 +121,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     Object result;
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
     if (event == null) {
-      DefaultLocalMuleClient.MuleClientFlowConstruct flowConstruct =
-          new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext);
+      MuleClientFlowConstruct flowConstruct =
+          new MuleClientFlowConstruct(muleContext);
       event = Event.builder(create(flowConstruct, "AbstractMessageTransformer")).message(message)
           .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
     }

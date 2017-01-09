@@ -19,11 +19,11 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.lifecycle.phases.MuleContextDisposePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextInitialisePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStartPhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStopPhase;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.registry.AbstractRegistryBroker;
 
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     final RegistryLifecycleCallback<Object> callback = new RegistryLifecycleCallback<>(this);
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
 
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
     registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), callback);
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
@@ -62,7 +62,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     super(id, object);
     RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
 
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new EmptyLifecycleCallback<>());
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
 
     for (Map.Entry<String, LifecyclePhase> entry : phases.entrySet()) {
       registerPhase(entry.getKey(), entry.getValue(), callback);

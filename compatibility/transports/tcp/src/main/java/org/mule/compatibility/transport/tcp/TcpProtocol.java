@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.tcp;
 
-import org.mule.runtime.core.ResponseOutputStream;
+import org.mule.compatibility.transport.tcp.protocols.ResponseOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;

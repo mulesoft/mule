@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 
-import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
-import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;

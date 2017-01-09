@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.util.rx.Exceptions.newEventDroppedException;
-import static reactor.core.Exceptions.propagate;
+import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -20,12 +19,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.rx.Exceptions.EventDroppedException;
-
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a

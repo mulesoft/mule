@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.extension.api.ExtensionManager;
 
 import com.google.common.collect.ImmutableMap;

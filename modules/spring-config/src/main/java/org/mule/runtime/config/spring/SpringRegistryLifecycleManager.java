@@ -35,11 +35,11 @@ import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
-import org.mule.runtime.core.lifecycle.phases.MuleContextDisposePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextInitialisePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStartPhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStopPhase;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
@@ -59,7 +59,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   @Override
   protected void registerPhases() {
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
     registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new SpringLifecycleCallback(this));
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);

@@ -28,7 +28,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.security.MuleCredentials;
-import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
