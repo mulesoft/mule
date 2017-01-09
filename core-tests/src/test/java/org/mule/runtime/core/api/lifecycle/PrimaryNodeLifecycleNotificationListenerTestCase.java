@@ -4,7 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,19 +23,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PrimaryNodeLifecycleNotificationListenerTestCase extends AbstractMuleTestCase {

@@ -4,15 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.context.notification.NotificationException;
 
 import org.slf4j.Logger;

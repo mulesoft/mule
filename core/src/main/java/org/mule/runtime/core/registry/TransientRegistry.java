@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.StringUtils;

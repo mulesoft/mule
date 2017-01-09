@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle.phases;
+package org.mule.runtime.core.internal.lifecycle.phases;
 
 /**
  * A container-managed lifecycle phase is called by the container itself. This class acts as a marker to enable tracking of phases

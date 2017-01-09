@@ -16,7 +16,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import org.junit.Test;
 
