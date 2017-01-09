@@ -143,6 +143,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${parent.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--TODO: MULE-10837-->
