@@ -30,6 +30,7 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
+
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
 

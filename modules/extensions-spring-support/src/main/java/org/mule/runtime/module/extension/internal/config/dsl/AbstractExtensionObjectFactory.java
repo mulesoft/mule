@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
@@ -24,14 +25,18 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+import com.google.common.base.Joiner;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
@@ -40,6 +45,8 @@ import org.mule.runtime.extension.api.declaration.type.annotation.DefaultEncodin
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -50,11 +57,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValue
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectTypeParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -96,7 +102,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
   }
 
   /**
-   * Constructs a {@link ResolverSet} from the output of {@link #getParameters()}, using {@link #toValueResolver(Object)} to
+   * Constructs a {@link ResolverSet} from the output of {@link #getParameters()}, using {@link #toValueResolver(Object, Set)} to
    * process the values.
    *
    * @return a {@link ResolverSet}
@@ -117,7 +123,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
                                                                      g.getName()))));
 
       if (parameters.containsKey(containerName)) {
-        resolverSet.add(containerName, toValueResolver(parameters.get(containerName)));
+        resolverSet.add(containerName, toValueResolver(parameters.get(containerName), g.getModelProperties()));
       }
     });
 
@@ -142,10 +148,12 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
     ResolverSet resolverSet = new ResolverSet();
     Map<String, Object> parameters = getParameters();
     parameterModels.forEach(p -> {
+
       String parameterName = getMemberName(p, p.getName());
-      ValueResolver<?> resolver = null;
+      ValueResolver<?> resolver;
+
       if (parameters.containsKey(parameterName)) {
-        resolver = toValueResolver(parameters.get(parameterName));
+        resolver = toValueResolver(parameters.get(parameterName), p.getModelProperties());
       } else {
         resolver = getDefaultValueResolver(p.getModelProperty(DefaultEncodingModelProperty.class).isPresent(), () -> {
           Object defaultValue = p.getDefaultValue();
@@ -188,26 +196,40 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
    * @param value the value to expose
+   * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */
-  protected ValueResolver<?> toValueResolver(Object value) {
+  protected ValueResolver<?> toValueResolver(Object value, Set<ModelProperty> modelProperties) {
     ValueResolver<?> resolver;
     if (value instanceof ValueResolver) {
       resolver = (ValueResolver<?>) value;
     } else if (value instanceof Collection) {
-      resolver = CollectionValueResolver
-          .of((Class<? extends Collection>) value.getClass(),
-              (List) ((Collection) value).stream().map(this::toValueResolver).collect(new ImmutableListCollector()));
+      resolver = getCollectionResolver((Collection) value);
     } else if (value instanceof Map) {
-      Map<Object, Object> map = (Map<Object, Object>) value;
-      Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(map.size());
-      map.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
-                                                         (ValueResolver<Object>) toValueResolver(entryValue)));
-      resolver = MapValueResolver.of(map.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
+      resolver = getMapResolver((Map<Object, Object>) value);
+    } else if (isParameterResolver(modelProperties)) {
+      resolver = new StaticValueResolver<>(new StaticParameterResolver<>(value));
+    } else if (isTypedValue(modelProperties)) {
+      resolver = new StaticValueResolver<>(new DefaultTypedValue<>(value, DataType.fromObject(value)));
     } else {
       resolver = new StaticValueResolver<>(value);
     }
     return resolver;
+  }
+
+  /**
+   * Wraps the {@code value} into a {@link ValueResolver} of the proper type. For example, {@link Collection} and {@link Map}
+   * instances are exposed as {@link CollectionValueResolver} and {@link MapValueResolver} respectively.
+   * <p>
+   * If {@code value} is already a {@link ValueResolver} then it's returned as is.
+   * <p>
+   * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
+   *
+   * @param value the value to expose
+   * @return a {@link ValueResolver}
+   */
+  protected ValueResolver<?> toValueResolver(Object value) {
+    return toValueResolver(value, emptySet());
   }
 
   @Override
@@ -341,5 +363,28 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
         .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
                                                                       objectClass.getName(),
                                                                       key)));
+  }
+
+  private ValueResolver<?> getMapResolver(Map<Object, Object> value) {
+    Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(value.size());
+    value.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
+                                                         (ValueResolver<Object>) toValueResolver(entryValue)));
+    return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
+  }
+
+  private ValueResolver<?> getCollectionResolver(Collection<T> collection) {
+    return CollectionValueResolver
+        .of(collection.getClass(), collection
+            .stream()
+            .map((value) -> toValueResolver(value))
+            .collect(new ImmutableListCollector<>()));
+  }
+
+  private boolean isTypedValue(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TypedValueTypeModelProperty);
+  }
+
+  private boolean isParameterResolver(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty);
   }
 }
