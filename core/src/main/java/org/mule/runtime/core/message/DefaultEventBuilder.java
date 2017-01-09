@@ -33,11 +33,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory.LegacyNonBlockingProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -60,7 +57,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   private EventContext context;
   private InternalMessage message;
-  private Map<String, DefaultTypedValue<Object>> flowVariables = new HashMap<>();
+  private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
   private Error error;
   private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
   private FlowConstruct flow;
@@ -105,7 +102,7 @@ public class DefaultEventBuilder implements Event.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     event.getVariableNames().forEach(key -> this.flowVariables
-        .put(key, (DefaultTypedValue<Object>) event.getVariable(key)));
+        .put(key, event.getVariable(key)));
   }
 
   @Override
@@ -118,14 +115,14 @@ public class DefaultEventBuilder implements Event.Builder {
   @Override
   public Event.Builder variables(Map<String, Object> flowVariables) {
     this.flowVariables.clear();
-    flowVariables.forEach((s, o) -> this.flowVariables.put(s, new DefaultTypedValue<>(o, DataType.fromObject(o))));
+    flowVariables.forEach((s, o) -> this.flowVariables.put(s, new TypedValue<>(o, DataType.fromObject(o))));
     this.modified = true;
     return this;
   }
 
   @Override
   public Event.Builder addVariable(String key, Object value) {
-    flowVariables.put(key, new DefaultTypedValue<>(value, DataType.fromObject(value)));
+    flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.modified = true;
     return this;
 
@@ -133,7 +130,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   @Override
   public Event.Builder addVariable(String key, Object value, DataType dataType) {
-    flowVariables.put(key, new DefaultTypedValue<>(value, dataType));
+    flowVariables.put(key, new TypedValue<>(value, dataType));
     this.modified = true;
     return this;
   }
@@ -273,7 +270,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     private final boolean notificationsEnabled;
 
-    private final CopyOnWriteCaseInsensitiveMap<String, DefaultTypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
+    private final CopyOnWriteCaseInsensitiveMap<String, TypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private final String legacyCorrelationId;
@@ -281,7 +278,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     // Use this constructor from the builder
     private EventImplementation(EventContext context, InternalMessage message,
-                                Map<String, DefaultTypedValue<Object>> variables,
+                                Map<String, TypedValue<Object>> variables,
                                 MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
                                 boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
@@ -290,7 +287,7 @@ public class DefaultEventBuilder implements Event.Builder {
       this.flowConstruct = flowConstruct;
       this.session = session;
       this.message = message;
-      variables.forEach((s, value) -> this.variables.put(s, new DefaultTypedValue<>(value.getValue(), value.getDataType())));
+      variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
 
       this.exchangePattern = exchangePattern;
       this.replyToHandler = replyToHandler;
@@ -477,7 +474,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
       out.defaultWriteObject();
-      for (Map.Entry<String, DefaultTypedValue> entry : variables.entrySet()) {
+      for (Map.Entry<String, TypedValue> entry : variables.entrySet()) {
         Object value = entry.getValue();
         if (value != null && !(value instanceof Serializable)) {
           String message = String.format(
@@ -500,7 +497,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     @Override
     public <T> TypedValue<T> getVariable(String key) {
-      DefaultTypedValue<T> typedValue = variables.get(key);
+      TypedValue<T> typedValue = variables.get(key);
 
       if (typedValue == null) {
         throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");

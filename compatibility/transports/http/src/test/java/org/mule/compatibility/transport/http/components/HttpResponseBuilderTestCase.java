@@ -18,12 +18,14 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.DefaultEventContext;
@@ -33,10 +35,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -272,7 +272,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testHttpResponseDefaultContentType() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    when(mockMuleMessage.getPayload()).thenReturn(new DefaultTypedValue("", DataType.HTML_STRING));
+    when(mockMuleMessage.getPayload()).thenReturn(new TypedValue("", DataType.HTML_STRING));
 
     when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
 
@@ -369,7 +369,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     for (String propertyName : propertyNames) {
       when(mockMuleMessage.getOutboundProperty(propertyName)).thenReturn(outboundProperties.get(propertyName));
       when(mockMuleMessage.getPayload())
-          .thenReturn(new DefaultTypedValue<>(null, DataType.builder(DataType.OBJECT).charset(StandardCharsets.UTF_8).build()));
+          .thenReturn(new TypedValue<>(null, DataType.builder(DataType.OBJECT).charset(StandardCharsets.UTF_8).build()));
     }
 
     HttpResponse response = new HttpResponse();
@@ -472,7 +472,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     HttpResponse response = new HttpResponse();
     response.setBody(HTTP_BODY);
 
-    when(mockMuleMessage.getPayload()).thenReturn(new DefaultTypedValue(HTTP_BODY, DataType.OBJECT));
+    when(mockMuleMessage.getPayload()).thenReturn(new TypedValue(HTTP_BODY, DataType.OBJECT));
 
     httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
     assertEquals(HTTP_BODY, response.getBodyAsString());
@@ -483,7 +483,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
     HttpResponse response = new HttpResponse();
 
-    when(mockMuleMessage.getPayload()).thenReturn(new DefaultTypedValue(HTTP_BODY, DataType.HTML_STRING));
+    when(mockMuleMessage.getPayload()).thenReturn(new TypedValue(HTTP_BODY, DataType.HTML_STRING));
 
     httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
     assertEquals(HTTP_BODY, response.getBodyAsString());

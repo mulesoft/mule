@@ -10,7 +10,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 /**
  * {@link ValueResolver} implementation for {@link TypedValue} that are not resolved from an
@@ -41,7 +40,7 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
   @Override
   public TypedValue<T> resolve(Event event) throws MuleException {
     Object resolve = resolver.resolve(event);
-    return new DefaultTypedValue<>((T) resolver.resolve(event), DataType.fromObject(resolve));
+    return new TypedValue<>((T) resolver.resolve(event), DataType.fromObject(resolve));
   }
 
   /**

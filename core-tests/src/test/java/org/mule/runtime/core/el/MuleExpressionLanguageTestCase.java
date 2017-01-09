@@ -25,19 +25,19 @@ import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ERROR;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.FLOW;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.PAYLOAD;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.VARIABLES;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
 import org.mule.runtime.core.message.BaseAttributes;
-import org.mule.runtime.api.message.NullAttributes;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.Sets;
@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -91,7 +92,7 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
     Event event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
-    TypedValue payload = new DefaultTypedValue("hey", STRING);
+    TypedValue payload = new TypedValue("hey", STRING);
     when(message.getPayload()).thenReturn(payload);
 
     TypedValue result = expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build());
@@ -122,7 +123,7 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
     String var2 = "var2";
     when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
     String varValue = "mangoose";
-    TypedValue var = new DefaultTypedValue(varValue, STRING);
+    TypedValue var = new TypedValue(varValue, STRING);
     when(event.getVariable(var1)).thenReturn(var);
     when(event.getVariable(var2)).thenReturn(var);
 

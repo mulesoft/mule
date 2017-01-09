@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 /**
@@ -34,7 +33,7 @@ public final class TypedValueArgumentResolver<T> implements ArgumentResolver<Typ
     if (value instanceof TypedValue) {
       return (TypedValue<T>) value;
     } else {
-      return new DefaultTypedValue<>((T) value, DataType.fromObject(value));
+      return new TypedValue<>((T) value, DataType.fromObject(value));
     }
   }
 }

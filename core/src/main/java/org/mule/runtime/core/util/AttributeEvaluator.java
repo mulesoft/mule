@@ -12,7 +12,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import java.util.regex.Pattern;
 
@@ -82,10 +81,10 @@ public class AttributeEvaluator {
       return expressionManager.evaluate(attributeValue, event, eventBuilder, null);
     } else if (isParseExpression()) {
       final String value = expressionManager.parse(attributeValue, event, null);
-      return new DefaultTypedValue(value, DataType.builder().type(String.class).build());
+      return new TypedValue(value, DataType.builder().type(String.class).build());
     } else {
       Class<?> type = attributeValue == null ? Object.class : String.class;
-      return new DefaultTypedValue(attributeValue, DataType.builder().type(type).build());
+      return new TypedValue(attributeValue, DataType.builder().type(type).build());
     }
   }
 

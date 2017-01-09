@@ -13,12 +13,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.NotSerializableException;
@@ -78,7 +78,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   public void testThrowsExceptionOnNonSerializableKey() throws Exception {
     keyGenerator.setExpression(SINGLE_EXPRESSION);
     keyGenerator.setMuleContext(muleContext);
-    when(expressionManager.evaluate(SINGLE_EXPRESSION, event)).thenReturn(new DefaultTypedValue(null, OBJECT));
+    when(expressionManager.evaluate(SINGLE_EXPRESSION, event)).thenReturn(new TypedValue(null, OBJECT));
     keyGenerator.generateKey(event);
   }
 }

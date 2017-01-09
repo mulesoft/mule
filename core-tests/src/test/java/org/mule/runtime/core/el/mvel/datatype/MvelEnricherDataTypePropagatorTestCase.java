@@ -16,10 +16,10 @@ import static org.mule.mvel2.MVEL.compileExpression;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
   public static final String MEL_EXPRESSION = "foo = bar";
 
-  private final DefaultTypedValue typedValue = new DefaultTypedValue<>(TEST_MESSAGE, DataType.STRING);
+  private final TypedValue typedValue = new TypedValue<>(TEST_MESSAGE, DataType.STRING);
   private final EnricherDataTypePropagator propagator1 = mock(EnricherDataTypePropagator.class);
   private final EnricherDataTypePropagator propagator2 = mock(EnricherDataTypePropagator.class);
 

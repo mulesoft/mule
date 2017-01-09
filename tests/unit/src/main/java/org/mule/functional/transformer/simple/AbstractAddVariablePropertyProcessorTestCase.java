@@ -18,7 +18,9 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -28,10 +30,8 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -78,7 +78,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     when(mockExpressionManager.evaluate(eq(EXPRESSION), any(Event.class), any(Event.Builder.class),
                                         any(FlowConstruct.class)))
                                             .thenReturn(mockTypedValue);
-    DefaultTypedValue typedValue = new DefaultTypedValue(EXPRESSION_VALUE, STRING);
+    TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, STRING);
     when(mockExpressionManager.evaluate(eq(EXPRESSION), any(Event.class), any(FlowConstruct.class)))
         .thenReturn(typedValue);
     when(mockExpressionManager.evaluate(eq(EXPRESSION), any(Event.class), any(Event.Builder.class),
@@ -184,7 +184,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   @Test
   public void testAddVariableWithNullExpressionValueResult() throws MuleException {
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
-    DefaultTypedValue typedValue = new DefaultTypedValue(null, DataType.OBJECT);
+    TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
     when(mockExpressionManager.evaluate(NULL_EXPRESSION, event)).thenReturn(typedValue);
     when(mockExpressionManager.evaluate(eq(NULL_EXPRESSION), eq(event), any(Event.Builder.class), eq(null)))
         .thenReturn(typedValue);
@@ -198,7 +198,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public void testAddVariableWithNullPayloadExpressionValueResult() throws MuleException {
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
     addVariableProcessor.setValue(EXPRESSION);
-    DefaultTypedValue typedValue = new DefaultTypedValue(null, DataType.OBJECT);
+    TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
     when(mockExpressionManager.evaluate(EXPRESSION, event)).thenReturn(typedValue);
     when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(event), any(Event.Builder.class), eq(null)))
         .thenReturn(typedValue);

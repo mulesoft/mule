@@ -23,6 +23,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -31,9 +32,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.DefaultEncodingAnnotation;
@@ -280,7 +281,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     } else if (isParameterResolver(modelProperties)) {
       resolver = new StaticValueResolver<>(new StaticParameterResolver<>(value));
     } else if (isTypedValue(modelProperties)) {
-      resolver = new StaticValueResolver<>(new DefaultTypedValue<>(value, DataType.fromObject(value)));
+      resolver = new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value)));
     } else {
       resolver = new StaticValueResolver<>(value);
     }

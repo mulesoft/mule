@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -19,17 +20,17 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -79,7 +80,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
 
     if (typedValue.getValue() instanceof InternalMessage) {
       InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
-      typedValue = new DefaultTypedValue(muleMessage.getPayload().getValue(), muleMessage.getPayload().getDataType());
+      typedValue = new TypedValue(muleMessage.getPayload().getValue(), muleMessage.getPayload().getDataType());
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {

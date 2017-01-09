@@ -14,12 +14,11 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ValidationResult;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -28,7 +27,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,7 +53,7 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
       try {
         this.expressionExecutor = executors.next();
       } catch (Throwable e) {
-        //TODO - MULE-10938: Fix DW dependency for FunctionalTestCase
+        // TODO - MULE-10938: Fix DW dependency for FunctionalTestCase
         logger.warn("DW Executor could not be loaded.");
       }
       break;
@@ -118,8 +116,8 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
 
   private BindingContext.Builder addFlowBindings(FlowConstruct flow, BindingContext.Builder contextBuilder) {
     if (flow != null) {
-      contextBuilder.addBinding(FLOW, new DefaultTypedValue(new FlowVariablesAccessor(flow.getName()),
-                                                            fromType(FlowVariablesAccessor.class)));
+      contextBuilder.addBinding(FLOW, new TypedValue(new FlowVariablesAccessor(flow.getName()),
+                                                     fromType(FlowVariablesAccessor.class)));
     }
     return contextBuilder;
   }
@@ -133,13 +131,13 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
         contextBuilder.addBinding(name, value);
       });
       contextBuilder.addBinding(VARIABLES,
-                                new DefaultTypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
+                                new TypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
       Message message = event.getMessage();
       Attributes attributes = message.getAttributes();
-      contextBuilder.addBinding(ATTRIBUTES, new DefaultTypedValue(attributes, fromType(attributes.getClass())));
+      contextBuilder.addBinding(ATTRIBUTES, new TypedValue(attributes, fromType(attributes.getClass())));
       contextBuilder.addBinding(PAYLOAD, message.getPayload());
       Error error = event.getError().isPresent() ? event.getError().get() : null;
-      contextBuilder.addBinding(ERROR, new DefaultTypedValue(error, fromType(Error.class)));
+      contextBuilder.addBinding(ERROR, new TypedValue(error, fromType(Error.class)));
     }
   }
 
@@ -153,7 +151,7 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
     String sanitizedExpression = expression.startsWith(DEFAULT_EXPRESSION_PREFIX)
         ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
         : expression;
-    //TODO: MULE-10410 - Remove once DW is the default language.
+    // TODO: MULE-10410 - Remove once DW is the default language.
     if (sanitizedExpression.startsWith(DW_PREFIX)) {
       sanitizedExpression = sanitizedExpression.substring(DW_PREFIX.length());
     }

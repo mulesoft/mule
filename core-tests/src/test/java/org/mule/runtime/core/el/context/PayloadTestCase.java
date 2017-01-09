@@ -15,10 +15,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class PayloadTestCase extends AbstractELTestCase {
   @Test
   public void payload() throws Exception {
     Object payload = new Object();
-    when(message.getPayload()).thenReturn(new DefaultTypedValue<>(payload, DataType.OBJECT));
+    when(message.getPayload()).thenReturn(new TypedValue<>(payload, DataType.OBJECT));
     assertSame(payload, evaluate("payload", event));
   }
 

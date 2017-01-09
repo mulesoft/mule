@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 /**
  * A {@link ValueResolver} implementation and extension of {@link TypeSafeExpressionValueResolver } which evaluates
@@ -43,7 +43,7 @@ public class ExpressionTypedValueValueResolver<T> extends TypeSafeExpressionValu
       DataType expectedDataType =
           DataType.builder().type(expectedClass).mediaType(typedValue.getDataType().getMediaType()).build();
       T result = (T) transform(typedValue, expectedDataType, event);
-      return new DefaultTypedValue<>(result, expectedDataType);
+      return new TypedValue<>(result, expectedDataType);
     }
   }
 }
