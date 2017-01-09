@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static org.mule.BenchmarkUtils.createMuleContext;
 import static org.mule.api.transformer.DataType.STRING_DATA_TYPE;
 import static org.mule.api.transport.PropertyScope.OUTBOUND;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
@@ -14,8 +15,6 @@ import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.context.DefaultMuleContextFactory;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -50,8 +49,7 @@ public class MuleMessageBenchmark
     @Setup
     public void setup() throws Exception
     {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        muleContext = muleContextFactory.createMuleContext();
+        muleContext = createMuleContext();
         message = new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
         messageWith20Properties = new DefaultMuleMessage(TEST_PAYLOAD, muleContext);
         for (int i = 0; i < 20; i++)

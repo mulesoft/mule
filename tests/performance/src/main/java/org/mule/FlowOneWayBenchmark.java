@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static org.mule.MessageExchangePattern.ONE_WAY;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.api.MuleContext;
@@ -89,72 +90,63 @@ public class FlowOneWayBenchmark
     @Threads(1)
     public MuleEvent processSourceOneWay1Thread() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(2)
     public MuleEvent processSourceOneWay2Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(4)
     public MuleEvent processSourceOneWay4Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(8)
     public MuleEvent processSourceOneWay8Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(16)
     public MuleEvent processSourceOneWay16Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(32)
     public MuleEvent processSourceOneWay32Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(64)
     public MuleEvent processSourceOneWay64Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(128)
     public MuleEvent processSourceOneWay128Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
     @Benchmark
     @Threads(256)
     public MuleEvent processSourceOneWay256Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.ONE_WAY, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow));
     }
 
 }

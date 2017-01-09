@@ -7,6 +7,8 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.MessageExchangePattern.fromString;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.api.MuleContext;
@@ -28,15 +30,13 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-/**
- *
- */
 @State(Benchmark)
 @Fork(1)
 @BenchmarkMode(AverageTime)
@@ -86,72 +86,63 @@ public class FlowRequestResponseBenchmark
     @Threads(1)
     public MuleEvent processSourceRequestResponse1Thread() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(2)
     public MuleEvent processSourceRequestResponse2Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(4)
     public MuleEvent processSourceRequestResponse4Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(8)
     public MuleEvent processSourceRequestResponse8Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(16)
     public MuleEvent processSourceRequestResponse16Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(32)
     public MuleEvent processSourceRequestResponse32Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(64)
     public MuleEvent processSourceRequestResponse64Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(128)
     public MuleEvent processSourceRequestResponse128Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
     @Benchmark
     @Threads(256)
     public MuleEvent processSourceRequestResponse256Threads() throws MuleException
     {
-        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext),
-                                                   MessageExchangePattern.REQUEST_RESPONSE, flow));
+        return source.trigger(new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), REQUEST_RESPONSE, flow));
     }
 
 }

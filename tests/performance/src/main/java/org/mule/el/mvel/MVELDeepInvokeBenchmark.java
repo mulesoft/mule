@@ -6,6 +6,7 @@
  */
 package org.mule.el.mvel;
 
+import static org.mule.BenchmarkUtils.createMuleContext;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.DefaultMuleEvent;
@@ -13,12 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.MuleException;
 import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Random;
 
@@ -49,10 +46,9 @@ public class MVELDeepInvokeBenchmark
     protected MuleEvent event;
 
     @Setup
-    public void setup() throws InitialisationException, ConfigurationException
+    public void setup() throws MuleException
     {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        muleContext = muleContextFactory.createMuleContext();
+        muleContext = createMuleContext();
         ((MVELExpressionLanguage) muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
         event = createMuleEvent();
         // Warmup

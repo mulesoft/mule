@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static org.mule.config.i18n.CoreMessages.agentsRunning;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -39,14 +40,14 @@ public class MessagingExceptionBenchmark
     @Threads(1)
     public MuleException messageSingleThead()
     {
-        return new DefaultMuleException(CoreMessages.agentsRunning());
+        return new DefaultMuleException(agentsRunning());
     }
 
     @Benchmark
     @Threads(4)
     public MuleException messageMultiThread()
     {
-        return new DefaultMuleException(CoreMessages.agentsRunning());
+        return new DefaultMuleException(agentsRunning());
     }
 
     @Benchmark

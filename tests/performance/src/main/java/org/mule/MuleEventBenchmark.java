@@ -7,15 +7,14 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static org.mule.BenchmarkUtils.createMuleContext;
 import static org.mule.MessageExchangePattern.ONE_WAY;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.context.MuleContextFactory;
 import org.mule.construct.Flow;
-import org.mule.context.DefaultMuleContextFactory;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -51,9 +50,9 @@ public class MuleEventBenchmark
     @Setup
     public void setup() throws Exception
     {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        muleContext = muleContextFactory.createMuleContext();
+        muleContext = createMuleContext();
         muleContext.start();
+
         flow = new Flow("flow", muleContext);
         muleContext.getRegistry().registerFlowConstruct(flow);
         event = new DefaultMuleEvent(new DefaultMuleMessage(TEST_PAYLOAD, muleContext), ONE_WAY, flow);
