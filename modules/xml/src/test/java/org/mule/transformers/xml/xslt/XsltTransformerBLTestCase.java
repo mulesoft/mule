@@ -7,8 +7,8 @@
 package org.mule.transformers.xml.xslt;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -50,12 +50,11 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase
         assertThat(output, containsString("010101010101010101010101010101010101010101010101"));
     }
 
-    @Test
+    @Test(expected = TransformerMessagingException.class)
     public void disabled() throws Exception
     {
         String input = makeInput();
         Object payload = input.getBytes();
         String output = (String) runFlow("flowBLDisabled", payload).getMessage().getPayload();
-        assertThat(output, not(containsString("010101010101010101010101010101010101010101010101")));
     }
 }
