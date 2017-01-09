@@ -24,7 +24,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
@@ -32,7 +31,8 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
+import org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage;
+
 import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.Collection;
@@ -48,18 +48,17 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
 
   private MuleContext muleContext;
-  //DW based expression language
-  private MuleExpressionLanguage muleExpressionLanguage;
-  //MVEL based expression language
-  private MVELExpressionLanguage mvelExpressionLanguage;
+  private ExtendedExpressionLanguage expressionLanguage;
   // Default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.muleExpressionLanguage = new MuleExpressionLanguage(muleContext.getExecutionClassLoader());
-    mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    DataWeaveExpressionLanguage dataWeaveExpressionLanguage =
+        new DataWeaveExpressionLanguage(muleContext.getExecutionClassLoader());
+    MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dataWeaveExpressionLanguage, mvelExpressionLanguage);
   }
 
   @Override
@@ -67,7 +66,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     Collection<GlobalBindingContextProvider> contextProviders =
         muleContext.getRegistry().lookupObjects(GlobalBindingContextProvider.class);
     for (GlobalBindingContextProvider contextProvider : contextProviders) {
-      muleExpressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
+      expressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
     }
   }
 
@@ -109,7 +108,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                              BindingContext context) {
-    return selectExpressionLanguage(expression).evaluate(expression, event, eventBuilder, flowConstruct, context);
+    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, context);
   }
 
   @Override
@@ -143,12 +142,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, object);
+    expressionLanguage.enrich(expression, event, eventBuilder, flowConstruct, object);
   }
 
   @Override
   public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, value);
+    expressionLanguage.enrich(expression, event, eventBuilder, flowConstruct, value);
   }
 
   @Override
@@ -195,6 +194,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
+    logger.warn("Expression parsing is deprecated, regular evaluations should be used instead.");
     if (isDwExpression(expression)) {
       TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
       try {
@@ -228,10 +228,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public ValidationResult validate(String expression) {
-    return validateExpression(expression, selectExpressionLanguage(expression));
-  }
-
-  private ValidationResult validateExpression(String expression, ExpressionLanguage expressionLanguage) {
     if (!muleContext.getConfiguration().isValidateExpressions()) {
       if (logger.isDebugEnabled()) {
         logger.debug("Validate expressions is turned off, no checking done for: " + expression);
@@ -267,15 +263,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     return success();
   }
 
-  private ExtendedExpressionLanguage selectExpressionLanguage(String expression) {
-    if (isDwExpression(expression)) {
-      return muleExpressionLanguage;
-    } else {
-      return mvelExpressionLanguage;
-    }
-  }
-
-  private boolean isDwExpression(String expression) {
+  protected static boolean isDwExpression(String expression) {
     //TODO: MULE-10410 - Remove once DW is the default language.
     return expression.startsWith(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX) || expression.startsWith(DW_PREFIX);
   }

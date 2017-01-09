@@ -22,6 +22,13 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 public interface ExpressionLanguage {
 
   /**
+   * Registers the given {@link BindingContext} as global.
+   *
+   * @param bindingContext the context to register
+   */
+  void registerGlobalContext(BindingContext bindingContext);
+
+  /**
    * Evaluates an expression according to a given {@link BindingContext} and an {@link MuleEvent}.
    *
    * @param expression the EL expression

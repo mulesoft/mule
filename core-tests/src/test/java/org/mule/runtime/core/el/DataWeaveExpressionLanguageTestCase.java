@@ -21,11 +21,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ATTRIBUTES;
-import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ERROR;
-import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.FLOW;
-import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.PAYLOAD;
-import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.VARIABLES;
+import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.ATTRIBUTES;
+import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.ERROR;
+import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.FLOW;
+import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.PAYLOAD;
+import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.VARIABLES;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -37,7 +37,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
+import org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -54,9 +54,10 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Expression Language")
 @Stories("Support DW")
-public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
+public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
 
-  private MuleExpressionLanguage expressionLanguage = new MuleExpressionLanguage(Thread.currentThread().getContextClassLoader());
+  private DataWeaveExpressionLanguage expressionLanguage =
+      new DataWeaveExpressionLanguage(Thread.currentThread().getContextClassLoader());
 
   @Test
   public void stringExpression() throws Exception {

@@ -34,9 +34,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
+public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
-  private static final Logger logger = getLogger(MuleExpressionLanguage.class);
+  private static final Logger logger = getLogger(DataWeaveExpressionLanguage.class);
   public static final String ATTRIBUTES = "attributes";
   public static final String PAYLOAD = "payload";
   public static final String ERROR = "error";
@@ -46,7 +46,7 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
 
-  public MuleExpressionLanguage(ClassLoader lookupClassloader) {
+  public DataWeaveExpressionLanguage(ClassLoader lookupClassloader) {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
 
     while (executors.hasNext()) {
