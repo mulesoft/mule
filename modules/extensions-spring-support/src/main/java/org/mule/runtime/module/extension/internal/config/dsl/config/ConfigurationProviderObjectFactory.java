@@ -70,7 +70,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
-    ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
+    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(configurationModel);
     final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
 
     ConfigurationProvider configurationProvider;
