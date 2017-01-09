@@ -20,7 +20,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_R
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -30,7 +30,7 @@ import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableList;
 

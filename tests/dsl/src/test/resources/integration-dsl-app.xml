@@ -4,11 +4,7 @@
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
-      xsi:schemaLocation="
-      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-      http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
-      http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <db:config name="dbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true"/>
@@ -24,15 +20,18 @@
                 <httpn:basic-authentication username="user" password="pass"/>
             </httpn:authentication>
             <httpn:client-socket-properties>
-                <sockets:tcp-client-socket-properties connectionTimeout="1000" keepAlive="true" receiveBufferSize="1024" sendBufferSize="1024"
-                                                      sendTcpNoDelay="true" clientTimeout="1000" linger="1000" />
+                <sockets:tcp-client-socket-properties connectionTimeout="1000" keepAlive="true"
+                                                      receiveBufferSize="1024" sendBufferSize="1024"
+                                                      clientTimeout="1000" linger="1000" />
             </httpn:client-socket-properties>
         </httpn:request-connection>
     </httpn:request-config>
 
-    <flow name="components" initialState="stopped">
+    <flow name="testFlow" initialState="stopped">
 
         <httpn:listener config-ref="httpListener" path="testBuilder">
+            <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
+            <reconnect blocking="true" count="1" frequency="0"/>
             <httpn:response-builder>
                 <httpn:headers>
                     #[['content-type' : 'text/plain']]

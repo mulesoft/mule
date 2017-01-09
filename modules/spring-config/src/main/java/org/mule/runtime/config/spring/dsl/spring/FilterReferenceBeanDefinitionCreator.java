@@ -10,8 +10,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_R
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;

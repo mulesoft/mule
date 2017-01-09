@@ -9,11 +9,11 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
@@ -62,7 +62,7 @@ final class MapSchemaDelegate {
     final MetadataType keyType = metadataType.getKeyType();
     final MetadataType valueType = metadataType.getValueType();
     final LocalComplexType entryComplexType = new LocalComplexType();
-    final Attribute keyAttribute = builder.createAttribute(ATTRIBUTE_NAME_KEY, keyType, true, REQUIRED);
+    final Attribute keyAttribute = builder.createAttribute(KEY_ATTRIBUTE_NAME, keyType, true, REQUIRED);
     entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
 
     final LocalComplexType mapComplexType = new LocalComplexType();
@@ -97,7 +97,7 @@ final class MapSchemaDelegate {
         final boolean shouldGenerateChildElement = entryValueDsl.supportsChildDeclaration();
 
         entryComplexType.getAttributeOrAttributeGroup()
-            .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
+            .add(builder.createAttribute(VALUE_ATTRIBUTE_NAME, valueType, !shouldGenerateChildElement, SUPPORTED));
 
         if (shouldGenerateChildElement) {
           DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType).orElseThrow(
@@ -122,13 +122,13 @@ final class MapSchemaDelegate {
       @Override
       public void visitArrayType(ArrayType arrayType) {
         entryComplexType.getAttributeOrAttributeGroup()
-            .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, false, SUPPORTED));
+            .add(builder.createAttribute(VALUE_ATTRIBUTE_NAME, valueType, false, SUPPORTED));
         entryComplexType.setSequence(new ExplicitGroup());
 
         LocalComplexType itemComplexType = new LocalComplexType();
         MetadataType itemType = arrayType.getType();
         itemComplexType.getAttributeOrAttributeGroup()
-            .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, itemType, true, REQUIRED));
+            .add(builder.createAttribute(VALUE_ATTRIBUTE_NAME, itemType, true, REQUIRED));
 
         DslElementSyntax itemDsl = entryValueDsl.getGeneric(itemType)
             .orElseThrow(() -> new IllegalArgumentException("Illegal DslSyntax definition of the given ArrayType. The DslElementSyntax for the item is required"));

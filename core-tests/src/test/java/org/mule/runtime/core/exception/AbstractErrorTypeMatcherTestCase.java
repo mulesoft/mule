@@ -12,7 +12,7 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_
 
 import org.junit.Before;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public abstract class AbstractErrorTypeMatcherTestCase extends AbstractMuleContextTestCase {

@@ -14,6 +14,8 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.concat;
 
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

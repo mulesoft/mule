@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -59,7 +59,8 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
         .withSetterParameterDefinition(TARGET_PARAMETER_NAME, fromSimpleParameter(TARGET_PARAMETER_NAME).build())
-        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
+        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
+                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build());
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(operationModel);
 

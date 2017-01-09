@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 import java.util.Collection;
 import java.util.List;

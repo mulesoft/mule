@@ -84,15 +84,11 @@ public final class SchemaConstants {
   // ATTRIBUTES
   public static final String USE_REQUIRED = "required";
   public static final String USE_OPTIONAL = "optional";
-  public static final String CONFIG_ATTRIBUTE = "config-ref";
   public static final String CONFIG_ATTRIBUTE_DESCRIPTION = "Specify which configuration to use for this invocation.";
-  public static final String ATTRIBUTE_NAME_VALUE = "value";
-  public static final String ATTRIBUTE_NAME_KEY = "key";
   public static final String ENUM_TYPE_SUFFIX = "EnumType";
   public static final String TYPE_SUFFIX = "Type";
   public static final String UNBOUNDED = "unbounded";
   public static final String MAX_ONE = "1";
-  public static final String ATTRIBUTE_NAME_NAME = "name";
   public static final String CURRENT_VERSION = "current";
 
   private SchemaConstants() {}

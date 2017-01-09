@@ -17,9 +17,9 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 /**
  * Provides the constants for the core error types

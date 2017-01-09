@@ -40,6 +40,17 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.extensions</groupId>
+            <artifactId>mule-extensions-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jms</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -133,6 +144,17 @@
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

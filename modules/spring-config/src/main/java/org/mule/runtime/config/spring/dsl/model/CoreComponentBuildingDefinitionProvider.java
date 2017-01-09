@@ -21,6 +21,12 @@ import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
@@ -38,13 +44,10 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
-import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -546,11 +549,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
 
-    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier("reconnect-forever")
+    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
         .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
-    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier("reconnect")
+    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
@@ -1091,7 +1094,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     buildingDefinitions.add(baseDefinition
         .copy()
-        .withIdentifier("pooling-profile")
+        .withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(PoolingProfile.class))
         .withConstructorParameterDefinition(fromSimpleParameter("maxActive").withDefaultValue(DEFAULT_MAX_POOL_ACTIVE).build())
         .withConstructorParameterDefinition(fromSimpleParameter("maxIdle").withDefaultValue(DEFAULT_MAX_POOL_IDLE).build())

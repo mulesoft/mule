@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.repository.api.RepositoryService;

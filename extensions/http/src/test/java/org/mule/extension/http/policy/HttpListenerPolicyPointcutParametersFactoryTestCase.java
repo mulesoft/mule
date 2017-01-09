@@ -14,8 +14,8 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier.Builder;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier.Builder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
