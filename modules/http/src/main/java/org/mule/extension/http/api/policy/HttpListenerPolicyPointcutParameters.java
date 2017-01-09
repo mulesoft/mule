@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 /**
  * Specific implementation of {@link PolicyPointcutParameters} for http:listener operation.

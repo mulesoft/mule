@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static java.util.Collections.emptySet;
-import static java.util.Optional.ofNullable;
 import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
@@ -16,8 +15,6 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
-import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -35,7 +32,6 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinition
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -54,7 +50,6 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final DslElementSyntax typeDsl;
   private final String name;
   private final String namespace;
-  private final Map<String, String> infrastructureParameterMap = getNameMap();
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
                                    DslSyntaxResolver dslResolver, ExtensionParsingContext context,
@@ -88,11 +83,6 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         .withConstructorParameterDefinition(fromFixedValue(muleContext).build());
 
     type.getFields().forEach(this::parseField);
-  }
-
-
-  private Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
-    return ofNullable(infrastructureParameterMap.get(getId(fieldType)));
   }
 
   private void parseField(ObjectFieldType objectField) {

@@ -6,85 +6,29 @@
  */
 package org.mule.test.extension.dsl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.dsl.model.ApplicationElement;
-import org.mule.runtime.api.dsl.model.ApplicationElementIdentifier;
-import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.dsl.config.ComponentConfiguration;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
-import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
-import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
-import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.extension.api.dsl.model.DslElementModel;
-import org.mule.runtime.extension.api.dsl.model.DslElementModelResolver;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
-@ArtifactClassLoaderRunnerConfig(
-    sharedRuntimeLibs = {"org.apache.derby:derby"},
-    plugins = {
-        "org.mule.modules:mule-module-sockets",
-        "org.mule.modules:mule-module-http-ext",
-        "org.mule.modules:mule-module-db",
-        "com.mulesoft.weave:mule-plugin-weave"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
-public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestCase {
-
-  private static final int LISTENER_PATH = 0;
-  private static final int DB_INSERT_PATH = 1;
-  private static final int REQUESTER_PATH = 2;
-  private static final String DB_NS = "http://www.mulesoft.org/schema/mule/db";
-  private static final String HTTP_NS = "http://www.mulesoft.org/schema/mule/httpn";
-
-  private ApplicationModel applicationModel;
-  private DslElementModelResolver modelResolver;
-
-  @Override
-  protected String getConfigFile() {
-    return "dsl-app.xml";
-  }
-
-  @Before
-  public void setup() throws Exception {
-    applicationModel = loadApplicationModel();
-
-    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    modelResolver = DslElementModelResolver.getDefault(extensions);
-  }
+public class DslElementModelResolverTestCase extends AbstractElementModelTestCase {
 
   @Test
   public void resolveSimpleConfigWithFlatConnection() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "dbConfig");
+    ComponentConfiguration config = getAppElement(applicationModel, DB_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
     assertElementName(configElement, "config");
 
-    ApplicationElement connection = config.getInnerComponents().get(0);
+    ComponentConfiguration connection = config.getNestedComponents().get(0);
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, connection);
 
     assertElementName(connectionElement, "derby-connection");
@@ -93,8 +37,8 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
     assertHasParameter(connectionElement.getModel(), "create");
     assertAttributeIsPresent(connectionElement, "create");
 
-    assertThat(configElement.getApplicationElement().isPresent(), is(true));
-    assertThat(configElement.getApplicationElement().get(), is(equalTo(config)));
+    assertThat(configElement.getConfiguration().isPresent(), is(true));
+    assertThat(configElement.getConfiguration().get(), is(equalTo(config)));
     assertThat(configElement.getIdentifier().isPresent(), is(true));
     assertThat(configElement.getIdentifier().get(), is(equalTo(config.getIdentifier())));
 
@@ -104,8 +48,8 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
 
   @Test
   public void resolveConnectionNoExtraParameters() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "dbConfig");
-    ApplicationElement connection = config.getInnerComponents().get(0);
+    ComponentConfiguration config = getAppElement(applicationModel, DB_CONFIG);
+    ComponentConfiguration connection = config.getNestedComponents().get(0);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
 
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, connection);
@@ -116,15 +60,15 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
 
   @Test
   public void resolutionFailsForNonTopLevelElement() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "dbConfig");
-    ApplicationElement connection = config.getInnerComponents().get(0);
+    ComponentConfiguration config = getAppElement(applicationModel, DB_CONFIG);
+    ComponentConfiguration connection = config.getNestedComponents().get(0);
 
     assertThat(modelResolver.resolve(connection).isPresent(), is(false));
   }
 
   @Test
   public void resolveConfigNoExtraContainedElements() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "httpListener");
+    ComponentConfiguration config = getAppElement(applicationModel, HTTP_LISTENER_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
 
     assertThat(configElement.findElement(newIdentifier("request-connection", DB_NS)).isPresent(),
@@ -133,14 +77,14 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
 
   @Test
   public void resolveConfigWithParameters() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "httpListener");
+    ComponentConfiguration config = getAppElement(applicationModel, HTTP_LISTENER_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
 
     assertElementName(configElement, "listener-config");
     assertHasParameter(configElement.getModel(), "basePath");
     assertAttributeIsPresent(configElement, "basePath");
 
-    ApplicationElement connection = config.getInnerComponents().get(0);
+    ComponentConfiguration connection = config.getNestedComponents().get(0);
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, connection);
 
     assertElementName(connectionElement, "listener-connection");
@@ -153,11 +97,11 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
 
   @Test
   public void resolveConnectionWithSubtypes() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "httpRequester");
+    ComponentConfiguration config = getAppElement(applicationModel, HTTP_REQUESTER_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
     assertElementName(configElement, "request-config");
 
-    ApplicationElement connection = config.getInnerComponents().get(0);
+    ComponentConfiguration connection = config.getNestedComponents().get(0);
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, connection);
 
     assertElementName(connectionElement, "request-connection");
@@ -166,7 +110,7 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
     assertHasParameter(connectionElement.getModel(), "port");
     assertAttributeIsPresent(connectionElement, "port");
 
-    ApplicationElement authenticationWrapper = connection.getInnerComponents().get(0);
+    ComponentConfiguration authenticationWrapper = connection.getNestedComponents().get(0);
     DslElementModel<ParameterModel> authenticationWrapperElement = getChild(connectionElement, authenticationWrapper);
     assertElementName(authenticationWrapperElement, "authentication");
 
@@ -181,11 +125,11 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
 
   @Test
   public void resolveConnectionWithImportedTypes() throws Exception {
-    ApplicationElement config = getApplicationElement(applicationModel, "httpRequester");
+    ComponentConfiguration config = getAppElement(applicationModel, HTTP_REQUESTER_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
     assertElementName(configElement, "request-config");
 
-    ApplicationElement connection = config.getInnerComponents().get(0);
+    ComponentConfiguration connection = config.getNestedComponents().get(0);
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, connection);
 
     assertElementName(connectionElement, "request-connection");
@@ -194,11 +138,11 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
     assertHasParameter(connectionElement.getModel(), "port");
     assertAttributeIsPresent(connectionElement, "port");
 
-    ApplicationElement propertiesWrapper = connection.getInnerComponents().get(1);
+    ComponentConfiguration propertiesWrapper = connection.getNestedComponents().get(1);
     DslElementModel<ParameterModel> wrapperElement = getChild(connectionElement, propertiesWrapper);
     assertElementName(wrapperElement, "client-socket-properties");
 
-    ApplicationElement properties = propertiesWrapper.getInnerComponents().get(0);
+    ComponentConfiguration properties = propertiesWrapper.getNestedComponents().get(0);
     DslElementModel<ObjectType> propertiesElement = getChild(wrapperElement, properties);
 
     assertElementName(propertiesElement, "tcp-client-socket-properties");
@@ -211,19 +155,18 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
 
   @Test
   public void flowElementsResolution() throws Exception {
-    ApplicationElement flow = getApplicationElement(applicationModel, "components");
+    ComponentConfiguration flow = getAppElement(applicationModel, COMPONENTS_FLOW);
 
-    ApplicationElement listener = flow.getInnerComponents().get(LISTENER_PATH);
+    ComponentConfiguration listener = flow.getNestedComponents().get(LISTENER_PATH);
     assertListenerSourceWithMessageBuilder(listener);
 
-    ApplicationElement dbInsert = flow.getInnerComponents().get(DB_INSERT_PATH);
+    ComponentConfiguration dbInsert = flow.getNestedComponents().get(DB_INSERT_PATH);
     assertBulkInsertOperationWithNestedList(dbInsert);
 
-    ApplicationElement requester = flow.getInnerComponents().get(REQUESTER_PATH);
+    ComponentConfiguration requester = flow.getNestedComponents().get(REQUESTER_PATH);
     assertRequestOperationWithFlatParameters(requester);
   }
-
-  private void assertRequestOperationWithFlatParameters(ApplicationElement requester) {
+  protected void assertRequestOperationWithFlatParameters(ComponentConfiguration requester) {
     DslElementModel<OperationModel> requesterElement = resolve(requester);
     assertHasParameter(requesterElement.getModel(), "path");
     assertThat(requesterElement.findElement("path").isPresent(), is(true));
@@ -231,114 +174,41 @@ public class DslElementModelResolverTestCase extends MuleArtifactFunctionalTestC
     assertThat(requesterElement.findElement("method").isPresent(), is(true));
   }
 
-  private void assertBulkInsertOperationWithNestedList(ApplicationElement dbInsert) {
+  protected void assertBulkInsertOperationWithNestedList(ComponentConfiguration dbInsert) {
     DslElementModel<OperationModel> dbElement = resolve(dbInsert);
 
-    assertThat(dbElement.getInnerElements().size(),
-               is(dbInsert.getInnerComponents().size() + dbInsert.getParameters().entrySet().size()));
+    assertThat(dbElement.getContainedElements().size(),
+               is(dbInsert.getNestedComponents().size() + dbInsert.getParameters().entrySet().size()));
 
-    ApplicationElement sql = dbInsert.getInnerComponents().get(0);
+    ComponentConfiguration sql = dbInsert.getNestedComponents().get(0);
     DslElementModel<ParameterModel> sqlElement = getChild(dbElement, sql);
     assertElementName(sqlElement, "sql");
-    ApplicationElement parameterTypes = dbInsert.getInnerComponents().get(1);
+    ComponentConfiguration parameterTypes = dbInsert.getNestedComponents().get(1);
     DslElementModel<ParameterModel> parameterTypesElement = getChild(dbElement, parameterTypes);
     assertElementName(parameterTypesElement, "parameter-types");
 
 
-    ApplicationElement parameterOne = parameterTypes.getInnerComponents().get(0);
+    ComponentConfiguration parameterOne = parameterTypes.getNestedComponents().get(0);
     assertThat(parameterOne.getParameters().get("key"), is("name"));
-    DslElementModel<ObjectType> elementOne = parameterTypesElement.getInnerElements().get(0);
+    DslElementModel<ObjectType> elementOne = parameterTypesElement.getContainedElements().get(0);
     assertElementName(elementOne, parameterOne.getIdentifier().getName());
 
-    ApplicationElement parameterTwo = parameterTypes.getInnerComponents().get(1);
+    ComponentConfiguration parameterTwo = parameterTypes.getNestedComponents().get(1);
     assertThat(parameterTwo.getParameters().get("key"), is("position"));
-    DslElementModel<ObjectType> elementTwo = parameterTypesElement.getInnerElements().get(1);
+    DslElementModel<ObjectType> elementTwo = parameterTypesElement.getContainedElements().get(1);
     assertElementName(elementTwo, parameterTwo.getIdentifier().getName());
   }
 
-  private void assertListenerSourceWithMessageBuilder(ApplicationElement listener) {
+  protected void assertListenerSourceWithMessageBuilder(ComponentConfiguration listener) {
     DslElementModel<SourceModel> listenerElement = resolve(listener);
 
     assertHasParameter(listenerElement.getModel(), "path");
-    ApplicationElement responseBuilder = listener.getInnerComponents().get(0);
+    ComponentConfiguration responseBuilder = listener.getNestedComponents().get(1);
 
     DslElementModel<ParameterModel> responseBuilderElement = getChild(listenerElement, responseBuilder);
     assertElementName(responseBuilderElement, "response-builder");
 
     assertThat(responseBuilderElement.getDsl().getChild("headers").isPresent(), is(true));
-  }
-
-  // Scaffolding
-  private <T extends NamedObject> DslElementModel<T> resolve(ApplicationElement component) {
-    Optional<DslElementModel<T>> elementModel = modelResolver.resolve(component);
-    assertThat(elementModel.isPresent(), is(true));
-    return elementModel.get();
-  }
-
-  private ApplicationElement getApplicationElement(ApplicationModel applicationModel, String name) {
-    Optional<ApplicationElement> component = applicationModel.findNamedElement(name);
-    assertThat(component.isPresent(), is(true));
-    return component.get();
-  }
-
-  private <T> DslElementModel<T> getChild(DslElementModel<? extends NamedObject> parent, ApplicationElement component) {
-    return getChild(parent, component.getIdentifier());
-  }
-
-  private <T> DslElementModel<T> getChild(DslElementModel<? extends NamedObject> parent,
-                                          ApplicationElementIdentifier identifier) {
-    Optional<DslElementModel<T>> elementModel = parent.findElement(identifier);
-    assertThat(format("Failed fetching child '%s' from parent '%s'", identifier.getName(),
-                      parent.getModel().getName()),
-               elementModel.isPresent(), is(true));
-    return elementModel.get();
-  }
-
-  private <T> DslElementModel<T> getAttribute(DslElementModel<? extends NamedObject> parent, String component) {
-    Optional<DslElementModel<T>> elementModel = parent.findElement(component);
-    assertThat(format("Failed fetching attribute '%s' from parent '%s'", component, parent.getModel().getName()),
-               elementModel.isPresent(), is(true));
-    return elementModel.get();
-  }
-
-  private ApplicationElementIdentifier newIdentifier(String name, String ns) {
-    return ApplicationElementIdentifier.builder().withName(name).withNamespace(ns).build();
-  }
-
-  private void assertHasParameter(ParameterizedModel model, String name) {
-    assertThat(model.getAllParameterModels()
-        .stream().anyMatch(p -> p.getName().equals(name)), is(true));
-  }
-
-  private void assertAttributeIsPresent(DslElementModel<? extends ParameterizedModel> element, String name) {
-    assertHasParameter(element.getModel(), name);
-    DslElementModel<NamedObject> databaseParam = getAttribute(element, name);
-    assertThat(databaseParam.getDsl().supportsAttributeDeclaration(), is(true));
-    assertThat(databaseParam.getDsl().supportsChildDeclaration(), is(false));
-  }
-
-  private void assertElementName(DslElementModel propertiesElement, String name) {
-    assertThat(propertiesElement.getDsl().getElementName(), is(name));
-  }
-
-  // Scaffolding
-  private ApplicationModel loadApplicationModel() throws Exception {
-    InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(getConfigFile());
-    checkArgument(appIs != null, "The given application was not found as resource");
-
-    Document document = new XmlConfigurationDocumentLoader().loadDocument(
-                                                                          of(muleContext.getExtensionManager()), getConfigFile(),
-                                                                          appIs);
-
-    ConfigLine configLine = new XmlApplicationParser(new SpiServiceRegistry())
-        .parse(document.getDocumentElement())
-        .orElseThrow(() -> new Exception("Failed to load config"));
-
-    ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
-        .addConfigFile(new ConfigFile(getConfigFile(), singletonList(configLine)))
-        .build();
-
-    return new ApplicationModel(artifactConfig, new ArtifactConfiguration(emptyList()));
   }
 
 }

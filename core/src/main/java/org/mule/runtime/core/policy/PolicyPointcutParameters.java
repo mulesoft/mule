@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 /**
  * This class defines a set of parameters related to the execution of a component. In particular to the execution of a source or

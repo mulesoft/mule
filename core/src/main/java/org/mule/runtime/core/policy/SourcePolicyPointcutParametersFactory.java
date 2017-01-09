@@ -7,8 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 /**
  * Factory for creating {@link PolicyPointcutParameters} for an specific source.

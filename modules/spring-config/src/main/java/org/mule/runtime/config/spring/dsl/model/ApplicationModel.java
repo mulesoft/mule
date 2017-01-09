@@ -17,24 +17,23 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
+import org.mule.runtime.api.dsl.config.ComponentConfiguration;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
-import org.mule.runtime.dsl.api.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.api.dsl.model.ApplicationElement;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -325,20 +324,19 @@ public class ApplicationModel {
   }
 
   private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration, boolean isRoot) {
-    ComponentModel.Builder builder = new ComponentModel.Builder().setIdentifier(new ComponentIdentifier.Builder()
-        .withName(componentConfiguration.getIdentifier()).withNamespace(componentConfiguration.getNamespace()).build());
+    ComponentModel.Builder builder = new ComponentModel.Builder().setIdentifier(componentConfiguration.getIdentifier());
     if (isRoot) {
       builder.markAsRootComponent();
     }
     for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet()) {
       builder.addParameter(parameter.getKey(), parameter.getValue(), false);
     }
-    for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponentConfiguration()) {
+    for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponents()) {
       builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration, false));
     }
-    if (componentConfiguration.getTextContent() != null) {
-      builder.setTextContent(componentConfiguration.getTextContent());
-    }
+
+    componentConfiguration.getValue().ifPresent(builder::setTextContent);
+
     return builder.build();
 
   }
@@ -695,13 +693,13 @@ public class ApplicationModel {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  //TODO MULE-11355: Make the ComponentModel haven an ApplicationElement internally
-  public Optional<ApplicationElement> findNamedElement(String name) {
-    Optional<ApplicationElement> requestedElement = empty();
+  //TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
+  public Optional<ComponentConfiguration> findNamedElement(String name) {
+    Optional<ComponentConfiguration> requestedElement = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {
       requestedElement = muleComponentModel.getInnerComponents().stream()
           .filter(componentModel -> name.equals(componentModel.getNameAttribute()))
-          .map(ComponentModel::asElement)
+          .map(ComponentModel::getConfiguration)
           .findAny();
       if (requestedElement.isPresent()) {
         break;

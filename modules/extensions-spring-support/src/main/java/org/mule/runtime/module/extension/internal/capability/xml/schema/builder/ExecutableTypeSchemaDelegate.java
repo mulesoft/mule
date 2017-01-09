@@ -11,8 +11,8 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
@@ -81,7 +81,8 @@ abstract class ExecutableTypeSchemaDelegate {
     complexContent.setExtension(complexContentExtension);
 
     if (dslSyntax.requiresConfig()) {
-      Attribute configAttr = builder.createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
+      Attribute configAttr =
+          builder.createAttribute(CONFIG_ATTRIBUTE_NAME, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
       complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
     }
 
