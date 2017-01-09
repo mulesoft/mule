@@ -29,7 +29,8 @@ import java.util.Map;
  * @since 4.0
  */
 @ArtifactClassLoaderRunnerConfig(
-    plugins = {"org.mule.modules:mule-module-http-ext", "org.mule.modules:mule-module-sockets"})
+    plugins = {"org.mule.modules:mule-module-http-ext", "org.mule.modules:mule-module-sockets"},
+    providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   /**

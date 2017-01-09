@@ -11,6 +11,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -27,7 +28,6 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -55,6 +55,7 @@ import java.util.function.Predicate;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
@@ -243,8 +244,21 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                     List<ArtifactUrlClassification> serviceUrlClassifications,
                                                     List<PluginUrlClassification> pluginUrlClassifications,
                                                     ArtifactClassificationType rootArtifactType) {
+    PatternInclusionsDependencyFilter inclusionsDependencyFilter =
+        new PatternInclusionsDependencyFilter(context.getProvidedInclusions());
+
     directDependencies = directDependencies.stream()
         .filter(getContainerDirectDependenciesFilter(rootArtifactType))
+        .filter(dependency -> {
+          Artifact artifact = dependency.getArtifact();
+          return (!serviceUrlClassifications.stream()
+              .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(toId(artifact))).findAny()
+              .isPresent()
+              && !pluginUrlClassifications.stream()
+                  .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(toId(artifact))).findAny()
+                  .isPresent())
+              || inclusionsDependencyFilter.accept(new DefaultDependencyNode(new Dependency(artifact, COMPILE)), emptyList());
+        })
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
@@ -262,6 +276,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       excludedFilterPattern.addAll(pluginUrlClassifications.stream()
           .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId())
           .collect(toList()));
+    }
+    if (!serviceUrlClassifications.isEmpty()) {
       excludedFilterPattern.addAll(serviceUrlClassifications.stream()
           .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId())
           .collect(toList()));
@@ -272,8 +288,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       logger.debug("Resolving dependencies for container using inclusion filter patterns: {}", context.getProvidedInclusions());
     }
 
-    final DependencyFilter dependencyFilter = orFilter(new PatternInclusionsDependencyFilter(context.getProvidedInclusions()),
-                                                       new PatternExclusionsDependencyFilter(excludedFilterPattern));
+    final DependencyFilter dependencyFilter =
+        orFilter(inclusionsDependencyFilter, new PatternExclusionsDependencyFilter(excludedFilterPattern));
 
     List<URL> containerUrls;
     try {
@@ -436,7 +452,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         if (node.getExportClasses() != null && !node.getExportClasses().isEmpty()) {
           logger.warn("exportClasses is not supported for services artifacts, they are going to be ignored");
         }
-        return new ArtifactUrlClassification(toClassifierLessId(node.getArtifact()), serviceProviderClassName, node.getUrls());
+        return new ArtifactUrlClassification(toId(node.getArtifact()), serviceProviderClassName, node.getUrls());
       } catch (IOException e) {
         throw new IllegalArgumentException("Couldn't read " + SERVICE_PROPERTIES_FILE_NAME + " for artifact: "
             + node.getArtifact(), e);
@@ -456,9 +472,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     for (ArtifactClassificationNode node : classificationNodes) {
       final List<String> pluginDependencies = node.getArtifactDependencies().stream()
-          .map(dependency -> toClassifierLessId(dependency.getArtifact()))
+          .map(dependency -> toId(dependency.getArtifact()))
           .collect(toList());
-      final String classifierLessId = toClassifierLessId(node.getArtifact());
+      final String classifierLessId = toId(node.getArtifact());
       final PluginUrlClassification pluginUrlClassification =
           pluginResourcesResolver.resolvePluginResourcesFor(
                                                             new PluginUrlClassification(classifierLessId, node.getUrls(),
@@ -524,7 +540,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     logger.debug("Artifacts {} identified a plugin dependencies for plugin {}", pluginArtifactDependencies, artifactToClassify);
     pluginArtifactDependencies.stream()
         .map(artifact -> {
-          String artifactClassifierLessId = toClassifierLessId(artifact);
+          String artifactClassifierLessId = toId(artifact);
           if (!artifactsClassified.containsKey(artifactClassifierLessId)) {
             buildPluginUrlClassification(artifact, context, rootArtifactDirectDependencies, directDependenciesFilter,
                                          artifactsClassified);
@@ -540,7 +556,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                                                           exportClasses,
                                                                                           artifactDependencies);
 
-    artifactsClassified.put(toClassifierLessId(artifactToClassify), artifactUrlClassification);
+    artifactsClassified.put(toId(artifactToClassify), artifactUrlClassification);
   }
 
   /**
@@ -645,11 +661,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     return directDependencies.isEmpty() ? Optional.<Dependency>empty()
         : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(groupId)
             && dependency.getArtifact().getArtifactId().equals(artifactId)).findFirst();
-  }
-
-  private String toClassifierLessId(Artifact pluginArtifact) {
-    return toId(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getExtension(), null,
-                pluginArtifact.getVersion());
   }
 
   /**
