@@ -39,7 +39,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
   private TimeUnit timeUnit = DEFAULT_POLL_TIMEUNIT;
 
   // @GuardedBy(itself)
-  protected final Map<ScheduledFuture, PollingReceiverWorker> schedules = new HashMap<ScheduledFuture, PollingReceiverWorker>();
+  protected final Map<ScheduledFuture, PollingReceiverWorker> schedules = new HashMap<>();
 
   public AbstractPollingMessageReceiver(Connector connector, FlowConstruct flowConstruct, final InboundEndpoint endpoint)
       throws CreateException {
@@ -79,8 +79,8 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
       // data.
       PollingReceiverWorker pollingReceiverWorker = this.createWork();
       ScheduledFuture schedule =
-          connector.getScheduler().scheduleWithFixedDelay(new PollingReceiverWorkerSchedule(pollingReceiverWorker),
-                                                          DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
+          connector.getInternalScheduler().scheduleWithFixedDelay(new PollingReceiverWorkerSchedule(pollingReceiverWorker),
+                                                                  DEFAULT_STARTUP_DELAY, this.getFrequency(), this.getTimeUnit());
       schedules.put(schedule, pollingReceiverWorker);
 
       if (logger.isDebugEnabled()) {

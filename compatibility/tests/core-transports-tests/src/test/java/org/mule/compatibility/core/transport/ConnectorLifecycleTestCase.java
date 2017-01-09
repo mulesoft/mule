@@ -564,20 +564,20 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Test
   public void testSchedulerLifecycle() throws MuleException, WorkException {
-    assertNull(connector.getScheduler());
+    assertNull(connector.getInternalScheduler());
 
     connector.start();
-    assertFalse(connector.getScheduler().isShutdown());
-    assertFalse(connector.getScheduler().isTerminated());
+    assertFalse(connector.getInternalScheduler().isShutdown());
+    assertFalse(connector.getInternalScheduler().isTerminated());
 
     connector.stop();
-    assertNull(connector.getScheduler());
+    assertNull(connector.getInternalScheduler());
 
     connector.start();
-    assertThat(connector.getScheduler(), nullValue());
+    assertThat(connector.getInternalScheduler(), nullValue());
 
     connector.dispose();
-    assertThat(connector.getScheduler(), nullValue());
+    assertThat(connector.getInternalScheduler(), nullValue());
   }
 
   @Test

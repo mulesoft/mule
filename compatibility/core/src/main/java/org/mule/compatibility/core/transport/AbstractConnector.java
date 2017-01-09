@@ -248,7 +248,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   /**
    * A generic scheduling service for tasks that need to be performed periodically.
    */
-  private Scheduler scheduler;
+  private Scheduler internalScheduler;
 
   /**
    * Holds the service configuration for this connector
@@ -406,17 +406,17 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
 
     if (!isConnected()) {
-      scheduler = createScheduler();
+      internalScheduler = createScheduler();
       try {
         // startAfterConnect() will get called from the connect() method once connected.
         // This is necessary for reconnection strategies.
         startOnConnect = true;
         connect();
       } catch (MuleException me) {
-        shutdownScheduler();
+        shutdownInternalScheduler();
         throw me;
       } catch (Exception e) {
-        shutdownScheduler();
+        shutdownInternalScheduler();
         throw new EndpointConnectException(e, this);
       }
     } else {
@@ -514,8 +514,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       clearDispatchers();
       clearRequesters();
 
-      // shutdown our scheduler service
-      shutdownScheduler();
+      // shutdown our internalScheduler service
+      shutdownInternalScheduler();
     });
   }
 
@@ -604,10 +604,10 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
   }
 
-  protected void shutdownScheduler() {
-    if (scheduler != null) {
-      scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-      scheduler = null;
+  protected void shutdownInternalScheduler() {
+    if (internalScheduler != null) {
+      internalScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      internalScheduler = null;
     }
   }
 
@@ -1338,7 +1338,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       if (logger.isDebugEnabled()) {
         logger.debug("Connecting: " + this);
       }
-      retryPolicyTemplate.execute(callback, getScheduler());
+      retryPolicyTemplate.execute(callback, getInternalScheduler());
     }
   }
 
@@ -1655,8 +1655,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   /**
    * Returns a Scheduler for periodic tasks, currently limited to internal use.
    */
-  public Scheduler getScheduler() {
-    return scheduler;
+  protected Scheduler getInternalScheduler() {
+    return internalScheduler;
   }
 
   protected Scheduler createScheduler() {
