@@ -9,7 +9,6 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DataTypeConversionResolver;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -31,6 +30,7 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
@@ -288,7 +288,7 @@ public interface MuleContext extends Lifecycle {
   SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
   /**
-   * @return a non null {@link org.mule.runtime.core.DataTypeConversionResolver} instance to resolve implicit data type
+   * @return a non null {@link DataTypeConversionResolver} instance to resolve implicit data type
    *         conversions
    */
   DataTypeConversionResolver getDataTypeConverterResolver();

@@ -34,7 +34,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAUL
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
-import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;

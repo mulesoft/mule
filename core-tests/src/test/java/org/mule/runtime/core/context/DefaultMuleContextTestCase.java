@@ -26,9 +26,9 @@ import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.DataTypeConversionResolver;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextFactory;

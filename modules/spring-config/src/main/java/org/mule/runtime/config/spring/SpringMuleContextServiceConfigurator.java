@@ -56,7 +56,7 @@ import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.spring.processors.MuleObjectNameProcessor;
 import org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholderProcessor;
 import org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor;
-import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.CustomService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
