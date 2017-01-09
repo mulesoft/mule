@@ -41,7 +41,10 @@ public abstract class JmsBasicTopicPublishAndSubscribe extends JmsAbstractTestCa
   @Test
   public void publishAndListenManyInOrder() throws Exception {
     final List<String> messages = of("First", "Second", "Third", "Fourth");
-    messages.forEach(this::publish);
+    for (String m : messages) {
+      publish(m);
+    }
+
     messages.forEach(payload -> assertThat(receiveIncomingMessage(), hasPayload(isIn(messages))));
     assertThat(receivedMessages.isEmpty(), is(true));
   }
@@ -51,12 +54,18 @@ public abstract class JmsBasicTopicPublishAndSubscribe extends JmsAbstractTestCa
     final List<String> firstMessages = of("First", "Second");
     final List<String> secondMessages = of("Third", "Fourth");
 
-    firstMessages.forEach(this::publish);
+    for (String m : firstMessages) {
+      publish(m);
+    }
+
     firstMessages.forEach(payload -> assertThat(receiveIncomingMessage(), hasPayload(isIn(firstMessages))));
 
     assertThat(receivedMessages.isEmpty(), is(true));
 
-    secondMessages.forEach(this::publish);
+    for (String m : secondMessages) {
+      publish(m);
+    }
+
     secondMessages.forEach(payload -> assertThat(receiveIncomingMessage(), hasPayload(isIn(secondMessages))));
 
     assertThat(receivedMessages.isEmpty(), is(true));

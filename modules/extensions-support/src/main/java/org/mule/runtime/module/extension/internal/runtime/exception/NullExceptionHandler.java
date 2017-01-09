@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.heisenberg.extension.exception;
+package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 
-public class NullExceptionEnricher extends ExceptionHandler {
+public final class NullExceptionHandler extends ExceptionHandler {
 
   @Override
   public Exception enrichException(Exception e) {

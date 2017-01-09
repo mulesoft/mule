@@ -11,7 +11,6 @@ import static org.mule.extensions.jms.api.config.AckMode.AUTO;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.evaluateMessageAck;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
@@ -21,7 +20,10 @@ import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.destination.QueueConsumer;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
+import org.mule.extensions.jms.api.exception.JmsConsumeException;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
+import org.mule.extensions.jms.api.exception.JmsPublishConsumeErrorTypeProvider;
+import org.mule.extensions.jms.api.exception.JmsPublishException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.MessageBuilder;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
@@ -30,6 +32,7 @@ import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
 import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -75,6 +78,7 @@ public class JmsPublishConsume {
    * @throws JmsExtensionException if an error occurs
    */
   @OutputResolver(output = JmsOutputResolver.class)
+  @Throws(JmsPublishConsumeErrorTypeProvider.class)
   public Result<Object, JmsAttributes> publishConsume(@UseConfig JmsConfig config, @Connection JmsConnection connection,
                                                       @Placement(order = 0) @XmlHints(
                                                           allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
@@ -118,7 +122,7 @@ public class JmsPublishConsume {
     } catch (Exception e) {
       String msg = format("An error occurred while sending a message to destination [%s] of type QUEUE: ", destination);
       LOGGER.error(msg, e);
-      throw new JmsExtensionException(createStaticMessage(msg), e);
+      throw new JmsPublishException(msg, e);
     }
 
     try {
@@ -146,7 +150,7 @@ public class JmsPublishConsume {
                                         session.getAckId());
     } catch (Exception e) {
       LOGGER.error("An error occurred while listening for the reply: ", e);
-      throw new JmsExtensionException(createStaticMessage("An error occurred while listening for the reply: "), e);
+      throw new JmsConsumeException("An error occurred while listening for the reply: ", e);
     }
   }
 

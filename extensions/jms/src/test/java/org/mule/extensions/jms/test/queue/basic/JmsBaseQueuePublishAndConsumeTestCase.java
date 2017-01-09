@@ -40,8 +40,14 @@ public abstract class JmsBaseQueuePublishAndConsumeTestCase extends JmsAbstractT
   public void publishAndConsumeManyInOrder() throws Exception {
     destination = newDestination("publishAndConsumeManyInOrder");
     final List<String> messages = of("First", "Second", "Third", "Fourth");
-    messages.forEach(this::publish);
-    messages.forEach(payload -> assertThat(consume(), hasPayload(equalTo(payload))));
+
+    for (String m : messages) {
+      publish(m);
+    }
+
+    for (String m : messages) {
+      assertThat(consume(), hasPayload(equalTo(m)));
+    }
   }
 
   @Test
@@ -50,16 +56,26 @@ public abstract class JmsBaseQueuePublishAndConsumeTestCase extends JmsAbstractT
     final List<String> firstMessages = of("First", "Second");
     final List<String> secondMessages = of("Third", "Fourth");
 
-    firstMessages.forEach(this::publish);
-    firstMessages.forEach(payload -> assertThat(consume(), hasPayload(equalTo(payload))));
+    for (String m : firstMessages) {
+      publish(m);
+    }
+
+    for (String m : firstMessages) {
+      assertThat(consume(), hasPayload(equalTo(m)));
+    }
 
     InternalMessage nullPayload = consume(destination, emptyMap(), 0);
     assertThat(format("Expected no more messages available but consumption did not fail: %s",
                       nullPayload.getPayload().getValue()),
                nullPayload.getPayload().getValue(), nullValue());
 
-    secondMessages.forEach(this::publish);
-    secondMessages.forEach(payload -> assertThat(consume(), hasPayload(equalTo(payload))));
+    for (String m : secondMessages) {
+      publish(m);
+    }
+
+    for (String m : secondMessages) {
+      assertThat(consume(), hasPayload(equalTo(m)));
+    }
 
     nullPayload = consume(destination, emptyMap(), 0);
     assertThat(format("Expected no more messages available but consumption did not fail: %s",

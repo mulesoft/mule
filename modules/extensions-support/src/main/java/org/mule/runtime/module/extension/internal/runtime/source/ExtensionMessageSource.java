@@ -42,7 +42,7 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapte
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
@@ -71,7 +71,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
-  private final ExceptionEnricherManager exceptionEnricherManager;
+  private final ExceptionHandlerManager exceptionEnricherManager;
   private Processor messageProcessor;
 
   private SourceAdapter sourceAdapter;
@@ -85,7 +85,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
   }
 
   private synchronized void createSource() throws Exception {

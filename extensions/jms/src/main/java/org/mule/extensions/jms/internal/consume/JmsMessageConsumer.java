@@ -7,7 +7,6 @@
 package org.mule.extensions.jms.internal.consume;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.exception.JmsTimeoutException;
@@ -71,7 +70,7 @@ public final class JmsMessageConsumer implements AutoCloseable {
     timeoutValidator.stop();
 
     if (message == null && timeoutValidator.getTime() > maximumWaitTime) {
-      throw new JmsTimeoutException(createStaticMessage("Failed to retrieve a Message, operation timed out"));
+      throw new JmsTimeoutException("Failed to retrieve a Message, operation timed out");
     }
     return message;
   }

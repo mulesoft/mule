@@ -4,14 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.exception;
+package org.mule.extensions.jms.api.exception;
 
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 
-public final class NullExceptionEnricher implements ExceptionEnricher {
+/**
+ * {@link ExceptionHandler} for the JMS extension.
+ * 
+ * @since 4.0
+ */
+public class JmsExceptionHandler extends ExceptionHandler {
 
   @Override
   public Exception enrichException(Exception e) {
-    return e;
+    return getRootErrorException(e);
   }
 }

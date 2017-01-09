@@ -66,10 +66,10 @@ import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinit
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionEnricherModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.PagedOperationModelProperty;
 import org.mule.tck.message.IntegerAttributes;
@@ -577,12 +577,12 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getAllParameters(), is(empty()));
     assertConnected(operation, false);
     assertTransactional(operation, false);
-    java.util.Optional<ExceptionEnricherFactory> exceptionEnricherFactory = operation
-        .getModelProperty(ExceptionEnricherModelProperty.class)
-        .map(ExceptionEnricherModelProperty::getExceptionEnricherFactory);
+    java.util.Optional<ExceptionHandlerFactory> exceptionEnricherFactory = operation
+        .getModelProperty(ExceptionHandlerModelProperty.class)
+        .map(ExceptionHandlerModelProperty::getExceptionHandlerFactory);
 
     assertThat(exceptionEnricherFactory.isPresent(), is(true));
-    assertThat(exceptionEnricherFactory.get().createEnricher(), instanceOf(CureCancerExceptionEnricher.class));
+    assertThat(exceptionEnricherFactory.get().createHandler(), instanceOf(CureCancerExceptionEnricher.class));
 
     operation = getOperation(extensionDeclaration, GET_MEDICAL_HISTORY);
     assertParameter(operation.getAllParameters(), "healthByYear", "",

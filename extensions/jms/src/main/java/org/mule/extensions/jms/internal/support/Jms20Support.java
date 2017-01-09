@@ -16,7 +16,6 @@ import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
 import static org.mule.extensions.jms.api.connection.LookupJndiDestination.ALWAYS;
 import static org.mule.extensions.jms.api.connection.LookupJndiDestination.NEVER;
 import static org.mule.extensions.jms.api.connection.LookupJndiDestination.TRY_ALWAYS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
@@ -160,7 +159,7 @@ public class Jms20Support implements JmsSupport {
 
         }
 
-        throw new DestinationNotFoundException(createStaticMessage(format("Failed to find JNDI destination [%s]"), name));
+        throw new DestinationNotFoundException(format("Failed to find JNDI destination [%s]", name));
       }
     }
 

@@ -42,7 +42,7 @@ import org.mule.runtime.core.internal.connection.ReconnectableConnectionProvider
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.Interceptable;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
@@ -109,7 +109,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private Interceptor operationInterceptor2;
 
   @Mock
-  private ExceptionEnricher exceptionEnricher;
+  private ExceptionHandler exceptionEnricher;
 
   @Mock
   private ConfigurationModel configurationModel;

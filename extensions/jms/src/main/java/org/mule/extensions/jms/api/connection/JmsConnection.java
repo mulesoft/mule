@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.destination.ConsumerType;
+import org.mule.extensions.jms.api.exception.JmsAckException;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.publish.JmsMessageProducer;
 import org.mule.extensions.jms.internal.support.JmsSupport;
@@ -165,7 +166,7 @@ public final class JmsConnection implements Stoppable, Disposable {
 
     Message message = pendingAckSessions.get(ackId);
     if (message == null) {
-      throw new IllegalArgumentException(format("No pending acknowledgement with ackId [%s] exists in this Connection", ackId));
+      throw new JmsAckException(format("No pending acknowledgement with ackId [%s] exists in this Connection", ackId));
     }
 
     message.acknowledge();

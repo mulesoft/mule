@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
+import org.mule.extensions.jms.api.exception.JmsIllegalBodyException;
 import org.mule.runtime.core.message.OutputHandler;
 
 import java.io.IOException;
@@ -29,7 +30,6 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageEOFException;
-import javax.jms.MessageFormatException;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
@@ -53,7 +53,7 @@ public class JmsMessageUtils {
 
   public static Message toMessage(Object object, Session session) throws JMSException {
     if (object == null) {
-      throw new JMSException("Message body was 'null', which is not a value of a supported type");
+      throw new JmsIllegalBodyException("Message body was 'null', which is not a value of a supported type");
     }
 
     if (object instanceof Message) {
@@ -80,7 +80,7 @@ public class JmsMessageUtils {
       return outputHandlerToMessage((OutputHandler) object, session);
 
     } else {
-      throw new JMSException("Message body was not of a supported type. "
+      throw new JmsIllegalBodyException("Message body was not of a supported type. "
           + "Valid types are Message, String, Map, InputStream, List, byte[], Serializable or OutputHandler, "
           + "but was " + getClassName(object));
     }
@@ -180,7 +180,7 @@ public class JmsMessageUtils {
         streamMessage.writeBytes(buffer, 0, len);
       }
     } catch (IOException e) {
-      throw new JMSException("Failed to read input stream to create a stream message: " + e);
+      throw new JmsIllegalBodyException("Failed to read input stream to create a stream message: " + e);
     } finally {
       closeQuietly(value);
     }
@@ -207,10 +207,10 @@ public class JmsMessageUtils {
       if (validateStreamMessageType(o)) {
         sMsg.writeObject(o);
       } else {
-        throw new MessageFormatException(format("Invalid type passed to StreamMessage: %s . Allowed types are: "
+        throw new JmsIllegalBodyException(format("Invalid type passed to StreamMessage: %s . Allowed types are: "
             + "Boolean, Byte, Short, Character, Integer, Long, Float, Double,"
             + "String and byte[]",
-                                                getClassName(o)));
+                                                 getClassName(o)));
       }
     }
     return sMsg;
@@ -235,9 +235,7 @@ public class JmsMessageUtils {
     try {
       value.write(null, output);
     } catch (IOException e) {
-      JMSException j = new JMSException("Could not serialize OutputHandler.");
-      j.initCause(e);
-      throw j;
+      throw new JmsIllegalBodyException("Could not serialize OutputHandler.", e);
     }
 
     BytesMessage bMsg = session.createBytesMessage();
@@ -275,7 +273,7 @@ public class JmsMessageUtils {
       } catch (MessageEOFException eof) {
         // ignored
       } catch (Exception e) {
-        throw new JMSException("Failed to extract information from JMS Stream Message: " + e);
+        throw new JmsIllegalBodyException("Failed to extract information from JMS Stream Message: " + e);
       }
       return result;
     }
@@ -306,7 +304,7 @@ public class JmsMessageUtils {
       if (JmsSpecification.JMS_1_1.equals(jmsSpec)) {
         long bmBodyLength = bMsg.getBodyLength();
         if (bmBodyLength > Integer.MAX_VALUE) {
-          throw new JMSException("Size of BytesMessage exceeds Integer.MAX_VALUE; "
+          throw new JmsIllegalBodyException("Size of BytesMessage exceeds Integer.MAX_VALUE; "
               + "please consider using JMS StreamMessage instead");
         }
 
@@ -365,7 +363,7 @@ public class JmsMessageUtils {
         return tMsgText.getBytes(encoding);
       }
     } else {
-      throw new JMSException("Cannot get bytes from Map Message");
+      throw new JmsIllegalBodyException("Cannot get bytes from Map Message");
     }
   }
 

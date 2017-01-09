@@ -10,15 +10,15 @@ import static org.mule.extension.validation.api.ValidationErrorTypes.VALIDATION;
 
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 
 /**
- * {@link ExceptionEnricher} implementation for {@link ValidationException} to wrap them and throw
+ * {@link ExceptionHandler} implementation for {@link ValidationException} to wrap them and throw
  * an {@link ModuleException} specifying the correspondent {@link ErrorTypeDefinition}
  *
  * @since 4.0
  */
-public class ValidationExceptionEnricher implements ExceptionEnricher {
+public class ValidationExceptionEnricher extends ExceptionHandler {
 
   @Override
   public Exception enrichException(Exception e) {

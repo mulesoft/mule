@@ -43,6 +43,7 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
 
   private static final Logger LOGGER = getLogger(JmsAbstractTestCase.class);
 
+  protected static final String NAMESPACE = "JMSN";
   protected static final String DESTINATION_VAR = "destination";
   protected static final String MAXIMUM_WAIT_VAR = "maximumWait";
 
@@ -85,50 +86,40 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
     return name + currentTimeMillis();
   }
 
-  protected void publish(Object message) {
-    checkArgument(!isBlank(destination), "Blank destination");
+  protected void publish(Object message) throws Exception {
     publish(message, destination);
   }
 
-  protected void publish(Object message, String destination) {
+  protected void publish(Object message, String destination) throws Exception {
     publish(message, destination, emptyMap());
   }
 
-  protected void publish(Object message, String destination, Map<String, Object> flowVars) {
+  protected void publish(Object message, String destination, Map<String, Object> flowVars) throws Exception {
     FlowRunner publisher = flowRunner(PUBLISHER_FLOW)
         .withPayload(message)
         .withVariable(DESTINATION_VAR, destination);
     flowVars.forEach(publisher::withVariable);
-    try {
-      publisher.run();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    publisher.run();
   }
 
-  protected InternalMessage consume() {
-    checkArgument(!isBlank(destination), "Blank destination");
+  protected InternalMessage consume() throws Exception {
     return consume(destination, emptyMap(), maximumWait);
   }
 
-  protected InternalMessage consume(String destination) {
+  protected InternalMessage consume(String destination) throws Exception {
     return consume(destination, emptyMap(), maximumWait);
   }
 
-  protected InternalMessage consume(String destination, Map<String, Object> flowVars) {
+  protected InternalMessage consume(String destination, Map<String, Object> flowVars) throws Exception {
     return consume(destination, flowVars, maximumWait);
   }
 
-  protected InternalMessage consume(String destination, Map<String, Object> flowVars, long maximumWait) {
+  protected InternalMessage consume(String destination, Map<String, Object> flowVars, long maximumWait) throws Exception {
     FlowRunner consumer = flowRunner(CONSUMER_FLOW)
         .withVariable(DESTINATION_VAR, destination)
         .withVariable(MAXIMUM_WAIT_VAR, maximumWait);
     flowVars.forEach(consumer::withVariable);
-    try {
-      return consumer.run().getMessage();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    return consumer.run().getMessage();
   }
 
   protected void assertHeaders(JmsAttributes attributes, JmsDestination destination, Integer deliveryMode,

@@ -62,7 +62,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
@@ -70,7 +70,7 @@ import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
+import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -133,7 +133,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Object configuration;
 
   @Mock
-  protected ExceptionEnricherFactory exceptionEnricherFactory;
+  protected ExceptionHandlerFactory exceptionHandlerFactory;
 
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
@@ -194,8 +194,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
 
-    mockExceptionEnricher(operationModel, exceptionEnricherFactory);
-    when(exceptionEnricherFactory.createEnricher()).thenReturn(new NullExceptionEnricher());
+    mockExceptionEnricher(operationModel, exceptionHandlerFactory);
+    when(exceptionHandlerFactory.createHandler()).thenReturn(new NullExceptionHandler());
 
     mockMetadataResolverFactory(operationModel, metadataResolverFactory);
     when(metadataResolverFactory.getKeyResolver()).thenReturn(new TestNoConfigMetadataResolver());

@@ -71,8 +71,8 @@ import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -159,7 +159,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private ExceptionCallback exceptionCallback;
 
   @Mock
-  private ExceptionEnricherFactory enricherFactory;
+  private ExceptionHandlerFactory enricherFactory;
 
   @Mock
   private ConfigurationProvider configurationProvider;
@@ -424,7 +424,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void enrichExceptionWithSourceExceptionEnricher() throws Exception {
-    when(enricherFactory.createEnricher()).thenReturn(new HeisenbergConnectionExceptionEnricher());
+    when(enricherFactory.createHandler()).thenReturn(new HeisenbergConnectionExceptionEnricher());
     mockExceptionEnricher(sourceModel, enricherFactory);
     mockExceptionEnricher(sourceModel, enricherFactory);
     ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
@@ -438,9 +438,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Test
   public void enrichExceptionWithExtensionEnricher() throws Exception {
     final String enrichedErrorMessage = "Enriched: " + ERROR_MESSAGE;
-    ExceptionEnricher exceptionEnricher = mock(ExceptionEnricher.class);
+    ExceptionHandler exceptionEnricher = mock(ExceptionHandler.class);
     when(exceptionEnricher.enrichException(any(Exception.class))).thenReturn(new Exception(enrichedErrorMessage));
-    when(enricherFactory.createEnricher()).thenReturn(exceptionEnricher);
+    when(enricherFactory.createHandler()).thenReturn(exceptionEnricher);
     mockExceptionEnricher(extensionModel, enricherFactory);
     ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
     doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).onStart(sourceCallback);
