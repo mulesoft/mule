@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.cxf.support;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
