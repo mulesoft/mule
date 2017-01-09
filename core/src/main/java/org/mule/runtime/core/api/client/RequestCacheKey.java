@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.client;
 
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.api.util.Preconditions;
 
 /**

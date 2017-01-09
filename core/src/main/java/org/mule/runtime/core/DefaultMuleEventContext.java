@@ -7,6 +7,7 @@
 package org.mule.runtime.core;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;

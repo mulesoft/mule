@@ -7,7 +7,7 @@
 package org.mule.test.core.el.mvel;
 
 
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 

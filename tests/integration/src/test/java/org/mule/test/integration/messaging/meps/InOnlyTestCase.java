@@ -7,10 +7,9 @@
 package org.mule.test.integration.messaging.meps;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
 import org.mule.functional.functional.FunctionalTestNotificationListener;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 

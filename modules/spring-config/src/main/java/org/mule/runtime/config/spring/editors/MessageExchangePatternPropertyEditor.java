@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.editors;
 
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 
 import java.beans.PropertyEditorSupport;
 

@@ -10,7 +10,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;

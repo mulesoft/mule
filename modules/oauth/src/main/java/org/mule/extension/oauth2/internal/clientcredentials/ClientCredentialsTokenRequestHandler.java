@@ -7,7 +7,7 @@
 package org.mule.extension.oauth2.internal.clientcredentials;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.extension.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.extension.oauth2.internal.ApplicationCredentials;

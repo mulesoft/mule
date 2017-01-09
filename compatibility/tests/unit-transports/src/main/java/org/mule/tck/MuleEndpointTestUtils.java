@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;

@@ -11,12 +11,11 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEv
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import org.junit.Test;

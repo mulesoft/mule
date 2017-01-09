@@ -17,7 +17,7 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;

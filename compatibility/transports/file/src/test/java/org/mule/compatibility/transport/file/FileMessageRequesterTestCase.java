@@ -10,9 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.DefaultInboundEndpoint;
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.compatibility.transport.file.FileMessageRequester;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.util.HashMap;

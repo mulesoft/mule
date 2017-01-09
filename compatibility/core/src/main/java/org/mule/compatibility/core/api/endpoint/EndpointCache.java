@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.api.endpoint;
 
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
