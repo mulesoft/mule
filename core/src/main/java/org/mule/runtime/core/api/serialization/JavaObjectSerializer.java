@@ -5,12 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.serialization;
+package org.mule.runtime.core.api.serialization;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.serialization.SerializationProtocol;
+import org.mule.runtime.core.internal.serialization.JavaExternalSerializerProtocol;
 
 /**
  * Serializes objects using the default Java serialization mechanism provided by writeObject and readObject methods.

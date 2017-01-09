@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 
 import java.util.HashMap;
 import java.util.List;

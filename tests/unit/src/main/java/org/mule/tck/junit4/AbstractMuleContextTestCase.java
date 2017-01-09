@@ -43,7 +43,7 @@ import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
