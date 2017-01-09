@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static org.mule.BenchmarkUtils.createMuleContext;
 import static org.mule.MessageExchangePattern.ONE_WAY;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
@@ -59,8 +60,7 @@ public class FlowOneWayBenchmark
     @Setup
     public void setup() throws Exception
     {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        muleContext = muleContextFactory.createMuleContext();
+        muleContext = createMuleContext();
         muleContext.start();
 
         source = new TriggerableMessageSource();
