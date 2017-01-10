@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.Error;

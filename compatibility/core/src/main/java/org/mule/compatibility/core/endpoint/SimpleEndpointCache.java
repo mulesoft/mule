@@ -12,7 +12,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointCache;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.registry.MuleRegistry;

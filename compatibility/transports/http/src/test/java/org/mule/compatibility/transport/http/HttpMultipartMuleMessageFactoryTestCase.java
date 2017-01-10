@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.ByteArrayInputStream;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.runtime.core.api;
 
 public enum MessageExchangePattern {
   ONE_WAY {
@@ -24,14 +24,6 @@ public enum MessageExchangePattern {
   };
 
   public abstract boolean hasResponse();
-
-  public static MessageExchangePattern fromSyncFlag(boolean sync) {
-    if (sync) {
-      return REQUEST_RESPONSE;
-    } else {
-      return ONE_WAY;
-    }
-  }
 
   public static MessageExchangePattern fromString(String string) {
     String mepString = string.toUpperCase().replace('-', '_');

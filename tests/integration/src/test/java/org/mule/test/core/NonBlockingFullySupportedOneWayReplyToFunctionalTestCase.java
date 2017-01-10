@@ -7,9 +7,9 @@
 package org.mule.test.core;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;

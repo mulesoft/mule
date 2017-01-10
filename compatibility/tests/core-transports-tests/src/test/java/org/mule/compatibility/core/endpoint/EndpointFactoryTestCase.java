@@ -20,7 +20,7 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;

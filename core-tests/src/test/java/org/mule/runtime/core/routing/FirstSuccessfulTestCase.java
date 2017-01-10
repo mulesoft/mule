@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.runtime.api.message.Error;

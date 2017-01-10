@@ -13,7 +13,7 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;

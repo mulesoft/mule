@@ -7,7 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;

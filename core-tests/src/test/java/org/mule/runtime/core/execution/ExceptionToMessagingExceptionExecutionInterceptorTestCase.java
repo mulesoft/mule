@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;

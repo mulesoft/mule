@@ -12,8 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import org.mule.runtime.core.MessageExchangePattern;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -21,7 +20,6 @@ import org.mule.test.AbstractIntegrationTestCase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 
 import org.junit.Test;
 

@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;

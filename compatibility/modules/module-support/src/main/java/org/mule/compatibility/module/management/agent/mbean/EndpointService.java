@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.util.TransportObjectNameHelper;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import org.slf4j.Logger;

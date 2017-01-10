@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.http.components;
 
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_METHOD_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODED_CONTENT_TYPE;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvokeRestService;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;

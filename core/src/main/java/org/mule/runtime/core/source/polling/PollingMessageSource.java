@@ -8,7 +8,7 @@ package org.mule.runtime.core.source.polling;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;

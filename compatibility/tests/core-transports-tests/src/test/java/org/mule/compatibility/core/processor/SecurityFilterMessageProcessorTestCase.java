@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;

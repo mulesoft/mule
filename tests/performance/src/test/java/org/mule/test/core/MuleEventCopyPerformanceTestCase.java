@@ -6,7 +6,7 @@
  */
 package org.mule.test.core;
 
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;

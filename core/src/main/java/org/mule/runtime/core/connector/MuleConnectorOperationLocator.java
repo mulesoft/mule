@@ -8,7 +8,7 @@ package org.mule.runtime.core.connector;
 
 import static java.util.Collections.sort;
 
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.OperationOptions;

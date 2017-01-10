@@ -7,10 +7,9 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;

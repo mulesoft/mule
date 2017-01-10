@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.processor;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -22,9 +22,8 @@ import org.mule.compatibility.core.context.notification.EndpointMessageNotificat
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -45,7 +44,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 

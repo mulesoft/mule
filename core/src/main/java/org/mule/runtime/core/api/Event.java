@@ -12,7 +12,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;

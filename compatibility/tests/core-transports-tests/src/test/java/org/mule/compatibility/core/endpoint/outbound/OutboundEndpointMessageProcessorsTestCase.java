@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;

@@ -15,7 +15,7 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.tck.MuleEndpointTestUtils;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;

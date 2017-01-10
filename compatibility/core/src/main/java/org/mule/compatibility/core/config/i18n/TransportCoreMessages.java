@@ -9,7 +9,7 @@ package org.mule.compatibility.core.config.i18n;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.config.i18n.CoreMessages;

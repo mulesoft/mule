@@ -7,15 +7,14 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;

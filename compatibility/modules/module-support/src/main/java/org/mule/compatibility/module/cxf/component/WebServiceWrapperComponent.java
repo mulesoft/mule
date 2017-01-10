@@ -8,9 +8,8 @@ package org.mule.compatibility.module.cxf.component;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.compatibility.module.cxf.component.AbstractWebServiceWrapperComponent;
 import org.mule.compatibility.module.cxf.endpoint.CxfEndpointBuilder;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;

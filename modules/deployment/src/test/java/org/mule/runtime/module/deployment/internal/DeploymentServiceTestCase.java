@@ -49,7 +49,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGI
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;

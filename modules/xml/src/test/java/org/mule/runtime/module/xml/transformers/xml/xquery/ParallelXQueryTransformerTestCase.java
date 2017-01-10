@@ -9,7 +9,7 @@ package org.mule.runtime.module.xml.transformers.xml.xquery;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;

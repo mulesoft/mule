@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;

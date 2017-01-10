@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;

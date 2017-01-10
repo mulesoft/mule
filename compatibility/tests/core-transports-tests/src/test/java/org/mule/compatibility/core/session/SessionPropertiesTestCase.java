@@ -14,8 +14,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 

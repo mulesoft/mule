@@ -20,7 +20,7 @@ import org.mule.compatibility.core.endpoint.DefaultInboundEndpoint;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.compatibility.transport.vm.VMConnector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.construct.Flow;

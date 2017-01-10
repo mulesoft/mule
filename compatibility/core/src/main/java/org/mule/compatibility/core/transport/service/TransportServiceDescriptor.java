@@ -17,7 +17,7 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequesterFactory;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
