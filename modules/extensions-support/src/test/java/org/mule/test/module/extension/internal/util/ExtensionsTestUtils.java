@@ -27,6 +27,8 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_ATTRIBUTES_FIELD_NAME;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_PAYLOAD_FIELD_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -164,8 +166,8 @@ public final class ExtensionsTestUtils {
     assertThat(getTypeId(type).get(), is(Message.class.getName()));
 
     ObjectType messageType = (ObjectType) type;
-    assertThat(messageType.getFieldByName("payload").get().getValue(), equalTo(payloadType));
-    assertThat(messageType.getFieldByName("attributes").get().getValue(), equalTo(attributesType));
+    assertThat(messageType.getFieldByName(MESSAGE_PAYLOAD_FIELD_NAME).get().getValue(), equalTo(payloadType));
+    assertThat(messageType.getFieldByName(MESSAGE_ATTRIBUTES_FIELD_NAME).get().getValue(), equalTo(attributesType));
   }
 
   public static ParameterModel getParameter(String name, Class<?> type) {

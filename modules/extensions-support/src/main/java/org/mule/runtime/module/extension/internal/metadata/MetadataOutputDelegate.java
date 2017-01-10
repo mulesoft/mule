@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.outputDescriptor;
 import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
@@ -15,6 +14,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
@@ -157,7 +157,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     }
 
     MetadataType outputType = ((ArrayType) component.getOutput().getType()).getType();
-    String typeId = getTypeId(outputType).orElse(null);
+    String typeId = getId(outputType);
 
     if (Message.class.getName().equals(typeId)) {
       resolvedType = wrapInMessageType(resolvedType, key, metadataContext);

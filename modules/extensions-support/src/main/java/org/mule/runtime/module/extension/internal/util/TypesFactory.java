@@ -20,6 +20,9 @@ import org.mule.runtime.api.message.Message;
  */
 public final class TypesFactory {
 
+  public static final String MESSAGE_PAYLOAD_FIELD_NAME = "payload";
+  public static final String MESSAGE_ATTRIBUTES_FIELD_NAME = "attributes";
+
   private TypesFactory() {}
 
   /**
@@ -36,8 +39,8 @@ public final class TypesFactory {
                                             MetadataType attributesType) {
 
     ObjectTypeBuilder messageType = typeBuilder.objectType().id(Message.class.getName());
-    messageType.addField().key("payload").required(true).value(outputType);
-    messageType.addField().key("attributes").required(true).value(attributesType);
+    messageType.addField().key(MESSAGE_PAYLOAD_FIELD_NAME).required(true).value(outputType);
+    messageType.addField().key(MESSAGE_ATTRIBUTES_FIELD_NAME).required(true).value(attributesType);
 
     return messageType.build();
   }
