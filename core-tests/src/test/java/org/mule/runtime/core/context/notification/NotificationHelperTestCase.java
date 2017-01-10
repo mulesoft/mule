@@ -13,21 +13,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
-import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -57,7 +60,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   public void before() {
     when(muleContext.getNotificationManager()).thenReturn(eventNotificationHandler);
     when(event.getMessage()).thenReturn(message);
-    when((Class<String>) message.getPayload().getDataType().getType()).thenReturn(String.class);
+    when(message.getPayload()).thenReturn(new TypedValue("", DataType.STRING));
     initMocks(eventNotificationHandler);
     initMocks(defaultNotificationHandler);
 

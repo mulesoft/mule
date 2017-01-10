@@ -11,15 +11,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -79,7 +80,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   public void setup() {
     when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mockMuleEvent);
     when(mockMuleEvent.getMessage()).thenReturn(mockMessageCollection);
-    when(mockMessageCollection.getPayload().getDataType()).thenReturn(DataType.OBJECT);
+    when(mockMessageCollection.getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
   }
 
 

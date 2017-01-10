@@ -20,6 +20,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
@@ -113,6 +115,8 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void payloadAsType() throws Exception {
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
+    final TypedValue<Object> expectedPayload = new TypedValue<>(new Object(), OBJECT);
+    when(transformedMessage.getPayload()).thenReturn(expectedPayload);
     TransformationService transformationService = mock(TransformationService.class);
     muleContext.setTransformationService(transformationService);
     when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
@@ -122,10 +126,9 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void payloadAsDataType() throws Exception {
-    String payload = TEST_PAYLOAD;
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     TransformationService transformationService = mock(TransformationService.class);
-    when(transformedMessage.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
+    when(transformedMessage.getPayload()).thenReturn(new TypedValue<Object>(TEST_PAYLOAD, STRING));
     muleContext.setTransformationService(transformationService);
     when(transformationService.transform(event.getMessage(), DataType.STRING)).thenReturn(transformedMessage);
     Object result = evaluate("message.payloadAs(" + DataType.class.getName() + ".STRING)", event);

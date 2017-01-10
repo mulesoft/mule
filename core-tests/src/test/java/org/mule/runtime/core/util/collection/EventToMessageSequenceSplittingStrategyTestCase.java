@@ -14,6 +14,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.routing.MessageSequence;
@@ -43,7 +46,7 @@ public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMul
   public void copiableCollection() {
     Copiable<Collection<String>> collection = mock(Copiable.class, withSettings().extraInterfaces(Collection.class));
     when(collection.copy()).thenReturn(testCollection);
-    when(event.getMessage().getPayload().getValue()).thenReturn(collection);
+    when(event.getMessage().getPayload()).thenReturn(new TypedValue<>(collection, fromObject(collection)));
 
     assertCollectionSequence();
     verify(collection).copy();
@@ -51,7 +54,7 @@ public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMul
 
   @Test
   public void nonCopiableCollection() {
-    when(event.getMessage().getPayload().getValue()).thenReturn(testCollection);
+    when(event.getMessage().getPayload()).thenReturn(new TypedValue<>(testCollection, fromObject(testCollection)));
     assertCollectionSequence();
   }
 

@@ -22,10 +22,12 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ClassUtils;
@@ -95,7 +97,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     initHeisenberg();
     configurationInstance =
         new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, config, emptyList(), Optional.empty());
-    when(muleEvent.getMessage().getPayload().getDataType()).thenReturn(DATA_TYPE);
+    when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, muleContext);

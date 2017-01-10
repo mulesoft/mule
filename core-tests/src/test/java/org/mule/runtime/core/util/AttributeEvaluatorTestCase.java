@@ -14,6 +14,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -95,7 +97,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "hi";
-    doReturn(mockFor(new StringBuilder(expectedValue))).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
+    Object value = new StringBuilder(expectedValue);
+    doReturn(new TypedValue<>(value, fromObject(value))).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     assertThat(attributeEvaluator.resolveStringValue(mockMuleEvent), is(expectedValue));
   }
 
@@ -104,7 +107,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "123";
-    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
+    doReturn(new TypedValue<>(expectedValue, fromObject(expectedValue))).when(mockExpressionManager).evaluate(anyString(),
+                                                                                                              any(Event.class));
     assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is(Integer.parseInt(expectedValue)));
   }
 
@@ -113,7 +117,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final long expectedValue = 1234l;
-    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
+    doReturn(new TypedValue<>(expectedValue, fromObject(expectedValue))).when(mockExpressionManager).evaluate(anyString(),
+                                                                                                              any(Event.class));
     assertThat(attributeEvaluator.resolveIntegerValue(mockMuleEvent), is((int) expectedValue));
   }
 
@@ -122,7 +127,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final String expectedValue = "true";
-    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
+    doReturn(new TypedValue<>(expectedValue, fromObject(expectedValue))).when(mockExpressionManager).evaluate(anyString(),
+                                                                                                              any(Event.class));
     assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
   }
 
@@ -131,7 +137,8 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
     final Boolean expectedValue = true;
-    doReturn(mockFor(expectedValue)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
+    doReturn(new TypedValue<>(expectedValue, fromObject(expectedValue))).when(mockExpressionManager).evaluate(anyString(),
+                                                                                                              any(Event.class));
     assertThat(attributeEvaluator.resolveBooleanValue(mockMuleEvent), is(Boolean.valueOf(expectedValue)));
   }
 
@@ -139,8 +146,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
   public void resolveIntegerWithNoNumericValue() {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
     attributeEvaluator.initialize(mockExpressionManager);
-    final String value = "abcd";
-    doReturn(mockFor(value)).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
+    doReturn(new TypedValue<>("abcd", fromObject("abcd"))).when(mockExpressionManager).evaluate(anyString(), any(Event.class));
     attributeEvaluator.resolveIntegerValue(mockMuleEvent);
   }
 
@@ -153,12 +159,6 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase {
     assertThat(nullAttributeEvaluator.resolveValue(mockMuleEvent), nullValue());
     assertThat(nullAttributeEvaluator.resolveIntegerValue(mockMuleEvent), nullValue());
     assertThat(nullAttributeEvaluator.resolveStringValue(mockMuleEvent), nullValue());
-  }
-
-  private TypedValue mockFor(Object value) {
-    TypedValue mockTypedValue = mock(TypedValue.class);
-    when(mockTypedValue.getValue()).thenReturn(value);
-    return mockTypedValue;
   }
 
 }

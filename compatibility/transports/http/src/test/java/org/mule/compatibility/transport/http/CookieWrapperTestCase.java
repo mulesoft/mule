@@ -13,6 +13,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -149,8 +151,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
     cookieWrapper.setExpiryDate("#[expiryDate]");
 
     when(mockExpressionManager.isExpression("#[expiryDate]")).thenReturn(true);
-    TypedValue typedValue = mock(TypedValue.class);
-    when(typedValue.getValue()).thenReturn(now);
+    TypedValue typedValue = new TypedValue<>(now, fromObject(now));
     when(mockExpressionManager.evaluate("#[expiryDate]", mockMuleEvent)).thenReturn(typedValue);
     mockParse();
 
