@@ -125,7 +125,7 @@ class StandaloneClientSchedulerService implements SchedulerService, Startable, S
   }
 
   @Override
-  public List<Scheduler> getActiveSchedulers() {
+  public List<Scheduler> getSchedulers() {
     return singletonList(scheduler);
   }
 

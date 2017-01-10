@@ -427,6 +427,9 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       } catch (MuleException me) {
         shutdownInternalScheduler();
         throw me;
+      } catch (Exception e) {
+        shutdownInternalScheduler();
+        throw new LifecycleException(e, this);
       }
     }
   }

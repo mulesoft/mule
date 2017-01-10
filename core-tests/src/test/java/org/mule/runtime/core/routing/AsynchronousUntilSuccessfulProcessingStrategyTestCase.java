@@ -124,7 +124,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
   @After
   public void after() {
-    final List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getActiveSchedulers();
+    final List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
     for (Scheduler scheduler : new ArrayList<>(createdSchedulers)) {
       scheduler.shutdown();
     }

@@ -43,7 +43,7 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
     ScheduledFuture<?> scheduler = factory.schedule(schedulerService.ioScheduler(), () -> {
     });
 
-    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleWithCronExpression(any(), eq("0 * * * ? *"), eq(getDefault()));
   }
 
@@ -56,7 +56,7 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
     ScheduledFuture<?> scheduler = factory.schedule(schedulerService.ioScheduler(), () -> {
     });
 
-    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleWithCronExpression(any(), eq("0 * * * ? *"),
                                                         eq(getTimeZone("America/Argentina/Buenos_Aires")));
   }
@@ -70,7 +70,7 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
     ScheduledFuture<?> scheduler = factory.schedule(schedulerService.ioScheduler(), () -> {
     });
 
-    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleWithCronExpression(any(), eq("0 * * * ? *"), eq(getTimeZone("Europe/London")));
   }
 

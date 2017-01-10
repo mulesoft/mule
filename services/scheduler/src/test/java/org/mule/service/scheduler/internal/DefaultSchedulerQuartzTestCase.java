@@ -54,8 +54,7 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
   public void before() throws SchedulerException {
     super.before();
     executor = new DefaultScheduler(DefaultSchedulerQuartzTestCase.class.getSimpleName(), sharedExecutor, 1,
-                                    sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM, sched -> {
-                                    });
+                                    sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
   }
 
   @Override

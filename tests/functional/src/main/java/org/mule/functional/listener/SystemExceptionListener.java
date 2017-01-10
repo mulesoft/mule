@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SystemExceptionListener {
 
-  private transient Logger logger = LoggerFactory.getLogger(SystemExceptionListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(SystemExceptionListener.class);
 
   private CountDownLatch exceptionThrownLatch = new Latch();
   private int timeout = 10000;

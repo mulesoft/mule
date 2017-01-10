@@ -83,7 +83,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     PollingMessageSource pollingMessageSource = createMessageSource(event -> null);
 
     verify(muleContext.getSchedulerService()).ioScheduler();
-    List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getActiveSchedulers();
+    List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
     pollingMessageSource.start();
 
     Scheduler pollScheduler = createdSchedulers.get(createdSchedulers.size() - 1);

@@ -36,7 +36,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   public void stopServices() throws MuleException {
     schedulerService.stop();
-    assertThat(schedulerService.getActiveSchedulers(), empty());
+    assertThat(schedulerService.getSchedulers(), empty());
   }
 
 }

@@ -378,7 +378,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
-  public List<Scheduler> getActiveSchedulers() {
+  public List<Scheduler> getSchedulers() {
     // TODO MULE-10549 Improve this syncronization
     synchronized (activeSchedulers) {
       return unmodifiableList(new ArrayList<>(activeSchedulers));

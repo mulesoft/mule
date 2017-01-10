@@ -776,7 +776,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       final SchedulerService schedulerService = muleContext.getSchedulerService();
       if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && (mode == MONO || mode == FLUX)) {
         new PollingProber().check(new JUnitLambdaProbe(() -> {
-          verify(schedulerService.getActiveSchedulers().get(0), atLeast(nonBlockingProcessorsExecuted.get()))
+          verify(schedulerService.getSchedulers().get(0), atLeast(nonBlockingProcessorsExecuted.get()))
               .submit(any(Runnable.class));
           return true;
         }));

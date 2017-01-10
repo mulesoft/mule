@@ -131,6 +131,6 @@ public interface SchedulerService extends Service {
    * 
    * @return all currently active {@link Scheduler}s.
    */
-  List<Scheduler> getActiveSchedulers();
+  List<Scheduler> getSchedulers();
 
 }

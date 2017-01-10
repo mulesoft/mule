@@ -139,7 +139,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     scheduler.shutdownNow();
   }
 
-  public List<Scheduler> getActiveSchedulers() {
+  public List<Scheduler> getSchedulers() {
     return unmodifiableList(decorators);
   }
 

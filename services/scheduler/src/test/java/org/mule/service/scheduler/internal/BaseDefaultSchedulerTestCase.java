@@ -15,6 +15,7 @@ import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -46,6 +47,8 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
   protected static final Consumer<ScheduledExecutorService> SUBMIT_RESULT_RUNNABLE = exec -> exec.submit(EMPTY_RUNNABLE, 0);
   protected static final Consumer<ScheduledExecutorService> EXECUTE_EMPTY_RUNNABLE = exec -> exec.execute(EMPTY_RUNNABLE);
 
+  protected static final Consumer<Scheduler> EMPTY_SHUTDOWN_CALLBACK = sched -> {
+  };
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -96,8 +99,7 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
   protected ScheduledExecutorService createExecutor() {
     return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
-                                sharedQuartzScheduler, CUSTOM, sched -> {
-                                });
+                                sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {

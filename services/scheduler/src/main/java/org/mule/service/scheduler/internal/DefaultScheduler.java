@@ -99,7 +99,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param quartzScheduler the quartz object that will handle tasks scheduled with cron expressions. This will not execute the
    *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
    * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
-   * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
+   * @param EMPTY_SHUTDOWN_CALLBACK a callback to be invoked when this scheduler is stopped/shutdown.
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
                    org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Consumer<Scheduler> shutdownCallback) {

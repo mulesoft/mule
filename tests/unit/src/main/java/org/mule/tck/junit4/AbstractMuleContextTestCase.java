@@ -294,7 +294,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         muleContext.dispose();
 
         final SchedulerService serviceImpl = muleContext.getSchedulerService();
-        assertThat(serviceImpl.getActiveSchedulers(), empty());
+        assertThat(serviceImpl.getSchedulers(), empty());
         if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
           stopIfNeeded(serviceImpl);
         }

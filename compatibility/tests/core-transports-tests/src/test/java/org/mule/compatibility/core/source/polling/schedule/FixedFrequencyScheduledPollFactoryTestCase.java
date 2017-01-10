@@ -52,7 +52,7 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
     ScheduledFuture<?> scheduler = factory.doSchedule(schedulerService.ioScheduler(), worker);
 
-    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleAtFixedRate(any(), eq(400l), eq(300l), eq(DAYS));
   }
 
@@ -63,7 +63,7 @@ public class FixedFrequencyScheduledPollFactoryTestCase extends AbstractMuleTest
     PollingReceiverWorker worker = new PollingReceiverWorker(receiver);
     ScheduledFuture<?> scheduler = factory.doSchedule(schedulerService.ioScheduler(), worker);
 
-    Scheduler createdScheduler = schedulerService.getActiveSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleAtFixedRate(any(), eq(1000l), eq(1000l), eq(MILLISECONDS));
   }
 
