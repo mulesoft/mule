@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.dsl.model.extension.xml;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;

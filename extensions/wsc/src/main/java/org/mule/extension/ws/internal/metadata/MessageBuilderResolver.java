@@ -8,7 +8,7 @@ package org.mule.extension.ws.internal.metadata;
 
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getAttachmentFields;
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getOperationType;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.internal.introspection.InputTypeIntrospecterDelegate;
 import org.mule.metadata.api.builder.BaseTypeBuilder;

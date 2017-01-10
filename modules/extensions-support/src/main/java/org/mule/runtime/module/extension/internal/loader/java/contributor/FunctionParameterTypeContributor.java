@@ -11,7 +11,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.internal.utils.MetadataTypeUtils;
+import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.core.api.Event;

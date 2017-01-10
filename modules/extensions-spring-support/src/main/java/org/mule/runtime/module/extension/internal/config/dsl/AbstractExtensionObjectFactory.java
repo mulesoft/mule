@@ -28,7 +28,7 @@ import java.util.Map;
  * @since 4.0
  */
 public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotatedObjectFactory<T>
-    implements ObjectTypeParametersResolver {
+  implements ObjectTypeParametersResolver {
 
   protected final MuleContext muleContext;
   protected Map<String, Object> parameters = new HashMap<>();
