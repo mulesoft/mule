@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
@@ -27,14 +28,20 @@ import java.util.List;
 
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Fork(1)
 @Threads(1)
 @BenchmarkMode(AverageTime)
+@OutputTimeUnit(MICROSECONDS)
 @State(Benchmark)
 public class AbstractBenchmark {
+
+  private final static Logger LOGGER = LoggerFactory.getLogger(AbstractBenchmark.class);
 
   public static final String CONNECTOR_NAME = "test";
   public static final String FLOW_NAME = "flow";
@@ -46,6 +53,7 @@ public class AbstractBenchmark {
     try {
       PAYLOAD = getResourceAsString("test-data.json", AbstractBenchmark.class);
     } catch (IOException e) {
+      LOGGER.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
   }

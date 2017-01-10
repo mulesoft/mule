@@ -6,7 +6,6 @@
  */
 package org.mule;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -14,10 +13,8 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 
-@OutputTimeUnit(NANOSECONDS)
 public class MessageBenchmark extends AbstractBenchmark {
 
   private Message message;

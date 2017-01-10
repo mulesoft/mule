@@ -6,7 +6,6 @@
  */
 package org.mule;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -19,12 +18,9 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 
-
-@OutputTimeUnit(NANOSECONDS)
 public class EventBenchmark extends AbstractBenchmark {
 
   public static final String KEY = "key";
