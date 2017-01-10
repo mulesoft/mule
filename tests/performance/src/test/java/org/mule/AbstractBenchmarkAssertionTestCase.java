@@ -6,21 +6,24 @@
  */
 package org.mule;
 
-import static java.lang.Boolean.TRUE;
 import static java.lang.System.getProperty;
+import static java.util.Collections.EMPTY_MAP;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 /**
@@ -30,6 +33,12 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTestCase {
 
   private static final String ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY = "enablePerformanceTests";
+  private static final String NORM_ALLOCATION_RESULT_KEY = "gc.alloc.rate.norm";
+
+  @Override
+  public int getTestTimeoutSecs() {
+    return 5 * 60;
+  }
 
   /**
    * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
@@ -40,8 +49,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
    * @param timeUnit the time unit of the expected result value.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, final double expectedResult, TimeUnit timeUnit) {
-    runAndAssertBenchmark(clazz, testName, 1, timeUnit,
-                          runResult -> assertThat(runResult.getPrimaryResult().getScore(), lessThanOrEqualTo(expectedResult)));
+    runAndAssertBenchmark(clazz, testName, 1, expectedResult, timeUnit);
   }
 
   /**
@@ -51,48 +59,98 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
    * @param testName the name of the test method.
    * @param expectedResult the expected minimum minimum result value.
    * @param timeUnit the time unit of the expected result value.
+   * @param expectedAllocation the expected maximum allocation in bytes per benchmark iteration.
+   */
+  protected void runAndAssertBenchmark(Class clazz, String testName, final double expectedResult, TimeUnit timeUnit,
+                                       double expectedAllocation) {
+    runAndAssertBenchmark(clazz, testName, 1, EMPTY_MAP, expectedResult, timeUnit, expectedAllocation);
+  }
+
+  /**
+   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   *
+   * @param clazz the JMS benchmark class.
+   * @param testName the name of the test method.
+   * @param threads the number of threads to run benchmark with.
+   * @param expectedResult the expected minimum minimum result value.
+   * @param timeUnit the time unit of the expected result value.
    */
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, final double expectedResult,
                                        TimeUnit timeUnit) {
-    runAndAssertBenchmark(clazz, testName, threads, timeUnit,
+    runAndAssertBenchmark(clazz, testName, threads, EMPTY_MAP, timeUnit, false,
                           runResult -> assertThat(runResult.getPrimaryResult().getScore(), lessThanOrEqualTo(expectedResult)));
   }
 
   /**
-   * Run a JMH benchmark and use a {@link Consumer<RunResult>} to assert the results are withing expected bounds.
+   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
    *
    * @param clazz the JMS benchmark class.
    * @param testName the name of the test method.
-   * @param timeUnit the timeunit to use for running JMH test.
-   * @param assertions an assertion callback for asserting test results.
+   * @param threads the number of threads to run benchmark with.
+   * @param params parameters along with array of parameters values to be applied to the benchmark.
+   * @param expectedResult the expected minimum minimum result value.
+   * @param timeUnit the time unit of the expected result value.
+   * @param expectedAllocation the expected maximum allocation in bytes per benchmark iteration.
    */
-  protected void runAndAssertBenchmark(Class clazz, String testName, int threads, TimeUnit timeUnit,
-                                       Consumer<RunResult> assertions) {
+  protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params,
+                                       final double expectedResult,
+                                       TimeUnit timeUnit, final double expectedAllocation) {
+    runAndAssertBenchmark(clazz, testName, threads, params, timeUnit, true,
+                          runResult -> {
+                            assertThat(runResult.getPrimaryResult().getScore(), lessThanOrEqualTo(expectedResult));
+                            assertThat(runResult.getSecondaryResults().get(NORM_ALLOCATION_RESULT_KEY).getScore(),
+                                       lessThanOrEqualTo(expectedAllocation));
+                          });
+  }
+
+  /**
+   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   *
+   * @param clazz the JMS benchmark class.
+   * @param testName the name of the test method.
+   * @param threads the number of threads to run benchmark with.
+   * @param params parameters along with array of parameters values to be applied to the benchmark.
+   * @param timeUnit the time unit of the expected result value.
+   * @param assertions assertion consumer.
+   */
+  protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params, TimeUnit timeUnit,
+                                       boolean profileGC, Consumer<RunResult> assertions) {
     try {
-      if (getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY).equals(TRUE.toString())) {
-        Options opt = new OptionsBuilder()
-            .include(clazz.getSimpleName() + "." + testName + "$")
-            .forks(1)
-            .threads(threads)
-            .timeUnit(timeUnit)
-            .warmupIterations(10)
-            .measurementIterations(10)
-            .build();
-        assertions.accept(new Runner(opt).runSingle());
-      } else {
-        Options opt = new OptionsBuilder()
-            .include(clazz.getSimpleName() + "." + testName + "$")
+      if (getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY) != null) {
+        ChainedOptionsBuilder optionsBuilder = createCommonOptionsBuilder(clazz, testName, params, timeUnit, profileGC);
+        optionsBuilder = optionsBuilder
             .forks(0)
-            .timeUnit(timeUnit)
+            .threads(threads)
+            .warmupIterations(10)
+            .measurementIterations(10);
+        assertions.accept(new Runner(optionsBuilder.build()).runSingle());
+      } else {
+        ChainedOptionsBuilder optionsBuilder = createCommonOptionsBuilder(clazz, testName, params, timeUnit, profileGC);
+        optionsBuilder = optionsBuilder
+            .forks(0)
             .warmupIterations(0)
-            .measurementIterations(1)
-            .build();
-        new Runner(opt).runSingle();
+            .measurementIterations(1);
+        new Runner(optionsBuilder.build()).runSingle();
       }
     } catch (RunnerException e) {
       fail(e.getMessage());
+      e.printStackTrace();
     }
   }
 
+  private ChainedOptionsBuilder createCommonOptionsBuilder(Class clazz, String testName, Map<String, String[]> params,
+                                                           TimeUnit timeUnit, boolean profileGC) {
+    ChainedOptionsBuilder optionsBuilder = new OptionsBuilder();
+    optionsBuilder = optionsBuilder
+        .include(clazz.getSimpleName() + "." + testName + "$")
+        .timeUnit(timeUnit);
+    if (profileGC) {
+      optionsBuilder = optionsBuilder.addProfiler(GCProfiler.class);
+    }
+    for (Entry<String, String[]> entries : params.entrySet()) {
+      optionsBuilder = optionsBuilder.param(entries.getKey(), entries.getValue());
+    }
+    return optionsBuilder;
+  }
 
 }

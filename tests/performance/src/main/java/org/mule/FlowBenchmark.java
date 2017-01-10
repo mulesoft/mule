@@ -9,8 +9,6 @@ package org.mule;
 import static java.lang.Class.forName;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -66,15 +64,15 @@ public class FlowBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Event processSourceOneWay() throws MuleException {
+  public Event processSource() throws MuleException {
     return source.trigger(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD)).exchangePattern(ONE_WAY).build());
+        .message(InternalMessage.of(TEST_PAYLOAD)).build());
   }
 
   @Benchmark
-  public Event processSourceRequestResponse() throws MuleException {
-    return source.trigger(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD)).exchangePattern(REQUEST_RESPONSE).build());
+  public Event processFlow() throws MuleException {
+    return flow.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_PAYLOAD)).build());
   }
 
 }
