@@ -10,6 +10,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -230,6 +231,15 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         private MuleEvent copyEventForEnrichment(MuleEvent event)
         {
             return OptimizedRequestContext.unsafeSetEvent(DefaultMuleEvent.copy(event));
+        }
+
+        @Override
+        protected MuleEvent processCatch(MuleEvent event, MessagingException exception) throws MessagingException
+        {
+            ((ThreadSafeAccess) eventToEnrich).resetAccessControl();
+            OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
+            exception.setProcessedEvent(eventToEnrich);
+            return super.processCatch(event, exception);
         }
 
         @Override
