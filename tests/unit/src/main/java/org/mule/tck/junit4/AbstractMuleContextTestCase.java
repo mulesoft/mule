@@ -6,6 +6,8 @@
  */
 package org.mule.tck.junit4;
 
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
@@ -289,11 +291,13 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static void disposeContext() throws RegistrationException, MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
+        muleContext.dispose();
+
         final SchedulerService serviceImpl = muleContext.getSchedulerService();
+        assertThat(serviceImpl.getSchedulers(), empty());
         if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
           stopIfNeeded(serviceImpl);
         }
-        muleContext.dispose();
 
         MuleConfiguration configuration = muleContext.getConfiguration();
 

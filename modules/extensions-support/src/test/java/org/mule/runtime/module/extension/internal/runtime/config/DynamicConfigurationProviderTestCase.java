@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -34,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +58,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   private ExpirationPolicy expirationPolicy;
 
+  @Override
   @Before
   public void before() throws Exception {
     mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
@@ -78,6 +82,12 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     super.before();
     provider.initialise();
     provider.start();
+  }
+
+  @After
+  public void after() throws MuleException {
+    provider.stop();
+    provider.dispose();
   }
 
   @Test

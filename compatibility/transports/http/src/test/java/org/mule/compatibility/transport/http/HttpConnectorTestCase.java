@@ -437,6 +437,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
     MessageDispatcher shouldBeANewDispatcher = httpConnector.borrowDispatcher(endpoint);
     assertThat(shouldBeANewDispatcher, not(sameInstance(initialDispatcher)));
     httpConnector.returnDispatcher(endpoint, shouldBeANewDispatcher);
+    httpConnector.stop();
   }
 
 }

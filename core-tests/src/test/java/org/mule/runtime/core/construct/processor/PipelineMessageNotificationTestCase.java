@@ -98,6 +98,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @After
   public void after() throws MuleException {
+    stopIfNeeded(pipeline);
     stopIfNeeded(muleContext.getSchedulerService());
   }
 
@@ -141,14 +142,15 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     thrown.expect(instanceOf(MessagingException.class));
     thrown.expectCause(instanceOf(IllegalStateException.class));
-    processFlow(pipeline, event);
-
-    verifyException();
+    try {
+      processFlow(pipeline, event);
+    } finally {
+      verifyException();
+    }
   }
 
   @Test
   public void oneWayException() throws Exception {
-    Flow pipeline = new Flow("test", muleContext);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
     List<Processor> processors = new ArrayList<>();
     processors.add(new ExceptionThrowingMessageProcessor());
@@ -161,9 +163,11 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     thrown.expect(instanceOf(MessagingException.class));
     thrown.expectCause(instanceOf(IllegalStateException.class));
-    processFlow(pipeline, event);
-
-    verifyException();
+    try {
+      processFlow(pipeline, event);
+    } finally {
+      verifyException();
+    }
   }
 
   private void verifySucess() {
@@ -262,5 +266,4 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       throw new IllegalStateException();
     }
   }
-
 }

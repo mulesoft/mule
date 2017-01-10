@@ -42,6 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -87,6 +88,8 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private volatile boolean shutdown = false;
 
+  private Consumer<Scheduler> shutdownCallback;
+
   /**
    * @param name the name of this scheduler
    * @param executor the actual executor that will run the dispatched tasks.
@@ -96,9 +99,10 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param quartzScheduler the quartz object that will handle tasks scheduled with cron expressions. This will not execute the
    *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
    * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
+   * @param EMPTY_SHUTDOWN_CALLBACK a callback to be invoked when this scheduler is stopped/shutdown.
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
+                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Consumer<Scheduler> shutdownCallback) {
     this.name = name + "@" + toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
     cancelledBeforeFireTasks = newKeySet();
@@ -106,6 +110,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     this.scheduledExecutor = scheduledExecutor;
     this.quartzScheduler = quartzScheduler;
     this.threadType = threadsType;
+    this.shutdownCallback = shutdownCallback;
   }
 
   @Override
@@ -221,6 +226,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   public void shutdown() {
     logger.debug("Shutting down " + this.toString());
     this.shutdown = true;
+    shutdownCallback.accept(this);
     tryTerminate();
   }
 

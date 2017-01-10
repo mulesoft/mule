@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
-import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
@@ -100,6 +100,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     phases.put(phaseName, phase);
   }
 
+  @Override
   public void fireLifecycle(String destinationPhase) throws LifecycleException {
     checkPhase(destinationPhase);
     if (isDirectTransition(destinationPhase)) {
@@ -122,6 +123,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     }
   }
 
+  @Override
   protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException {
     try {
       setExecutingPhase(phase);

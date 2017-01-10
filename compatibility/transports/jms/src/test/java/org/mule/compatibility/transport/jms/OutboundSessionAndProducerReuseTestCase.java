@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.jms;
 
 
+import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -95,6 +97,13 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
     epBuilder.setConnector(connector);
     outboundEndpoint = epBuilder.buildOutboundEndpoint();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    connector.disconnect();
+    safeStopIfNeeded(singleton(connector), logger);
+    super.doTearDown();
   }
 
   private void setupMockSession() throws JMSException {

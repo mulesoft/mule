@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.work;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -13,13 +14,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
-import org.mule.compatibility.core.work.AbstractMuleEventWork;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -42,11 +41,13 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testScheduleMuleEventWork() throws Exception {
-    muleContext.getSchedulerService().cpuIntensiveScheduler().submit(new TestMuleEventWork(originalEvent));
+    final Scheduler scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
+    scheduler.submit(new TestMuleEventWork(originalEvent));
 
-    assertTrue("Timed out waiting for latch", latch.await(2000, TimeUnit.MILLISECONDS));
+    assertTrue("Timed out waiting for latch", latch.await(2000, MILLISECONDS));
 
     assertSame(originalEvent, getCurrentEvent());
+    scheduler.shutdownNow();
   }
 
   @Test

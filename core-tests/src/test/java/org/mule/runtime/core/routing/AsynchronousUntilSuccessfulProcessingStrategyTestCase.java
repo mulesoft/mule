@@ -45,10 +45,11 @@ import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -123,8 +124,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
   @After
   public void after() {
-    for (Scheduler scheduler : ((SimpleUnitTestSupportSchedulerService) muleContext.getSchedulerService())
-        .getCreatedSchedulers()) {
+    final List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
+    for (Scheduler scheduler : new ArrayList<>(createdSchedulers)) {
       scheduler.shutdown();
     }
   }

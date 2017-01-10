@@ -6,21 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.connector;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static org.hamcrest.CoreMatchers.sameInstance;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -28,8 +28,7 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -42,6 +41,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends ExtensionFunction
   public static final int POLL_DELAY_MILLIS = 50;
   @Rule
   public ExpectedException exception = ExpectedException.none();
+
+  private static ConnectionException connectionException = new ConnectionException("ERROR");
+
+  private static ExecutorService executor;
 
   @Override
   protected String getConfigFile() {
@@ -56,13 +59,15 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends ExtensionFunction
   @After
   public void tearDown() {
     PetStoreConnectorWithSource.timesStarted = 0;
+    if (executor != null) {
+      executor.shutdownNow();
+    }
   }
 
-  // TODO - MULE-9399 this test case should expect a MuleRuntimeException
   @Test
   public void retryPolicySourceFailOnStart() throws Exception {
-    exception.expect(LifecycleException.class);
-    exception.expectCause(is(instanceOf(MuleRuntimeException.class)));
+    exception.expect(RetryPolicyExhaustedException.class);
+    exception.expectCause(sameInstance(connectionException));
     try {
       startFlow("source-fail-on-start");
     } catch (Exception e) {
@@ -108,13 +113,13 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends ExtensionFunction
       PetStoreConnectorWithSource.timesStarted++;
 
       if (failOnStart || failedDueOnException) {
-        throw new RuntimeException(new ConnectionException("ERROR"));
+        throw new RuntimeException(connectionException);
       }
 
       if (failOnException) {
         failedDueOnException = true;
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> sourceCallback.onSourceException(new ConnectionException("ERROR")));
+        executor = newSingleThreadExecutor();
+        executor.execute(() -> sourceCallback.onSourceException(connectionException));
       }
     }
 

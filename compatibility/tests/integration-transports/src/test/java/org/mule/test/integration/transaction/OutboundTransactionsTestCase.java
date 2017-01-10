@@ -11,22 +11,35 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.exception.MuleException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class OutboundTransactionsTestCase extends CompatibilityFunctionalTestCase {
 
   private static final int TIMEOUT = 2000;
 
+  private MuleClient client;
+
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/transaction/outbound-transactions.xml";
   }
 
+  @Before
+  public void before() throws MuleException {
+    client = new MuleClient(muleContext);
+  }
+
+  @After
+  public void after() {
+    client.dispose();
+  }
+
   @Test
   public void testOutboundRouterTransactions() throws Exception {
-    MuleClient client = new MuleClient(muleContext);
-
     while (client.request("jms://my.queue1", TIMEOUT) != null) {
       // consume messages
     }
@@ -45,8 +58,6 @@ public class OutboundTransactionsTestCase extends CompatibilityFunctionalTestCas
 
   @Test
   public void testOutboundRouterTransactions2() throws Exception {
-    MuleClient client = new MuleClient(muleContext);
-
     while (client.request("jms://my.queue3", TIMEOUT) != null) {
       // consume messages
     }

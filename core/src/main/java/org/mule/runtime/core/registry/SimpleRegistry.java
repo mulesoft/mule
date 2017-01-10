@@ -8,11 +8,11 @@ package org.mule.runtime.core.registry;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
@@ -42,7 +42,6 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
   @Override
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
-    initialiseObjects();
     super.doInitialise();
   }
 
@@ -149,16 +148,5 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
     }
 
     return object;
-  }
-
-
-  private void initialiseObjects() throws InitialisationException {
-    try {
-      for (Initialisable initialisable : lookupObjects(Initialisable.class)) {
-        getLifecycleManager().applyPhase(initialisable, NotInLifecyclePhase.PHASE_NAME, Initialisable.PHASE_NAME);
-      }
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
-    }
   }
 }

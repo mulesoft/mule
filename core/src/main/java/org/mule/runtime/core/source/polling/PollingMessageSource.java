@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -224,39 +225,15 @@ public class PollingMessageSource
    */
   @Override
   public void initialise() throws InitialisationException {
-    if (sourceMessageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) sourceMessageProcessor).setMuleContext(muleContext);
-    }
-    if (sourceMessageProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) sourceMessageProcessor).setFlowConstruct(flowConstruct);
-    }
-    if (sourceMessageProcessor instanceof Initialisable) {
-      ((Initialisable) sourceMessageProcessor).initialise();
-    }
-    if (override instanceof MuleContextAware) {
-      ((MuleContextAware) override).setMuleContext(muleContext);
-    }
-    if (override instanceof FlowConstructAware) {
-      ((FlowConstructAware) override).setFlowConstruct(flowConstruct);
-    }
-    if (override instanceof Initialisable) {
-      ((Initialisable) override).initialise();
-    }
+    initialiseIfNeeded(sourceMessageProcessor, muleContext, flowConstruct);
+    initialiseIfNeeded(override, muleContext, flowConstruct);
     createScheduler();
   }
 
   @Override
   public void dispose() {
-    if (override instanceof Disposable) {
-      try {
-        ((Disposable) override).dispose();
-      } catch (Exception e) {
-        logger.warn(format("Could not dispose polling override of class %s. Message receiver will continue to dispose",
-                           override.getClass().getCanonicalName()),
-                    e);
-      }
-    }
-
+    disposeIfNeeded(sourceMessageProcessor, logger);
+    disposeIfNeeded(override, logger);
     disposeScheduler();
   }
 

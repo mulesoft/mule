@@ -8,7 +8,9 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
@@ -39,10 +41,19 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
   public static final String JMS_QUEUE_INPUT_CONF_E = "in5";
   public static final String JMS_QUEUE_OUTPUT_CONF_E = "out5";
 
+  private SystemExceptionHandler originalExceptionListener;
+
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
+    originalExceptionListener = muleContext.getExceptionListener();
     muleContext.setExceptionListener(new TestExceptionStrategy());
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    disposeIfNeeded(originalExceptionListener, logger);
+    super.doTearDown();
   }
 
   @Override
@@ -135,16 +146,12 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
 
     send(scenarioCommit);
 
-    final ExceptionCallback exceptionCallback = new ExceptionCallback() {
-
-      @Override
-      public void onException(Throwable t) {
-        assertTrue(ExceptionUtils.containsType(t, org.mule.runtime.core.transaction.IllegalTransactionStateException.class));
-        assertEquals(1, exceptionLatch.getCount()); // make sure this
-                                                    // exception doesn't
-                                                    // happen more than once
-        exceptionLatch.countDown();
-      }
+    final ExceptionCallback exceptionCallback = t -> {
+      assertTrue(ExceptionUtils.containsType(t, org.mule.runtime.core.transaction.IllegalTransactionStateException.class));
+      assertEquals(1, exceptionLatch.getCount()); // make sure this
+                                                  // exception doesn't
+                                                  // happen more than once
+      exceptionLatch.countDown();
     };
     TestExceptionStrategy exceptionStrategy =
         (TestExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct(serviceName).getExceptionListener();

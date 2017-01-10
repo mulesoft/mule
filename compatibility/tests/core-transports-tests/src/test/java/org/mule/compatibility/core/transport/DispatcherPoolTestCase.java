@@ -153,9 +153,9 @@ public class DispatcherPoolTestCase extends AbstractMuleContextEndpointTestCase 
     TestConnector connector = new TestConnector(muleContext);
     ThreadingProfile threadingProfile = new ImmutableThreadingProfile(1, 1, 1, 1, 1, exhaustedAction, true, null, null);
     connector.setDispatcherThreadingProfile(threadingProfile);
-    connector.createReceiver(getTestFlow(muleContext), getTestInboundEndpoint("test", "test://test"));
+    connector.createReceiver(getTestFlow(muleContext),
+                             getTestInboundEndpoint("test", "test://test", null, null, null, connector));
     registerConnector(muleContext.getRegistry(), connector);
     return connector;
   }
-
 }

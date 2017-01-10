@@ -31,6 +31,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 
@@ -47,6 +49,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * {@link #disposeContextPerClass}.
    */
   private static ArtifactClassLoader executionClassLoader;
+
+  private Set<FlowRunner> runners = new HashSet<>();
 
   public FunctionalTestCase() {
     super();
@@ -158,6 +162,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @Override
   protected void doTearDown() throws Exception {
     executionClassLoader = null;
+    for (FlowRunner runner : runners) {
+      runner.dispose();
+    }
     super.doTearDown();
   }
 
@@ -191,7 +198,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return the {@link FlowRunner}
    */
   protected FlowRunner flowRunner(String flowName) {
-    return new FlowRunner(muleContext, flowName);
+    final FlowRunner flowRunner = new FlowRunner(muleContext, flowName);
+    runners.add(flowRunner);
+    return flowRunner;
   }
 
   /**

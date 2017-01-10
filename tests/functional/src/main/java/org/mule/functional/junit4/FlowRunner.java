@@ -6,21 +6,23 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.tck.MuleTestUtils.processWithMono;
 import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
 
 import org.mule.functional.functional.FlowAssert;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import org.apache.commons.collections.Transformer;
@@ -30,7 +32,7 @@ import org.apache.commons.collections.Transformer;
  * 
  * This runner is <b>not</b> thread-safe.
  */
-public class FlowRunner extends FlowConstructRunner<FlowRunner> {
+public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Disposable {
 
   private String flowName;
 
@@ -38,6 +40,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private Transformer responseEventTransformer = input -> input;
   private boolean nonBlocking = false;
+
   private Scheduler scheduler;
 
   /**
@@ -49,7 +52,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   public FlowRunner(MuleContext muleContext, String flowName) {
     super(muleContext);
     this.flowName = flowName;
-    this.scheduler = muleContext.getSchedulerService().ioScheduler();
   }
 
   /**
@@ -159,6 +161,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public void dispatchAsync() throws Exception {
     Flow flow = (Flow) getFlowConstruct();
+    scheduler = muleContext.getSchedulerService().ioScheduler();
     try {
       scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
     } catch (Exception e) {
@@ -208,5 +211,12 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   @Override
   public String getFlowConstructName() {
     return flowName;
+  }
+
+  @Override
+  public void dispose() {
+    if (scheduler != null) {
+      scheduler.stop(0, SECONDS);
+    }
   }
 }

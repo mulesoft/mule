@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +61,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
 
   private ConnectionProvider connectionProvider = new HeisenbergConnectionProvider();
 
+  @Override
   @Before
   public void before() throws Exception {
     mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
@@ -79,6 +82,11 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
         .createStaticConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                            new StaticValueResolver<>(connectionProvider), muleContext);
     super.before();
+  }
+
+  @After
+  public void after() {
+    provider.dispose();
   }
 
   @Test
@@ -104,6 +112,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
     provider.initialise();
     provider.start();
     assertLifecycle(HeisenbergExtension::getStart);
+    provider.stop();
   }
 
   @Test

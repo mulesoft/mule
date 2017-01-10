@@ -105,7 +105,6 @@ import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
@@ -594,19 +593,18 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
         .build());
 
-    componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier("notifications").withTypeDefinition(fromType(ServerNotificationManager.class))
-            .withObjectFactoryType(ServerNotificationManagerConfigurator.class)
-            .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
-            .withSetterParameterDefinition("enabledNotifications",
-                                           fromChildCollectionConfiguration(NotificationConfig.EnabledNotificationConfig.class)
-                                               .build())
-            .withSetterParameterDefinition("disabledNotifications",
-                                           fromChildCollectionConfiguration(NotificationConfig.DisabledNotificationConfig.class)
-                                               .build())
-            .withSetterParameterDefinition("notificationListeners",
-                                           fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
-            .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("notifications")
+        .withTypeDefinition(fromType(ServerNotificationManagerConfigurator.class))
+        .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
+        .withSetterParameterDefinition("enabledNotifications",
+                                       fromChildCollectionConfiguration(NotificationConfig.EnabledNotificationConfig.class)
+                                           .build())
+        .withSetterParameterDefinition("disabledNotifications",
+                                       fromChildCollectionConfiguration(NotificationConfig.DisabledNotificationConfig.class)
+                                           .build())
+        .withSetterParameterDefinition("notificationListeners",
+                                       fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
+        .build());
 
     ComponentBuildingDefinition.Builder baseNotificationDefinition =
         baseDefinition.copy().withSetterParameterDefinition("interfaseName", fromSimpleParameter("interface").build())

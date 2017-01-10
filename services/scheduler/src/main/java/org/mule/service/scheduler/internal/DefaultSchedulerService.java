@@ -9,6 +9,8 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.synchronizedList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.service.scheduler.ThreadType.CPU_INTENSIVE;
@@ -40,6 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Consumer;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -85,6 +88,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private org.quartz.Scheduler quartzScheduler;
 
   private volatile boolean started = false;
+  private List<Scheduler> activeSchedulers = synchronizedList(new ArrayList<>());
 
   @Override
   public String getName() {
@@ -94,59 +98,80 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuLightScheduler() {
     checkStarted();
-    return new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
-                                scheduledExecutor, quartzScheduler, CPU_LIGHT);
+    final DefaultScheduler scheduler =
+        new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
+                             scheduledExecutor, quartzScheduler, CPU_LIGHT, schr -> activeSchedulers.remove(schr));
+    activeSchedulers.add(scheduler);
+    return scheduler;
   }
 
   @Override
   public Scheduler ioScheduler() {
     checkStarted();
-    return new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor, cores * cores,
-                                scheduledExecutor, quartzScheduler, IO);
+    final DefaultScheduler scheduler = new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor,
+                                                            cores * cores, scheduledExecutor, quartzScheduler, IO,
+                                                            schr -> activeSchedulers.remove(schr));
+    activeSchedulers.add(scheduler);
+    return scheduler;
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
     checkStarted();
-    return new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                                scheduledExecutor, quartzScheduler, CPU_INTENSIVE);
+    final DefaultScheduler scheduler =
+        new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
+                             scheduledExecutor, quartzScheduler, CPU_INTENSIVE, schr -> activeSchedulers.remove(schr));
+    activeSchedulers.add(scheduler);
+    return scheduler;
   }
 
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config) {
     checkStarted();
     final String schedulerName = resolveSchedulerName(config, CPU_LIGHT_THREADS_NAME);
+    Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
-      return new ThrottledScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT,
-                                    config.getMaxConcurrentTasks());
+      scheduler = new ThrottledScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
+                                         CPU_LIGHT, config.getMaxConcurrentTasks(), schr -> activeSchedulers.remove(schr));
     } else {
-      return new DefaultScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT);
+      scheduler = new DefaultScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT,
+                                       schr -> activeSchedulers.remove(schr));
     }
+    activeSchedulers.add(scheduler);
+    return scheduler;
   }
 
   @Override
   public Scheduler ioScheduler(SchedulerConfig config) {
     checkStarted();
     final String schedulerName = resolveSchedulerName(config, IO_THREADS_NAME);
+    Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
-      return new ThrottledScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO,
-                                    config.getMaxConcurrentTasks());
+      scheduler = new ThrottledScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO,
+                                         config.getMaxConcurrentTasks(), schr -> activeSchedulers.remove(schr));
     } else {
-      return new DefaultScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO);
+      scheduler = new DefaultScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO,
+                                       schr -> activeSchedulers.remove(schr));
     }
+    activeSchedulers.add(scheduler);
+    return scheduler;
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     checkStarted();
     final String schedulerName = resolveSchedulerName(config, COMPUTATION_THREADS_NAME);
+    Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
-      return new ThrottledScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
-                                    CPU_INTENSIVE, config.getMaxConcurrentTasks());
+      scheduler = new ThrottledScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
+                                         CPU_INTENSIVE, config.getMaxConcurrentTasks(), schr -> activeSchedulers.remove(schr));
     } else {
-      return new DefaultScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
-                                  CPU_INTENSIVE);
+      scheduler =
+          new DefaultScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_INTENSIVE,
+                               schr -> activeSchedulers.remove(schr));
     }
+    activeSchedulers.add(scheduler);
+    return scheduler;
   }
 
   private String resolveSchedulerName(SchedulerConfig config, String prefix) {
@@ -171,7 +196,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
-                            scheduledExecutor, quartzScheduler, CUSTOM);
+                            scheduledExecutor, quartzScheduler, CUSTOM, schr -> activeSchedulers.remove(schr));
+    activeSchedulers.add(customScheduler);
     return customScheduler;
   }
 
@@ -188,9 +214,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
                                                           "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
 
     final DefaultScheduler customScheduler =
-        new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
-                            scheduledExecutor, quartzScheduler, CUSTOM);
+        new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores, scheduledExecutor,
+                            quartzScheduler, CUSTOM, schr -> activeSchedulers.remove(schr));
     customSchedulersExecutors.add(customScheduler);
+    activeSchedulers.add(customScheduler);
     return customScheduler;
   }
 
@@ -205,8 +232,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     private final ExecutorService executor;
 
     private CustomScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                            org.quartz.Scheduler quartzScheduler, ThreadType threadsType) {
-      super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType);
+                            org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Consumer<Scheduler> shutdownCallback) {
+      super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownCallback);
       this.executor = executor;
     }
 
@@ -231,16 +258,20 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
     StackTraceElement ste = stackTrace[i++];
     // We have to go deep enough, right before the proxy call
-    while (!ste.getClassName().contains("$Proxy") && i < stackTrace.length) {
+    while (skip(ste) && i < stackTrace.length) {
       ste = stackTrace[i++];
     }
-    if (ste.getClassName().contains("$Proxy")) {
-      ste = stackTrace[i++];
-    } else {
+    if (skip(ste)) {
       ste = stackTrace[2];
+    } else {
+      ste = stackTrace[i++];
     }
 
     return prefix + "@" + (ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber());
+  }
+
+  private boolean skip(StackTraceElement ste) {
+    return !ste.getClassName().contains("$Proxy");
   }
 
   @Override
@@ -346,4 +377,11 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     }
   }
 
+  @Override
+  public List<Scheduler> getSchedulers() {
+    // TODO MULE-10549 Improve this syncronization
+    synchronized (activeSchedulers) {
+      return unmodifiableList(new ArrayList<>(activeSchedulers));
+    }
+  }
 }

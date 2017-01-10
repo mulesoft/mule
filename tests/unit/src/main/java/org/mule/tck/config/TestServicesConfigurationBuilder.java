@@ -7,6 +7,8 @@
 
 package org.mule.tck.config;
 
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -34,6 +36,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   public void stopServices() throws MuleException {
     schedulerService.stop();
+    assertThat(schedulerService.getSchedulers(), empty());
   }
 
 }
