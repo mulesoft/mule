@@ -3842,7 +3842,7 @@
     <xsd:complexType name="securityManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                The default security manager (type 'defaultSecurityManagerType') provides basic support for security functions. Other modules (JAAS, PGP, Spring Security) provide more advanced functionality.
+                The default security manager (type 'defaultSecurityManagerType') provides basic support for security functions. Other modules (PGP, Spring Security) provide more advanced functionality.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
