@@ -12,7 +12,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
@@ -20,6 +20,8 @@ import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFi
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -44,9 +46,6 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
@@ -57,7 +56,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   @Override
   public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {
     ArtifactPluginDescriptor artifactPluginDescriptor;
-    final File mulePluginJsonFile = new File(pluginFolder, META_INF + separator + MULE_PLUGIN_JSON);
+    final File mulePluginJsonFile = new File(pluginFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON);
     if (mulePluginJsonFile.exists()) {
       artifactPluginDescriptor = loadFromJsonDescriptor(pluginFolder, mulePluginJsonFile);
     } else {

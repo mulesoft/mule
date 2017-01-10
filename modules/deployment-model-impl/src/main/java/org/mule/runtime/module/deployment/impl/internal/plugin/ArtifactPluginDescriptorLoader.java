@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static org.apache.commons.lang.StringUtils.removeEnd;
-import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
+import static org.mule.runtime.core.util.FileUtils.unzip;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
 import java.io.File;
@@ -38,12 +36,14 @@ public class ArtifactPluginDescriptorLoader {
    *         location
    */
   public ArtifactPluginDescriptor load(File pluginZip, File unpackDestination) throws IOException {
+    //TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips
     checkArgument(pluginZip != null, "plugin zip cannot be null");
     checkArgument(unpackDestination != null, "unpack destination cannot be null");
-    checkArgument(pluginZip.getName().endsWith("zip"),
-                  "plugin zip must be a zip file ending with .zip, but the file name was " + pluginZip.getAbsolutePath());
+    checkArgument(pluginZip.getName().endsWith("zip") || pluginZip.getName().endsWith("jar"),
+                  "plugin zip must be a zip file ending with .zip or .jar, but the file name was " + pluginZip.getAbsolutePath());
 
-    final String pluginName = removeEnd(pluginZip.getName(), ".zip");
+    //    final String pluginName = removeEnd(pluginZip.getName(), ".zip");
+    final String pluginName = pluginZip.getName().substring(0, pluginZip.getName().length() - ".zip".length());
     // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
     final File tmpDir = new File(unpackDestination, pluginName);
     unzip(pluginZip, tmpDir);

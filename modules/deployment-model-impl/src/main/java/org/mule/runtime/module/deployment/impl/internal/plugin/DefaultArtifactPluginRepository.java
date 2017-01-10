@@ -8,27 +8,26 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.separator;
+import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.core.util.FileUtils.unzip;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
  * Default implementation of an {@link ArtifactPluginRepository} that holds in memory the list of artifact plugin descriptors
@@ -89,7 +88,8 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
    */
   private void unzipPluginsIfNeeded() throws IOException {
     for (File pluginZipFile : getContainerAppPluginsFolder()
-        .listFiles((FileFilter) new SuffixFileFilter(".zip", INSENSITIVE))) {
+        //TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files
+        .listFiles((FileFilter) new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE))) {
       String pluginName = removeExtension(pluginZipFile.getName());
 
       final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(), separator + pluginName);
