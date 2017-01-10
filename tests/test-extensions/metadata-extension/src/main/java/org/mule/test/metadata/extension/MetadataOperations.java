@@ -185,6 +185,15 @@ public class MetadataOperations {
     return null;
   }
 
+  public List<Result<String, StringAttributes>> listOfMessages() {
+    return null;
+  }
+
+  @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
+  public List<Result> dynamicListOfMessages(@MetadataKeyId String type) {
+    return null;
+  }
+
   public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal) {
     return false;
   }

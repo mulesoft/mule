@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -23,8 +24,8 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
   /**
    * {@inheritDoc}
    */
-  ValueReturnDelegate(MuleContext muleContext) {
-    super(muleContext);
+  ValueReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
+    super(componentModel, muleContext);
   }
 
   /**

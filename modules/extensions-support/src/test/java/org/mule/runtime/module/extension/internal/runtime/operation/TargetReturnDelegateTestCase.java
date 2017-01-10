@@ -25,7 +25,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new TargetReturnDelegate(TARGET, muleContext);
+    return new TargetReturnDelegate(TARGET, componentModel, muleContext);
   }
 
   @After

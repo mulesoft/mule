@@ -695,6 +695,31 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DynamicListOfMessagesType" substitutionGroup="mule:abstract-operator" name="dynamic-list-of-messages"></xs:element>
+    <xs:complexType name="DynamicListOfMessagesType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListOfMessagesType" substitutionGroup="mule:abstract-operator" name="list-of-messages"></xs:element>
+    <xs:complexType name="ListOfMessagesType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesPersonTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-person-type-metadata"></xs:element>
     <xs:complexType name="MessageAttributesPersonTypeMetadataType">
         <xs:complexContent>

@@ -29,10 +29,12 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -158,6 +160,38 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void operationWithDefaulValueParameter() throws Exception {
     assertThat(GUSTAVO_FRING, equalTo(runFlow("getDefaultEnemy").getMessage().getPayload().getValue()));
+  }
+
+  @Test
+  public void operationWhichReturnsListOfMessages() throws Exception {
+    List<Message> enemies = (List<Message>) runFlow("getAllEnemies").getMessage().getPayload().getValue();
+    HeisenbergExtension heisenberg = getConfig(HEISENBERG);
+
+    assertThat(enemies, hasSize(heisenberg.getEnemies().size()));
+
+    int index = 0;
+    for (Message enemyMessage : enemies) {
+      assertEnemyMessage(heisenberg, index, enemyMessage);
+      index++;
+    }
+  }
+
+  private void assertEnemyMessage(HeisenbergExtension heisenberg, int index, Message enemyMessage) {
+    assertThat(enemyMessage.getPayload().getValue(), is(heisenberg.getEnemies().get(index)));
+    assertThat(enemyMessage.getAttributes(), is(instanceOf(IntegerAttributes.class)));
+    assertThat(((IntegerAttributes) enemyMessage.getAttributes()).getValue(), is(index));
+  }
+
+  @Test
+  public void randomAccessOnOperationWhichReturnsListOfMessages() throws Exception {
+    List<Message> enemies = (List<Message>) runFlow("getAllEnemies").getMessage().getPayload().getValue();
+    HeisenbergExtension heisenberg = getConfig(HEISENBERG);
+
+    assertThat(enemies, hasSize(heisenberg.getEnemies().size()));
+    int index = enemies.size() - 1;
+    assertEnemyMessage(heisenberg, index, enemies.get(index));
+    index = 0;
+    assertEnemyMessage(heisenberg, index, enemies.get(index));
   }
 
   @Test

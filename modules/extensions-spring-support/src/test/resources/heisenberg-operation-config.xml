@@ -66,6 +66,10 @@
     <flow name="getDefaultEnemy">
         <heisenberg:get-enemy/>
     </flow>
+    
+    <flow name="getAllEnemies">
+        <heisenberg:get-all-enemies />
+    </flow>
 
     <flow name="expressionEnemy">
         <heisenberg:get-enemy index="#[flowVars['enemy']]"/>

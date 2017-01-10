@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
@@ -23,9 +24,12 @@ import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -78,6 +82,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Operation
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageCollection;
+import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageList;
+import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
@@ -85,11 +92,12 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -124,6 +132,34 @@ public class MuleExtensionUtils {
         .mediaType(mediaType)
         .attributes((Attributes) result.getAttributes().orElse(NULL_ATTRIBUTES))
         .build();
+  }
+
+  /**
+   * Transforms the given {@code results} into a similar collection of {@link Message}
+   * objects
+   *
+   * @param results a collection of {@link Result} items
+   * @param mediaType the {@link MediaType} of the generated {@link Message} instances
+   * @return a similar collection of {@link Message}
+   */
+  public static Collection<Message> toMessageCollection(Collection<Result> results, MediaType mediaType) {
+    if (results instanceof List) {
+      return new ResultsToMessageList((List<Result>) results, mediaType);
+    } else if (results instanceof Set) {
+      return new ResultsToMessageSet((Set<Result>) results, mediaType);
+    } else {
+      return new ResultsToMessageCollection(results, mediaType);
+    }
+  }
+
+  /**
+   * @param componentModel a {@link ComponentModel}
+   * @return Whether the {@code componentModel} returns a list of messages
+   */
+  public static boolean returnsListOfMessages(ComponentModel componentModel) {
+    MetadataType outputType = componentModel.getOutput().getType();
+    return outputType instanceof ArrayType &&
+        Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
   }
 
   /**
@@ -164,22 +200,6 @@ public class MuleExtensionUtils {
                                                                         ConfigurationModel configurationModel) {
     return ImmutableList.<ConnectionProviderModel>builder().addAll(configurationModel.getConnectionProviders())
         .addAll(extensionModel.getConnectionProviders()).build();
-  }
-
-  /**
-   * Sorts the given {@code list} in ascending alphabetic order, using {@link NamedObject#getName()} as the sorting criteria
-   *
-   * @param list a {@link List} with instances of {@link NamedObject}
-   * @param <T>  the generic type of the items in the {@code list}
-   * @return the sorted {@code list}
-   */
-  public static <T extends NamedObject> List<T> alphaSortDescribedList(List<T> list) {
-    if (isEmpty(list)) {
-      return list;
-    }
-
-    Collections.sort(list, new NamedObjectComparator());
-    return list;
   }
 
   /**

@@ -12,6 +12,10 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -20,8 +24,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_ATTRIBUTES_FIELD_NAME;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_PAYLOAD_FIELD_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -29,12 +36,14 @@ import org.mule.metadata.api.builder.TypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
-import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
@@ -150,6 +159,15 @@ public final class ExtensionsTestUtils {
     when(resolver.isDynamic()).thenReturn(dynamic);
 
     return resolver;
+  }
+
+  public static void assertMessageType(MetadataType type, MetadataType payloadType, MetadataType attributesType) {
+    assertThat(type, is(instanceOf(ObjectType.class)));
+    assertThat(getTypeId(type).get(), is(Message.class.getName()));
+
+    ObjectType messageType = (ObjectType) type;
+    assertThat(messageType.getFieldByName(MESSAGE_PAYLOAD_FIELD_NAME).get().getValue(), equalTo(payloadType));
+    assertThat(messageType.getFieldByName(MESSAGE_ATTRIBUTES_FIELD_NAME).get().getValue(), equalTo(attributesType));
   }
 
   public static ParameterModel getParameter(String name, Class<?> type) {
