@@ -392,4 +392,29 @@ public class FlowStackTestCase extends FunctionalTestCase
                 isFlowStackElement("subFlow", "/subFlowDynamicWithScatterGatherChain/processors/0/1/0/subFlow/subprocessors/0"),
                 isFlowStackElement("subFlowDynamicWithScatterGatherChain", "/subFlowDynamicWithScatterGatherChain/processors/0/1/0"));
     }
+
+
+    @Test
+    public void flowChainedFilter() throws Exception
+    {
+        muleContext.getClient().send("vm://in-flowChainedFilter", new DefaultMuleMessage("payload", muleContext));
+
+        assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+
+        assertStackElements(FlowStackAsserter.stackToAssert,
+                isFlowStackElement("flow", "/flow/processors/0"),
+                isFlowStackElement("flowChainedFilter", "/flowChainedFilter/processors/0/1"));
+    }
+
+    @Test
+    public void flowForEachFilter() throws Exception
+    {
+        muleContext.getClient().send("vm://in-flowForEachFilter", new DefaultMuleMessage("payload", muleContext));
+
+        assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+
+        assertStackElements(FlowStackAsserter.stackToAssert,
+                isFlowStackElement("flow", "/flow/processors/0"),
+                isFlowStackElement("flowForEachFilter", "/flowForEachFilter/processors/0/1"));
+    }
 }

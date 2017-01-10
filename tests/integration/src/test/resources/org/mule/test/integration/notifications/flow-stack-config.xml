@@ -261,5 +261,23 @@
             </processor-chain>
         </scatter-gather>
     </flow>
+
+    <!-- Filter -->
+
+    <flow name="flowChainedFilter">
+        <vm:inbound-endpoint path="in-flowChainedFilter" exchange-pattern="request-response"/>
+        <processor-chain>
+            <expression-filter expression="#[true]"/>
+            <flow-ref name="flow"/>
+        </processor-chain>
+    </flow>
+
+    <flow name="flowForEachFilter">
+        <vm:inbound-endpoint path="in-flowForEachFilter" exchange-pattern="request-response"/>
+        <foreach collection="#[['foo', 'bar']]">
+            <expression-filter expression="#[true]"/>
+            <flow-ref name="flow"/>
+        </foreach>
+    </flow>
     
 </mule>
