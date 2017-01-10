@@ -9,6 +9,7 @@ package org.mule.enricher;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -61,33 +62,42 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-
-        MuleEvent enricherEvent;
-        //TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
-        enricherEvent = DefaultMuleEvent.copy(event);
-
-        OptimizedRequestContext.unsafeSetEvent(enricherEvent);
-        MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);
-        OptimizedRequestContext.unsafeSetEvent(event);
-
-        if (enrichmentEvent != null && !VoidMuleEvent.getInstance().equals(enrichmentEvent))
+        try
         {
-            for (EnrichExpressionPair pair : enrichExpressionPairs)
+            ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
+
+            MuleEvent enricherEvent;
+            // TODO: change DefaultMuleEvent.copy to DefaultMuleEvent.copyPreservingSession
+            enricherEvent = DefaultMuleEvent.copy(event);
+
+            OptimizedRequestContext.unsafeSetEvent(enricherEvent);
+            MuleEvent enrichmentEvent = enrichmentProcessor.process(enricherEvent);
+            OptimizedRequestContext.unsafeSetEvent(event);
+
+            if (enrichmentEvent != null && !VoidMuleEvent.getInstance().equals(enrichmentEvent))
             {
-                enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
-                       expressionManager);
+                for (EnrichExpressionPair pair : enrichExpressionPairs)
+                {
+                    enrich(event.getMessage(), enrichmentEvent.getMessage(), pair.getSource(), pair.getTarget(),
+                            expressionManager);
+                }
             }
-        }
 
-        if (muleContext != null
-            && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
+            if (muleContext != null
+                && muleContext.getConfiguration().isEnricherPropagatesSessionVariableChanges())
+            {
+                event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
+            }
+            OptimizedRequestContext.unsafeSetEvent(event);
+
+            return event;
+        }
+        catch (MessagingException exception)
         {
-            event = new DefaultMuleEvent(event.getMessage(), event, enrichmentEvent.getSession());
+            exception.setProcessedEvent(event);
+            OptimizedRequestContext.unsafeSetEvent(event);
+            throw exception;
         }
-        OptimizedRequestContext.unsafeSetEvent(event);
-
-        return event;
     }
 
     protected void enrich(MuleMessage currentMessage,
