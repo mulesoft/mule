@@ -11,7 +11,9 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * This test case validates that the XSLT transformer is not vulnerable to
@@ -23,6 +25,9 @@ import org.junit.Test;
  */
 public class XsltTransformerBLTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Override
     protected String getConfigFile()
@@ -50,11 +55,15 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase
         assertThat(output, containsString("010101010101010101010101010101010101010101010101"));
     }
 
-    @Test(expected = TransformerMessagingException.class)
+    @Test
     public void disabled() throws Exception
     {
         String input = makeInput();
         Object payload = input.getBytes();
+
+        exception.expect(TransformerMessagingException.class);
+        exception.expectMessage("Undeclared general entity");
+
         String output = (String) runFlow("flowBLDisabled", payload).getMessage().getPayload();
     }
 }
