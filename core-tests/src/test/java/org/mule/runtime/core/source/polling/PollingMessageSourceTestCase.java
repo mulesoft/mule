@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -88,6 +91,24 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     pollingMessageSource.dispose();
 
     verify(pollScheduler).stop(anyLong(), any());
+  }
+
+  @Test
+  public void setExecutionClassLoader() throws Exception {
+    ClassLoader executionClassLoader = mock(ClassLoader.class);
+    muleContext.setExecutionClassLoader(executionClassLoader);
+
+    PollingMessageSource pollingMessageSource = createMessageSource(event -> {
+      assertThat(currentThread().getContextClassLoader(), sameInstance(executionClassLoader));
+      return Event.builder(event).message(InternalMessage.builder().payload(TEST_PAYLOAD).build()).build();
+    });
+
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    pollingMessageSource.setListener(flow);
+
+    pollingMessageSource.poll();
+
+    assertNotNull(flow.event);
   }
 
   private PollingMessageSource createMessageSource(Processor processor) throws Exception {
