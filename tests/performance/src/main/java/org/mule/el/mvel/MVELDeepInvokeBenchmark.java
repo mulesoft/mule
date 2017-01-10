@@ -6,34 +6,33 @@
  */
 package org.mule.el.mvel;
 
+import static org.mule.BenchmarkUtils.createMuleContext;
+import static org.openjdk.jmh.annotations.Mode.AverageTime;
+import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.construct.Flow;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Random;
 
-import org.databene.contiperf.PerfTest;
-import org.databene.contiperf.Required;
-import org.databene.contiperf.junit.ContiPerfRule;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Threads;
 
-public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCase
+@Fork(1)
+@Threads(1)
+@BenchmarkMode(AverageTime)
+@State(Benchmark)
+public class MVELDeepInvokeBenchmark
 {
-    @Rule
-    public ContiPerfRule rule = new ContiPerfRule();
-
-    @Override
-    public int getTestTimeoutSecs()
-    {
-        return 180;
-    }
-
     final protected String mel = "payload.setFirstName('Tom');"
                                  + "payload.setLastName('Fennelly');"
                                  + "payload.contact.setAddress('Male');"
@@ -43,11 +42,13 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
 
     final protected Payload payload = new Payload();
 
+    private MuleContext muleContext;
     protected MuleEvent event;
 
-    @Before
-    public void before()
+    @Setup
+    public void setup() throws MuleException
     {
+        muleContext = createMuleContext();
         ((MVELExpressionLanguage) muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
         event = createMuleEvent();
         // Warmup
@@ -57,58 +58,39 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
         }
     }
 
+    @TearDown
+    public void teardown()
+    {
+        muleContext.dispose();
+    }
+
     /**
      * Cold start: - New expression for each iteration - New context (message) for each iteration
      */
-    @Test
-    @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-    @Required(median = 4000)
-    public void mvelColdStart()
+    @Benchmark
+    public Object mvelColdStart()
     {
-        for (int i = 0; i < 1000; i++)
-        {
-            muleContext.getExpressionLanguage().evaluate(mel + new Random().nextInt(), createMuleEvent());
-        }
+        return muleContext.getExpressionLanguage().evaluate(mel + new Random().nextInt(), createMuleEvent());
     }
 
     /**
      * Warm start: - Same expression for each iteration - New context (message) for each iteration
      */
-    @Test
-    @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-    @Required(median = 25)
-    public void mvelWarmStart()
+    @Benchmark
+    public Object mvelWarmStart()
     {
-        for (int i = 0; i < 1000; i++)
-        {
-            muleContext.getExpressionLanguage().evaluate(mel, event);
-        }
+        return muleContext.getExpressionLanguage().evaluate(mel, event);
     }
 
     /**
      * Hot start: - Same expression for each iteration - Same context (message) for each iteration
      */
-    @Test
-    @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-    @Required(median = 25)
-    public void mvelHotStart()
+    @Benchmark
+    public Object mvelHotStart()
     {
-        for (int i = 0; i < 1000; i++)
-        {
-            muleContext.getExpressionLanguage().evaluate(mel, event);
-        }
+        return muleContext.getExpressionLanguage().evaluate(mel, event);
     }
 
-    @Ignore
-    @Test
-    @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-    public void createEventBaseline()
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            createMuleEvent();
-        }
-    }
 
     protected MuleEvent createMuleEvent()
     {
