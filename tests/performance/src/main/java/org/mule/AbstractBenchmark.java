@@ -7,6 +7,8 @@
 package org.mule;
 
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
+import static org.openjdk.jmh.annotations.Mode.AverageTime;
+import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
@@ -23,11 +25,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Static util methods for use in benchmark setup/teardown. Benchmark methods themselves should ideally be self-contained for
- * clarity.
- */
-public class BenchmarkUtils {
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
+
+@Fork(1)
+@Threads(1)
+@BenchmarkMode(AverageTime)
+@State(Benchmark)
+public class AbstractBenchmark {
 
   public static final String CONNECTOR_NAME = "test";
   public static final String FLOW_NAME = "flow";
@@ -37,18 +44,18 @@ public class BenchmarkUtils {
 
   static {
     try {
-      PAYLOAD = getResourceAsString("test-data.json", BenchmarkUtils.class);
+      PAYLOAD = getResourceAsString("test-data.json", AbstractBenchmark.class);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static MuleContext createMuleContext() throws MuleException {
+  public MuleContext createMuleContext() throws MuleException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     return muleContextFactory.createMuleContext();
   }
 
-  public static MuleContext createMuleContextWithServices() throws MuleException {
+  public MuleContext createMuleContextWithServices() throws MuleException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builderList = new ArrayList<>();
     builderList.add(new DefaultsConfigurationBuilder());
@@ -56,17 +63,20 @@ public class BenchmarkUtils {
     return muleContextFactory.createMuleContext(builderList.toArray(new ConfigurationBuilder[] {}));
   }
 
-  public static Flow createFlow(MuleContext muleContext) {
+  public Flow createFlow(MuleContext muleContext) {
     return new Flow(FLOW_NAME, muleContext);
   }
 
-  public static Event createEvent(Flow flow) {
+  public Event createEvent(Flow flow) {
+    return createEvent(flow, PAYLOAD);
+  }
+
+  public Event createEvent(Flow flow, Object payload) {
     try {
       return Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
-          .message(InternalMessage.builder().payload(PAYLOAD).build()).build();
+          .message(InternalMessage.builder().payload(payload).build()).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
-
 }

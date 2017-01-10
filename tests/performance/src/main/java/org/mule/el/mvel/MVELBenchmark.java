@@ -6,33 +6,23 @@
  */
 package org.mule.el.mvel;
 
-import static org.mule.BenchmarkUtils.createEvent;
-import static org.mule.BenchmarkUtils.createFlow;
-import static org.mule.BenchmarkUtils.createMuleContext;
-import static org.openjdk.jmh.annotations.Mode.AverageTime;
-import static org.openjdk.jmh.annotations.Scope.Benchmark;
-
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 
 import java.util.Random;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.annotations.Threads;
 
-@Fork(1)
-@Threads(1)
-@BenchmarkMode(AverageTime)
-@State(Benchmark)
-public class MVELBenchmark {
+public class MVELBenchmark extends AbstractBenchmark {
 
   final protected String mel = "StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
       + "if (fields.length > 4) {"
@@ -52,14 +42,15 @@ public class MVELBenchmark {
 
   @Setup
   public void setup() throws MuleException {
-    muleContext = createMuleContext();
-    ((MVELExpressionLanguage) muleContext.getExpressionManager()).setAutoResolveVariables(false);
+    muleContext = createMuleContextWithServices();
+    ((MVELExpressionLanguage) muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).setAutoResolveVariables(false);
     flow = createFlow(muleContext);
     event = createEvent(flow);
   }
 
   @TearDown
-  public void teardown() {
+  public void teardown() throws MuleException {
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
     muleContext.dispose();
   }
 

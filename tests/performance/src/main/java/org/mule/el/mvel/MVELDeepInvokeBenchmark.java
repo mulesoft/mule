@@ -6,33 +6,23 @@
  */
 package org.mule.el.mvel;
 
-import static org.mule.BenchmarkUtils.createEvent;
-import static org.mule.BenchmarkUtils.createFlow;
-import static org.mule.BenchmarkUtils.createMuleContext;
-import static org.openjdk.jmh.annotations.Mode.AverageTime;
-import static org.openjdk.jmh.annotations.Scope.Benchmark;
-
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 
 import java.util.Random;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.annotations.Threads;
 
-@Fork(1)
-@Threads(1)
-@BenchmarkMode(AverageTime)
-@State(Benchmark)
-public class MVELDeepInvokeBenchmark {
+public class MVELDeepInvokeBenchmark extends AbstractBenchmark {
 
   final protected String mel = "payload.setFirstName('Tom');"
       + "payload.setLastName('Fennelly');"
@@ -49,14 +39,15 @@ public class MVELDeepInvokeBenchmark {
 
   @Setup
   public void setup() throws MuleException {
-    muleContext = createMuleContext();
-    ((MVELExpressionLanguage) muleContext.getExpressionManager()).setAutoResolveVariables(false);
+    muleContext = createMuleContextWithServices();
+    ((MVELExpressionLanguage) muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).setAutoResolveVariables(false);
     flow = createFlow(muleContext);
-    event = createEvent(flow);
+    event = createEvent(flow, payload);
   }
 
   @TearDown
-  public void teardown() {
+  public void teardown() throws MuleException {
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
     muleContext.dispose();
   }
 
@@ -65,7 +56,7 @@ public class MVELDeepInvokeBenchmark {
    */
   @Benchmark
   public Object mvelColdStart() {
-    return muleContext.getExpressionManager().evaluate(mel + new Random().nextInt(), createEvent(flow));
+    return muleContext.getExpressionManager().evaluate(mel + new Random().nextInt(), createEvent(flow, payload));
   }
 
   /**

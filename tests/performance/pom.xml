@@ -246,6 +246,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
+                                <enablePerformanceTests>true</enablePerformanceTests>
                                 <contiperf.active>true</contiperf.active>
                                 <mule.test.timeoutSecs>300</mule.test.timeoutSecs>
                             </systemPropertyVariables>

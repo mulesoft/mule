@@ -29,7 +29,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  */
 public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTestCase {
 
-  private static final String ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY = "contiperf.active";
+  private static final String ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY = "enablePerformanceTests";
 
   /**
    * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
@@ -71,7 +71,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
     try {
       if (getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY).equals(TRUE.toString())) {
         Options opt = new OptionsBuilder()
-            .include(clazz.getSimpleName() + "." + testName)
+            .include(clazz.getSimpleName() + "." + testName + "$")
             .forks(1)
             .threads(threads)
             .timeUnit(timeUnit)
@@ -81,7 +81,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
         assertions.accept(new Runner(opt).runSingle());
       } else {
         Options opt = new OptionsBuilder()
-            .include(clazz.getSimpleName() + "." + testName)
+            .include(clazz.getSimpleName() + "." + testName + "$")
             .forks(0)
             .timeUnit(timeUnit)
             .warmupIterations(0)

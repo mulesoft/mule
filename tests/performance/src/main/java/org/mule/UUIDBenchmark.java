@@ -6,30 +6,12 @@
  */
 package org.mule;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static org.openjdk.jmh.annotations.Mode.AverageTime;
-import static org.openjdk.jmh.annotations.Scope.Benchmark;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.UUID;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
 
-@State(Benchmark)
-@Fork(1)
-@Threads(1)
-@BenchmarkMode(AverageTime)
-@OutputTimeUnit(NANOSECONDS)
-@Warmup(iterations = 10)
-@Measurement(iterations = 10)
-public class UUIDBenchmark {
+public class UUIDBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public String UUID() throws MuleException {

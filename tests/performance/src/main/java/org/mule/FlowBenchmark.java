@@ -9,42 +9,28 @@ package org.mule;
 import static java.lang.Class.forName;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
-import static org.mule.BenchmarkUtils.createFlow;
-import static org.mule.BenchmarkUtils.createMuleContextWithServices;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.openjdk.jmh.annotations.Mode.AverageTime;
-import static org.openjdk.jmh.annotations.Scope.Benchmark;
-
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.TriggerableMessageSource;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
 
-@State(Benchmark)
-@Fork(1)
-@Threads(1)
-@BenchmarkMode(AverageTime)
+
 @OutputTimeUnit(MICROSECONDS)
-@Warmup(iterations = 10)
-@Measurement(iterations = 10)
-public class FlowBenchmark {
+public class FlowBenchmark extends AbstractBenchmark {
 
   public static final String TEST_PAYLOAD = "test";
   public static final String TEST_CONNECTOR = "test";
@@ -74,7 +60,8 @@ public class FlowBenchmark {
   }
 
   @TearDown
-  public void teardown() {
+  public void teardown() throws MuleException {
+    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
     muleContext.dispose();
   }
 
