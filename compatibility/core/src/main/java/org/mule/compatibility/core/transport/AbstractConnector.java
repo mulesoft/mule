@@ -429,7 +429,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
         throw me;
       } catch (Exception e) {
         shutdownInternalScheduler();
-        throw new LifecycleException(e, this);
+        throw new IllegalStateException(e);
       }
     }
   }
