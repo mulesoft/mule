@@ -96,7 +96,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     verify(pollScheduler).stop(anyLong(), any());
   }
 
-   private PollingMessageSource pollingMessageSource;
+  private PollingMessageSource pollingMessageSource;
 
   @After
   public void after() throws MuleException {
