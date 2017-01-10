@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ws.internal.generator.attachment;
 
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import org.mule.extension.ws.internal.interceptor.OutputMtomSoapAttachmentsInterceptor;
 import org.mule.metadata.api.model.ObjectFieldType;
 

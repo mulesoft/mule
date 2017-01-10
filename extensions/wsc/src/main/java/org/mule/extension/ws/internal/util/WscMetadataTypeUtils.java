@@ -7,7 +7,7 @@
 package org.mule.extension.ws.internal.util;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isObjectType;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import org.mule.extension.ws.internal.WebServiceConsumer;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataType;

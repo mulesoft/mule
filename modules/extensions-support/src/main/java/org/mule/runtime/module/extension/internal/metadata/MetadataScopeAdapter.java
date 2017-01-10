@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.stream.Collectors.toMap;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isEnum;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import org.mule.metadata.api.ClassTypeLoader;

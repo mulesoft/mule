@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.TypeLoader;

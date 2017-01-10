@@ -12,7 +12,7 @@ import static java.math.BigInteger.ZERO;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
