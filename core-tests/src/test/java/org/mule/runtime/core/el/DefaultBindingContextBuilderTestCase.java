@@ -12,7 +12,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.el.v2.DefaultBindingContextBuilder;
@@ -26,27 +27,27 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
   private static final String OTHER_ID = "otherId";
 
   private BindingContext.Builder builder = new DefaultBindingContextBuilder();
-  private TypedValue mockTypedValue = mock(TypedValue.class);
+  private TypedValue<String> typedValue = new TypedValue<>("", STRING);
 
   @Test
   public void addsBinding() {
-    BindingContext context = builder.addBinding(ID, mockTypedValue).build();
+    BindingContext context = builder.addBinding(ID, typedValue).build();
 
     assertThat(context.bindings(), hasSize(1));
     assertThat(context.identifiers(), hasItem("id"));
-    assertThat(context.lookup("id").get(), is(sameInstance(mockTypedValue)));
+    assertThat(context.lookup("id").get(), is(sameInstance(typedValue)));
   }
 
   @Test
   public void addsBindings() {
     BindingContext previousContext =
-        BindingContext.builder().addBinding(ID, mockTypedValue).addBinding(OTHER_ID, mockTypedValue).build();
+        BindingContext.builder().addBinding(ID, typedValue).addBinding(OTHER_ID, typedValue).build();
     BindingContext context = builder.addAll(previousContext).build();
 
     assertThat(context.bindings(), hasSize(2));
     assertThat(context.identifiers(), hasItems(ID, OTHER_ID));
-    assertThat(context.lookup(ID).get(), is(sameInstance(mockTypedValue)));
-    assertThat(context.lookup(OTHER_ID).get(), is(sameInstance(mockTypedValue)));
+    assertThat(context.lookup(ID).get(), is(sameInstance(typedValue)));
+    assertThat(context.lookup(OTHER_ID).get(), is(sameInstance(typedValue)));
   }
 
 }

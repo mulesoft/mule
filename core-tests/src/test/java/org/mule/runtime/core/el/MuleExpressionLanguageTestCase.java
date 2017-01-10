@@ -19,6 +19,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ATTRIBUTES;
 import static org.mule.runtime.core.el.v2.MuleExpressionLanguage.ERROR;
@@ -106,7 +107,7 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
     String var1 = "var1";
     String var2 = "var2";
     when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
-    TypedValue varValue = mock(TypedValue.class);
+    TypedValue varValue = new TypedValue(null, OBJECT);
     when(event.getVariable(var1)).thenReturn(varValue);
     when(event.getVariable(var2)).thenReturn(varValue);
 
@@ -140,7 +141,7 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
     Event event = spy(testEvent());
     HashSet<String> variables = Sets.newHashSet(PAYLOAD, ATTRIBUTES, ERROR, VARIABLES, FLOW);
     when(event.getVariableNames()).thenReturn(variables);
-    TypedValue varValue = mock(TypedValue.class);
+    TypedValue<String> varValue = new TypedValue<>("", STRING);
     variables.forEach(var -> doReturn(varValue).when(event).getVariable(var));
     FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
     String flowName = "myFlowName";
@@ -171,6 +172,7 @@ public class MuleExpressionLanguageTestCase extends AbstractMuleTestCase {
   private Event getEventWithError(Optional<Error> error) {
     Event event = mock(Event.class, RETURNS_DEEP_STUBS);
     doReturn(error).when(event).getError();
+    when(event.getMessage().getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
     return event;
   }
 

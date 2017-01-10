@@ -23,6 +23,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -31,9 +32,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -299,19 +300,18 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void successfulExecutionWithAckExpression() throws Exception {
     String ackExpression = "some-expression";
-    String expressionEvalutaionResult = "new payload";
+    String expressionEvaluationResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    TypedValue mockTypedValue = mock(TypedValue.class);
-    when(mockTypedValue.getValue()).thenReturn(expressionEvalutaionResult);
+    TypedValue<String> typedValue = new TypedValue<>(expressionEvaluationResult, STRING);
     when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, event))
-        .thenReturn(mockTypedValue);
+        .thenReturn(typedValue);
     final Event result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(any(Event.class));
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1))
         .evaluate(eq(ackExpression), any(Event.class));
 
-    assertThat(result.getMessage().getPayload().getValue(), is(expressionEvalutaionResult));
+    assertThat(result.getMessage().getPayload().getValue(), is(expressionEvaluationResult));
     verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));
   }
 

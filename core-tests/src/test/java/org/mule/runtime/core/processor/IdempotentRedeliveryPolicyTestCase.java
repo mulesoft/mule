@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -14,23 +16,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
-import org.mule.tck.SerializationTestUtils;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.SerializationTestUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -42,11 +48,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
-import org.mockito.internal.verification.VerificationModeFactory;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import junit.framework.Assert;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
@@ -70,14 +71,10 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @SuppressWarnings("rawtypes")
   public void setUpTest() throws MuleException {
     when(mockFailingMessageProcessor.process(any(Event.class))).thenThrow(new RuntimeException("failing"));
-    when(mockWaitingMessageProcessor.process(event)).thenAnswer(new Answer<Event>() {
-
-      @Override
-      public Event answer(InvocationOnMock invocationOnMock) throws Throwable {
-        waitingMessageProcessorExecutionLatch.countDown();
-        waitLatch.await(2000, TimeUnit.MILLISECONDS);
-        return mockFailingMessageProcessor.process((Event) invocationOnMock.getArguments()[0]);
-      }
+    when(mockWaitingMessageProcessor.process(event)).thenAnswer(invocationOnMock -> {
+      waitingMessageProcessorExecutionLatch.countDown();
+      waitLatch.await(2000, TimeUnit.MILLISECONDS);
+      return mockFailingMessageProcessor.process((Event) invocationOnMock.getArguments()[0]);
     });
     MuleLockFactory muleLockFactory = new MuleLockFactory();
     muleLockFactory.setMuleContext(mockMuleContext);
@@ -88,13 +85,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
     final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
     when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt()))
-        .thenAnswer(new Answer<ObjectStore>() {
-
-          @Override
-          public ObjectStore answer(InvocationOnMock invocation) throws Throwable {
-            return inMemoryObjectStore;
-          }
-        });
+        .thenAnswer(invocation -> inMemoryObjectStore);
     when(event.getMessage()).thenReturn(message);
 
     IdempotentRedeliveryPolicyTestCase.serializer = SerializationTestUtils.getJavaSerializerWithMockContext();
@@ -110,41 +101,35 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void messageDigestFailure() throws Exception {
-    when(message.getPayload().getValue()).thenReturn(new Object());
+    when(message.getPayload()).thenReturn(new TypedValue<>(new Object(), OBJECT));
     irp.initialise();
     Event process = irp.process(event);
-    Assert.assertNull(process);
+    assertThat(process, nullValue());
   }
 
   @Test
   public void testMessageRedeliveryUsingMemory() throws Exception {
-    when(message.getPayload().getValue()).thenReturn(STRING_MESSAGE);
+    when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.initialise();
     processUntilFailure();
-    verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+    verify(mockDlqMessageProcessor, times(1)).process(event);
   }
 
   @Test
   public void testMessageRedeliveryUsingSerializationStore() throws Exception {
-    when(message.getPayload().getValue()).thenReturn(STRING_MESSAGE);
+    when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     reset(mockObjectStoreManager);
     final ObjectStore serializationObjectStore = new SerializationObjectStore();
     when(mockObjectStoreManager.getObjectStore(anyString(), anyBoolean(), anyInt(), anyInt(), anyInt()))
-        .thenAnswer(new Answer<ObjectStore>() {
-
-          @Override
-          public ObjectStore answer(InvocationOnMock invocation) throws Throwable {
-            return serializationObjectStore;
-          }
-        });
+        .thenAnswer(invocation -> serializationObjectStore);
     irp.initialise();
     processUntilFailure();
-    verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+    verify(mockDlqMessageProcessor, times(1)).process(event);
   }
 
   @Test
   public void testThreadSafeObjectStoreUsage() throws Exception {
-    when(message.getPayload().getValue()).thenReturn(STRING_MESSAGE);
+    when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.setListener(mockWaitingMessageProcessor);
     irp.initialise();
     ExecuteIrpThread firstIrpExecutionThread = new ExecuteIrpThread();
@@ -155,7 +140,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     waitLatch.release();
     firstIrpExecutionThread.join();
     threadCausingRedeliveryException.join();
-    verify(mockDlqMessageProcessor, VerificationModeFactory.times(1)).process(event);
+    verify(mockDlqMessageProcessor, times(1)).process(event);
   }
 
   private void processUntilFailure() {
@@ -184,7 +169,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   public static class SerializationObjectStore implements ObjectStore<AtomicInteger> {
 
-    private Map<Serializable, Serializable> store = new HashMap<Serializable, Serializable>();
+    private Map<Serializable, Serializable> store = new HashMap<>();
 
     @Override
     public boolean contains(Serializable key) throws ObjectStoreException {
@@ -221,7 +206,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   public static class InMemoryObjectStore implements ObjectStore<AtomicInteger> {
 
-    private Map<Serializable, AtomicInteger> store = new HashMap<Serializable, AtomicInteger>();
+    private Map<Serializable, AtomicInteger> store = new HashMap<>();
 
     @Override
     public boolean contains(Serializable key) throws ObjectStoreException {

@@ -32,6 +32,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -45,7 +46,9 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -269,8 +272,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   }
 
   protected Event configureEvent() throws Exception {
-    when(message.getPayload().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
-    when(message.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
+    when(message.getPayload())
+        .thenReturn(new TypedValue<Object>(TEST_PAYLOAD,
+                                           DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));
     return eventBuilder().message(message).build();
   }
 

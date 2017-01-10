@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -56,9 +57,8 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   public void testGeneratesSerializableKey() throws Exception {
     keyGenerator.setExpression(SINGLE_EXPRESSION);
     keyGenerator.setMuleContext(muleContext);
-    TypedValue mockTypedValue = mock(TypedValue.class);
-    when(mockTypedValue.getValue()).thenReturn(RESOLVED_KEY);
-    when(expressionManager.evaluate(SINGLE_EXPRESSION, event)).thenReturn(mockTypedValue);
+    TypedValue<String> typedValue = new TypedValue<>(RESOLVED_KEY, STRING);
+    when(expressionManager.evaluate(SINGLE_EXPRESSION, event)).thenReturn(typedValue);
     Serializable key = keyGenerator.generateKey(event);
 
     assertEquals(RESOLVED_KEY, key);
