@@ -65,7 +65,7 @@ public class MockSchedulerService implements SchedulerService {
   }
 
   @Override
-  public List<Scheduler> getActiveSchedulers() {
+  public List<Scheduler> getSchedulers() {
     return singletonList(new MockScheduler());
   }
 }
