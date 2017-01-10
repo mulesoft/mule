@@ -12,10 +12,10 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
 import static org.mule.runtime.core.util.ObjectUtils.getDouble;
@@ -24,6 +24,7 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
@@ -39,7 +40,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
@@ -70,8 +70,8 @@ public class DefaultMessageBuilder
 
   private ExceptionPayload exceptionPayload;
 
-  private Map<String, DefaultTypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
-  private Map<String, DefaultTypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
+  private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
+  private Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
   private Map<String, DataHandler> inboundAttachments = new HashMap<>();
   private Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
@@ -177,39 +177,39 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage.Builder addInboundProperty(String key, Serializable value) {
-    inboundProperties.put(key, new DefaultTypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
+    inboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
     return this;
   }
 
   @Override
   public InternalMessage.Builder addInboundProperty(String key, Serializable value, MediaType mediaType) {
     inboundProperties.put(key,
-                          new DefaultTypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+                          new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
   public InternalMessage.Builder addInboundProperty(String key, Serializable value, DataType dataType) {
-    inboundProperties.put(key, new DefaultTypedValue(value, dataType));
+    inboundProperties.put(key, new TypedValue(value, dataType));
     return this;
   }
 
   @Override
   public InternalMessage.Builder addOutboundProperty(String key, Serializable value) {
-    outboundProperties.put(key, new DefaultTypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
+    outboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
     return this;
   }
 
   @Override
   public InternalMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
     outboundProperties.put(key,
-                           new DefaultTypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+                           new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
   public InternalMessage.Builder addOutboundProperty(String key, Serializable value, DataType dataType) {
-    outboundProperties.put(key, new DefaultTypedValue(value, dataType));
+    outboundProperties.put(key, new TypedValue(value, dataType));
     return this;
   }
 
@@ -281,7 +281,7 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage build() {
-    return new MessageImplementation(new DefaultTypedValue(payload, resolveDataType()), attributes,
+    return new MessageImplementation(new TypedValue(payload, resolveDataType()), attributes,
                                      inboundProperties, outboundProperties, inboundAttachments,
                                      outboundAttachments, exceptionPayload);
   }
@@ -319,16 +319,16 @@ public class DefaultMessageBuilder
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-    private transient DefaultTypedValue typedValue;
+    private transient TypedValue typedValue;
     //TODO: MULE-10774 - Make attributes a TypedValue
     private Attributes attributes;
 
-    private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
-    private Map<String, DefaultTypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
+    private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
+    private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
 
-    private MessageImplementation(DefaultTypedValue typedValue, Attributes attributes,
-                                  Map<String, DefaultTypedValue<Serializable>> inboundProperties,
-                                  Map<String, DefaultTypedValue<Serializable>> outboundProperties,
+    private MessageImplementation(TypedValue typedValue, Attributes attributes,
+                                  Map<String, TypedValue<Serializable>> inboundProperties,
+                                  Map<String, TypedValue<Serializable>> outboundProperties,
                                   Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
                                   ExceptionPayload exceptionPayload) {
       this.typedValue = typedValue;
@@ -541,7 +541,7 @@ public class DefaultMessageBuilder
 
     private void readObject(ObjectInputStream in) throws Exception {
       in.defaultReadObject();
-      typedValue = new DefaultTypedValue(deserializeValue(in), (DataType) in.readObject());
+      typedValue = new TypedValue(deserializeValue(in), (DataType) in.readObject());
       inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
       outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
     }
@@ -578,7 +578,7 @@ public class DefaultMessageBuilder
 
     @Override
     public <T extends Serializable> T getInboundProperty(String name, T defaultValue) {
-      return getValueOrDefault((DefaultTypedValue<T>) inboundMap.get(name), defaultValue);
+      return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
     }
 
     @Override
@@ -588,7 +588,7 @@ public class DefaultMessageBuilder
 
     @Override
     public <T extends Serializable> T getOutboundProperty(String name, T defaultValue) {
-      return getValueOrDefault((DefaultTypedValue<T>) outboundMap.get(name), defaultValue);
+      return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
     }
 
     @Override
@@ -603,17 +603,17 @@ public class DefaultMessageBuilder
 
     @Override
     public DataType getInboundPropertyDataType(String name) {
-      DefaultTypedValue typedValue = inboundMap.get(name);
+      TypedValue typedValue = inboundMap.get(name);
       return typedValue == null ? null : typedValue.getDataType();
     }
 
     @Override
     public DataType getOutboundPropertyDataType(String name) {
-      DefaultTypedValue typedValue = outboundMap.get(name);
+      TypedValue typedValue = outboundMap.get(name);
       return typedValue == null ? null : typedValue.getDataType();
     }
 
-    private <T extends Serializable> T getValueOrDefault(DefaultTypedValue<T> typedValue, T defaultValue) {
+    private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue) {
       if (typedValue == null) {
         return defaultValue;
       }

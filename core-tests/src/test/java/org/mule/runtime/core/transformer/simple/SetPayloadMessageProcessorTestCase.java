@@ -16,15 +16,16 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -84,7 +85,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(EXPRESSION);
     when(expressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadMessageProcessor.initialise();
-    DefaultTypedValue typedValue = new DefaultTypedValue(PLAIN_TEXT, DataType.STRING);
+    TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
     when(expressionManager.evaluate(EXPRESSION, testEvent())).thenReturn(typedValue);
     when(expressionManager.evaluate(eq(EXPRESSION), eq(testEvent()), any(Event.Builder.class), eq(null)))
         .thenReturn(typedValue);

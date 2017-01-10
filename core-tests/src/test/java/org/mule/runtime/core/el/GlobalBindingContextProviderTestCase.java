@@ -15,11 +15,6 @@ import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.Test;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.metadata.DataType;
@@ -32,8 +27,14 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -86,8 +87,8 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
     public BindingContext getBindingContext() {
       TestExpressionFunction function = new TestExpressionFunction();
       return builder()
-          .addBinding("number", new DefaultTypedValue(1, NUMBER))
-          .addBinding("repeat", new DefaultTypedValue(function, fromFunction(function)))
+          .addBinding("number", new TypedValue(1, NUMBER))
+          .addBinding("repeat", new TypedValue(function, fromFunction(function)))
           .build();
     }
   }

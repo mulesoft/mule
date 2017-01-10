@@ -12,13 +12,11 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.compatibility.module.cxf.CxfConfiguration;
-import org.mule.compatibility.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -74,7 +72,7 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleCont
     InternalMessage muleMessage = mock(InternalMessage.class);
 
     when(muleEvent.getMessage()).thenReturn(muleMessage);
-    when(muleMessage.getPayload()).thenReturn(new DefaultTypedValue<>(payload, DataType.OBJECT));
+    when(muleMessage.getPayload()).thenReturn(new TypedValue<>(payload, DataType.OBJECT));
 
     Object[] args = cxfMP.getArgs(muleEvent);
     return args;

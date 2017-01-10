@@ -14,6 +14,7 @@ import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
@@ -23,6 +24,8 @@ import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -31,12 +34,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -190,7 +190,7 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initi
       final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
       DataType dataType = event != null ? dataTypeResolver.resolve(value, event, compiledExpression) : OBJECT;
 
-      return new DefaultTypedValue(value, dataType);
+      return new TypedValue(value, dataType);
     }
   }
 

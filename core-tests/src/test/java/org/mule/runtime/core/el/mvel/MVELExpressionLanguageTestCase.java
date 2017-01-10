@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
@@ -26,6 +27,7 @@ import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -34,7 +36,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.MuleManifest;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -461,7 +461,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   protected Event createMockEvent(String payload, DataType dataType) {
     Event event = mock(Event.class);
     InternalMessage message = mock(InternalMessage.class);
-    when(message.getPayload()).thenReturn(new DefaultTypedValue<Object>(payload, dataType));
+    when(message.getPayload()).thenReturn(new TypedValue<Object>(payload, dataType));
     when(event.getMessage()).thenReturn(message);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());

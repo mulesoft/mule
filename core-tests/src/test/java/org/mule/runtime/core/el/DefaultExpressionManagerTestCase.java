@@ -21,6 +21,7 @@ import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -33,7 +34,6 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -105,7 +106,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that custom variables are considered.")
   public void simpleCustomVariable() {
     Object object = new Object();
-    BindingContext context = BindingContext.builder().addBinding(MY_VAR, new DefaultTypedValue(object, OBJECT)).build();
+    BindingContext context = BindingContext.builder().addBinding(MY_VAR, new TypedValue(object, OBJECT)).build();
     assertThat(expressionManager.evaluate("#[myVar]", context).getValue(), equalTo(object));
     assertThat(expressionManager.evaluate("#[dw:myVar]", context).getValue(), equalTo(object));
   }
@@ -256,7 +257,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     Event event = testEvent();
     Event.Builder builder = Event.builder(event);
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
-    TypedValue myPayload = new DefaultTypedValue("myPayload", STRING);
+    TypedValue myPayload = new TypedValue("myPayload", STRING);
     String expression = "payload";
     expressionManager.enrich(expression, event, builder, flowConstruct, myPayload);
     Event enrichedEvent = builder.build();

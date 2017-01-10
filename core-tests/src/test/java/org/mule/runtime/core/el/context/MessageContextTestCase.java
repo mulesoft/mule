@@ -23,12 +23,12 @@ import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.message.GroupCorrelation;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +88,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void dataType() throws Exception {
-    when(message.getPayload()).thenReturn(new DefaultTypedValue<Object>("", DataType.STRING));
+    when(message.getPayload()).thenReturn(new TypedValue<Object>("", DataType.STRING));
     assertThat(evaluate("message.dataType", event), is(DataType.STRING));
     assertFinalProperty("message.mimType=2", event);
   }
@@ -98,7 +98,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     InternalMessage message = mock(InternalMessage.class);
     when(event.getMessage()).thenReturn(message);
     Object payload = new Object();
-    when(message.getPayload()).thenReturn(new DefaultTypedValue<>(payload, DataType.OBJECT));
+    when(message.getPayload()).thenReturn(new TypedValue<>(payload, DataType.OBJECT));
     assertSame(payload, evaluate("message.payload", event));
   }
 

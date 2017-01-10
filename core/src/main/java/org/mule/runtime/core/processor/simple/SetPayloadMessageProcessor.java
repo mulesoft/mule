@@ -8,6 +8,7 @@
 package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -15,8 +16,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
@@ -58,7 +57,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   private TypedValue resolveTypedValue(Event event, Event.Builder eventBuilder) {
     if (valueEvaluator.getRawValue() == null) {
-      return new DefaultTypedValue(null, DataType.OBJECT);
+      return new TypedValue(null, DataType.OBJECT);
     } else {
       return valueEvaluator.resolveTypedValue(event, eventBuilder);
     }
