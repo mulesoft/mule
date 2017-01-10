@@ -198,14 +198,17 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
             }
         });
 
+        MuleEvent event = getTestEvent("");
+
         try
         {
-            enricher.process(getTestEvent(""));
+            enricher.process(event);
             fail("Expected a MessagingException");
         }
         catch (MessagingException e)
         {
             assertThat(e.getMessage(), is("Expected."));
+            assertThat(e.getEvent(), sameInstance(event));
         }
         assertThat(RequestContext.getEvent().getReplyToHandler(), nullValue());
     }

@@ -58,7 +58,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         catch (MessagingException e)
         {
             exception = e;
-            throw e;
+            return processCatch(event, e);
         }
         finally
         {
@@ -188,4 +188,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
     }
 
+    protected MuleEvent processCatch(MuleEvent event, MessagingException exception) throws MessagingException
+    {
+        throw exception;
+    }
 }
