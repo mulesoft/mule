@@ -297,7 +297,6 @@
 /mule-standalone-${productVersion}/lib/opt/javax.annotation-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.13.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.1.13.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
