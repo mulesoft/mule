@@ -8,6 +8,7 @@ package org.mule.service.scheduler.internal.config;
 
 import static java.io.File.separator;
 import static java.lang.Long.parseLong;
+import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
@@ -100,7 +101,8 @@ public class ThreadPoolsConfig {
     config.setCpuLightPoolSize(resolveExpression(properties, CPU_LIGHT_PREFIX + "." + THREAD_POOL_SIZE, config, engine));
     config.setCpuLightQueueSize(resolveExpression(properties, CPU_LIGHT_PREFIX + "." + WORK_QUEUE_SIZE, config, engine));
 
-    config.setIoCorePoolSize(resolveExpression(properties, IO_PREFIX + "." + THREAD_POOL_SIZE_CORE, config, engine));
+    // TODO MULE-11363 This is a temporary workaround until the referenced issue is done
+    config.setIoCorePoolSize(max(4, resolveExpression(properties, IO_PREFIX + "." + THREAD_POOL_SIZE_CORE, config, engine)));
     config.setIoMaxPoolSize(resolveExpression(properties, IO_PREFIX + "." + THREAD_POOL_SIZE_MAX, config, engine));
     config.setIoQueueSize(resolveExpression(properties, IO_PREFIX + "." + WORK_QUEUE_SIZE, config, engine));
     config.setIoKeepAlive(resolveNumber(properties, IO_PREFIX + "." + THREAD_POOL_KEEP_ALIVE));
