@@ -12,16 +12,25 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -38,7 +47,9 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -50,11 +61,17 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   private static final Class MODULE_CLASS = HeisenbergExtension.class;
 
+  @Rule
+  public ExpectedException expected = none();
+
   @Mock
   private ResolverSet resolverSet;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ResolverSetResult resolverSetResult;
+
+  @Mock
+  private StaticValueResolver<ConnectionProvider> connectionProviderResolver;
 
   private ExpirationPolicy expirationPolicy;
 
@@ -75,9 +92,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
 
+    when(connectionProviderResolver.resolve(any())).thenReturn(null);
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
-                                                new StaticValueResolver<>(null),
-                                                expirationPolicy);
+                                                connectionProviderResolver, expirationPolicy);
 
     super.before();
     provider.initialise();
@@ -150,5 +167,45 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     Object config2 = provider.get(event);
 
     assertThat(config1, is(not(sameInstance(config2))));
+  }
+
+  @Test
+  public void configFailsOnInitialize() throws Exception {
+    final Lifecycle connProvider = mock(Lifecycle.class, withSettings().extraInterfaces(ConnectionProvider.class));
+    final String expectedExceptionMessage = "Init failed!";
+    doThrow(new RuntimeException(expectedExceptionMessage)).when(connProvider).initialise();
+
+    when(connectionProviderResolver.resolve(any())).thenReturn((ConnectionProvider) connProvider);
+
+    expected.expectCause(hasMessage(is(InitialisationException.class.getName() + ": " + expectedExceptionMessage)));
+
+    try {
+      provider.get(event);
+    } finally {
+      verify(connProvider).initialise();
+      verify(connProvider, never()).start();
+      verify(connProvider, never()).stop();
+      verify(connProvider).dispose();
+    }
+  }
+
+  @Test
+  public void configFailsOnStart() throws Exception {
+    final Lifecycle connProvider = mock(Lifecycle.class, withSettings().extraInterfaces(ConnectionProvider.class));
+    final RuntimeException toThrow = new RuntimeException("Start failed!");
+    doThrow(toThrow).when(connProvider).start();
+
+    when(connectionProviderResolver.resolve(any())).thenReturn((ConnectionProvider) connProvider);
+
+    expected.expectCause(sameInstance(toThrow));
+
+    try {
+      provider.get(event);
+    } finally {
+      verify(connProvider).initialise();
+      verify(connProvider).start();
+      verify(connProvider).stop();
+      verify(connProvider).dispose();
+    }
   }
 }
