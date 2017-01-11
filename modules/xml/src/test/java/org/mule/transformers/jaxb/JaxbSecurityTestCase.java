@@ -104,7 +104,7 @@ public class JaxbSecurityTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void expandsEntitiesWhenDisabled() throws Exception
+    public void expandsEntitiesDisabled() throws Exception
     {
         try
         {
