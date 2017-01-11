@@ -9,12 +9,9 @@ package org.mule.test.core;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import org.mule.AbstractBenchmarkAssertionTestCase;
-import org.mule.EventBenchmark;
 import org.mule.FlowBenchmark;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
-
-import java.util.Collections;
 
 import org.junit.Test;
 

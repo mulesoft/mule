@@ -10,15 +10,7 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.UUIDBenchmark;
-import org.mule.runtime.core.util.UUID;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.concurrent.TimeUnit;
-
-import org.databene.contiperf.PerfTest;
-import org.databene.contiperf.Required;
-import org.databene.contiperf.junit.ContiPerfRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class UUIDBenchmarkAssertionTestCase extends AbstractBenchmarkAssertionTestCase {

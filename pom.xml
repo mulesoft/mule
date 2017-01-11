@@ -198,7 +198,7 @@
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <!-- TODO MULE-10771 -->
-        <projectReactorVersion>3.0.4.BUILD-SNAPSHOT</projectReactorVersion>
+        <projectReactorVersion>3.0.5.BUILD-SNAPSHOT</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.3</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
