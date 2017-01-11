@@ -34,7 +34,7 @@
             <reconnect blocking="true" count="1" frequency="0"/>
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['content-type' : 'text/plain']]
+                    #[mel:['content-type' : 'text/plain']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

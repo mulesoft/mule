@@ -6,11 +6,11 @@
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <flow name="publisher">
-        <jmsn:publish config-ref="config" destination="#[dw:destination]" destinationType="TOPIC"/>
+        <jmsn:publish config-ref="config" destination="#[destination]" destinationType="TOPIC"/>
     </flow>
 
     <flow name="consumer">
-        <jmsn:consume config-ref="config" destination="#[dw:destination]">
+        <jmsn:consume config-ref="config" destination="#[destination]">
             <jmsn:consumer-type>
                 <jmsn:topic-consumer/>
             </jmsn:consumer-type>

@@ -62,7 +62,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   protected WildcardFilter commitTxFilter;
 
   protected boolean enableNotifications = true;
-  protected String logException = "true";
+  protected String logException = "mel:true";
 
   protected String globalName;
 

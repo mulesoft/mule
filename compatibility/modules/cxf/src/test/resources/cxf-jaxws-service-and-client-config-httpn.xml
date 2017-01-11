@@ -17,13 +17,13 @@
 
     <flow name="client">
         <httpn:listener path="hello" config-ref="listenerConfig"/>
-        <logger level="WARN" message="#[payload]" />
+        <logger level="WARN" message="#[mel:payload]" />
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld" />
 
         <!-- The MULE_METHOD_PROPERTY invocation property set by the jaxws-service should override the "invalidOperation"
             value of the operation attribute in jaxws-client -->
         <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld" operation="invalidOperation"/>
-        <logger level="WARN" message="#[payload]" />
+        <logger level="WARN" message="#[mel:payload]" />
         <httpn:request path="hello2" method="POST" config-ref="requestConfig"/>
     </flow>
 

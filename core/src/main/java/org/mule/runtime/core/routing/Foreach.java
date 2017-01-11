@@ -44,8 +44,8 @@ import org.w3c.dom.Document;
  * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
  * generating a message for each element.
  * <p>
- * The number of the message being processed is stored in {@code #[variable:counter]} and the root message is store in
- * {@code #[flowVars.rootMessage]}. Both variables may be renamed by means of {@link #setCounterVariableName(String)} and
+ * The number of the message being processed is stored in {@code #[mel:variable:counter]} and the root message is store in
+ * {@code #[mel:flowVars.rootMessage]}. Both variables may be renamed by means of {@link #setCounterVariableName(String)} and
  * {@link #setRootMessageVariableName(String)}.
  * <p>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.

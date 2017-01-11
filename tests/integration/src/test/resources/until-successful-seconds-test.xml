@@ -22,8 +22,8 @@
 
     <flow name="full-config-with-mp">
         <until-successful objectStore-ref="objectStore"
-                          ackExpression="#['ACK']"
-                          failureExpression="#[regex('(?i).*error')]"
+                          ackExpression="#[mel:'ACK']"
+                          failureExpression="#[mel:regex('(?i).*error')]"
                           maxRetries="2"
                           secondsBetweenRetries="1"
                           deadLetterQueue-ref="dlq-mp">
@@ -33,7 +33,7 @@
 
     <flow name="retry-endpoint-config">
         <until-successful objectStore-ref="objectStore"
-                          failureExpression="#[regex('(?i).*error]')"
+                          failureExpression="#[mel:regex('(?i).*error]')"
                           maxRetries="2"
                           secondsBetweenRetries="1">
             <flow-ref name="target-flow"/>
@@ -41,7 +41,7 @@
     </flow>
 
     <flow name="target-mp">
-        <test:component appendString="ERROR" />
+        <test:component appendString="'ERROR'" />
     </flow>
 
     <flow name="target-flow">

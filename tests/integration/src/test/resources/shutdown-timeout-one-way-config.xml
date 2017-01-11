@@ -38,7 +38,7 @@
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <expression-transformer>
-            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" />
+            <return-argument expression="mel:return &quot;expressionTransformerResponse&quot;;" />
         </expression-transformer>
 
         <test:queue name="response"/>

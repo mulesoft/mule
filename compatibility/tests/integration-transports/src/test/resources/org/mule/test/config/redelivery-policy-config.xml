@@ -32,7 +32,7 @@
 
     <flow name="simpleTextFileStore">
         <transports:inbound-endpoint address="test://foo">
-            <redelivery-policy useSecureHash="false" idExpression="#[message:id]">
+            <redelivery-policy useSecureHash="false" idExpression="#[mel:message:id]">
                 <dead-letter-queue>
                     <transports:outbound-endpoint address="test://dead-letter-queue"/>
                 </dead-letter-queue>

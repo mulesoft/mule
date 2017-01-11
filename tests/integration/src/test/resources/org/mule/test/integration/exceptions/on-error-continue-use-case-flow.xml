@@ -122,13 +122,13 @@
 
     <flow name="onErrorTypeMatchSeveral">
         <choice>
-            <when expression="#[payload]">
+            <when expression="#[mel:payload]">
                 <append-string-transformer message=" apt1"/>
                 <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$FailingProcessor"/>
             </when>
             <otherwise>
                 <append-string-transformer message=" apt1"/>
-                <expression-transformer expression="#[payload.nope]"/>
+                <expression-transformer expression="#[mel:payload.nope]"/>
             </otherwise>
         </choice>
         <error-handler>

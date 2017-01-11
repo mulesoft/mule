@@ -32,7 +32,7 @@
     </transports:mutator-transformer>
 
     <transports:mutator-transformer name="setSessVarGlobal">
-        <transports:set-session-variable variableName="#[sessionVars.sesVarKey]" value="#[flowVars.invVarKey]"/>
+        <transports:set-session-variable variableName="#[mel:sessionVars.sesVarKey]" value="#[mel:flowVars.invVarKey]"/>
     </transports:mutator-transformer>
 
     <transports:mutator-transformer name="remSessVarGlobal">
@@ -40,42 +40,42 @@
     </transports:mutator-transformer>
 
     <flow name="addSessionVariableFlow" processingStrategy="synchronous">
-        <transports:set-session-variable variableName="prop" value="#['some value']"/>
-        <test:assert expression="#[sessionVars.prop == 'some value']"/>
+        <transports:set-session-variable variableName="prop" value="#[mel:'some value']"/>
+        <test:assert expression="#[mel:sessionVars.prop == 'some value']"/>
     </flow>
 
     <flow name="addSessionVariableUsingExpressionKeyFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addInvocationVariable"/>
         <transformer ref="setSessVarGlobal"/>
-        <test:assert expression="#[sessionVars.sesVarValue == 'invVarValue']"/>
+        <test:assert expression="#[mel:sessionVars.sesVarValue == 'invVarValue']"/>
     </flow>
 
     <flow name="addVariableWithParsedStringKeyFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addInvocationVariable"/>
-        <transports:set-session-variable variableName="-#[sessionVars.sesVarKey]-" value="-#[flowVars.invVarKey]-"/>
-        <test:assert expression="#[sessionVars['-sesVarValue-'] == '-invVarValue-']"/>
+        <transports:set-session-variable variableName="-#[mel:sessionVars.sesVarKey]-" value="-#[mel:flowVars.invVarKey]-"/>
+        <test:assert expression="#[mel:sessionVars['-sesVarValue-'] == '-invVarValue-']"/>
     </flow>
 
     <flow name="removeSessionVariableFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="remSessVarGlobal"/>
-        <test:assert expression="#[sessionVars.sesVarKey == null]"/>
+        <test:assert expression="#[mel:sessionVars.sesVarKey == null]"/>
     </flow>
 
     <flow name="removeSessionVariableUsingExpressionFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <transports:remove-session-variable variableName="#[sessionVars.sesVarKeyName]"/>
-        <test:assert expression="#[sessionVars.sesVarKey == null]"/>
+        <transports:remove-session-variable variableName="#[mel:sessionVars.sesVarKeyName]"/>
+        <test:assert expression="#[mel:sessionVars.sesVarKey == null]"/>
     </flow>
     
     <flow name="removeSessionVariableUsingParsedStringFlow" processingStrategy="synchronous">
         <transformer ref="addSessionVariable"/>
         <transformer ref="addSessionVariableName"/>
-        <transports:remove-session-variable variableName="ses#['Var']key"/>
-        <test:assert expression="#[sessionVars.sesVarKey == null]"/>
+        <transports:remove-session-variable variableName="ses#[mel:'Var']key"/>
+        <test:assert expression="#[mel:sessionVars.sesVarKey == null]"/>
     </flow>
 
     <flow name="removeSessionVariableUsingRegexFlow" processingStrategy="synchronous">
@@ -83,9 +83,9 @@
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
         <transports:remove-session-variable variableName="ses*"/>
-        <test:assert expression="#[sessionVars.sesPropKey == null]"/>
-        <test:assert expression="#[sessionVars.sesPropKey2 == null]"/>
-        <test:assert expression="#[sessionVars.anotherSessionVarKey != null]"/>
+        <test:assert expression="#[mel:sessionVars.sesPropKey == null]"/>
+        <test:assert expression="#[mel:sessionVars.sesPropKey2 == null]"/>
+        <test:assert expression="#[mel:sessionVars.anotherSessionVarKey != null]"/>
     </flow>
     
     <flow name="removeAllSessionVariablesFlow" processingStrategy="synchronous">
@@ -93,9 +93,9 @@
         <transformer ref="addSessionVariable2"/>
         <transformer ref="addAnotherSessionVariable"/>
         <transports:remove-session-variable variableName="*" />
-        <test:assert expression="#[sessionVars.invPropKey == null]"/>
-        <test:assert expression="#[sessionVars.invPropKey2 == null]"/>
-        <test:assert expression="#[sessionVars.anotherSessionVarKey == null]"/>
+        <test:assert expression="#[mel:sessionVars.invPropKey == null]"/>
+        <test:assert expression="#[mel:sessionVars.invPropKey2 == null]"/>
+        <test:assert expression="#[mel:sessionVars.anotherSessionVarKey == null]"/>
     </flow>
 
 </mule>

@@ -2760,14 +2760,14 @@
                 <xsd:attribute name="username" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A Mule expression which extracts the username from the message. Defaults to #[message.inboundProperties.username].
+                            A Mule expression which extracts the username from the message. Defaults to #[mel:message.inboundProperties.username].
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="password" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A Mule expression which extracts the password from the message. Defaults to #[message.inboundProperties.password].
+                            A Mule expression which extracts the password from the message. Defaults to #[mel:message.inboundProperties.password].
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4406,7 +4406,7 @@
                  substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying message source must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[mel:message:id]', which means the underlying message source must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4420,7 +4420,7 @@
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use when extracting the ID from the message. For example, it would be possible to combine to headers as the ID of the message to provide idempotency: '#[headers:foo,bar]'. Or, you could combine the message ID with a header: '#[message:id]-#[header:foo]'. If this property is not set, '#[message:id]' will be used by default.
+                            Defines one or more expressions to use when extracting the ID from the message. For example, it would be possible to combine to headers as the ID of the message to provide idempotency: '#[mel:headers:foo,bar]'. Or, you could combine the message ID with a header: '#[mel:message:id]-#[mel:header:foo]'. If this property is not set, '#[mel:message:id]' will be used by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

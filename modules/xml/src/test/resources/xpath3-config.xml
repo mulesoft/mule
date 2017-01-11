@@ -27,12 +27,12 @@
     </flow>
 
     <flow name="payloadConsumed">
-        <set-variable variableName="result" value="#[xpath3('count(//LINE)')]" />
+        <set-variable variableName="result" value="#[mel:xpath3('count(//LINE)')]" />
     </flow>
 
     <flow name="foreach">
-        <foreach collection="#[xpath3('//LINE', payload, 'NODESET')]">
-            <expression-component>flowVars['nodes'].add(payload)</expression-component>
+        <foreach collection="#[mel:xpath3('//LINE', payload, 'NODESET')]">
+            <expression-component>mel:flowVars['nodes'].add(payload)</expression-component>
         </foreach>
     </flow>
 

@@ -9,7 +9,7 @@
 
     <flow name="listCities">
         <mulexml:xslt-transformer xsl-file="cities-result-document-xslt.xsl" maxActiveTransformers="1" >
-            <mulexml:context-property key="output_location" value="#[sessionVars.outputFile]" />
+            <mulexml:context-property key="output_location" value="#[mel:sessionVars.outputFile]" />
         </mulexml:xslt-transformer>
     </flow>
 

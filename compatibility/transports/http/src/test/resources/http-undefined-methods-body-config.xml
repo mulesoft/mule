@@ -21,6 +21,6 @@
     </flow>
 
     <flow name="requestFlow">
-        <httpn:request path="/" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS" />
+        <httpn:request path="/" method="#[mel:method]" config-ref="requestConfig" sendBodyMode="ALWAYS" />
     </flow>
 </mule>

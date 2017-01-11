@@ -21,7 +21,7 @@
         <httpn:listener config-ref="listenerConfig" path="${mixedPath}">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Type' : 'multipart/mixed']]
+                    #[mel:['Content-Type' : 'multipart/mixed']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

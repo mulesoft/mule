@@ -43,13 +43,14 @@ import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
-  public static final String DW_PREFIX = "dw:";
+  public static final String MEL_PREFIX = "mel:";
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
 
   private MuleContext muleContext;
   private ExtendedExpressionLanguage expressionLanguage;
   // Default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
+  private boolean forceMel;
 
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
@@ -58,6 +59,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
         new DataWeaveExpressionLanguage(muleContext.getExecutionClassLoader());
     MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dataWeaveExpressionLanguage, mvelExpressionLanguage);
+    forceMel = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isForceMel();
   }
 
   @Override
@@ -194,16 +196,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
     logger.warn("Expression parsing is deprecated, regular evaluations should be used instead.");
-    if (isDwExpression(expression)) {
-      TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
-      try {
-        return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
-      } catch (TransformerException e) {
-        throw new ExpressionRuntimeException(createStaticMessage(format("Failed to transform %s to %s.", evaluation.getDataType(),
-                                                                        STRING)),
-                                             e);
-      }
-    } else {
+    if (hasMelExpression(expression) || forceMel) {
       return parser.parse(token -> {
         Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
         if (result instanceof InternalMessage) {
@@ -212,6 +205,15 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
           return result;
         }
       }, expression);
+    } else {
+      TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
+      try {
+        return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
+      } catch (TransformerException e) {
+        throw new ExpressionRuntimeException(createStaticMessage(format("Failed to transform %s to %s.", evaluation.getDataType(),
+                                                                        STRING)),
+                                             e);
+      }
     }
   }
 
@@ -262,9 +264,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     return success();
   }
 
-  protected static boolean isDwExpression(String expression) {
-    //TODO: MULE-10410 - Remove once DW is the default language.
-    return expression.startsWith(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX) || expression.startsWith(DW_PREFIX);
+  private boolean hasMelExpression(String expression) {
+    return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX);
   }
 
 }

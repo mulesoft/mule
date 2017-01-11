@@ -24,7 +24,7 @@ import org.openjdk.jmh.annotations.TearDown;
 
 public class MVELBenchmark extends AbstractBenchmark {
 
-  final protected String mel = "StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
+  final protected String mel = "mel:StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
       + "if (fields.length > 4) {"
       + "    sb.append('  <Contact>\n');"
       + "    sb.append('    <FirstName>').append(fields[0]).append('</FirstName>\n');"

@@ -87,15 +87,15 @@
 
     <flow name="server1">
         <httpn:listener config-ref="listenerConfig1" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="server2">
         <httpn:listener config-ref="listenerConfig2" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="server3">
         <httpn:listener config-ref="listenerConfig3" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
 
 </mule>

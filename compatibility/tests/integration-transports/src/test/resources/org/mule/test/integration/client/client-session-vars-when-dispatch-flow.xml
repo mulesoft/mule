@@ -36,8 +36,8 @@
         <transports:set-session-variable variableName="team" value="Sales"/>
         <processor ref="myProcessor"/>
         <transports:set-session-variable variableName="ammount" value="100"/>
-        <test:assert expression="#[sessionVars.team == 'Sales']" />
-        <test:assert expression="#[sessionVars.ammount == '100']" />
+        <test:assert expression="#[mel:sessionVars.team == 'Sales']" />
+        <test:assert expression="#[mel:sessionVars.ammount == '100']" />
     </flow>
 
     <flow name="sessionVarsFlowUsingJavaComponent">
@@ -45,8 +45,8 @@
         <transports:set-session-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingSessionVariablesTestCase$JavaComponentDispatchFlowUsingNewMuleClient"/>
         <transports:set-session-variable variableName="ammount" value="100"/>
-        <test:assert expression="#[sessionVars.team == 'Sales']" />
-        <test:assert expression="#[sessionVars.ammount == '100']" />
+        <test:assert expression="#[mel:sessionVars.team == 'Sales']" />
+        <test:assert expression="#[mel:sessionVars.ammount == '100']" />
     </flow>
 
     <flow name="sessionVarsFlowUsingJavaComponentRequestResponse">
@@ -54,7 +54,7 @@
         <transports:set-session-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingSessionVariablesTestCase$JavaComponentSendFlowUsingNewMuleClient"/>
         <transports:set-session-variable variableName="ammount" value="100"/>
-        <test:assert expression="#[sessionVars.team == 'Sales']" />
-        <test:assert expression="#[sessionVars.ammount == '100']" />
+        <test:assert expression="#[mel:sessionVars.team == 'Sales']" />
+        <test:assert expression="#[mel:sessionVars.ammount == '100']" />
     </flow>
 </mule>

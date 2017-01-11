@@ -11,7 +11,7 @@
         <jms:inbound-endpoint ref="in"/>
         <custom-processor class="org.mule.compatibility.transport.jms.integration.JmsObjectToMessageDataTypeTransformerTestCase$CheckTextMessageType"/>
         <jms:jmsmessage-to-object-transformer/>
-        <test:assert expression="#[message.dataType.getType().getName() == 'java.lang.String']"></test:assert>
+        <test:assert expression="#[mel:message.dataType.getType().getName() == 'java.lang.String']"></test:assert>
     </flow>
 
 </mule>

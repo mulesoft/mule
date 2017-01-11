@@ -55,7 +55,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     implements Initialisable, MuleContextAware, FlowConstructAware, DebugInfoProvider {
 
   public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
-  public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
+  public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[mel:payload]";
   public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
   private static final Logger logger = LoggerFactory.getLogger(DefaultHttpRequester.class);
 

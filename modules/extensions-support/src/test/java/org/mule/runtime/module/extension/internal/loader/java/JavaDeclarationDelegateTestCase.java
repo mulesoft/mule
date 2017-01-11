@@ -635,7 +635,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE);
     assertThat(operation, is(notNullValue()));
-    assertParameter(operation.getAllParameters(), "grams", "", TYPE_LOADER.load(int[][].class), false, SUPPORTED, "#[payload]");
+    assertParameter(operation.getAllParameters(), "grams", "", TYPE_LOADER.load(int[][].class), false, SUPPORTED,
+                    "#[payload]");
     assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(int[][].class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);

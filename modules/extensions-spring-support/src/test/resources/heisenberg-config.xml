@@ -23,9 +23,9 @@
                        initialHealth="CANCER"
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
-                       labAddress="#['Pollos Hermanos']"
-                       weaponTypeFunction="#[weaponType]"
-                       knownAddresses="#[[]]">
+                       labAddress="#[mel:'Pollos Hermanos']"
+                       weaponTypeFunction="#[mel:weaponType]"
+                       knownAddresses="#[mel:[]]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -44,8 +44,8 @@
                 <heisenberg:deaths-by-season-item value="emilio"/>
                 <heisenberg:deaths-by-season-item value="domingo"/>
             </heisenberg:deaths-by-season>
-            <heisenberg:deaths-by-season key="s02" value="#[['some', 'other']]"/>
-            <heisenberg:deaths-by-season key="s02" value="#[['tuco', 'tortuga']]"/>
+            <heisenberg:deaths-by-season key="s02" value="#[mel:['some', 'other']]"/>
+            <heisenberg:deaths-by-season key="s02" value="#[mel:['tuco', 'tortuga']]"/>
         </heisenberg:deaths-by-seasons>
         <heisenberg:weapon-value-maps>
             <heisenberg:weapon-value-map key="first">
@@ -95,10 +95,10 @@
                        initialHealth="${initialHealth}"
                        finalHealth="${finalHealth}"
                        candidateDoors="${candidateDoors}"
-                       labAddress="#['Pollos Hermanos']"
+                       labAddress="#[mel:'Pollos Hermanos']"
                        deathsBySeasons="${deathsBySeasons}"
                        labeledRicin="${labeledRicin}"
-                       knownAddresses="#[[]]">
+                       knownAddresses="#[mel:[]]">
         <heisenberg:enemies>
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
@@ -131,68 +131,68 @@
                        ricinPacks="ricinPacks"
                        nextDoor="door"
                        candidateDoors="candidateDoors"
-                       labAddress="#['Pollos Hermanos']"
+                       labAddress="#[mel:'Pollos Hermanos']"
                        monthlyIncomes="monthlyIncomes"
                        deathsBySeasons="deathsBySeasons"
                        labeledRicin="labeledRicins"
-                       knownAddresses="#[[]]">
+                       knownAddresses="#[mel:[]]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenberg"
-                       myName="#[myName]"
-                       age="#[age]"
-                       cancer="#[true]"
-                       initialHealth="#[initialHealth]"
-                       finalHealth="#[finalHealth]"
-                       dateOfBirth="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
-                       dateOfDeath="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
-                       dateOfConception="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfConception()]"
-                       money="#[money]"
-                       recipe="#[app.registry.recipes]"
-                       candidateDoors="#[app.registry.candidateDoors]"
-                       labAddress="#['Pollos Hermanos']"
-                       weaponTypeFunction="#[weaponType]"
-                       monthlyIncomes="#[[12000L, 500L]]"
-                       deathsBySeasons="#[['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
-                       labeledRicin="#[app.registry.labeledRicins]"
-                       knownAddresses="#[[]]">
+                       myName="#[mel:myName]"
+                       age="#[mel:age]"
+                       cancer="#[mel:true]"
+                       initialHealth="#[mel:initialHealth]"
+                       finalHealth="#[mel:finalHealth]"
+                       dateOfBirth="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
+                       dateOfConception="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfConception()]"
+                       money="#[mel:money]"
+                       recipe="#[mel:app.registry.recipes]"
+                       candidateDoors="#[mel:app.registry.candidateDoors]"
+                       labAddress="#[mel:'Pollos Hermanos']"
+                       weaponTypeFunction="#[mel:weaponType]"
+                       monthlyIncomes="#[mel:[12000L, 500L]]"
+                       deathsBySeasons="#[mel:['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
+                       labeledRicin="#[mel:app.registry.labeledRicins]"
+                       knownAddresses="#[mel:[]]">
         <heisenberg:enemies>
-            <heisenberg:enemy value="#[gustavoFring]"/>
-            <heisenberg:enemy value="#[hank]"/>
+            <heisenberg:enemy value="#[mel:gustavoFring]"/>
+            <heisenberg:enemy value="#[mel:hank]"/>
         </heisenberg:enemies>
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
-        <heisenberg:next-door address="#[pollosHermanos]" victim="#[gustavoFring]">
-            <heisenberg:previous victim="#[krazy8]" address="#[jesses]"/>
+        <heisenberg:next-door address="#[mel:pollosHermanos]" victim="#[mel:gustavoFring]">
+            <heisenberg:previous victim="#[mel:krazy8]" address="#[mel:jesses]"/>
         </heisenberg:next-door>
         <heisenberg:ricin-packs>
-            <heisenberg:ricin microgramsPerKilo="#[microgramsPerKilo]">
-                <heisenberg:destination victim="#[lidia]" address="#[steviaCoffeShop]"/>
+            <heisenberg:ricin microgramsPerKilo="#[mel:microgramsPerKilo]">
+                <heisenberg:destination victim="#[mel:lidia]" address="#[mel:steviaCoffeShop]"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
     </heisenberg:config>
 
     <heisenberg:config name="expressionHeisenbergByRef"
-                       myName="#[myName]"
-                       age="#[age]"
-                       cancer="#[true]"
-                       initialHealth="#[initialHealth]"
-                       finalHealth="#[finalHealth]"
-                       dateOfBirth="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
-                       dateOfDeath="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
-                       dateOfConception="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfConception()]"
-                       money="#[money]"
-                       recipe="#[app.registry.recipes]"
-                       candidateDoors="#[app.registry.candidateDoors]"
-                       enemies="#[app.registry.enemies]"
-                       ricinPacks="#[app.registry.ricinPacks]"
-                       nextDoor="#[org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDoor()]"
-                       labAddress="#['Pollos Hermanos']"
-                       monthlyIncomes="#[app.registry.monthlyIncomes]"
-                       deathsBySeasons="#[app.registry.deathsBySeasons]"
-                       labeledRicin="#[app.registry.labeledRicins]"
-                       weapon="#[weapon]"
-                       knownAddresses="#[[]]">
+                       myName="#[mel:myName]"
+                       age="#[mel:age]"
+                       cancer="#[mel:true]"
+                       initialHealth="#[mel:initialHealth]"
+                       finalHealth="#[mel:finalHealth]"
+                       dateOfBirth="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfBirth().getTime()]"
+                       dateOfDeath="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfDeath()]"
+                       dateOfConception="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDateOfConception()]"
+                       money="#[mel:money]"
+                       recipe="#[mel:app.registry.recipes]"
+                       candidateDoors="#[mel:app.registry.candidateDoors]"
+                       enemies="#[mel:app.registry.enemies]"
+                       ricinPacks="#[mel:app.registry.ricinPacks]"
+                       nextDoor="#[mel:org.mule.runtime.module.extension.internal.config.ParameterizedConfigParserTestCase.getDoor()]"
+                       labAddress="#[mel:'Pollos Hermanos']"
+                       monthlyIncomes="#[mel:app.registry.monthlyIncomes]"
+                       deathsBySeasons="#[mel:app.registry.deathsBySeasons]"
+                       labeledRicin="#[mel:app.registry.labeledRicins]"
+                       weapon="#[mel:weapon]"
+                       knownAddresses="#[mel:[]]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 

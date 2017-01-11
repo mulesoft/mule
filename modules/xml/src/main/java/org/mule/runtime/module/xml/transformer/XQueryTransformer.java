@@ -396,7 +396,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
    * </p>
    * <p>
    * For example: If the current event's message has a property named "myproperty", to pass this in you would set the transform
-   * parameter's value to be "#[mule.message:header(myproperty)]".
+   * parameter's value to be "#[mel:mule.message:header(myproperty)]".
    * <p/>
    * <p>
    * This method may be overloaded by a sub class to provide a different dynamic parameter implementation.

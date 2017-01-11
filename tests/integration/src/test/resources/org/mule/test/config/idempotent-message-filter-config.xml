@@ -12,7 +12,7 @@
     <append-string-transformer name="appendStringTransformer" message="appended"/>
 
     <flow name="inMemoryStore">
-        <idempotent-message-filter idExpression="#[Rmessage:id]">
+        <idempotent-message-filter idExpression="#[mel:Rmessage:id]">
             <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
         </idempotent-message-filter>
     </flow>

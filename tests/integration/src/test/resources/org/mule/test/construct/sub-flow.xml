@@ -115,7 +115,7 @@
     </sub-flow>
 
     <flow name="service">
-        <test:component appendString="xyz"/>
+        <test:component appendString="'xyz'"/>
     </flow>
 
 </mule>

@@ -15,7 +15,7 @@
             </db:stored-procedure>
 
             <!--Obtains the java array from the array field-->
-            <set-payload value="#[payload['out'].getArray()]"/>
+            <set-payload value="#[mel:payload['out'].getArray()]"/>
         </block>
     </flow>
 
@@ -29,7 +29,7 @@
             </db:stored-procedure>
 
             <!--Obtains the java array from the array field-->
-            <set-payload value="#[payload['out'].getArray()]"/>
+            <set-payload value="#[mel:payload['out'].getArray()]"/>
         </block>
     </flow>
 </mule>

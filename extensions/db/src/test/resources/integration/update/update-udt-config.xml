@@ -12,12 +12,12 @@
             </db:select>
 
             <!-- Sets the UDT as payload-->
-            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+            <set-payload value="#[mel:payload.get(0)['DETAILS']]"/>
 
             <db:update>
                 <db:sql>update REGION_MANAGERS set DETAILS = :details where REGION_NAME = 'Northwest'</db:sql>
                 <db:input-parameters>
-                    #[['details' : payload]]
+                    #[mel:['details' : payload]]
                 </db:input-parameters>
             </db:update>
 
@@ -26,7 +26,7 @@
             </db:select>
 
             <!--Obtains the UDT-->
-            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+            <set-payload value="#[mel:payload.get(0)['DETAILS']]"/>
         </block>
     </flow>
 
@@ -38,7 +38,7 @@
                     <db:parameter-type key="details" customType="CONTACT_DETAILS"/>
                 </db:parameter-types>
                 <db:input-parameters>
-                    #[['details' : payload]]
+                    #[mel:['details' : payload]]
                 </db:input-parameters>
             </db:update>
 
@@ -47,7 +47,7 @@
             </db:select>
 
             <!--Obtains the UDT-->
-            <set-payload value="#[payload.get(0)['DETAILS']]"/>
+            <set-payload value="#[mel:payload.get(0)['DETAILS']]"/>
         </block>
     </flow>
 </mule>

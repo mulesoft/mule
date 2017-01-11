@@ -7,12 +7,12 @@
 
     <flow name="flowWithFilter">
         <expression-filter expression="payload == null"/>
-        <test:component appendString=" processed"/>
+        <test:component appendString="' processed'"/>
     </flow>
 
     <flow name="flowWithSubFlowWithFilter">
         <flow-ref name="subFlowWithFilter"/>
-        <test:component appendString=" processed"/>
+        <test:component appendString="' processed'"/>
     </flow>
 
     <sub-flow name="subFlowWithFilter">

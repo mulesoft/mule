@@ -25,7 +25,7 @@
         <scatter-gather timeout="1000">
             <set-payload value="apple"/>
             <set-payload value="banana"/>
-            <expression-component>java.lang.Thread.sleep(10000)</expression-component>
+            <expression-component>mel:java.lang.Thread.sleep(10000)</expression-component>
         </scatter-gather>
     </flow>
 
@@ -56,7 +56,7 @@
     <flow name="routeWithMelException">
         <scatter-gather timeout="1000">
             <set-payload value="apple"/>
-            <set-payload value="#[invalidExpr]"/>
+            <set-payload value="#[mel:invalidExpr]"/>
             <set-payload value="orange"/>
         </scatter-gather>
     </flow>
@@ -123,10 +123,10 @@
 
         <error-handler>
             <on-error-continue>
-                <test:assert expression="#[exception is org.mule.runtime.core.routing.CompositeRoutingException]"/>
-                <test:assert expression="#[exception.getExceptionForRouteIndex(0) == null]"/>
-                <test:assert expression="#[exception.getExceptionForRouteIndex(1) != null]"/>
-                <test:assert expression="#[exception.getExceptionForRouteIndex(2) != null]"/>
+                <test:assert expression="#[mel:exception is org.mule.runtime.core.routing.CompositeRoutingException]"/>
+                <test:assert expression="#[mel:exception.getExceptionForRouteIndex(0) == null]"/>
+                <test:assert expression="#[mel:exception.getExceptionForRouteIndex(1) != null]"/>
+                <test:assert expression="#[mel:exception.getExceptionForRouteIndex(2) != null]"/>
             </on-error-continue>
         </error-handler>
     </flow>
@@ -143,10 +143,10 @@
             </processor-chain>
         </scatter-gather>
 
-        <test:assert expression="#[payload[0].getMessage().getPayload().equals('apple')]" />
-        <test:assert expression="#[payload[1].getMessage().getPayload().equals('banana')]" />
-        <test:assert expression="#[payload[1].getFlowVariable('flow').equals('var')]" />
-        <test:assert expression="#[payload[1].getSession().getProperty('session').equals('sessionvar')]" />
+        <test:assert expression="#[mel:payload[0].getMessage().getPayload().equals('apple')]" />
+        <test:assert expression="#[mel:payload[1].getMessage().getPayload().equals('banana')]" />
+        <test:assert expression="#[mel:payload[1].getFlowVariable('flow').equals('var')]" />
+        <test:assert expression="#[mel:payload[1].getSession().getProperty('session').equals('sessionvar')]" />
     </flow>
 
     <flow name="failingMergeStrategy">
@@ -165,8 +165,8 @@
 
         <flow-ref name="minimalConfig"/>
 
-        <test:assert expression="#[flowVars['flow'] == 'var']"/>
-        <test:assert expression="#[sessionVars['session'] == 'sessionvar']"/>
+        <test:assert expression="#[mel:flowVars['flow'] == 'var']"/>
+        <test:assert expression="#[mel:sessionVars['session'] == 'sessionvar']"/>
     </flow>
 
     <flow name="requestResponseInboundEndpoint">
@@ -192,13 +192,13 @@
     <flow name="routesWithForeachAndInboundEndpoint">
         <scatter-gather>
             <foreach>
-                <set-property propertyName="timeStamp" value="#[server.dateTime]"/>
+                <set-property propertyName="timeStamp" value="#[mel:server.dateTime]"/>
             </foreach>
             <foreach>
-                <set-property propertyName="timeStamp" value="#[server.dateTime]"/>
+                <set-property propertyName="timeStamp" value="#[mel:server.dateTime]"/>
             </foreach>
             <foreach>
-                <set-property propertyName="timeStamp" value="#[server.dateTime]"/>
+                <set-property propertyName="timeStamp" value="#[mel:server.dateTime]"/>
             </foreach>
         </scatter-gather>
 
@@ -214,7 +214,7 @@
             <flow-ref name="propertyToPayload"/>
         </scatter-gather>
 
-        <test:assert expression="#[payload == 'apple']"/>
+        <test:assert expression="#[mel:payload == 'apple']"/>
     </flow>
 
     <flow name="oneWayRouteWithMultipleResponses">
@@ -228,7 +228,7 @@
         </scatter-gather>
 
         <flow-ref name="testRoutes"/>
-        <test:assert expression="#[payload.size() == 3]"/>
+        <test:assert expression="#[mel:payload.size() == 3]"/>
     </flow>
 
     <flow name="oneWayRoutesOnly">
@@ -243,7 +243,7 @@
             </async>
         </scatter-gather>
 
-        <test:assert expression="#[payload == 'apple']"/>
+        <test:assert expression="#[mel:payload == 'apple']"/>
     </flow>
 
     <flow name="expressionFilterRoute">
@@ -251,20 +251,20 @@
 
         <scatter-gather>
             <processor-chain>
-                <expression-filter expression="#[1 == 0 ]"/>
+                <expression-filter expression="#[mel:1 == 0 ]"/>
                 <set-payload value="kiwi" />
             </processor-chain>
             <set-payload value="banana"/>
             <set-payload value="orange"/>
         </scatter-gather>
 
-        <test:assert expression="#[payload.size() == 2]"/>
-        <test:assert expression="#[payload[0].payload == 'banana']"/>
-        <test:assert expression="#[payload[1].payload == 'orange']"/>
+        <test:assert expression="#[mel:payload.size() == 2]"/>
+        <test:assert expression="#[mel:payload[0].payload == 'banana']"/>
+        <test:assert expression="#[mel:payload[1].payload == 'orange']"/>
     </flow>
 
     <flow name="propertyToPayload">
-        <set-payload value="#[sessionVars.stuff]"/>
+        <set-payload value="#[mel:sessionVars.stuff]"/>
     </flow>
 
     <flow name="doesThreading">
@@ -286,8 +286,8 @@
 
         <flow-ref name="assertFlowVars" />
 
-        <foreach collection="#[payload]">
-            <test:assert expression="#[flowVars.foo.equals('bar')]" count="2" />
+        <foreach collection="#[mel:payload]">
+            <test:assert expression="#[mel:flowVars.foo.equals('bar')]" count="2" />
         </foreach>
 
         <flow-ref name="assertFlowVars" />
@@ -302,7 +302,7 @@
     </flow>
 
     <sub-flow name="assertFlowVars">
-        <test:assert expression="#[flowVars.foo.equals('bar')]" />
+        <test:assert expression="#[mel:flowVars.foo.equals('bar')]" />
     </sub-flow>
 
     <flow name="log">
@@ -310,19 +310,19 @@
     </flow>
 
     <sub-flow name="testAggregationStrategy">
-        <test:assert expression="#[payload == 'apple banana orange']"/>
+        <test:assert expression="#[mel:payload == 'apple banana orange']"/>
     </sub-flow>
 
     <sub-flow name="captureThreadAndWait">
         <custom-processor class="org.mule.test.routing.ScatterGatherRouterTestCase$ThreadCaptor" />
-        <expression-component>flowVars['latch'].await()</expression-component>
+        <expression-component>mel:flowVars['latch'].await()</expression-component>
     </sub-flow>
 
     <sub-flow name="testRoutes">
         <combine-collections-transformer/>
-        <test:assert expression="#[payload[0] == 'apple']"/>
-        <test:assert expression="#[payload[1] == 'banana']"/>
-        <test:assert expression="#[payload[2] == 'orange']"/>
+        <test:assert expression="#[mel:payload[0] == 'apple']"/>
+        <test:assert expression="#[mel:payload[1] == 'banana']"/>
+        <test:assert expression="#[mel:payload[2] == 'orange']"/>
     </sub-flow>
 
     <sub-flow name="setEventVariables">

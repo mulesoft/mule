@@ -7,7 +7,7 @@
 
     <db:query name="selectQuery">
         <db:input-parameters>
-            #[['name' : payload]]
+            #[mel:['name' : payload]]
         </db:input-parameters>
         <db:sql>select * from PLANET where name = :name</db:sql>
     </db:query>

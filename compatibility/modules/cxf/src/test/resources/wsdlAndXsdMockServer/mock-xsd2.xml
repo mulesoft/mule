@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema elementFormDefault="qualified" targetNamespace="http://localhost:#[server.systemProperties.portMockServer]/DataContracts/2008/01"
+<xs:schema elementFormDefault="qualified" targetNamespace="http://localhost:#[mel:server.systemProperties.portMockServer]/DataContracts/2008/01"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:tns="http://localhost:#[server.systemProperties.portMockServer]/DataContracts/2008/01">
+           xmlns:tns="http://localhost:#[mel:server.systemProperties.portMockServer]/DataContracts/2008/01">
     <xs:complexType name="GeoLocation">
         <xs:sequence>
             <xs:element minOccurs="0" name="Registry" nillable="true" type="xs:string"/>

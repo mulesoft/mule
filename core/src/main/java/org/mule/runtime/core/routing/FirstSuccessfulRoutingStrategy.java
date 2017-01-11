@@ -37,7 +37,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
     if (failureExpression != null) {
       failureExpressionFilter = new ExpressionFilter(failureExpression);
     } else {
-      failureExpressionFilter = new ExpressionFilter("exception != null");
+      failureExpressionFilter = new ExpressionFilter("mel:exception != null");
     }
     failureExpressionFilter.setMuleContext(muleContext);
     this.processor = processor;

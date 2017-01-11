@@ -20,14 +20,14 @@
     <flow name="expressionAndFixedParamMixed">
         <set-variable variableName="position" value="3"/>
         <db:select>
-            <db:sql>SELECT * FROM PLANET WHERE POSITION = #[position] AND NAME = 'Earth'</db:sql>
+            <db:sql>SELECT * FROM PLANET WHERE POSITION = #[mel:position] AND NAME = 'Earth'</db:sql>
         </db:select>
     </flow>
 
     <flow name="dynamicQuery">
         <set-variable variableName="tableName" value="PLANET"/>
         <db:select>
-            <db:sql>select * from #[tableName] order by ID</db:sql>
+            <db:sql>select * from #[mel:tableName] order by ID</db:sql>
         </db:select>
     </flow>
 
@@ -42,20 +42,20 @@
             <db:sql>select * from PLANET order by ID</db:sql>
         </db:select>
 
-        <set-variable variableName="records" value="#[new ArrayList()]"/>
+        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
 
         <foreach>
-            <expression-component>flowVars['records'].add(payload)</expression-component>
+            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
         </foreach>
 
-        <set-payload value="#[flowVars['records']]"/>
+        <set-payload value="#[mel:flowVars['records']]"/>
     </flow>
 
     <flow name="selectParameterizedQuery">
         <db:select>
             <db:sql>select * from PLANET where name = :name</db:sql>
             <db:input-parameters>
-                #[['name' : payload]]
+                #[mel:['name' : payload]]
             </db:input-parameters>
         </db:select>
     </flow>
@@ -65,13 +65,13 @@
             <db:sql>select * from PLANET order by ID</db:sql>
         </db:select>
 
-        <set-variable variableName="records" value="#[new ArrayList()]"/>
+        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
 
         <foreach batchSize="2">
-            <expression-component>flowVars['records'].add(payload)</expression-component>
+            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
         </foreach>
 
-        <set-payload value="#[flowVars['records']]"/>
+        <set-payload value="#[mel:flowVars['records']]"/>
     </flow>
 
     <flow name="selectStreaming">
@@ -79,10 +79,10 @@
             <db:sql>select * from PLANET order by ID</db:sql>
         </db:select>
 
-        <set-variable variableName="records" value="#[new ArrayList()]"/>
+        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
 
         <foreach>
-            <expression-component>flowVars['records'].add(payload)</expression-component>
+            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
         </foreach>
     </flow>
 

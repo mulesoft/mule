@@ -9,9 +9,6 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.compatibility.transport.file.ExpressionFilenameParser;
-import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -52,62 +49,64 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
   @Test
   public void testWigglyMuleStyleParsing() {
     String result =
-        parser.getFilename(event, "Test1_#[org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
+        parser.getFilename(event, "Test1_#[mel:org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
     assertEquals("Test1_0.txt", result);
 
-    result = parser.getFilename(event, "Test2_#[org.mule.runtime.core.util.DateUtils.getTimeStamp('yyMMdd')].txt");
+    result = parser.getFilename(event, "Test2_#[mel:org.mule.runtime.core.util.DateUtils.getTimeStamp('yyMMdd')].txt");
     assertDatestampWithYearMonthAndDayMatches(result);
 
-    result = parser.getFilename(event, "Test3_#[org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')].txt");
+    result =
+        parser.getFilename(event, "Test3_#[mel:org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')].txt");
     assertDefaultDatestampMatches(result);
 
-    result = parser.getFilename(event, "Test4_#[server.dateTime.toDate()].txt");
-    assertFalse(result.equals("Test4_#[server.dateTime.toDate()].txt"));
+    result = parser.getFilename(event, "Test4_#[mel:server.dateTime.toDate()].txt");
+    assertFalse(result.equals("Test4_#[mel:server.dateTime.toDate()].txt"));
 
-    result = parser.getFilename(event, "Test5_#[org.mule.runtime.core.util.UUID.getUUID()].txt");
-    assertFalse(result.equals("Test5_#[org.mule.runtime.core.util.UUID.getUUID()].txt"));
+    result = parser.getFilename(event, "Test5_#[mel:org.mule.runtime.core.util.UUID.getUUID()].txt");
+    assertFalse(result.equals("Test5_#[mel:org.mule.runtime.core.util.UUID.getUUID()].txt"));
 
-    result = parser.getFilename(event, "Test6_#[org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
+    result = parser.getFilename(event, "Test6_#[mel:org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
     assertEquals("Test6_1.txt", result);
 
-    result = parser.getFilename(event, "Test7_#[message.inboundProperties.originalFilename].txt");
+    result = parser.getFilename(event, "Test7_#[mel:message.inboundProperties.originalFilename].txt");
     assertEquals("Test7_originalName.txt", result);
 
-    result = parser.getFilename(event, "Test8_#[message.outboundProperties.foo].txt");
+    result = parser.getFilename(event, "Test8_#[mel:message.outboundProperties.foo].txt");
     assertEquals("Test8_bar.txt", result);
 
-    result = parser.getFilename(event, "Test9_#[message.outboundProperties.xxx].txt");
+    result = parser.getFilename(event, "Test9_#[mel:message.outboundProperties.xxx].txt");
     assertEquals("Test9_null.txt", result);
   }
 
   @Test
   public void testSquareStyleParsing() {
     String result =
-        parser.getFilename(event, "Test1_[org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
+        parser.getFilename(event, "Test1_[mel:org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
     assertEquals("Test1_0.txt", result);
 
-    result = parser.getFilename(event, "Test2_[org.mule.runtime.core.util.DateUtils.getTimeStamp('yyMMdd')].txt");
+    result = parser.getFilename(event, "Test2_[mel:org.mule.runtime.core.util.DateUtils.getTimeStamp('yyMMdd')].txt");
     assertDatestampWithYearMonthAndDayMatches(result);
 
-    result = parser.getFilename(event, "Test3_[org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')].txt");
+    result =
+        parser.getFilename(event, "Test3_[mel:org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')].txt");
     assertDefaultDatestampMatches(result);
 
-    result = parser.getFilename(event, "Test4_[server.dateTime.toDate()].txt");
-    assertFalse(result.equals("Test4_[server.dateTime.toDate()].txt"));
+    result = parser.getFilename(event, "Test4_[mel:server.dateTime.toDate()].txt");
+    assertFalse(result.equals("Test4_[mel:server.dateTime.toDate()].txt"));
 
-    result = parser.getFilename(event, "Test5_[org.mule.runtime.core.util.UUID.getUUID()].txt");
-    assertFalse(result.equals("Test5_[org.mule.runtime.core.util.UUID.getUUID()].txt"));
+    result = parser.getFilename(event, "Test5_[mel:org.mule.runtime.core.util.UUID.getUUID()].txt");
+    assertFalse(result.equals("Test5_[mel:org.mule.runtime.core.util.UUID.getUUID()].txt"));
 
-    result = parser.getFilename(event, "Test6_[org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
+    result = parser.getFilename(event, "Test6_[mel:org.mule.compatibility.transport.file.ExpressionFilenameParser.count()].txt");
     assertEquals("Test6_1.txt", result);
 
-    result = parser.getFilename(event, "Test7_[message.inboundProperties.originalFilename].txt");
+    result = parser.getFilename(event, "Test7_[mel:message.inboundProperties.originalFilename].txt");
     assertEquals("Test7_originalName.txt", result);
 
-    result = parser.getFilename(event, "Test8_[message.outboundProperties.foo].txt");
+    result = parser.getFilename(event, "Test8_[mel:message.outboundProperties.foo].txt");
     assertEquals("Test8_bar.txt", result);
 
-    result = parser.getFilename(event, "Test9_[message.outboundProperties.xxx].txt");
+    result = parser.getFilename(event, "Test9_[mel:message.outboundProperties.xxx].txt");
     assertEquals("Test9_null.txt", result);
   }
 

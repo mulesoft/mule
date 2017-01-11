@@ -85,7 +85,7 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void deleteWithExpressionInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
-        getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = #[payload]");
+        getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = #[mel:payload]");
     assertThat(parameters.getType(), is(typeBuilder.anyType().build()));
   }
 }

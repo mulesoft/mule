@@ -50,7 +50,7 @@
     </sub-flow>
 
     <flow name="flow2">
-        <flow-ref name="sub-flow-#[letter]" />
+        <flow-ref name="sub-flow-#[mel:letter]" />
     </flow>
 
     <sub-flow name="sub-flow-A">
@@ -63,7 +63,7 @@
 
     <sub-flow name="sub-flow-C">
         <choice>
-            <when expression="#[true]">
+            <when expression="#[mel:true]">
                 <append-string-transformer message="A" />
             </when>
             <otherwise>
@@ -80,8 +80,8 @@
     </sub-flow>
 
     <flow name="flow3">
-        <flow-ref name="sub-flow-#[letter]" />
-        <flow-ref name="sub-flow-#[letter]" />
+        <flow-ref name="sub-flow-#[mel:letter]" />
+        <flow-ref name="sub-flow-#[mel:letter]" />
     </flow>
 
     <sub-flow name="sub-flow-J">

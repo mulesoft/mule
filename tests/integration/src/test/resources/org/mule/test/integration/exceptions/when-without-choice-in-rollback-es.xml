@@ -7,7 +7,7 @@
         <flow name="invalidFlow">
             <logger/>
             <error-handler>
-                <on-error-propagate when="#[exception.causedBy(java.lang.Exception)]"/>
+                <on-error-propagate when="#[mel:exception.causedBy(java.lang.Exception)]"/>
             </error-handler>
         </flow>
 

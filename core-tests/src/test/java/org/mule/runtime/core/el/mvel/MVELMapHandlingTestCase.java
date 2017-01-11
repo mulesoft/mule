@@ -76,9 +76,9 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   }
 
   private void assertMapKey(Event event, String key, Object expectedValue) throws Exception {
-    runExpressionAndExpect(String.format("#[payload.%s]", key), expectedValue, event);
-    runExpressionAndExpect(String.format("#[payload['%s']]", key), expectedValue, event);
-    runExpressionAndExpect(String.format("#[payload.'%s']", key), expectedValue, event);
+    runExpressionAndExpect(String.format("#[mel:payload.%s]", key), expectedValue, event);
+    runExpressionAndExpect(String.format("#[mel:payload['%s']]", key), expectedValue, event);
+    runExpressionAndExpect(String.format("#[mel:payload.'%s']", key), expectedValue, event);
   }
 
   private void runExpressionAndExpect(String expression, Object expectedValue, Event event) throws Exception {

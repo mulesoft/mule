@@ -14,7 +14,7 @@
         <httpn:request config-ref="config" path="test" method="POST">
             <httpn:request-builder>
                 <httpn:body>
-                    #[dw:payload]
+                    #[payload]
                 </httpn:body>
             </httpn:request-builder>
         </httpn:request>
@@ -24,7 +24,7 @@
         <httpn:request config-ref="config" path="test" method="POST">
             <httpn:request-builder>
                 <httpn:body>
-                    #[dw:customSource]
+                    #[customSource]
                 </httpn:body>
             </httpn:request-builder>
         </httpn:request>

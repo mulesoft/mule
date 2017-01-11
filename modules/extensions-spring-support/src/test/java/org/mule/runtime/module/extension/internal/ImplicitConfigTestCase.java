@@ -82,7 +82,7 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase {
     private String optionalNoDefault;
 
     @Parameter
-    @Optional(defaultValue = "#[flowVars['optionalWithDefault']]")
+    @Optional(defaultValue = "#[mel:flowVars['optionalWithDefault']]")
     private Integer optionalWithDefault;
 
     @Override

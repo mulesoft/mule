@@ -13,7 +13,7 @@
     </flow>
 
     <flow name="IdempotentReceiverRouter">
-        <idempotent-message-filter idExpression="#[message:id]-#[message:correlationId]">
+        <idempotent-message-filter idExpression="#[mel:message:id]-#[mel:message:correlationId]">
             <simple-text-file-store directory="foo" maxEntries="10000000"/>
         </idempotent-message-filter>
     </flow>

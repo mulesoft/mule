@@ -19,12 +19,12 @@
 
     <flow name="fireMissile">
         <test:assert-intercepting responseSameTask="false" />
-        <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
+        <marvel:fire-missile at="#[mel:payload]" config-ref="ironMan"/>
     </flow>
 
     <flow name="warMachineFireMissile">
         <test:assert-intercepting responseSameTask="false" />
-        <marvel:fire-missile at="#[payload]" config-ref="warMachine"/>
+        <marvel:fire-missile at="#[mel:payload]" config-ref="warMachine"/>
     </flow>
 
     <flow name="computeFlightPlan">

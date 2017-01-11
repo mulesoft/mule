@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:config name="pooledJdbcConfig">
-        <db:derby-connection database="#[derbyDb]" create="true" useXaTransactions="true">
+        <db:derby-connection database="#[mel:derbyDb]" create="true" useXaTransactions="true">
             <db:pooling-profile maxPoolSize="10" minPoolSize="0" maxWait="1" maxWaitUnit="SECONDS"/>
             <db:custom-data-types>
                 <!-- Derby uses JAVA_OBJECT for UDT-->

@@ -11,7 +11,7 @@
         <default-exception-strategy>
             <processor-chain>
                 <set-property propertyName="mainEs" value="yes"/>
-                <set-property propertyName="flowRefEs" value="#[flowVars.flowRefEs]" />
+                <set-property propertyName="flowRefEs" value="#[mel:flowVars.flowRefEs]" />
                 <test:queue name="dlq"/>
             </processor-chain>
         </default-exception-strategy>

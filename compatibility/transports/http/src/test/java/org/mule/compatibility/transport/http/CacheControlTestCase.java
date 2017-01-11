@@ -24,11 +24,11 @@ import org.junit.Test;
 @SmallTest
 public class CacheControlTestCase extends AbstractMuleTestCase {
 
-  private static final String HEADER_DIRECTIVE = "#[header:directive]";
-  private static final String HEADER_MAX_AGE = "#[header:maxAge]";
-  private static final String HEADER_MUST_REVALIDATE = "#[header:mustRevalidate]";
-  private static final String HEADER_NO_CACHE = "#[header:noCache]";
-  private static final String HEADER_NO_STORE = "#[header:noStore]";
+  private static final String HEADER_DIRECTIVE = "#[mel:header:directive]";
+  private static final String HEADER_MAX_AGE = "#[mel:header:maxAge]";
+  private static final String HEADER_MUST_REVALIDATE = "#[mel:header:mustRevalidate]";
+  private static final String HEADER_NO_CACHE = "#[mel:header:noCache]";
+  private static final String HEADER_NO_STORE = "#[mel:header:noStore]";
   private InternalMessage muleMessage;
   private Event muleEvent;
   private ExtendedExpressionManager expressionManager;

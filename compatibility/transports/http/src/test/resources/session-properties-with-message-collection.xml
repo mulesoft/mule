@@ -50,9 +50,9 @@
     </flow>
 
     <flow name="synchronousCollectionAggregatorFlow">
-        <transports:set-session-variable value="#[new java.util.ArrayList()]" variableName="recordsToUpdate" />
+        <transports:set-session-variable value="#[mel:new java.util.ArrayList()]" variableName="recordsToUpdate" />
         <collection-splitter/>
-        <expression-component>#[sessionVars.get('recordsToUpdate').add(payload)]</expression-component>
+        <expression-component>#[mel:sessionVars.get('recordsToUpdate').add(payload)]</expression-component>
         <collection-aggregator failOnTimeout="true" persistentStores="true"/>
     </flow>
 

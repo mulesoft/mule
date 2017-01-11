@@ -51,7 +51,7 @@ public class RedeliveryPolicyProviderNamespaceHandlerTestCase extends Compatibil
   @Test
   public void testSimpleTextFileStore() throws Exception {
     IdempotentRedeliveryPolicy filter = redeliveryPolicyFromFlow("simpleTextFileStore");
-    assertEquals("#[message:id]", filter.getIdExpression());
+    assertEquals("#[mel:message:id]", filter.getIdExpression());
     assertNotNull(filter.getTheFailedMessageProcessor());
     assertEquals(5, filter.getMaxRedeliveryCount());
   }

@@ -14,22 +14,22 @@
 
     <flow name="empty">
         <httpn:listener config-ref="listenerConfig" path="emptyHeader"/>
-        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
+        <set-payload value="#[mel:message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="simple">
         <httpn:listener config-ref="listenerConfig" path="simpleHeader"/>
-        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
+        <set-payload value="#[mel:message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="multipleString">
         <httpn:listener config-ref="listenerConfig" path="multipleHeadersString"/>
-        <set-payload value="#[message.getAttributes().getHeaders()['${header}']]"/>
+        <set-payload value="#[mel:message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="multipleCollection">
         <httpn:listener config-ref="listenerConfig" path="multipleHeadersCollection"/>
-        <set-payload value="#[message.getAttributes().getHeaders().getAll('${header}').iterator().next()]"/>
+        <set-payload value="#[mel:message.getAttributes().getHeaders().getAll('${header}').iterator().next()]"/>
     </flow>
 
 </mule>

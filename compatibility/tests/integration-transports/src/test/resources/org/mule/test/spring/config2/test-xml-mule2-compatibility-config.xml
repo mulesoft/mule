@@ -113,7 +113,7 @@
 
     <flow name="msgInfoMappingTestComponent">
         <component class="org.mule.tck.testmodels.fruit.Apple"/>
-        <transports:set-correlation-id correlationId="#[message.outboundProperties.correlation]"/>
+        <transports:set-correlation-id correlationId="#[mel:message.outboundProperties.correlation]"/>
         <transports:outbound-endpoint address="test://msgInfoMappingTestComponent"
                                 exchange-pattern="one-way"/>
     </flow>

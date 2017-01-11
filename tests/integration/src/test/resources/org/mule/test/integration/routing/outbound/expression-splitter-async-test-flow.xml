@@ -7,7 +7,7 @@
 
     <flow name="Distributor">
         <!-- FruitBowl.getFruit() List -->
-        <splitter expression="#[payload.fruit]"/>
+        <splitter expression="#[mel:payload.fruit]"/>
         <async>
             <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
             <flow-ref name="ServiceOne"/>
@@ -23,15 +23,15 @@
     </flow>
 
     <flow name="ServiceOne">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Apple]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Apple]"/>
     </flow>
 
     <flow name="ServiceTwo">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Banana]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Banana]"/>
     </flow>
 
     <flow name="ServiceThree">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Orange]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Orange]"/>
     </flow>
 
 </mule>

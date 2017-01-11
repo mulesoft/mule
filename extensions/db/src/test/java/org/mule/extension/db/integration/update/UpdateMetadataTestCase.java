@@ -89,7 +89,7 @@ public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void updateWithExpressionInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
-        getInputMetadata("updateMetadata", "update PLANET set NAME='#[data]' where POSITION=#[type]");
+        getInputMetadata("updateMetadata", "update PLANET set NAME='#[mel:data]' where POSITION=#[mel:type]");
     assertThat(parameters.getType(), is(typeBuilder.anyType().build()));
   }
 

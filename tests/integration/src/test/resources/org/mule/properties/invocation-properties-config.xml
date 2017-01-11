@@ -37,7 +37,7 @@
     <!-- Test Flows -->
 
     <flow name="GetInvocationPropertyInFlow" processingStrategy="synchronous">
-        <test:assert expression="#[P1 == 'P1_VALUE']" />
+        <test:assert expression="#[mel:P1 == 'P1_VALUE']" />
     </flow>
 
     <flow name="SetInvocationPropertyInFlow" processingStrategy="synchronous">
@@ -51,38 +51,38 @@
     <flow name="propagationInSameFlow">
         <processor ref="addP1" />
         <response>
-            <test:assert expression="#[P1]" />
-            <test:assert expression="#[P2]" />
+            <test:assert expression="#[mel:P1]" />
+            <test:assert expression="#[mel:P2]" />
         </response>
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:flowVars['P2'] == null]" />
         <processor ref="addP2" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
     </flow>
 
     <flow name="noPropagationInDifferentFlowHttp">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <httpn:request config-ref="requestConfig2" path="/"/>
     </flow>
     <flow name="noPropagationInDifferentFlowHttp-2">
         <httpn:listener config-ref="listenerConfig2" path="/" />
-        <test:assert expression="#[flowVars['P1'] == null]" />
+        <test:assert expression="#[mel:flowVars['P1'] == null]" />
     </flow>
 
     <flow name="AsyncFlow">
-        <test:assert expression="#[testThread != Thread.currentThread()]" />
+        <test:assert expression="#[mel:testThread != Thread.currentThread()]" />
         <processor ref="addP3" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
-        <test:assert expression="#[flowVars.P3]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
+        <test:assert expression="#[mel:flowVars.P3]" />
     </flow>
 
     <flow name="HTTPRequestResponseEndpointFlowMidFlow">
         <processor ref="addP1" />
         <httpn:request path="/" config-ref="requestConfig1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="HTPPEchoFlow">
         <httpn:listener path="/" config-ref="listenerConfig1" />
@@ -91,41 +91,41 @@
 
     <flow name="propagationThroughFlowRefToFlow">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <flow-ref name="FlowRef-1" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
-        <test:assert expression="#[flowVars.P4]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
+        <test:assert expression="#[mel:flowVars.P4]" />
         <flow-ref name="FlowRef-2" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
-        <test:assert expression="#[flowVars['P3'] == null]" />
-        <test:assert expression="#[flowVars.P4]" message="I failed" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
+        <test:assert expression="#[mel:flowVars['P3'] == null]" />
+        <test:assert expression="#[mel:flowVars.P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-1" processingStrategy="synchronous">
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <processor ref="addP2" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[flowVars.P4]" message="I failed" />
+        <test:assert expression="#[mel:flowVars.P4]" message="I failed" />
     </flow>
     <flow name="FlowRef-2" processingStrategy="asynchronous">
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
         <processor ref="addP3" />
         <flow-ref name="FlowRef-3" />
-        <test:assert expression="#[flowVars.P4]" />
+        <test:assert expression="#[mel:flowVars.P4]" />
     </flow>
     <flow name="FlowRef-3" processingStrategy="synchronous">
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
         <processor ref="addP4" />
-        <test:assert expression="#[flowVars.P4]" />
+        <test:assert expression="#[mel:flowVars.P4]" />
     </flow>
     <flow name="OverwriteInFlowRef">
         <processor ref="addP1" />
-        <test:assert expression="#[P1 == 'P1_VALUE']" />
+        <test:assert expression="#[mel:P1 == 'P1_VALUE']" />
         <flow-ref name="OverwriteInFlowRef-1" />
-        <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
+        <test:assert expression="#[mel:P1 == 'P1_VALUE_NEW']" />
     </flow>
     <flow name="OverwriteInFlowRef-1" processingStrategy="synchronous">
         <set-variable variableName="P1" value="P1_VALUE_NEW"/>
@@ -133,38 +133,38 @@
 
     <flow name="propagationThroughFlowRefToSubFlow">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <flow-ref name="SubFlowRef-1" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
         <flow-ref name="SubFlowRef-2" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
-        <test:assert expression="#[flowVars.P3]" />
-        <test:assert expression="#[flowVars.P4]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
+        <test:assert expression="#[mel:flowVars.P3]" />
+        <test:assert expression="#[mel:flowVars.P4]" />
     </flow>
     <sub-flow name="SubFlowRef-1">
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <processor ref="addP2" />
     </sub-flow>
     <sub-flow name="SubFlowRef-2">
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
         <processor ref="addP3" />
         <flow-ref name="SubFlowRef-3" />
-        <test:assert expression="#[flowVars.P4]" />
+        <test:assert expression="#[mel:flowVars.P4]" />
     </sub-flow>
     <sub-flow name="SubFlowRef-3">
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
-        <test:assert expression="#[flowVars.P3]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
+        <test:assert expression="#[mel:flowVars.P3]" />
         <processor ref="addP4" />
     </sub-flow>
     <flow name="OverwriteInSubFlowRef">
         <processor ref="addP1" />
-        <test:assert expression="#[P1 == 'P1_VALUE']" />
+        <test:assert expression="#[mel:P1 == 'P1_VALUE']" />
         <flow-ref name="OverwriteInSubFlowRef-1" />
-        <test:assert expression="#[P1 == 'P1_VALUE_NEW']" />
+        <test:assert expression="#[mel:P1 == 'P1_VALUE_NEW']" />
     </flow>
     <flow name="OverwriteInSubFlowRef-1" processingStrategy="synchronous">
         <set-variable variableName="P1" value="P1_VALUE_NEW"/>
@@ -174,8 +174,8 @@
         <processor ref="addP1" />
         <async>
             <processor ref="addP2" />
-            <test:assert expression="#[P1]" />
-            <test:assert expression="#[P2]" />
+            <test:assert expression="#[mel:P1]" />
+            <test:assert expression="#[mel:P2]" />
         </async>
     </flow>
     <flow name="propertyAddedInAsyncElementNotAddedinFlow">
@@ -183,92 +183,92 @@
         <async>
             <processor ref="addP2" />
         </async>
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:flowVars['P2'] == null]" />
     </flow>
 
     <flow name="propagationThroughWireTap">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <wire-tap>
-            <test:assert expression="#[P1]" />
+            <test:assert expression="#[mel:P1]" />
         </wire-tap>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="propertyAddedInWireTapNotAddedinFlow">
         <wire-tap>
             <flow-ref name="WireTap2-2" />
         </wire-tap>
-        <test:assert expression="#[flowVars['P1'] == null]" />
+        <test:assert expression="#[mel:flowVars['P1'] == null]" />
     </flow>
     <sub-flow name="WireTap2-2">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </sub-flow>
 
     <flow name="propagationThroughEnricher">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
-        <enricher target="#[flowVars.test]">
-            <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
+        <enricher target="#[mel:flowVars.test]">
+            <test:assert expression="#[mel:P1]" />
         </enricher>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="propertyAddedInEnricherNotAddedinFlow">
-        <enricher target="#[flowVars.test]">
+        <enricher target="#[mel:flowVars.test]">
             <flow-ref name="Enricher2-2" />
         </enricher>
-        <test:assert expression="#[flowVars['P1'] == null]" />
+        <test:assert expression="#[mel:flowVars['P1'] == null]" />
     </flow>
     <sub-flow name="Enricher2-2">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </sub-flow>
 
     <flow name="propagateToRoutesInAll">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <all>
-            <test:assert expression="#[P1]" />
-            <test:assert expression="#[P1]" />
+            <test:assert expression="#[mel:P1]" />
+            <test:assert expression="#[mel:P1]" />
         </all>
     </flow>
     <flow name="propagateThroughAllRouterWithResults">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <all>
             <echo-component />
             <echo-component />
         </all>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="propagateThroughAllRouterWithNoResults">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <all>
             <test:queue name="tmp" />
             <test:queue name="tmp2" />
         </all>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="propagateBetweenRoutes">
         <all>
             <processor ref="addP1" />
-            <test:assert expression="#[P1]" />
+            <test:assert expression="#[mel:P1]" />
         </all>
     </flow>
     <flow name="propagateFromRouteToNextProcessorSingleRoute">
         <all>
             <processor ref="addP1" />
         </all>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="propagateFromRouteToNextProcessorMultipleRoutes">
         <all>
             <processor ref="addP1" />
             <processor ref="addP2" />
         </all>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="propagateFromRouteToNextProcessorNoResult">
         <all>
@@ -277,11 +277,11 @@
                 <test:queue name="tmp3" />
             </processor-chain>
         </all>
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="AllAsync">
         <processor ref="addP1" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:P1]" />
         <all>
             <async>
                 <flow-ref name="All-1" />
@@ -290,42 +290,42 @@
                 <flow-ref name="All-2" />
             </async>
         </all>
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
-        <test:assert expression="#[flowVars['P3'] == null]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:flowVars['P2'] == null]" />
+        <test:assert expression="#[mel:flowVars['P3'] == null]" />
     </flow>
     <sub-flow name="All-1">
         <processor ref="addP2" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
     </sub-flow>
     <sub-flow name="All-2">
         <processor ref="addP3" />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[flowVars['P2'] == null]" />
-        <test:assert expression="#[P3]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:flowVars['P2'] == null]" />
+        <test:assert expression="#[mel:P3]" />
     </sub-flow>
 
     <flow name="propogationOfPropertiesInMessageSplitWithSplitter" processingStrategy="synchronous">
         <processor ref="addP1" />
         <collection-splitter />
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]" count="3" />
-        <test:assert expression="#[P1]" />
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Fruit]" count="3" />
+        <test:assert expression="#[mel:P1]" />
     </flow>
 
     <flow name="aggregationOfPropertiesFromMultipleMessageWithAggregator">
         <flow-ref name="propogationOfPropertiesInMessageSplitWithSplitter" />
         <processor ref="addP2" />
         <collection-aggregator />
-        <test:assert expression="#[P1]" />
-        <test:assert expression="#[P2]" />
+        <test:assert expression="#[mel:P1]" />
+        <test:assert expression="#[mel:P2]" />
     </flow>
 
     <flow name="defaultExceptionStrategy">
         <processor ref="addP1" />
         <test:component throwException="true" />
         <default-exception-strategy>
-            <test:assert expression="#[P1]" />
+            <test:assert expression="#[mel:P1]" />
         </default-exception-strategy>
     </flow>
 
@@ -334,7 +334,7 @@
         <test:component throwException="true" />
         <error-handler>
             <on-error-continue>
-                <test:assert expression="#[P1]" />
+                <test:assert expression="#[mel:P1]" />
             </on-error-continue>
         </error-handler>
     </flow>
@@ -349,8 +349,8 @@
         <default-exception-strategy>
            <processor-chain>
                <processor-chain>
-                   <test:assert expression="#[flowVars.P1]" />
-                   <test:assert expression="#[flowVars.P2]" />
+                   <test:assert expression="#[mel:flowVars.P1]" />
+                   <test:assert expression="#[mel:flowVars.P2]" />
                </processor-chain>
             </processor-chain>
         </default-exception-strategy>

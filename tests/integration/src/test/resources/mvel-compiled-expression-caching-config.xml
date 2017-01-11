@@ -6,16 +6,16 @@
              http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="foo-flow">
-        <set-payload value="#[new org.mule.mvel.Foo()]"/>
+        <set-payload value="#[mel:new org.mule.mvel.Foo()]"/>
 
-        <enricher target="#[payload.stuff]">
-            <set-payload value="#[new org.mule.mvel.FooDetails()]"/>
+        <enricher target="#[mel:payload.stuff]">
+            <set-payload value="#[mel:new org.mule.mvel.FooDetails()]"/>
         </enricher>
 
-        <set-payload value="#[new org.mule.mvel.Bar()]"/>
+        <set-payload value="#[mel:new org.mule.mvel.Bar()]"/>
 
-        <enricher target="#[payload.stuff]">
-            <set-payload value="#[new org.mule.mvel.BarDetails()]"/>
+        <enricher target="#[mel:payload.stuff]">
+            <set-payload value="#[mel:new org.mule.mvel.BarDetails()]"/>
         </enricher>
 
         <set-payload value="SUCCESS"/>

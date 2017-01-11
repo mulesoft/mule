@@ -13,7 +13,7 @@
         <metadata:connection/>
     </metadata:config>
 
-    <metadata:config name="dynamic-config" data="#['dynamic']">
+    <metadata:config name="dynamic-config" data="#[mel:'dynamic']">
         <metadata:connection/>
     </metadata:config>
 
@@ -163,9 +163,9 @@
     </flow>
 
     <flow name="typeWithDeclaredSubtypesMetadata">
-        <metadata:type-with-declared-subtypes-metadata plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
-                                                       rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
-                                                       animal="#[new org.mule.test.metadata.extension.model.animals.Bear()]"/>
+        <metadata:type-with-declared-subtypes-metadata plainShape="#[mel:new org.mule.test.metadata.extension.model.shapes.Circle()]"
+                                                       rectangleSubtype="#[mel:new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
+                                                       animal="#[mel:new org.mule.test.metadata.extension.model.animals.Bear()]"/>
     </flow>
 
     <flow name="resolverWithDynamicConfig">
@@ -182,7 +182,7 @@
 
     <flow name="pagedOperationMetadata">
         <metadata:paged-operation-metadata config-ref="config"
-                                           animal="#[new org.mule.test.metadata.extension.model.animals.Bear()]"/>
+                                           animal="#[mel:new org.mule.test.metadata.extension.model.animals.Bear()]"/>
     </flow>
 
     <flow name="queryOperation">

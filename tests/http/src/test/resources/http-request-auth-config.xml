@@ -9,7 +9,7 @@
     <httpn:request-config name="basicConfig">
         <httpn:request-connection host="localhost" port="${httpPort}">
             <httpn:authentication>
-                <httpn:basic-authentication username="#[user]" password="#[password]" preemptive="#[preemptive]" />
+                <httpn:basic-authentication username="#[mel:user]" password="#[mel:password]" preemptive="#[mel:preemptive]" />
             </httpn:authentication>
         </httpn:request-connection>
     </httpn:request-config>
@@ -21,7 +21,7 @@
     <httpn:request-config name="digestConfig">
         <httpn:request-connection host="localhost" port="${httpPort}">
             <httpn:authentication>
-                <httpn:digest-authentication username="#[user]" password="#[password]" />
+                <httpn:digest-authentication username="#[mel:user]" password="#[mel:password]" />
             </httpn:authentication>
         </httpn:request-connection>
     </httpn:request-config>

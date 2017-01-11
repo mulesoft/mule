@@ -11,7 +11,7 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="#[timeout]"/>
+        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="#[mel:timeout]"/>
     </flow>
 
     <flow name="requestFlowNoTimeout">

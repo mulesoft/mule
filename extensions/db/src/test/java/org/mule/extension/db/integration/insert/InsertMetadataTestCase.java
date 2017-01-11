@@ -85,7 +85,7 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void insertWithExpressionInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
-        getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, #[payload])");
+        getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, #[mel:payload])");
     assertThat(parameters.getType(), is(typeBuilder.anyType().build()));
   }
 

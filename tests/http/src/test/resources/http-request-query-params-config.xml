@@ -14,7 +14,7 @@
         <httpn:request config-ref="config" path="testPath" method="POST">
             <httpn:request-builder>
                 <httpn:query-params>
-                    #[['testName1' : 'testValue1', paramName : paramValue]]
+                    #[mel:['testName1' : 'testValue1', paramName : paramValue]]
                 </httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
@@ -23,7 +23,7 @@
     <flow name="queryParamMap">
         <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder>
-                <httpn:query-params>#[params]</httpn:query-params>
+                <httpn:query-params>#[mel:params]</httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -31,7 +31,7 @@
     <flow name="multipleQueryParam">
         <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder>
-                <httpn:query-params>#[params]</httpn:query-params>
+                <httpn:query-params>#[mel:params]</httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
     </flow>
@@ -39,9 +39,9 @@
     <flow name="queryParamNulls">
         <httpn:request config-ref="config" path="testPath">
                 <!-- Not currently supported. -->
-                <!--<httpn:request-builder queryParams="#[{'testName1':null, 'testName2': [null]}]"/>-->
+                <!--<httpn:request-builder queryParams="#[mel:{'testName1':null, 'testName2': [null]}]"/>-->
             <httpn:request-builder>
-                <httpn:query-params>#[['testName1' : null, 'testName2' : null]]</httpn:query-params>
+                <httpn:query-params>#[mel:['testName1' : null, 'testName2' : null]]</httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
     </flow>

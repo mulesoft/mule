@@ -8,7 +8,6 @@ package org.mule.compatibility.module.cxf;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -18,8 +17,11 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
+
+import org.junit.Rule;
 
 /**
  * Declares a dependency on HTTP extension for integration tests cases.
@@ -29,6 +31,9 @@ import java.util.List;
  * @since 4.0
  */
 public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunctionalTestCase {
+
+  @Rule
+  public SystemProperty melDefault = new SystemProperty("mule.test.mel.default", "true");
 
   //TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
   private HttpService httpService = new HttpServiceImplementation();
@@ -62,7 +67,7 @@ public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunc
 
   @Override
   protected void doTearDown() throws Exception {
-    super.doTearDown();
     stopIfNeeded(httpService);
+    super.doTearDown();
   }
 }

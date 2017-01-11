@@ -12,7 +12,7 @@
 
     <flow name="testFlow1">
         <httpn:listener config-ref="listenerConfig"  path="/"/>
-        <expression-filter expression="#[message.getAttributes().getHeaders().get('filterexpression')]" />
+        <expression-filter expression="#[mel:message.getAttributes().getHeaders().get('filterexpression')]" />
         <echo-component />
     </flow>
 

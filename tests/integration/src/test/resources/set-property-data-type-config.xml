@@ -4,6 +4,6 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="main">
-        <set-property propertyName="testProperty" value="#['test']" encoding="UTF-16" mimeType="text/xml"/>
+        <set-property propertyName="testProperty" value="#[mel:'test']" encoding="UTF-16" mimeType="text/xml"/>
     </flow>
 </mule>

@@ -95,7 +95,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase {
   private Map<String, String> getCookieMap() {
     Map<String, String> cookieMap = new HashMap<>();
     cookieMap.put("customCookie", "yes");
-    cookieMap.put("expressionCookie", "#[message.inboundProperties.COOKIE_HEADER]");
+    cookieMap.put("expressionCookie", "#[mel:message.inboundProperties.COOKIE_HEADER]");
     return cookieMap;
   }
 

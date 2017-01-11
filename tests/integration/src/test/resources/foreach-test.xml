@@ -35,7 +35,7 @@
     </flow>
 
     <flow name="minimal-config-expression">
-        <foreach collection="#[message.inboundProperties.names]">
+        <foreach collection="#[mel:message.inboundProperties.names]">
             <test:component/>
             <test:queue name="out"/>
         </foreach>
@@ -51,56 +51,56 @@
     <flow name="parent-message-config">
         <foreach rootMessageVariableName="parent">
             <test:component/>
-            <set-variable variableName="parent2" value="#[flowVars.parent]" />
+            <set-variable variableName="parent2" value="#[mel:flowVars.parent]" />
         </foreach>
-        <set-property propertyName="parent" value="#[flowVars.parent2]"/>
+        <set-property propertyName="parent" value="#[mel:flowVars.parent2]"/>
     </flow>
 
     <flow name="message-collection-config">
         <foreach>
-            <test:assert expression="#[message.outboundProperties['out']=='out'+counter]" />
-            <set-variable variableName="totalMessages" value="#[counter]"/>
+            <test:assert expression="#[mel:message.outboundProperties['out']=='out'+counter]" />
+            <set-variable variableName="totalMessages" value="#[mel:counter]"/>
         </foreach>
-        <test:assert expression="#[totalMessages==10]" />
-        <set-property propertyName="totalMessages" value="#[totalMessages]"/>
+        <test:assert expression="#[mel:totalMessages==10]" />
+        <set-property propertyName="totalMessages" value="#[mel:totalMessages]"/>
     </flow>
 
     <flow name="message-collection-config-one-way">
         <foreach>
-            <test:assert expression="#[message.inboundProperties['out']=='out'+counter]" />
-            <set-variable variableName="totalMessages" value="#[counter]"/>
+            <test:assert expression="#[mel:message.inboundProperties['out']=='out'+counter]" />
+            <set-variable variableName="totalMessages" value="#[mel:counter]"/>
         </foreach>
-        <logger level="WARN" message="variable:totalMessages: #[flowVars.totalMessages]"/>
-        <test:assert expression="#[totalMessages==10]" />
+        <logger level="WARN" message="variable:totalMessages: #[mel:flowVars.totalMessages]"/>
+        <test:assert expression="#[mel:totalMessages==10]" />
     </flow>
 
     <flow name="map-config">
         <foreach>
             <test:component/>
-            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
+            <set-variable variableName="totalMessages" value="#[mel:flowVars.counter]" />
         </foreach>
-        <set-property propertyName="totalMessages" value="#[flowVars.totalMessages]"/>
-        <test:assert expression="#[totalMessages == 2]" />
+        <set-property propertyName="totalMessages" value="#[mel:flowVars.totalMessages]"/>
+        <test:assert expression="#[mel:totalMessages == 2]" />
     </flow>
 
     <flow name="map-expression-config">
-        <foreach collection="#[message.inboundProperties.names]">
+        <foreach collection="#[mel:message.inboundProperties.names]">
             <test:component/>
-            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
+            <set-variable variableName="totalMessages" value="#[mel:flowVars.counter]" />
         </foreach>
-        <set-property propertyName="totalMessages" value="#[flowVars.totalMessages]"/>
+        <set-property propertyName="totalMessages" value="#[mel:flowVars.totalMessages]"/>
     </flow>
 
     <flow name="process-order-update">
-        <foreach collection="#[xpath3('/PurchaseOrder/Items/Item')]">
-            <set-variable variableName="total" value="#[counter]" />
+        <foreach collection="#[mel:xpath3('/PurchaseOrder/Items/Item')]">
+            <set-variable variableName="total" value="#[mel:counter]" />
         </foreach>
     </flow>
 
     <flow name="process-json-update">
         <json:json-to-object-transformer returnClass="java.util.Map"/>
-        <test:assert expression="#[payload.order.items.size() == 2]" />
-        <foreach collection="#[payload.order.items]">
+        <test:assert expression="#[mel:payload.order.items.size() == 2]" />
+        <foreach collection="#[mel:payload.order.items]">
             <script:component>
                 <script:script engine="groovy">
                     <![CDATA[
@@ -111,8 +111,8 @@
                 </script:script>
             </script:component>
         </foreach>
-        <test:assert expression="#[payload is Map]" />
-        <test:assert expression="#[payload.order.items.size() == 4]" />
+        <test:assert expression="#[mel:payload is Map]" />
+        <test:assert expression="#[mel:payload.order.items.size() == 4]" />
     </flow>
 
     <flow name="array-expression-config">
@@ -126,26 +126,26 @@
                 </script:script>
             </script:component>
         </foreach>
-        <test:assert expression="#[flowVars.loops == '3']" />
+        <test:assert expression="#[mel:flowVars.loops == '3']" />
     </flow>
 
     <flow name="counter-scope">
         <foreach>
             <test:component/>
         </foreach>
-        <test:assert expression="#[flowVars.counter == null]"/>
+        <test:assert expression="#[mel:flowVars.counter == null]"/>
     </flow>
 
     <flow name="counter-two-foreach-independence">
         <foreach>
             <test:component/>
-            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
+            <set-variable variableName="totalMessages" value="#[mel:flowVars.counter]" />
         </foreach>
         <foreach>
             <test:component/>
-            <set-variable variableName="totalMessages" value="#[flowVars.counter]" />
+            <set-variable variableName="totalMessages" value="#[mel:flowVars.counter]" />
         </foreach>
-        <set-property propertyName="msg-total-messages" value="#[flowVars.totalMessages]"/>
+        <set-property propertyName="msg-total-messages" value="#[mel:flowVars.totalMessages]"/>
     </flow>
 
     <flow name="nested-foreach">
@@ -161,10 +161,10 @@
         <foreach>
             <foreach>
                 <test:component/>
-                <set-property propertyName="j" value="#[flowVars.counter]"/>
+                <set-property propertyName="j" value="#[mel:flowVars.counter]"/>
                 <test:queue name="out"/>
             </foreach>
-            <set-property propertyName="i" value="#[flowVars.counter]"/>
+            <set-property propertyName="i" value="#[mel:flowVars.counter]"/>
             <test:queue name="out"/>
         </foreach>
     </flow>
@@ -176,53 +176,53 @@
             <test:component/>
             <test:queue name="out"/>
         </foreach>
-        <test:assert expression="#[counter == 'hello']" />
-        <test:assert expression="#[rootMessage == 'world']" />
+        <test:assert expression="#[mel:counter == 'hello']" />
+        <test:assert expression="#[mel:rootMessage == 'world']" />
     </flow>
 
     <flow name="mvel-list">
-        <foreach collection="#[['foo', 'bar']]">
+        <foreach collection="#[mel:['foo', 'bar']]">
             <test:component/>
             <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="mvel-map">
-        <foreach collection="#[['key1' : 'val1', 'key2':'val2']]">
+        <foreach collection="#[mel:['key1' : 'val1', 'key2':'val2']]">
             <test:component/>
-            <logger level="ERROR" message="message-#[counter]: #[payload]"/>
+            <logger level="ERROR" message="message-#[mel:counter]: #[mel:payload]"/>
             <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="mvel-collection">
-        <foreach collection="#[['key1' : 'val1', 'key2':'val2'].values()]">
+        <foreach collection="#[mel:['key1' : 'val1', 'key2':'val2'].values()]">
             <test:component/>
             <test:queue name="out"/>
         </foreach>
     </flow>
 
     <flow name="mvel-array">
-        <foreach collection="#[{'foo', 'bar'}]">
+        <foreach collection="#[mel:{'foo', 'bar'}]">
             <flow-ref name="assertIterable" />
         </foreach>
     </flow>
 
     <flow name="expression-iterable">
-        <foreach collection="#[iterable]">
+        <foreach collection="#[mel:iterable]">
             <flow-ref name="assertIterable" />
         </foreach>
     </flow>
     
     <sub-flow name="assertIterable">
         <test:component/>
-        <test:assert expression="#[payload instanceof String]"  message="hoal"/>
-        <logger level="ERROR" message="message-#[counter]: #[payload]"/>
+        <test:assert expression="#[mel:payload instanceof String]"  message="hoal"/>
+        <logger level="ERROR" message="message-#[mel:counter]: #[mel:payload]"/>
         <test:queue name="out"/>
     </sub-flow>
     
     <flow name="mvel-error">
-        <foreach collection="#[invalid]">
+        <foreach collection="#[mel:invalid]">
             <test:component/>
         </foreach>
     </flow>
@@ -243,13 +243,13 @@
 		<set-property propertyName="value1" value="value1" />
 		<set-property propertyName="value2" value="value2" />
 		
-		<test:assert expression="#[flowVars['value1'] == 'value1']" />
-		<test:assert expression="#[flowVars['value2'] == 'value2']" />
+		<test:assert expression="#[mel:flowVars['value1'] == 'value1']" />
+		<test:assert expression="#[mel:flowVars['value2'] == 'value2']" />
 		
-		<test:assert expression="#[message.outboundProperties['value1'] == 'value1']" />
-		<test:assert expression="#[message.outboundProperties['value2'] == 'value2']" />
+		<test:assert expression="#[mel:message.outboundProperties['value1'] == 'value1']" />
+		<test:assert expression="#[mel:message.outboundProperties['value2'] == 'value2']" />
 		
-		<expression-component>flowVars['latch'].countDown()</expression-component>
+		<expression-component>mel:flowVars['latch'].countDown()</expression-component>
 	</sub-flow>
 
     <sub-flow name="sub-flow-with-foreach">

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wsdl:definitions name="GeoIPService"
-                  targetNamespace="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01"
+                  targetNamespace="http://localhost:#[mel:server.systemProperties.portMockServer]/ServiceContracts/2008/01"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
                   xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
                   xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
-                  xmlns:tns="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01"
+                  xmlns:tns="http://localhost:#[mel:server.systemProperties.portMockServer]/ServiceContracts/2008/01"
                   xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                   xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
                   xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"
@@ -16,9 +16,9 @@
                   xmlns:wsa10="http://www.w3.org/2005/08/addressing"
                   xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
     <wsdl:types>
-        <xsd:schema targetNamespace="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01/Imports">
-            <xsd:import schemaLocation="http://localhost:#[server.systemProperties.portMockServer]/remoteServicePathXsd0/mock-xsd0.xml?xsd=xsd0"
-                        namespace="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01"/>
+        <xsd:schema targetNamespace="http://localhost:#[mel:server.systemProperties.portMockServer]/ServiceContracts/2008/01/Imports">
+            <xsd:import schemaLocation="http://localhost:#[mel:server.systemProperties.portMockServer]/remoteServicePathXsd0/mock-xsd0.xml?xsd=xsd0"
+                        namespace="http://localhost:#[mel:server.systemProperties.portMockServer]/ServiceContracts/2008/01"/>
         </xsd:schema>
     </wsdl:types>
     <wsdl:message name="IGeoIPService_Analyse_InputMessage">
@@ -31,10 +31,10 @@
         <wsdl:operation name="Analyse">
             <wsdl:input wsaw:Action="Analyse" message="tns:IGeoIPService_Analyse_InputMessage"/>
             <wsdl:output
-                    wsaw:Action="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01/IGeoIPService/AnalyseResponse"
+                    wsaw:Action="http://localhost:#[mel:server.systemProperties.portMockServer]/ServiceContracts/2008/01/IGeoIPService/AnalyseResponse"
                     message="tns:IGeoIPService_Analyse_OutputMessage"/>
             <wsdl:fault
-                    wsaw:Action="http://localhost:#[server.systemProperties.portMockServer]/ServiceContracts/2008/01/IGeoIPService/AnalyseDefaultFaultContractFault"
+                    wsaw:Action="http://localhost:#[mel:server.systemProperties.portMockServer]/ServiceContracts/2008/01/IGeoIPService/AnalyseDefaultFaultContractFault"
                     name="DefaultFaultContractFault"
                     message="tns:IGeoIPService_Analyse_DefaultFaultContractFault_FaultMessage"/>
         </wsdl:operation>
@@ -56,7 +56,7 @@
     </wsdl:binding>
     <wsdl:service name="GeoIPService">
         <wsdl:port name="BasicHttpBinding_IGeoIPService" binding="tns:BasicHttpBinding_IGeoIPService">
-            <soap:address location="http://localhost:#[server.systemProperties.portMockServer]/wcf/GeoIPService.svc"/>
+            <soap:address location="http://localhost:#[mel:server.systemProperties.portMockServer]/wcf/GeoIPService.svc"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

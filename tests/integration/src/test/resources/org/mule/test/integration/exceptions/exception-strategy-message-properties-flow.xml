@@ -9,7 +9,7 @@
         <test:component throwException="true"/>
         <error-handler>
             <on-error-continue>
-                <set-property propertyName="prop" value="#[message.inboundProperties.foo]" />
+                <set-property propertyName="prop" value="#[mel:message.inboundProperties.foo]" />
                 <test:queue name="out"/>
             </on-error-continue>
         </error-handler>

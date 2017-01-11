@@ -22,7 +22,7 @@
     </flow>
 
     <flow name="echoWithTransform">
-        <expression-filter expression="#[xpath3('/s:Envelope/s:Body/@foo', payload, 'STRING') == 'bar']" />
+        <expression-filter expression="#[mel:xpath3('/s:Envelope/s:Body/@foo', payload, 'STRING') == 'bar']" />
         <flow-ref name="echoService"/>
     </flow>
 

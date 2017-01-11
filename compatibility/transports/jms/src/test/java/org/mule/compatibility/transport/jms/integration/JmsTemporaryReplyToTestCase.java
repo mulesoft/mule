@@ -73,7 +73,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   }
 
   @Test
-  @Ignore("#[context:serviceName] not supported")
+  @Ignore("#[mel:context:serviceName] not supported")
   public void testExplicitReplyToAsyncSet() throws Exception {
     InternalMessage response = flowRunner("JMSService4").withPayload(TEST_MESSAGE).run().getMessage();
     // We get the original message back, not the result from the remote component

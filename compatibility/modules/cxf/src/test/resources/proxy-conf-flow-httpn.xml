@@ -31,7 +31,7 @@
 
     <flow name="testCDATA">
         <httpn:listener path="/services/CDATAService" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
         <echo-component />
@@ -39,7 +39,7 @@
 
     <flow name="serverClientProxyEnvelopeWithValidation">
         <httpn:listener path="/services/proxyEnvelopeWithValidation" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="WebService2"
             wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
@@ -55,7 +55,7 @@
 
     <flow name="serverClientProxyBodyWithValidation">
         <httpn:listener path="/services/proxyBodyWithValidation" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="WebService2"
             wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
@@ -71,7 +71,7 @@
 
     <flow name="serverClientProxyBodyWithValidationAndSchemas">
         <httpn:listener path="/services/proxyBodyWithValidationAndSchemas" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="WebService2"
             wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
@@ -92,7 +92,7 @@
 
     <flow name="jaxwsProxy">
         <httpn:listener path="/services/greeterProxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
 
@@ -105,7 +105,7 @@
 
     <flow name="proxyWithTransform">
         <httpn:listener path="/services/transform-proxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" />
         <cxf:proxy-service />
@@ -119,7 +119,7 @@
 
     <flow name="greeter-proxy">
         <httpn:listener path="/services/greeter-proxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
 
@@ -129,7 +129,7 @@
 
     <flow name="greeter-databinding-proxy">
         <httpn:listener path="/services/greeter-databinding-proxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
 
@@ -141,7 +141,7 @@
 
     <flow name="greeter">
         <httpn:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
 
@@ -153,7 +153,7 @@
 
     <flow name="serverEcho">
         <httpn:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
         <log-component />
@@ -161,7 +161,7 @@
 
     <flow name="serverClientProxy">
         <httpn:listener path="/services/proxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service>
             <cxf:inInterceptors>
@@ -178,7 +178,7 @@
 
     <flow name="serverClientProxyEnvelope">
         <httpn:listener path="/services/envelope-proxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service payload="envelope" />
 
@@ -188,7 +188,7 @@
 
     <flow name="serverClientProxyWithWsdl">
         <httpn:listener path="/services/proxyWithWsdl" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="WebService"
                            wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org" />
@@ -201,7 +201,7 @@
 
     <flow name="serverClientProxyWithWsdl2">
         <httpn:listener path="/services/proxyWithWsdl2" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="WebService2"
                            wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org" />
@@ -214,7 +214,7 @@
 
     <flow name="serverClientProxyWithTransform">
         <httpn:listener path="/services/proxyWithTransform" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
 
@@ -227,7 +227,7 @@
 
     <flow name="routeBasedNoWsdl">
         <httpn:listener path="/services/routeBasedNoWsdl" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service>
             <cxf:features>
@@ -240,7 +240,7 @@
     </flow>
     <flow name="routeBasedNoWsdl-async">
         <httpn:listener path="/services/routeBasedNoWsdlAsync" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <async>
             <cxf:proxy-service>
@@ -256,7 +256,7 @@
 
     <flow name="routeBasedOnNoSoapAction">
         <httpn:listener path="/services/routeBasedOnNoSoapAction" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service bindingId="WebServiceHttpBinding" namespace="http://www.muleumo.org" service="WebService" payload="body" wsdlLocation="localWsdl.wsdl" >
             <cxf:features>
@@ -269,7 +269,7 @@
     </flow>
     <flow name="routeBasedOnNoSoapActionNoWsdl">
         <httpn:listener path="/services/routeBasedOnNoSoapActionNoWsdl" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service bindingId="WebServiceHttpBinding" namespace="http://www.muleumo.org" service="WebService" payload="body" wsdlLocation="localWsdl.wsdl" >
             <cxf:features>
@@ -282,7 +282,7 @@
     </flow>
     <flow name="routeBasedOnNoSoapAction-async">
         <httpn:listener path="/services/routeBasedOnNoSoapActionAsync" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <async>
             <cxf:proxy-service bindingId="WebService2HttpBinding" namespace="http://www.muleumo.org" service="WebService2" payload="body" wsdlLocation="localWsdl.wsdl" >
@@ -310,7 +310,7 @@
     </flow>
     <flow name="routeBasedOnSoapAction-async">
         <httpn:listener path="/services/routeBasedOnSoapActionAsync" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <async>
             <cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"
@@ -327,7 +327,7 @@
 
     <flow name="asyncService">
         <httpn:listener path="/services/oneway" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.testmodels.AsyncService"/>
 
@@ -339,7 +339,7 @@
 
     <flow name="asyncServiceWithSoapAction">
         <httpn:listener path="/services/onewayWithSoapAction" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
 
@@ -375,7 +375,7 @@
 
      <flow name="proxyWithSoapFault">
         <httpn:listener path="/proxyFault" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="SOAPService" wsdlLocation="classpath:/wsdl/hello_world_fault.wsdl" port="SoapPort"
                            namespace="http://apache.org/intfault" payload="envelope" validationEnabled="false"/>
@@ -388,7 +388,7 @@
 
     <flow name="proxyEnvelopeWithXSLTTransformation">
         <httpn:listener path="/services/envelope-xslt-proxy" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service payload="envelope"/>
 
@@ -397,7 +397,7 @@
 
     <flow name="proxyWithSoapJms">
         <httpn:listener path="/proxyJms" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryJms.wsdl" port="EmployeeDirectoryPort"
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
@@ -406,7 +406,7 @@
 
     <flow name="proxyOneWay">
         <httpn:listener path="/proxyOneWay" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
@@ -416,7 +416,7 @@
 
     <flow name="proxyOneWayFault">
         <httpn:listener path="/proxyOneWayFault" config-ref="listenerConfig" allowedMethods="POST">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>

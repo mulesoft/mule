@@ -12,7 +12,7 @@
     </spring:beans>
 
     <flow name="read">
-        <ftp:read path="#[path]"/>
+        <ftp:read path="#[mel:path]"/>
     </flow>
 
     <flow name="readWithLock" processingStrategy="synchronous">
@@ -20,7 +20,7 @@
     </flow>
 
     <flow name="readWithForcedMimeType">
-        <ftp:read path="#[path]" outputMimeType="test/test"/>
+        <ftp:read path="#[mel:path]" outputMimeType="test/test"/>
     </flow>
 
 </mule>

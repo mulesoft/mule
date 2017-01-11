@@ -22,11 +22,11 @@
     <flow name="udp-listen-and-modify-pojo">
         <sockets:socket-listener config-ref="udp-listener"/>
         <byte-array-to-object-transformer returnClass="org.mule.extension.socket.TestPojo"/>
-        <expression-component>
+        <expression-component>mel:
             payload.setAge(7)
         </expression-component>
 
-        <expression-component>
+        <expression-component>mel:
             payload.setName("Ronaldo")
         </expression-component>
 

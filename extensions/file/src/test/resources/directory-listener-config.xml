@@ -23,6 +23,6 @@
     </flow>
 
     <sub-flow name="onEvent">
-        <expression-component>org.mule.extension.file.DirectoryListenerFunctionalTestCase.onMessage(message)</expression-component>
+        <expression-component>mel:org.mule.extension.file.DirectoryListenerFunctionalTestCase.onMessage(message)</expression-component>
     </sub-flow>
 </mule>

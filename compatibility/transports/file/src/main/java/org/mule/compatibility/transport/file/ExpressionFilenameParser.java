@@ -23,21 +23,21 @@ import java.util.concurrent.atomic.AtomicLong;
  * <p/>
  * For example an xpath expression can be defined to pull a message id out of an xml message and use that as the file name -
  * <code>
- * #[xpath:/message/header/@id]
+ * #[mel:xpath:/message/header/@id]
  * </code>
  * <p/>
  * This parser superseeds the (now removed) <code>org.mule.compatibility.transport.file.SimpleFilenameParser</code> which has been
  * kept in Mule 2 for compatibility. The following demonstrates how to achieve the same results when using the
  * <code>ExpressionFilenameParser</code> over the <code>SimpleFilenameParser</code>
  * <ul>
- * <li>#[DATE] : #[org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')]</li>
- * <li>#[DATE:yy-MM-dd] : #[org.mule.runtime.core.util.DateUtils.getTimeStamp('yy-MM-dd')]</li>
- * <li>#[SYSTIME] : #[server.dateTime.toDate()]</li>
- * <li>#[UUID] : #[org.mule.runtime.core.util.UUID.getUUID()]</li>
- * <li>#[ORIGINALNAME] : #[message.inboundProperties.originalFilename]</li>
- * <li>#[COUNT] : #[org.mule.compatibility.transport.file.ExpressionFilenameParser.count()] - note that this is a global
+ * <li>#[mel:DATE] : #[mel:org.mule.runtime.core.util.DateUtils.getTimeStamp('dd-MM-yy_HH-mm-ss.SSS')]</li>
+ * <li>#[mel:DATE:yy-MM-dd] : #[mel:org.mule.runtime.core.util.DateUtils.getTimeStamp('yy-MM-dd')]</li>
+ * <li>#[mel:SYSTIME] : #[mel:server.dateTime.toDate()]</li>
+ * <li>#[mel:UUID] : #[mel:org.mule.runtime.core.util.UUID.getUUID()]</li>
+ * <li>#[mel:ORIGINALNAME] : #[mel:message.inboundProperties.originalFilename]</li>
+ * <li>#[mel:COUNT] : #[mel:org.mule.compatibility.transport.file.ExpressionFilenameParser.count()] - note that this is a global
  * counter.</li>
- * <li>#[&lt;Message Property Name&gt;] : #[message.outboundProperties&lt;Message Property Name&gt;]</li>
+ * <li>#[mel:&lt;Message Property Name&gt;] : #[mel:message.outboundProperties&lt;Message Property Name&gt;]</li>
  * </ul>
  */
 public class ExpressionFilenameParser implements FilenameParser, MuleContextAware {

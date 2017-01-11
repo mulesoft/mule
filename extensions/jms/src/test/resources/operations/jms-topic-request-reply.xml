@@ -6,9 +6,9 @@
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <flow name="request-reply-explicit-destination">
-        <jmsn:publish-consume config-ref="config" destination="#[dw:destination]">
+        <jmsn:publish-consume config-ref="config" destination="#[destination]">
             <jmsn:message-builder>
-                <jmsn:reply-to destination="#[dw:replyToDestination]" destinationType="TOPIC"/>
+                <jmsn:reply-to destination="#[replyToDestination]" destinationType="TOPIC"/>
             </jmsn:message-builder>
         </jmsn:publish-consume>
     </flow>

@@ -14,34 +14,34 @@
                 <message-filter throwOnUnaccepted="true">
                     <payload-type-filter expectedType="java.lang.String"/>
                 </message-filter>
-                <test:component appendString=" is a string"/>
+                <test:component appendString="' is a string'"/>
             </processor-chain>
             <processor-chain>
                 <message-filter throwOnUnaccepted="true">
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </message-filter>
-                <test:component appendString=" is an integer"/>
+                <test:component appendString="' is an integer'"/>
             </processor-chain>
             <processor-chain>
                 <message-filter throwOnUnaccepted="true">
                     <payload-type-filter expectedType="java.lang.Number"/>
                 </message-filter>
-                <test:component appendString=" is a number"/>
+                <test:component appendString="' is a number'"/>
             </processor-chain>
         </first-successful>
     </flow>
 
     <flow name="test-router2">
-        <first-successful failureExpression="#[payload.contains('is a number')]">
-            <test:component appendString=" is a number" />
-            <test:component appendString=" is a string" />
+        <first-successful failureExpression="#[mel:payload.contains('is a number')]">
+            <test:component appendString="' is a number'" />
+            <test:component appendString="' is a string'" />
         </first-successful>
     </flow>
 
     <flow name="test-router3">
-        <first-successful failureExpression="#[payload.contains('is a ')]">
-            <test:component appendString=" is a number" />
-            <test:component appendString=" is a string" />
+        <first-successful failureExpression="#[mel:payload.contains('is a ')]">
+            <test:component appendString="' is a number'" />
+            <test:component appendString="' is a string'" />
         </first-successful>
     </flow>
 

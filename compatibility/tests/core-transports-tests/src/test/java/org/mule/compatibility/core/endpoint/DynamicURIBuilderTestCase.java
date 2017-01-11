@@ -29,11 +29,11 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
   public static final String EXPECTED_ADDRESS = "http://admin%40abc:admin%40123@localhost:8080/test?foo=bar";
   private final Event event = mock(Event.class);
   private final MuleContext muleContext = mock(MuleContext.class);
-  public static final String ATTRIBUTE_EXPRESSION = "#[expression]";
+  public static final String ATTRIBUTE_EXPRESSION = "#[mel:expression]";
 
   @Test
   public void resolvesDynamicAddress() throws Exception {
-    String uriTemplate = "http://admin%40abc:admin%40123@localhost:8080/#[expression]";
+    String uriTemplate = "http://admin%40abc:admin%40123@localhost:8080/#[mel:expression]";
 
     createExpressionManager(uriTemplate, EXPECTED_ADDRESS);
 
@@ -44,7 +44,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolvesDynamicPort() throws Exception {
-    String templatePort = "#[expression]";
+    String templatePort = "#[mel:expression]";
 
     createExpressionManager(ATTRIBUTE_EXPRESSION, "8080");
 
@@ -96,7 +96,7 @@ public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
 
   @Test(expected = MalformedEndpointException.class)
   public void throwsErrorOnInvalidUrl() throws Exception {
-    URIBuilder uriBuilder = new URIBuilder("#[expression]://localhost", muleContext);
+    URIBuilder uriBuilder = new URIBuilder("#[mel:expression]://localhost", muleContext);
 
     DynamicURIBuilder dynamicURIBuilder = new DynamicURIBuilder(uriBuilder);
     dynamicURIBuilder.build(event);

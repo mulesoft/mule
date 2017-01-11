@@ -55,7 +55,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
   private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
   private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
-  private static final String DYNAMIC_NON_EXISTANT = "#['nonExistant']";
+  private static final String DYNAMIC_NON_EXISTANT = "#[mel:'nonExistant']";
   private static final String NON_EXISTANT = "nonExistant";
 
   private Event result = testEvent();

@@ -20,7 +20,7 @@
         <request-reply storePrefix="foo" >
             <vm:outbound-endpoint path="request"/>
             <vm:inbound-endpoint path="reply">
-                <logger level="ERROR" message="Got to inbound endpoint: #[payload]"/>
+                <logger level="ERROR" message="Got to inbound endpoint: #[mel:payload]"/>
             </vm:inbound-endpoint>
         </request-reply>
         <logger level="ERROR" message="Returned fron request-reply"/>

@@ -416,7 +416,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Object evaluate(String expression) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateUntyped("#[" + expression + "]", null, null, null, null);
+      return mvel.evaluateUntyped("#[mel:" + expression + "]", null, null, null, null);
     } else {
       return mvel.evaluateUntyped(expression, null, null, null, null);
     }
@@ -424,7 +424,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected TypedValue evaluateTyped(String expression, Event event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[" + expression + "]", event, Event.builder(event), flowConstruct, BindingContext.builder().build());
+      return mvel.evaluate("#[mel:" + expression + "]", event, Event.builder(event), flowConstruct,
+                           BindingContext.builder().build());
     } else {
       return mvel.evaluate(expression, event, Event.builder(event), flowConstruct, BindingContext.builder().build());
     }
@@ -432,7 +433,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Object evaluate(String expression, Map<String, Object> vars) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateUntyped("#[" + expression + "]", vars);
+      return mvel.evaluateUntyped("#[mel:" + expression + "]", vars);
     } else {
       return mvel.evaluateUntyped(expression, vars);
     }
@@ -440,7 +441,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Object evaluate(String expression, Event event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateUntyped("#[" + expression + "]", event, Event.builder(event), flowConstruct, null);
+      return mvel.evaluateUntyped("#[mel:" + expression + "]", event, Event.builder(event), flowConstruct, null);
     } else {
       return mvel.evaluateUntyped(expression, event, Event.builder(event), flowConstruct, null);
     }
@@ -448,7 +449,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected ValidationResult validate(String expression) {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.validate("#[" + expression + "]");
+      return mvel.validate("#[mel:" + expression + "]");
     } else {
       return mvel.validate(expression);
     }

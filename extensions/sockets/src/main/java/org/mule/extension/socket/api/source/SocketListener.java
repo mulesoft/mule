@@ -94,7 +94,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   }
 
   @OnSuccess
-  public void onSuccess(@Optional(defaultValue = "#[payload]") @XmlHints(allowReferences = false) Object responseValue,
+  public void onSuccess(@Optional(defaultValue = "#[mel:payload]") @XmlHints(allowReferences = false) Object responseValue,
                         SourceCallbackContext context) {
     SocketWorker worker = context.getVariable(WORK);
     worker.onComplete(responseValue);

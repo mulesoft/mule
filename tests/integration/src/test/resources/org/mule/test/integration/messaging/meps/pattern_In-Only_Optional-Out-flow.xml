@@ -25,7 +25,7 @@
             </script:script>
         </script:component>
         
-        <logger level="ERROR" message="#[payload]"/>
+        <logger level="ERROR" message="#[mel:payload]"/>
         
         <async>
             <mule:wildcard-filter pattern="* header received"/>

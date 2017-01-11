@@ -40,7 +40,7 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * The map's values will contain the actual assignation for each parameter.
    */
   @Parameter
-  @Optional(defaultValue = "#[new java.util.HashMap()]")
+  @Optional(defaultValue = "#[mel:new java.util.HashMap()]")
   @Content
   @Placement(order = 2)
   @TypeResolver(DbInputMetadataResolver.class)

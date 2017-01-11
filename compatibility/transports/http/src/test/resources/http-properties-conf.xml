@@ -18,33 +18,33 @@
 
     <flow name="testProperties" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources" exchange-pattern="request-response"/>
-        <set-property propertyName="http.relative.path" value="#[message.inboundProperties['http.relative.path']]"/>
-        <set-property propertyName="http.context.uri" value="#[message.inboundProperties['http.context.uri']]"/>
+        <set-property propertyName="http.relative.path" value="#[mel:message.inboundProperties['http.relative.path']]"/>
+        <set-property propertyName="http.context.uri" value="#[mel:message.inboundProperties['http.context.uri']]"/>
 
         <choice>
-            <when expression="#[message.inboundProperties['http.relative.path'] == 'client']">
+            <when expression="#[mel:message.inboundProperties['http.relative.path'] == 'client']">
                 <choice>
-                    <when expression="#[message.inboundProperties['http.method'] == 'GET']">
+                    <when expression="#[mel:message.inboundProperties['http.method'] == 'GET']">
                         <expression-transformer>
-                            <return-argument expression="#['Retrieving client with id = ' + message.inboundProperties['http.query.params']['id']]"/>
+                            <return-argument expression="#[mel:'Retrieving client with id = ' + message.inboundProperties['http.query.params']['id']]"/>
                         </expression-transformer>
                     </when>
-                    <when expression="#[message.inboundProperties['http.method'] == 'POST']">
+                    <when expression="#[mel:message.inboundProperties['http.method'] == 'POST']">
                         <http:body-to-parameter-map-transformer/>
                         <expression-transformer>
-                            <return-argument expression="#['Storing client with name = ' + payload['name'] + ' and lastname = ' + payload['lastname']]"/>
+                            <return-argument expression="#[mel:'Storing client with name = ' + payload['name'] + ' and lastname = ' + payload['lastname']]"/>
                         </expression-transformer>
                     </when>
                     <otherwise>
                         <expression-transformer>
-                            <return-argument expression="#['Unknown HTTP method: ' + message.inboundProperties['http.method']]"/>
+                            <return-argument expression="#[mel:'Unknown HTTP method: ' + message.inboundProperties['http.method']]"/>
                         </expression-transformer>
                     </otherwise>
                 </choice>
             </when>
             <otherwise>
                 <expression-transformer>
-                    <return-argument expression="#['Unknown resource: ' + message.inboundProperties['http.relative.path']]"/>
+                    <return-argument expression="#[mel:'Unknown resource: ' + message.inboundProperties['http.relative.path']]"/>
                 </expression-transformer>
             </otherwise>
         </choice>
@@ -53,13 +53,13 @@
 
     <flow name="testRedirect" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/redirect" exchange-pattern="request-response"/>
-        <http:outbound-endpoint address="http://localhost:${port1}/newSite/#[message.inboundProperties['http.relative.path']]?#[message.inboundProperties['http.query.string']]" exchange-pattern="request-response"/>
+        <http:outbound-endpoint address="http://localhost:${port1}/newSite/#[mel:message.inboundProperties['http.relative.path']]?#[mel:message.inboundProperties['http.query.string']]" exchange-pattern="request-response"/>
     </flow>
 
     <flow name="testRedirection" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/newSite" exchange-pattern="request-response"/>
         <expression-transformer>
-            <return-argument expression="#['Successfully redirected: ' + message.inboundProperties['http.relative.path'] + '?' + message.inboundProperties['http.query.string']]"/>
+            <return-argument expression="#[mel:'Successfully redirected: ' + message.inboundProperties['http.relative.path'] + '?' + message.inboundProperties['http.query.string']]"/>
         </expression-transformer>
     </flow>
 </mule>

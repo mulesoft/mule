@@ -24,7 +24,7 @@
                 <spring:entry key="Content-Type" value="application/x-download"/>
             </properties>
         </http:inbound-endpoint>
-        <set-payload value="#[message.inboundProperties['accept']]"/>
+        <set-payload value="#[mel:message.inboundProperties['accept']]"/>
     </flow>
 
 </mule>

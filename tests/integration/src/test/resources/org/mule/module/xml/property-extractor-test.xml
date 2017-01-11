@@ -15,9 +15,9 @@
     </mxml:namespace-manager>
 
     <flow name="test">
-        <!-- this property is set from the test case as something like "#[bean:childBean.value]"
-         or #[xpath:/endpoints/endpoint]
+        <!-- this property is set from the test case as something like "#[mel:bean:childBean.value]"
+         or #[mel:xpath:/endpoints/endpoint]
          -->
-        <set-payload value="#[${selector.expression}]"/>
+        <set-payload value="#[mel:${selector.expression}]"/>
     </flow>
 </mule>

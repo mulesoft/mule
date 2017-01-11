@@ -15,7 +15,7 @@
                        initialHealth="CANCER"
                        finalHealth="DEAD">
         <heisenberg:family-informations>
-            <heisenberg:personal-info dateOfBirth="1959-09-07T00:00:00" dateOfDeath="2011-09-07T00:00:00-05:00" dateOfGraduation="#['expressionNotSupported']"/>
+            <heisenberg:personal-info dateOfBirth="1959-09-07T00:00:00" dateOfDeath="2011-09-07T00:00:00-05:00" dateOfGraduation="#[mel:'expressionNotSupported']"/>
         </heisenberg:family-informations>
     </heisenberg:config>
 </mule>

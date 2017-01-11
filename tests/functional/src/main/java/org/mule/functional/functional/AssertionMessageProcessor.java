@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AssertionMessageProcessor implements Processor, FlowConstructAware, Startable {
 
-  protected String expression = "#[true]";
+  protected String expression = "#[mel:true]";
   protected String message = "?";
   private int count = 1;
   private int invocationCount = 0;

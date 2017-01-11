@@ -41,7 +41,7 @@
         
         <mule:message-filter>
             <mule:not-filter>
-                <mule:expression-filter expression="#[payload == null]"/>
+                <mule:expression-filter expression="#[mel:payload == null]"/>
             </mule:not-filter>
         </mule:message-filter>
                 

@@ -20,14 +20,14 @@
     </httpn:request-config>
 
     <flow name="cxfClient">
-        <set-variable variableName="originalPayload" value="#[message.payload]" />
+        <set-variable variableName="originalPayload" value="#[mel:message.payload]" />
         <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
                           wsdlLocation="classpath:/wsdl/hello_world.wsdl" operation="greetMe">
             <cxf:ws-security>
                 <cxf:ws-config>
                     <cxf:property key="action" value="UsernameToken"/>
                     <cxf:property key="user" value="joe"/>
-                    <cxf:property key="passwordType" value="#[originalPayload]"/>
+                    <cxf:property key="passwordType" value="#[mel:originalPayload]"/>
                     <cxf:property key="passwordCallbackClass" value="org.mule.compatibility.module.cxf.wssec.ClientPasswordCallback"/>
                 </cxf:ws-config>
             </cxf:ws-security>

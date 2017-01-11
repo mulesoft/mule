@@ -43,6 +43,6 @@
 
     <sub-flow name="respond">
         <object-to-string-transformer mimeType="text/plain"/>
-        <set-payload value="#[payload]_modified"/>
+        <set-payload value="#[mel:payload]_modified"/>
     </sub-flow>
 </mule>

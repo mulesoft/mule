@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContextTestCase {
 
-  private static final String INTEGER_EXPRESSION = "#[2+2]";
+  private static final String INTEGER_EXPRESSION = "#[mel:2+2]";
   private static final ExpressionFunction INTEGER_EXPRESSION_FUNCTION =
       new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext);
 

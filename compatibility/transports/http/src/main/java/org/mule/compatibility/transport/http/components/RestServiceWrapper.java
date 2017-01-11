@@ -132,9 +132,9 @@ public class RestServiceWrapper extends AbstractComponent {
 
     if (errorFilter == null) {
       // We'll set a default filter that checks the return code
-      errorFilter = new ExpressionFilter("#[message.inboundProperties['http.status']!=200]");
+      errorFilter = new ExpressionFilter("#[mel:message.inboundProperties['http.status']!=200]");
       ((ExpressionFilter) errorFilter).setMuleContext(muleContext);
-      logger.info("Setting default error filter to ExpressionFilter('#[message.inboundProperties['http.status']!=200]')");
+      logger.info("Setting default error filter to ExpressionFilter('#[mel:message.inboundProperties['http.status']!=200]')");
     }
   }
 

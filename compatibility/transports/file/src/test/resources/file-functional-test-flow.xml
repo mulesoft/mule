@@ -11,7 +11,7 @@
        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd">
 
     <!-- access this from test code to set destination directory -->
-    <file:connector name="sendConnector" outputAppend="true" outputPattern="#[message.outboundProperties.TARGET_FILE]"/>
+    <file:connector name="sendConnector" outputAppend="true" outputPattern="#[mel:message.outboundProperties.TARGET_FILE]"/>
 
     <!-- access this from test code to set destination directory -->
     <file:connector name="receiveConnector" fileAge="500" autoDelete="true" pollingFrequency="100"/>

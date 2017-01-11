@@ -31,7 +31,8 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
     MuleSession session = mock(MuleSession.class);
 
     IdempotentMessageFilter ir = new IdempotentMessageFilter();
-    ir.setIdExpression("#[message.inboundProperties.id]");
+    ir.setIdExpression("#[mel:message.inboundProperties.id]");
+    ir.setValueExpression("#[mel:message:id]");
     ir.setFlowConstruct(flow);
     ir.setThrowOnUnaccepted(false);
     ir.setStorePrefix("foo");

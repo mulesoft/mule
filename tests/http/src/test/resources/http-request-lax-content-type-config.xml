@@ -22,7 +22,7 @@
         <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET">
             <httpn:request-builder>
                 <httpn:headers>
-                    #[['Content-Type' : 'invalidMimeType']]
+                    #[mel:['Content-Type' : 'invalidMimeType']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -31,6 +31,6 @@
     <flow name="requesterContentTypeServer" >
         <httpn:listener config-ref="httpConf" path="requestServer"/>
 
-        <set-payload value="#[message.getAttributes().getHeaders().get('content-type')]"/>
+        <set-payload value="#[mel:message.getAttributes().getHeaders().get('content-type')]"/>
     </flow>
 </mule>

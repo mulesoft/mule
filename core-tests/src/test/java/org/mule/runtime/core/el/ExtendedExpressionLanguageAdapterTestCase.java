@@ -96,46 +96,46 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
         .build();
     expressionLanguageAdapter.registerGlobalContext(context);
 
-    assertThat(expressionLanguageAdapter.evaluate(weavify(global), testEvent(), emptyBindingContext).getValue(), is(value));
-    assertThat(expressionLanguageAdapter.evaluate(weavify("upper('hey')"), testEvent(), emptyBindingContext).getValue(),
+    assertThat(expressionLanguageAdapter.evaluate(global, testEvent(), emptyBindingContext).getValue(), is(value));
+    assertThat(expressionLanguageAdapter.evaluate("upper('hey')", testEvent(), emptyBindingContext).getValue(),
                is("HEY"));
 
-    assertThat(expressionLanguageAdapter.evaluate(global, testEvent(), context).getValue(), is(value));
+    assertThat(expressionLanguageAdapter.evaluate(melify(global), testEvent(), context).getValue(), is(value));
     expectedException.expect(ExpressionRuntimeException.class);
-    expressionLanguageAdapter.evaluate(global, testEvent(), emptyBindingContext);
+    expressionLanguageAdapter.evaluate(melify(global), testEvent(), emptyBindingContext);
   }
 
   @Test
   @Description("Verifies that the Event variable still works for MVEL but that it fails for DW.")
   public void eventCompatibilityVariables() throws MuleException {
     String expression = "_muleEvent";
-    Object mvelFlowResult = expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
+    Object mvelFlowResult = expressionLanguageAdapter.evaluate(melify(expression), testEvent(), emptyBindingContext).getValue();
     assertThat(mvelFlowResult, is(instanceOf(Event.class)));
 
     expectedException.expect(RuntimeException.class);
-    expressionLanguageAdapter.evaluate(weavify(expression), testEvent(), emptyBindingContext).getValue();
+    expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
   }
 
   @Test
   @Description("Verifies that the MuleContext variable still works for MVEL but that it fails for DW.")
   public void muleContextCompatibilityVariables() throws MuleException {
     String expression = "_muleContext";
-    Object mvelFlowResult = expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
+    Object mvelFlowResult = expressionLanguageAdapter.evaluate(melify(expression), testEvent(), emptyBindingContext).getValue();
     assertThat(mvelFlowResult, is(instanceOf(MuleContext.class)));
 
     expectedException.expect(RuntimeException.class);
-    expressionLanguageAdapter.evaluate(weavify(expression), testEvent(), emptyBindingContext).getValue();
+    expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
   }
 
   @Test
   @Description("Verifies that the Message variable still works for MVEL but that it fails for DW.")
   public void messageCompatibilityVariables() throws MuleException {
     String expression = "message";
-    Object mvelFlowResult = expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
+    Object mvelFlowResult = expressionLanguageAdapter.evaluate(melify(expression), testEvent(), emptyBindingContext).getValue();
     assertThat(mvelFlowResult, is(instanceOf(MessageContext.class)));
 
     expectedException.expect(ExpressionRuntimeException.class);
-    expressionLanguageAdapter.evaluate(weavify(expression), testEvent(), emptyBindingContext).getValue();
+    expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
   }
 
   @Test
@@ -146,11 +146,12 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
     String myFlowName = "myFlowName";
     when(mockFlowConstruct.getName()).thenReturn(myFlowName);
 
-    TypedValue mvelResult = expressionLanguageAdapter.evaluate(expression, testEvent(), mockFlowConstruct, emptyBindingContext);
+    TypedValue mvelResult =
+        expressionLanguageAdapter.evaluate(melify(expression), testEvent(), mockFlowConstruct, emptyBindingContext);
     assertThat(mvelResult.getValue(), is(myFlowName));
 
     TypedValue dwResult =
-        expressionLanguageAdapter.evaluate(weavify(expression), testEvent(), mockFlowConstruct, emptyBindingContext);
+        expressionLanguageAdapter.evaluate(expression, testEvent(), mockFlowConstruct, emptyBindingContext);
     assertThat(dwResult.getValue(), is(myFlowName));
 
   }
@@ -160,7 +161,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
   public void variablesMutation() throws Exception {
     Event event = testEvent();
     Event.Builder builder1 = builder(event);
-    TypedValue result = expressionLanguageAdapter.evaluate("flowVars.put(\'key\',\'value\')",
+    TypedValue result = expressionLanguageAdapter.evaluate(melify("flowVars.put(\'key\',\'value\')"),
                                                            event,
                                                            builder1,
                                                            mock(FlowConstruct.class),
@@ -169,7 +170,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
     assertThat(builder1.build().getVariableNames(), contains("key"));
 
     Event.Builder builder2 = builder(event);
-    TypedValue result2 = expressionLanguageAdapter.evaluate(weavify("variables.put(\'key\',\'value\')"),
+    TypedValue result2 = expressionLanguageAdapter.evaluate("variables.put(\'key\',\'value\')",
                                                             event,
                                                             builder2,
                                                             mock(FlowConstruct.class),
@@ -184,7 +185,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
     Event event = eventBuilder().message(InternalMessage.of(1)).build();
     Event.Builder builder1 = builder(event);
     String expression = "payload = 3";
-    TypedValue result = expressionLanguageAdapter.evaluate(expression,
+    TypedValue result = expressionLanguageAdapter.evaluate(melify(expression),
                                                            event,
                                                            builder1,
                                                            mock(FlowConstruct.class),
@@ -194,7 +195,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
     Event.Builder builder2 = builder(event);
 
     expectedException.expect(ExpressionRuntimeException.class);
-    expressionLanguageAdapter.evaluate(weavify(expression),
+    expressionLanguageAdapter.evaluate(expression,
                                        event,
                                        builder2,
                                        mock(FlowConstruct.class),
@@ -209,11 +210,11 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     String myPayload = "myPayload";
     String expression = "payload";
-    expressionLanguageAdapter.enrich(expression, event, builder, flowConstruct, myPayload);
+    expressionLanguageAdapter.enrich(melify(expression), event, builder, flowConstruct, myPayload);
     assertThat(builder.build().getMessage().getPayload().getValue(), is(myPayload));
 
     expectedException.expect(UnsupportedOperationException.class);
-    expressionLanguageAdapter.enrich(weavify(expression), event, builder, flowConstruct, myPayload);
+    expressionLanguageAdapter.enrich(expression, event, builder, flowConstruct, myPayload);
   }
 
   @Test
@@ -224,17 +225,17 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     TypedValue myPayload = new TypedValue("myPayload", STRING);
     String expression = "payload";
-    expressionLanguageAdapter.enrich(expression, event, builder, flowConstruct, myPayload);
+    expressionLanguageAdapter.enrich(melify(expression), event, builder, flowConstruct, myPayload);
     Event enrichedEvent = builder.build();
     assertThat(enrichedEvent.getMessage().getPayload().getValue(), is(myPayload.getValue()));
     assertThat(enrichedEvent.getMessage().getPayload().getDataType(), is(myPayload.getDataType()));
 
     expectedException.expect(UnsupportedOperationException.class);
-    expressionLanguageAdapter.enrich(weavify(expression), event, builder, flowConstruct, myPayload);
+    expressionLanguageAdapter.enrich(expression, event, builder, flowConstruct, myPayload);
   }
 
-  private String weavify(String expression) {
-    return format("dw:%s", expression);
+  private String melify(String expression) {
+    return format("mel:%s", expression);
   }
 
 }

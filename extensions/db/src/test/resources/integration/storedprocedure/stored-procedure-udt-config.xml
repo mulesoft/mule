@@ -15,7 +15,7 @@
             </db:stored-procedure>
 
             <!--Obtains the UDT -->
-            <set-payload value="#[payload['out']]"/>
+            <set-payload value="#[mel:payload['out']]"/>
         </block>
     </flow>
 </mule>

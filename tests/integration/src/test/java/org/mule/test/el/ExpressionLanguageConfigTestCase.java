@@ -67,14 +67,14 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContext() throws Exception {
-    assertEquals("123appended", el.evaluate("appendPayload()", eventBuilder().message(InternalMessage.of("123")).build(),
+    assertEquals("123appended", el.evaluate("mel:appendPayload()", eventBuilder().message(InternalMessage.of("123")).build(),
                                             getTestFlow(muleContext))
         .getValue());
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContextAndImport() throws Exception {
-    assertEquals("321", el.evaluate("reversePayload()", eventBuilder().message(InternalMessage.of("123")).build(),
+    assertEquals("321", el.evaluate("mel:reversePayload()", eventBuilder().message(InternalMessage.of("123")).build(),
                                     getTestFlow(muleContext))
         .getValue());
   }
@@ -85,7 +85,7 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
   }
 
   private Object evaluate(String expression) {
-    return el.evaluate(expression).getValue();
+    return el.evaluate("mel:" + expression).getValue();
   }
 
 }

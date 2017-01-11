@@ -189,7 +189,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
   }
 
   private String getExpression(String name) {
-    return String.format("#[%s]", name);
+    return String.format("#[mel:%s]", name);
   }
 
   private void configureRequesterExpressions() throws InitialisationException {

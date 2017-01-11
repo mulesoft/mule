@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="withCustomCorrelationId">
-        <transports:set-correlation-id correlationId="#['custom-cid']"/>
+        <transports:set-correlation-id correlationId="#[mel:'custom-cid']"/>
         <transports:outbound-endpoint ref="in" />
     </flow>
 
@@ -27,21 +27,21 @@
 
     <flow name="withCorrelationIdBridge">
         <transports:inbound-endpoint ref="in" />
-        <test:assert expression="#[message.correlationId == 'custom-cid']"/>
-        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid']"/>
+        <test:assert expression="#[mel:message.correlationId == 'custom-cid']"/>
+        <test:assert expression="#[mel:message.inboundProperties['JMScorrelationId'] == 'custom-cid']"/>
         <!-- MULE Correlation ID can be overwritten and will be propagated forward -->
         <transports:set-correlation-id correlationId="custom-cid-2"/>
         <transports:outbound-endpoint ref="out" exchange-pattern="request-response"/>
-        <test:assert expression="#[message.correlationId == 'custom-cid-2']"/>
-        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
+        <test:assert expression="#[mel:message.correlationId == 'custom-cid-2']"/>
+        <test:assert expression="#[mel:message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
     </flow>
 
     <flow name="withCorrelationIdOut">
         <transports:inbound-endpoint ref="out" />
-        <logger level="WARN" message="withCorrelationIdOut: #[message]"/>
-        <logger level="WARN" message="withCorrelationIdOut: #[message.correlationId]"/>
-        <test:assert expression="#[message.correlationId == 'custom-cid-2']"/>
-        <test:assert expression="#[message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
+        <logger level="WARN" message="withCorrelationIdOut: #[mel:message]"/>
+        <logger level="WARN" message="withCorrelationIdOut: #[mel:message.correlationId]"/>
+        <test:assert expression="#[mel:message.correlationId == 'custom-cid-2']"/>
+        <test:assert expression="#[mel:message.inboundProperties['JMScorrelationId'] == 'custom-cid-2']"/>
         <!-- Overwritten MULE Correlation ID is not used in ReplyTo message -->
         <transports:set-correlation-id correlationId="custom-cid-3"/>
     </flow>

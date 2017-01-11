@@ -9,12 +9,11 @@ package org.mule.runtime.core.el;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
-import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
@@ -50,11 +49,17 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
 
     while (executors.hasNext()) {
+      boolean useMel = false;
       try {
         this.expressionExecutor = executors.next();
       } catch (Throwable e) {
-        // TODO - MULE-10938: Fix DW dependency for FunctionalTestCase
-        logger.warn("DW Executor could not be loaded.");
+        // TODO - MULE-11413: Fix DW dependency for FunctionalTestCase
+        logger.warn("DW Executor could not be loaded. Setting MEL as default EL.");
+        useMel = true;
+      } finally {
+        if (System.getProperty(MULE_MEL_AS_DEFAULT) == null) {
+          System.setProperty(MULE_MEL_AS_DEFAULT, Boolean.toString(useMel));
+        }
       }
       break;
     }
@@ -151,10 +156,6 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     String sanitizedExpression = expression.startsWith(DEFAULT_EXPRESSION_PREFIX)
         ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
         : expression;
-    // TODO: MULE-10410 - Remove once DW is the default language.
-    if (sanitizedExpression.startsWith(DW_PREFIX)) {
-      sanitizedExpression = sanitizedExpression.substring(DW_PREFIX.length());
-    }
     return sanitizedExpression;
   }
 

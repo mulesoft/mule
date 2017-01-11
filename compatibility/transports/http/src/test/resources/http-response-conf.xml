@@ -54,14 +54,14 @@
 
      <flow name="testResponseAllExpressions" processingStrategy="synchronous">
         <http:inbound-endpoint address="http://localhost:${port1}/resources/allExpressions" exchange-pattern="request-response"/>
-        <http:response-builder status="#[message.inboundProperties.status]" contentType="#[message.inboundProperties.contentType]">
-            <http:cache-control maxAge="#[message.inboundProperties.cacheControl]"/>
+        <http:response-builder status="#[mel:message.inboundProperties.status]" contentType="#[mel:message.inboundProperties.contentType]">
+            <http:cache-control maxAge="#[mel:message.inboundProperties.cacheControl]"/>
             <http:expires value="Thu, 01 Dec 2014 16:00:00 GMT" />
             <http:location value="http://localhost:9090"/>
-            <http:set-cookie name="#[message.inboundProperties.cookie1]" value="#[message.inboundProperties.value1]" domain="#[message.inboundProperties.domain]" path="#[message.inboundProperties.path]" expiryDate="#[message.inboundProperties.expiryDate]" secure="#[message.inboundProperties.secure]"/>
-            <http:set-cookie name="#[message.inboundProperties.cookie2]" value="#[message.inboundProperties.value2]" maxAge="#[message.inboundProperties.maxAge]"/>
-            <http:header name="#[message.inboundProperties.header1]" value="#[message.inboundProperties.value1]"/>
-            <http:header name="#[message.inboundProperties.header2]" value="#[message.inboundProperties.value2]"/>
+            <http:set-cookie name="#[mel:message.inboundProperties.cookie1]" value="#[mel:message.inboundProperties.value1]" domain="#[mel:message.inboundProperties.domain]" path="#[mel:message.inboundProperties.path]" expiryDate="#[mel:message.inboundProperties.expiryDate]" secure="#[mel:message.inboundProperties.secure]"/>
+            <http:set-cookie name="#[mel:message.inboundProperties.cookie2]" value="#[mel:message.inboundProperties.value2]" maxAge="#[mel:message.inboundProperties.maxAge]"/>
+            <http:header name="#[mel:message.inboundProperties.header1]" value="#[mel:message.inboundProperties.value1]"/>
+            <http:header name="#[mel:message.inboundProperties.header2]" value="#[mel:message.inboundProperties.value2]"/>
         </http:response-builder>
         <echo-component/>
     </flow>
@@ -78,7 +78,7 @@
         <httpn:listener config-ref="httpConfig" path="/nested">
             <httpn:response-builder>
             	<httpn:headers>
-                    #[['testHeader' : 'testValue']]
+                    #[mel:['testHeader' : 'testValue']]
                	</httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -89,7 +89,7 @@
         <httpn:listener config-ref="httpConfig" path="/nestedError">
             <httpn:error-response-builder statusCode="200">
             	<httpn:headers>
-                    #[['testHeader' : 'testValue']]
+                    #[mel:['testHeader' : 'testValue']]
                 </httpn:headers>
             </httpn:error-response-builder>
         </httpn:listener>

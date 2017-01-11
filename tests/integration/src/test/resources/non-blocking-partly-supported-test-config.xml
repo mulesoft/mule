@@ -15,28 +15,28 @@
     </configuration>
 
     <flow name="wiretap">
-        <test:assert-intercepting message="before" responseSameTask="false" responseExpression="#[assertPayload()]"/>
+        <test:assert-intercepting message="before" responseSameTask="false" responseExpression="#[mel:assertPayload()]"/>
         <wire-tap>
             <processor-chain>
-                <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+                <set-variable variableName="beforeThread" value="#[mel:Thread.currentThread()]"/>
                 <test:non-blocking-processor/>
-                <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+                <test:assert count="1" expression="#[mel:Thread.currentThread()==beforeThread  and assertPayload()]"/>
             </processor-chain>
         </wire-tap>
         <test:non-blocking-processor/>
     </flow>
 
     <flow name="childDefaultFlow">
-        <test:assert-intercepting responseSameTask="false" responseExpression="#[assertPayload()]" message="1"/>
-        <expression-component>flowVars['requestThread'] = Thread.currentThread()</expression-component>
+        <test:assert-intercepting responseSameTask="false" responseExpression="#[mel:assertPayload()]" message="1"/>
+        <expression-component>mel:flowVars['requestThread'] = Thread.currentThread()</expression-component>
         <flow-ref name="childDefaultFlowChild"/>
-        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[mel:assertPayload()]"/>
         <test:non-blocking-processor/>
     </flow>
     <flow name="childDefaultFlowChild" processingStrategy="default">
-        <test:assert-intercepting responseSameTask="true" responseExpression="#[assertPayload()]" message="2"/>
+        <test:assert-intercepting responseSameTask="true" responseExpression="#[mel:assertPayload()]" message="2"/>
         <test:non-blocking-processor/>
-        <test:assert expression="#[assertPayload()]"/>
+        <test:assert expression="#[mel:assertPayload()]"/>
     </flow>
 
 </mule>

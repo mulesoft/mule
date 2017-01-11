@@ -7,7 +7,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="slowRequestHandler">
-        <expression-component>
+        <expression-component>mel:
             Thread.sleep(2000);
         </expression-component>
         <set-payload value="Slow Response" />

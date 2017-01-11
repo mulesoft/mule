@@ -154,7 +154,7 @@
     </flow>
 
     <flow name="foreach">
-        <foreach collection="#[{'one','two'}]">
+        <foreach collection="#[mel:{'one','two'}]">
             <logger/>
         </foreach>
         <logger message="Log after a scope"/>
@@ -163,10 +163,10 @@
     <flow name="enricher">
         <enricher>
             <append-string-transformer message="Hello"/>
-            <enrich target="#[message.outboundProperties.helloHeader]"/>
-            <enrich target="#[message.outboundProperties.helloHeader2]"/>
+            <enrich target="#[mel:message.outboundProperties.helloHeader]"/>
+            <enrich target="#[mel:message.outboundProperties.helloHeader2]"/>
         </enricher>
-        <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
+        <enricher target="#[mel:message.outboundProperties.echoHeader]" source="#[mel:payload]">
             <processor-chain>
                 <echo-component/>
                 <echo-component/>
@@ -194,7 +194,7 @@
     <flow name="until-successful-with-enricher">
         <until-successful objectStore-ref="objectStore">
             <processor-chain>
-                <enricher source="#[payload]" target="#[payload]">
+                <enricher source="#[mel:payload]" target="#[mel:payload]">
                     <append-string-transformer message="Hello"/>
                 </enricher>
                 <test:queue name="out-us"/>
@@ -219,14 +219,14 @@
     </flow>
 
     <flow name="idempotent-msg-filter">
-        <idempotent-message-filter idExpression="#[message:id]">
+        <idempotent-message-filter idExpression="#[mel:message:id]">
             <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
         </idempotent-message-filter>
         <logger level="INFO"/>
     </flow>
 
     <flow name="idempotent-secure-hash-msg-filter">
-        <idempotent-secure-hash-message-filter idExpression="#[message:id]">
+        <idempotent-secure-hash-message-filter idExpression="#[mel:message:id]">
             <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
         </idempotent-secure-hash-message-filter>
         <logger level="INFO"/>
@@ -250,12 +250,12 @@
     </flow>
 
     <sub-flow name="subflow-call">
-        <splitter expression="#[{'one'}]"/>
+        <splitter expression="#[mel:{'one'}]"/>
         <logger/>
     </sub-flow>
 
     <sub-flow name="subflow/call">
-        <splitter expression="#[{'one'}]"/>
+        <splitter expression="#[mel:{'one'}]"/>
         <logger/>
     </sub-flow>
 
@@ -286,7 +286,7 @@
             <on-error-continue type="REDELIVERY_EXHAUSTED">
                 <logger/>
             </on-error-continue>
-            <on-error-propagate when="#[exception.causedBy(java.io.IOException)]">
+            <on-error-propagate when="#[mel:exception.causedBy(java.io.IOException)]">
                 <echo-component/>
             </on-error-propagate>
             <on-error-continue>

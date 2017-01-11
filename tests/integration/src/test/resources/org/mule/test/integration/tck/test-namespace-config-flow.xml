@@ -23,7 +23,7 @@
 
     <flow name="testService3">
         <test:component enableMessageHistory="false"
-            appendString=" received" />
+            appendString="' received'" />
     </flow>
 
     <flow name="testService4">

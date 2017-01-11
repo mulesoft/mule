@@ -11,11 +11,11 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     </spring:beans>
 
     <flow name="withSplitterAggregatorTest">
-        <set-payload value="#[{1,2}]"/>
+        <set-payload value="#[mel:{1,2}]"/>
         <collection-splitter/>
         <until-successful maxRetries="2" objectStore-ref="objectStore" millisBetweenRetries="2000">
             <processor-chain>
-                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+                <expression-component><![CDATA[mel:throw new Exception("error");]]></expression-component>
             </processor-chain>
         </until-successful>
         <collection-aggregator/>
@@ -34,7 +34,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <flow name="simpleTest">
         <until-successful maxRetries="2" objectStore-ref="objectStore" millisBetweenRetries="2000">
             <processor-chain>
-                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+                <expression-component><![CDATA[mel:throw new Exception("error");]]></expression-component>
             </processor-chain>
         </until-successful>
         <!--wait until all events fail-->
@@ -49,11 +49,11 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     </flow>
 
     <flow name="noRetriesSplitterAggregatorTest">
-        <set-payload value="#[{1,2}]"/>
+        <set-payload value="#[mel:{1,2}]"/>
         <collection-splitter/>
         <until-successful maxRetries="0" objectStore-ref="objectStore" millisBetweenRetries="2000">
             <processor-chain>
-                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+                <expression-component><![CDATA[mel:throw new Exception("error");]]></expression-component>
             </processor-chain>
         </until-successful>
         <collection-aggregator/>
@@ -71,7 +71,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <flow name="noRetriesSimpleTest">
         <until-successful maxRetries="0" objectStore-ref="objectStore" millisBetweenRetries="2000">
             <processor-chain>
-                <expression-component><![CDATA[throw new Exception("error");]]></expression-component>
+                <expression-component><![CDATA[mel:throw new Exception("error");]]></expression-component>
             </processor-chain>
         </until-successful>
         <!--wait until all events fail-->

@@ -10,31 +10,31 @@
 
     <flow name="foo" processingStrategy="synchronous">
         <append-string-transformer message=" bar" />
-        <set-property propertyName="foo" value="#[message.inboundProperties.foo]" />
+        <set-property propertyName="foo" value="#[mel:message.inboundProperties.foo]" />
         <echo-component />
     </flow>
 
     <flow name="s1">
-        <set-property propertyName="foo2" value="#[message.inboundProperties.foo]" />
+        <set-property propertyName="foo2" value="#[mel:message.inboundProperties.foo]" />
         <flow-ref name="s2" />
-        <set-property propertyName="foo4" value="#[message.outboundProperties.foo3]" />
+        <set-property propertyName="foo4" value="#[mel:message.outboundProperties.foo3]" />
     </flow>
 
     <flow name="s2">
         <append-string-transformer message=" bar" />
-        <set-property propertyName="foo3" value="#[message.outboundProperties.foo2]" />
+        <set-property propertyName="foo3" value="#[mel:message.outboundProperties.foo2]" />
         <echo-component />
     </flow>
 
     <flow name="oneWay">
         <append-string-transformer message=" bar" />
-        <set-property propertyName="foo2" value="#[message.inboundProperties.foo]" />
+        <set-property propertyName="foo2" value="#[mel:message.inboundProperties.foo]" />
         <test:queue name="queueOut" />
     </flow>
 
     <flow name="rrToOneWay">
         <append-string-transformer message=" baz" />
-        <set-property propertyName="foo2" value="#[message.inboundProperties.foo]" />
+        <set-property propertyName="foo2" value="#[mel:message.inboundProperties.foo]" />
         <test:queue name="rrQueueOut" />
     </flow>
 </mule>

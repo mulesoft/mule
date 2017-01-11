@@ -409,7 +409,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   public void operationWithLiteralArgument() throws Exception {
     Event event = flowRunner("literalEcho").withPayload(EMPTY).run();
     assertThat(((ParameterResolver<String>) event.getMessage().getPayload().getValue()).getExpression(),
-               is(Optional.of("#[money]")));
+               is(Optional.of("#[mel:money]")));
   }
 
   @Test

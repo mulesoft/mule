@@ -17,10 +17,10 @@
         <httpn:request path="/" config-ref="reqConfig" outputType="ANY">
             <httpn:request-builder>
                 <httpn:query-params>
-                    #[['query' : 'param']]
+                    #[mel:['query' : 'param']]
                 </httpn:query-params>
                 <httpn:headers>
-                    #[['X-Custom' : 'custom-value']]
+                    #[mel:['X-Custom' : 'custom-value']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>

@@ -14,7 +14,7 @@
         <petstore:source failOnStart="true" config-ref="petstore-config">
             <reconnect count="1" frequency="0"/>
         </petstore:source>
-        <set-payload value="#[payload]"/>
+        <set-payload value="#[mel:payload]"/>
     </flow>
 
     <flow name="source-fail-on-exception" initialState="stopped">
@@ -22,7 +22,7 @@
             <redelivery-policy maxRedeliveryCount="2"/>
             <reconnect count="1" frequency="0"/>
         </petstore:source>
-        <set-payload value="#[payload]"/>
+        <set-payload value="#[mel:payload]"/>
     </flow>
 
 </mule>

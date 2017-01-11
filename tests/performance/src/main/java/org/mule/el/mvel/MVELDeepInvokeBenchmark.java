@@ -24,7 +24,7 @@ import org.openjdk.jmh.annotations.TearDown;
 
 public class MVELDeepInvokeBenchmark extends AbstractBenchmark {
 
-  final protected String mel = "payload.setFirstName('Tom');"
+  final protected String mel = "mel:payload.setFirstName('Tom');"
       + "payload.setLastName('Fennelly');"
       + "payload.contact.setAddress('Male');"
       + "payload.contact.setTelnum('4');"

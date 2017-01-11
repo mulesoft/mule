@@ -51,7 +51,7 @@
         </vm:inbound-endpoint>
         <test:component />
         <message-filter>
-            <expression-filter expression="#[message.inboundProperties['filterMessage']"/>
+            <expression-filter expression="#[mel:message.inboundProperties['filterMessage']"/>
         </message-filter>
         <error-handler>
             <on-error-continue/>

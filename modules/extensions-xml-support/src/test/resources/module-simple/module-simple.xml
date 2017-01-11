@@ -20,7 +20,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value]"/>
+            <mule:set-payload value="#[mel:param.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -30,7 +30,7 @@
             <parameter name="value" type="string" defaultValue="15"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value]"/>
+            <mule:set-payload value="#[mel:param.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -55,7 +55,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value + ' from module']"/>
+            <mule:set-payload value="#[mel:param.value + ' from module']"/>
         </body>
         <output type="string"/>
     </operation>
@@ -66,14 +66,14 @@
             <parameter name="value2" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value1 + param.value2]"/>
+            <mule:set-payload value="#[mel:param.value1 + param.value2]"/>
         </body>
         <output type="string"/>
     </operation>
 
     <operation name="set-payload-using-undefined-param">
         <body>
-            <mule:set-payload value="#[param.value1]"/>
+            <mule:set-payload value="#[mel:param.value1]"/>
         </body>
         <output type="string"/>
     </operation>

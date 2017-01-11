@@ -9,7 +9,7 @@
       http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd
       http://www.mulesoft.org/schema/mule/subtypes http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd">
 
-    <subtypes:config name="config" twoPojos="#[[]]" >
+    <subtypes:config name="config" twoPojos="#[mel:[]]" >
         <subtypes:connection>
             <subtypes:abstract-shape>
                 <subtypes:triangle-alias height="2" area="1"/>
@@ -42,7 +42,7 @@
             <subtypes:triangle-alias height="4" area="2"/>
         </subtypes:triangle>
         <subtypes:pojo-with-extension>
-            <subtypes:extensible-pojo myString="A String" numbers="#[[]]"/>
+            <subtypes:extensible-pojo myString="A String" numbers="#[mel:[]]"/>
         </subtypes:pojo-with-extension>
         <subtypes:one-pojos>
             <subtypes:pojo-for-list id="inner"/>
@@ -66,7 +66,7 @@
             <subtypes:weapon-map key="revolverChild">
                 <subtypes:revolver bullets="1"/>
             </subtypes:weapon-map>
-            <subtypes:weapon-map key="revolverMEL" value="#[new org.mule.test.subtypes.extension.Revolver()]"/>
+            <subtypes:weapon-map key="revolverMEL" value="#[mel:new org.mule.test.subtypes.extension.Revolver()]"/>
         </subtypes:weapon-maps>
     </subtypes:config>
 
@@ -76,10 +76,10 @@
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="1000000"
                        finalHealth="DEAD"
-                       labAddress="#['Pollos Hermanos']"
-                       enemies="#[[]]"
-                       monthlyIncomes="#[[]]"
-                       knownAddresses="#[[]]">
+                       labAddress="#[mel:'Pollos Hermanos']"
+                       enemies="#[mel:[]]"
+                       monthlyIncomes="#[mel:[]]"
+                       knownAddresses="#[mel:[]]">
         <heisenberg:wild-card-weapons>
             <heisenberg:ricin microgramsPerKilo="10">
                 <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
@@ -156,7 +156,7 @@
     </flow>
 
     <flow name="duplicatedOperationParameterAndTypeNames">
-        <subtypes:no-global-pojo noGlobalPojo="#[new org.mule.test.subtypes.extension.NoGlobalPojo()]"/>
+        <subtypes:no-global-pojo noGlobalPojo="#[mel:new org.mule.test.subtypes.extension.NoGlobalPojo()]"/>
     </flow>
 
     <flow name="pojoIsUsedInMapAndAlone">

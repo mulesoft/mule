@@ -35,7 +35,7 @@ import org.junit.Test;
 public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
   private static final String PLAIN_TEXT = "This is a plain text";
-  private static final String EXPRESSION = "#[testVariable]";
+  private static final String EXPRESSION = "#[mel:testVariable]";
 
   private SetPayloadTransformer setPayloadTransformer;
   private MuleContext mockMuleContext;

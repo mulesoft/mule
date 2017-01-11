@@ -13,12 +13,12 @@
 
     <!-- tests that encoded expressions are decoded, Note that you don't need to decode them -->
     <http:endpoint name="clientEndpoint2" host="localhost" port="${port1}" 
-        path="test1/?foo=#[message.outboundProperties.foo.toString()]&amp;far=#[message.outboundProperties.far.toString()]" exchange-pattern="request-response"/>
+        path="test1/?foo=#[mel:message.outboundProperties.foo.toString()]&amp;far=#[mel:message.outboundProperties.far.toString()]" exchange-pattern="request-response"/>
 
     <http:endpoint name="serverEndpoint1" host="localhost" port="${port1}" path="test1" exchange-pattern="request-response">
         <expression-transformer>
-            <return-argument expression="#[message.inboundProperties.foo]"/>
-            <return-argument expression="#[message.inboundProperties.far]"/>
+            <return-argument expression="#[mel:message.inboundProperties.foo]"/>
+            <return-argument expression="#[mel:message.inboundProperties.far]"/>
         </expression-transformer>
     </http:endpoint>
 

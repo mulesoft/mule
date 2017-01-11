@@ -55,7 +55,7 @@
             <test:component throwException="true"/>
             <error-handler>
                 <on-error-continue>
-                    <test:assert expression="#[flowVars.expectedHandler == false]"/>
+                    <test:assert expression="#[mel:flowVars.expectedHandler == false]"/>
                     <test:queue name="outTransactional1"/>
                 </on-error-continue>
             </error-handler>
@@ -97,7 +97,7 @@
         <error-handler>
             <on-error-continue>
                 <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
-                <test:assert expression="#[flowVars.expectedHandler == false]"/>
+                <test:assert expression="#[mel:flowVars.expectedHandler == false]"/>
                 <test:queue name="outStrategy1"/>
             </on-error-continue>
         </error-handler>

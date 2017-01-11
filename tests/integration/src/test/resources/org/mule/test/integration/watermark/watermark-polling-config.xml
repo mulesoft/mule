@@ -15,12 +15,12 @@
     </flow>
     
     <sub-flow name="fruits">
-    	<set-payload value="#[['Apple', 'Banana', 'Coconut']]" />
+    	<set-payload value="#[mel:['Apple', 'Banana', 'Coconut']]" />
     </sub-flow>
     
     <sub-flow name="fruitsIterator">
     	<flow-ref name="fruits" />
-    	<set-payload value="#[payload.iterator()]" />
+    	<set-payload value="#[mel:payload.iterator()]" />
     </sub-flow>
     
     <flow name="pollWithoutWatermark" initialState="stopped">
@@ -35,7 +35,7 @@
 
     <flow name="nameNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test1" default-expression="#['noKey']"/>
+            <watermark variable="test1" default-expression="#[mel:'noKey']"/>
             <flow-ref name="echo"/>
         </poll>
         <logger message="Executed With watermark"/>
@@ -43,20 +43,20 @@
 
     <flow name="changeWatermarkWihtNotDefinedWatermarkObjectStoreFlow" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test2" default-expression="#['noKey']"/>
+            <watermark variable="test2" default-expression="#[mel:'noKey']"/>
             <flow-ref name="echo"/>
         </poll>
         <set-variable variableName="test2" value="keyPresent"/>
-        <logger level="ERROR" message="Executed With watermark #[test2]"/>
+        <logger level="ERROR" message="Executed With watermark #[mel:test2]"/>
     </flow>
 
 
     <flow name="usingWatermarkFlow" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test3" default-expression="#['noKey']"/>
+            <watermark variable="test3" default-expression="#[mel:'noKey']"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#[test3]"/>
+        <set-payload value="#[mel:test3]"/>
         <set-variable variableName="test3" value="keyPresent"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
@@ -64,12 +64,12 @@
 
     <flow name="usingWatermarkFlowWithNullValue" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="testNull" default-expression="#[null]" update-expression="#['noWatermark']"/>
+            <watermark variable="testNull" default-expression="#[mel:null]" update-expression="#[mel:'noWatermark']"/>
             <flow-ref name="echo"/>
         </poll>
         <choice>
-            <when expression="#[testNull != null]">
-                <set-payload value="#[testNull]"/>
+            <when expression="#[mel:testNull != null]">
+                <set-payload value="#[mel:testNull]"/>
                 <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
             </when>
             <otherwise>
@@ -81,17 +81,17 @@
 
     <flow name="usingWatermarkFlowWithNullUpdateValue" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="testUpdateAsNull" default-expression="#['defaultValue']" update-expression="#[null]"/>
+            <watermark variable="testUpdateAsNull" default-expression="#[mel:'defaultValue']" update-expression="#[mel:null]"/>
             <flow-ref name="echo"/>
         </poll>
 
-        <set-payload value="#[testUpdateAsNull]"/>
+        <set-payload value="#[mel:testUpdateAsNull]"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
     <flow name="watermarkWithKeyAsAnExpression" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="#['test4']" default-expression="#['noKey']"/>
+            <watermark variable="#[mel:'test4']" default-expression="#[mel:'noKey']"/>
             <flow-ref name="echo"/>
         </poll>
         <set-variable variableName="test4" value="keyPresent"/>
@@ -100,10 +100,10 @@
 
     <flow name="watermarkWithUpdateExpression" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test5" default-expression="#['noKey']" update-expression="#[payload]"/>
+            <watermark variable="test5" default-expression="#[mel:'noKey']" update-expression="#[mel:payload]"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#['valueUpdated']"/>
+        <set-payload value="#[mel:'valueUpdated']"/>
         <set-variable variableName="test5" value="keyPresent"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
@@ -111,55 +111,55 @@
 
     <flow name="watermarkWithAnnotations" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test6" default-expression="#['noKey']" doc:name="watermark"/>
+            <watermark variable="test6" default-expression="#[mel:'noKey']" doc:name="watermark"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#['valueUpdated']"/>
+        <set-payload value="#[mel:'valueUpdated']"/>
     </flow>
 
     <flow name="watermarkWithAsyncProcessing" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test6" default-expression="#['noKey']"/>
+            <watermark variable="test6" default-expression="#[mel:'noKey']"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#['valueUpdated']"/>
+        <set-payload value="#[mel:'valueUpdated']"/>
         <set-variable variableName="test6" value="keyPresent"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
     <flow name="watermarkWithObjectStore" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test8" default-expression="#['noKey']" update-expression="#[payload]" object-store-ref="_defaultInMemoryObjectStore"/>
+            <watermark variable="test8" default-expression="#[mel:'noKey']" update-expression="#[mel:payload]" object-store-ref="_defaultInMemoryObjectStore"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#['valueUpdated']"/>
+        <set-payload value="#[mel:'valueUpdated']"/>
         <set-variable variableName="test8" value="keyPresent"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
     <flow name="failingFlowWithWatermark" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test6" default-expression="#['noKey']" update-expression="#[payload]"/>
+            <watermark variable="test6" default-expression="#[mel:'noKey']" update-expression="#[mel:payload]"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#['valueUpdated']"/>
-        <set-payload value="#[sing:valueU]"/>
+        <set-payload value="#[mel:'valueUpdated']"/>
+        <set-payload value="#[mel:sing:valueU]"/>
         <set-variable variableName="test6" value="keyPresent"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
     </flow>
 
     <flow name="failingFlowCachedExceptionWatermark" processingStrategy="synchronous" initialState="stopped">
         <poll frequency="1000">
-            <watermark variable="test7" default-expression="#['noKey']"/>
+            <watermark variable="test7" default-expression="#[mel:'noKey']"/>
             <flow-ref name="echo"/>
         </poll>
-        <set-payload value="#[sing:valueU]"/>
+        <set-payload value="#[mel:sing:valueU]"/>
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
         <error-handler>
             <on-error-continue>
-                <logger level="ERROR" message="FAILED"/>
+                <logger level="ERROR" message="'FAILED'"/>
                 <set-variable variableName="test7" value="catchedException"/>
-                <logger level="ERROR" message="#[test7]"/>
+                <logger level="ERROR" message="#[mel:test7]"/>
             </on-error-continue>
         </error-handler>
 
@@ -167,7 +167,7 @@
 
 	<flow name="minSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="minSelectorWithList" default-expression="#['noKey']" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+            <watermark variable="minSelectorWithList" default-expression="#[mel:'noKey']" selector="MIN" selector-expression="#[mel:payload.charAt(0)]"/>
     		<flow-ref name="fruits" />
         </poll>
         
@@ -176,7 +176,7 @@
 	
 	<flow name="maxSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="maxSelectorWithList" default-expression="#['noKey']" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+            <watermark variable="maxSelectorWithList" default-expression="#[mel:'noKey']" selector="MAX" selector-expression="#[mel:payload.charAt(0)]"/>
     		<flow-ref name="fruits" />
         </poll>
         
@@ -185,7 +185,7 @@
 	
 	<flow name="firstSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="firstSelectorWithList" default-expression="#['noKey']" selector="FIRST" />
+            <watermark variable="firstSelectorWithList" default-expression="#[mel:'noKey']" selector="FIRST" />
     		<flow-ref name="fruits" />
         </poll>
         
@@ -194,7 +194,7 @@
 	
 	<flow name="lastSelectorWithList" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="lastSelectorWithList" default-expression="#['noKey']" selector="LAST" />
+            <watermark variable="lastSelectorWithList" default-expression="#[mel:'noKey']" selector="LAST" />
     		<flow-ref name="fruits" />
         </poll>
         
@@ -203,7 +203,7 @@
 	
 	<flow name="minSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="minSelectorWithIterator" default-expression="#['noKey']" selector="MIN" selector-expression="#[payload.charAt(0)]"/>
+            <watermark variable="minSelectorWithIterator" default-expression="#[mel:'noKey']" selector="MIN" selector-expression="#[mel:payload.charAt(0)]"/>
     		<flow-ref name="fruitsIterator" />
         </poll>
         
@@ -212,7 +212,7 @@
 	
 	<flow name="maxSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="maxSelectorWithIterator" default-expression="#['noKey']" selector="MAX" selector-expression="#[payload.charAt(0)]"/>
+            <watermark variable="maxSelectorWithIterator" default-expression="#[mel:'noKey']" selector="MAX" selector-expression="#[mel:payload.charAt(0)]"/>
     		<flow-ref name="fruitsIterator" />
         </poll>
         
@@ -221,7 +221,7 @@
 	
 	<flow name="firstSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="firstSelectorWithIterator" default-expression="#['noKey']" selector="FIRST" />
+            <watermark variable="firstSelectorWithIterator" default-expression="#[mel:'noKey']" selector="FIRST" />
     		<flow-ref name="fruitsIterator" />
         </poll>
         
@@ -230,7 +230,7 @@
 	
 	<flow name="lastSelectorWithIterator" processingStrategy="synchronous" initialState="stopped">
 		<poll frequency="1000">
-            <watermark variable="lastSelectorWithIterator" default-expression="#['noKey']" selector="LAST" />
+            <watermark variable="lastSelectorWithIterator" default-expression="#[mel:'noKey']" selector="LAST" />
     		<flow-ref name="fruitsIterator" />
         </poll>
         
@@ -239,7 +239,7 @@
 	
 	<sub-flow name="consume">
 		<foreach>
-			<logger message="selecting from #[payload]" />
+			<logger message="selecting from #[mel:payload]" />
 		</foreach>
 	</sub-flow>
 

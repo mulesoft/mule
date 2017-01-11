@@ -6,12 +6,12 @@
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <flow name="subscriber">
-        <jmsn:listener config-ref="config" destination="#[dw:destination]"/>
+        <jmsn:listener config-ref="config" destination="#[destination]"/>
         <flow-ref name="onIncomingConnection"/>
     </flow>
 
     <sub-flow name="onIncomingConnection">
-        <expression-component>
+        <expression-component>mel:
             new org.mule.extensions.jms.test.JmsAbstractTestCase$OnIncomingConnection().onCall(message)
         </expression-component>
     </sub-flow>

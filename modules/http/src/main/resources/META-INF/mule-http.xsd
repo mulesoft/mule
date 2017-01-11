@@ -353,11 +353,11 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="target" type="xsd:string" default="#[payload]">
+                <xsd:attribute name="target" type="xsd:string" default="#[mel:payload]">
                     <xsd:annotation>
                         <xsd:documentation>
                             The enricher expression used to enrich the current message with the body
-                            of the response. Default is "#[payload]", so after processing the response, the contents
+                            of the response. Default is "#[mel:payload]", so after processing the response, the contents
                             of its body will be set as payload of the message.
                         </xsd:documentation>
                     </xsd:annotation>

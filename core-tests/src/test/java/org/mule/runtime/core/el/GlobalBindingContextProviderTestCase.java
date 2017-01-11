@@ -7,18 +7,16 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
-
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -62,23 +59,16 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
 
   @Test
   public void variable() {
-    TypedValue result = muleContext.getExpressionManager().evaluate("dw:number");
+    TypedValue result = muleContext.getExpressionManager().evaluate("number");
     assertThat(result.getValue(), is(1));
     assertThat(NUMBER.isCompatibleWith(result.getDataType()), is(true));
   }
 
   @Test
   public void function() {
-    // For now, only verify we are passing the function along correctly and it's working as expected
-    GlobalBindingContextProvider provider = muleContext.getRegistry().lookupObject(KEY);
-    Optional<TypedValue> binding = provider.getBindingContext().lookup("repeat");
-    assertThat(binding.isPresent(), is(true));
-
-    assertThat(binding.get().getDataType(), instanceOf(FunctionDataType.class));
-
-    assertThat(binding.get().getValue(), instanceOf(ExpressionFunction.class));
-    assertThat(((ExpressionFunction) binding.get().getValue()).call(new Object[] {"oa", 2}, builder().build()),
-               is("oaoa"));
+    TypedValue result = muleContext.getExpressionManager().evaluate("repeat('oa', 3)");
+    assertThat(result.getValue(), is("oaoaoa"));
+    assertThat(result.getDataType(), is(STRING));
   }
 
   private class TestGlobalBindingContextProvider implements GlobalBindingContextProvider {
@@ -98,7 +88,7 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
     @Override
     public Object call(Object[] objects, BindingContext bindingContext) {
       StringBuilder builder = new StringBuilder();
-      for (int i = 0; i < (int) objects[1]; i++) {
+      for (int i = 0; i < (Integer) objects[1]; i++) {
         builder.append((String) objects[0]);
       }
       return builder.toString();
@@ -113,7 +103,7 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
     public List<FunctionParameter> parameters() {
       List<FunctionParameter> parameters = new ArrayList<>();
       parameters.add(new FunctionParameter("word", STRING));
-      parameters.add(new FunctionParameter("times", NUMBER, ctx -> 1));
+      parameters.add(new FunctionParameter("times", fromType(Integer.class), ctx -> 1));
       return parameters;
     }
 

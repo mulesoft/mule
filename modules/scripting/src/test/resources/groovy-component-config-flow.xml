@@ -17,7 +17,7 @@
                 'bar-mutated').build()
             </script:script>
         </script:component>
-        <test:assert expression="#[message.outboundProperties.foo == 'bar-mutated']"/>
+        <test:assert expression="#[mel:message.outboundProperties.foo == 'bar-mutated']"/>
     </flow>
 
     <flow name="inlineScriptAddProperty">
@@ -27,7 +27,7 @@
                 'bar').build()
             </script:script>
         </script:component>
-        <test:assert expression="#[message.outboundProperties.foo == 'bar']"/>
+        <test:assert expression="#[mel:message.outboundProperties.foo == 'bar']"/>
     </flow>
 
     <flow name="inlineScriptMutatePropertiesMap">
@@ -36,8 +36,8 @@
                 outbound = new HashMap()              
              </script:script>
         </script:component>
-        <test:assert expression="#[message.outboundProperties.foo == 'bar']"/>
-        <test:assert expression="#[payload instanceof HashMap]"/>
+        <test:assert expression="#[mel:message.outboundProperties.foo == 'bar']"/>
+        <test:assert expression="#[mel:payload instanceof HashMap]"/>
     </flow>
 
     <flow name="inlineScriptMutateVariable">
@@ -46,7 +46,7 @@
                 flowVars['foo'] = 'bar-mutated'
              </script:script>
         </script:component>
-        <test:assert expression="#[flowVars.foo == 'bar-mutated']"/>
+        <test:assert expression="#[mel:flowVars.foo == 'bar-mutated']"/>
     </flow>
     
     <flow name="inlineScriptAddVariable">
@@ -55,7 +55,7 @@
                 flowVars['foo'] = 'bar'
              </script:script>
         </script:component>
-        <test:assert expression="#[flowVars.foo == 'bar']"/>
+        <test:assert expression="#[mel:flowVars.foo == 'bar']"/>
     </flow>
 
     <flow name="inlineScriptMutateVariablesMap">
@@ -64,8 +64,8 @@
                 flowVars = new HashMap()              
              </script:script>
         </script:component>
-        <test:assert expression="#[flowVars.foo == 'bar']"/>
-        <test:assert expression="#[payload is HashMap]"/>
+        <test:assert expression="#[mel:flowVars.foo == 'bar']"/>
+        <test:assert expression="#[mel:payload is HashMap]"/>
     </flow>
 
     <flow name="inlineScriptMutatePayload">
@@ -74,20 +74,20 @@
                 payload = 'bar-mutated'               
              </script:script>
         </script:component>
-        <test:assert expression="#[payload == 'bar-mutated']"/>
+        <test:assert expression="#[mel:payload == 'bar-mutated']"/>
     </flow>
     
     <flow name="scriptExpressionVariables">
         <script:component>
             <script:script engine="groovy">
-                <property key="expr1" value="#[flowVars.prop1]"/>
-                <property key="expr2" value="#[flowVars.prop2]"/>
+                <property key="expr1" value="#[mel:flowVars.prop1]"/>
+                <property key="expr2" value="#[mel:flowVars.prop2]"/>
                 <script:text>
                         payload = expr1 + expr2
                     </script:text>
             </script:script>
         </script:component>
-        <test:assert expression="#[payload == 'ReceivedA-OK']"/>
+        <test:assert expression="#[mel:payload == 'ReceivedA-OK']"/>
     </flow>
     
 </mule>

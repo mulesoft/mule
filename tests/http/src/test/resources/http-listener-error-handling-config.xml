@@ -21,15 +21,15 @@
         <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseParameters">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[dw:{ Content-Type: contentType}]
+                    #[{ Content-Type: contentType}]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-continue type="EXPRESSION">
                 <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#[dw:'Exception Handled']"/>
+                <set-payload value="#['Exception Handled']"/>
             </on-error-continue>
             <on-error-continue>
                 <set-payload value="Error."/>
@@ -39,11 +39,11 @@
 
     <flow name="exceptionBuildingResponse">
         <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-continue type="ANY">
                 <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#[dw:'Exception Handled']"/>
+                <set-payload value="#['Exception Handled']"/>
             </on-error-continue>
         </error-handler>
     </flow>

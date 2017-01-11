@@ -20,7 +20,7 @@
             <add-message-property key="queueName" value="step2"/>
         </message-properties-transformer>
         <request-reply timeout="5000">
-            <jms:outbound-endpoint path="#[header:OUTBOUND:queueName]" exchange-pattern="one-way"/>
+            <jms:outbound-endpoint path="#[mel:header:OUTBOUND:queueName]" exchange-pattern="one-way"/>
             <vm:inbound-endpoint path="reply" exchange-pattern="one-way"/>
         </requesr-reply>
     </flow>

@@ -29,7 +29,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> implements MuleContextAware, AnnotatedObject {
 
   public static final String MULE_WATERMARK_PARTITION = "mule.watermark";
-  private static final String DEFAULT_SELECTOR_EXPRESSION = "#[payload]";
+  private static final String DEFAULT_SELECTOR_EXPRESSION = "#[mel:payload]";
 
   private String variable;
   private String defaultExpression;

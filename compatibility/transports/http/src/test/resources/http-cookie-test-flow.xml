@@ -16,7 +16,7 @@
         <vm:inbound-endpoint path="vm-in"
             exchange-pattern="one-way" />
 
-        <http:outbound-endpoint address="http://localhost:${port1}/#[message.inboundProperties.PATH]"
+        <http:outbound-endpoint address="http://localhost:${port1}/#[mel:message.inboundProperties.PATH]"
             method="POST" exchange-pattern="one-way" />
 
     </flow>

@@ -17,7 +17,7 @@
         <object-to-string-transformer/>
         <test:component logMessageDetails="true"/>
         <!-- TODO MULE-9857 Make message properties case sensitive -->
-        <set-property propertyName="X-Custom-Header" value="#[message.attributes.headers['x-custom-header']]"/>
+        <set-property propertyName="X-Custom-Header" value="#[mel:message.attributes.headers['x-custom-header']]"/>
         <test:queue name="out"/>
     </flow>
 
