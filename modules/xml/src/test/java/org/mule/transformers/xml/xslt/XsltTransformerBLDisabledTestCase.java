@@ -6,22 +6,28 @@
  */
 package org.mule.transformers.xml.xslt;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import org.mule.api.transformer.TransformerMessagingException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class XsltTransformerBLDisabledTestCase extends XsltTransformerBLTestCase
 {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void disabled() throws Exception
     {
         String input = makeInput();
         Object payload = input.getBytes();
+
+        exception.expect(TransformerMessagingException.class);
+        exception.expectMessage("Undeclared general entity");
+
         String output = (String) runFlow("flow", payload).getMessage().getPayload();
-        assertThat(output, not(containsString("010101010101010101010101010101010101010101010101")));
     }
 
 }
