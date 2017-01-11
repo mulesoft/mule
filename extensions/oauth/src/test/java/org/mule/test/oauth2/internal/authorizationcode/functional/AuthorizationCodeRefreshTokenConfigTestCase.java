@@ -8,10 +8,11 @@ package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,9 +28,18 @@ public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthori
     return "authorization-code/authorization-code-refresh-token-config.xml";
   }
 
+  @Before
+  public void before() {
+    try {
+      flowRunner("testFlow").runNoVerify();
+    } catch (Exception e) {
+      // Ignore
+    }
+  }
+
   @Test
   public void afterFailureDoRefreshTokenWithDefaultValueNoResourceOwnerId() throws Exception {
-    executeRefreshToken("testFlow", SINGLE_TENANT_OAUTH_CONFIG, ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403);
+    executeRefreshToken("testFlow", SINGLE_TENANT_OAUTH_CONFIG, DEFAULT_RESOURCE_OWNER_ID, 403);
   }
 
   /**
@@ -42,7 +52,11 @@ public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthori
   public void afterFailureWithRefreshTokenNotIssuedThrowAuthenticationException() throws Exception {
     expectedException.expectCause(is(instanceOf(ResponseValidatorException.class)));
     executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers("testFlow", SINGLE_TENANT_OAUTH_CONFIG,
-                                                                        ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403,
-                                                                        400);
+                                                                        DEFAULT_RESOURCE_OWNER_ID, 403, 400);
+  }
+
+  @Override
+  public int getTestTimeoutSecs() {
+    return 100 * super.getTestTimeoutSecs();
   }
 }
