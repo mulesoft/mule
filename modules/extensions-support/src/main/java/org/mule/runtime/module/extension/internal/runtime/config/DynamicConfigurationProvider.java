@@ -11,6 +11,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -155,13 +156,19 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     try {
       withContextClassLoader(getExtensionClassLoader(), () -> {
         if (lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME)) {
-          initialiseIfNeeded(configuration, true, muleContext);
+          try {
+            initialiseIfNeeded(configuration, true, muleContext);
+          } catch (Exception e) {
+            disposeIfNeeded(configuration, LOGGER);
+            throw e;
+          }
         }
 
         if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME)) {
           try {
             startConfig(configuration);
           } catch (Exception e) {
+            stopIfNeeded(configuration);
             disposeIfNeeded(configuration, LOGGER);
             throw e;
           }

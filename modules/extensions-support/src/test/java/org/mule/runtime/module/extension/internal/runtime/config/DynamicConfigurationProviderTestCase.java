@@ -18,6 +18,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,10 +29,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -172,20 +171,27 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @Test
   public void configFailsOnInitialize() throws Exception {
-    final Initialisable connProvider = mock(Initialisable.class, withSettings().extraInterfaces(ConnectionProvider.class));
-    doThrow(new RuntimeException("Init failed!")).when(connProvider).initialise();
+    final Lifecycle connProvider = mock(Lifecycle.class, withSettings().extraInterfaces(ConnectionProvider.class));
+    final String expectedExceptionMessage = "Init failed!";
+    doThrow(new RuntimeException(expectedExceptionMessage)).when(connProvider).initialise();
 
     when(connectionProviderResolver.resolve(any())).thenReturn((ConnectionProvider) connProvider);
 
-    expected.expectCause(hasMessage(is(InitialisationException.class.getName() + ": Init failed!")));
+    expected.expectCause(hasMessage(is(InitialisationException.class.getName() + ": " + expectedExceptionMessage)));
 
-    provider.get(event);
+    try {
+      provider.get(event);
+    } finally {
+      verify(connProvider).initialise();
+      verify(connProvider, never()).start();
+      verify(connProvider, never()).stop();
+      verify(connProvider).dispose();
+    }
   }
 
   @Test
   public void configFailsOnStart() throws Exception {
-    final Startable connProvider =
-        mock(Startable.class, withSettings().extraInterfaces(Initialisable.class, Disposable.class, ConnectionProvider.class));
+    final Lifecycle connProvider = mock(Lifecycle.class, withSettings().extraInterfaces(ConnectionProvider.class));
     final RuntimeException toThrow = new RuntimeException("Start failed!");
     doThrow(toThrow).when(connProvider).start();
 
@@ -196,8 +202,10 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     try {
       provider.get(event);
     } finally {
-      verify((Initialisable) connProvider).initialise();
-      verify((Disposable) connProvider).dispose();
+      verify(connProvider).initialise();
+      verify(connProvider).start();
+      verify(connProvider).stop();
+      verify(connProvider).dispose();
     }
   }
 }
