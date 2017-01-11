@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
+import org.mule.extension.oauth2.internal.OAuthCallbackServersManager;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -39,7 +40,6 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
-import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
@@ -122,7 +122,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @ParameterGroup(name = "token-request")
   private AutoAuthorizationCodeTokenRequestHandler tokenRequestHandler;
 
-  private HttpService httpService;
+  private OAuthCallbackServersManager serversManager;
   private SchedulerService schedulerService;
 
   /**
@@ -190,7 +190,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @Override
   public void initialise() throws InitialisationException {
     try {
-      this.httpService = muleContext.getRegistry().lookupObject(HttpService.class);
+      this.serversManager = muleContext.getRegistry().lookupObject(OAuthCallbackServersManager.class);
       this.schedulerService = muleContext.getSchedulerService();
 
       if (tokenManager == null) {
@@ -248,8 +248,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         serverConfigBuilder.setSchedulerSupplier(() -> schedulerService.ioScheduler()).build();
 
     try {
-      server = httpService.getServerFactory().create(serverConfiguration);
-    } catch (ConnectionException e) {
+      server = serversManager.getServer(serverConfiguration);
+    } catch (ConnectionException | IOException e) {
       logger.warn("Could not create server for OAuth callback.");
       throw new InitialisationException(e, this);
     }
@@ -261,8 +261,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     final String accessToken =
         getUserOAuthContext().getContextForResourceOwner(resourceOwnerId.resolve()).getAccessToken();
     if (accessToken == null) {
-      throw new RequestAuthenticationException(createStaticMessage(format("No access token for the %s user. Verify that you have authenticated the user before trying to execute an operation to the API.",
-                                                                          resourceOwnerId)));
+      throw new RequestAuthenticationException(createStaticMessage(format("No access token for the '%s' user. Verify that you have authenticated the user before trying to execute an operation to the API.",
+                                                                          resourceOwnerId.resolve())));
     }
     builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
   }
