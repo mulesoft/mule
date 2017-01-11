@@ -16,6 +16,8 @@
         <foreach collection="#[payload]">
             <set-variable variableName="current" value="#[payload]"/>
             <set-session-variable variableName="current" value="#[payload]"/>
+            <set-variable variableName="mimeVariable" value="{'var': 'value'}" mimeType="application/json"/>
+            <set-session-variable  variableName="mimeSessionVariable" value="{'var': 'value'}" mimeType="application/json"/>
             <until-successful synchronous="true">
                 <processor-chain>
                     <set-payload value="#[payload]"/>
