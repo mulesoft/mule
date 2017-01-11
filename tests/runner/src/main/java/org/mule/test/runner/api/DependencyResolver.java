@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.api;
 
+import static com.google.common.base.Joiner.on;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
@@ -139,6 +140,7 @@ public class DependencyResolver {
     DependencyNode node;
     try {
       node = system.collectDependencies(session, collectRequest).getRoot();
+      logDependencyGraph(node, collectRequest);
       DependencyRequest dependencyRequest = new DependencyRequest();
       dependencyRequest.setRoot(node);
       dependencyRequest.setCollectRequest(collectRequest);
@@ -156,6 +158,20 @@ public class DependencyResolver {
 
     List<File> files = getFiles(node);
     return files;
+  }
+
+  private void logDependencyGraph(DependencyNode node, Object request) {
+    if (logger.isTraceEnabled()) {
+      PathRecordingDependencyVisitor visitor = new PathRecordingDependencyVisitor(null, false);
+      node.accept(visitor);
+
+      logger.trace("******* Dependency Graph calculated for {} with request: '{}' *******", request.getClass().getSimpleName(),
+                   request);
+      visitor.getPaths().stream().forEach(
+                                          pathList -> logger.trace(on(" -> ")
+                                              .join(pathList.stream().filter(path -> path != null).collect(toList()))));
+      logger.trace("******* End of dependency Graph *******");
+    }
   }
 
   /**

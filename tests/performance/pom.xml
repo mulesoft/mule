@@ -53,6 +53,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file-extension-common</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -90,12 +91,14 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ftp</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
