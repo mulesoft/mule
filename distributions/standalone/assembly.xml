@@ -147,7 +147,6 @@
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
                 <include>org.mule.modules:mule-module-extensions-xml-support</include>
                 <include>org.mule.modules:mule-module-http</include>
-                <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
                 <include>org.mule.modules:mule-module-json</include>
                 <include>org.mule.modules:mule-module-management</include>
@@ -225,7 +224,6 @@
                 <exclude>org.mule.modules:mule-module-email</exclude>
                 <exclude>org.mule.modules:mule-module-wsc</exclude>
                 <!--<exclude>org.mule.modules:mule-module-jms</exclude>-->
-                <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
                 <exclude>org.mule.modules:mule-module-json</exclude>
                 <exclude>org.mule.modules:mule-module-container</exclude>

@@ -108,7 +108,6 @@ public class ApplicationModel {
   // TODO MULE-9638 Remove once all bean definitions parsers where migrated
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
-  public static final String JAAS_NAMESPACE = "jaas";
   public static final String SPRING_SECURITY_NAMESPACE = "ss";
   public static final String MULE_SECURITY_NAMESPACE = "mule-ss";
   public static final String MULE_XML_NAMESPACE = "mulexml";
@@ -209,8 +208,6 @@ public class ApplicationModel {
           .add(new ComponentIdentifier.Builder().withNamespace(MULE_ROOT_ELEMENT).withName("security-manager").build())
           .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("queue").build())
           .add(new ComponentIdentifier.Builder().withNamespace(TEST_NAMESPACE).withName("invocation-counter").build())
-          .add(new ComponentIdentifier.Builder().withNamespace(JAAS_NAMESPACE).withName("password-encryption-strategy").build())
-          .add(new ComponentIdentifier.Builder().withNamespace(JAAS_NAMESPACE).withName("security-provider").build())
           .add(new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName("property").build())
           .add(new ComponentIdentifier.Builder().withNamespace(SPRING_NAMESPACE).withName("bean").build())
           .add(new ComponentIdentifier.Builder().withNamespace(SPRING_SECURITY_NAMESPACE).withName("user").build())
