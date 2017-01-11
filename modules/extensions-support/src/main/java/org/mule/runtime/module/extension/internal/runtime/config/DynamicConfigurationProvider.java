@@ -8,17 +8,20 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -36,6 +39,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.slf4j.Logger;
+
 /**
  * A {@link ConfigurationProvider} which continuously evaluates the same {@link ResolverSet} and then uses the resulting
  * {@link ResolverSetResult} to build an instance of type {@code T}
@@ -49,6 +54,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public final class DynamicConfigurationProvider extends LifecycleAwareConfigurationProvider
     implements ExpirableConfigurationProvider {
+
+  private static final Logger LOGGER = getLogger(DynamicConfigurationProvider.class);
 
   private final ConfigurationInstanceFactory configurationInstanceFactory;
   private final ResolverSet resolverSet;
@@ -152,7 +159,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
         }
 
         if (lifecycleManager.isPhaseComplete(Startable.PHASE_NAME)) {
-          startConfig(configuration);
+          try {
+            startConfig(configuration);
+          } catch (Exception e) {
+            disposeIfNeeded(configuration, LOGGER);
+            throw e;
+          }
         }
 
         return null;
