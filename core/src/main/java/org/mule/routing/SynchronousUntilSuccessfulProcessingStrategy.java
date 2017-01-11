@@ -53,7 +53,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     {
                         for (String flowVar : successEvent.getFlowVariableNames())
                         {
-                            event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
+                            event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar), event.getFlowVariableDataType(flowVar));
                         }
                         event.getSession().merge(successEvent.getSession());
                         finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);

@@ -7,8 +7,10 @@
 package org.mule.test.routing;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
@@ -35,7 +37,8 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase
     public void variablesSyncArePropagated() throws Exception
     {
         MuleEvent event = runAndAssert("varSync");
-        assertThat((Integer) event.getFlowVariable("until"), is(3));
+        assertThat(event.getFlowVariableDataType("mimeVariable").getMimeType(), is(APPLICATION_JSON.toString()));
+        assertThat(event.getSessionVariableDataType("mimeSessionVariable").getMimeType(), is(APPLICATION_JSON.toString()));
         assertThat((Integer) event.getSessionVariable("until"), is(3));
     }
 
