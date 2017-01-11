@@ -139,8 +139,9 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     scheduler.shutdownNow();
   }
 
+  @Override
   public List<Scheduler> getSchedulers() {
-    return unmodifiableList(decorators);
+    return unmodifiableList(new ArrayList<>(decorators));
   }
 
   public void clearCreatedSchedulers() {

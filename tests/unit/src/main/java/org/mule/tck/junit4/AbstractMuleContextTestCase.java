@@ -18,11 +18,12 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingFo
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -45,7 +47,6 @@ import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -293,11 +294,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
         muleContext.dispose();
 
-        final SchedulerService serviceImpl = muleContext.getSchedulerService();
-        assertThat(serviceImpl.getSchedulers(), empty());
-        if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
-          stopIfNeeded(serviceImpl);
-        }
+        verifyAndStopSchedulers();
 
         MuleConfiguration configuration = muleContext.getConfiguration();
 
@@ -313,6 +310,22 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       muleContext = null;
       clearLoggingConfig();
     }
+  }
+
+  protected static void verifyAndStopSchedulers() throws MuleException {
+    final SchedulerService serviceImpl = muleContext.getSchedulerService();
+    final List<Scheduler> schedulers = serviceImpl.getSchedulers();
+
+    try {
+      assertThat(schedulers, empty());
+    } finally {
+      schedulers.forEach(sched -> sched.shutdownNow());
+
+      if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
+        stopIfNeeded(serviceImpl);
+      }
+    }
+
   }
 
   /**
