@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.el.v2;
+package org.mule.runtime.core.el;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.ServiceLoader.load;
@@ -67,7 +67,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
    *
    * @param bindingContext the context to register
    */
-  public void registerGlobalContext(BindingContext bindingContext) {
+  public synchronized void registerGlobalContext(BindingContext bindingContext) {
     expressionExecutor.addGlobalBindings(bindingContext);
   }
 

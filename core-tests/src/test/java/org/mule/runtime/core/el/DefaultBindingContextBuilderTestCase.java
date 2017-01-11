@@ -16,7 +16,6 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.el.v2.DefaultBindingContextBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

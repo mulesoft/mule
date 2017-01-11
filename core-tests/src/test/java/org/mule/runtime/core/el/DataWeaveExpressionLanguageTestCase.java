@@ -21,11 +21,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.ATTRIBUTES;
-import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.ERROR;
-import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.FLOW;
-import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.PAYLOAD;
-import static org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage.VARIABLES;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ATTRIBUTES;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ERROR;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.FLOW;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.PAYLOAD;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.VARIABLES;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -37,7 +37,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

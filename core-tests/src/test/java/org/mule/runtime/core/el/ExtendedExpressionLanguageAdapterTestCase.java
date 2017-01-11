@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.el.v2.DataWeaveExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;

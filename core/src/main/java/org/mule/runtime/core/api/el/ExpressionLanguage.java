@@ -22,7 +22,9 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 public interface ExpressionLanguage {
 
   /**
-   * Registers the given {@link BindingContext} as global.
+   * Registers the given {@link BindingContext} entries as globals. Notice globals cannot be removed once registered, only
+   * overwritten by the registration of a binding with the same identifier.
+   * Implementations should be thread safe to avoid race conditions between registration and expression evaluation.
    *
    * @param bindingContext the context to register
    */
