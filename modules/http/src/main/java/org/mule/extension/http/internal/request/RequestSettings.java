@@ -9,13 +9,10 @@ package org.mule.extension.http.internal.request;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-
-import java.util.function.Function;
 
 /**
  * Groups parameters which configure how a request is done
@@ -30,7 +27,7 @@ public final class RequestSettings {
   @Parameter
   @Optional(defaultValue = "true")
   @Placement(tab = ADVANCED_TAB, order = 1)
-  private Function<Event, Boolean> followRedirects;
+  private Boolean followRedirects;
 
   /**
    * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
@@ -39,7 +36,7 @@ public final class RequestSettings {
   @Parameter
   @Optional(defaultValue = "AUTO")
   @Placement(tab = ADVANCED_TAB, order = 2)
-  private Function<Event, HttpSendBodyMode> sendBodyMode;
+  private HttpSendBodyMode sendBodyMode;
 
   /**
    * Defines if the request should be sent using streaming or not. If this attribute is not present, the behavior will depend on
@@ -51,17 +48,17 @@ public final class RequestSettings {
   @Placement(tab = ADVANCED_TAB, order = 3)
   @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, "
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
-  private Function<Event, HttpStreamingType> requestStreamingMode;
+  private HttpStreamingType requestStreamingMode;
 
-  public Function<Event, Boolean> getFollowRedirects() {
+  public Boolean getFollowRedirects() {
     return followRedirects;
   }
 
-  public Function<Event, HttpSendBodyMode> getSendBodyMode() {
+  public HttpSendBodyMode getSendBodyMode() {
     return sendBodyMode;
   }
 
-  public Function<Event, HttpStreamingType> getRequestStreamingMode() {
+  public HttpStreamingType getRequestStreamingMode() {
     return requestStreamingMode;
   }
 }

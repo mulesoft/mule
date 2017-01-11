@@ -41,8 +41,6 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
 
-import java.util.function.Function;
-
 import javax.inject.Inject;
 
 public class HttpRequestOperations implements Initialisable, Disposable {
@@ -87,19 +85,19 @@ public class HttpRequestOperations implements Initialisable, Disposable {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
       UriParameters uriParameters = client.getDefaultUriParameters();
 
-      String resolvedHost = resolveIfNecessary(overrides.getHost(), uriParameters.getHost(), muleEvent);
-      Integer resolvedPort = resolveIfNecessary(overrides.getPort(), uriParameters.getPort(), muleEvent);
-      String resolvedBasePath = config.getBasePath().apply(muleEvent);
+      String resolvedHost = resolveIfNecessary(overrides.getHost(), uriParameters.getHost());
+      Integer resolvedPort = resolveIfNecessary(overrides.getPort(), uriParameters.getPort());
+      String resolvedBasePath = config.getBasePath();
       String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, path));
 
       String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
       Boolean resolvedFollowRedirects =
-          resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects(), muleEvent);
+          resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects());
       HttpStreamingType resolvedStreamingMode =
-          resolveIfNecessary(overrides.getRequestStreamingMode(), config.getRequestStreamingMode(), muleEvent);
-      HttpSendBodyMode resolvedSendBody = resolveIfNecessary(overrides.getSendBodyMode(), config.getSendBodyMode(), muleEvent);
-      Boolean resolvedParseResponse = resolveIfNecessary(overrides.getParseResponse(), config.getParseResponse(), muleEvent);
-      Integer resolvedTimeout = resolveResponseTimeout(muleEvent, config, overrides.getResponseTimeout());
+          resolveIfNecessary(overrides.getRequestStreamingMode(), config.getRequestStreamingMode());
+      HttpSendBodyMode resolvedSendBody = resolveIfNecessary(overrides.getSendBodyMode(), config.getSendBodyMode());
+      Boolean resolvedParseResponse = resolveIfNecessary(overrides.getParseResponse(), config.getParseResponse());
+      Integer resolvedTimeout = resolveResponseTimeout(config, overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : new SuccessStatusCodeValidator("0..399");
 
@@ -120,8 +118,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  private <T> T resolveIfNecessary(T value, Function<Event, T> function, Event event) {
-    return value != null ? value : function.apply(event);
+  private <T> T resolveIfNecessary(T value, T configValue) {
+    return value != null ? value : configValue;
   }
 
   private String resolveUri(HttpConstants.Protocols scheme, String host, Integer port, String path) {
@@ -131,9 +129,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     return String.format("%s://%s:%s%s", scheme.getScheme(), host, port, resolvedPath);
   }
 
-  private int resolveResponseTimeout(Event muleEvent, HttpRequesterConfig config, Integer responseTimeout) {
+  private int resolveResponseTimeout(HttpRequesterConfig config, Integer responseTimeout) {
     if (responseTimeout == null && config.getResponseTimeout() != null) {
-      responseTimeout = config.getResponseTimeout().apply(muleEvent);
+      responseTimeout = config.getResponseTimeout();
     }
 
     if (muleContext.getConfiguration().isDisableTimeouts()) {

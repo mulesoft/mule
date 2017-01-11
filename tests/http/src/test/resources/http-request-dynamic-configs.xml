@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="dynamicConfig1" basePath="#[basePath]" followRedirects="#[follow]" sendBodyMode="#[send]">
+        <httpn:request-connection host="#[host]" port="${httpPort}"/>
+    </httpn:request-config>
+    <httpn:request-config name="dynamicConfig2" parseResponse="#[parse]" requestStreamingMode="#[stream]" responseTimeout="#[timeout]">
+        <httpn:request-connection host="localhost" port="#[port]"/>
+    </httpn:request-config>
+
+    <flow name="client1">
+        <httpn:request config-ref="dynamicConfig1" path="#[path]" method="#[method]"/>
+    </flow>
+
+    <flow name="client2" >
+        <httpn:request config-ref="dynamicConfig2" path="testPath" method="POST">
+            <httpn:request-builder>
+                <httpn:body>
+                    #[body]
+                </httpn:body>
+            </httpn:request-builder>
+        </httpn:request>
+    </flow>
+</mule>

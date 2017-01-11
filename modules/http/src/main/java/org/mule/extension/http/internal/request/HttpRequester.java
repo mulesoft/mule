@@ -7,12 +7,7 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
-import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
-import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-
-import java.io.InputStream;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -26,9 +21,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
@@ -41,6 +36,9 @@ import org.mule.service.http.api.client.HttpRequestAuthentication;
 import org.mule.service.http.api.client.async.ResponseHandler;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
+
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +84,8 @@ public class HttpRequester {
       throws MuleException {
     HttpRequest httpRequest = eventToHttpRequest.create(muleEvent, requestBuilder, authentication, muleContext);
 
-    notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
+    //TODO: MULE-10340 - Add notifications to HTTP request
+    //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication),
                 createResponseHandler(muleEvent, muleContext, flowConstruct, requestBuilder, client, httpRequest, checkRetry,
                                       callback));
@@ -105,7 +104,8 @@ public class HttpRequester {
           HttpResponseToMuleMessage httpResponseToMuleMessage = new HttpResponseToMuleMessage(config, parseResponse, muleContext);
           try {
             Message responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
-            notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
+            //TODO: MULE-10340 - Add notifications to HTTP request
+            //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
             // Create a new muleEvent based on the old and the response so that the auth can use it
             Event responseEvent =
                 Event.builder(muleEvent).message(InternalMessage.builder(responseMessage).build())

@@ -6,11 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import java.util.function.Function;
 
 public final class RequestUrlConfiguration {
 
@@ -19,9 +16,9 @@ public final class RequestUrlConfiguration {
    */
   @Parameter
   @Optional(defaultValue = "/")
-  private Function<Event, String> basePath;
+  private String basePath;
 
-  public Function<Event, String> getBasePath() {
+  public String getBasePath() {
     return basePath;
   }
 }

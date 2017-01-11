@@ -29,7 +29,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -42,13 +41,9 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
-import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
-import org.mule.service.http.api.tcp.TcpClientSocketPropertiesBuilder;
-
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -105,7 +100,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
   @Inject
-  private HttpService httpService;
+  private HttpRequesterConnectionManager connectionManager;
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
@@ -117,7 +112,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     final HttpConstants.Protocols protocol = connectionParams.getProtocol();
 
     if (connectionParams.getPort() == null) {
-      connectionParams.setPort(muleEvent -> protocol.getDefaultPort());
+      connectionParams.setPort(protocol.getDefaultPort());
     }
 
     if (protocol.equals(HTTP) && tlsContext != null) {
@@ -155,20 +150,26 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public HttpExtensionClient connect() throws ConnectionException {
-    String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
+    HttpClient httpClient;
+    java.util.Optional<HttpClient> client = connectionManager.lookup(configName);
+    if (client.isPresent()) {
+      httpClient = client.get();
+    } else {
+      String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
 
-    HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-        .setTlsContextFactory(tlsContext)
-        .setProxyConfig(proxyConfig)
-        .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
-        .setMaxConnections(connectionParams.getMaxConnections())
-        .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setThreadNamePrefix(threadNamePrefix)
-        .setOwnerName(configName)
-        .build();
+      HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
+          .setTlsContextFactory(tlsContext)
+          .setProxyConfig(proxyConfig)
+          .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
+          .setMaxConnections(connectionParams.getMaxConnections())
+          .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
+          .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+          .setThreadNamePrefix(threadNamePrefix)
+          .setOwnerName(configName)
+          .build();
 
-    HttpClient httpClient = httpService.getClientFactory().create(configuration);
+      httpClient = connectionManager.create(configName, configuration);
+    }
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
     return new HttpExtensionClient(httpClient, uriParameters, authentication);
@@ -189,7 +190,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Override
   public void disconnect(HttpExtensionClient httpClient) {}
 
-  public Function<Event, Integer> getPort() {
+  public Integer getPort() {
     return connectionParams.getPort();
   }
 

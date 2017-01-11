@@ -7,13 +7,10 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-
-import java.util.function.Function;
 
 /**
  * Groups parameters regarding how to generate responses
@@ -31,7 +28,7 @@ public final class ResponseSettings {
   @Optional(defaultValue = "true")
   @Placement(tab = ADVANCED_TAB, order = 1)
   @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-  private Function<Event, Boolean> parseResponse;
+  private Boolean parseResponse;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
@@ -40,13 +37,13 @@ public final class ResponseSettings {
   @Parameter
   @Optional
   @Placement(tab = ADVANCED_TAB, order = 2)
-  private Function<Event, Integer> responseTimeout;
+  private Integer responseTimeout;
 
-  public Function<Event, Boolean> getParseResponse() {
+  public Boolean getParseResponse() {
     return parseResponse;
   }
 
-  public Function<Event, Integer> getResponseTimeout() {
+  public Integer getResponseTimeout() {
     return responseTimeout;
   }
 }
