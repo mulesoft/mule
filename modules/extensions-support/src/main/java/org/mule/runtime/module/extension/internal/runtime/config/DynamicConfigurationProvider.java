@@ -172,6 +172,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
               stopIfNeeded(configuration);
             } catch (Exception ex) {
               // Ignore and continue with the disposal
+              LOGGER.warn("Exception while stopping " + configuration.toString(), e);
             }
             disposeIfNeeded(configuration, LOGGER);
             throw e;
