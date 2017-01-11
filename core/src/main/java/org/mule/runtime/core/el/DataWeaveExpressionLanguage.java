@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.el.v2;
+package org.mule.runtime.core.el;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.ServiceLoader.load;
@@ -34,9 +34,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
+public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
-  private static final Logger logger = getLogger(MuleExpressionLanguage.class);
+  private static final Logger logger = getLogger(DataWeaveExpressionLanguage.class);
   public static final String ATTRIBUTES = "attributes";
   public static final String PAYLOAD = "payload";
   public static final String ERROR = "error";
@@ -46,7 +46,7 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
 
-  public MuleExpressionLanguage(ClassLoader lookupClassloader) {
+  public DataWeaveExpressionLanguage(ClassLoader lookupClassloader) {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
 
     while (executors.hasNext()) {
@@ -67,7 +67,7 @@ public class MuleExpressionLanguage implements ExtendedExpressionLanguage {
    *
    * @param bindingContext the context to register
    */
-  public void registerGlobalContext(BindingContext bindingContext) {
+  public synchronized void registerGlobalContext(BindingContext bindingContext) {
     expressionExecutor.addGlobalBindings(bindingContext);
   }
 

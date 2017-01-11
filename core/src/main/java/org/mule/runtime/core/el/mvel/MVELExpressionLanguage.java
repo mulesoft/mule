@@ -166,6 +166,11 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initi
   }
 
   @Override
+  public void registerGlobalContext(BindingContext bindingContext) {
+    // Do nothing
+  }
+
+  @Override
   public TypedValue evaluate(String expression, Event event, BindingContext context) {
     return evaluate(expression, event, Event.builder(event), null, context);
   }
