@@ -64,7 +64,7 @@ public class WireTapTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         client.send("vm://inbound.channel", "test", null);
         assertTrue(receiverLatch.await(3L, TimeUnit.SECONDS));
-        assertTrue(tappedReceiver1Latch.await(1L, TimeUnit.SECONDS));
-        assertTrue(tappedReceiver2Latch.await(1L, TimeUnit.SECONDS));
+        assertTrue(tappedReceiver1Latch.await(3L, TimeUnit.SECONDS));
+        assertTrue(tappedReceiver2Latch.await(3L, TimeUnit.SECONDS));
     }
 }
