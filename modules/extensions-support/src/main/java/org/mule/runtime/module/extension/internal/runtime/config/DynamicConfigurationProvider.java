@@ -168,7 +168,11 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
           try {
             startConfig(configuration);
           } catch (Exception e) {
-            stopIfNeeded(configuration);
+            try {
+              stopIfNeeded(configuration);
+            } catch (Exception ex) {
+              // Ignore and continue with the disposal
+            }
             disposeIfNeeded(configuration, LOGGER);
             throw e;
           }
