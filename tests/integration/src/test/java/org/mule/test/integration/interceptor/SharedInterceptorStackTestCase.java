@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.interceptor.Interceptor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -42,6 +43,11 @@ public class SharedInterceptorStackTestCase extends AbstractIntegrationTestCase 
     public Event process(Event event) throws MuleException {
       return processNext(Event.builder(event).message(InternalMessage.builder(event.getMessage())
           .payload(event.getMessage().getPayload().getValue().toString() + " CustomInterceptor").build()).build());
+    }
+
+    @Override
+    public Processor getNext() {
+      return next;
     }
   }
 

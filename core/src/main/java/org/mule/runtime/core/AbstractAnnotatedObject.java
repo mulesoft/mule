@@ -7,9 +7,13 @@
 
 package org.mule.runtime.core;
 
+import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,12 +33,53 @@ public abstract class AbstractAnnotatedObject implements AnnotatedObject {
 
   @Override
   public final Map<QName, Object> getAnnotations() {
-    return Collections.unmodifiableMap(annotations);
+    return unmodifiableMap(annotations);
   }
 
   @Override
   public synchronized void setAnnotations(Map<QName, Object> newAnnotations) {
     annotations.clear();
     annotations.putAll(newAnnotations);
+  }
+
+  @Override
+  public ComponentIdentifier getIdentifier() {
+    return new ComponentIdentifier() {
+
+      @Override
+      public String getNamespace() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getNamespace();
+      }
+
+      @Override
+      public String getName() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
+      }
+    };
+  }
+
+  @Override
+  public ComponentLocation getLocation(String flowPath) {
+    if (flowPath == null) {
+      return null;
+    } else {
+      return new ComponentLocation() {
+
+        @Override
+        public String getPath() {
+          return flowPath;
+        }
+
+        @Override
+        public String getFileName() {
+          return (String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName"));
+        }
+
+        @Override
+        public int getLineInFile() {
+          return (int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine"));
+        }
+      };
+    }
   }
 }

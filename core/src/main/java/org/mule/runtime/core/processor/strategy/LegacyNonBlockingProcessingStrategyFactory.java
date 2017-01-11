@@ -56,7 +56,7 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
       this.schedulerStopper = schedulerStopper;
     }
 
-    @Override
+    //@Override
     public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
                                                                     Function<Publisher<Event>, Publisher<Event>> processorFunction) {
       if (processor instanceof NonBlockingMessageProcessor) {

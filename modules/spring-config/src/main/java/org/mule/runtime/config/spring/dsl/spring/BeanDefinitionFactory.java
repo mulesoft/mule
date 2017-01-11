@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.dsl.spring;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
@@ -34,8 +35,8 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGL
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -186,6 +187,7 @@ public class BeanDefinitionFactory {
               annotations = (Map<QName, Object>) propertyValue.getValue();
             }
             annotations.put(ANNOTATION_NAME, componentModel.getIdentifier());
+            annotations.put(ANNOTATION_PARAMETERS, componentModel.getParameters());
             //add any error mappings if present
             List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
                 .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());

@@ -54,6 +54,7 @@ import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.processor.interceptor.DefaultMessageProcessorInterceptorManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.RegistryDelegatingInjector;
@@ -117,6 +118,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     ErrorTypeRepository defaultErrorTypeRepository = createDefaultErrorTypeRepository();
     muleContext.setErrorTypeRepository(defaultErrorTypeRepository);
     muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(defaultErrorTypeRepository));
+
+    muleContext.setMessageProcessorInterceptorManager(new DefaultMessageProcessorInterceptorManager());
 
     return muleContext;
   }

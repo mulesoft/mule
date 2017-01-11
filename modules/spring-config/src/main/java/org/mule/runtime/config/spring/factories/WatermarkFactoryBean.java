@@ -7,6 +7,10 @@
 
 package org.mule.runtime.config.spring.factories;
 
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -38,7 +42,7 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
   private String selectorExpression;
   private ObjectStore<Serializable> objectStore;
 
-  private Map<QName, Object> annotations = new HashMap<QName, Object>();
+  private Map<QName, Object> annotations = new HashMap<>();
   private MuleContext muleContext;
 
   @Override
@@ -115,5 +119,46 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
   @Override
   public void setAnnotations(Map<QName, Object> annotations) {
     this.annotations = annotations;
+  }
+
+  @Override
+  public ComponentIdentifier getIdentifier() {
+    return new ComponentIdentifier() {
+
+      @Override
+      public String getNamespace() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getNamespace();
+      }
+
+      @Override
+      public String getName() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
+      }
+    };
+  }
+
+  @Override
+  public ComponentLocation getLocation(String flowPath) {
+    if (flowPath == null) {
+      return null;
+    } else {
+      return new ComponentLocation() {
+
+        @Override
+        public String getPath() {
+          return flowPath;
+        }
+
+        @Override
+        public String getFileName() {
+          return (String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName"));
+        }
+
+        @Override
+        public int getLineInFile() {
+          return (int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine"));
+        }
+      };
+    }
   }
 }

@@ -90,7 +90,7 @@ public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStr
       super.stop();
     }
 
-    @Override
+    //@Override
     public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
                                                                     Function<Publisher<Event>, Publisher<Event>> processorFunction) {
       if (messageProcessor.getProcessingType() == BLOCKING) {

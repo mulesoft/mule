@@ -8,23 +8,26 @@ package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -75,6 +78,47 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
       this.flowConstruct = flowConstruct;
     }
 
+    @Override
+    public ComponentIdentifier getIdentifier() {
+      return new ComponentIdentifier() {
+
+        @Override
+        public String getNamespace() {
+          return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME))
+              .getNamespace();
+        }
+
+        @Override
+        public String getName() {
+          return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
+        }
+      };
+    }
+
+    @Override
+    public ComponentLocation getLocation(String flowPath) {
+      if (flowPath == null) {
+        return null;
+      } else {
+        return new ComponentLocation() {
+
+          @Override
+          public String getPath() {
+            return flowPath;
+          }
+
+          @Override
+          public String getFileName() {
+            return (String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName"));
+          }
+
+          @Override
+          public int getLineInFile() {
+            return (int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine"));
+          }
+        };
+      }
+    }
   }
 
   private abstract class FlowRefMessageProcessorContainer extends FlowRefMessageProcessor

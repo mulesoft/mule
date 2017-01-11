@@ -6,6 +6,8 @@
  */
 package org.mule.functional.junit4;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.message.Attributes;
@@ -262,7 +264,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   protected FlowConstruct getFlowConstruct() {
-    return muleContext.getRegistry().lookupFlowConstruct(getFlowConstructName());
+    final FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct(getFlowConstructName());
+    requireNonNull(flow, format("No flow with name '%s' found.", getFlowConstructName()));
+    return flow;
   }
 
   /**

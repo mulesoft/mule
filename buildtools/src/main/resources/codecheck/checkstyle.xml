@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
-    "-//Puppy Crawl//DTD Check Configuration 1.1//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_1.dtd">
+        "-//Puppy Crawl//DTD Check Configuration 1.1//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_1.dtd">
 
 
 <module name="Checker">
@@ -25,14 +25,14 @@
 
         <!-- <property name="cacheFile" value="${checkstyle.cache.file}"/> -->
         <property name="tabWidth" value="4"/>
-    
+
         <!-- http://checkstyle.sf.net/config_javadoc.html -->
         <!--<module name="JavadocMethod"/>-->
         <!--<module name="JavadocType"/>-->
         <!--<module name="JavadocVariable"/>-->
 
         <!-- http://checkstyle.sf.net/config_naming.html -->
-        <module name="MemberName"/>        
+        <module name="MemberName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
         <module name="MethodName"/>
@@ -72,10 +72,10 @@
         <module name="EmptyBlock"/>
         <module name="NeedBraces"/>
         <module name="LeftCurly">
-          <property name="option" value="nl"/>
+            <property name="option" value="nl"/>
         </module>
         <module name="RightCurly">
-          <property name="option" value="alone"/>
+            <property name="option" value="alone"/>
         </module>
 
         <!-- http://checkstyle.sf.net/config_coding.html -->

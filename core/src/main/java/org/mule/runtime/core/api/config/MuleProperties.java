@@ -163,6 +163,7 @@ public class MuleProperties {
   public static final String OBJECT_CONNECTIVITY_TESTING_SERVICE = "_muleConnectivityTestingService";
   public static final String OBJECT_CONFIGURATION_COMPONENT_LOCATOR = "_muleConfigurationComponentLocator";
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
+  public static final String OBJECT_MESSAGE_PROCESSOR_INTERCEPTOR_PROVIDER = "_muleMessageProcessorInterceptorRegistry";
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
