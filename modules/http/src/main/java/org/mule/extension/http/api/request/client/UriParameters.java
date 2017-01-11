@@ -6,10 +6,7 @@
  */
 package org.mule.extension.http.api.request.client;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpConstants.Protocols;
-
-import java.util.function.Function;
 
 /**
  * Represents the default URI parameters an {@HttpClient} will receive in {@HttpRequest}s.
@@ -26,10 +23,10 @@ public interface UriParameters {
   /**
    * @return the function that will resolve to the URI host.
    */
-  Function<Event, String> getHost();
+  String getHost();
 
   /**
    * @return the function that will resolve to the URI port.
    */
-  Function<Event, Integer> getPort();
+  Integer getPort();
 }

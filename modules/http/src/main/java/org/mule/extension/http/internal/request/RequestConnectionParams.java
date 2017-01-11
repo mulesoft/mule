@@ -9,7 +9,6 @@ package org.mule.extension.http.internal.request;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -18,8 +17,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.module.http.api.HttpConstants;
-
-import java.util.function.Function;
 
 /**
  * Groups parameters related to a requester connection
@@ -48,7 +45,7 @@ public final class RequestConnectionParams {
   @Optional
   @Example("www.somehost.com")
   @Placement(order = 2)
-  private Function<Event, String> host;
+  private String host;
 
   /**
    * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
@@ -57,7 +54,7 @@ public final class RequestConnectionParams {
   @Parameter
   @Optional
   @Placement(order = 3)
-  private Function<Event, Integer> port;
+  private Integer port;
 
   /**
    * If false, each connection will be closed after the first request is completed.
@@ -99,11 +96,11 @@ public final class RequestConnectionParams {
     return protocol;
   }
 
-  public Function<Event, String> getHost() {
+  public String getHost() {
     return host;
   }
 
-  public Function<Event, Integer> getPort() {
+  public Integer getPort() {
     return port;
   }
 
@@ -127,11 +124,11 @@ public final class RequestConnectionParams {
     this.protocol = protocol;
   }
 
-  public void setHost(Function<Event, String> host) {
+  public void setHost(String host) {
     this.host = host;
   }
 
-  public void setPort(Function<Event, Integer> port) {
+  public void setPort(Integer port) {
     this.port = port;
   }
 

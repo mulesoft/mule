@@ -7,6 +7,7 @@
 package org.mule.test.module.http.functional.listener;
 
 import static org.apache.http.client.fluent.Request.Get;
+import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
@@ -14,7 +15,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Connector")
+@Features(HTTP_CONNECTOR_FEATURE)
 @Stories("Error Handling")
 public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 
