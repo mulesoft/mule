@@ -6,7 +6,6 @@
  */
 package org.mule.util.xmlsecurity;
 
-import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
 
@@ -66,7 +65,6 @@ public class DefaultXMLSecureFactories
         XMLInputFactory factory = XMLInputFactory.newInstance();
 
         factory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, externalEntities);
-        factory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandEntities);
         factory.setProperty(SUPPORT_DTD, expandEntities);
 
         return factory;
