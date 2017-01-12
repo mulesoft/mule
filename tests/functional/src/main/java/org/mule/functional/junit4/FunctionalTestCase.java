@@ -8,6 +8,7 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
@@ -15,6 +16,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -24,14 +26,17 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.service.http.api.HttpService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -82,6 +87,29 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     }
     String[] multipleConfigResources = getConfigFiles();
     return new SpringXmlConfigurationBuilder(multipleConfigResources, emptyMap(), APP);
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    if (mockHttpService()) {
+      builders.add(new AbstractConfigurationBuilder() {
+
+        @Override
+        protected void doConfigure(MuleContext muleContext) throws Exception {
+          muleContext.getRegistry().registerObject("mockHttpService", mock(HttpService.class));
+        }
+      });
+    }
+  }
+
+  /**
+   * Defines if a mock should be used for the {@link HttpService}. If {@code false} an implementation will need to be provided.
+   *
+   * @return whether or not the {@link HttpService} should be mocked.
+   */
+  protected boolean mockHttpService() {
+    return true;
   }
 
   /**
