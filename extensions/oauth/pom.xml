@@ -9,7 +9,7 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-oauth</artifactId>
-    <name>Mule OAuth module</name>
+    <name>Mule OAuth Extension</name>
     <packaging>mule-extension</packaging>
 
     <properties>
