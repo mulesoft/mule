@@ -30,9 +30,10 @@ public interface OperationPolicyPointcutParametersFactory {
    *
    * @param operationIdentifier identifier of the message source
    * @param operationParameters set of parameters that are going to be used to execute the operation.
+   * @param flowName name of the flow executing the operation.
    * @return the pointcut parameters.
    */
   PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier operationIdentifier,
-                                                          Map<String, Object> operationParameters);
+                                                          Map<String, Object> operationParameters, String flowName);
 
 }

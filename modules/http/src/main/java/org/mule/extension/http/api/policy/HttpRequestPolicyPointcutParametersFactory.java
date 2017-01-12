@@ -6,9 +6,9 @@
  */
 package org.mule.extension.http.api.policy;
 
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.core.policy.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 import java.util.Map;
 
@@ -31,9 +31,10 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
 
   @Override
   public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier operationIdentifier,
-                                                                 Map<String, Object> operationParameters) {
+                                                                 Map<String, Object> operationParameters,
+                                                                 String flowName) {
     String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
     String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
-    return new HttpRequestPolicyPointcutParameters(operationIdentifier, pathParameter, methodParameter);
+    return new HttpRequestPolicyPointcutParameters(operationIdentifier, pathParameter, methodParameter, flowName);
   }
 }

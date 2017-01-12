@@ -24,6 +24,7 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
       new ComponentIdentifier.Builder().withNamespace("http").withName("request").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
+  private static final String FLOW_NAME = "flow-name";
 
   private final HttpRequestPolicyPointcutParametersFactory factory = new HttpRequestPolicyPointcutParametersFactory();
 
@@ -31,14 +32,14 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
   public void supportsHttpRequest() {
     assertThat(factory
         .supportsOperationIdentifier(HTTP_REQUEST_COMPONENT_IDENTIFIER),
-               is(true));;
+               is(true));
   }
 
   @Test
   public void doesNotSupportHttpListener() {
     assertThat(factory
         .supportsOperationIdentifier(new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build()),
-               is(false));;
+               is(false));
   }
 
   @Test
@@ -47,10 +48,11 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
         ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
             .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
     HttpRequestPolicyPointcutParameters policyPointcutParameters = (HttpRequestPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(HTTP_REQUEST_COMPONENT_IDENTIFIER, parametersMap);
+        .createPolicyPointcutParameters(HTTP_REQUEST_COMPONENT_IDENTIFIER, parametersMap, FLOW_NAME);
     assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_REQUEST_COMPONENT_IDENTIFIER));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
+    assertThat(policyPointcutParameters.getFlowName(), is(FLOW_NAME));
   }
 
 }

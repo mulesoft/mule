@@ -8,10 +8,10 @@ package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.SourcePolicyPointcutParametersFactory;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 /**
  * HTTP request operation policy pointcut parameters factory.
@@ -29,13 +29,14 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier sourceIdentifier, Attributes attributes) {
+  public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier sourceIdentifier, Attributes attributes,
+                                                                 String flowName) {
     checkArgument(attributes instanceof HttpRequestAttributes, String
         .format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: ",
                 HttpRequestAttributes.class.getName(), attributes != null ? attributes.getClass().getName() : "null"));
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes;
     return new HttpListenerPolicyPointcutParameters(sourceIdentifier, httpRequestAttributes.getRequestPath(),
-                                                    httpRequestAttributes.getMethod());
+                                                    httpRequestAttributes.getMethod(), flowName);
   }
 
 }
