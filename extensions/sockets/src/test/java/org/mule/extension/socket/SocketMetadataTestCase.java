@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -68,13 +69,14 @@ public class SocketMetadataTestCase extends SocketExtensionTestCase {
   @Description("Resolves the Metadata for the send operation, the metadata changes whether the operation waits" +
       "for response or not")
   public void resolveMetadata() {
-    ComponentMetadataDescriptor metadataWithOutResponse =
-        service.getMetadata(new ProcessorId("tcp-send-without-response", "0")).get();
-    assertThat(metadataWithOutResponse.getOutputMetadata().getPayloadMetadata().getType(),
+    ComponentMetadataDescriptor<OperationModel> metadataWithOutResponse =
+        service.getOperationMetadata(new ProcessorId("tcp-send-without-response", "0")).get();
+    assertThat(metadataWithOutResponse.getModel().getOutput().getType(),
                is(instanceOf(AnyType.class)));
 
-    ComponentMetadataDescriptor metadataWithResponse = service.getMetadata(new ProcessorId("tcp-send-with-response", "0")).get();
-    assertThat(metadataWithResponse.getOutputMetadata().getPayloadMetadata().getType(),
+    ComponentMetadataDescriptor<OperationModel> metadataWithResponse =
+        service.getOperationMetadata(new ProcessorId("tcp-send-with-response", "0")).get();
+    assertThat(metadataWithResponse.getModel().getOutput().getType(),
                is(instanceOf(BinaryType.class)));
   }
 }

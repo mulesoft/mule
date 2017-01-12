@@ -8,12 +8,12 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.componentDescriptor;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.MetadataAttributes;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
@@ -50,9 +50,9 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class MetadataMediator {
+public final class MetadataMediator<T extends ComponentModel<T>> {
 
-  private final ComponentModel component;
+  protected final T component;
   private final List<ParameterModel> metadataKeyParts;
   private final MetadataKeysDelegate keysDelegate;
   private final MetadataOutputDelegate outputDelegate;
@@ -60,7 +60,7 @@ public class MetadataMediator {
   private final MetadataKeyIdObjectResolver keyIdObjectResolver;
   private String keyContainerName = null;
 
-  public MetadataMediator(ComponentModel componentModel) {
+  public MetadataMediator(T componentModel) {
     this.component = componentModel;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
     this.keysDelegate = new MetadataKeysDelegate(componentModel, metadataKeyParts);
@@ -97,13 +97,18 @@ public class MetadataMediator {
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
    * when the Metadata retrieval of any element fails for any reason
    */
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context, MetadataKey key) {
+  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context, MetadataKey key) {
     try {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
-      return getMetadata(context, p -> resolvedKey);
+      return getMetadata(context, p -> resolvedKey, MetadataAttributes.builder().withKey(key));
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).onComponent());
     }
+  }
+
+  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context,
+                                                                    ParameterValueResolver metadataKeyResolver) {
+    return getMetadata(context, metadataKeyResolver, MetadataAttributes.builder());
   }
 
   /**
@@ -116,8 +121,9 @@ public class MetadataMediator {
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
    * when the Metadata retrieval of any element fails for any reason
    */
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataContext context,
-                                                                 ParameterValueResolver metadataKeyResolver) {
+  private MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context,
+                                                                     ParameterValueResolver metadataKeyResolver,
+                                                                     MetadataAttributes.MetadataAttributesBuilder attributesBuilder) {
     Object keyValue;
     MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
     if (!keyValueResult.isSuccess()) {
@@ -128,14 +134,11 @@ public class MetadataMediator {
 
     MetadataResult<OutputMetadataDescriptor> output = outputDelegate.getOutputMetadataDescriptor(context, keyValue);
     MetadataResult<InputMetadataDescriptor> input = inputDelegate.getInputMetadataDescriptors(context, keyValue);
-    ComponentMetadataDescriptor componentDescriptor = componentDescriptor(component.getName())
-        .withInputDescriptor(input.get())
-        .withOutputDescriptor(output.get())
-        .build();
-
 
     if (output.isSuccess() && input.isSuccess()) {
-      return success(componentDescriptor);
+      MetadataAttributes metadataAttributes = getMetadataAttributes(attributesBuilder, outputDelegate, input.get());
+      T model = component.getTypedModel(input.get(), output.get());
+      return success(ComponentMetadataDescriptor.builder(model).withAttributes(metadataAttributes).build());
     }
 
     List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
@@ -143,7 +146,22 @@ public class MetadataMediator {
         .addAll(input.getFailures())
         .build();
 
-    return failure(componentDescriptor, failures);
+    return failure(ComponentMetadataDescriptor.builder(component).build(), failures);
+  }
+
+  private MetadataAttributes getMetadataAttributes(MetadataAttributes.MetadataAttributesBuilder attributesBuilder,
+                                                   MetadataOutputDelegate outputDelegate,
+                                                   InputMetadataDescriptor input) {
+
+    outputDelegate.getCategoryName().ifPresent(attributesBuilder::withCategoryName);
+    outputDelegate.getOutputResolver().ifPresent(r -> attributesBuilder.withOutputResolver(r.getResolverName()));
+    outputDelegate.getOutputAttributesResolver()
+        .ifPresent(r -> attributesBuilder.withOutputAttributesResolver(r.getResolverName()));
+    input.getAllParameters().entrySet()
+        .forEach(entry -> attributesBuilder.withParameterResolver(entry.getKey(),
+                                                                  inputDelegate.getParameterResolver(entry.getKey())
+                                                                      .getResolverName()));
+    return attributesBuilder.build();
   }
 
   private MetadataResult<Object> getMetadataKeyObjectValue(ParameterValueResolver metadataKeyResolver) {

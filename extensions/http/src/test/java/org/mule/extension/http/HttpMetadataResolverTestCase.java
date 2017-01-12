@@ -20,6 +20,9 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.meta.model.OutputModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -27,7 +30,6 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -69,14 +71,12 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
   @Test
   public void resolvesAny() {
-    TypeMetadataDescriptor any = getMetadata("anyExplicit");
-    verifyAny(any);
+    verifyAny(getMetadata("anyExplicit"));
   }
 
   @Test
   public void resolveDefault() {
-    TypeMetadataDescriptor any = getMetadata("anyImplicit");
-    verifyAny(any);
+    verifyAny(getMetadata("anyImplicit"));
   }
 
   @Test
@@ -97,9 +97,9 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   @Description("Resolves the metadata for a HTTP Listener")
   @Test
   public void getListenerMetadata() {
-    MetadataResult<ComponentMetadataDescriptor> server = service.getMetadata(new SourceId("server"));
+    MetadataResult<ComponentMetadataDescriptor<SourceModel>> server = service.getSourceMetadata(new SourceId("server"));
     assertThat(server.isSuccess(), is(true));
-    assertThat(server.get().getOutputMetadata().getPayloadMetadata().getType(), is(instanceOf(AnyType.class)));
+    assertThat(server.get().getModel().getOutput().getType(), is(instanceOf(AnyType.class)));
   }
 
   @Description("Resolves the MetadataKeys of a Request Configuration. The resolution of keys is done implicitly from" +
@@ -119,18 +119,19 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   }
 
   private void verifyType(String flowName, Class expectedMetadataType, Class keyClass) {
-    TypeMetadataDescriptor stream = getMetadata(flowName);
+    OutputModel stream = getMetadata(flowName);
     assertThat(stream.getType(), is(instanceOf(expectedMetadataType)));
     assertThat(stream.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(), is(keyClass.getName()));
   }
 
-  private TypeMetadataDescriptor getMetadata(String flowName) {
-    MetadataResult<ComponentMetadataDescriptor> result = service.getMetadata(new ProcessorId(flowName, "0"));
+  private OutputModel getMetadata(String flowName) {
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> result =
+        service.getOperationMetadata(new ProcessorId(flowName, "0"));
     assertThat(result.isSuccess(), is(true));
-    return result.get().getOutputMetadata().getPayloadMetadata();
+    return result.get().getModel().getOutput();
   }
 
-  private void verifyAny(TypeMetadataDescriptor any) {
+  private void verifyAny(OutputModel any) {
     assertThat(any.getType(), is(instanceOf(UnionType.class)));
     UnionType unionType = (UnionType) any.getType();
     assertThat(unionType.getTypes(), hasSize(3));

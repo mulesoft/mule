@@ -47,4 +47,9 @@ public class MetadataExtensionEntityResolver implements QueryEntityResolver {
         throw new MetadataResolvingException("Invalid metadata key: " + key, INVALID_METADATA_KEY);
     }
   }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionEntityResolver";
+  }
 }

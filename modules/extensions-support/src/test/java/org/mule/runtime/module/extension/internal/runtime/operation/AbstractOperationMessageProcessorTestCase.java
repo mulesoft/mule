@@ -32,7 +32,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -196,6 +195,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
+    when(operationModel.getDisplayModel()).thenReturn(empty());
 
     mockExceptionEnricher(operationModel, exceptionHandlerFactory);
     when(exceptionHandlerFactory.createHandler()).thenReturn(new NullExceptionHandler());
@@ -206,22 +206,29 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(metadataResolverFactory.getInputResolver("type")).thenReturn(new NullMetadataResolver());
     when(metadataResolverFactory.getOutputResolver()).thenReturn(new TestNoConfigMetadataResolver());
     when(metadataResolverFactory.getOutputAttributesResolver()).thenReturn(new TestNoConfigMetadataResolver());
+    when(metadataResolverFactory.getQueryEntityResolver()).thenReturn(new TestNoConfigMetadataResolver());
 
     when(keyParamMock.getName()).thenReturn("type");
     when(keyParamMock.getType()).thenReturn(stringType);
     when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class))
         .thenReturn(of(new MetadataKeyPartModelProperty(0)));
     when(keyParamMock.getRole()).thenReturn(BEHAVIOUR);
+    when(keyParamMock.getDisplayModel()).thenReturn(empty());
+    when(keyParamMock.getLayoutModel()).thenReturn(empty());
     when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
     when(contentMock.hasDynamicType()).thenReturn(true);
     when(contentMock.getType()).thenReturn(stringType);
     when(contentMock.getRole()).thenReturn(CONTENT);
+    when(contentMock.getDisplayModel()).thenReturn(empty());
+    when(contentMock.getLayoutModel()).thenReturn(empty());
     when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
     when(contentMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     parameterGroupModel = mockParameters(operationModel, keyParamMock, contentMock);
+    when(parameterGroupModel.getDisplayModel()).thenReturn(empty());
+    when(parameterGroupModel.getLayoutModel()).thenReturn(empty());
     when(parameterGroupModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
 
     when(outputMock.getType()).thenReturn(stringType);

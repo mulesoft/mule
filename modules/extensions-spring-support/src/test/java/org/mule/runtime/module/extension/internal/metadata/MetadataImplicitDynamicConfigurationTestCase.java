@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -25,7 +26,7 @@ public class MetadataImplicitDynamicConfigurationTestCase extends MetadataExtens
   @Test
   public void resolveMetadataWithImplicitDynamicConfig() throws Exception {
     componentId = new ProcessorId(CONTENT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-    final MetadataResult<ComponentMetadataDescriptor> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
+    final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
                           "Configuration used for Metadata fetch cannot be dynamic",

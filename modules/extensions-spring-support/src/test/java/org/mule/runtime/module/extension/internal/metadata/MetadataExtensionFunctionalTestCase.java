@@ -24,14 +24,15 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.Typed;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.OutputModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
@@ -114,10 +115,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
-  private static final MetadataComponentDescriptorProvider explicitMetadataResolver =
-      (metadataService, componentId, key) -> metadataService.getMetadata(componentId, key);
-  private static final MetadataComponentDescriptorProvider dslMetadataResolver =
-      (metadataService, componentId, key) -> metadataService.getMetadata(componentId);
+  private static final MetadataComponentDescriptorProvider<OperationModel> explicitMetadataResolver =
+      MetadataService::getOperationMetadata;
+  private static final MetadataComponentDescriptorProvider<OperationModel> dslMetadataResolver =
+      (metadataService, componentId, key) -> metadataService.getOperationMetadata(componentId);
 
   protected MetadataType personType;
   protected ComponentId componentId;
@@ -156,7 +157,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     EXPLICIT_RESOLUTION, DSL_RESOLUTION
   }
 
-  MetadataResult<ComponentMetadataDescriptor> getComponentDynamicMetadata(MetadataKey key) {
+  <T extends ComponentModel<T>> MetadataResult<ComponentMetadataDescriptor<T>> getComponentDynamicMetadata(MetadataKey key) {
     checkArgument(componentId != null, "Unable to resolve Metadata. The Component ID has not been configured.");
     return provider.resolveDynamicMetadata(metadataService, componentId, key);
   }
@@ -165,8 +166,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     return getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
   }
 
-  ComponentMetadataDescriptor getSuccessComponentDynamicMetadata(MetadataKey key) {
-    MetadataResult<ComponentMetadataDescriptor> componentMetadata = getComponentDynamicMetadata(key);
+  <T extends ComponentModel<T>> ComponentMetadataDescriptor<T> getSuccessComponentDynamicMetadata(MetadataKey key) {
+    MetadataResult<ComponentMetadataDescriptor<T>> componentMetadata = getComponentDynamicMetadata(key);
     String msg = componentMetadata.getFailures().stream().map(f -> "Failure: " + f.getMessage()).collect(joining(", "));
     assertThat(msg, componentMetadata.isSuccess(), is(true));
     return componentMetadata.get();
@@ -200,43 +201,35 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     }
   }
 
-  void assertExpectedOutput(OutputMetadataDescriptor output, Type payloadType, Type attributesType) {
-    assertExpectedType(output.getPayloadMetadata(), payloadType);
-    assertExpectedType(output.getAttributesMetadata(), attributesType);
+  void assertExpectedOutput(ComponentModel model, Type payloadType, Type attributesType) {
+    assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), TYPE_LOADER.load(payloadType),
+                         TYPE_LOADER.load(attributesType));
   }
 
-  void assertExpectedOutput(OutputMetadataDescriptor output, MetadataType payloadType, Type attributesType) {
-    assertExpectedType(output.getPayloadMetadata(), payloadType);
-    assertExpectedType(output.getAttributesMetadata(), attributesType);
+  void assertExpectedOutput(ComponentModel model, MetadataType payloadType, Type attributesType) {
+    assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, TYPE_LOADER.load(attributesType));
   }
 
-  void assertExpectedOutput(OutputMetadataDescriptor output, MetadataType payloadType, MetadataType attributesType) {
-    assertExpectedType(output.getPayloadMetadata(), payloadType);
-    assertExpectedType(output.getAttributesMetadata(), attributesType);
+  void assertExpectedOutput(ComponentModel model, MetadataType payloadType, MetadataType attributesType) {
+    assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, attributesType);
   }
 
-  private void assertExpectedType(TypeMetadataDescriptor descriptor, Type type) {
-    assertThat(descriptor.getType(), is(TYPE_LOADER.load(type)));
+  void assertExpectedOutput(OutputModel output, OutputModel attributes, MetadataType payloadType, MetadataType attributesType) {
+    assertExpectedType(output.getType(), payloadType);
+    assertExpectedType(attributes.getType(), attributesType);
   }
 
-  void assertExpectedType(ParameterMetadataDescriptor descriptor, String name, Type type) {
-    assertThat(descriptor.getType(), is(TYPE_LOADER.load(type)));
-    if (!isBlank(name)) {
-      assertThat(descriptor.getName(), is(name));
-    }
-    assertThat(descriptor.isDynamic(), is(false));
+  private void assertExpectedType(MetadataType type, MetadataType expectedType) {
+    assertThat(type, is(expectedType));
   }
 
-  private void assertExpectedType(TypeMetadataDescriptor descriptor, MetadataType type) {
-    assertThat(descriptor.getType(), is(type));
+  protected void assertExpectedType(Typed type, Type expectedType) {
+    assertThat(type.getType(), is(TYPE_LOADER.load(expectedType)));
   }
 
-  void assertExpectedType(ParameterMetadataDescriptor descriptor, String name, MetadataType type, boolean isDynamic) {
-    assertThat(descriptor.getType(), is(type));
-    if (!isBlank(name)) {
-      assertThat(descriptor.getName(), is(name));
-    }
-    assertThat(descriptor.isDynamic(), is(isDynamic));
+  protected void assertExpectedType(Typed typedModel, MetadataType expectedType, boolean isDynamic) {
+    assertThat(typedModel.getType(), is(expectedType));
+    assertThat(typedModel.hasDynamicType(), is(isDynamic));
   }
 
   Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
@@ -254,9 +247,9 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     assertThat("Expecting failure but a success result found", result.isSuccess(), is(false));
   }
 
-  private interface MetadataComponentDescriptorProvider {
+  interface MetadataComponentDescriptorProvider<T extends ComponentModel<T>> {
 
-    MetadataResult<ComponentMetadataDescriptor> resolveDynamicMetadata(MetadataService metadataService,
-                                                                       ComponentId componentId, MetadataKey key);
+    MetadataResult<ComponentMetadataDescriptor<T>> resolveDynamicMetadata(MetadataService metadataService,
+                                                                          ComponentId componentId, MetadataKey key);
   }
 }

@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.ClassUtils.getClassName;
+import static java.util.Collections.unmodifiableCollection;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -78,6 +77,13 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
   /**
    * {@inheritDoc}
    */
+  public Collection<InputTypeResolver> getInputResolvers() {
+    return unmodifiableCollection(inputResolvers.values());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T> OutputTypeResolver<T> getOutputResolver() {
     return outputTypeResolver;
@@ -96,6 +102,6 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
    */
   @Override
   public QueryEntityResolver getQueryEntityResolver() {
-    return new NullQueryEntityMetadataResolver();
+    return new NullQueryMetadataResolver();
   }
 }
