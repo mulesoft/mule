@@ -11,11 +11,11 @@ import static org.mule.runtime.core.api.functional.Either.right;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.functional.Either;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,8 @@ public class CompositeSourcePolicy extends
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
    * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
    * @param flowExecutionProcessor the operation that executes the flow
-   * @param messageSourceResponseParametersProcessor processor that gives access to the set of parameters to be sent originally by the source
+   * @param messageSourceResponseParametersProcessor processor that gives access to the set of parameters to be sent originally by
+   *        the source
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
@@ -60,14 +61,17 @@ public class CompositeSourcePolicy extends
    * Executes the flow.
    * 
    * If there's a {@link SourcePolicyParametersTransformer} provided then it will use it to convert the source response or source
-   * failure response from the parameters back to a {@link Message} that can be routed through the policy chain which later will be
-   * convert back to response or failure response parameters thus allowing the policy chain to modify the response.. That message
-   * will be the result of the next-operation of the policy.
+   * failure response from the parameters back to a {@link Message} that can be routed through the policy chain which later will
+   * be convert back to response or failure response parameters thus allowing the policy chain to modify the response.. That
+   * message will be the result of the next-operation of the policy.
    * 
    * If no {@link SourcePolicyParametersTransformer} is provided, then the same response from the flow is going to be routed as
    * response of the next-operation of the policy chain. In this case, the same response from the flow is going to be used to
    * generate the response or failure response for the source so the policy chain is not going to be able to modify the response
    * sent by the source.
+   * 
+   * When the flow execution fails, it will create a {@link FlowExecutionException} instead of a regular
+   * {@link MessagingException} to signal that the failure was though the the flow exception and not the policy logic.
    */
   @Override
   protected Event processNextOperation(Event event) throws MuleException {
@@ -86,8 +90,9 @@ public class CompositeSourcePolicy extends
           .map(parametersTransformer -> parametersTransformer
               .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
           .orElse(messagingException.getEvent().getMessage());
-      throw new MessagingException(Event.builder(event).message((InternalMessage) message).build(), messagingException.getCause(),
-                                   messagingException.getFailingMessageProcessor());
+      throw new FlowExecutionException(Event.builder(event).message((InternalMessage) message).build(),
+                                       messagingException.getCause(),
+                                       messagingException.getFailingMessageProcessor());
     }
   }
 
@@ -124,11 +129,18 @@ public class CompositeSourcePolicy extends
           getParametersTransformer().map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
               .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage()))).orElse(originalResponseParameters);
       return right(new SuccessSourcePolicyResult(policiesResultEvent, responseParameters, getParametersProcessor()));
-    } catch (MessagingException e) {
+    } catch (FlowExecutionException e) {
       Map<String, Object> responseParameters =
           getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
                   .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
+              .orElse(originalFailureResponseParameters);
+      return left(new FailureSourcePolicyResult(e, responseParameters));
+    } catch (MessagingException e) {
+      Map<String, Object> responseParameters =
+          getParametersTransformer()
+              .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
+                  .fromMessageToErrorResponseParameters(Message.builder().nullPayload().build())))
               .orElse(originalFailureResponseParameters);
       return left(new FailureSourcePolicyResult(e, responseParameters));
     }
