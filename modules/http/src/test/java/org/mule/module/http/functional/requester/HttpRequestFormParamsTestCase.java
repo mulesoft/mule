@@ -7,6 +7,7 @@
 package org.mule.module.http.functional.requester;
 
 
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -49,6 +50,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
     {
         MuleEvent event = getTestEvent(getTestMap());
         event.getMessage().getDataType().setMimeType(APPLICATION_JAVA);
+        event.getMessage().getDataType().setEncoding(UTF_8);
 
         runAndAssert(event);
     }
@@ -58,6 +60,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase
     {
         MuleEvent event = getTestEvent(getTestMap());
         event.getMessage().getDataType().setMimeType(APPLICATION_X_WWW_FORM_URLENCODED);
+        event.getMessage().getDataType().setEncoding(UTF_8);
 
         runAndAssert(event);
     }
