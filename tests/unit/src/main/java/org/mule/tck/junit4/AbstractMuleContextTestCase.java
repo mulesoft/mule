@@ -50,6 +50,7 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.service.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
@@ -248,7 +249,16 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   // This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    builders.add(new TestServicesConfigurationBuilder());
+    builders.add(new TestServicesConfigurationBuilder(mockHttpService()));
+  }
+
+  /**
+   * Defines if a mock should be used for the {@link HttpService}. If {@code false} an implementation will need to be provided.
+   *
+   * @return whether or not the {@link HttpService} should be mocked.
+   */
+  protected boolean mockHttpService() {
+    return true;
   }
 
   /**

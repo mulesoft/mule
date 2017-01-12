@@ -6,18 +6,17 @@
  */
 package org.mule.service.http.api.tcp;
 
-import org.junit.Test;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
+
 @Features("HTTP Service")
 @Stories("TCP builders")
-public class TcpClientSocketPropertiesBuilderTestCase extends AbstractMuleTestCase {
+public class TcpClientSocketPropertiesBuilderTestCase {
 
   TcpClientSocketPropertiesBuilder builder = TcpClientSocketProperties.builder();
 
