@@ -55,9 +55,4 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
     OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_OAUTH_CONFIG), USER_ID_TONY)
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 100 * super.getTestTimeoutSecs();
-  }
 }

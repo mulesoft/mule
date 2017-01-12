@@ -249,7 +249,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
 
     try {
       server = serversManager.getServer(serverConfiguration);
-    } catch (ConnectionException | IOException e) {
+    } catch (ConnectionException e) {
       logger.warn("Could not create server for OAuth callback.");
       throw new InitialisationException(e, this);
     }
@@ -259,7 +259,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @Override
   public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
     final String accessToken =
-        getUserOAuthContext().getContextForResourceOwner(resourceOwnerId.resolve()).getAccessToken();
+        getUserOAuthContext().getContextForResourceOwner(resolveExpression(resourceOwnerId, muleEvent))
+            .getAccessToken();
     if (accessToken == null) {
       throw new RequestAuthenticationException(createStaticMessage(format("No access token for the '%s' user. Verify that you have authenticated the user before trying to execute an operation to the API.",
                                                                           resourceOwnerId.resolve())));
@@ -279,17 +280,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
       }
     }
     return shouldRetryRequest;
-  }
-
-  private <T> T resolveExpression(ParameterResolver<T> expr, Event event) {
-    if (expr == null) {
-      return null;
-    } else if (!expr.getExpression().isPresent()
-        && !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
-      return expr.resolve();
-    } else {
-      return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
-    }
   }
 
   @Override
