@@ -6,8 +6,10 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Thread.currentThread;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
@@ -76,6 +78,13 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
     try {
       running = true;
       task.run();
+      task.get();
+    } catch (ExecutionException e) {
+      logger.error("Uncaught throwable in task " + toString(), e);
+    } catch (CancellationException e) {
+      logger.warn("Task " + toString() + " cancelled");
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
     } finally {
       wrapUp();
       if (logger.isTraceEnabled()) {
