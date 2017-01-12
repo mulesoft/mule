@@ -11,12 +11,14 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICA
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -25,6 +27,7 @@ import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -47,13 +50,18 @@ import org.mule.service.http.api.client.proxy.ProxyConfig;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
  *
  * @since 4.0
  */
 @Alias("request")
-public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable {
+public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable {
+
+  private static final Logger logger = LoggerFactory.getLogger(HttpRequesterProvider.class);
 
   private static final int UNLIMITED_CONNECTIONS = -1;
   private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
@@ -130,10 +138,17 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
       initialiseIfNeeded(tlsContext);
     }
     if (authentication != null) {
-      initialiseIfNeeded(authentication);
+      initialiseIfNeeded(authentication, muleContext);
     }
 
     verifyConnectionsParameters();
+  }
+
+  @Override
+  public void dispose() {
+    if (authentication != null) {
+      disposeIfNeeded(authentication, logger);
+    }
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
