@@ -6,6 +6,8 @@
  */
 package org.mule.util.store;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
@@ -15,7 +17,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <code>InMemoryObjectStore</code> implements an optionally bounded
@@ -154,7 +155,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
             Long oldestKey = (Long) oldestEntry.getKey();
             long oldestKeyValue = oldestKey.longValue();
 
-            if (TimeUnit.NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL)
+            if (NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL)
             {
                 store.remove(oldestKey);
                 expiredEntries++;
@@ -187,7 +188,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     {
         int expiredEntries = doTrimAndExpire();
 
-        if (logger.isDebugEnabled() && expiredEntries != 0)
+        if (logger.isDebugEnabled())
         {
             logger.debug("Expired " + expiredEntries + " old entries");
         }
