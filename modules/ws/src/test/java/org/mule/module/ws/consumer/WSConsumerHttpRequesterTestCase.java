@@ -15,17 +15,15 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * This tests "mocks" a proxy server through which a wsdl file is served.
- * The initialization of the ws consumer involved in the test app should
- * be routed through the http requester. If an URLConnection is used
- * instead of the http requester, the proxy will not be used. In this
- * way, we can verify that the http requester is being used.
+ * This tests "mocks" a proxy server through which a wsdl file is served. The initialization of the ws consumer involved
+ * in the test app should be routed through the http requester. If an URLConnection is used instead of the http
+ * requester, the proxy will not be used. In this way, we can verify that the http requester is being used.
  *
  */
 public class WSConsumerHttpRequesterTestCase extends AbstractWSDLServerTestCase
 {
-	
-	private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 1;
+
+    private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 1;
 
     @Override
     protected String getConfigFile()
@@ -36,10 +34,10 @@ public class WSConsumerHttpRequesterTestCase extends AbstractWSDLServerTestCase
     @Test
     public void consumerPresentInRegistry() throws Exception
     {
-    	Map<String, WSConsumer> consumers = muleContext.getRegistry().lookupByType(WSConsumer.class);
-		// if one consumer is present in the registry, the config
-		// was correctly initialized
-		assertThat(EXPECTED_NUMBER_OF_WS_CONSUMERS, equalTo(consumers.values().size()));
+        Map<String, WSConsumer> consumers = muleContext.getRegistry().lookupByType(WSConsumer.class);
+        // if one consumer is present in the registry, the config
+        // was correctly initialized
+        assertThat(EXPECTED_NUMBER_OF_WS_CONSUMERS, equalTo(consumers.values().size()));
     }
 
 }
