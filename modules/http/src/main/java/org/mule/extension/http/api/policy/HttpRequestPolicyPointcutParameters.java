@@ -27,7 +27,7 @@ public class HttpRequestPolicyPointcutParameters extends PolicyPointcutParameter
    *        operation identifier.
    * @param path the target path of the http:request operation.
    * @param method the HTTP method of the http:request operation.
-   * @param flowName name of the flow executing the http request
+   * @param flowName name of the flow executing the HTTP request
    */
   public HttpRequestPolicyPointcutParameters(ComponentIdentifier componentIdentifier, String path, String method,
                                              String flowName) {
@@ -52,7 +52,7 @@ public class HttpRequestPolicyPointcutParameters extends PolicyPointcutParameter
   }
 
   /**
-   * @return the name of the flow executing the http request
+   * @return the name of the flow executing the HTTP request
    */
   public String getFlowName() {
     return flowName;
