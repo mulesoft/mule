@@ -71,7 +71,7 @@ public class CompositeSourcePolicy extends
    * sent by the source.
    * 
    * When the flow execution fails, it will create a {@link FlowExecutionException} instead of a regular
-   * {@link MessagingException} to signal that the failure was though the the flow exception and not the policy logic.
+   * {@link MessagingException} to signal that the failure was through the the flow exception and not the policy logic.
    */
   @Override
   protected Event processNextOperation(Event event) throws MuleException {
