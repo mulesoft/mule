@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
@@ -22,11 +23,11 @@ import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,16 +61,28 @@ public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorization
     return "client-credentials/client-credentials-minimal-config.xml";
   }
 
+  @Override
+  @Before
+  public void before() throws Exception {
+    // Force the initialization of the OAuth context
+    // TODO MULE-11405 switch to the client
+    // muleContext.getRegistry().lookupObject(ExtensionsClient.class).execute("HTTP", "request",
+    // builder().configName("requestConfig").build());
+    flowRunner("testFlow").runNoVerify();
+  }
+
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[] {"tokenUrlFailsDuringAppStartup", (Consumer<WireMockRule>) wireMockRule -> {
-    },
+    return asList(new Object[] {"tokenUrlFailsDuringAppStartup",
+        (Consumer<WireMockRule>) wireMockRule -> {
+        },
         format("http://localhost:%s%s", dynamicPort.getNumber() - 1, TOKEN_PATH),
         hasRootCause(isA(IOException.class))},
-                         new Object[] {"accessTokenNotRetrieve", (Consumer<WireMockRule>) wireMockRule -> wireMockRule
-                             .stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(EMPTY))),
-                             format("http://localhost:%s%s", dynamicPort.getNumber(), TOKEN_PATH),
-                             hasRootCause(isA(TokenNotFoundException.class))});
+                  new Object[] {"accessTokenNotRetrieve",
+                      (Consumer<WireMockRule>) wireMockRule -> wireMockRule
+                          .stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(EMPTY))),
+                      format("http://localhost:%s%s", dynamicPort.getNumber(), TOKEN_PATH),
+                      hasRootCause(isA(TokenNotFoundException.class))});
   }
 
   public ClientCredentialsFailureTestCase(String name, Consumer<WireMockRule> wireMockConfigurer, String tokenPath,

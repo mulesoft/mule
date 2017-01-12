@@ -8,9 +8,10 @@ package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig.defaultTokenManagerConfigIndex;
 
-import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 
@@ -29,7 +30,7 @@ public class AuthorizationCodeNoTokenManagerConfigTestCase extends AbstractAutho
   public void hitRedirectUrlAndGetToken() throws Exception {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
 
-    Request.Get(localCallbackUrl.getValue() + "?" + OAuthConstants.CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
+    Request.Get(localCallbackUrl.getValue() + "?" + CODE_PARAMETER + "=" + AUTHENTICATION_CODE)
         .connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT).execute();
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
@@ -37,8 +38,8 @@ public class AuthorizationCodeNoTokenManagerConfigTestCase extends AbstractAutho
     TokenManagerConfig tokenManagerConfig =
         muleContext.getRegistry().get("default-token-manager-config-" + (defaultTokenManagerConfigIndex.get() - 1));
 
-    final ResourceOwnerOAuthContext oauthContext = tokenManagerConfig.getConfigOAuthContext()
-        .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+    final ResourceOwnerOAuthContext oauthContext =
+        tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
 
     assertThat(oauthContext.getAccessToken(), is(ACCESS_TOKEN));
     assertThat(oauthContext.getRefreshToken(), is(REFRESH_TOKEN));

@@ -47,7 +47,7 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
     contextForResourceOwnerJohn.setAccessToken(JOHN_ACCESS_TOKEN);
     configOAuthContext.updateResourceOwnerOAuthContext(contextForResourceOwnerJohn);
 
-    executeRefreshToken("testMultitenantFlow", MULTITENANT_OAUTH_CONFIG, multitenantUser.getValue(),
+    executeRefreshToken("testFlow", MULTITENANT_OAUTH_CONFIG, multitenantUser.getValue(),
                         INTERNAL_SERVER_ERROR.getStatusCode());
 
     OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_OAUTH_CONFIG), USER_ID_JOHN)
@@ -56,4 +56,8 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
         .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
   }
 
+  @Override
+  public int getTestTimeoutSecs() {
+    return 100 * super.getTestTimeoutSecs();
+  }
 }

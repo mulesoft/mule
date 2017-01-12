@@ -13,18 +13,25 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.module.http.internal.HttpParser.encodeQueryString;
+import static org.mule.runtime.module.http.internal.HttpParser.encodeString;
 
-import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
@@ -54,15 +61,15 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
   @Rule
   public SystemProperty localAuthorizationUrl =
       new SystemProperty("local.authorization.url",
-                         String.format("%s://localhost:%d/authorization", getProtocol(), localHostPort.getNumber()));
+                         format("%s://localhost:%d/authorization", getProtocol(), localHostPort.getNumber()));
   @Rule
   public SystemProperty authorizationUrl =
       new SystemProperty("authorization.url",
-                         String.format("%s://localhost:%d" + AUTHORIZE_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
+                         format("%s://localhost:%d" + AUTHORIZE_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
   @Rule
   public SystemProperty tokenUrl =
       new SystemProperty("token.url",
-                         String.format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
+                         format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), oauthHttpsServerPort.getNumber()));
   @Rule
   public SystemProperty authenticationRequestParam1 = new SystemProperty("auth.request.param1", "auth-req-param1");
   @Rule
@@ -115,20 +122,20 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
   public void hitRedirectUrlAndGetToken() throws Exception {
 
     final ImmutableMap<Object, Object> tokenUrlResponseParameters =
-        ImmutableMap.builder().put(OAuthConstants.ACCESS_TOKEN_PARAMETER, ACCESS_TOKEN)
-            .put(OAuthConstants.EXPIRES_IN_PARAMETER, EXPIRES_IN).put(OAuthConstants.REFRESH_TOKEN_PARAMETER, REFRESH_TOKEN)
+        ImmutableMap.builder().put(ACCESS_TOKEN_PARAMETER, ACCESS_TOKEN)
+            .put(EXPIRES_IN_PARAMETER, EXPIRES_IN).put(REFRESH_TOKEN_PARAMETER, REFRESH_TOKEN)
             .put(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE)
             .put(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE).build();
 
 
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse()
-        .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
-        .withBody(HttpParser.encodeString(UTF_8, tokenUrlResponseParameters))));
+        .withHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
+        .withBody(encodeString(UTF_8, tokenUrlResponseParameters))));
 
     final ImmutableMap<Object, Object> redirectUrlQueryParams = ImmutableMap.builder()
-        .put(OAuthConstants.CODE_PARAMETER, AUTHENTICATION_CODE).put(OAuthConstants.STATE_PARAMETER, state.getValue()).build();
+        .put(CODE_PARAMETER, AUTHENTICATION_CODE).put(STATE_PARAMETER, state.getValue()).build();
 
-    muleContext.getClient().send(localCallbackUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
+    muleContext.getClient().send(localCallbackUrl.getValue() + "?" + encodeQueryString(redirectUrlQueryParams),
                                  InternalMessage.builder().nullPayload().build(),
                                  newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
 

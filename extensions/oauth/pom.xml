@@ -86,12 +86,6 @@
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -108,28 +102,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-json</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -152,12 +127,6 @@
             <artifactId>httpclient</artifactId>
             <version>4.3.5</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

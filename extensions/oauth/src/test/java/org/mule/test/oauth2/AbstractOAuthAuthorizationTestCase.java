@@ -13,10 +13,23 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
+import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.codec.binary.Base64.encodeBase64String;
+import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
-import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -27,9 +40,8 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
-import org.apache.commons.codec.binary.Base64;
+import org.junit.Before;
 import org.junit.Rule;
 
 import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
@@ -80,6 +92,19 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   @Rule
   public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
+  @Before
+  public void before() throws Exception {
+    try {
+      // Force the initialization of the OAuth context
+      // TODO MULE-11405 switch to the client
+      // muleContext.getRegistry().lookupObject(ExtensionsClient.class).execute("HTTP", "request",
+      // builder().configName("requestConfig").build());
+      flowRunner("testFlow").runNoVerify();
+    } catch (Exception e) {
+      // Ignore
+    }
+  }
+
   protected String getProtocol() {
     return "http";
   }
@@ -94,13 +119,13 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
 
   protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken, String refreshToken) {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" + "\""
-        + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + OAuthConstants.EXPIRES_IN_PARAMETER
-        + "\":" + EXPIRES_IN + "," + "\"" + OAuthConstants.REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
+        + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER
+        + "\":" + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
   }
 
   protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken) {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" + "\""
-        + OAuthConstants.ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + OAuthConstants.EXPIRES_IN_PARAMETER
+        + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER
         + "\":" + EXPIRES_IN + "," + "\"}");
   }
 
@@ -122,8 +147,8 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
 
   protected void configureWireMockToExpectTokenPathRequestForClientCredentialsGrantType(String accessToken) {
     wireMockRule
-        .stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody("{" + "\"" + OAuthConstants.ACCESS_TOKEN_PARAMETER
-            + "\":\"" + accessToken + "\"," + "\"" + OAuthConstants.EXPIRES_IN_PARAMETER + "\":\"" + EXPIRES_IN + "\"}")));
+        .stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody("{" + "\"" + ACCESS_TOKEN_PARAMETER
+            + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER + "\":\"" + EXPIRES_IN + "\"}")));
   }
 
 
@@ -134,8 +159,8 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
 
   private void configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(String accessToken,
                                                                                                      ImmutableMap customParameters) {
-    customParameters = new ImmutableMap.Builder().putAll(customParameters).put(OAuthConstants.ACCESS_TOKEN_PARAMETER, accessToken)
-        .put(OAuthConstants.EXPIRES_IN_PARAMETER, EXPIRES_IN).build();
+    customParameters = new ImmutableMap.Builder().putAll(customParameters).put(ACCESS_TOKEN_PARAMETER, accessToken)
+        .put(EXPIRES_IN_PARAMETER, EXPIRES_IN).build();
     final ImmutableMap.Builder bodyParametersMapBuilder = new ImmutableMap.Builder();
     for (Object customParameterName : customParameters.keySet()) {
       bodyParametersMapBuilder.put(customParameterName, customParameters.get(customParameterName));
@@ -147,15 +172,11 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
 
   protected void verifyRequestDoneToTokenUrlForAuthorizationCode() throws UnsupportedEncodingException {
     wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
-        .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "="
-            + URLEncoder.encode(clientId.getValue(), UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.CODE_PARAMETER + "=" + URLEncoder.encode(AUTHENTICATION_CODE, UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "="
-            + URLEncoder.encode(clientSecret.getValue(), UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "="
-            + URLEncoder.encode(OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE, UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.REDIRECT_URI_PARAMETER + "="
-            + URLEncoder.encode(localCallbackUrl.getValue(), UTF_8.name()))));
+        .withRequestBody(containing(CLIENT_ID_PARAMETER + "=" + encode(clientId.getValue(), UTF_8.name())))
+        .withRequestBody(containing(CODE_PARAMETER + "=" + encode(AUTHENTICATION_CODE, UTF_8.name())))
+        .withRequestBody(containing(CLIENT_SECRET_PARAMETER + "=" + encode(clientSecret.getValue(), UTF_8.name())))
+        .withRequestBody(containing(GRANT_TYPE_PARAMETER + "=" + encode(GRANT_TYPE_AUTHENTICATION_CODE, UTF_8.name())))
+        .withRequestBody(containing(REDIRECT_URI_PARAMETER + "=" + encode(localCallbackUrl.getValue(), UTF_8.name()))));
   }
 
   protected void verifyRequestDoneToTokenUrlForClientCredentials() throws UnsupportedEncodingException {
@@ -169,20 +190,18 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   protected void verifyRequestDoneToTokenUrlForClientCredentials(String scope, boolean encodeInBody)
       throws UnsupportedEncodingException {
     final RequestPatternBuilder verification =
-        postRequestedFor(urlEqualTo(TOKEN_PATH)).withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "="
-            + URLEncoder.encode(OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS, UTF_8.name())));
+        postRequestedFor(urlEqualTo(TOKEN_PATH))
+            .withRequestBody(containing(GRANT_TYPE_PARAMETER + "=" + encode(GRANT_TYPE_CLIENT_CREDENTIALS, UTF_8.name())));
     if (encodeInBody == true) {
       verification
-          .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "="
-              + URLEncoder.encode(clientId.getValue(), UTF_8.name())))
-          .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "="
-              + URLEncoder.encode(clientSecret.getValue(), UTF_8.name())));
+          .withRequestBody(containing(CLIENT_ID_PARAMETER + "=" + encode(clientId.getValue(), UTF_8.name())))
+          .withRequestBody(containing(CLIENT_SECRET_PARAMETER + "=" + encode(clientSecret.getValue(), UTF_8.name())));
     } else {
-      verification.withHeader(HttpHeaders.Names.AUTHORIZATION, containing("Basic "
-          + Base64.encodeBase64String(format("%s:%s", clientId.getValue(), clientSecret.getValue()).getBytes())));
+      verification.withHeader(AUTHORIZATION, containing("Basic "
+          + encodeBase64String(format("%s:%s", clientId.getValue(), clientSecret.getValue()).getBytes())));
     }
     if (scope != null) {
-      verification.withRequestBody(containing(OAuthConstants.SCOPE_PARAMETER + "=" + URLEncoder.encode(scope, UTF_8.name())));
+      verification.withRequestBody(containing(SCOPE_PARAMETER + "=" + encode(scope, UTF_8.name())));
     }
     wireMockRule.verify(verification);
   }

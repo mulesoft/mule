@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -18,25 +19,25 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-
 import java.util.List;
 
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+
 public abstract class AbstractAuthorizationCodeBasicTestCase extends AbstractOAuthAuthorizationTestCase {
 
   @Rule
   public SystemProperty localAuthorizationUrl =
       new SystemProperty("local.authorization.url",
-                         String.format("%s://localhost:%d/authorization", getProtocol(), localHostPort.getNumber()));
+                         format("%s://localhost:%d/authorization", getProtocol(), localHostPort.getNumber()));
 
   @Rule
   public SystemProperty authorizationUrl =
       new SystemProperty("authorization.url",
-                         String.format("%s://localhost:%d" + AUTHORIZE_PATH, getProtocol(), resolveOauthServerPort()));
+                         format("%s://localhost:%d" + AUTHORIZE_PATH, getProtocol(), resolveOauthServerPort()));
 
   private int resolveOauthServerPort() {
     return getProtocol().equals("http") ? oauthServerPort.getNumber() : oauthHttpsServerPort.getNumber();
@@ -44,8 +45,9 @@ public abstract class AbstractAuthorizationCodeBasicTestCase extends AbstractOAu
 
   @Rule
   public SystemProperty tokenUrl =
-      new SystemProperty("token.url", String.format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), resolveOauthServerPort()));
+      new SystemProperty("token.url", format("%s://localhost:%d" + TOKEN_PATH, getProtocol(), resolveOauthServerPort()));
 
+  @Override
   protected String getProtocol() {
     return "http";
   }
