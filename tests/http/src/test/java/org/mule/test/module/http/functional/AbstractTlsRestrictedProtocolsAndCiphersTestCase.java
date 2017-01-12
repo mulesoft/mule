@@ -51,6 +51,11 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
   }
 
   @Override
+  protected boolean mockHttpService() {
+    return false;
+  }
+
+  @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
     return new Class[] {SocketsExtension.class, HttpConnector.class};
   }

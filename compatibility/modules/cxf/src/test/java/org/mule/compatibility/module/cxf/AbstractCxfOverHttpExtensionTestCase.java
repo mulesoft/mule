@@ -51,6 +51,11 @@ public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunc
   }
 
   @Override
+  protected boolean mockHttpService() {
+    return false;
+  }
+
+  @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
     return new Class[] {SocketsExtension.class, HttpConnector.class};
   }
