@@ -9,13 +9,14 @@ package org.mule.tck.config;
 
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
+import org.mule.service.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.List;
@@ -29,12 +30,26 @@ import java.util.List;
  */
 public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder {
 
+  private static final String MOCK_HTTP_SERVICE = "mockHttpService";
+
   final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+  private boolean mockHttpService;
+
+  public TestServicesConfigurationBuilder() {
+    this(true);
+  }
+
+  public TestServicesConfigurationBuilder(boolean mockHttpService) {
+    this.mockHttpService = mockHttpService;
+  }
 
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
+    if (mockHttpService) {
+      registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
+    }
   }
 
   public void stopServices() throws MuleException {

@@ -9,11 +9,8 @@ package org.mule.service.http.api.client.proxy;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import static org.hamcrest.Matchers.containsString;
-
-public abstract class AbstractProxyConfigTestCase<B extends BaseProxyConfigBuilder> extends AbstractMuleTestCase {
+public abstract class AbstractProxyConfigTestCase<B extends BaseProxyConfigBuilder> {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

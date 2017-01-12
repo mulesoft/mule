@@ -16,7 +16,6 @@ import static org.hamcrest.core.Is.isA;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
 import org.mule.extension.oauth2.internal.TokenNotFoundException;
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,6 +29,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -38,8 +39,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 public class ClientCredentialsFailureTestCase extends AbstractMuleContextTestCase {
 
@@ -102,7 +101,7 @@ public class ClientCredentialsFailureTestCase extends AbstractMuleContextTestCas
     @Override
     protected void addBuilders(List<ConfigurationBuilder> builders) {
       super.addBuilders(builders);
-      builders.add(new TestServicesConfigurationBuilder());
+      builders.add(new TestServicesConfigurationBuilder(false));
       builders.add(new AbstractConfigurationBuilder() {
 
         @Override

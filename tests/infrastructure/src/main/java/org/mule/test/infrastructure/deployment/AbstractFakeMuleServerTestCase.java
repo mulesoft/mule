@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -37,6 +38,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
     muleServer.addZippedService(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")));
+    muleServer.addZippedService(buildHttpServiceFile(compilerWorkFolder.newFolder("httpService")));
   }
 
   @After

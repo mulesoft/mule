@@ -12,6 +12,7 @@ import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_P
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
+import org.mule.service.http.api.HttpService;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
@@ -49,6 +50,23 @@ public class TestServicesUtils {
 
     return new ServiceFileBuilder("schedulerService")
         .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.scheduler.MockSchedulerServiceProvider")
+        .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
+  }
+
+  /**
+   * Provides a packaged mock {@link HttpService} implementation.
+   *
+   * @param tempFolder where to generate temporary files needed for compilation of the service classes.
+   * @return the zip service file
+   */
+  public static File buildHttpServiceFile(File tempFolder) {
+    final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .compiling(getResourceFile("/org/mule/service/http/MockHttpService.java", tempFolder),
+                   getResourceFile("/org/mule/service/http/MockHttpServiceProvider.java", tempFolder))
+        .compile("mule-module-service-mock-http-1.0-SNAPSHOT.jar");
+
+    return new ServiceFileBuilder("HTTP Service")
+        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.http.MockHttpServiceProvider")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }
 }
