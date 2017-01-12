@@ -13,15 +13,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
@@ -29,7 +31,6 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
@@ -64,8 +65,8 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
-                         new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
+    return asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
+                  new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
   }
 
   @Override
@@ -103,10 +104,10 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
   public void authenticationFailedTriggersRefreshAccessToken() throws Exception {
     configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(NEW_ACCESS_TOKEN);
 
-    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
-        .willReturn(aResponse().withStatus(500).withHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"myRealm\"")));
+    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(ACCESS_TOKEN))
+        .willReturn(aResponse().withStatus(500).withHeader(WWW_AUTHENTICATE, "Basic realm=\"myRealm\"")));
 
-    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(NEW_ACCESS_TOKEN))
+    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(NEW_ACCESS_TOKEN))
         .willReturn(aResponse().withBody(TEST_MESSAGE).withStatus(200)));
 
     flowRunner("testFlow").withPayload(TEST_MESSAGE).run();
@@ -114,7 +115,7 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
     verifyRequestDoneToTokenUrlForClientCredentials();
 
     wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
-        .withHeader(HttpHeaders.Names.AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
+        .withHeader(AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
   }
 
   @Override

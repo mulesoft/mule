@@ -9,10 +9,10 @@ package org.mule.test.oauth2.internal.authorizationcode.functional;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-
 import org.junit.Rule;
 import org.junit.Test;
+
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
 public class AuthorizationCodeExternalUrlTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
@@ -34,7 +34,6 @@ public class AuthorizationCodeExternalUrlTestCase extends AbstractAuthorizationC
   public void canDefineExternalUrlThroughXmlAttribute() throws Exception {
     LoggedRequest request = getLoggedRequest();
 
-    AuthorizationRequestAsserter.create(request)
-        .assertRedirectUriIs(externalUrl.getValue());
+    AuthorizationRequestAsserter.create(request).assertRedirectUriIs(externalUrl.getValue());
   }
 }

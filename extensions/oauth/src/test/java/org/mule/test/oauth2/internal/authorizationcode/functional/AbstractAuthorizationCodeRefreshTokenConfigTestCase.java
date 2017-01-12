@@ -11,20 +11,25 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_REFRESH_TOKEN;
+import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
+import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 
-import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import org.junit.Rule;
 
@@ -37,20 +42,20 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
   @Rule
   public SystemProperty localAuthorizationUrl =
       new SystemProperty("local.authorization.url",
-                         String.format("http://localhost:%d/authorization", localHostPort.getNumber()));
+                         format("http://localhost:%d/authorization", localHostPort.getNumber()));
   @Rule
   public SystemProperty authorizationUrl =
-      new SystemProperty("authorization.url", String.format("http://localhost:%d" + AUTHORIZE_PATH, oauthServerPort.getNumber()));
+      new SystemProperty("authorization.url", format("http://localhost:%d" + AUTHORIZE_PATH, oauthServerPort.getNumber()));
   @Rule
   public SystemProperty redirectUrl =
-      new SystemProperty("redirect.url", String.format("http://localhost:%d/redirect", localHostPort.getNumber()));
+      new SystemProperty("redirect.url", format("http://localhost:%d/redirect", localHostPort.getNumber()));
   @Rule
   public SystemProperty tokenUrl =
-      new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
+      new SystemProperty("token.url", format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
   @Rule
-  public SystemProperty tokenHost = new SystemProperty("token.host", String.format("localhost"));
+  public SystemProperty tokenHost = new SystemProperty("token.host", format("localhost"));
   @Rule
-  public SystemProperty tokenPort = new SystemProperty("token.port", String.valueOf(oauthServerPort.getNumber()));
+  public SystemProperty tokenPort = new SystemProperty("token.port", valueOf(oauthServerPort.getNumber()));
   @Rule
   public SystemProperty tokenPath = new SystemProperty("token.path", TOKEN_PATH);
 
@@ -67,14 +72,10 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
     assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
 
     wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
-        .withRequestBody(containing(OAuthConstants.CLIENT_ID_PARAMETER + "="
-            + URLEncoder.encode(clientId.getValue(), StandardCharsets.UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.REFRESH_TOKEN_PARAMETER + "="
-            + URLEncoder.encode(REFRESH_TOKEN, StandardCharsets.UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "="
-            + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
-        .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "="
-            + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
+        .withRequestBody(containing(CLIENT_ID_PARAMETER + "=" + encode(clientId.getValue(), UTF_8.name())))
+        .withRequestBody(containing(REFRESH_TOKEN_PARAMETER + "=" + encode(REFRESH_TOKEN, UTF_8.name())))
+        .withRequestBody(containing(CLIENT_SECRET_PARAMETER + "=" + encode(clientSecret.getValue(), UTF_8.name())))
+        .withRequestBody(containing(GRANT_TYPE_PARAMETER + "=" + encode(GRANT_TYPE_REFRESH_TOKEN, UTF_8.name()))));
   }
 
   protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName,
@@ -84,7 +85,7 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
     configureResourceResponsesForRefreshToken(oauthConfigName, userId, resourceFailureStatusCode);
 
     wireMockRule
-        .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
+        .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
             .willReturn(aResponse().withStatus(tokenFailureStatusCode).withBody("")));
     runFlow(flowName, userId);
   }
@@ -98,9 +99,9 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(REFRESHED_ACCESS_TOKEN);
 
     wireMockRule
-        .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
+        .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
             .willReturn(aResponse().withStatus(200).withBody(RESOURCE_RESULT)));
-    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(HttpHeaders.Names.AUTHORIZATION, containing(ACCESS_TOKEN))
+    wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(ACCESS_TOKEN))
         .willReturn(aResponse().withStatus(failureStatusCode).withBody("")));
 
     final ConfigOAuthContext configOAuthContext =

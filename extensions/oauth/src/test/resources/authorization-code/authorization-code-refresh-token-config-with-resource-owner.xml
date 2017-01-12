@@ -10,7 +10,7 @@
 
     <oauth:token-manager-config name="multitenantOauthConfig"/>
 
-    <httpn:request-config name="multitenantRequestConfig">
+    <httpn:request-config name="requestConfig">
         <httpn:request-connection>
             <httpn:authentication>
                 <oauth:authorization-code-grant-type
@@ -30,8 +30,8 @@
         </httpn:request-connection>
     </httpn:request-config>
 
-    <flow name="testMultitenantFlow">
+    <flow name="testFlow">
         <httpn:request host="localhost" port="${oauth.server.port}" path="/resource" method="POST"
-                      config-ref="multitenantRequestConfig"/>
+                      config-ref="requestConfig"/>
     </flow>
 </mule>
