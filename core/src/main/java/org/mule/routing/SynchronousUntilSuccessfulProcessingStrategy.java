@@ -6,8 +6,13 @@
  */
 package org.mule.routing;
 
+import java.io.NotSerializableException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -15,11 +20,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-
-import java.io.NotSerializableException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Until successful synchronous processing strategy.
@@ -41,7 +41,23 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             {
                 try
                 {
-                    return processResponseThroughAckResponseExpression(processEvent(retryEvent));
+                    MuleEvent successEvent = processResponseThroughAckResponseExpression(processEvent(retryEvent));
+                    MuleEvent finalEvent;
+                    if (successEvent instanceof VoidMuleEvent)
+                    {
+                        //continue processing with the original event
+                        finalEvent = event;
+                    }
+                    else
+                    {
+                        for (String flowVar : successEvent.getFlowVariableNames())
+                        {
+                            event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar), event.getFlowVariableDataType(flowVar));
+                        }
+                        event.getSession().merge(successEvent.getSession());
+                        finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
+                    }
+                    return OptimizedRequestContext.unsafeSetEvent(finalEvent);
                 }
                 catch (Exception e)
                 {
