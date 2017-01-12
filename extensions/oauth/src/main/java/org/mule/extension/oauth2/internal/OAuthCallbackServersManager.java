@@ -10,6 +10,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
+import org.mule.service.http.api.server.HttpServerFactory;
 import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
@@ -24,6 +25,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
+/**
+ * In Mule 4, the http {@code requester-config} is dynamic. That means, it is evaluated and created for each event that tires to
+ * send an http request. Since the OAuth config is nested inside the requester, OAuth config will be dynamic too.
+ * <p>
+ * That raises the need to have a centralized manager for the OAuth callbacks, since different events through the same http
+ * requester will try to create the same callback server. This class manages that. It will return wrapped HTTP services that have
+ * a counter of how many users of that server are in OAuth extension.
+ *
+ * @since 4.0
+ */
 public class OAuthCallbackServersManager {
 
   @Inject
@@ -31,7 +42,15 @@ public class OAuthCallbackServersManager {
 
   private Map<Integer, CountedHttpServer> serversByPort = new HashMap<>();
 
-  public synchronized HttpServer getServer(HttpServerConfiguration serverConfiguration) throws ConnectionException, IOException {
+  /**
+   * Builds or returns an already built {@link HttpServer} wrapper.
+   * 
+   * @param serverConfiguration the configuration for the new server. Its port will be used to determine if a new one must be
+   *        created or an existing one returned.
+   * @return the corresponding server wrapper.
+   * @throws ConnectionException See {@link HttpServerFactory#create(HttpServerConfiguration)}
+   */
+  public synchronized HttpServer getServer(HttpServerConfiguration serverConfiguration) throws ConnectionException {
     if (!serversByPort.containsKey(serverConfiguration.getPort())) {
       serversByPort.put(serverConfiguration.getPort(),
                         new CountedHttpServer(httpService.getServerFactory().create(serverConfiguration)));

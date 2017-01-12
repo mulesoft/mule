@@ -6,6 +6,8 @@
  */
 package org.mule.extension.oauth2.internal.tokenmanager;
 
+import static java.lang.String.format;
+
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -102,8 +104,8 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
    */
   public ResourceOwnerOAuthContext processOauthContextFunctionACall(Object... params) {
     if (params.length > 1) {
-      throw new IllegalArgumentException(String.format("oauthContext for config type %s does not accepts more than two arguments",
-                                                       "authorization-code"));
+      throw new IllegalArgumentException(format("oauthContext for config type %s does not accepts more than two arguments",
+                                                "authorization-code"));
     }
     String resourceOwnerId = ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
     if (params.length == 1) {
@@ -116,4 +118,5 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
+
 }

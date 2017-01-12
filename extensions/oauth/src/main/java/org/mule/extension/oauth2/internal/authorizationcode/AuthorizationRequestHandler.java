@@ -154,7 +154,7 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
     if (expr == null) {
       return null;
     } else if (!expr.getExpression().isPresent()
-        && !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+        || !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
       return expr.resolve();
     } else {
       return (String) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();

@@ -6,6 +6,14 @@
  */
 package org.mule.extension.oauth2.internal.clientcredentials;
 
+import static java.lang.String.format;
+import static org.apache.commons.codec.binary.Base64.encodeBase64String;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
+import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -13,7 +21,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import org.mule.extension.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.extension.oauth2.internal.ApplicationCredentials;
 import org.mule.extension.oauth2.internal.MuleEventLogger;
-import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.extension.oauth2.internal.TokenNotFoundException;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
@@ -31,7 +38,6 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,20 +85,20 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
 
   private Event setMapPayloadWithTokenRequestParameters(final Event event) throws MuleException {
     final Map<String, String> formData = new HashMap<>();
-    formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
+    formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);
     String clientId = applicationCredentials.getClientId();
     String clientSecret = applicationCredentials.getClientSecret();
 
     InternalMessage.Builder builder = InternalMessage.builder(event.getMessage());
     if (encodeClientCredentialsInBody) {
-      formData.put(OAuthConstants.CLIENT_ID_PARAMETER, clientId);
-      formData.put(OAuthConstants.CLIENT_SECRET_PARAMETER, clientSecret);
+      formData.put(CLIENT_ID_PARAMETER, clientId);
+      formData.put(CLIENT_SECRET_PARAMETER, clientSecret);
     } else {
-      String encodedCredentials = Base64.encodeBase64String(String.format("%s:%s", clientId, clientSecret).getBytes());
+      String encodedCredentials = encodeBase64String(format("%s:%s", clientId, clientSecret).getBytes());
       builder.attributes(new OAuthAuthorizationAttributes("Basic " + encodedCredentials));
     }
     if (scopes != null) {
-      formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
+      formData.put(SCOPE_PARAMETER, scopes);
     }
     return Event.builder(event).message(builder.payload(formData).build()).build();
   }
@@ -117,7 +123,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
       }
 
       final ResourceOwnerOAuthContext defaultUserState =
-          tokenManager.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+          tokenManager.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
       defaultUserState.setAccessToken(tokenResponse.getAccessToken());
       defaultUserState.setExpiresIn(tokenResponse.getExpiresIn());
       final Map<String, Object> customResponseParameters = tokenResponse.getCustomResponseParameters();
@@ -126,13 +132,13 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
       }
       tokenManager.getConfigOAuthContext().updateResourceOwnerOAuthContext(defaultUserState);
     } catch (TokenNotFoundException e) {
-      logger.error(String
-          .format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
-                  e.getTokenResponseAccessToken(), e.getTokenResponseRefreshToken()));
+      logger
+          .error(format("Could not extract access token or refresh token from token URL. Access token is %s, Refresh token is %s",
+                        e.getTokenResponseAccessToken(), e.getTokenResponseRefreshToken()));
       muleEventLogger.logContent(e.getTokenUrlResponse());
       throw new DefaultMuleException(e);
     } catch (TokenUrlResponseException e) {
-      logger.error((String.format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
+      logger.error((format("HTTP response from token URL %s returned a failure status code", getTokenUrl())));
       muleEventLogger.logContent(e.getTokenUrlResponse());
       throw new DefaultMuleException(e);
     }

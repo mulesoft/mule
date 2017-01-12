@@ -6,17 +6,18 @@
  */
 package org.mule.extension.oauth2.internal.tokenmanager;
 
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
@@ -50,7 +51,7 @@ public class InvalidateOauthContextMessageProcessor extends AbstractAnnotatedObj
   @Override
   public void initialise() throws InitialisationException {
     if (resourceOwnerIdEvaluator == null) {
-      resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
+      resourceOwnerIdEvaluator = new AttributeEvaluator(DEFAULT_RESOURCE_OWNER_ID);
     }
     resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
   }

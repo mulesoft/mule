@@ -32,7 +32,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
@@ -133,17 +132,6 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
       }
     }
     return shouldRetryRequest;
-  }
-
-  private <T> T resolveExpression(ParameterResolver<T> expr, Event event) {
-    if (expr == null) {
-      return null;
-    } else if (!expr.getExpression().isPresent()
-        && !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
-      return expr.resolve();
-    } else {
-      return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
-    }
   }
 
   public void setTokenManager(TokenManagerConfig tokenManager) {
