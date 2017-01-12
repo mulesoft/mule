@@ -43,7 +43,7 @@ public class AttributeEvaluator {
 
   private String sanitize(String attributeValue) {
     if (attributeValue != null) {
-      attributeValue = attributeValue.trim().replaceAll("\n", "").replaceAll("\r", "").replaceAll("\t", "");
+      attributeValue = attributeValue.trim().replaceAll("\r", "").replaceAll("\t", "");
     }
 
     return attributeValue;

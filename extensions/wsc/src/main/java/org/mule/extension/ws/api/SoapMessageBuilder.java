@@ -25,6 +25,7 @@ public class SoapMessageBuilder {
    * The XML body to include in the SOAP message, with all the required parameters, or {@code null} if no params are required.
    */
   @Parameter
+  @Optional
   @Content(primary = true)
   private String body;
 
@@ -33,8 +34,8 @@ public class SoapMessageBuilder {
    */
   @Parameter
   @Optional
-  @NullSafe
-  private Map<String, String> headers;
+  @Content
+  private String headers;
 
   /**
    * The attachments to include in the SOAP request.
@@ -42,13 +43,14 @@ public class SoapMessageBuilder {
   @Parameter
   @Optional
   @NullSafe
+  @Content
   private Map<String, SoapAttachment> attachments;
 
   public String getBody() {
     return body;
   }
 
-  public Map<String, String> getHeaders() {
+  public String getHeaders() {
     return headers;
   }
 

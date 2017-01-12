@@ -8,9 +8,6 @@ package org.mule.extension.ws.api;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * Represents and enables the construction of an attachment to be sent over SOAP.
@@ -22,21 +19,16 @@ public class SoapAttachment {
   /**
    * the name of the attachment.
    */
-  @Parameter
   private String id;
 
   /**
    * the content of the attachment.
    */
-  @Parameter
-  @XmlHints(allowReferences = false)
   private Object content;
 
   /**
    * the content type of the attachment content.
    */
-  @Parameter
-  @Optional
   private String contentType;
 
   public SoapAttachment() {}

@@ -61,6 +61,7 @@ final class HeadersElementResolver extends NodeElementResolver {
                                        Message message)
       throws MetadataResolvingException {
     ObjectTypeBuilder typeBuilder = baseTypeBuilder.objectType();
+    typeBuilder.id("headers");
     for (String header : headers) {
       ObjectFieldTypeBuilder field = typeBuilder.addField();
       field.key(header).value(buildPartMetadataType(loader, message.getPart(header)));

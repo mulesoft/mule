@@ -8,7 +8,6 @@ package org.mule.extension.ws.internal;
 
 
 import static java.lang.String.format;
-import static org.mule.extension.ws.internal.util.TransformationUtils.stringToDomElement;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.api.SoapMessageBuilder;
@@ -22,7 +21,6 @@ import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
 import org.mule.extension.ws.internal.metadata.MessageBuilderResolver;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
 import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
-import org.mule.extension.ws.internal.util.WscTransformationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -34,8 +32,12 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.xml.util.XMLUtils;
+
+import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +49,9 @@ import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The only {@link WebServiceConsumer} operation. the {@link ConsumeOperation} consumes an operation of the connected web service
@@ -81,12 +86,11 @@ public class ConsumeOperation {
                                                @NullSafe @Optional @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
       throws SoapFaultException {
     Map<String, SoapAttachment> attachments = message.getAttachments();
-    Map<String, String> headers = message.getHeaders();
     XMLStreamReader request = requestGenerator.generate(connection, operation, message.getBody(), attachments);
     Exchange exchange = new ExchangeImpl();
     Object[] response = connection.invoke(operation,
                                           request,
-                                          transformToCxfHeaders(headers),
+                                          transformToCxfHeaders(message.getHeaders()),
                                           transformToCxfAttachments(attachments),
                                           config.getEncoding(),
                                           exchange);
@@ -95,17 +99,27 @@ public class ConsumeOperation {
 
   /**
    * Prepares the provided {@link Map} of headers in the {@link SoapMessageBuilder} to be processed by CXF.
+   *
+   * @param headers
    */
-  private List<SoapHeader> transformToCxfHeaders(Map<String, String> headers) {
-    return headers.entrySet().stream()
-        .map(h -> {
-          try {
-            return new SoapHeader(new QName(null, h.getKey()), stringToDomElement(h.getValue()));
-          } catch (WscTransformationException e) {
-            throw new BadRequestException(format("Error while preparing request header [%s] to be sent", h.getKey()), e);
-          }
-        })
-        .collect(new ImmutableListCollector<>());
+  private List<SoapHeader> transformToCxfHeaders(String headers) {
+    if (headers == null) {
+      return Collections.emptyList();
+    }
+    ImmutableList.Builder<SoapHeader> soapHeaders = ImmutableList.builder();
+    try {
+      Element document = XMLUtils.toW3cDocument(headers).getDocumentElement();
+      NodeList nodes = document.getChildNodes();
+      for (int i = 0; i < nodes.getLength(); i++) {
+        Node currentNode = nodes.item(i);
+        if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+          soapHeaders.add(new SoapHeader(new QName(null, currentNode.getNodeName()), currentNode));
+        }
+      }
+    } catch (Exception e) {
+      throw new BadRequestException("Error while parsing the provided soap headers", e);
+    }
+    return soapHeaders.build();
   }
 
   /**
