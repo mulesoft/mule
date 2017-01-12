@@ -39,7 +39,7 @@ public class PolicyNextActionMessageProcessor extends AbstractAnnotatedObject im
     }
     try {
       return nextOperation.process(event);
-    } catch (MessagingException e) {
+    } catch (MuleException e) {
       throw e;
     } catch (Exception e) {
       throw new DefaultMuleException(e);

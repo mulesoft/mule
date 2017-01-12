@@ -6,15 +6,14 @@
  */
 package org.mule.extension.http.api.policy;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.dsl.config.ComponentIdentifier.parseComponentIdentifier;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import com.google.common.collect.ImmutableMap;
@@ -73,22 +72,24 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,
                                                           String responseBuilderParameterName, Message message) {
+    ImmutableMap.Builder<String, Object> mapBuilder =
+        ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder);
     if (message.getAttributes() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes();
       httpListenerResponseBuilder.setBody(message.getPayload().getValue());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
-      return ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder).build();
+      return mapBuilder.build();
     } else if (message.getAttributes() instanceof HttpPolicyResponseAttributes) {
       HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes();
       httpListenerResponseBuilder.setBody(message.getPayload().getValue());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
-      return ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder).build();
+      return mapBuilder.build();
     } else {
-      return emptyMap();
+      return mapBuilder.build();
     }
   }
 
