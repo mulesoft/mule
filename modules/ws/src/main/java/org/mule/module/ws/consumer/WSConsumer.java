@@ -64,7 +64,6 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class WSConsumer implements MessageProcessor, Initialisable, MuleContextAware, Disposable, NonBlockingMessageProcessor
 {
 
@@ -107,19 +106,34 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     }
 
 
-    private void initializeWsdlRetrievalStrategy()
+    private void initializeWsdlRetrievalStrategy() throws InitialisationException
     {
         HttpRequesterConfig httpRequesterConfig = config.getConnectorConfig();
+        String url = config.getWsdlLocation();
 
-        if (httpRequesterConfig == null || httpRequesterConfig.getProxyConfig() == null)
+        boolean isHttpRequester = verifyIsHttpRequester(url);
+
+        if (httpRequesterConfig == null && config.isUseConnectorToRetrieveWsdl())
         {
-            wsdlRetrieverStrategy = new URLRetrieverStrategy();
+            throw new InitialisationException(CoreMessages.createStaticMessage("The useConnectorToRetrieveWsdl option requires connectorConfig to work"),
+                    this);
+        }
+
+        if (config.isUseConnectorToRetrieveWsdl() && isHttpRequester)
+        {
+            wsdlRetrieverStrategy = new HttpRequesterWsdlRetrieverStrategy(url, httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
         }
         else
         {
-            wsdlRetrieverStrategy = new ProxyWsdlRetrieverStrategy(httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
+            wsdlRetrieverStrategy = new URLRetrieverStrategy(url);
         }
     }
+
+    private boolean verifyIsHttpRequester(String url) throws InitialisationException
+    {
+        return url.startsWith(HttpConnector.HTTP_URL_PROTOCOL) || url.startsWith(HttpConnector.HTTPS_URL_PROTOCOL);
+    }
+
 
     /**
      * Initializes the configuration for this web service consumer. If no reference to WSConsumerConfig is set, then it
@@ -360,15 +374,9 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     {
         Definition wsdlDefinition = null;
 
-        URL url = IOUtils.getResourceAsUrl(config.getWsdlLocation(), getClass());
-        if (url == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Can't find wsdl at %s", config.getWsdlLocation()), this);
-        }
-
         try
         {
-            wsdlDefinition = wsdlRetrieverStrategy.retrieveWsdlFrom(url);
+            wsdlDefinition = getWsdlRetrieverStrategy().retrieveWsdl();
         }
         catch (Exception e)
         {
@@ -522,4 +530,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
             ((Disposable) messageProcessor).dispose();
         }
     }
+
+
+    public WsdlRetrieverStrategy getWsdlRetrieverStrategy()
+    {
+        return wsdlRetrieverStrategy;
+    }
+
 }

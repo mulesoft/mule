@@ -41,6 +41,7 @@ public class WSConsumerConfig implements MuleContextAware
     private String service;
     private String port;
     private String serviceAddress;
+    private boolean useConnectorToRetrieveWsdl;
     private Connector connector;
     private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
@@ -226,6 +227,16 @@ public class WSConsumerConfig implements MuleContextAware
     public void setSecurity(WSSecurity security)
     {
         this.security = security;
+    }
+
+    public boolean isUseConnectorToRetrieveWsdl()
+    {
+        return useConnectorToRetrieveWsdl;
+    }
+
+    public void setUseConnectorToRetrieveWsdl(boolean useConnectorToRetrieveWsdl)
+    {
+        this.useConnectorToRetrieveWsdl = useConnectorToRetrieveWsdl;
     }
 
 }

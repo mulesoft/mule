@@ -81,6 +81,9 @@ public class HttpConnector extends TcpConnector
 {
 
     public static final String HTTP = "http";
+    public static final String HTTPS = "https";
+    public static final String HTTP_URL_PROTOCOL = HTTP + "://";
+    public static final String HTTPS_URL_PROTOCOL = HTTPS + "://";
     public static final String HTTP_PREFIX = "http.";
     public static final String DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY = MuleProperties.SYSTEM_PROPERTY_PREFIX
                                                                                 + "transport."
