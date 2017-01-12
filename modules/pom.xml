@@ -31,7 +31,6 @@
         <module>jboss-transactions</module>
         <module>json</module>
         <module>management</module>
-        <module>oauth</module>
         <module>pgp</module>
         <module>reboot</module>
         <module>schedulers</module>

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.listener.matcher;
 
+import static java.lang.System.identityHashCode;
+
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 
@@ -18,6 +20,7 @@ public class AcceptsAllMethodsRequestMatcher extends DefaultMethodRequestMatcher
 
   private AcceptsAllMethodsRequestMatcher() {}
 
+  @Override
   public boolean matches(HttpRequest httpRequest) {
     return true;
   }
@@ -29,5 +32,15 @@ public class AcceptsAllMethodsRequestMatcher extends DefaultMethodRequestMatcher
   @Override
   public boolean intersectsWith(MethodRequestMatcher matcher) {
     return matcher instanceof AcceptsAllMethodsRequestMatcher;
+  }
+
+  @Override
+  public int hashCode() {
+    return identityHashCode(this);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof AcceptsAllMethodsRequestMatcher;
   }
 }
