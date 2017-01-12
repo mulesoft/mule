@@ -8,6 +8,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -41,7 +42,23 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             {
                 try
                 {
-                    return processResponseThroughAckResponseExpression(processEvent(retryEvent));
+                    MuleEvent successEvent = processResponseThroughAckResponseExpression(processEvent(retryEvent));
+                    MuleEvent finalEvent;
+                    if (successEvent instanceof VoidMuleEvent)
+                    {
+                        //continue processing with the original event
+                        finalEvent = event;
+                    }
+                    else
+                    {
+                        for (String flowVar : successEvent.getFlowVariableNames())
+                        {
+                            event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
+                        }
+                        event.getSession().merge(successEvent.getSession());
+                        finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
+                    }
+                    return OptimizedRequestContext.unsafeSetEvent(finalEvent);
                 }
                 catch (Exception e)
                 {
