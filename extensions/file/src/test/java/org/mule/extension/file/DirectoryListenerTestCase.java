@@ -66,7 +66,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void startIfNodeBecomesSecondary() throws Exception {
+  public void startIfNodeBecomesPrimary() throws Exception {
     ArgumentCaptor<PrimaryNodeLifecycleNotificationListener> listenerCaptor =
         ArgumentCaptor.forClass(PrimaryNodeLifecycleNotificationListener.class);
 
@@ -79,6 +79,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
     listener.onNotification(mock(ServerNotification.class));
 
     verify(mockMuleContext, times(2)).isPrimaryPollingInstance();
+
   }
 
 }

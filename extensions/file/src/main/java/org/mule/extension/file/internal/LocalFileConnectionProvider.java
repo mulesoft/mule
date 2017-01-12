@@ -35,8 +35,8 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 @DisplayName("Local FileSystem Connection")
-public final class LocalFileConnectionProvider extends FileSystemProvider<FileSystem>
-    implements CachedConnectionProvider<FileSystem> {
+public final class LocalFileConnectionProvider extends FileSystemProvider<LocalFileSystem>
+    implements CachedConnectionProvider<LocalFileSystem> {
 
   private static final Logger LOGGER = getLogger(LocalFileConnectionProvider.class);
 
@@ -60,7 +60,7 @@ public final class LocalFileConnectionProvider extends FileSystemProvider<FileSy
    * @return a {@link LocalFileSystem}
    */
   @Override
-  public FileSystem connect() throws ConnectionException {
+  public LocalFileSystem connect() throws ConnectionException {
     validateWorkingDir();
     return new LocalFileSystem(workingDir, muleContext);
   }
@@ -71,12 +71,12 @@ public final class LocalFileConnectionProvider extends FileSystemProvider<FileSy
    * @param localFileSystem a {@link LocalFileSystem} instance
    */
   @Override
-  public void disconnect(FileSystem localFileSystem) {
+  public void disconnect(LocalFileSystem localFileSystem) {
     // no-op
   }
 
   @Override
-  public ConnectionValidationResult validate(FileSystem fileSystem) {
+  public ConnectionValidationResult validate(LocalFileSystem fileSystem) {
     return ConnectionValidationResult.success();
   }
 

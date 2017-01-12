@@ -17,7 +17,6 @@ import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
 
@@ -93,18 +93,21 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
-                       Predicate<FileAttributes> matcher) {
-    return getListCommand().list(config, directoryPath, recursive, message, matcher);
+  public List<Result<InputStream, FileAttributes>> list(FileConnectorConfig config,
+                                                        String directoryPath,
+                                                        boolean recursive,
+                                                        MediaType mediaType,
+                                                        Predicate<FileAttributes> matcher) {
+    return getListCommand().list(config, directoryPath, recursive, mediaType, matcher);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
+  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, String filePath, MediaType mediaType,
                                                   boolean lock) {
-    return getReadCommand().read(config, message, filePath, lock);
+    return getReadCommand().read(config, filePath, mediaType, lock);
   }
 
   /**

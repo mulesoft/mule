@@ -8,7 +8,6 @@ package org.mule.runtime.core.registry;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
@@ -132,13 +131,12 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
       Class<?> dependencyType = field.getType();
       try {
         field.setAccessible(true);
-        if (MuleContext.class.isAssignableFrom(dependencyType)) {
-          field.set(object, muleContext);
-        } else {
-          Object dependency = lookupObject(dependencyType);
-          if (dependency != null) {
-            field.set(object, dependency);
-          }
+        Object dependency = lookupObject(dependencyType);
+        if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
+          dependency = muleContext;
+        }
+        if (dependency != null) {
+          field.set(object, dependency);
         }
       } catch (Exception e) {
         throw new RuntimeException(String.format("Could not inject dependency on field %s of type %s", field.getName(),
