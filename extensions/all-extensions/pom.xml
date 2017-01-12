@@ -232,6 +232,7 @@
             <artifactId>mule-module-oauth</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <!--TODO(gfernandes): remove this, see validation's comment-->
             <exclusions>
                 <exclusion>
