@@ -9,7 +9,7 @@
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 
     <http:request-config name="HTTP_Request_Configuration"
-                         protocol="HTTPS" host="fake.com" responseTimeout="60000" port="80"
+                         protocol="HTTPS" host="fake.com" port="80"
                          proxy-ref="Proxy_Configuration">
     </http:request-config>
 
@@ -18,7 +18,7 @@
 
 
     <ws:consumer-config name="Web_Service_Consumer"
-                        service="TestService" port="TestPort" serviceAddress="http://localhost:${port}/service/Test"
+                        service="TestService" port="TestPort" serviceAddress="http://fake.com/service/Test"
                         wsdlLocation="http://fake.com/services/Test?wsdl" connectorConfig="HTTP_Request_Configuration"/>
 
     <flow name="test">

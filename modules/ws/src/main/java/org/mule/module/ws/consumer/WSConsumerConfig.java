@@ -8,9 +8,11 @@ package org.mule.module.ws.consumer;
 
 
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL;
 import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -19,6 +21,8 @@ import org.mule.api.connector.ConnectorOperationLocator;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
@@ -41,9 +45,16 @@ public class WSConsumerConfig implements MuleContextAware
     private String service;
     private String port;
     private String serviceAddress;
+    private boolean useConnectorToRetrieveWsdl;
     private Connector connector;
     private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
+
+    WSConsumerConfig()
+    {
+        String useConnectorToRetrieveWsdlValue = System.getProperty(MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL, "false");
+        useConnectorToRetrieveWsdl = Boolean.parseBoolean(useConnectorToRetrieveWsdlValue);
+    }
 
     @Override
     public void setMuleContext(MuleContext muleContext)
@@ -228,4 +239,8 @@ public class WSConsumerConfig implements MuleContextAware
         this.security = security;
     }
 
+    public boolean isUseConnectorToRetrieveWsdl()
+    {
+        return useConnectorToRetrieveWsdl;
+    }
 }
