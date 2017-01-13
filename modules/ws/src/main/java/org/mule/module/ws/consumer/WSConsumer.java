@@ -115,11 +115,10 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         if (httpRequesterConfig == null && config.isUseConnectorToRetrieveWsdl())
         {
-            throw new InitialisationException(CoreMessages.createStaticMessage("The useConnectorToRetrieveWsdl option requires connectorConfig to work"),
-                    this);
+            logger.warn("The useConnectorToRetrieveWsdl option requires connectorConfig to work");
         }
 
-        if (config.isUseConnectorToRetrieveWsdl() && isHttpRequester)
+        if (httpRequesterConfig != null && config.isUseConnectorToRetrieveWsdl() && isHttpRequester)
         {
             wsdlRetrieverStrategy = new HttpRequesterWsdlRetrieverStrategy(url, httpRequesterConfig.getTlsContext(), httpRequesterConfig.getProxyConfig(), muleContext);
         }

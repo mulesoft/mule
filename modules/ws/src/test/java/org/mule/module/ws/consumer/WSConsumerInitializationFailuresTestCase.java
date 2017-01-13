@@ -15,7 +15,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
-import org.junit.Test;;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;;
 
 
 public class WSConsumerInitializationFailuresTestCase extends AbstractMuleContextTestCase
@@ -24,15 +25,14 @@ public class WSConsumerInitializationFailuresTestCase extends AbstractMuleContex
     @Rule
     public SystemProperty useConnectorToRetrieveWsdl = new SystemProperty(MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL, "true");
 
-    @Test(expected = ConfigurationException.class)
-    public void wsConsumerConfigUseConnectorToRetrieveWsdlNoHttp() throws Exception
-    {
-        loadConfiguration("ws-consumer-wsdl-no-connector-config-and-connector-to-retrieve.xml");
-    }
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void wsConsumerConfigNullWsdlLocation() throws Exception
     {
+        exception.expect(ConfigurationException.class);
+        exception.expectMessage("wsdlLocation");;
         loadConfiguration("ws-consumer-wsdl-null-wsdl-location.xml");
     }
 
