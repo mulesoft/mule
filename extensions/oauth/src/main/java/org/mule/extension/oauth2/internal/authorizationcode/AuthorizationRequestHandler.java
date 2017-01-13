@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
  * Handles the call to the localAuthorizationUrl and redirects the user to the oauth authentication server authorization url so
  * the user can grant access to the resources to the mule application.
  */
+// TODO MULE-11412 Remove MuleContextAware
 public class AuthorizationRequestHandler implements MuleContextAware, Startable, Stoppable {
 
   public static final String OAUTH_STATE_ID_FLOW_VAR_NAME = "resourceOwnerId";
@@ -102,6 +103,8 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
   private Map<String, String> customParameters = new HashMap<>();
 
   private RequestHandlerManager redirectUrlHandlerManager;
+  // TODO MULE-11412 Uncomment
+  // @Inject
   private MuleContext muleContext;
   private AuthorizationCodeGrantType oauthConfig;
 

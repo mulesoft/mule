@@ -60,12 +60,17 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//TODO MULE-11412 Remove MuleContextAware
 public abstract class AbstractTokenRequestHandler implements Initialisable, Startable, Stoppable, MuleContextAware {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
+  // TODO MULE-11412 Uncomment
+  // @Inject
   protected MuleContext muleContext;
 
+  // TODO MULE-11412 Uncomment
+  // @Inject
   private HttpService httpService;
 
   /**

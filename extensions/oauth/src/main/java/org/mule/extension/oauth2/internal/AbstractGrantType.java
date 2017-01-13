@@ -18,8 +18,11 @@ import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 /**
  * Common interface for all grant types must extend this interface.
  */
+// TODO MULE-11412 Remove MuleContextAware
 public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials, MuleContextAware {
 
+  // TODO MULE-11412 Uncomment
+  // @Inject
   protected MuleContext muleContext;
 
   /**
