@@ -28,20 +28,28 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
     @ClassRule
     public static DynamicPort dynamicPort = new DynamicPort("port");
 
-    @ClassRule
-    public static DynamicPort dynamicPort2 = new DynamicPort("portNoReply");
-
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
     @ClassRule
-    public static ExternalResource mockServer = new ExternalResource()
+    public static ExternalResource mockServer = new ServerResource(dynamicPort);
+
+    /**
+     * JUnit rule to initialize and teardown the http server
+     */
+    public static class ServerResource extends ExternalResource
     {
-        MockServer server;
+        private Server server;
+        private DynamicPort port;
+
+        ServerResource(DynamicPort port)
+        {
+            this.port = port;
+        }
 
         @Override
         protected void before() throws Throwable
         {
-            server = new MockServer(dynamicPort.getNumber());
+            server = new Server(dynamicPort.getNumber());
             server.start();
         }
 
@@ -57,18 +65,18 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
                 throw new RuntimeException("server stop failed");
             }
         }
-    };
+    }
 
     /**
      * Implementation of an http fake server
      */
-    private static class MockServer
+    public static class Server
     {
 
         private int serverPort;
         private HttpServer server;
 
-        public MockServer(int serverPort)
+        public Server(int serverPort)
         {
             this.serverPort = serverPort;
         }
