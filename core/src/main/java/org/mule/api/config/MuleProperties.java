@@ -200,4 +200,5 @@ public class MuleProperties
     public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
     public static final String CONTENT_TYPE_PROPERTY = "Content-Type";
     public static final String MULE_PGP_ENCRYPTION_ALGORITHM = SYSTEM_PROPERTY_PREFIX + "pgp.encryption.algorithm";
+    public static final String MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL = SYSTEM_PROPERTY_PREFIX + "ws.useConnectorToRetrieveWsdl";
 }

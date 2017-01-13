@@ -9,6 +9,8 @@ package org.mule.module.ws.consumer;
 
 import static org.mule.util.Base64.encodeBytes;
 
+import org.mule.util.IOUtils;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,38 +25,38 @@ import javax.wsdl.WSDLException;
 public class URLRetrieverStrategy extends AbstractInputStreamStrategy
 {
 
-    @Override
-    public Definition retrieveWsdlFrom(URL url) throws Exception
+    private URL url;
+
+    public URLRetrieverStrategy(String url)
     {
-        InputStream responseStream = null;
-        Definition wsdlDefinition = null;
+        this.url = IOUtils.getResourceAsUrl(url, getClass());
+    }
 
-        URLConnection urlConnection = url.openConnection();
-
-        if (url.getUserInfo() != null)
-        {
-            urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(url.getUserInfo().getBytes()));
-        }
-
-        responseStream = urlConnection.getInputStream();
-
+    @Override
+    public Definition retrieveWsdl() throws WSDLException
+    {
         try
         {
-            wsdlDefinition = getWsdlDefinition(url, responseStream);
-        }
-        finally
-        {
-            try
-            {
-                responseStream.close();
-            }
-            catch (Exception e)
-            {
-                throw new WSDLException("Exception closing streaming for url: %s", url.toString(), e);
-            }
-        }
+            InputStream responseStream = null;
+            Definition wsdlDefinition = null;
 
-        return wsdlDefinition;
+            URLConnection urlConnection = url.openConnection();
+
+            if (url.getUserInfo() != null)
+            {
+                urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(url.getUserInfo().getBytes()));
+            }
+
+            responseStream = urlConnection.getInputStream();
+
+            wsdlDefinition = getWsdlDefinition(url.toString(), responseStream);
+            responseStream.close();
+            return wsdlDefinition;
+        }
+        catch (Exception e)
+        {
+            throw new WSDLException("Exception retrieving WSDL for URL: %s", url.toString(), e);
+        }
     }
 
 }
