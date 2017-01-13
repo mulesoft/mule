@@ -9,13 +9,12 @@ package org.mule.module.ws.consumer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.api.config.MuleProperties.MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL;
 
-import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Map;
 
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;;
 
 /**
@@ -28,8 +27,11 @@ import org.junit.Test;;
  */
 public class WSConsumerHttpURLConnectionTestCase extends AbstractWSDLServerTestCase {
 
-	private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 2;
-	
+    private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 2;
+
+    @ClassRule
+    public static DynamicPort portNoReply = new DynamicPort("portNoReply");
+
 	@Override
 	protected String getConfigFile() {
 		return "ws-consumer-url-connection-test-case.xml";
