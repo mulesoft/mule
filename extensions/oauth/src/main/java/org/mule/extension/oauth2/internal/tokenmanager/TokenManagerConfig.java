@@ -39,15 +39,17 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
   /**
    * Identifier for the token manager configuration.
    */
+  // TODO MULE-11424 Move to OAuthExtension
   @ConfigName
   private String name;
 
   /**
    * References an object store to use for storing oauth context data
    */
+  // TODO MULE-11424 Move to OAuthExtension
   @Parameter
   @Optional
-  private ListableObjectStore objectStore;
+  private ListableObjectStore<ResourceOwnerOAuthContext> objectStore;
 
   private MuleContext muleContext;
 
@@ -55,11 +57,11 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
 
   private boolean initialised;
 
-  public ListableObjectStore getObjectStore() {
+  public ListableObjectStore<ResourceOwnerOAuthContext> getObjectStore() {
     return objectStore;
   }
 
-  public void setObjectStore(ListableObjectStore objectStore) {
+  public void setObjectStore(ListableObjectStore<ResourceOwnerOAuthContext> objectStore) {
     this.objectStore = objectStore;
   }
 
@@ -73,8 +75,9 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
       return;
     }
     if (objectStore == null) {
-      objectStore = (ListableObjectStore) ((MuleObjectStoreManager) muleContext.getObjectStoreManager())
-          .getUserObjectStore("token-manager-store-" + this.name, true);
+      objectStore =
+          (ListableObjectStore<ResourceOwnerOAuthContext>) ((MuleObjectStoreManager) muleContext.getObjectStoreManager())
+              .getUserObjectStore("token-manager-store-" + this.name, true);
     }
     configOAuthContext = new ConfigOAuthContext(muleContext.getLockFactory(), objectStore, name);
     initialised = true;

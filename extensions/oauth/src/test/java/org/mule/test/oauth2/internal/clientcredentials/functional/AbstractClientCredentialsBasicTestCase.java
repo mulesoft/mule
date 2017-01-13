@@ -16,7 +16,6 @@ import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-import static org.mule.extension.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
@@ -49,8 +48,7 @@ public abstract class AbstractClientCredentialsBasicTestCase extends AbstractOAu
 
     flowRunner(TEST_FLOW_NAME).withPayload(TEST_MESSAGE).run();
 
-    wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
-        .withHeader(AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(ACCESS_TOKEN))));
+    wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, equalTo("Bearer " + ACCESS_TOKEN)));
   }
 
   @Test
@@ -68,7 +66,7 @@ public abstract class AbstractClientCredentialsBasicTestCase extends AbstractOAu
 
     verifyRequestDoneToTokenUrlForClientCredentials();
 
-    wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
-        .withHeader(AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
+    wireMockRule
+        .verify(postRequestedFor(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, equalTo("Bearer " + NEW_ACCESS_TOKEN)));
   }
 }

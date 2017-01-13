@@ -8,22 +8,23 @@ package org.mule.extension.oauth2.internal;
 
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 /**
  * Common interface for all grant types must extend this interface.
+ * 
+ * @since 4.0
  */
 // TODO MULE-11412 Remove MuleContextAware
 public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials, MuleContextAware {
 
-  // TODO MULE-11412 Uncomment
-  // @Inject
+  // TODO MULE-11412 Add @Inject
   protected MuleContext muleContext;
+
+  protected DeferredExpressionResolver resolver;
 
   /**
    * The token manager configuration to use for this grant type.
@@ -36,24 +37,13 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
    * @param accessToken an oauth access token
    * @return the content of the HTTP authentication header.
    */
-  public static String buildAuthorizationHeaderContent(String accessToken) {
+  protected String buildAuthorizationHeaderContent(String accessToken) {
     return "Bearer " + accessToken;
   }
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+    this.resolver = new DeferredExpressionResolver(muleContext);
   }
-
-  protected <T> T resolveExpression(ParameterResolver<T> expr, Event event) {
-    if (expr == null) {
-      return null;
-    } else if (!expr.getExpression().isPresent()
-        || !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
-      return expr.resolve();
-    } else {
-      return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
-    }
-  }
-
 }

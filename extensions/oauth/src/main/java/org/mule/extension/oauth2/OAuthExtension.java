@@ -4,9 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.oauth2.internal;
+package org.mule.extension.oauth2;
 
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
+import org.mule.extension.oauth2.api.exception.OAuthErrors;
+import org.mule.extension.oauth2.api.exception.TokenNotFoundException;
+import org.mule.extension.oauth2.internal.OAuthOperations;
 import org.mule.extension.oauth2.internal.authorizationcode.DefaultAuthorizationCodeGrantType;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.clientcredentials.ClientCredentialsGrantType;
@@ -17,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 /**
  * An extension to hook oauth2 to http extension connectors.
@@ -28,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 @Operations(OAuthOperations.class)
 @SubTypeMapping(baseType = HttpAuthentication.class,
     subTypes = {DefaultAuthorizationCodeGrantType.class, ClientCredentialsGrantType.class})
+@ErrorTypes(OAuthErrors.class)
 @Xml(namespace = "oauth")
 @Export(classes = {TokenManagerConfig.class, ResourceOwnerOAuthContext.class, TokenNotFoundException.class})
 public class OAuthExtension {

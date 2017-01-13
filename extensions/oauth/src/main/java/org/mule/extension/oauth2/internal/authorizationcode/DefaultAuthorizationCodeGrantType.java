@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
@@ -49,11 +50,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Represents the config element for oauth:authentication-code-config.
- * <p/>
+ * Represents the config element for {@code oauth:authentication-code-config}.
+ * <p>
  * This config will: - If the authorization-request is defined then it will create a flow listening for an user call to begin the
  * oauth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
  * authentication code and retrieve the access token
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 @Alias("authorization-code-grant-type")
 public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Lifecycle, AuthorizationCodeGrantType {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultAuthorizationCodeGrantType.class);
+  private static final Logger LOGGER = getLogger(DefaultAuthorizationCodeGrantType.class);
 
   /**
    * Application identifier as defined in the oauth authentication server.
@@ -226,15 +226,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         final URL localCallbackUrl = new URL(getLocalCallbackUrl());
         serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
       } catch (MalformedURLException e) {
-        logger.warn("Could not parse provided url %s. Validate that the url is correct", getLocalCallbackUrl());
+        LOGGER.warn("Could not parse provided url %s. Validate that the url is correct", getLocalCallbackUrl());
         throw new InitialisationException(e, this);
       }
+    } else if (getLocalCallbackConfig() != null) {
       // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
-      // } else if (getLocalCallbackConfig() != null) {
-      // serverConfigBuilder
-      // .setHost(getLocalCallbackConfig().getHost())
-      // .setPort(getLocalCallbackConfig().getPort())
-      // .setTlsContextFactory(getLocalCallbackConfig().getTlsContext());
+      throw new UnsupportedOperationException("Not implemented yet.");
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
@@ -250,7 +247,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     try {
       server = serversManager.getServer(serverConfiguration);
     } catch (ConnectionException e) {
-      logger.warn("Could not create server for OAuth callback.");
+      LOGGER.warn("Could not create server for OAuth callback.");
       throw new InitialisationException(e, this);
     }
 
@@ -259,8 +256,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @Override
   public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
     final String accessToken =
-        getUserOAuthContext().getContextForResourceOwner(resolveExpression(resourceOwnerId, muleEvent))
-            .getAccessToken();
+        getUserOAuthContext().getContextForResourceOwner(resolver.resolveExpression(resourceOwnerId, muleEvent)).getAccessToken();
     if (accessToken == null) {
       throw new RequestAuthenticationException(createStaticMessage(format("No access token for the '%s' user. Verify that you have authenticated the user before trying to execute an operation to the API.",
                                                                           resourceOwnerId.resolve())));
@@ -270,11 +266,11 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
 
   @Override
   public boolean shouldRetry(final Event firstAttemptResponseEvent) throws MuleException {
-    Boolean shouldRetryRequest = resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
+    Boolean shouldRetryRequest = resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
     if (shouldRetryRequest) {
       try {
         tokenRequestHandler.refreshToken(firstAttemptResponseEvent,
-                                         resolveExpression(resourceOwnerId, firstAttemptResponseEvent));
+                                         resolver.resolveExpression(resourceOwnerId, firstAttemptResponseEvent));
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }

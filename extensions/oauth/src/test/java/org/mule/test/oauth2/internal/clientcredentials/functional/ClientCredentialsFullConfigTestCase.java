@@ -16,7 +16,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
@@ -114,8 +113,8 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
 
     verifyRequestDoneToTokenUrlForClientCredentials();
 
-    wireMockRule.verify(postRequestedFor(urlEqualTo(RESOURCE_PATH))
-        .withHeader(AUTHORIZATION, equalTo(buildAuthorizationHeaderContent(NEW_ACCESS_TOKEN))));
+    wireMockRule
+        .verify(postRequestedFor(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, equalTo("Bearer " + NEW_ACCESS_TOKEN)));
   }
 
   @Override

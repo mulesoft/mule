@@ -13,9 +13,11 @@ import static org.mule.extension.http.api.HttpConstants.Methods.GET;
 import static org.mule.extension.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.oauth2.internal.DeferredExpressionResolver;
 import org.mule.extension.oauth2.internal.StateEncoder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -43,18 +45,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Handles the call to the localAuthorizationUrl and redirects the user to the oauth authentication server authorization url so
- * the user can grant access to the resources to the mule application.
+ * Handles the call to the {@code localAuthorizationUrl} and redirects the user to the oauth authentication server authorization
+ * url so the user can grant access to the resources to the mule application.
  */
 // TODO MULE-11412 Remove MuleContextAware
 public class AuthorizationRequestHandler implements MuleContextAware, Startable, Stoppable {
 
-  public static final String OAUTH_STATE_ID_FLOW_VAR_NAME = "resourceOwnerId";
+  private static final Logger LOGGER = getLogger(AuthorizationRequestHandler.class);
 
-  private Logger logger = LoggerFactory.getLogger(AuthorizationRequestHandler.class);
+  public static final String OAUTH_STATE_ID_FLOW_VAR_NAME = "resourceOwnerId";
 
   /**
    * Scope required by this application to execute. Scopes define permissions over resources.
@@ -106,6 +107,7 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
   // TODO MULE-11412 Uncomment
   // @Inject
   private MuleContext muleContext;
+  private DeferredExpressionResolver resolver;
   private AuthorizationCodeGrantType oauthConfig;
 
   public void init() throws MuleException {
@@ -117,9 +119,9 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
                                                        new URL(localAuthorizationUrl).getPath()),
                             createDynamicFlow(muleContext, "authorization-request-handler-" + localAuthorizationUrl,
                                               createLocalAuthorizationUrlListener()),
-                            logger);
+                            LOGGER);
     } catch (MalformedURLException e) {
-      logger.warn("Could not parse provided url %s. Validate that the url is correct", localAuthorizationUrl);
+      LOGGER.warn("Could not parse provided url %s. Validate that the url is correct", localAuthorizationUrl);
       throw new DefaultMuleException(e);
     }
   }
@@ -130,10 +132,10 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
 
       final String onCompleteRedirectToValue =
           ((HttpRequestAttributes) muleEvent.getMessage().getAttributes()).getQueryParams().get("onCompleteRedirectTo");
-      final String resourceOwnerId = resolveExpression(localAuthorizationUrlResourceOwnerId, muleEvent);
+      final String resourceOwnerId = resolver.resolveExpression(localAuthorizationUrlResourceOwnerId, muleEvent);
       muleEvent = builder.addVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
 
-      final StateEncoder stateEncoder = new StateEncoder(resolveExpression(state, muleEvent));
+      final StateEncoder stateEncoder = new StateEncoder(resolver.resolveExpression(state, muleEvent));
       if (resourceOwnerId != null) {
         stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
       }
@@ -153,20 +155,10 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
     return asList(listenerMessageProcessor);
   }
 
-  private String resolveExpression(ParameterResolver<String> expr, Event event) {
-    if (expr == null) {
-      return null;
-    } else if (!expr.getExpression().isPresent()
-        || !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
-      return expr.resolve();
-    } else {
-      return (String) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), event).getValue();
-    }
-  }
-
   @Override
   public void setMuleContext(final MuleContext muleContext) {
     this.muleContext = muleContext;
+    this.resolver = new DeferredExpressionResolver(muleContext);
   }
 
   public void setOauthConfig(final AuthorizationCodeGrantType oauthConfig) {

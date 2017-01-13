@@ -123,7 +123,8 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
   @Override
   public boolean shouldRetry(final Event firstAttemptResponseEvent) {
-    final Boolean shouldRetryRequest = resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
+    final Boolean shouldRetryRequest =
+        resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
     if (shouldRetryRequest) {
       try {
         tokenRequestHandler.refreshAccessToken();

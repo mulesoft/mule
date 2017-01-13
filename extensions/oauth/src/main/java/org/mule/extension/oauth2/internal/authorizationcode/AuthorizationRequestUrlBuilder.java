@@ -7,6 +7,7 @@
 package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.oauth2.internal.OAuthConstants;
 import org.mule.runtime.api.util.Preconditions;
@@ -17,22 +18,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Builds the authorization url to redirect the user to.
  */
 public class AuthorizationRequestUrlBuilder {
 
+  private static final Logger LOGGER = getLogger(AuthorizationRequestUrlBuilder.class);
+
   private static final String ADDED_PARAMETER_TEMPLATE = "&%s=";
 
-  private Logger logger = LoggerFactory.getLogger(AuthorizationRequestUrlBuilder.class);
   private String authorizationUrl;
   private String redirectUrl;
   private String clientId;
   private String scope;
   private String clientSecret;
-  private Map<String, String> customParameters = new HashMap<String, String>();
+  private Map<String, String> customParameters = new HashMap<>();
   private String state;
 
   public AuthorizationRequestUrlBuilder setAuthorizationUrl(String authorizationUrl) {
@@ -102,8 +103,8 @@ public class AuthorizationRequestUrlBuilder {
       throw new RuntimeException(e);
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(("Authorization URL has been generated as follows: " + urlBuilder));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(("Authorization URL has been generated as follows: " + urlBuilder));
     }
     return urlBuilder.toString();
   }

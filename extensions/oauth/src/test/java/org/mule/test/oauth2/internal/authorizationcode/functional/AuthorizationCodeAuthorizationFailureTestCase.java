@@ -24,7 +24,6 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL
 import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
-import org.mule.extension.oauth2.internal.StateEncoder;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.functional.functional.FlowAssert;
@@ -162,9 +161,8 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
   }
 
   private String getRedirectUrlWithOnCompleteUrlQueryParam() {
-    StateEncoder stateEncoder = new StateEncoder(null);
-    stateEncoder.encodeOnCompleteRedirectToInState(format("http://localhost:%s/afterLogin", onCompleteUrlPort.getNumber()));
-    return appendQueryParam(localCallbackUrl.getValue(), STATE_PARAMETER, stateEncoder.getEncodedState());
+    return appendQueryParam(localCallbackUrl.getValue(), STATE_PARAMETER,
+                            ":onCompleteRedirectTo=" + format("http://localhost:%s/afterLogin", onCompleteUrlPort.getNumber()));
   }
 
   private String getRedirectUrlWithOnCompleteUrlAndCodeQueryParams() {

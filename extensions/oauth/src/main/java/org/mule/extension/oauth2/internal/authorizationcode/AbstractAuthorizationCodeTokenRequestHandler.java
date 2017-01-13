@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mule.extension.http.api.HttpConstants.Methods.GET;
 import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
@@ -26,10 +27,14 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+
 /**
  * Base class for token request handler.
  */
 public abstract class AbstractAuthorizationCodeTokenRequestHandler extends AbstractTokenRequestHandler {
+
+  private static final Logger LOGGER = getLogger(AbstractAuthorizationCodeTokenRequestHandler.class);
 
   private AuthorizationCodeGrantType oauthConfig;
   private RequestHandlerManager redirectUrlHandlerManager;
@@ -42,8 +47,8 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
    * @param resourceOwnerId the resource owner id to update
    */
   public void refreshToken(final Event currentEvent, String resourceOwnerId) throws MuleException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Executing refresh token for user " + resourceOwnerId);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Executing refresh token for user " + resourceOwnerId);
     }
     final ResourceOwnerOAuthContext resourceOwnerOAuthContext =
         getOauthConfig().getUserOAuthContext().getContextForResourceOwner(resourceOwnerId);
@@ -107,15 +112,14 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
         // TODO MULE-11283 improve this API
         requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
       } catch (MalformedURLException e) {
-        logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
+        LOGGER.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
         throw new DefaultMuleException(e);
       }
+    } else if (getOauthConfig().getLocalCallbackConfig() != null) {
       // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
-      // } else if (getOauthConfig().getLocalCallbackConfig() != null) {
-      // flowName =
-      // flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
-      // requestMatcher =
-      // new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
+      flowName = flowName + "_" + getOauthConfig().getLocalCallbackConfigPath();
+      requestMatcher =
+          new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
@@ -123,7 +127,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
     final Flow redirectUrlFlow = createDynamicFlow(getMuleContext(), flowName, asList(createRedirectUrlProcessor()));
 
     this.redirectUrlHandlerManager =
-        addRequestHandler(getOauthConfig().getServer(), requestMatcher, redirectUrlFlow, logger);
+        addRequestHandler(getOauthConfig().getServer(), requestMatcher, redirectUrlFlow, LOGGER);
   }
 
   @Override
