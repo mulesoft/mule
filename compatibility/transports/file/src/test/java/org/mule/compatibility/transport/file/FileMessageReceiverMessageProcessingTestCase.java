@@ -18,17 +18,17 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MES
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.util.UUID;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -37,7 +37,9 @@ import org.mule.tck.size.SmallTest;
 import java.io.File;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -53,7 +55,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FileConnector mockFileConnector;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private FlowConstruct mockFlowConstruct;
+  private Flow mockFlowConstruct;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private InboundEndpoint mockInboundEndpoint;
   private FileMuleMessageFactory mockMessageFactory;
@@ -79,12 +81,30 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
   }
 
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
+
+  /**
+   * Message processed successfully
+   */
+  @Test
+  public void testAutoDeleteAsync() throws Exception {
+    configureMocks();
+    when(mockFlowConstruct.isSynchronous()).thenReturn(false);
+    configureAutoDelete();
+    configureWorkingDirectory(null);
+
+    expected.expect(IllegalStateException.class);
+    createFileMessageReceiver();
+  }
+
   /**
    * Message processed successfully
    */
   @Test
   public void testProcessFileAndDeleteIt() throws Exception {
     configureMocks();
+    when(mockFlowConstruct.isSynchronous()).thenReturn(true);
     configureAutoDelete();
     configureWorkingDirectory(null);
     FileMessageReceiver fileMessageReceiver = createFileMessageReceiver();
@@ -99,6 +119,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   @Test
   public void testProcessFileThatFailsThrowHandleExceptionThenDeleteIt() throws Exception {
     configureMocks();
+    when(mockFlowConstruct.isSynchronous()).thenReturn(true);
     configureAutoDelete();
     configureWorkingDirectory(null);
     configureListenerToThrow(mockHandledMessagingException);
@@ -114,6 +135,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   @Test
   public void testProcessFileThatFailsThrowsUnhandledExceptionThenDoNotDeleteIt() throws Exception {
     configureMocks();
+    when(mockFlowConstruct.isSynchronous()).thenReturn(true);
     configureAutoDelete();
     configureWorkingDirectory(null);
     configureListenerToThrow(mockUnhandledMessagingException);

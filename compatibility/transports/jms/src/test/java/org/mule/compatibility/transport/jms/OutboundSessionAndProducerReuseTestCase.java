@@ -8,6 +8,7 @@ package org.mule.compatibility.transport.jms;
 
 
 import static java.util.Collections.singleton;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -30,11 +31,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeede
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -97,6 +100,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
     epBuilder.setConnector(connector);
     outboundEndpoint = epBuilder.buildOutboundEndpoint();
+    outboundEndpoint.setFlowConstruct(new Flow("flow for jms://out", muleContext));
   }
 
   @Override
@@ -269,10 +273,17 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
 
     outboundEndpoint.process(testEvent());
 
-    verify(connectionFactory, times(0)).createConnection();
-    verify(connection, times(1)).createSession(anyBoolean(), anyInt());
+    new PollingProber().check(new JUnitProbe() {
 
-    assertTrue(messageSentLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+      @Override
+      protected boolean test() throws Exception {
+        verify(connectionFactory, times(0)).createConnection();
+        verify(connection, times(1)).createSession(anyBoolean(), anyInt());
+
+        assertTrue(messageSentLatch.await(RECEIVE_TIMEOUT, MILLISECONDS));
+        return true;
+      }
+    });
   }
 
   @Test
