@@ -10,8 +10,11 @@ package org.mule.module.ws.consumer;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.util.Map;
 
+import org.junit.ClassRule;
 import org.junit.Test;;
 
 /**
@@ -25,7 +28,10 @@ import org.junit.Test;;
 public class WSConsumerHttpURLConnectionTestCase extends AbstractWSDLServerTestCase {
 
 	private static final int EXPECTED_NUMBER_OF_WS_CONSUMERS = 3;
-	
+
+    @ClassRule
+    public static DynamicPort portNoReply = new DynamicPort("portNoReply");
+
 	@Override
 	protected String getConfigFile() {
 		return "ws-consumer-url-connection-test-case.xml";

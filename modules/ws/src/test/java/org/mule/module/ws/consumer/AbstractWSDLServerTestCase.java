@@ -9,7 +9,9 @@ package org.mule.module.ws.consumer;
 
 import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.fail;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
@@ -17,52 +19,66 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
-import org.junit.After;
-import org.junit.Rule;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
+import org.junit.ClassRule;
+import org.junit.rules.ExternalResource;
 
 public class AbstractWSDLServerTestCase extends FunctionalTestCase
 {
 
-    @Rule
-    public DynamicPort dynamicPort = new DynamicPort("port");
-
-    @Rule
-    public DynamicPort dynamicPort2 = new DynamicPort("portNoReply");
+    @ClassRule
+    public static DynamicPort dynamicPort = new DynamicPort("port");
 
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
-    private MockServer server = new MockServer(dynamicPort.getNumber());
+    @ClassRule
+    public static ExternalResource mockServer = new ServerResource(dynamicPort);
 
-
-    @After
-    public void after() throws Exception
+    /**
+     * JUnit rule to initialize and teardown the http server
+     */
+    public static class ServerResource extends ExternalResource
     {
-        server.stop();
+        private Server server;
+        private DynamicPort port;
+
+        ServerResource(DynamicPort port)
+        {
+            this.port = port;
+        }
+
+        @Override
+        protected void before() throws Throwable
+        {
+            server = new Server(dynamicPort.getNumber());
+            server.start();
+        }
+
+        @Override
+        protected void after()
+        {
+            try
+            {
+                server.stop();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("server stop failed");
+            }
+        }
     }
 
     /**
      * Implementation of an http fake server
      */
-    private static class MockServer
+    public static class Server
     {
 
         private int serverPort;
         private HttpServer server;
 
-        public MockServer(int serverPort)
+        public Server(int serverPort)
         {
-            try
-            {
-                this.serverPort = serverPort;
-                start();
-            }
-            catch (Exception e)
-            {
-                fail("Could not construct mock server");
-            }
+            this.serverPort = serverPort;
         }
 
         public void start() throws IOException
