@@ -20,8 +20,8 @@ import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -49,24 +49,19 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
   protected MessageExchangePattern exchangePattern;
   protected boolean nonBlocking;
-  protected boolean synchronous;
   private volatile int threads = 1;
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{REQUEST_RESPONSE, false, true},
-        {REQUEST_RESPONSE, false, false},
-        {REQUEST_RESPONSE, true, true},
-        {REQUEST_RESPONSE, true, false},
-        {ONE_WAY, false, true},
-        {ONE_WAY, false, false},
-        {ONE_WAY, true, true}});
+    return Arrays.asList(new Object[][] {{REQUEST_RESPONSE, false},
+        {REQUEST_RESPONSE, true},
+        {ONE_WAY, false},
+        {ONE_WAY, true}});
   }
 
-  public DefaultMessageProcessorChainTestCase(MessageExchangePattern exchangePattern, boolean nonBlocking, boolean synchronous) {
+  public DefaultMessageProcessorChainTestCase(MessageExchangePattern exchangePattern, boolean nonBlocking) {
     this.exchangePattern = exchangePattern;
     this.nonBlocking = nonBlocking;
-    this.synchronous = synchronous;
   }
 
   @Test
@@ -120,7 +115,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
                                                                 DefaultMessageProcessorChainTestCase.class.getSimpleName()));
     when(mockFlow.getMuleContext()).thenReturn(muleContext);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
-    when(event.isSynchronous()).thenReturn(synchronous);
     return event;
   }
 

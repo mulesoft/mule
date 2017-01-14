@@ -8,16 +8,15 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -94,20 +93,6 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     } catch (CouldNotRouteOutboundMessageException e) {
       // this one was expected
     }
-  }
-
-  @Test
-  public void testProcessingIsForcedOnSameThread() throws Exception {
-    Processor checkForceSyncFlag = event -> {
-      assertTrue(event.isSynchronous());
-      return event;
-    };
-    FirstSuccessful router = createFirstSuccessfulRouter(checkForceSyncFlag);
-    router.initialise();
-
-    // the configured message processor will blow up if the router did not force processing
-    // on same thread
-    router.process(testEvent());
   }
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws MuleException {

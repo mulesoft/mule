@@ -7,12 +7,13 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotCopyStreamPayload;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -91,7 +92,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    * Create a new event to be routed to the target MP
    */
   protected Event createEventToRoute(Event routedEvent, InternalMessage message, Processor route) {
-    return Event.builder(routedEvent).message(message).synchronous(true).build();
+    return Event.builder(routedEvent).message(message).build();
   }
 
   protected MuleContext getMuleContext() {

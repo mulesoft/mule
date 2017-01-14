@@ -224,9 +224,8 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.stop();
     flow.start();
 
-    Event response =
-        triggerFunction.apply(directInboundMessageSource.getListener(),
-                              eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(),
+                                           eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build());
     assertThat(response, not(nullValue()));
   }
 

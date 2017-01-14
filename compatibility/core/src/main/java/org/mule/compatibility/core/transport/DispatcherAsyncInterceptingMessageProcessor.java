@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.construct.AbstractPipeline;
+import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
@@ -77,7 +77,7 @@ public class DispatcherAsyncInterceptingMessageProcessor extends AbstractInterce
   }
 
   protected boolean canProcessAsync(Event event) {
-    return !((flowConstruct instanceof AbstractPipeline && ((AbstractPipeline) flowConstruct).isSynchronous())
+    return !((flowConstruct instanceof ProcessingDescriptor && ((ProcessingDescriptor) flowConstruct).isSynchronous())
         || isTransactionActive());
   }
 

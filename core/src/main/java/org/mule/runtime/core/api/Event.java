@@ -199,14 +199,6 @@ public interface Event extends MuleEvent {
   Object getReplyToDestination();
 
   /**
-   * 
-   * @return
-   * @deprecated MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  boolean isSynchronous();
-
-  /**
    * Indicates if notifications should be fired when processing this message.
    *
    * @return true if notifications are enabled, false otherwise
@@ -334,15 +326,6 @@ public interface Event extends MuleEvent {
      * @return the builder instance
      */
     Builder error(Error error);
-
-    /**
-     *
-     * @param synchronous
-     * @return the builder instance
-     * @deprecated MULE-10445 Mule 4 - New Threading model
-     */
-    @Deprecated
-    Builder synchronous(boolean synchronous);
 
     /**
      * 

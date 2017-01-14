@@ -94,7 +94,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     configureAutoDelete();
     configureWorkingDirectory(null);
 
-    expected.expect(IllegalStateException.class);
+    expected.expect(CreateException.class);
     createFileMessageReceiver();
   }
 

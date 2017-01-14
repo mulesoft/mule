@@ -7,9 +7,11 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
@@ -40,8 +42,8 @@ public class WatermarkPollingInterceptor extends MessageProcessorPollingIntercep
    * Watermark route preparation carries the value from the source event to the flow event
    */
   @Override
-  public Event prepareRouting(Event sourceEvent, Event event) throws ConfigurationException {
-    if (!event.isSynchronous()) {
+  public Event prepareRouting(Event sourceEvent, Event event, FlowConstruct flow) throws ConfigurationException {
+    if (!(flow instanceof ProcessingDescriptor && ((ProcessingDescriptor) flow).isSynchronous())) {
       throw new ConfigurationException(CoreMessages.watermarkRequiresSynchronousProcessing());
     }
 

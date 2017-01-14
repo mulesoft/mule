@@ -12,6 +12,7 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -30,12 +31,12 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.connector.ConnectException;
-import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.FileUtils;
@@ -106,7 +107,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
       throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
     }
 
-    checkMustForceSync(flowConstruct instanceof AbstractPipeline && ((AbstractPipeline) flowConstruct).isSynchronous());
+    checkMustForceSync(flowConstruct instanceof ProcessingDescriptor && ((ProcessingDescriptor) flowConstruct).isSynchronous());
   }
 
   /**
@@ -123,8 +124,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
 
     if ((connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming) && !flowSynchronous) {
-      throw new IllegalStateException("File message receiver for endpoint " + endpoint.getName()
-          + " must have a synchrouns processing strategy");
+      throw new CreateException(createStaticMessage("File message receiver for endpoint " + endpoint.getName()
+          + " must have a synchrouns processing strategy"), this);
     }
   }
 

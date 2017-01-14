@@ -1045,7 +1045,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
-    when(event.isSynchronous()).thenReturn(false);
     when(event.getError()).thenReturn(empty());
     when(event.getContext()).thenReturn(eventContext);
     return event;

@@ -7,17 +7,17 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
@@ -135,7 +135,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Event updateEventForAsync(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    Event newEvent = Event.builder(event).synchronous(false).exchangePattern(ONE_WAY).replyToHandler(null).build();
+    Event newEvent = Event.builder(event).exchangePattern(ONE_WAY).replyToHandler(null).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(newEvent);
     return newEvent;

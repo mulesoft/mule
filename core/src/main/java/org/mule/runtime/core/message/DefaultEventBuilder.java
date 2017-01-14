@@ -63,7 +63,6 @@ public class DefaultEventBuilder implements Event.Builder {
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
-  private boolean synchronous = false;
   private MuleSession session = new DefaultMuleSession();
   private Event originalEvent;
   private boolean modified;
@@ -88,10 +87,6 @@ public class DefaultEventBuilder implements Event.Builder {
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
     this.message = event.getMessage();
-
-    if (event.isSynchronous()) {
-      this.synchronous = event.isSynchronous();
-    }
 
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
@@ -161,13 +156,6 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder synchronous(boolean synchronous) {
-    this.synchronous = synchronous;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public Event.Builder exchangePattern(MessageExchangePattern exchangePattern) {
     this.exchangePattern = exchangePattern;
     this.modified = true;
@@ -215,7 +203,6 @@ public class DefaultEventBuilder implements Event.Builder {
       return originalEvent;
     } else {
       return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session,
-                                     synchronous,
                                      replyToDestination,
                                      replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
                                      notificationsEnabled);
@@ -245,7 +232,6 @@ public class DefaultEventBuilder implements Event.Builder {
 
     private final MessageExchangePattern exchangePattern;
     private final ReplyToHandler replyToHandler;
-    private final boolean synchronous;
 
     /** Mutable MuleEvent state **/
     private final Object replyToDestination;
@@ -262,7 +248,7 @@ public class DefaultEventBuilder implements Event.Builder {
     private EventImplementation(EventContext context, InternalMessage message,
                                 Map<String, TypedValue<Object>> variables,
                                 MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
-                                boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler,
+                                Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
                                 String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
@@ -274,7 +260,6 @@ public class DefaultEventBuilder implements Event.Builder {
       this.exchangePattern = exchangePattern;
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
-      this.synchronous = synchronous;
 
       this.flowCallStack = flowCallStack;
 
@@ -443,11 +428,6 @@ public class DefaultEventBuilder implements Event.Builder {
     @Override
     public Object getReplyToDestination() {
       return replyToDestination;
-    }
-
-    @Override
-    public boolean isSynchronous() {
-      return synchronous;
     }
 
     // //////////////////////////
