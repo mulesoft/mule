@@ -15,25 +15,22 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory.LegacyNonBlockingProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
@@ -66,7 +63,7 @@ public class DefaultEventBuilder implements Event.Builder {
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
-  private Boolean synchronous;
+  private boolean synchronous = false;
   private MuleSession session = new DefaultMuleSession();
   private Event originalEvent;
   private boolean modified;
@@ -218,26 +215,11 @@ public class DefaultEventBuilder implements Event.Builder {
       return originalEvent;
     } else {
       return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session,
-                                     synchronous == null ? resolveEventSynchronicity() : synchronous,
+                                     synchronous,
                                      replyToDestination,
                                      replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
                                      notificationsEnabled);
     }
-  }
-
-  protected boolean resolveEventSynchronicity() {
-    return isFlowConstructSynchronous()
-        || (exchangePattern != null && exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy());
-  }
-
-  private boolean isFlowConstructSynchronous() {
-    return (flow instanceof ProcessingDescriptor) && ((ProcessingDescriptor) flow)
-        .isSynchronous();
-  }
-
-  protected boolean isFlowConstructNonBlockingProcessingStrategy() {
-    return (flow instanceof Pipeline)
-        && ((Pipeline) flow).getProcessingStrategy() instanceof LegacyNonBlockingProcessingStrategy;
   }
 
   /**
