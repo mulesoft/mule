@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.el;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
@@ -37,7 +39,7 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
                                            MVELExpressionLanguage mvelExpressionLanguage) {
     this.dataWeaveExpressionLanguage = dataWeaveExpressionLanguage;
     this.mvelExpressionLanguage = mvelExpressionLanguage;
-    forceMel = Boolean.valueOf(System.getProperty(MULE_MEL_AS_DEFAULT, "false"));
+    forceMel = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false")) || !dataWeaveExpressionLanguage.isEnabled();
   }
 
   public boolean isForceMel() {

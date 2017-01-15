@@ -9,7 +9,6 @@ package org.mule.runtime.core.el;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
@@ -44,22 +43,19 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
+  private boolean enabled;
 
   public DataWeaveExpressionLanguage(ClassLoader lookupClassloader) {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
 
     while (executors.hasNext()) {
-      boolean useMel = false;
       try {
         this.expressionExecutor = executors.next();
+        enabled = true;
       } catch (Throwable e) {
         // TODO - MULE-11413: Fix DW dependency for FunctionalTestCase
-        logger.warn("DW Executor could not be loaded. Setting MEL as default EL.");
-        useMel = true;
-      } finally {
-        if (System.getProperty(MULE_MEL_AS_DEFAULT) == null) {
-          System.setProperty(MULE_MEL_AS_DEFAULT, Boolean.toString(useMel));
-        }
+        logger.warn("DW Executor could not be loaded. MEL will be the default EL.");
+        enabled = false;
       }
       break;
     }
@@ -109,6 +105,10 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                      TypedValue value) {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
+  }
+
+  public boolean isEnabled() {
+    return enabled;
   }
 
   private TypedValue evaluate(String expression, BindingContext context) {
