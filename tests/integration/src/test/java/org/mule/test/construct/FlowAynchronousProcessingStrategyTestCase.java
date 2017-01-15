@@ -7,6 +7,7 @@
 package org.mule.test.construct;
 
 import static org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory.SYNCHRONOUS_EVENT_ERROR_MESSAGE;
+
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;
@@ -24,7 +25,6 @@ public class FlowAynchronousProcessingStrategyTestCase extends FlowDefaultProces
 
   @Override
   public void requestResponse() throws Exception {
-    setUpExpectedException();
     super.requestResponse();
   }
 
