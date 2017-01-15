@@ -202,10 +202,9 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session,
-                                     replyToDestination,
-                                     replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
-                                     notificationsEnabled);
+      return new EventImplementation(context, message, flowVariables, REQUEST_RESPONSE, flow, session,
+                                     replyToDestination, replyToHandler, flowCallStack, groupCorrelation, error,
+                                     legacyCorrelationId, notificationsEnabled);
     }
   }
 
