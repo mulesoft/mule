@@ -109,8 +109,6 @@ public interface MuleEventContext {
 
   FlowConstruct getFlowConstruct();
 
-  MessageExchangePattern getExchangePattern();
-
   /**
    * Returns the transaction for the current event or null if there is no transaction in progress
    * 

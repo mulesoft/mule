@@ -21,8 +21,7 @@ public abstract class AbstractFlowConstructStatistics implements Statistics {
   protected String name;
   protected boolean enabled = false;
   private long samplePeriod = 0;
-  protected final AtomicLong receivedEventSync = new AtomicLong(0);
-  protected final AtomicLong receivedEventASync = new AtomicLong(0);
+  protected final AtomicLong receivedEvents = new AtomicLong(0);
 
   public AbstractFlowConstructStatistics(String flowConstructType, String name) {
     this.name = name;
@@ -39,6 +38,7 @@ public abstract class AbstractFlowConstructStatistics implements Statistics {
   /**
    * Are statistics logged
    */
+  @Override
   public boolean isEnabled() {
     return enabled;
   }
@@ -52,30 +52,17 @@ public abstract class AbstractFlowConstructStatistics implements Statistics {
   }
 
   public synchronized void clear() {
-    receivedEventSync.set(0);
-    receivedEventASync.set(0);
+    receivedEvents.set(0);
     samplePeriod = System.currentTimeMillis();
   }
 
 
-  public void incReceivedEventSync() {
-    receivedEventSync.addAndGet(1);
-  }
-
-  public void incReceivedEventASync() {
-    receivedEventASync.addAndGet(1);
-  }
-
-  public long getAsyncEventsReceived() {
-    return receivedEventASync.get();
-  }
-
-  public long getSyncEventsReceived() {
-    return receivedEventSync.get();
+  public void incReceivedEvents() {
+    receivedEvents.addAndGet(1);
   }
 
   public long getTotalEventsReceived() {
-    return getSyncEventsReceived() + getAsyncEventsReceived();
+    return receivedEvents.get();
   }
 
   public String getFlowConstructType() {

@@ -106,28 +106,6 @@ public class ApplicationStatistics extends FlowConstructStatistics {
   }
 
   @Override
-  public long getAsyncEventsReceived() {
-    long total = 0;
-    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
-      if (!(stats instanceof ApplicationStatistics)) {
-        total += stats.getAsyncEventsReceived();
-      }
-    }
-    return total;
-  }
-
-  @Override
-  public long getSyncEventsReceived() {
-    long total = 0;
-    for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
-      if (!(stats instanceof ApplicationStatistics)) {
-        total += stats.getSyncEventsReceived();
-      }
-    }
-    return total;
-  }
-
-  @Override
   public long getTotalEventsReceived() {
     long total = 0;
     for (FlowConstructStatistics stats : parent.getServiceStatistics()) {
