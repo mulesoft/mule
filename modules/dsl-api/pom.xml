@@ -28,6 +28,12 @@
             <artifactId>guava</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-unit</artifactId>
+            <version>${muleVersion}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
