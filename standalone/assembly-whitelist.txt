@@ -145,7 +145,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-service-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-container-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-management-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-oauth-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-pgp-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-repository-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-scripting-${productVersion}.jar
@@ -174,6 +173,7 @@
 /mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}-mule-plugin.zip
 /mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}-mule-plugin.zip
 /mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}-mule-plugin.zip
+/mule-standalone-${productVersion}/plugins/mule-module-oauth-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}-mule-plugin.zip
 /mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}-mule-plugin.zip
 /mule-standalone-${productVersion}/plugins/mule-plugin-weave-${productVersion}-dist.zip

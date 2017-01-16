@@ -150,7 +150,6 @@
                 <include>org.mule.modules:mule-module-jbossts</include>
                 <include>org.mule.modules:mule-module-json</include>
                 <include>org.mule.modules:mule-module-management</include>
-                <include>org.mule.modules:mule-module-oauth</include>
                 <include>org.mule.modules:mule-module-pgp</include>
                 <include>org.mule.modules:mule-module-repository</include>
                 <include>org.mule.modules:mule-module-scripting</include>
