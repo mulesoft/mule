@@ -24,7 +24,7 @@
             <wsc:message>
                 <wsc:body>#[payload]</wsc:body>
                 <wsc:attachments>
-                    #[dw:{ attachment: { id: "SomeId", content: "Some Content" } as :object { class : "org.mule.extension.ws.api.SoapAttachment" } } ]
+                    #[dw:{ attachment: { id: "SomeId", content: "Some Content" } as Object { class : "org.mule.extension.ws.api.SoapAttachment" } } ]
                 </wsc:attachments>
             </wsc:message>
         </wsc:consume>
