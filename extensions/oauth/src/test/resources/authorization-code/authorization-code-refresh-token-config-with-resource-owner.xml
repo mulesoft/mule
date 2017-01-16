@@ -18,12 +18,12 @@
                         clientSecret="${client.secret}"
                         localCallbackUrl="${local.callback.url}"
                         externalCallbackUrl="${local.callback.url}"
-                        localAuthorizationUrlResourceOwnerId="#[message.attributes.queryParams.userId]"
-                        resourceOwnerId="#[flowVars['userId']]"
+                        localAuthorizationUrlResourceOwnerId="#[attributes.queryParams.userId]"
+                        resourceOwnerId="#[variables['userId']]"
                         tokenManager="multitenantOauthConfig"
                         localAuthorizationUrl="${local.authorization.url}"
                         authorizationUrl="${authorization.url}"
-                        refreshTokenWhen="#[message.attributes.statusCode == 500]"
+                        refreshTokenWhen="#[attributes.statusCode == 500]"
                         tokenUrl="${token.url}">
                 </oauth:authorization-code-grant-type>
             </httpn:authentication>

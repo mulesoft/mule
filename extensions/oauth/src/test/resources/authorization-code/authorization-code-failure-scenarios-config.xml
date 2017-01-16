@@ -32,7 +32,7 @@
 
     <flow name="someFlow">
         <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
-        <test:assert expression="#[message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
+        <test:assert expression="#[mel:message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
     </flow>
 
     <!-- TODO MULE-11405 remove this flow  -->
