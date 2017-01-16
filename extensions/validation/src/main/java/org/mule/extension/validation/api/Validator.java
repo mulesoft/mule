@@ -6,16 +6,12 @@
  */
 package org.mule.extension.validation.api;
 
-import org.mule.runtime.core.api.Event;
-
 /**
  * A component which performs a validation and expresses its result through a {@link ValidationResult} object.
  * <p/>
- * The {@link #validate()} method receives a {@link Event} in order to make it generic and easy to extend. However, that
- * doesn't necessarily mean that all the validation is performed with or over the event exclusively. Thread safeness is not to be
- * assumed over instances of this class since the validator could be stateful.
+ * Thread safeness is not to be assumed over instances of this class since the validator could be stateful.
  *
- * @since 3.7.0
+ * @since 4.0
  */
 public interface Validator {
 

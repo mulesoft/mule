@@ -18,14 +18,13 @@ import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
 import org.mule.extension.db.internal.domain.query.QueryTemplate;
-import org.mule.runtime.core.api.Event;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Resolves a {@link BulkQuery} for a given {@link Event}
+ * Resolves a {@link BulkQuery} for a given {@link BulkQueryDefinition}
  */
 public class BulkQueryResolver extends AbstractQueryResolver<BulkQueryDefinition> {
 

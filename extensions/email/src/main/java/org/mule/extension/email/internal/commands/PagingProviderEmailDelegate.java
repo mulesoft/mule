@@ -58,8 +58,7 @@ public final class PagingProviderEmailDelegate<T extends BaseEmailAttributes>
   /**
    * @param configuration The {@link MailboxAccessConfiguration} associated to this operation.
    * @param folderName the name of the folder where the emails are stored.
-   * @param matcherBuilder a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
-   *        {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
+   * @param matcherBuilder a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list
    * @param pageSize size of the block that would be retrieved from the email server. This page doesn't represent the page size to
    *        be returned by the {@link PagingProvider} because emails must be tested against the {@link BaseEmailPredicateBuilder}
    *        matcher after retrieval to see if they fulfill matcher's condition.
