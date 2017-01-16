@@ -14,21 +14,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -43,7 +42,6 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.AllStatistics;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import java.util.ArrayList;
@@ -103,25 +101,11 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   @Test
-  public void requestResponse() throws Exception {
+  public void send() throws Exception {
     pipeline.initialise();
     pipeline.start();
 
-    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
-        .flow(pipeline).build();
-
-    processFlow(pipeline, event);
-
-    verifySucess();
-  }
-
-  @Test
-  public void oneWay() throws Exception {
-    pipeline.initialise();
-    pipeline.start();
-
-    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
-        .flow(pipeline).build();
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).flow(pipeline).build();
 
     processFlow(pipeline, event);
 
@@ -137,29 +121,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
-        .flow(pipeline).build();
-
-    thrown.expect(instanceOf(MessagingException.class));
-    thrown.expectCause(instanceOf(IllegalStateException.class));
-    try {
-      processFlow(pipeline, event);
-    } finally {
-      verifyException();
-    }
-  }
-
-  @Test
-  public void oneWayException() throws Exception {
-    pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<Processor> processors = new ArrayList<>();
-    processors.add(new ExceptionThrowingMessageProcessor());
-    pipeline.setMessageProcessors(processors);
-    pipeline.initialise();
-    pipeline.start();
-
-    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
-        .flow(pipeline).build();
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).flow(pipeline).build();
 
     thrown.expect(instanceOf(MessagingException.class));
     thrown.expectCause(instanceOf(IllegalStateException.class));

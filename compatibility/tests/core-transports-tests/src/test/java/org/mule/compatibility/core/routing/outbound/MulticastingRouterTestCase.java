@@ -15,7 +15,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -171,7 +170,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow(muleContext);
     final EventContext context = create(flow, TEST_CONNECTOR, "MyCustomCorrelationId");
-    final Event testEvent = Event.builder(context).message(message).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
+    final Event testEvent = Event.builder(context).message(message).flow(flow).build();
 
     assertTrue(router.isMatch(testEvent, mock(Event.Builder.class)));
 

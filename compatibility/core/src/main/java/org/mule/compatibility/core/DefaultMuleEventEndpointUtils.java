@@ -8,6 +8,7 @@ package org.mule.compatibility.core;
 
 import static org.mule.runtime.core.api.config.MuleProperties.ENDPOINT_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -44,8 +45,6 @@ public class DefaultMuleEventEndpointUtils {
         }
       }
     }
-
-    builder.exchangePattern(endpoint.getExchangePattern());
 
     return builder.build();
   }

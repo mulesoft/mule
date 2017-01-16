@@ -10,14 +10,13 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
@@ -123,7 +122,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
       }
 
       return Event.builder(executionContext).message(InternalMessage.builder().payload(eventList).build())
-          .exchangePattern(ONE_WAY).flow(fc).build();
+          .flow(fc).build();
     }
   }
 }

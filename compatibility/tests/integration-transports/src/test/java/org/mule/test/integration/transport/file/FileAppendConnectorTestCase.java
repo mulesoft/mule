@@ -16,6 +16,8 @@ import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,24 +55,31 @@ public class FileAppendConnectorTestCase extends CompatibilityFunctionalTestCase
 
   @Test
   public void testBasic() throws Exception {
-    FileInputStream myFileStream = null;
-    try {
-      File myDir = FileUtils.newFile(OUTPUT_DIR);
-      File myFile = FileUtils.newFile(myDir, OUTPUT_FILE);
-      assertFalse(myFile.exists());
+    File myDir = FileUtils.newFile(OUTPUT_DIR);
+    File myFile = FileUtils.newFile(myDir, OUTPUT_FILE);
+    assertFalse(myFile.exists());
 
-      MuleClient client = muleContext.getClient();
-      client.send("vm://fileappend", "Hello1", null);
-      client.send("vm://fileappend", "Hello2", null);
+    MuleClient client = muleContext.getClient();
+    client.send("vm://fileappend", "Hello1", null);
+    client.send("vm://fileappend", "Hello2", null);
 
-      assertTrue(fileReceiveLatch.await(30, TimeUnit.SECONDS));
+    assertTrue(fileReceiveLatch.await(30, TimeUnit.SECONDS));
 
-      // the output file should exist now
-      myFileStream = new FileInputStream(myFile);
-      assertEquals("Hello1Hello2", IOUtils.toString(myFileStream));
-    } finally {
-      IOUtils.closeQuietly(myFileStream);
-    }
+    new PollingProber().check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        FileInputStream myFileStream = null;
+        try {
+          // the output file should exist now
+          myFileStream = new FileInputStream(myFile);
+          assertEquals("Hello1Hello2", IOUtils.toString(myFileStream));
+        } finally {
+          IOUtils.closeQuietly(myFileStream);
+        }
+        return true;
+      }
+    });
   }
 
   @Override

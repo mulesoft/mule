@@ -9,7 +9,6 @@ package org.mule.runtime.module.xml.transformers.xml.xquery;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -77,7 +76,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
       new Thread(() -> {
         try {
           setCurrentEvent(Event.builder(DefaultEventContext.create(testFlow, TEST_CONNECTOR))
-              .message(InternalMessage.builder().payload("test").build()).exchangePattern(REQUEST_RESPONSE).flow(testFlow)
+              .message(InternalMessage.builder().payload("test").build()).flow(testFlow)
               .session(new DefaultMuleSession()).build());
         } catch (Exception e1) {
           e1.printStackTrace();

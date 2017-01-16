@@ -12,9 +12,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -60,14 +59,14 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
 
   @Test
   public void testProcessOneWay() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(ONE_WAY).build();
+    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     assertAsync(messageProcessor, event);
   }
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(REQUEST_RESPONSE).build();
+    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     assertAsync(messageProcessor, event);
   }
@@ -80,7 +79,6 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
 
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.of(TEST_MESSAGE))
-        .exchangePattern(ONE_WAY)
         .build();
 
     messageProcessor.setListener(failingProcessor);

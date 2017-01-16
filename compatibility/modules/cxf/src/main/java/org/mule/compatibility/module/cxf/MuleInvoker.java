@@ -115,11 +115,6 @@ public class MuleInvoker implements Invoker {
       throw new Fault(e);
     }
 
-    if (!event.getExchangePattern().hasResponse()) {
-      // weird response from AbstractInterceptingMessageProcessor
-      responseEvent = null;
-    }
-
     if (responseEvent != null) {
       exchange.put(CxfConstants.MULE_EVENT, responseEvent);
       InternalMessage resMessage = responseEvent.getMessage();

@@ -49,7 +49,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGI
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -76,6 +75,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -155,8 +155,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
@@ -415,13 +413,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private void configurePolicyManagerListener() {
     // Invokes the policy manager when an application is deployed
-    doAnswer(new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-        policyManager.onDeploymentSuccess((String) invocationOnMock.getArguments()[0]);
-        return null;
-      }
+    doAnswer(invocationOnMock -> {
+      policyManager.onDeploymentSuccess((String) invocationOnMock.getArguments()[0]);
+      return null;
     }).when(applicationDeploymentListener).onMuleContextConfigured(any(), any());
   }
 
@@ -3712,7 +3706,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     mainFlow.process(Event.builder(DefaultEventContext.create(mainFlow, TEST_CONNECTOR))
         .message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+        .flow(mainFlow).build());
   }
 
 

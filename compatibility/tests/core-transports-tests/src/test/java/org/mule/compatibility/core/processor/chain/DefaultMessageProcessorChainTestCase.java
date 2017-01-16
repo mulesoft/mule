@@ -103,7 +103,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     Event event = mock(Event.class);
     InternalMessage message = InternalMessage.builder().payload(data).build();
     when(event.getMessage()).thenReturn(message);
-    when(event.getExchangePattern()).thenReturn(exchangePattern);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     Pipeline mockFlow = mock(Flow.class);

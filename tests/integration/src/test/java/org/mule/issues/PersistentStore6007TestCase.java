@@ -8,7 +8,6 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -73,7 +72,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
 
     static void addEvents() throws Exception {
       for (String str : new String[] {"A", "B", "C"}) {
-        Event event = eventBuilder().message(InternalMessage.builder().payload(str).build()).exchangePattern(ONE_WAY)
+        Event event = eventBuilder().message(InternalMessage.builder().payload(str).build())
             .session(new DefaultMuleSession()).build();
         events.put(buildQueueKey(event, getTestFlow(muleContext), muleContext), event);
       }

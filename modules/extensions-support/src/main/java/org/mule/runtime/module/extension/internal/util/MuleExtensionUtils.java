@@ -14,7 +14,6 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
@@ -24,6 +23,7 @@ import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Attributes;
@@ -341,7 +341,7 @@ public class MuleExtensionUtils {
       }
     };
     return Event.builder(create(flowConstruct, "InitializerEvent")).message(InternalMessage.builder().nullPayload().build())
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
+        .flow(flowConstruct).build();
   }
 
   /**

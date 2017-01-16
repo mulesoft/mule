@@ -175,14 +175,6 @@ public interface Event extends MuleEvent {
   MuleContext getMuleContext();
 
   /**
-   * Returns the message exchange pattern for this event
-   * 
-   * @deprecated TODO MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  MessageExchangePattern getExchangePattern();
-
-  /**
    * Return the replyToHandler (if any) that will be used to perform async reply
    * 
    * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
@@ -326,15 +318,6 @@ public interface Event extends MuleEvent {
      * @return the builder instance
      */
     Builder error(Error error);
-
-    /**
-     * 
-     * @param exchangePattern
-     * @return the builder instance
-     * @deprecated MULE-10445 Mule 4 - New Threading model
-     */
-    @Deprecated
-    Builder exchangePattern(MessageExchangePattern exchangePattern);
 
     /**
      * 

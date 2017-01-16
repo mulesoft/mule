@@ -15,18 +15,16 @@ import org.mule.compatibility.module.cxf.CxfConfiguration;
 import org.mule.compatibility.module.cxf.CxfConstants;
 import org.mule.compatibility.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.compatibility.module.cxf.support.DelegatingOutputStream;
-import org.mule.compatibility.module.cxf.transport.MuleUniversalConduit;
-import org.mule.compatibility.module.cxf.transport.MuleUniversalTransport;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
 
@@ -142,7 +140,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
           }
         };
         event = Event.builder(event == null ? DefaultEventContext.create(flowConstruct, "EndpointMuleUniversalConduit")
-            : event.getContext()).message(muleMsg).exchangePattern(ep.getExchangePattern()).flow(flowConstruct).build();
+            : event.getContext()).message(muleMsg).flow(flowConstruct).build();
       } catch (Exception e) {
         throw new Fault(e);
       }

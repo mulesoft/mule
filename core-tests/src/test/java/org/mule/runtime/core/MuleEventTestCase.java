@@ -10,7 +10,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
@@ -104,7 +103,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     Event testEvent = eventBuilder()
         .message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes())))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);

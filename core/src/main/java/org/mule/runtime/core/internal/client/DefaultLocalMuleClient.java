@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_M
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
@@ -30,10 +31,10 @@ import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.functional.Either;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class DefaultLocalMuleClient implements MuleClient {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      return createEitherResult(connectorMessageProcessor.process(createRequestResponseMuleEvent(message)));
+      return createEitherResult(connectorMessageProcessor.process(createMuleEvent(message)));
     } else {
       throw createUnsupportedUrlException(url);
     }
@@ -111,7 +112,7 @@ public class DefaultLocalMuleClient implements MuleClient {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      return createEitherResult(returnEvent(connectorMessageProcessor.process(createRequestResponseMuleEvent(message))));
+      return createEitherResult(returnEvent(connectorMessageProcessor.process(createMuleEvent(message))));
     } else {
       throw createUnsupportedUrlException(url);
     }
@@ -150,7 +151,7 @@ public class DefaultLocalMuleClient implements MuleClient {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      connectorMessageProcessor.process(createOneWayMuleEvent(message));
+      connectorMessageProcessor.process(createMuleEvent(message));
     } else {
       throw createUnsupportedUrlException(url);
     }
@@ -164,7 +165,7 @@ public class DefaultLocalMuleClient implements MuleClient {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      connectorMessageProcessor.process(createOneWayMuleEvent(message));
+      connectorMessageProcessor.process(createMuleEvent(message));
     } else {
       dispatch(url, message);
     }
@@ -180,7 +181,7 @@ public class DefaultLocalMuleClient implements MuleClient {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
       final Event event =
-          connectorMessageProcessor.process(createOneWayMuleEvent(InternalMessage.builder().nullPayload().build()));
+          connectorMessageProcessor.process(createMuleEvent(InternalMessage.builder().nullPayload().build()));
       if (event == null) {
         return right(empty());
       }
@@ -193,12 +194,8 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  protected Event createRequestResponseMuleEvent(InternalMessage message) throws MuleException {
-    return baseEventBuilder(message).exchangePattern(REQUEST_RESPONSE).build();
-  }
-
-  protected Event createOneWayMuleEvent(InternalMessage message) throws MuleException {
-    return baseEventBuilder(message).exchangePattern(ONE_WAY).build();
+  protected Event createMuleEvent(InternalMessage message) throws MuleException {
+    return baseEventBuilder(message).build();
   }
 
   private org.mule.runtime.core.api.Event.Builder baseEventBuilder(InternalMessage message) {

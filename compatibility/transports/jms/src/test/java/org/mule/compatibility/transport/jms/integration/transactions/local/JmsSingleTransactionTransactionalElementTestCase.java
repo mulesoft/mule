@@ -12,7 +12,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.transport.jms.integration.AbstractJmsFunctionalTestCase;
 import org.mule.runtime.core.DefaultEventContext;
@@ -174,7 +173,7 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   public void testNestedTransactional() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactional");
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of("message")).exchangePattern(REQUEST_RESPONSE)
+        .message(InternalMessage.of("message"))
         .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();

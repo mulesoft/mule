@@ -7,7 +7,6 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -16,6 +15,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.internal.listener.HttpRequestToMuleEvent.transform;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_0;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -176,7 +176,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                                                                                                                         .getDefaultEncoding(muleContext),
                                                                                                                     parseRequest,
                                                                                                                     listenerPath))
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(new DefaultMuleSession()).build();
+        .flow(flowConstruct).session(new DefaultMuleSession()).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(muleEvent);
     return muleEvent;

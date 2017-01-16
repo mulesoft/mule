@@ -30,9 +30,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -40,7 +41,6 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
@@ -454,7 +454,7 @@ public class MuleClient implements Disposable {
     }
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
     return Event.builder(DefaultEventContext.create(flowConstruct, "MuleClient")).message(message)
-        .exchangePattern(exchangePattern).flow(flowConstruct).build();
+        .flow(flowConstruct).build();
   }
 
   protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException {

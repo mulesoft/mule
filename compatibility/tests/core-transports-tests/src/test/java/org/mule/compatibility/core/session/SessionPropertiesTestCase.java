@@ -14,8 +14,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -63,7 +61,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @Test
   public void serializationSessionPropertyPropagation() throws Exception {
     InternalMessage message = InternalMessage.builder().payload("data").build();
-    Event event = Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
     event.getSession().setProperty("key", "value");
 
@@ -97,7 +95,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @Test
   public void defaultSessionHandlerSessionPropertyPropagation() throws Exception {
     InternalMessage message = InternalMessage.builder().payload("data").build();
-    Event event = Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
     event.getSession().setProperty("key", "value");
 
@@ -132,7 +130,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @Test
   public void serializationNonSerializableSessionPropertyPropagation() throws Exception {
     InternalMessage message = InternalMessage.builder().payload("data").build();
-    Event event = Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
     Object nonSerializable = new Object();
     event.getSession().setProperty("key", nonSerializable);
@@ -159,7 +157,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @Test
   public void defaultSessionHandlerNonSerializableSessionPropertyPropagation() throws Exception {
     InternalMessage message = InternalMessage.builder().payload("data").build();
-    Event event = Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
     Object nonSerializable = new Object();
     event.getSession().setProperty("key", nonSerializable);
@@ -191,7 +189,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @Test
   public void processFlowSessionPropertyPropagation() throws Exception {
     InternalMessage message = InternalMessage.builder().payload("data").build();
-    Event event = Event.builder(context).message(message).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
     SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
     Flow flow = new Flow("flow", muleContext);

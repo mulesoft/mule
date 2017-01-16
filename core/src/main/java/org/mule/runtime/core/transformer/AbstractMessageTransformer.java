@@ -7,18 +7,17 @@
 package org.mule.runtime.core.transformer;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -124,7 +123,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       MuleClientFlowConstruct flowConstruct =
           new MuleClientFlowConstruct(muleContext);
       event = Event.builder(create(flowConstruct, "AbstractMessageTransformer")).message(message)
-          .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
+          .flow(flowConstruct).build();
     }
     try {
       result = transformMessage(event, enc);

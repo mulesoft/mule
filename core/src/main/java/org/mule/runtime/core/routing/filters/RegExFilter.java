@@ -7,17 +7,16 @@
 package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -77,8 +76,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   public boolean accept(InternalMessage message, Event.Builder builder) {
     // TODO MULE-9341 Remove Filters that are not needed
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(Event.builder(create(flowConstruct, "RegExFilter")).message(message).exchangePattern(ONE_WAY)
-        .flow(flowConstruct).build(), builder);
+    return accept(Event.builder(create(flowConstruct, "RegExFilter")).message(message).flow(flowConstruct).build(), builder);
   }
 
   @Override

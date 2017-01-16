@@ -8,7 +8,6 @@ package org.mule.runtime.core.message;
 
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -19,7 +18,6 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -56,7 +54,6 @@ public class DefaultEventBuilder implements Event.Builder {
   private InternalMessage message;
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
   private Error error;
-  private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
   private FlowConstruct flow;
   private GroupCorrelation groupCorrelation = new GroupCorrelation(null, null);
   private String legacyCorrelationId;
@@ -81,8 +78,6 @@ public class DefaultEventBuilder implements Event.Builder {
     this.legacyCorrelationId = event.getLegacyCorrelationId();
 
     this.flowCallStack = event.getFlowCallStack().clone();
-
-    this.exchangePattern = event.getExchangePattern();
 
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
@@ -156,13 +151,6 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder exchangePattern(MessageExchangePattern exchangePattern) {
-    this.exchangePattern = exchangePattern;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public Event.Builder flow(FlowConstruct flow) {
     this.flow = flow;
     this.modified = true;
@@ -202,10 +190,8 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session,
-                                     replyToDestination,
-                                     replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
-                                     notificationsEnabled);
+      return new EventImplementation(context, message, flowVariables, flow, session, replyToDestination, replyToHandler,
+                                     flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
     }
   }
 
@@ -230,7 +216,6 @@ public class DefaultEventBuilder implements Event.Builder {
     // TODO MULE-10013 make this final
     private transient FlowConstruct flowConstruct;
 
-    private final MessageExchangePattern exchangePattern;
     private final ReplyToHandler replyToHandler;
 
     /** Mutable MuleEvent state **/
@@ -245,9 +230,8 @@ public class DefaultEventBuilder implements Event.Builder {
     private final Error error;
 
     // Use this constructor from the builder
-    private EventImplementation(EventContext context, InternalMessage message,
-                                Map<String, TypedValue<Object>> variables,
-                                MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
+    private EventImplementation(EventContext context, InternalMessage message, Map<String, TypedValue<Object>> variables,
+                                FlowConstruct flowConstruct, MuleSession session,
                                 Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
                                 String legacyCorrelationId, boolean notificationsEnabled) {
@@ -257,7 +241,6 @@ public class DefaultEventBuilder implements Event.Builder {
       this.message = message;
       variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
 
-      this.exchangePattern = exchangePattern;
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
 
@@ -413,11 +396,6 @@ public class DefaultEventBuilder implements Event.Builder {
     @Override
     public MuleContext getMuleContext() {
       return flowConstruct.getMuleContext();
-    }
-
-    @Override
-    public MessageExchangePattern getExchangePattern() {
-      return exchangePattern;
     }
 
     @Override
