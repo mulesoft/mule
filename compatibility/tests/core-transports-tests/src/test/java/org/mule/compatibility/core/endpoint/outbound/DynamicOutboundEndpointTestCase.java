@@ -343,8 +343,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
       throws Exception {
 
     return createTestOutboundEndpoint("test://localhost:#[mel:message.outboundProperties.port]", filter, securityFilter, in,
-                                      response,
-                                      exchangePattern, txConfig);
+                                      response, exchangePattern, txConfig);
   }
 
   private static class FakeMessageDispatcher extends TestMessageDispatcher {
