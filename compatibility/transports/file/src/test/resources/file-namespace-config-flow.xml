@@ -23,7 +23,7 @@
             readFromDirectory="${workingDirectory}/readFromDirectory"
             writeToDirectory="${workingDirectory}/writeToDirectory"
             workDirectory="${workingDirectory}/workDirectory"
-            workFileNamePattern="#[org.mule.runtime.core.util.UUID.getUUID()]"
+            workFileNamePattern="#[mel:org.mule.runtime.core.util.UUID.getUUID()]"
             recursive="true">
         <file:custom-filename-parser class="org.mule.compatibility.transport.file.DummyFilenameParser"/>
     </file:connector>

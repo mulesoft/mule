@@ -14,7 +14,7 @@
     </httpn:request-config>
 
     <flow name="clientCookiesEnabled" >
-        <httpn:request config-ref="requesterConfigCookiesEnabled" path="#[path]" method="GET"/>
+        <httpn:request config-ref="requesterConfigCookiesEnabled" path="#[mel:path]" method="GET"/>
     </flow>
 
     <flow name="clientCookiesDisabled" >

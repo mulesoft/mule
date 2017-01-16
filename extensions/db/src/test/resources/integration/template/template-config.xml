@@ -48,7 +48,7 @@
     </db:template-query>
 
     <db:template-query name="testDynamicQuery">
-        <db:dynamic-query>SELECT * FROM PLANET WHERE POSITION = #[position]</db:dynamic-query>
+        <db:dynamic-query>SELECT * FROM PLANET WHERE POSITION = #[mel:position]</db:dynamic-query>
     </db:template-query>
 
     <db:template-query name="testDynamicPlaceholderQuery">

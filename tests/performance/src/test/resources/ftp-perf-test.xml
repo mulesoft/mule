@@ -32,11 +32,11 @@
     </flow>
 
     <flow name="move">
-        <ftp:move sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]" createParentDirectories="#[createParent]"/>
+        <ftp:move sourcePath="#[mel:source]" targetPath="#[mel:target]" overwrite="#[mel:overwrite]" createParentDirectories="#[mel:createParent]"/>
     </flow>
 
     <flow name="rename">
-        <ftp:rename path="#[path]" to="#[to]" overwrite="#[overwrite]"/>
+        <ftp:rename path="#[mel:path]" to="#[mel:to]" overwrite="#[mel:overwrite]"/>
     </flow>
 
     <flow name="write">

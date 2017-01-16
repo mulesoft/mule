@@ -108,7 +108,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that flowVars work, returning null for non existent ones and it's value for those that do.")
   public void flowVars() throws MuleException {
     Event.Builder eventBuilder = Event.builder(testEvent());
-    String flowVars = "flowVars.myVar";
+    String flowVars = "variables.myVar";
     assertThat(expressionManager.evaluate(flowVars, eventBuilder.build()).getValue(), nullValue());
     String value = "Leda";
     eventBuilder.addVariable(MY_VAR, value);
@@ -136,13 +136,12 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Test
   @Description("Verifies that parsing works with inner expressions in MVEL but only with regular ones in DW.")
   public void parseCompatibility() throws MuleException {
-    String expression = "this is #[payload]";
-    assertThat(expressionManager.parse(expression, testEvent(), mock(FlowConstruct.class)),
+    assertThat(expressionManager.parse("this is #[mel:payload]", testEvent(), mock(FlowConstruct.class)),
                is(String.format("this is %s", TEST_PAYLOAD)));
-    assertThat(expressionManager.parse("dw:'this is ' ++ payload", testEvent(), mock(FlowConstruct.class)),
+    assertThat(expressionManager.parse("'this is ' ++ payload", testEvent(), mock(FlowConstruct.class)),
                is(String.format("this is %s", TEST_PAYLOAD)));
     expectedException.expect(RuntimeException.class);
-    expressionManager.parse("dw:" + expression, testEvent(), mock(FlowConstruct.class));
+    expressionManager.parse("this is #[payload]", testEvent(), mock(FlowConstruct.class));
   }
 
   @Test
@@ -162,7 +161,6 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     assertThat(expressionManager.isExpression("2*2 + #[var]"), is(true));
     assertThat(expressionManager.isExpression("#[var]"), is(true));
     assertThat(expressionManager.isExpression("${var}"), is(false));
-
   }
 
 }

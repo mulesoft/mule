@@ -13,9 +13,9 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     <flow name="xmlStringParam">
         <mulexml:xml-to-dom-transformer returnClass="org.dom4j.Document"/>
 
-        <enricher target="#[flowVars['xml']]">
+        <enricher target="#[mel:flowVars['xml']]">
             <processor-chain>
-                <set-payload value="#[flowVars['xml']]"/>
+                <set-payload value="#[mel:flowVars['xml']]"/>
                 <mulexml:xml-to-dom-transformer returnClass="javax.xml.transform.Source"/>
             </processor-chain>
         </enricher>
@@ -25,7 +25,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 
     <sub-flow name="transform">
         <mulexml:xslt-transformer maxIdleTransformers="2" maxActiveTransformers="5" xsl-file="with-xml-node-param.xsl">
-            <mulexml:context-property key="SomeXml" value="#[flowVars['xml']]"/>
+            <mulexml:context-property key="SomeXml" value="#[mel:flowVars['xml']]"/>
         </mulexml:xslt-transformer>
 
         <mulexml:dom-to-xml-transformer/>

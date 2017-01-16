@@ -45,10 +45,10 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   protected volatile ObjectStore<String> store;
   protected String storePrefix;
 
-  protected String idExpression = MessageFormat.format("{0}message:id{1}", DEFAULT_EXPRESSION_PREFIX,
+  protected String idExpression = MessageFormat.format("{0}mel:message:id{1}", DEFAULT_EXPRESSION_PREFIX,
                                                        DEFAULT_EXPRESSION_POSTFIX);
 
-  protected String valueExpression = MessageFormat.format("{0}message:id{1}", DEFAULT_EXPRESSION_PREFIX,
+  protected String valueExpression = MessageFormat.format("{0}mel:message:id{1}", DEFAULT_EXPRESSION_PREFIX,
                                                           DEFAULT_EXPRESSION_POSTFIX);
 
   public IdempotentMessageFilter() {

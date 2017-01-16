@@ -19,7 +19,7 @@
         <transports:inbound-endpoint ref="inbound">
             <append-string-transformer message=" bar"/>
             <transports:mutator-transformer>
-                <set-property propertyName="foo" value="#[message.inboundProperties.foo]"/>
+                <set-property propertyName="foo" value="#[mel:message.inboundProperties.foo]"/>
             </transports:mutator-transformer>
         </transports:inbound-endpoint>
 

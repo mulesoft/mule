@@ -14,7 +14,7 @@
                        money="0"
                        initialHealth="CANCER"
                        finalHealth="CANCER"
-                       enemies="#[[]]">
+                       enemies="#[mel:[]]">
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>

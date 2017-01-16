@@ -7,11 +7,11 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <flow name="recipientListFlow">
-        <recipient-list expression="#[message.inboundProperties['urls']]"/>
+        <recipient-list expression="#[mel:message.inboundProperties['urls']]"/>
     </flow>
 
     <flow name="fireAndForgetFlow">
-        <recipient-list expression="#[message.inboundProperties['urls']]" />
+        <recipient-list expression="#[mel:message.inboundProperties['urls']]" />
     </flow>
 
     <flow name="in1Flow">

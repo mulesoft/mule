@@ -7,14 +7,14 @@
 
     <db:query name="namedParamsQueryTemplate">
         <db:input-parameters>
-            #[['position' : 4, 'name' : 'Venus']]
+            #[mel:['position' : 4, 'name' : 'Venus']]
         </db:input-parameters>
         <db:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</db:sql>
     </db:query>
 
     <db:query name="overridenQueryParamByName" template="namedParamsQueryTemplate">
         <db:input-parameters>
-           #[['name' : 'Mars']]
+           #[mel:['name' : 'Mars']]
         </db:input-parameters>
     </db:query>
 
@@ -26,7 +26,7 @@
         <db:select template="namedParamsQueryTemplate">
             <db:input-parameters>
                 <!-- Note that parameters are in different order-->
-                #[['name' : 'Venus', 'position' : 2]]
+                #[mel:['name' : 'Venus', 'position' : 2]]
             </db:input-parameters>
         </db:select>
     </flow>

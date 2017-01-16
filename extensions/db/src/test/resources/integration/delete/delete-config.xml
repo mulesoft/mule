@@ -7,7 +7,7 @@
 
     <flow name="deleteDynamic">
         <db:delete>
-            <db:sql>DELETE FROM PLANET WHERE name = '#[payload]'</db:sql>
+            <db:sql>DELETE FROM PLANET WHERE name = '#[mel:payload]'</db:sql>
         </db:delete>
     </flow>
 
@@ -15,7 +15,7 @@
         <db:delete>
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
             <db:input-parameters>
-                #[['name' : payload]]
+                #[mel:['name' : payload]]
             </db:input-parameters>
         </db:delete>
     </flow>

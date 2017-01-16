@@ -62,23 +62,23 @@ import org.junit.Test;
 public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String HTTP_BODY = "<html><head></head><body><p>This is the response body</p></body></html>";
-  private static final String HEADER_STATUS = "#[header:status]";
-  private static final String HEADER_CONTENT_TYPE = "#[header:contentType]";
-  private static final String HEADER_CACHE_CONTROL = "#[header:cacheControl]";
-  private static final String HEADER_EXPIRES = "#[header:expires]";
-  private static final String HEADER_LOCATION = "#[header:location]";
-  private static final String HEADER_NAME = "#[header:name]";
-  private static final String HEADER_VALUE = "#[header:value]";
-  private static final String HEADER_DOMAIN = "#[header:domain]";
-  private static final String HEADER_PATH = "#[header:path]";
-  private static final String HEADER_EXPIRY_DATE = "#[header:expiryDate]";
-  private static final String HEADER_SECURE = "#[header:secure]";
-  private static final String HEADER_VERSION = "#[header:version]";
-  private static final String HEADER_DIRECTIVE = "#[header:directive]";
-  private static final String HEADER_MAX_AGE = "#[header:maxAge]";
-  private static final String HEADER_MUST_REVALIDATE = "#[header:mustRevalidate]";
-  private static final String HEADER_NO_CACHE = "#[header:noCache]";
-  private static final String HEADER_NO_STORE = "#[header:noStore]";
+  private static final String HEADER_STATUS = "#[mel:header:status]";
+  private static final String HEADER_CONTENT_TYPE = "#[mel:header:contentType]";
+  private static final String HEADER_CACHE_CONTROL = "#[mel:header:cacheControl]";
+  private static final String HEADER_EXPIRES = "#[mel:header:expires]";
+  private static final String HEADER_LOCATION = "#[mel:header:location]";
+  private static final String HEADER_NAME = "#[mel:header:name]";
+  private static final String HEADER_VALUE = "#[mel:header:value]";
+  private static final String HEADER_DOMAIN = "#[mel:header:domain]";
+  private static final String HEADER_PATH = "#[mel:header:path]";
+  private static final String HEADER_EXPIRY_DATE = "#[mel:header:expiryDate]";
+  private static final String HEADER_SECURE = "#[mel:header:secure]";
+  private static final String HEADER_VERSION = "#[mel:header:version]";
+  private static final String HEADER_DIRECTIVE = "#[mel:header:directive]";
+  private static final String HEADER_MAX_AGE = "#[mel:header:maxAge]";
+  private static final String HEADER_MUST_REVALIDATE = "#[mel:header:mustRevalidate]";
+  private static final String HEADER_NO_CACHE = "#[mel:header:noCache]";
+  private static final String HEADER_NO_STORE = "#[mel:header:noStore]";
 
 
   private MuleContext muleContext;
@@ -426,14 +426,14 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   public void testHttpResponseWithDateExpression() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
     Map<String, String> headers = new HashMap<>();
-    headers.put(HttpConstants.HEADER_EXPIRES, "#[now]");
+    headers.put(HttpConstants.HEADER_EXPIRES, "#[mel:now]");
     httpResponseBuilder.setHeaders(headers);
 
     Date now = new Date();
 
     when(mockExpressionManager.parse("Expires", mockEvent, null)).thenReturn("Expires");
-    when(mockExpressionManager.isExpression("#[now]")).thenReturn(true);
-    doReturn(new TypedValue(now, fromObject(now))).when(mockExpressionManager).evaluate(eq("#[now]"), eq(mockEvent),
+    when(mockExpressionManager.isExpression("#[mel:now]")).thenReturn(true);
+    doReturn(new TypedValue(now, fromObject(now))).when(mockExpressionManager).evaluate(eq("#[mel:now]"), eq(mockEvent),
                                                                                         any(FlowConstruct.class));
 
     HttpResponse httpResponse = new HttpResponse();
@@ -450,11 +450,11 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
     Date now = new Date();
     List<CookieWrapper> cookies = new ArrayList<>();
-    cookies.add(createCookie("test", "test", null, null, "#[now]", null, null));
+    cookies.add(createCookie("test", "test", null, null, "#[mel:now]", null, null));
     httpResponseBuilder.setCookies(cookies);
 
-    when(mockExpressionManager.isExpression("#[now]")).thenReturn(true);
-    doReturn(new TypedValue(now, fromObject(now))).when(mockExpressionManager).evaluate("#[now]", mockEvent);
+    when(mockExpressionManager.isExpression("#[mel:now]")).thenReturn(true);
+    doReturn(new TypedValue(now, fromObject(now))).when(mockExpressionManager).evaluate("#[mel:now]", mockEvent);
     when(mockExpressionManager.parse("test", mockEvent, null)).thenReturn("test");
     when(mockExpressionManager.parse("test", mockEvent, null)).thenReturn("test");
 

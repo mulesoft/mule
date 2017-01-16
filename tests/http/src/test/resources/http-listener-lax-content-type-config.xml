@@ -20,7 +20,7 @@
         <httpn:listener config-ref="httpConf" path="testInputInvalid">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Type' : 'invalidMimeType']]
+                    #[mel:['Content-Type' : 'invalidMimeType']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

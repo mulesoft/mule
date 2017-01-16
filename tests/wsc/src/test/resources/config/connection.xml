@@ -12,14 +12,14 @@
     </wsc:config>
 
     <wsc:config name="localWsdl">
-        <wsc:connection address="http://localhost:${servicePort}/server" service="TestService" port="TestPort" wsdlLocation="#[flowVars.wsdl]" soapVersion="${soapVersion}">
+        <wsc:connection address="http://localhost:${servicePort}/server" service="TestService" port="TestPort" wsdlLocation="#[wsdl]" soapVersion="${soapVersion}">
             <reconnect blocking="false"/>
             <pooling-profile maxActive="1"/>
         </wsc:connection>
     </wsc:config>
 
     <wsc:config name="rpcWsdl">
-        <wsc:connection service="SoapResponder" port="SoapResponderPortType" wsdlLocation="#[flowVars.wsdl]" soapVersion="${soapVersion}">
+        <wsc:connection service="SoapResponder" port="SoapResponderPortType" wsdlLocation="#[wsdl]" soapVersion="${soapVersion}">
             <reconnect blocking="false"/>
             <pooling-profile maxActive="1"/>
         </wsc:connection>
@@ -28,12 +28,12 @@
     <flow name="operationShareInstance">
         <wsc:consume config-ref="single-instance" operation="echo">
             <wsc:message>
-                <wsc:body>#[flowVars.req]</wsc:body>
+                <wsc:body>#[req]</wsc:body>
             </wsc:message>
         </wsc:consume>
         <wsc:consume config-ref="single-instance" operation="echo">
             <wsc:message>
-                <wsc:body>#[flowVars.req]</wsc:body>
+                <wsc:body>#[req]</wsc:body>
             </wsc:message>
         </wsc:consume>
     </flow>
@@ -41,7 +41,7 @@
     <flow name="withLocalWsdlConnection">
         <wsc:consume config-ref="single-instance" operation="echo">
             <wsc:message>
-                <wsc:body>#[flowVars.req]</wsc:body>
+                <wsc:body>#[req]</wsc:body>
             </wsc:message>
         </wsc:consume>
     </flow>

@@ -32,12 +32,12 @@
 
     <flow name="testFlowGlobalContext">
         <httpn:listener config-ref="globalConfig" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
 
     <flow name="testFlowNestedContext">
         <httpn:listener config-ref="nestedConfig" path="/" allowedMethods="POST"/>
-        <expression-component>payload = 'all right'</expression-component>
+        <expression-component>mel:payload = 'all right'</expression-component>
     </flow>
 
 

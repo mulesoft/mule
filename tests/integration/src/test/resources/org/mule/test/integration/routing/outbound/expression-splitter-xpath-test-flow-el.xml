@@ -11,7 +11,7 @@
 
     <flow name="Distributor">
         <mulexml:xml-to-dom-transformer returnClass="org.dom4j.Document"/>
-        <splitter expression="xpath3('//acme:Trade', payload, 'NODESET')" />
+        <splitter expression="mel:xpath3('//acme:Trade', payload, 'NODESET')" />
         <round-robin>
             <flow-ref name="ServiceOne"/>
             <flow-ref name="ServiceTwo"/>

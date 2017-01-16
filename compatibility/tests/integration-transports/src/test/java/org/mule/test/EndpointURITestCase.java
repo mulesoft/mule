@@ -32,10 +32,11 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
   @Test
   public void testEndpoints() throws Exception {
     EndpointUri[] uris = {
-        new EndpointUri("vm://#[message.inboundProperties.prop1]/#[message.inboundProperties.prop2]", "vm://apple/orange"),
+        new EndpointUri("vm://#[mel:message.inboundProperties.prop1]/#[mel:message.inboundProperties.prop2]",
+                        "vm://apple/orange"),
         new EndpointUri("vm://bucket:somefiles?query=%7B%22filename%22%3A%22foo%22%7D"), new EndpointUri("http://localhost:1313"),
         new EndpointUri("http://localhost:1313?${foo}", "http://localhost:1313?$[foo]"),
-        new EndpointUri("vm://#[message.inboundProperties.prop1]", "vm://apple"),};
+        new EndpointUri("vm://#[mel:message.inboundProperties.prop1]", "vm://apple"),};
 
     for (EndpointUri uri : uris) {
       if (!uri.isDynamic()) {

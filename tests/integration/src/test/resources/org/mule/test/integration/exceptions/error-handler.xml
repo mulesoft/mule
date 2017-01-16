@@ -10,38 +10,38 @@
     <flow name="matchesHandlerUsingWhen">
         <test:component/>
         <error-handler>
-            <on-error-continue when="#[exception.causedBy(java.lang.IllegalArgumentException)]">
+            <on-error-continue when="#[mel:exception.causedBy(java.lang.IllegalArgumentException)]">
                 <append-string-transformer message=" catch-1"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causedBy(java.lang.IllegalStateException)]">
+            <on-error-continue when="#[mel:exception.causedBy(java.lang.IllegalStateException)]">
                 <append-string-transformer message=" catch-2"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causedExactlyBy(org.mule.test.integration.exceptions.ErrorHandlerTestCase$BaseException)]">
+            <on-error-continue when="#[mel:exception.causedExactlyBy(org.mule.test.integration.exceptions.ErrorHandlerTestCase$BaseException)]">
                 <append-string-transformer message=" catch-3"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causedBy(org.mule.test.integration.exceptions.ErrorHandlerTestCase$SubtypeException)]">
+            <on-error-continue when="#[mel:exception.causedBy(org.mule.test.integration.exceptions.ErrorHandlerTestCase$SubtypeException)]">
                 <append-string-transformer message=" catch-4"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causeMatches('(.*)mule.test.integration.(.*).ErrorHandlerTestCase(.*)MyException')]">
+            <on-error-continue when="#[mel:exception.causeMatches('(.*)mule.test.integration.(.*).ErrorHandlerTestCase(.*)MyException')]">
                 <append-string-transformer message=" catch-5"/>
             </on-error-continue>
-            <on-error-continue when="#[payload == 'groovy']">
+            <on-error-continue when="#[mel:payload == 'groovy']">
                 <append-string-transformer message=" catch-6"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causeMatches('org.mule.test.integration.exceptions.ErrorHandlerTestCase$StartsWith*')]">
+            <on-error-continue when="#[mel:exception.causeMatches('org.mule.test.integration.exceptions.ErrorHandlerTestCase$StartsWith*')]">
                 <append-string-transformer message=" catch-7"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causeMatches('*FinishesWithException')]">
+            <on-error-continue when="#[mel:exception.causeMatches('*FinishesWithException')]">
                 <append-string-transformer message=" catch-8"/>
             </on-error-continue>
-            <on-error-continue when="#[exception.causeMatches('*FinishesWithSomethingElse')]">
+            <on-error-continue when="#[mel:exception.causeMatches('*FinishesWithSomethingElse')]">
 		        <script:component>
 		            <script:script engine="groovy">
 		                return "$payload groovified"
 		            </script:script>
 		        </script:component>
             </on-error-continue>
-            <on-error-continue when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.runtime.core.api.registry.ResolverException)]">
+            <on-error-continue when="#[mel:exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.runtime.core.api.registry.ResolverException)]">
                 <append-string-transformer message=" catch-9"/>
             </on-error-continue>
         </error-handler>

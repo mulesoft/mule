@@ -7,7 +7,7 @@
 
     <flow name="queryTimeout">
         <db:update queryTimeout="1">
-            <db:sql>update PLANET set NAME='Mercury' where DELAY(#[payload]) = 1</db:sql>
+            <db:sql>update PLANET set NAME='Mercury' where DELAY(#[mel:payload]) = 1</db:sql>
         </db:update>
     </flow>
 </mule>

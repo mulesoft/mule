@@ -23,12 +23,12 @@
     </flow>
 
     <flow name="service-2">
-        <expression-component>hola</expression-component>
+        <expression-component>mel:hola</expression-component>
     </flow>
 
     <flow name="service-3">
         <response>
-            <expression-component>hola</expression-component>
+            <expression-component>mel:hola</expression-component>
         </response>
     </flow>
 
@@ -37,7 +37,7 @@
     </flow>
 
     <flow name="service-5">
-        <expression-component>hola</expression-component>
+        <expression-component>mel:hola</expression-component>
         <error-handler>
             <on-error-continue>
                 <test:queue name="owException-out" />

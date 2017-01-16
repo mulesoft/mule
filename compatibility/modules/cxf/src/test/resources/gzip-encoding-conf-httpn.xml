@@ -24,7 +24,7 @@
         <httpn:listener path="/proxy" config-ref="listenerConfig2" allowedMethods="POST">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Encoding' : 'gzip']]
+                    #[mel:['Content-Encoding' : 'gzip']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -44,7 +44,7 @@
         <httpn:request config-ref="requestConfig" path="/artistRegistry" method="POST">
             <httpn:request-builder>
                 <httpn:headers>
-                    #[['Content-Encoding' : message.attributes.headers['content-encoding']]]
+                    #[mel:['Content-Encoding' : message.attributes.headers['content-encoding']]]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>
@@ -54,7 +54,7 @@
         <httpn:listener path="/artistRegistry" config-ref="listenerConfig1" allowedMethods="POST">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Encoding' : 'gzip']]
+                    #[mel:['Content-Encoding' : 'gzip']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

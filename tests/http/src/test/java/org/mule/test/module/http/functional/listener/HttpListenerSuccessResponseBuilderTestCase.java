@@ -209,7 +209,7 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   private void simpleHeaderTest(String url) throws IOException {
     final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
     final HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 3.6.0"));
+    assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 4.0.0"));
     assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue(), new TypeSafeMatcher<String>() {
 
       private ParseException parseException;

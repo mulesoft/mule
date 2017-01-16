@@ -14,7 +14,7 @@
                        money="0"
                        initialHealth="CANCER"
                        finalHealth="CANCER"
-                       enemies="#[[]]">
+                       enemies="#[mel:[]]">
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>
@@ -27,14 +27,14 @@
     <flow name="source" initialState="stopped">
         <heisenberg:listen-payments initialBatchNumber="0"/>
 
-        <set-payload value="#[java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
         <heisenberg:listen-payments initialBatchNumber="0"/>
 
         <!--invalid expression results in exception-->
-        <set-payload value="#[new java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[mel:new java.lang.Long.valueOf('100')]"/>
     </flow>
 
     <flow name="sourceFailedOnRuntime" initialState="stopped">

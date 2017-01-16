@@ -40,7 +40,7 @@
     </flow>
 
     <flow name="requestFlow">
-        <httpn:request path="${path}" method="#[dw:method]" config-ref="requestConfig" sendBodyMode="ALWAYS"/>
+        <httpn:request path="${path}" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS"/>
     </flow>
 
 

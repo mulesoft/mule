@@ -20,7 +20,7 @@
         <httpn:listener config-ref="httpConf" path="testBuilder">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['content-type' : 'text/plain']]
+                    #[mel:['content-type' : 'text/plain']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>

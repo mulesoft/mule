@@ -12,7 +12,7 @@
     <flow name="input">
         <until-successful objectStore-ref="dummyPersistentStore">
             <processor-chain>
-                <logger level="WARN" message="Message Payload is #[payload:]"/>
+                <logger level="WARN" message="Message Payload is #[mel:payload:]"/>
                 <component class="org.mule.issues.PersistentStore6007TestCase$Component"/>
             </processor-chain>
         </until-successful>

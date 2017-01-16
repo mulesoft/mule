@@ -10,15 +10,15 @@
     </flow>
 
     <flow name="matches-configuring-value">
-        <regex-filter pattern="(\w)* with the mules" value="#[payload.goodValue]"/>
+        <regex-filter pattern="(\w)* with the mules" value="#[mel:payload.goodValue]"/>
     </flow>
 
     <flow name="not-matches-configuring-value">
-        <regex-filter pattern="(\w)* with the mules" value="#[payload.wrongValue]"/>
+        <regex-filter pattern="(\w)* with the mules" value="#[mel:payload.wrongValue]"/>
     </flow>
 
     <flow name="not-matches-configuring-non-string-value">
-        <regex-filter pattern="(\w)* with the mules" value="#[payload]"/>
+        <regex-filter pattern="(\w)* with the mules" value="#[mel:payload]"/>
     </flow>
 
     <flow name="matches-configuring-plain-text-value">

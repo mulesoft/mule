@@ -52,7 +52,7 @@
     </flow>
     <flow name="RollbackExceptionStrategyCommit" >
         <file:inbound-endpoint path="${workingDirectory}/rollbackOnException" >
-            <redelivery-policy idExpression="#[header:inbound:originalFilename]" maxRedeliveryCount="2"/>
+            <redelivery-policy idExpression="#[mel:header:inbound:originalFilename]" maxRedeliveryCount="2"/>
         </file:inbound-endpoint>
         <test:component throwException="true"/>
         <error-handler>

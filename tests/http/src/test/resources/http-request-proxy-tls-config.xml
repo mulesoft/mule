@@ -11,7 +11,7 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="#[host]" port="${httpPort}" protocol="HTTPS">
+        <httpn:request-connection host="#[mel:host]" port="${httpPort}" protocol="HTTPS">
             <tls:context>
                 <tls:trust-store path="${trustStorePath}" password="changeit"/>
             </tls:context>
@@ -30,7 +30,7 @@
     </httpn:listener-config>
 
     <flow name="clientFlow">
-        <httpn:request config-ref="requestConfig" path="#[path]" method="POST"/>
+        <httpn:request config-ref="requestConfig" path="#[mel:path]" method="POST"/>
     </flow>
 
     <flow name="serverFlow">

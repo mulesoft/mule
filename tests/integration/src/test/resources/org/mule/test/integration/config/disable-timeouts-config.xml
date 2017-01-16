@@ -25,7 +25,7 @@
 
     <flow name="HttpService">
         <httpn:listener config-ref="listenerConfig" path="service" />
-        <test:component waitTime="200" appendString=" processed"/>
+        <test:component waitTime="200" appendString="' processed'"/>
     </flow>
 
 </mule>

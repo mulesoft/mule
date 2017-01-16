@@ -29,7 +29,7 @@
 
     <flow name="test">
         <custom-security-filter class="org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter">
-            <spring:property name="password" value="#[message.inboundProperties.pass]"/>
+            <spring:property name="password" value="#[mel:message.inboundProperties.pass]"/>
         </custom-security-filter>
         <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>

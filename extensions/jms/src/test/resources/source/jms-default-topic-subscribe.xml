@@ -11,7 +11,7 @@
                 <jmsn:topic-consumer/>
             </jmsn:consumer-type>
         </jmsn:listener>
-        <expression-component>
+        <expression-component>mel:
             new org.mule.extensions.jms.test.JmsAbstractTestCase$OnIncomingConnection().onCall(message)
         </expression-component>
         <set-payload value="Message Stored"/>

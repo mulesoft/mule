@@ -12,12 +12,12 @@
 
     <flow name="typedValueForString">
         <set-payload value="This is a string" mimeType="application/json" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-string-parameter stringValue="#[payload]"/>
+        <typed-value:typed-value-operation-string-parameter stringValue="#[mel:payload]"/>
     </flow>
 
     <flow name="typedValueForStringFromByteArray">
-        <set-payload value="#['This is a string'.getBytes()]" mimeType="application/json" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-string-parameter stringValue="#[payload]"/>
+        <set-payload value="#[mel:'This is a string'.getBytes()]" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-parameter stringValue="#[mel:payload]"/>
     </flow>
 
     <flow name="typedValueForStringWithDefaultValue">
@@ -25,8 +25,8 @@
     </flow>
 
     <flow name="typedValueForStringList">
-        <set-payload value="#[['string','string']]" mimeType="application/java" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-string-list-parameter stringValues="#[payload]"/>
+        <set-payload value="#[mel:['string','string']]" mimeType="application/java" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-list-parameter stringValues="#[mel:payload]"/>
     </flow>
     <flow name="typedValueForStringListAsChild">
         <typed-value:typed-value-operation-string-list-parameter>
@@ -38,8 +38,8 @@
     </flow>
 
     <flow name="typedValueForStringMap">
-        <set-payload value="#[['string':'string']]" mimeType="application/java" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-string-map-parameter stringMapValues="#[payload]"/>
+        <set-payload value="#[mel:['string':'string']]" mimeType="application/java" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-map-parameter stringMapValues="#[mel:payload]"/>
     </flow>
 
     <flow name="typedValueForStringMapAsChild">
@@ -85,14 +85,14 @@
     </flow>
 
     <flow name="typedValueForStringOnSourceOnSuccess" initialState="stopped">
-        <typed-value:source stringValue="#[payload]"/>
+        <typed-value:source stringValue="#[mel:payload]"/>
         <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
     </flow>
 
     <flow name="typedValueForStringInsidePojo">
         <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-for-string-inside-pojo>
-            <typed-value:differed-door address="#[payload]"/>
+            <typed-value:differed-door address="#[mel:payload]"/>
         </typed-value:typed-value-for-string-inside-pojo>
     </flow>
 </mule>

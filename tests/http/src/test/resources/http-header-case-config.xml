@@ -17,18 +17,18 @@
         <httpn:listener path="test" config-ref="listenerConfig">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Type' : 'application/x-www-form-urlencoded', 'customname1' : 'customValue']]
+                    #[mel:['Content-Type' : 'application/x-www-form-urlencoded', 'customname1' : 'customValue']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
-        <set-payload value="#[message.getAttributes().getHeaders().get('CusTomName2')]=value" />
+        <set-payload value="#[mel:message.getAttributes().getHeaders().get('CusTomName2')]=value" />
     </flow>
 
     <flow name="client">
         <httpn:request path="test" config-ref="requestConfig">
             <httpn:request-builder>
                 <httpn:headers>
-                    #[['CusTomName2' : 'CustomValue']]
+                    #[mel:['CusTomName2' : 'CustomValue']]
                 </httpn:headers>
             </httpn:request-builder>
         </httpn:request>

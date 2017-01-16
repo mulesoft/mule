@@ -21,16 +21,16 @@
 
     <flow name="noExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[message.attributes.method]" path="#[message.attributes.requestPath]" parseResponse="false"/>
+        <httpn:request config-ref="requestConfig" method="#[mel:message.attributes.method]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
     </flow>
 
     <flow name="catchExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[message.attributes.method]]" path="#[message.attributes.requestPath]" parseResponse="false"/>
+        <httpn:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
         <error-handler>
             <on-error-continue>
                 <processor ref="catchSensingMessageProcessor"/>
-                <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
+                <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[mel:org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
                 <set-payload value="Service Down"/>
             </on-error-continue>
         </error-handler>
@@ -38,7 +38,7 @@
 
     <flow name="rollbackExceptionStrategyFlow">
         <httpn:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[message.attributes.method]]" path="#[message.attributes.requestPath]" parseResponse="false"/>
+        <httpn:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
         <error-handler>
             <on-error-propagate>
                 <processor ref="rollbackSensingMessageProcessor"/>

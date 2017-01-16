@@ -87,7 +87,7 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
   @Description("Executes a simple operation with an expression as parameter using the client and checks the output")
   public void executeSimpleOperationWithExpression() throws Throwable {
     OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("victim", "#['Juani']")
+        .addParameter("victim", "#[mel:'Juani']")
         .addParameter("goodbyeMessage", "ADIOS")
         .build();
     Result<String, ? extends Attributes> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);

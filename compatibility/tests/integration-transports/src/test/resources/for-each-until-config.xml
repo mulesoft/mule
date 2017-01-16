@@ -13,50 +13,50 @@
     </spring:beans>
 
     <flow name="varSync">
-        <set-variable variableName="count" value="#[0]"/>
-        <transports:set-session-variable variableName="count" value="#[0]"/>
-        <foreach collection="#[payload]">
-            <set-variable variableName="current" value="#[payload]"/>
-            <transports:set-session-variable variableName="current" value="#[payload]"/>
+        <set-variable variableName="count" value="#[mel:0]"/>
+        <transports:set-session-variable variableName="count" value="#[mel:0]"/>
+        <foreach collection="#[mel:payload]">
+            <set-variable variableName="current" value="#[mel:payload]"/>
+            <transports:set-session-variable variableName="current" value="#[mel:payload]"/>
             <until-successful synchronous="true">
                 <processor-chain>
-                    <set-payload value="#[payload]"/>
-                    <set-variable variableName="until" value="#[payload]"/>
-                    <transports:set-session-variable variableName="until" value="#[payload]"/>
+                    <set-payload value="#[mel:payload]"/>
+                    <set-variable variableName="until" value="#[mel:payload]"/>
+                    <transports:set-session-variable variableName="until" value="#[mel:payload]"/>
                 </processor-chain>
             </until-successful>
-            <set-variable variableName="count" value="#[flowVars.count + payload]"/>
-            <transports:set-session-variable variableName="count" value="#[sessionVars.count + payload]"/>
+            <set-variable variableName="count" value="#[mel:flowVars.count + payload]"/>
+            <transports:set-session-variable variableName="count" value="#[mel:sessionVars.count + payload]"/>
         </foreach>
     </flow>
 
     <flow name="varSyncNoForEach">
-        <set-variable variableName="count" value="#[3]"/>
-        <transports:set-session-variable variableName="count" value="#[3]"/>
-        <set-variable variableName="current" value="#[payload]"/>
-        <transports:set-session-variable variableName="current" value="#[payload]"/>
+        <set-variable variableName="count" value="#[mel:3]"/>
+        <transports:set-session-variable variableName="count" value="#[mel:3]"/>
+        <set-variable variableName="current" value="#[mel:payload]"/>
+        <transports:set-session-variable variableName="current" value="#[mel:payload]"/>
         <until-successful synchronous="true">
             <processor-chain>
-                <set-payload value="#[payload]"/>
-                <set-variable variableName="until" value="#[payload]"/>
-                <transports:set-session-variable variableName="until" value="#[payload]"/>
+                <set-payload value="#[mel:payload]"/>
+                <set-variable variableName="until" value="#[mel:payload]"/>
+                <transports:set-session-variable variableName="until" value="#[mel:payload]"/>
             </processor-chain>
         </until-successful>
-        <set-variable variableName="count" value="#[flowVars.count + payload]"/>
-        <transports:set-session-variable variableName="count" value="#[sessionVars.count + payload]"/>
+        <set-variable variableName="count" value="#[mel:flowVars.count + payload]"/>
+        <transports:set-session-variable variableName="count" value="#[mel:sessionVars.count + payload]"/>
     </flow>
 
     <flow name="varAsync">
-        <set-variable variableName="count" value="#[0]"/>
-        <transports:set-session-variable variableName="count" value="#[0]"/>
-        <foreach collection="#[payload]">
-            <set-variable variableName="current" value="#[payload]"/>
-            <transports:set-session-variable variableName="current" value="#[payload]"/>
+        <set-variable variableName="count" value="#[mel:0]"/>
+        <transports:set-session-variable variableName="count" value="#[mel:0]"/>
+        <foreach collection="#[mel:payload]">
+            <set-variable variableName="current" value="#[mel:payload]"/>
+            <transports:set-session-variable variableName="current" value="#[mel:payload]"/>
             <until-successful synchronous="false" objectStore-ref="objectStore">
-                <set-payload value="#[payload]"/>
+                <set-payload value="#[mel:payload]"/>
             </until-successful>
-            <set-variable variableName="count" value="#[flowVars.count + payload]"/>
-            <transports:set-session-variable variableName="count" value="#[sessionVars.count + payload]"/>
+            <set-variable variableName="count" value="#[mel:flowVars.count + payload]"/>
+            <transports:set-session-variable variableName="count" value="#[mel:sessionVars.count + payload]"/>
         </foreach>
     </flow>
 

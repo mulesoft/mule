@@ -12,19 +12,19 @@
 
     <flow name="stringAttachment">
         <vm:inbound-endpoint path="inString" exchange-pattern="request-response"/>
-        <transports:set-attachment attachmentName="file" value="#[payload]" contentType="text/plain"/>
+        <transports:set-attachment attachmentName="file" value="#[mel:payload]" contentType="text/plain"/>
         <http:outbound-endpoint host="localhost" port="${port}" path="upload" method="POST"/>
     </flow>
 
     <flow name="byteArrayAttachment">
         <vm:inbound-endpoint path="inByteArray" exchange-pattern="request-response"/>
         <string-to-byte-array-transformer />
-        <transports:set-attachment attachmentName="file" value="#[payload]" contentType="application/zip"/>
+        <transports:set-attachment attachmentName="file" value="#[mel:payload]" contentType="application/zip"/>
         <http:outbound-endpoint host="localhost" port="${port}" path="upload" method="POST"/>
     </flow>
 
     <flow name="server">
         <http:inbound-endpoint host="localhost" port="${port}" path="upload"/>
-        <set-payload value="#[message.inboundAttachments['file'].content]"/>
+        <set-payload value="#[mel:message.inboundAttachments['file'].content]"/>
     </flow>
 </mule>

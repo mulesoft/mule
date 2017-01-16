@@ -93,7 +93,7 @@
                 <parsers-test:simple-type-child value="value1"/>
                 <parsers-test:simple-type-child value="value2"/>
             </parsers-test:simple-list-entry>
-            <parsers-test:simple-list-entry key="2" value="#['some expression']"/>
+            <parsers-test:simple-list-entry key="2" value="#[mel:'some expression']"/>
         </parsers-test:simple-list-type-map>
     </parsers-test:parameter-collection-parser>
 

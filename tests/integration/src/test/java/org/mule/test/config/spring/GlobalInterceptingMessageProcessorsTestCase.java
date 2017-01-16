@@ -40,7 +40,7 @@ public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegra
     Processor mp1 = muleContext.getRegistry().lookupObject("idempotentFilter");
     assertTrue(mp1 instanceof IdempotentMessageFilter);
     IdempotentMessageFilter imf = (IdempotentMessageFilter) mp1;
-    assertEquals(imf.getIdExpression(), "#[payload:]");
+    assertEquals(imf.getIdExpression(), "#[mel:payload:]");
     assertMpPresent(mpList, mp1, IdempotentMessageFilter.class);
 
     Processor mp2 = muleContext.getRegistry().lookupObject("messageFilter");

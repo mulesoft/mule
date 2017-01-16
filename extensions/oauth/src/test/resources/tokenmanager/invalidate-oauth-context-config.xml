@@ -13,7 +13,7 @@
     </flow>
 
     <flow name="invalidateOauthContextWithResourceOwnerId">
-        <oauth:invalidate-oauth-context tokenManager="tokenManagerConfig" resourceOwnerId="#[flowVars['resourceOwnerId']]"/>
+        <oauth:invalidate-oauth-context tokenManager="tokenManagerConfig" resourceOwnerId="#[variables['resourceOwnerId']]"/>
     </flow>
 
 </mule>

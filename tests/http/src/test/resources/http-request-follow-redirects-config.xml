@@ -16,7 +16,7 @@
         <httpn:request-connection host="localhost" port="${httpPort}"/>
     </httpn:request-config>
 
-    <httpn:request-config name="withFollowRedirectsExpression" followRedirects="#[redirect]">
+    <httpn:request-config name="withFollowRedirectsExpression" followRedirects="#[mel:redirect]">
         <httpn:request-connection host="localhost" port="${httpPort}"/>
     </httpn:request-config>
 
@@ -42,7 +42,7 @@
     </flow>
 
     <flow name="followRedirectsExpression">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[redirect]"/>
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[mel:redirect]"/>
     </flow>
 
     <flow name="fromConfig">

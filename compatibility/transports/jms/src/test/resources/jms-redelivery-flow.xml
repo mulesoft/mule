@@ -22,13 +22,13 @@
         <default-exception-strategy>
             <commit-transaction exception-pattern="org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException"/>
             <choice>
-                <when expression="#[payload.getException() instanceof org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException]">
+                <when expression="#[mel:payload.getException() instanceof org.mule.compatibility.transport.jms.redelivery.MessageRedeliveredException]">
                     <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorLimitedRedelivery">
                         <jms:transaction action="ALWAYS_JOIN" />
                     </jms:outbound-endpoint>
                 </when>
                 <otherwise>
-                    <logger message="#[payload.exception.class]" level="WARN"/>
+                    <logger message="#[mel:payload.exception.class]" level="WARN"/>
                 </otherwise>
             </choice>
         </default-exception-strategy>

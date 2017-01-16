@@ -14,7 +14,7 @@
     <flow name="SynchronousService">
         <vm:inbound-endpoint path="input" exchange-pattern="request-response"/>
 
-        <jms:outbound-endpoint connector-ref="jmsConnector" queue="#[message.inboundProperties.queueName]"
+        <jms:outbound-endpoint connector-ref="jmsConnector" queue="#[mel:message.inboundProperties.queueName]"
                                exchange-pattern="request-response"/>
     </flow>
 

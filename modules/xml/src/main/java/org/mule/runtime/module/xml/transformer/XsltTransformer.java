@@ -59,14 +59,14 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * 
  * <pre>
  *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot; xslFile=&quot;myXslFile.xsl&quot;&amp;gt
- *      &lt;context-property name=&quot;myParameter&quot; value=&quot;#[head:myproperty]&quot;/&amp;gt
- *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;#[function:uuid]&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter&quot; value=&quot;#[mel:head:myproperty]&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;#[mel:function:uuid]&quot;/&amp;gt
  *  &lt;/mxml:xslt-transformer&amp;gt
  * </pre>
  * <p/>
  * <p>
  * The 'header' expression pulls a header from the current message and 'function' can execute a set of arbitrary functions. You
- * can also pass in static values by ommitting the expression prefix '#['.
+ * can also pass in static values by ommitting the expression prefix '#[mel:'.
  * </p>
  * <p/>
  * In addition to being able to pass in an XSLT file you can also define templates inline. For example -

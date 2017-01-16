@@ -7,26 +7,26 @@
 
     <flow name="publisher">
         <jmsn:publish config-ref="config"
-                      destination="#[dw:destination]"
-                      deliveryDelay="#[dw:deliveryDelay]"
-                      destinationType="#[dw:destinationType]"
-                      disableMessageId="#[dw:disableMessageId]"
-                      disableMessageTimestamp="#[dw:disableMessageTimestamp]"
-                      deliveryDelayUnit="#[dw:deliveryDelayUnit]"
-                      persistentDelivery="#[dw:persistentDelivery]"
-                      priority="#[dw:priority]"
-                      timeToLive="#[dw:timeToLive]"
-                      timeToLiveUnit="#[dw:timeToLiveUnit]">
-            <jmsn:message-builder contentType="#[dw:contentType]"
-                                  correlationId="#[dw:correlationId]"
-                                  encoding="#[dw:encoding]"
-                                  jmsType="#[dw:jmsType]"
-                                  sendContentType="#[dw:sendContentType]"
-                                  sendEncoding="#[dw:sendEncoding]">
-                <jmsn:body>"#[dw:destination]"</jmsn:body>
-                <jmsn:reply-to destination="#[dw:replyDestination]" destinationType="#[dw:replyDestinationType]"/>
+                      destination="#[destination]"
+                      deliveryDelay="#[deliveryDelay]"
+                      destinationType="#[destinationType]"
+                      disableMessageId="#[disableMessageId]"
+                      disableMessageTimestamp="#[disableMessageTimestamp]"
+                      deliveryDelayUnit="#[deliveryDelayUnit]"
+                      persistentDelivery="#[persistentDelivery]"
+                      priority="#[priority]"
+                      timeToLive="#[timeToLive]"
+                      timeToLiveUnit="#[timeToLiveUnit]">
+            <jmsn:message-builder contentType="#[contentType]"
+                                  correlationId="#[correlationId]"
+                                  encoding="#[encoding]"
+                                  jmsType="#[jmsType]"
+                                  sendContentType="#[sendContentType]"
+                                  sendEncoding="#[sendEncoding]">
+                <jmsn:body>"#[destination]"</jmsn:body>
+                <jmsn:reply-to destination="#[replyDestination]" destinationType="#[replyDestinationType]"/>
                 <jmsn:properties>
-                    #[dw:properties]
+                    #[properties]
                 </jmsn:properties>
             </jmsn:message-builder>
         </jmsn:publish>
@@ -34,14 +34,14 @@
 
     <flow name="consumer">
         <jmsn:consume config-ref="config"
-                      destination="#[dw:destination]"
-                      maximumWait="#[dw:maximumWait]"
-                      waitTimeUnit="#[dw:waitTimeUnit]"
-                      encoding="#[dw:encoding]"
-                      ackMode="#[dw:ackMode]"
-                      consumerType="#[dw:consumerType]"
-                      contentType="#[dw:contentType]"
-                      selector="#[dw:selector]"/>
+                      destination="#[destination]"
+                      maximumWait="#[maximumWait]"
+                      waitTimeUnit="#[waitTimeUnit]"
+                      encoding="#[encoding]"
+                      ackMode="#[ackMode]"
+                      consumerType="#[consumerType]"
+                      contentType="#[contentType]"
+                      selector="#[selector]"/>
     </flow>
 
 </mule>

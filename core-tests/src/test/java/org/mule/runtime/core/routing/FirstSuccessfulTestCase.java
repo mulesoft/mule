@@ -65,7 +65,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     };
 
     FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
-    fs.setFailureExpression("#[payload is Integer]");
+    fs.setFailureExpression("#[mel:payload is Integer]");
     fs.initialise();
 
     assertEquals("abc", fs.process(eventBuilder()

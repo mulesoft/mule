@@ -13,7 +13,7 @@
     <flow name="testFLow">
         <file:inbound-endpoint connector-ref="GenericFileConnector" path="${workingDirectory}/data" responseTimeout="60000"/>
 
-        <set-payload value="#[['sourceDirectory': message.inboundProperties['sourceDirectory'], 'sourceFileName': message.inboundProperties['sourceFileName']]]"/>
+        <set-payload value="#[mel:['sourceDirectory': message.inboundProperties['sourceDirectory'], 'sourceFileName': message.inboundProperties['sourceFileName']]]"/>
 
         <vm:outbound-endpoint path="testOut"/>
     </flow>

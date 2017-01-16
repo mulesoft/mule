@@ -120,7 +120,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void contentParameterWithCustomDefault() {
     assertSinglePrimaryContentParameter(createExtension(VeganExtension.class), "tryToEatThisListOfMaps",
-                                        "#[new java.util.ArrayList()]");
+                                        "#[mel:new java.util.ArrayList()]");
   }
 
   private void assertSinglePrimaryContentParameter(ExtensionModel extensionModel, String operationName, String defaultValue) {

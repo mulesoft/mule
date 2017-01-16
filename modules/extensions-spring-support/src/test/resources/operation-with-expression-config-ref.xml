@@ -32,7 +32,7 @@
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name config-ref="#[dynamic]"/>
+        <heisenberg:say-my-name config-ref="#[mel:dynamic]"/>
     </flow>
 
 </mule>

@@ -150,7 +150,7 @@
 
     <flow name="redeliveryPolicyRedefinition">
         <vm:inbound-endpoint path="in3">
-            <redelivery-policy idExpression="#[payload:]" useSecureHash="false"/>
+            <redelivery-policy idExpression="#[mel:payload:]" useSecureHash="false"/>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true"/>

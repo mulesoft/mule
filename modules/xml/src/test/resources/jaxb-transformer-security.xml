@@ -13,6 +13,6 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         <mulexml:jaxb-xml-to-object-transformer returnClass="org.mule.jaxb.model.Foo" jaxbContext-ref="JAXB_Context"/>
         <mulexml:jaxb-object-to-xml-transformer jaxbContext-ref="JAXB_Context"/>
         <object-to-string-transformer/>
-        <logger message="final: #[payload]" level="INFO"/>
+        <logger message="final: #[mel:payload]" level="INFO"/>
     </flow>
 </mule>

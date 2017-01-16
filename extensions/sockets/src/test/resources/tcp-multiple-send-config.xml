@@ -35,6 +35,6 @@
     <flow name="tcp-listen">
         <sockets:socket-listener config-ref="tcp-listener"/>
         <object-to-string-transformer mimeType="text/plain"/>
-        <set-payload value="#[payload]_modified"/>
+        <set-payload value="#[mel:payload]_modified"/>
     </flow>
 </mule>

@@ -7,7 +7,7 @@
     <flow name="flowA">
         <logger/>
         <error-handler name="choice">
-            <on-error-continue when="#[exception is java.lang.NullPointerException]"/>
+            <on-error-continue when="#[mel:exception is java.lang.NullPointerException]"/>
             <defaul-exception-strategy/>
         </error-handler>
     </flow>

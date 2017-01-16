@@ -15,7 +15,7 @@
     </flow>
 
     <flow name="FlowRefInvalidException">
-        <flow-ref name="#['service999']"/>
+        <flow-ref name="#[mel:'service999']"/>
     </flow>
 
     <flow name="TransformerException">

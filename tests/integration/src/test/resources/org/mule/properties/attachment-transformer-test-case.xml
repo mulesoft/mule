@@ -16,97 +16,97 @@
 
     <set-session-variable name="addSessionProperty2" variableName="sesPropKey2" value="sesPropValue2"/>
 
-    <set-attachment name="setAttachGlobal" attachmentName="#[flowVars.invPropKey]" value="#[sessionVars.sesPropKey]" contentType="text/plain"/>
+    <set-attachment name="setAttachGlobal" attachmentName="#[mel:flowVars.invPropKey]" value="#[mel:sessionVars.sesPropKey]" contentType="text/plain"/>
     
-    <remove-attachment name="remAttachGlobal" attachmentName="#['attach']"/>
+    <remove-attachment name="remAttachGlobal" attachmentName="#[mel:'attach']"/>
     
     <copy-attachments name="copyAttachGlobal" attachmentName="*2"/>
    
     <flow name="addAttachment" processingStrategy="synchronous">
-        <set-attachment attachmentName="attach" value="#['some value']" contentType="text/plain"/>
-        <test:assert expression="#[message.outboundAttachments['attach'].getContentType().equals('text/plain')]"/>
+        <set-attachment attachmentName="attach" value="#[mel:'some value']" contentType="text/plain"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'].getContentType().equals('text/plain')]"/>
     </flow>
 
     <flow name="addAttachmentUsingExpressionKey" processingStrategy="synchronous">
         <transformer ref="addInvocationProperty"/>
         <transformer ref="addSessionProperty"/>
         <transformer ref="setAttachGlobal"/>
-        <test:assert expression="#[message.outboundAttachments['invPropValue'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['invPropValue'].getContentType().equals('text/plain')]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['invPropValue'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['invPropValue'].getContentType().equals('text/plain')]"/>
     </flow>
 
     <flow name="addAttachmentUsingExpressionContentType" processingStrategy="synchronous">
-        <set-attachment attachmentName="attach" value="value" contentType="#['application/xml']"/>
-        <test:assert expression="#[message.outboundAttachments['attach'].getContentType().equals('application/xml')]"/>
+        <set-attachment attachmentName="attach" value="value" contentType="#[mel:'application/xml']"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'].getContentType().equals('application/xml')]"/>
     </flow>
 
     <flow name="removeAttachment" processingStrategy="synchronous">
-        <set-attachment attachmentName="attach" value="#['some value']" contentType="text/plain"/>
-        <set-attachment attachmentName="attach2" value="#['some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach" value="#[mel:'some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach2" value="#[mel:'some value']" contentType="text/plain"/>
         <remove-attachment attachmentName="attach" />
-        <test:assert expression="#[message.outboundAttachments['attach'] == null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach2'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach2'] != null]"/>
     </flow>
 
     <flow name="removeAttachmentUsingExpression" processingStrategy="synchronous">
-        <set-attachment attachmentName="attach" value="#['some value']" contentType="text/plain"/>
-        <set-attachment attachmentName="attach2" value="#['some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach" value="#[mel:'some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach2" value="#[mel:'some value']" contentType="text/plain"/>
         <transformer ref="remAttachGlobal"/>
-        <test:assert expression="#[message.outboundAttachments['attach'] == null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach2'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach2'] != null]"/>
     </flow>
     
     <flow name="removeAttachmentUsingRegex" processingStrategy="synchronous">
-        <set-attachment attachmentName="attach" value="#['some value']" contentType="text/plain"/>
-        <set-attachment attachmentName="attach2" value="#['some value']" contentType="text/plain"/>
-        <set-attachment attachmentName="attach22" value="#['some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach" value="#[mel:'some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach2" value="#[mel:'some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach22" value="#[mel:'some value']" contentType="text/plain"/>
         <remove-attachment attachmentName="*2"/>
-        <test:assert expression="#[message.outboundAttachments['attach'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach2'] == null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach22'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach2'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach22'] == null]"/>
     </flow>
     
     <flow name="removeAllAttachments" processingStrategy="synchronous">
-        <set-attachment attachmentName="attach" value="#['some value']" contentType="text/plain"/>
-        <set-attachment attachmentName="attach2" value="#['some value']" contentType="text/plain"/>
-        <set-attachment attachmentName="attach22" value="#['some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach" value="#[mel:'some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach2" value="#[mel:'some value']" contentType="text/plain"/>
+        <set-attachment attachmentName="attach22" value="#[mel:'some value']" contentType="text/plain"/>
         <remove-attachment attachmentName="*" />
-        <test:assert expression="#[message.outboundAttachments['attach'] == null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach2'] == null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach22'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach2'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach22'] == null]"/>
     </flow>
 
     <flow name="enrichAttachment" processingStrategy="synchronous">
         <enricher>
             <set-variable variableName="enricherAttachment" value="some text"/>
-            <enrich target="#[message.outboundAttachments['attach'] = new DataHandler($, 'text/plain')]" source="#[flowVars.enricherAttachment]"/>
+            <enrich target="#[mel:message.outboundAttachments['attach'] = new DataHandler($, 'text/plain')]" source="#[mel:flowVars.enricherAttachment]"/>
         </enricher>
-        <test:assert expression="#[message.outboundAttachments['attach'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach'].getContentType().equals('text/plain')]"/>
-        <expression-transformer expression="#[message.outboundAttachments['attach']]"/>
-        <expression-transformer expression="#[message.getPayload().getInputStream()]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'].getContentType().equals('text/plain')]"/>
+        <expression-transformer expression="#[mel:message.outboundAttachments['attach']]"/>
+        <expression-transformer expression="#[mel:message.getPayload().getInputStream()]"/>
         <object-to-string-transformer/>
-        <test:assert expression="#[message.payloadAs(String) == 'some text']"/>
+        <test:assert expression="#[mel:message.payloadAs(String) == 'some text']"/>
     </flow>
 
     <flow name="enrichAttachmentUsingDataHandler" processingStrategy="synchronous">
         <enricher>
             <set-attachment attachmentName="enricherAttachment" value="{message: 'value'}" contentType="application/json"/>
-            <enrich target="#[message.outboundAttachments['attach']]" source="#[message.outboundAttachments['enricherAttachment']]"/>
+            <enrich target="#[mel:message.outboundAttachments['attach']]" source="#[mel:message.outboundAttachments['enricherAttachment']]"/>
         </enricher>
-        <test:assert expression="#[message.outboundAttachments['attach'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach'].getContentType().equals('application/json')]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'].getContentType().equals('application/json')]"/>
     </flow>
 
     <flow name="enrichAttachmentWithoutContentType" processingStrategy="synchronous">
         <flow-ref name="flowEnricher"/>
-        <test:assert expression="#[message.outboundProperties['failure'] != null]"/>
+        <test:assert expression="#[mel:message.outboundProperties['failure'] != null]"/>
     </flow>
 
     <flow name="flowEnricher" processingStrategy="synchronous">
         <enricher>
             <set-variable variableName="enricherAttachment" value="some text"/>
-            <enrich target="#[message.outboundAttachments['attach']]" source="#[flowVars.enricherAttachment]"/>
+            <enrich target="#[mel:message.outboundAttachments['attach']]" source="#[mel:flowVars.enricherAttachment]"/>
         </enricher>
         <error-handler>
             <on-error-continue>
@@ -117,16 +117,16 @@
 
     <flow name="copyAttachments" processingStrategy="synchronous">
         <copy-attachments attachmentName="*"/>
-        <test:assert expression="#[message.outboundAttachments['attach'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach2'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach22'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach2'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach22'] != null]"/>
     </flow>
 
     <flow name="copyAttachmentsWithWildcard" processingStrategy="synchronous">
         <transformer ref="copyAttachGlobal"/>
-        <test:assert expression="#[message.outboundAttachments['attach'] == null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach2'] != null]"/>
-        <test:assert expression="#[message.outboundAttachments['attach22'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach'] == null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach2'] != null]"/>
+        <test:assert expression="#[mel:message.outboundAttachments['attach22'] != null]"/>
     </flow>
 
 </mule>

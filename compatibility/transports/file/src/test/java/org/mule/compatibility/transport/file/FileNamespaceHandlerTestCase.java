@@ -43,7 +43,7 @@ public class FileNamespaceHandlerTestCase extends CompatibilityFunctionalTestCas
     assertTrue(getFileInsideWorkingDirectory("readFromDirectory").getAbsolutePath().endsWith(c.getReadFromDirectory()));
     assertTrue(getFileInsideWorkingDirectory("writeToDirectory").getAbsolutePath().endsWith(c.getWriteToDirectory()));
     assertTrue(getFileInsideWorkingDirectory("workDirectory").getAbsolutePath().endsWith(c.getWorkDirectory()));
-    assertEquals("#[org.mule.runtime.core.util.UUID.getUUID()]", c.getWorkFileNamePattern());
+    assertEquals("#[mel:org.mule.runtime.core.util.UUID.getUUID()]", c.getWorkFileNamePattern());
     assertEquals(false, c.isAutoDelete());
     assertEquals(true, c.isOutputAppend());
     assertEquals(true, c.isSerialiseObjects());

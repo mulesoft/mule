@@ -31,7 +31,7 @@ import org.junit.rules.ExpectedException;
 
 public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
-  public static final String FOO_FLOW_VAR_EXPRESSION = "#[flowVars['foo']]";
+  public static final String FOO_FLOW_VAR_EXPRESSION = "#[mel:flowVars['foo']]";
 
   @Rule
   public ExpectedException thrown = none();
@@ -44,7 +44,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void testEnrichHeaderWithPayload() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).payload(TEST_PAYLOAD).build()).build());
     enricher.initialise();
@@ -58,8 +58,8 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void testEnrichHeaderWithHeader() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header1]",
-                                                              "#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.header1]",
+                                                              "#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("header1", "test").build()).build());
 
@@ -72,12 +72,12 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void testEnrichHeadersMToN() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header1]",
-                                                              "#[message.outboundProperties.myHeader1]"));
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header2]",
-                                                              "#[message.outboundProperties.myHeader2]"));
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header3]",
-                                                              "#[message.outboundProperties.myHeader3]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.header1]",
+                                                              "#[mel:message.outboundProperties.myHeader1]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.header2]",
+                                                              "#[mel:message.outboundProperties.myHeader2]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.header3]",
+                                                              "#[mel:message.outboundProperties.myHeader3]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event).message(InternalMessage.builder(event.getMessage())
         .addOutboundProperty("header1", "test")
         .addOutboundProperty("header2", "test2")
@@ -96,7 +96,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void testEnrichWithNullResponse() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> null);
 
     InternalMessage result = process(enricher, testEvent()).getMessage();
@@ -109,7 +109,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     IllegalStateException testException = new IllegalStateException();
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:header:myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
       throw testException;
     });
@@ -123,7 +123,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void propagateMessage() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build());
     Event in = eventBuilder().message(InternalMessage.builder().payload("").addOutboundProperty("foo", "bar").build()).build();
@@ -137,7 +137,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void propagatesVariables() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build());
     Event in = eventBuilder().message(InternalMessage.of("")).addVariable("flowFoo", "bar").build();
@@ -153,7 +153,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void doNotImplicitlyEnrichMessagePayload() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build());
     InternalMessage out = process(enricher, testEvent()).getMessage();
@@ -164,7 +164,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void doNotImplicitlyEnrichMessageProperties() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addInboundProperty("foo", "bar").build())
         .build());
@@ -176,7 +176,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void doNotImplicitlyEnrichFlowVariable() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event).addVariable("flowFoo", "bar").build());
     Event out = process(enricher, testEvent());
     assertThat(out.getVariableNames(), not(hasItem("flowFoo")));
@@ -186,7 +186,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void doNotImplicitlyEnrichSessionVariable() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
       event.getSession().setProperty("sessionFoo", "bar");
       return event;
@@ -199,7 +199,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void enrichFlowVariable() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[flowVars.foo]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:flowVars.foo]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).payload("bar").build()).build());
     Event out = process(enricher, testEvent());
@@ -210,7 +210,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
   public void enrichSessionVariable() throws Exception {
     MessageEnricher enricher = new MessageEnricher();
     enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
+    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:sessionVars['foo']]"));
     enricher.setEnrichmentMessageProcessor(event -> Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).payload("bar").build()).build());
     Event out = process(enricher, testEvent());
@@ -219,7 +219,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void enrichesFlowVarWithDataType() throws Exception {
-    doEnrichDataTypePropagationTest(new EnrichExpressionPair("#[payload]", FOO_FLOW_VAR_EXPRESSION));
+    doEnrichDataTypePropagationTest(new EnrichExpressionPair("#[mel:payload]", FOO_FLOW_VAR_EXPRESSION));
   }
 
   @Test

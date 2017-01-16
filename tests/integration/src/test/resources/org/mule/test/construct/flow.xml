@@ -66,7 +66,7 @@
     </flow>
 
     <flow name="split-aggregate">
-        <splitter expression="#[payload.fruit]"/>
+        <splitter expression="#[mel:payload.fruit]"/>
         <script:transformer>
             <script:script engine="groovy">
                 ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
@@ -78,7 +78,7 @@
     </flow>
     
     <flow name="split-no-parts">
-        <splitter expression="#[xpath3('//Order/item', payload, 'NODESET')]"/>
+        <splitter expression="#[mel:xpath3('//Order/item', payload, 'NODESET')]"/>
     </flow>
 
     <flow name="split-aggregate-singleton-list">
@@ -138,7 +138,7 @@
     </flow>
 
     <flow name="split-filter-aggregate">
-        <splitter expression="#[payload.fruit]"/>
+        <splitter expression="#[mel:payload.fruit]"/>
         <message-filter throwOnUnaccepted="false">
             <not-filter>
                 <or-filter>
@@ -159,7 +159,7 @@
 
     <flow name="components">
         <echo-component/>
-        <test:component appendString="test"/>
+        <test:component appendString="'test'"/>
     </flow>
 
     <flow name="wiretap">
@@ -270,11 +270,11 @@
     </flow>
 
     <flow name="invoke">
-        <invoke object-ref="appender" method="transform" methodArguments="#[payload]"/>
+        <invoke object-ref="appender" method="transform" methodArguments="#[mel:payload]"/>
     </flow>
 
     <flow name="invoke2">
-        <invoke object-ref="appender" method="transform" methodArguments="#[message.inboundProperties.one]"/>
+        <invoke object-ref="appender" method="transform" methodArguments="#[mel:message.inboundProperties.one]"/>
     </flow>
     
     <flow name="invoke3">
@@ -286,7 +286,7 @@
     </flow>
 
     <flow name="enrich">
-        <enricher target="#[message.outboundProperties.helloHeader]" source="#[payload]">
+        <enricher target="#[mel:message.outboundProperties.helloHeader]" source="#[mel:payload]">
             <append-string-transformer message="Hello" />
         </enricher>
     </flow>
@@ -294,20 +294,20 @@
     <flow name="enrich2">
         <enricher>
             <append-string-transformer message="Hello" />
-            <enrich target="#[message.outboundProperties.helloHeader]" />
-            <enrich target="#[message.outboundProperties.helloHeader2]" source="#[payload]" />
+            <enrich target="#[mel:message.outboundProperties.helloHeader]" />
+            <enrich target="#[mel:message.outboundProperties.helloHeader2]" source="#[mel:payload]" />
         </enricher>
     </flow>
     
     <!-- MULE-5544 -->
     <flow name="enrichcomponent">
-        <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
+        <enricher target="#[mel:message.outboundProperties.echoHeader]" source="#[mel:payload]">
             <echo-component/>
         </enricher>
     </flow>
 
     <flow name="enrichcomponent2">
-        <enricher target="#[message.outboundProperties.echoHeader]" source="#[payload]">
+        <enricher target="#[mel:message.outboundProperties.echoHeader]" source="#[mel:payload]">
             <processor-chain>
                 <echo-component/>
             </processor-chain>
@@ -315,7 +315,7 @@
     </flow>
 
 
-    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#['Account'] ,    #[payload]"
+    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[mel:'Account'] ,    #[mel:payload]"
         methodArgumentTypes="java.lang.String, java.lang.String" />
 
     <invoke name="invokeme-noargs" object-ref="pojo" method="method"/>
@@ -333,7 +333,7 @@
     </flow>
 
     <flow name="loggerheader">
-        <logger message="Ths is my header value: #[message.inboundProperties.toLog]" level="ERROR" category="mycategory"/>
+        <logger message="Ths is my header value: #[mel:message.inboundProperties.toLog]" level="ERROR" category="mycategory"/>
     </flow>
 
     <flow name="poll">
@@ -354,7 +354,7 @@
 
     <flow name="messagefiltersubflow">
         <message-filter onUnaccepted="invokedByMessageFilter">
-            <expression-filter expression="#[false]"/>
+            <expression-filter expression="#[mel:false]"/>
         </message-filter>
     </flow>
      

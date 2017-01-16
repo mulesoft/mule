@@ -16,17 +16,17 @@
 
     <flow name="parallelProcessing">
         <scatter-gather>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
         </scatter-gather>
     </flow>
 
     <flow name="sequentialProcessing">
         <scatter-gather parallel="false">
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
         </scatter-gather>
     </flow>
 
@@ -48,7 +48,7 @@
 
     <flow name="Http">
         <httpn:listener config-ref="HTTP" path="do"/>
-        <expression-component><![CDATA[Thread.sleep(1);]]></expression-component>
+        <expression-component><![CDATA[mel:Thread.sleep(1);]]></expression-component>
     </flow>
 
 </mule>

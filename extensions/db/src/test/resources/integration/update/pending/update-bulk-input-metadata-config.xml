@@ -13,22 +13,22 @@
 
     <flow name="updateBulkMetadataNotSupportedValueParams">
         <db:update config-ref="dbConfig" bulkMode="true">
-            <db:parameterized-query>update Planet set position = #[payload.position] where name =
-                #[message.outboundProperties.name]
+            <db:parameterized-query>update Planet set position = #[mel:payload.position] where name =
+                #[mel:message.outboundProperties.name]
             </db:parameterized-query>
         </db:update>
     </flow>
 
     <flow name="updateBulkMetadataBeanParams">
         <db:update config-ref="dbConfig" bulkMode="true">
-            <db:parameterized-query>update Planet set position = #[payload.position] where name = #[payload.name]
+            <db:parameterized-query>update Planet set position = #[mel:payload.position] where name = #[mel:payload.name]
             </db:parameterized-query>
         </db:update>
     </flow>
 
     <flow name="updateBulkMetadataMapParams">
         <db:update config-ref="dbConfig" bulkMode="true">
-            <db:parameterized-query>update Planet set position = #[payload['position']] where name = #[payload['name']]
+            <db:parameterized-query>update Planet set position = #[mel:payload['position']] where name = #[mel:payload['name']]
             </db:parameterized-query>
         </db:update>
     </flow>

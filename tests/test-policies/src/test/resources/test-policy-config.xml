@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd">
 
     <flow name="main">
-        <logger level="ERROR" message="#[payload]"/>
+        <logger level="ERROR" message="#[mel:payload]"/>
     </flow>
 
     <test-policy:proxy>

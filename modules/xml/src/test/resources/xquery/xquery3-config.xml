@@ -68,8 +68,8 @@
 
     <flow name="multipleInputsByPath">
         <mxml:xquery-transformer>
-            <mxml:context-property key="books" value="#[flowVars['books']]" />
-            <mxml:context-property key="cities" value="#[flowVars['cities']]" />
+            <mxml:context-property key="books" value="#[mel:flowVars['books']]" />
+            <mxml:context-property key="cities" value="#[mel:flowVars['cities']]" />
             <mxml:xquery-text>
                 <![CDATA[
                    xquery version "3.0";
@@ -91,8 +91,8 @@
 
     <flow name="multipleInputsByParam">
         <mxml:xquery-transformer>
-            <mxml:context-property key="books" value="#[flowVars['books']]" />
-            <mxml:context-property key="cities" value="#[flowVars['cities']]" />
+            <mxml:context-property key="books" value="#[mel:flowVars['books']]" />
+            <mxml:context-property key="cities" value="#[mel:flowVars['cities']]" />
             <mxml:xquery-text>
                 <![CDATA[
                    xquery version "3.0";

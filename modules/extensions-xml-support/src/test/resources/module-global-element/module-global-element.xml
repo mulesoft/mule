@@ -15,9 +15,9 @@
     <property name="port" type="string"/>
 
     <httpn:request-config name="simple-config" basePath="/basic-auth/">
-        <httpn:request-connection host="localhost" protocol="HTTP" port="#[property.port]">
+        <httpn:request-connection host="localhost" protocol="HTTP" port="#[mel:property.port]">
             <httpn:authentication>
-                <httpn:basic-authentication username="#[property.someUserConfig]" password="#[property.somePassConfig]"/>
+                <httpn:basic-authentication username="#[mel:property.someUserConfig]" password="#[mel:property.somePassConfig]"/>
             </httpn:authentication>
         </httpn:request-connection>
     </httpn:request-config>
@@ -31,11 +31,11 @@
             <httpn:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <httpn:request-builder>
                     <httpn:uri-params>
-                        #[['aUser' : param.someUser, 'aPass' : param.somePass]]
+                        #[mel:['aUser' : param.someUser, 'aPass' : param.somePass]]
                     </httpn:uri-params>
                 </httpn:request-builder>
             </httpn:request>
-            <mule:set-payload value="#['success with basic-authentication for user: ' + param.someUser]"/>
+            <mule:set-payload value="#[mel:'success with basic-authentication for user: ' + param.someUser]"/>
         </body>
         <output type="string"/>
     </operation>

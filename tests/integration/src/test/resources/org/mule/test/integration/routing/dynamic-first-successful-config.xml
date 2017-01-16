@@ -15,7 +15,7 @@
     </flow>
 
     <flow name="dynamicFirstSuccessfulWithExpression">
-        <dynamic-first-successful failureExpression="#[payload.contains('f')]">
+        <dynamic-first-successful failureExpression="#[mel:payload.contains('f')]">
             <custom-route-resolver ref="beanRouteResolver"/>
         </dynamic-first-successful>
     </flow>

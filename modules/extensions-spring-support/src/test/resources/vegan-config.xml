@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
 
-    <vegan:apple-config name="apple" parameterizedFunction="#[['Apple' : 'Tasty']]">
+    <vegan:apple-config name="apple" parameterizedFunction="#[mel:['Apple' : 'Tasty']]">
         <vegan:cook-book>
             <vegan:vegan-cook-book/>
         </vegan:cook-book>
@@ -42,7 +42,7 @@
     <flow name="eatComplexListOfMaps">
         <vegan:try-to-eat-this-list-of-maps>
             <vegan:foods>
-                #[payload]
+                #[mel:payload]
             </vegan:foods>
         </vegan:try-to-eat-this-list-of-maps>
     </flow>

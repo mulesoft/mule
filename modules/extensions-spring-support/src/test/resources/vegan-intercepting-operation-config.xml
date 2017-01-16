@@ -13,7 +13,7 @@
 
     <flow name="interceptingBanana">
         <vegan:get-lunch />
-        <expression-component>payload.bite()</expression-component>
+        <expression-component>mel:payload.bite()</expression-component>
     </flow>
 
     <flow name="interceptingNotBanana">
@@ -23,12 +23,12 @@
 
     <flow name="interceptingError">
         <vegan:get-lunch />
-        <expression-component>bla bla bla</expression-component>
+        <expression-component>mel:bla bla bla</expression-component>
     </flow>
 
     <flow name="interceptingWithTarget">
         <vegan:get-lunch target="banana"/>
-        <expression-component>banana.payload.value.bite()</expression-component>
+        <expression-component>mel:banana.payload.value.bite()</expression-component>
     </flow>
 
     <flow name="nestedInterceptingWithTarget">

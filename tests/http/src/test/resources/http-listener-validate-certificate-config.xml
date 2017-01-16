@@ -22,10 +22,10 @@
 
     <flow name="listenerWithTrustStoreFlow">
         <httpn:listener config-ref="listenerConfigWithTrustStore" path="/" allowedMethods="POST"/>
-        <test:assert expression="#[message.getAttributes().getClientCertificate() != null]"/>
-        <test:assert expression="#[message.getAttributes().getClientCertificate() instanceof java.security.cert.Certificate]"/>
+        <test:assert expression="#[mel:message.getAttributes().getClientCertificate() != null]"/>
+        <test:assert expression="#[mel:message.getAttributes().getClientCertificate() instanceof java.security.cert.Certificate]"/>
         <!-- Only the client certificate contains CN=OLEKSIYS-W3T this way we validate that we are actually publishing the client cert -->
-        <test:assert expression="#[message.getAttributes().getClientCertificate().getSubjectDN().getName().contains('CN=OLEKSIYS-W3T')]"/>
+        <test:assert expression="#[mel:message.getAttributes().getClientCertificate().getSubjectDN().getName().contains('CN=OLEKSIYS-W3T')]"/>
         <echo-component />
     </flow>
 

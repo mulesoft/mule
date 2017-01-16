@@ -51,7 +51,7 @@ public class FileConnector extends AbstractConnector {
 
   public static final String FILE = "file";
   private static final String DEFAULT_WORK_FILENAME_PATTERN =
-      "#[org.mule.runtime.core.util.UUID.getUUID()].#[server.dateTime.toDate()].#[message.inboundProperties.originalFilename]";
+      "#[mel:org.mule.runtime.core.util.UUID.getUUID()].#[mel:server.dateTime.toDate()].#[mel:message.inboundProperties.originalFilename]";
 
   // These are properties that can be overridden on the Receiver by the endpoint declaration
   // inbound only

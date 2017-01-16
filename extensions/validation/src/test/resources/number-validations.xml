@@ -6,7 +6,7 @@
         http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 
     <flow name="validateNumber">
-        <validation:is-number value="#[payload]" minValue="#[minValue]" maxValue="#[maxValue]" numberType="#[numberType]" />
+        <validation:is-number value="#[mel:payload]" minValue="#[mel:minValue]" maxValue="#[mel:maxValue]" numberType="#[mel:numberType]" />
     </flow>
 
 </mule>

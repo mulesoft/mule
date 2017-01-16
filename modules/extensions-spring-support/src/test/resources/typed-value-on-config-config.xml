@@ -6,8 +6,8 @@
                http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd">
 
 
-    <typed-value:config name="dynamicConfig" stringTypedValue="#[payload]">
-        <typed-value:differed-door address="#[flowVars.address]"/>
+    <typed-value:config name="dynamicConfig" stringTypedValue="#[mel:payload]">
+        <typed-value:differed-door address="#[mel:flowVars.address]"/>
     </typed-value:config>
 
     <typed-value:config name="staticConfig" stringTypedValue="string">

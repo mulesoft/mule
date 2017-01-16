@@ -19,7 +19,7 @@
         <test:assert-intercepting responseSameTask="false"/>
         <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsTemporaryReplyToTestCase$SetReplyTo"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" responseTimeout="20"/>
-        <test:assert expression="#[message.payload == null]"/>
+        <test:assert expression="#[mel:message.payload == null]"/>
     </flow>
 
     <flow name="JMSService1NonBlockingFixed" processingStrategy="non-blocking">
@@ -33,7 +33,7 @@
         <test:assert-intercepting responseSameTask="false"/>
         <custom-transformer class="org.mule.compatibility.transport.jms.integration.JmsTemporaryReplyToTestCase$SetReplyTo"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" responseTimeout="20"/>
-        <test:assert expression="#[message.payload == null]"/>
+        <test:assert expression="#[mel:message.payload == null]"/>
     </flow>
 
     <flow name="JMSService1Sync">
@@ -46,7 +46,7 @@
     <flow name="JMSService1SyncTimeout">
         <test:assert-intercepting responseSameTask="false"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" responseTimeout="20"/>
-        <test:assert expression="#[message.payload == null]"/>
+        <test:assert expression="#[mel:message.payload == null]"/>
     </flow>
  
     <flow name="JMSService1NonBlocking" processingStrategy="non-blocking">
@@ -58,7 +58,7 @@
     <flow name="JMSService1NonBlockingTimeout" processingStrategy="non-blocking">
         <test:assert-intercepting responseSameTask="false"/>
         <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1" responseTimeout="20"/>
-        <test:assert expression="#[message.payload == null]"/>
+        <test:assert expression="#[mel:message.payload == null]"/>
     </flow>
 
      <flow name="JMSService2Sync">

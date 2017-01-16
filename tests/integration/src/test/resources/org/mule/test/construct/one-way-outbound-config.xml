@@ -6,12 +6,12 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="noOutbound">
-        <test:component appendString=" processed"/>
+        <test:component appendString="' processed'"/>
     </flow>
 
     <flow name="noOutboundAsync">
         <async>
-            <test:component appendString=" processed"/>
+            <test:component appendString="' processed'"/>
         </async>
     </flow>
 
@@ -20,12 +20,12 @@
     </flow>
 
     <flow name="oneWayOutboundAfterComponent">
-        <test:component appendString=" processed"/>
+        <test:component appendString="' processed'"/>
         <test:queue name="outbound"/>
     </flow>
 
     <flow name="oneWayOutboundBeforeComponent">
         <test:queue name="outbound"/>
-        <test:component appendString=" processed"/>
+        <test:component appendString="' processed'"/>
     </flow>
 </mule>

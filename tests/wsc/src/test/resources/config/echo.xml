@@ -18,7 +18,7 @@
     <flow name="echoOperation">
         <wsc:consume config-ref="config" operation="echo">
             <wsc:message>
-                <wsc:body>#[dw:payload]</wsc:body>
+                <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
     </flow>
@@ -26,7 +26,7 @@
     <flow name="echoAccountOperation">
         <wsc:consume config-ref="config" operation="echoAccount">
             <wsc:message>
-                <wsc:body>#[dw:payload]</wsc:body>
+                <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
     </flow>
@@ -35,7 +35,7 @@
         <wsc:consume config-ref="config" operation="echoWithHeaders">
             <wsc:message>
                 <wsc:body>
-                #[dw:
+                #[
                 %dw 1.0
                 %output application/xml
                 %namespace con http://service.ws.extension.mule.org/
@@ -45,7 +45,7 @@
                 }]
                 </wsc:body>
                 <wsc:headers>
-                #[dw:
+                #[
                 %dw 1.0
                 %output application/xml
                 %namespace con http://service.ws.extension.mule.org/

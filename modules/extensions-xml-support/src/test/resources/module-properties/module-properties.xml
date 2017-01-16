@@ -23,21 +23,21 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value + ' from module']"/>
+            <mule:set-payload value="#[mel:param.value + ' from module']"/>
         </body>
         <output type="string"/>
     </operation>
 
     <operation name="set-payload-config-param-value">
         <body>
-            <mule:set-payload value="#[property.configParam]"/>
+            <mule:set-payload value="#[mel:property.configParam]"/>
         </body>
         <output type="string"/>
     </operation>
 
     <operation name="set-payload-config-default-param-value">
         <body>
-            <mule:set-payload value="#[property.defaultConfigParam]"/>
+            <mule:set-payload value="#[mel:property.defaultConfigParam]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -47,7 +47,7 @@
             <parameter name="value1" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value1 + ' ' + property.configParam]"/>
+            <mule:set-payload value="#[mel:param.value1 + ' ' + property.configParam]"/>
         </body>
         <output type="string"/>
     </operation>

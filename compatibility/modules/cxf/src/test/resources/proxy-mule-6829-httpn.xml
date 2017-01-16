@@ -25,17 +25,17 @@ http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/tes
 		<choice doc:name="Choice">
 			<when expression="flowVars['cxf_operation'].getLocalPart() == 'EchoOperation1'">
 				<processor-chain>
-					<logger level="INFO" doc:name="EchoOperation1" message="SOAP Action: #[message.inboundProperties.SOAPAction] CXF Operation: #[cxf_operation]" />
+					<logger level="INFO" doc:name="EchoOperation1" message="SOAP Action: #[mel:message.inboundProperties.SOAPAction] CXF Operation: #[mel:cxf_operation]" />
 				</processor-chain>
 			</when>
 			<when expression="flowVars['cxf_operation'].getLocalPart() == 'EchoOperation2'">
 				<processor-chain>
-					<logger level="INFO" doc:name="EchoOperation2" message="SOAP Action:#[message.inboundProperties.SOAPAction]  CXF Operation: #[cxf_operation]" />
+					<logger level="INFO" doc:name="EchoOperation2" message="SOAP Action:#[mel:message.inboundProperties.SOAPAction]  CXF Operation: #[mel:cxf_operation]" />
 				</processor-chain>
 			</when>
 			<otherwise>
 				<processor-chain>
-					<logger level="INFO" doc:name="Default" message="SOAP Action: #[message.inboundProperties.SOAPAction] CXF Operation: #[cxf_operation]" />
+					<logger level="INFO" doc:name="Default" message="SOAP Action: #[mel:message.inboundProperties.SOAPAction] CXF Operation: #[mel:cxf_operation]" />
 				</processor-chain>
 			</otherwise>
 		</choice>
@@ -49,17 +49,17 @@ http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/tes
 		<choice doc:name="Choice">
 			<when expression="flowVars['cxf_operation'].getLocalPart() == 'EchoOperation1'">
 				<processor-chain>
-					<logger level="INFO" doc:name="EchoOperation1" message="SOAP Action: #[message.inboundProperties.get('SOAPAction')] CXF Operation: #[cxf_operation]" />
+					<logger level="INFO" doc:name="EchoOperation1" message="SOAP Action: #[mel:message.inboundProperties.get('SOAPAction')] CXF Operation: #[mel:cxf_operation]" />
 				</processor-chain>
 			</when>
 			<when expression="flowVars['cxf_operation'].getLocalPart() == 'EchoOperation2'">
 				<processor-chain>
-					<logger level="INFO" doc:name="EchoOperation2" message="SOAP Action:#[message.inboundProperties.get('SOAPAction')]  CXF Operation: #[cxf_operation]" />
+					<logger level="INFO" doc:name="EchoOperation2" message="SOAP Action:#[mel:message.inboundProperties.get('SOAPAction')]  CXF Operation: #[mel:cxf_operation]" />
 				</processor-chain>
 			</when>
 			<otherwise>
 				<processor-chain>
-					<logger level="INFO" doc:name="Default" message="SOAP Action: #[message.inboundProperties.get('SOAPAction')] CXF Operation: #[cxf_operation]" />
+					<logger level="INFO" doc:name="Default" message="SOAP Action: #[mel:message.inboundProperties.get('SOAPAction')] CXF Operation: #[mel:cxf_operation]" />
 				</processor-chain>
 			</otherwise>
 		</choice>

@@ -49,6 +49,6 @@
                 </xsl:template>
             </xsl:stylesheet>
         </mxml:xslt-text>
-        <mxml:context-property key="bar" value="#[header:foo]"/>
+        <mxml:context-property key="bar" value="#[mel:header:foo]"/>
     </mxml:xslt-transformer>
 </mule>

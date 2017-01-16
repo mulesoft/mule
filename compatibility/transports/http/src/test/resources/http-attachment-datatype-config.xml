@@ -23,7 +23,7 @@
     <flow name="serverFlow">
         <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${httpPort}" path="readAttachments"/>
 
-        <foreach collection="#[message.inboundAttachments]">
+        <foreach collection="#[mel:message.inboundAttachments]">
             <component class="org.mule.compatibility.transport.http.multipart.HttpAttachmentDataTypeTestCase$AttachmentListener"/>
         </foreach>
     </flow>

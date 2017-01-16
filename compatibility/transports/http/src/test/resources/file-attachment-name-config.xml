@@ -23,10 +23,10 @@
     <flow name="backend">
         <http:inbound-endpoint address="http://localhost:${httpPort}/backend" exchange-pattern="request-response" method="POST"/>
 
-        <set-variable variableName="attachment" value="#[message.inboundAttachments.get('testAttachment')]"/>
-        <set-variable variableName="attachmentName" value="#[flowVars.attachment.getDataSource().getPart().getName()]"/>
-        <set-variable variableName="attachmentFileName" value="#[flowVars.attachment.getDataSource().getPart().getContentDispositionFilename()]"/>
+        <set-variable variableName="attachment" value="#[mel:message.inboundAttachments.get('testAttachment')]"/>
+        <set-variable variableName="attachmentName" value="#[mel:flowVars.attachment.getDataSource().getPart().getName()]"/>
+        <set-variable variableName="attachmentFileName" value="#[mel:flowVars.attachment.getDataSource().getPart().getContentDispositionFilename()]"/>
 
-        <set-payload value="#[flowVars.attachmentName]:#[flowVars.attachmentFileName]"/>
+        <set-payload value="#[mel:flowVars.attachmentName]:#[mel:flowVars.attachmentFileName]"/>
     </flow>
 </mule>

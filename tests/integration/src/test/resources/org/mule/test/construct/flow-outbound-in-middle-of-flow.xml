@@ -19,12 +19,12 @@
 
         <test:queue name="test.out.1" />
 
-        <expression-transformer expression="payload.replaceAll('hello', 'bye')" />
+        <expression-transformer expression="mel:payload.replaceAll('hello', 'bye')" />
 
         <test:queue name="test.out.2" />
         
-        <expression-transformer expression="payload.replaceAll('bye', '')" />
-        <expression-transformer expression="reversePayload()" />
+        <expression-transformer expression="mel:payload.replaceAll('bye', '')" />
+        <expression-transformer expression="mel:reversePayload()" />
             
         <test:queue name="test.out.3" />
 

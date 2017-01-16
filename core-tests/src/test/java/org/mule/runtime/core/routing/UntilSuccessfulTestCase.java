@@ -121,7 +121,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testSuccessfulDeliveryAckExpression() throws Exception {
-    untilSuccessful.setAckExpression("#['ACK']");
+    untilSuccessful.setAckExpression("#[mel:'ACK']");
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setFlowConstruct(mockFlow);
     untilSuccessful.initialise();
@@ -133,7 +133,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testSuccessfulDeliveryFailureExpression() throws Exception {
-    untilSuccessful.setFailureExpression("#[regex('(?i)error')]");
+    untilSuccessful.setFailureExpression("#[mel:regex('(?i)error')]");
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();
@@ -156,7 +156,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testPermanentDeliveryFailureExpression() throws Exception {
-    untilSuccessful.setFailureExpression("#[regex('(?i)error')]");
+    untilSuccessful.setFailureExpression("#[mel:regex('(?i)error')]");
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();

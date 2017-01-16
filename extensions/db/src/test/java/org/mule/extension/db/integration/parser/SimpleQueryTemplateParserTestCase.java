@@ -194,7 +194,7 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void definesTemplateWithExpressionParam() throws Exception {
-    QueryTemplate queryTemplate = parser.parse("update PLANET set NAME='Mercury' where ID= #[planetId]");
+    QueryTemplate queryTemplate = parser.parse("update PLANET set NAME='Mercury' where ID= #[mel:planetId]");
 
     assertEquals(QueryType.UPDATE, queryTemplate.getType());
     assertEquals("update PLANET set NAME='Mercury' where ID= ?", queryTemplate.getSqlText());
@@ -202,13 +202,14 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase {
     InputQueryParam param1 = queryTemplate.getInputParams().get(0);
     assertEquals(UnknownDbType.getInstance(), param1.getType());
     assertNull(param1.getName());
-    assertEquals("#[planetId]", param1.getValue());
+    assertEquals("#[mel:planetId]", param1.getValue());
   }
 
   @Test
   public void definesTemplateWithComplexExpressionParam() throws Exception {
     QueryTemplate queryTemplate =
-        parser.parse("SELECT * FROM PLANET WHERE POSITION = #[message.inboundProperties['position']] AND NAME= #[planetName]");
+        parser
+            .parse("SELECT * FROM PLANET WHERE POSITION = #[mel:message.inboundProperties['position']] AND NAME= #[mel:planetName]");
 
     assertEquals(SELECT, queryTemplate.getType());
     assertEquals("SELECT * FROM PLANET WHERE POSITION = ? AND NAME= ?", queryTemplate.getSqlText());
@@ -216,21 +217,21 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase {
     InputQueryParam param1 = queryTemplate.getInputParams().get(0);
     assertEquals(UnknownDbType.getInstance(), param1.getType());
     assertNull(param1.getName());
-    assertEquals("#[message.inboundProperties['position']]", param1.getValue());
+    assertEquals("#[mel:message.inboundProperties['position']]", param1.getValue());
 
     InputQueryParam param2 = queryTemplate.getInputParams().get(1);
     assertEquals(UnknownDbType.getInstance(), param2.getType());
     assertNull(param2.getName());
-    assertEquals("#[planetName]", param2.getValue());
+    assertEquals("#[mel:planetName]", param2.getValue());
   }
 
   @Test
   public void detectsUnterminatedMuleExpression() throws Exception {
     try {
-      parser.parse("SELECT * FROM PLANET where id = #[incompleteExpression");
+      parser.parse("SELECT * FROM PLANET where id = #[mel:incompleteExpression");
       fail("Did not detect an unfinished mule expression");
     } catch (QueryTemplateParsingException e) {
-      assertTrue("Error message did not contains invalid expression", e.getMessage().endsWith("#[incompleteExpression"));
+      assertTrue("Error message did not contains invalid expression", e.getMessage().endsWith("#[mel:incompleteExpression"));
     }
   }
 

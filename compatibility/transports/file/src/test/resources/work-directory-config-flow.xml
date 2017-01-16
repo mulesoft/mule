@@ -13,7 +13,7 @@
     <file:connector name="fileConnector" fileAge="500"
         autoDelete="false" moveToDirectory="${workingDirectory}/done" streaming="true"
         pollingFrequency="100" workDirectory="${workingDirectory}/work"
-        workFileNamePattern="#[org.mule.runtime.core.util.UUID.getUUID()].#[server.dateTime.toDate()].#[message.inboundProperties.originalFilename]">
+        workFileNamePattern="#[mel:org.mule.runtime.core.util.UUID.getUUID()].#[mel:server.dateTime.toDate()].#[mel:message.inboundProperties.originalFilename]">
     </file:connector>
 
     <file:endpoint path="${workingDirectory}/in" name="get"

@@ -14,7 +14,7 @@
         </db:stored-procedure>
 
         <!-- This is needed because foreach cannot iterator when the expression is iterable/iterator-->
-        <set-payload value="#[payload.get('resultSet1')]"/>
+        <set-payload value="#[mel:payload.get('resultSet1')]"/>
 
         <foreach>
             <test:queue name="testOut"/>
@@ -27,15 +27,15 @@
             <db:out-param name="resultSet1" type="CURSOR"/>
         </db:stored-procedure>
 
-        <set-variable variableName="records" value="#[new ArrayList()]"/>
+        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
 
         <!-- This is needed because foreach cannot iterator when the expression is iterable/iterator-->
-        <set-payload value="#[payload.get('resultSet1')]"/>
+        <set-payload value="#[mel:payload.get('resultSet1')]"/>
 
         <foreach>
-            <expression-component>flowVars['records'].add(payload)</expression-component>
+            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
         </foreach>
 
-        <set-payload value="#[flowVars['records']]"/>
+        <set-payload value="#[mel:flowVars['records']]"/>
     </flow>
 </mule>

@@ -38,7 +38,7 @@
         <processor ref="addP1" />
         <test:component throwException="true"/>
         <default-exception-strategy>
-            <test:assert expression="#[sessionVars.P1]" />
+            <test:assert expression="#[mel:sessionVars.P1]" />
         </default-exception-strategy>
     </flow>
 
@@ -47,7 +47,7 @@
         <test:component throwException="true"/>
         <error-handler>
             <on-error-continue>
-                <test:assert expression="#[sessionVars.P1]" />
+                <test:assert expression="#[mel:sessionVars.P1]" />
             </on-error-continue>
         </error-handler>
     </flow>

@@ -24,7 +24,7 @@
     <!-- Jaxws Service with exception thrown by component with default exception strategy -->
     <flow name="FlowServiceFault">
         <httpn:listener path="testServiceWithFault" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
         <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
@@ -34,7 +34,7 @@
     <!-- Jaxws Service with exception thrown by transformer with default exception strategy -->
     <flow name="FlowServiceFaultTransformerException">
         <httpn:listener path="testServiceWithException" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
         <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
@@ -47,7 +47,7 @@
 
     <flow name="helloFlow">
         <httpn:listener path="hello" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl"/>
         <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />
@@ -55,7 +55,7 @@
 
     <flow name="helloFault">
         <httpn:listener path="helloFault" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFault"/>
         <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
@@ -91,7 +91,7 @@
 
     <flow name="FlowProxyWithTransformerExceptionDefaultStrategy">
         <httpn:listener path="proxyExceptionStrategy" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service/>
 

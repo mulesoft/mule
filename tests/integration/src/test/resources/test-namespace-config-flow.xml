@@ -19,7 +19,7 @@
 
     <flow name="testService3">
         <test:component enableMessageHistory="false"
-            appendString=" #[context:serviceName]" />
+            appendString=" #[mel:context:serviceName]" />
     </flow>
 
 </mule>

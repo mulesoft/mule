@@ -9,15 +9,15 @@
     <pojo:config name="pojo2" config1="config1Val"/>
 
     <flow name="pojoFlow">
-        <pojo:method1 config-ref="pojo" arg1="#[payload:]" />
-        <pojo:method2 config-ref="pojo" arg1="#[payload:]" />
-        <pojo:method2 config-ref="pojo" arg1="#[payload:]" arg2="#[string:arg2Val]" />
+        <pojo:method1 config-ref="pojo" arg1="#[mel:payload:]" />
+        <pojo:method2 config-ref="pojo" arg1="#[mel:payload:]" />
+        <pojo:method2 config-ref="pojo" arg1="#[mel:payload:]" arg2="#[mel:string:arg2Val]" />
     </flow>
 
     <flow name="pojoFlow2">
-        <pojo:method1 config-ref="pojo2" arg1="#[payload:]" />
-        <pojo:method2 config-ref="pojo2" arg1="#[payload:]" />
-        <pojo:method2 config-ref="pojo2" arg1="#[payload:]" arg2="#[string:arg2Val]" />
+        <pojo:method1 config-ref="pojo2" arg1="#[mel:payload:]" />
+        <pojo:method2 config-ref="pojo2" arg1="#[mel:payload:]" />
+        <pojo:method2 config-ref="pojo2" arg1="#[mel:payload:]" arg2="#[mel:string:arg2Val]" />
     </flow>
 
 

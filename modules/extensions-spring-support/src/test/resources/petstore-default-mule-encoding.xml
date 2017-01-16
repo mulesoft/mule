@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
 
-    <petstore:config name="config" cashierName="jim" pets="#[[]]">
+    <petstore:config name="config" cashierName="jim" pets="#[mel:[]]">
         <petstore:connection username="john" password="doe"/>
         <petstore:cage>
             <petstore:birds>
@@ -26,7 +26,7 @@
 
     <flow name="topLevelEncoding">
         <petstore:get-default-encoding usePhoneNumber="true">
-            <petstore:phone-number mobile="13123" home="1231" areaCodes="#[[]]"/>
+            <petstore:phone-number mobile="13123" home="1231" areaCodes="#[mel:[]]"/>
         </petstore:get-default-encoding>
     </flow>
 
@@ -35,6 +35,6 @@
     </flow>
 
     <flow name="overridedArgumentEncoding">
-        <petstore:get-default-encoding usePhoneNumber="false" encoding="#[flowVars.customEncoding]"/>
+        <petstore:get-default-encoding usePhoneNumber="false" encoding="#[mel:flowVars.customEncoding]"/>
     </flow>
 </mule>

@@ -9,7 +9,7 @@
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="test">
-        <transports:set-session-variable variableName="ErrorCount" value="#[0]" />
+        <transports:set-session-variable variableName="ErrorCount" value="#[mel:0]" />
 
         <collection-splitter/>
         <flow-ref name="splitterFlow"/>
@@ -27,6 +27,6 @@
     </flow>
 
     <flow name="exceptionFlow">
-        <transports:set-session-variable variableName="ErrorCount" value="#[sessionVars.ErrorCount + 1]" />
+        <transports:set-session-variable variableName="ErrorCount" value="#[mel:sessionVars.ErrorCount + 1]" />
     </flow>
 </mule>

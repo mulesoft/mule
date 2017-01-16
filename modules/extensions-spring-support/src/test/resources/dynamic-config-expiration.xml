@@ -15,7 +15,7 @@
     </configuration>
 
     <heisenberg:config name="heisenberg"
-                       myName="#[payload]"
+                       myName="#[mel:payload]"
                        age="50"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"

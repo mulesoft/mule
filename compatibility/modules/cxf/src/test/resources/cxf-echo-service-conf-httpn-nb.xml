@@ -32,7 +32,7 @@
         <processor ref="sensingRequestResponseProcessor" />
         <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <httpn:request config-ref="requestConfig" path="/hello" method="POST" />
-        <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
+        <set-property propertyName="contentType" value="#[mel:message.getDataType().getMediaType().toRfcString()]"/>
     </flow>
 
     <spring:bean name="sensingRequestResponseProcessorProxy" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
@@ -42,7 +42,7 @@
         <processor ref="sensingRequestResponseProcessorProxy" />
         <cxf:jaxws-client serviceClass="org.mule.compatibility.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <httpn:request config-ref="requestConfig" path="/hello" method="POST" />
-        <set-property propertyName="contentType" value="#[message.getDataType().getMediaType().toRfcString()]"/>
+        <set-property propertyName="contentType" value="#[mel:message.getDataType().getMediaType().toRfcString()]"/>
     </flow>
 
 </mule>

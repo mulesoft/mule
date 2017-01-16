@@ -8,7 +8,7 @@
     <vegan:banana-config name="banana"/>
 
     <flow name="eatFromExpression">
-        <vegan:try-eat food="#[payload]"/>
+        <vegan:try-eat food="#[mel:payload]"/>
     </flow>
 
     <flow name="eatFixedMeat">
@@ -20,7 +20,7 @@
     </flow>
 
     <flow name="eatPealedBanana">
-        <vegan:eat-pealed attributeOnlyBanana="#[new org.mule.tck.testmodels.fruit.Banana()]" />
+        <vegan:eat-pealed attributeOnlyBanana="#[mel:new org.mule.tck.testmodels.fruit.Banana()]" />
     </flow>
 
 </mule>

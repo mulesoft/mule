@@ -7,7 +7,7 @@
        ">
 
     <flow name="enricherExceptionFlow">
-        <enricher source="#[payload]" target="#[variable:blob]">
+        <enricher source="#[mel:payload]" target="#[mel:variable:blob]">
             <test:component throwException="true" />
         </enricher>
         <error-handler>

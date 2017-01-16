@@ -36,12 +36,12 @@
     </flow>
     <flow name="remote">
         <httpn:listener config-ref="blockingListenerConfig" path="/remote" allowedMethods="GET"/>
-        <set-payload value="#['&lt;root&gt;&lt;node&gt;value&lt;/node&gt;&lt;/root&gt;']"/>
+        <set-payload value="#[mel:'&lt;root&gt;&lt;node&gt;value&lt;/node&gt;&lt;/root&gt;']"/>
     </flow>
     <flow name="blockingRequest">
         <httpn:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
-        <set-variable variableName="remotePayload" value="#[xpath3('/root/node/text()')]"/>
-        <set-payload value="#[remotePayload]"/>
+        <set-variable variableName="remotePayload" value="#[mel:xpath3('/root/node/text()')]"/>
+        <set-payload value="#[mel:remotePayload]"/>
     </flow>
 
 </mule>

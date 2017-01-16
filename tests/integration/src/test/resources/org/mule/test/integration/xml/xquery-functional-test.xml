@@ -7,8 +7,8 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <mxml:xquery-transformer name="xquery" returnClass="java.lang.String">
-        <mxml:context-property key="title" value="#[message.inboundProperties.ListTitle]"/>
-        <mxml:context-property key="rating" value="#[message.inboundProperties.ListRating]"/>
+        <mxml:context-property key="title" value="#[mel:message.inboundProperties.ListTitle]"/>
+        <mxml:context-property key="rating" value="#[mel:message.inboundProperties.ListRating]"/>
 
         <mxml:xquery-text>
             <![CDATA[

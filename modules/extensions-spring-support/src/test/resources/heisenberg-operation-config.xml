@@ -11,7 +11,7 @@
 
     <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
 
-    <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+    <heisenberg:door victim="#[mel:victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
     <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
         <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
@@ -72,7 +72,7 @@
     </flow>
 
     <flow name="expressionEnemy">
-        <heisenberg:get-enemy index="#[flowVars['enemy']]"/>
+        <heisenberg:get-enemy index="#[mel:flowVars['enemy']]"/>
     </flow>
 
     <flow name="collectFromEvent">
@@ -100,16 +100,16 @@
     </flow>
 
     <flow name="killFromPayload">
-        <heisenberg:kill goodbyeMessage="#[flowVars['goodbye']]"/>
+        <heisenberg:kill goodbyeMessage="#[mel:flowVars['goodbye']]"/>
     </flow>
 
     <flow name="customKillWithDefault">
-        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[mel:flowVars['goodbye']]"/>
     </flow>
 
     <flow name="customKillWithoutDefault">
-        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"
-                                             victim="#[flowVars['victim']]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[mel:flowVars['goodbye']]"
+                                             victim="#[mel:flowVars['victim']]"/>
     </flow>
 
     <flow name="killMany">
@@ -169,7 +169,7 @@
 
     <flow name="knockDynamicInlineDoor">
         <heisenberg:knock>
-            <heisenberg:knocked-door victim="#[victim]" address="308 Negra Arroyo Lane"/>
+            <heisenberg:knocked-door victim="#[mel:victim]" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
@@ -177,13 +177,13 @@
         <heisenberg:knock-many>
             <heisenberg:doors>
                 <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
-                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
+                <heisenberg:door victim="#[mel:victim]" address="308 Negra Arroyo Lane"/>
             </heisenberg:doors>
         </heisenberg:knock-many>
     </flow>
 
     <flow name="knockManyByExpression">
-        <heisenberg:knock-many doors="#[doors]"/>
+        <heisenberg:knock-many doors="#[mel:doors]"/>
     </flow>
 
     <flow name="callSaul">
@@ -191,17 +191,17 @@
     </flow>
 
     <flow name="killWithWeapon">
-        <heisenberg:kill-with-weapon weapon="#[weapon]" type="MELEE_WEAPON">
+        <heisenberg:kill-with-weapon weapon="#[mel:weapon]" type="MELEE_WEAPON">
             <heisenberg:attributes-of-weapon brand="Pizza on the rooftop"/>
         </heisenberg:kill-with-weapon>
     </flow>
 
     <flow name="killWithMultipleWeapons">
-        <heisenberg:kill-with-multiples-weapons weapons="#[weapons]"/>
+        <heisenberg:kill-with-multiples-weapons weapons="#[mel:weapons]"/>
     </flow>
 
     <flow name="killWithMultipleWildCardWeapons">
-        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[weapons]"/>
+        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[mel:weapons]"/>
     </flow>
 
     <flow name="killWithRicinDefaultPayload">
@@ -234,7 +234,7 @@
     </flow>
 
     <flow name="literalEcho">
-        <heisenberg:literal-echo literalExpression="#[money]"/>
+        <heisenberg:literal-echo literalExpression="#[mel:money]"/>
     </flow>
 
     <flow name="getMedicalHistory">
@@ -279,7 +279,7 @@
                     <heisenberg:recursive-pojo/>
                 </heisenberg:childs>
                 <heisenberg:mapped-childs>
-                    <heisenberg:mapped-child key="someKey" value="#[new org.mule.test.heisenberg.extension.model.RecursivePojo()"/>
+                    <heisenberg:mapped-child key="someKey" value="#[mel:new org.mule.test.heisenberg.extension.model.RecursivePojo()"/>
                 </heisenberg:mapped-childs>
             </heisenberg:recursive-pojo>
         </heisenberg:approve>

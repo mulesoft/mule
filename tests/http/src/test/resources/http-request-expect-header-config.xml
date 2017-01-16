@@ -14,7 +14,7 @@
         <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
             <httpn:request-builder>
                 <httpn:headers>
-                    #[['Expect' : '100-continue']]
+                    #[mel:['Expect' : '100-continue']]
                 </httpn:headers>
             </httpn:request-builder>
             <httpn:response-validator>

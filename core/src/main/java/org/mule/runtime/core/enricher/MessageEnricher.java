@@ -73,7 +73,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
                          String targetExpressionArg,
                          ExtendedExpressionManager expressionManager) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
-      sourceExpressionArg = "#[payload:]";
+      sourceExpressionArg = "#[mel:payload:]";
     }
 
     TypedValue typedValue = expressionManager.evaluate(sourceExpressionArg, enrichmentEvent, flowConstruct);

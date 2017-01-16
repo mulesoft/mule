@@ -14,6 +14,7 @@ import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
 
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
@@ -327,6 +328,9 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initi
     }
     if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
       expression = expression.substring(2, expression.length() - 1);
+    }
+    if (expression.startsWith(MEL_PREFIX)) {
+      expression = expression.substring(MEL_PREFIX.length());
     }
     return expression;
   }

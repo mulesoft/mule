@@ -12,11 +12,11 @@
     </spring:beans>
 
     <flow name="read">
-        <ftp:read path="#[path]"/>
+        <ftp:read path="#[mel:path]"/>
     </flow>
 
     <flow name="list">
-        <ftp:list directoryPath="#[path]" recursive="#[recursive]" />
+        <ftp:list directoryPath="#[mel:path]" recursive="#[mel:recursive]" />
     </flow>
 
 </mule>

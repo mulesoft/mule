@@ -49,7 +49,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
     MetadataResult<ComponentMetadataDescriptor> metadata =
         getMetadata("selectMetadata",
-                    "select * from PLANET where id = #[payload.id] and name = #[message.outboundProperties.updateCount]");
+                    "select * from PLANET where id = #[mel:payload.id] and name = #[mel:message.outboundProperties.updateCount]");
 
     assertThat(metadata.isSuccess(), is(true));
     assertThat(metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType(),

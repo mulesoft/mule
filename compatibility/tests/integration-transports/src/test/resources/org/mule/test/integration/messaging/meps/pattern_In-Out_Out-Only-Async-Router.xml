@@ -45,7 +45,7 @@
         <inbound-endpoint ref="externalEndpoint">
             <message-properties-transformer>
                 <!-- propagate the property explicitly -->
-                <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
+                <add-message-property key="foo" value="#[mel:header:INBOUND:foo]"/>
             </message-properties-transformer>
         </inbound-endpoint>
         <test:component logMessageDetails="true">

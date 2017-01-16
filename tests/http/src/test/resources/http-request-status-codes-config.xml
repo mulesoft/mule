@@ -14,7 +14,7 @@
         <httpn:request config-ref="requestConfig" path="status">
             <httpn:request-builder>
                 <httpn:query-params>
-                    #[['code' : code]]
+                    #[mel:['code' : code]]
                 </httpn:query-params>
             </httpn:request-builder>
         </httpn:request>
@@ -24,7 +24,7 @@
         <httpn:request config-ref="requestConfig" path="status">
             <httpn:request-builder>
                 <httpn:query-params>
-                    #[['code' : code]]
+                    #[mel:['code' : code]]
                 </httpn:query-params>
             </httpn:request-builder>
             <httpn:response-validator>
@@ -37,7 +37,7 @@
         <httpn:request config-ref="requestConfig" path="status">
             <httpn:request-builder>
                 <httpn:query-params>
-                    #[['code' : code]]
+                    #[mel:['code' : code]]
                 </httpn:query-params>
             </httpn:request-builder>
             <httpn:response-validator>

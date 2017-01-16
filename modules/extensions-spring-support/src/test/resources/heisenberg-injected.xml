@@ -37,7 +37,7 @@
 
     <heisenberg:config name="dynamicAgeHeisenberg"
                        myName="Heisenberg"
-                       age="#[age]"
+                       age="#[mel:age]"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"
                        dateOfDeath="2011-09-07T00:00:00-05:00"

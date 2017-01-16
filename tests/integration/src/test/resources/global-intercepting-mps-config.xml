@@ -6,7 +6,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <idempotent-message-filter name="idempotentFilter" idExpression="#[payload:]"/>
+    <idempotent-message-filter name="idempotentFilter" idExpression="#[mel:payload:]"/>
     <idempotent-secure-hash-message-filter name="idempotentSecureHashMessageFilter" messageDigestAlgorithm="MDA5"/>
     <message-filter name="messageFilter" throwOnUnaccepted="false">
         <wildcard-filter pattern="*"/>

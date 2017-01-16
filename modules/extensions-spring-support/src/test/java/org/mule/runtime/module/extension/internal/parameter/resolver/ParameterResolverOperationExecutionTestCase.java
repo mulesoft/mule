@@ -94,7 +94,7 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
 
   @Test
   public void parameterResolverOfListOfComplexType() throws Exception {
-    assertExpressionResolverWeapon("processWeaponList", "#[payload]",
+    assertExpressionResolverWeapon("processWeaponList", "#[mel:payload]",
                                    allOf((Matcher) hasSize(1), hasItem(is(instanceOf(Weapon.class)))));
   }
 
@@ -106,7 +106,7 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
 
   @Test
   public void parameterResolverOfListOfSimpleType() throws Exception {
-    assertExpressionResolverWeapon("processAddressBookAsExpression", "#[['123-333-33','333-333-333']]",
+    assertExpressionResolverWeapon("processAddressBookAsExpression", "#[mel:['123-333-33','333-333-333']]",
                                    allOf((Matcher) hasSize(2), hasItem(is(instanceOf(String.class)))));
   }
 

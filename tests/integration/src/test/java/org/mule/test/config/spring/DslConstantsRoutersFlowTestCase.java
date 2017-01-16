@@ -55,7 +55,7 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
     assertTrue(router instanceof IdempotentMessageFilter);
 
     IdempotentMessageFilter filter = (IdempotentMessageFilter) router;
-    assertEquals("#[message:id]-#[message:correlationId]", filter.getIdExpression());
+    assertEquals("#[mel:message:id]-#[mel:message:correlationId]", filter.getIdExpression());
     assertNotNull(filter.getStore());
     assertTrue(filter.getStore() instanceof TextFileObjectStore);
 

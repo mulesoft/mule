@@ -16,7 +16,7 @@
 
     <flow name="asyncService">
         <httpn:listener config-ref="listenerConfig" path="/test">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.testmodels.AsyncService"/>
         <component>

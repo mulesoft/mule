@@ -39,7 +39,7 @@
     <!-- Jaxws Service with exception thrown by component with catch exception strategy and Fault rethrown-->
     <flow name="FlowServiceFaultWithCatchExceptionRethrown">
         <httpn:listener path="testServiceWithFaultCatchExceptionRethrown" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+            <httpn:response-builder statusCode="#[mel:message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
         <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />

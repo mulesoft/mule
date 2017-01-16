@@ -9,8 +9,11 @@ package org.mule.functional.extensions;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.tck.ThreadingProfileConfigurationBuilder;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
+
+import org.junit.Rule;
 
 /**
  * Provides the extension dependencies of the compatibility plugin for runnint its tests in an isolated manner.
@@ -19,6 +22,9 @@ import java.util.List;
  */
 public abstract class CompatibilityFunctionalTestCase extends MuleArtifactFunctionalTestCase
     implements CompatibilityFunctionalTestCaseRunnerConfig {
+
+  @Rule
+  public SystemProperty melDefault = new SystemProperty("mule.test.mel.default", "true");
 
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {

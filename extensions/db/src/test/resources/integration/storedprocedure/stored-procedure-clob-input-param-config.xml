@@ -12,7 +12,7 @@
                 <db:parameter-type key="description" type="CLOB" />
             </db:parameter-types>
             <db:input-parameters>
-                #[['description' : payload]]
+                #[mel:['description' : payload]]
             </db:input-parameters>
         </db:stored-procedure>
 
@@ -21,7 +21,7 @@
                 <db:sql>select description from Planet where name = 'Venus'</db:sql>
             </db:select>
             <!-- Get the CLOB field value -->
-            <set-payload value="#[payload.get(0).get('DESCRIPTION')]"/>
+            <set-payload value="#[mel:payload.get(0).get('DESCRIPTION')]"/>
             <component class="org.mule.extension.db.integration.ClobToString"/>
         </block>
     </flow>

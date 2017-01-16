@@ -240,7 +240,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     expectedException.expect(IllegalOperationException.class);
     expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression"));
 
-    target = "#[someExpression]";
+    target = "#[mel:someExpression]";
     messageProcessor = createOperationMessageProcessor();
 
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));

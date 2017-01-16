@@ -55,7 +55,7 @@
     <!-- TODO - MULE-9638 - Doesn't work because old parsing mechanism is used. Uncomment once all old parsers get removed-->
     <!--<flow name="consumeFileWithStreamingAndRollbackWithRedelivery" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-rollback-with-redelivery" connector-ref="fileConnectorStreaming">
-            <redelivery-policy idExpression="#['fixedValue']" maxRedeliveryCount="2"/>
+            <redelivery-policy idExpression="#[mel:'fixedValue']" maxRedeliveryCount="2"/>
         </file:inbound-endpoint>
         <test:component/>
         <error-handler>

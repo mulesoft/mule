@@ -17,25 +17,25 @@
 
     <flow name="generalFlow">
         <httpn:listener  path="/*" config-ref="listenerConfig"/>
-        <set-payload value="#[message.getAttributes()]"/>
+        <set-payload value="#[mel:message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="severalUriParameters">
         <httpn:listener config-ref="listenerConfig" path="/{uri-param1}/{uri-param2}/{uri-param3}" />
-        <set-payload value="#[message.getAttributes()]"/>
+        <set-payload value="#[mel:message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="oneUriParameterInTheMiddle">
         <httpn:listener config-ref="listenerConfig" path="/some-path/{uri-param1}/some-other-path" />
-        <set-payload value="#[message.getAttributes()]"/>
+        <set-payload value="#[mel:message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="basePathConfig">
         <httpn:listener config-ref="listenerBaseConfig" path="*" />
-        <set-payload value="#[message.getAttributes()]"/>
+        <set-payload value="#[mel:message.getAttributes()]"/>
         <test:queue name="out"/>
     </flow>
 

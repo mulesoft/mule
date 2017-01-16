@@ -13,7 +13,7 @@
     <flow name="noParamsOperation">
         <wsc:consume config-ref="config" operation="noParams">
             <wsc:message>
-                <wsc:body>#[dw:payload]</wsc:body>
+                <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
     </flow>

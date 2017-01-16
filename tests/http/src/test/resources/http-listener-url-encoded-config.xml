@@ -16,7 +16,7 @@
         <httpn:listener config-ref="listenerConfig"  path="${path}">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Type' : 'application/x-www-form-urlencoded']]
+                    #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
@@ -27,11 +27,11 @@
         <httpn:listener config-ref="listenerConfig"  path="map">
             <httpn:response-builder>
                 <httpn:headers>
-                    #[['Content-Type' : 'application/x-www-form-urlencoded']]
+                    #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
             </httpn:response-builder>
         </httpn:listener>
-        <expression-transformer expression="#[message.getAttributes().getQueryParams()]"/>
+        <expression-transformer expression="#[mel:message.getAttributes().getQueryParams()]"/>
 
         <!-- The default handler ignores the error and returns 200, so we can't detect if it was handled correctly -->
         <error-handler>

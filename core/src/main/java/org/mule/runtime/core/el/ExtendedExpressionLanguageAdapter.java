@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.el;
 
-import static org.mule.runtime.core.el.DefaultExpressionManager.isDwExpression;
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -29,10 +33,17 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
   //MVEL based expression language
   private MVELExpressionLanguage mvelExpressionLanguage;
 
+  private boolean forceMel = false;
+
   public ExtendedExpressionLanguageAdapter(DataWeaveExpressionLanguage dataWeaveExpressionLanguage,
                                            MVELExpressionLanguage mvelExpressionLanguage) {
     this.dataWeaveExpressionLanguage = dataWeaveExpressionLanguage;
     this.mvelExpressionLanguage = mvelExpressionLanguage;
+    forceMel = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false")) || !dataWeaveExpressionLanguage.isEnabled();
+  }
+
+  public boolean isForceMel() {
+    return forceMel;
   }
 
   @Override
@@ -76,10 +87,14 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
   }
 
   private ExtendedExpressionLanguage selectExpressionLanguage(String expression) {
-    if (isDwExpression(expression)) {
-      return dataWeaveExpressionLanguage;
-    } else {
+    if (isMelExpression(expression) || forceMel) {
       return mvelExpressionLanguage;
+    } else {
+      return dataWeaveExpressionLanguage;
     }
+  }
+
+  protected boolean isMelExpression(String expression) {
+    return expression.startsWith(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX) || expression.startsWith(MEL_PREFIX);
   }
 }

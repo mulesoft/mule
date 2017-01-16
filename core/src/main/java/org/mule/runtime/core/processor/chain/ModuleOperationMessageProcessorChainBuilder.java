@@ -43,9 +43,9 @@ import org.reactivestreams.Publisher;
  *    <module-operation-properties/>
  *    <module-operation-parameters>
  *      <module-operation-parameter-entry value="howdy" key="value1"/>
- *      <module-operation-parameter-entry value="#[flowVars.person]" key="value2"/>
+ *      <module-operation-parameter-entry value="#[mel:flowVars.person]" key="value2"/>
  *    </module-operation-parameters>
- *    <set-payload value="#[param.value1 + param.value2]"/>
+ *    <set-payload value="#[mel:param.value1 + param.value2]"/>
  * </module-operation-chain>
  * </pre>
  */

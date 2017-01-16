@@ -12,8 +12,8 @@
 
     <sub-flow name="SubprocessCreateLicense">
         <set-variable variableName="_enricher.name" value="EnrichCreateLicense" />
-        <enricher target="#[message.outboundProperties['_enricher.status']]">
-            <flow-ref name="#[flowVars['_enricher.name']]" />
+        <enricher target="#[mel:message.outboundProperties['_enricher.status']]">
+            <flow-ref name="#[mel:flowVars['_enricher.name']]" />
         </enricher>
     </sub-flow>
 

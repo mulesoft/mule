@@ -25,7 +25,7 @@ public class VeganFidelityOperation {
   }
 
   public List<Map<String, String>> tryToEatThisListOfMaps(@Optional(
-      defaultValue = "#[new java.util.ArrayList()]") @Content List<Map<String, String>> foods) {
+      defaultValue = "#[mel:new java.util.ArrayList()]") @Content List<Map<String, String>> foods) {
     if (foods != null) {
       return foods;
     }

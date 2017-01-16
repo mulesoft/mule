@@ -7,7 +7,7 @@
 
     <flow name="greedy">
         <choice>
-            <when expression="#[flowVars['currency'] == 'USD']">
+            <when expression="#[mel:flowVars['currency'] == 'USD']">
                 <processor-chain>
                     <scripting:component>
                         <scripting:script file="greedy.groovy">
@@ -16,7 +16,7 @@
                     </scripting:component>
                 </processor-chain>
              </when>
-            <when expression="#[flowVars['currency'] == 'GBP']">
+            <when expression="#[mel:flowVars['currency'] == 'GBP']">
                 <processor-chain>
                     <scripting:component>
                         <scripting:script file="greedy.py">

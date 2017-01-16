@@ -12,11 +12,11 @@
     </spring:beans>
 
     <flow name="delete">
-        <ftp:delete path="#[delete]" />
+        <ftp:delete path="#[mel:delete]" />
     </flow>
 
     <flow name="readAndDelete">
-        <ftp:read path="#[delete]" />
+        <ftp:read path="#[mel:delete]" />
         <ftp:delete />
     </flow>
 </mule>

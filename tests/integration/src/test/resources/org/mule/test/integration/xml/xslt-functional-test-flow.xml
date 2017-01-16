@@ -34,8 +34,8 @@
         </mulexml:xslt-text>
 
         <!--// START SNIPPET: transformer-params -->
-        <mulexml:context-property key="title" value="#[message.inboundProperties.ListTitle]"/>
-        <mulexml:context-property key="rating" value="#[message.inboundProperties.ListRating]"/>
+        <mulexml:context-property key="title" value="#[mel:message.inboundProperties.ListTitle]"/>
+        <mulexml:context-property key="rating" value="#[mel:message.inboundProperties.ListRating]"/>
         <!--// END SNIPPET: transformer-params -->
     </mulexml:xslt-transformer>
     <!--// END SNIPPET: transformer-config -->

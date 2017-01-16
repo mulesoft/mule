@@ -12,9 +12,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
-import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
@@ -45,6 +43,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
   private ExpressionExecutor expressionExecutor;
   private BindingContext globalBindingContext;
+  private boolean enabled;
 
   public DataWeaveExpressionLanguage(ClassLoader lookupClassloader) {
     Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
@@ -52,9 +51,11 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     while (executors.hasNext()) {
       try {
         this.expressionExecutor = executors.next();
+        enabled = true;
       } catch (Throwable e) {
-        // TODO - MULE-10938: Fix DW dependency for FunctionalTestCase
-        logger.warn("DW Executor could not be loaded.");
+        // TODO - MULE-11413: Fix DW dependency for FunctionalTestCase
+        logger.warn("DW Executor could not be loaded. MEL will be the default EL.");
+        enabled = false;
       }
       break;
     }
@@ -106,6 +107,10 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
 
+  public boolean isEnabled() {
+    return enabled;
+  }
+
   private TypedValue evaluate(String expression, BindingContext context) {
     try {
       return expressionExecutor.evaluate(sanitize(expression), context);
@@ -151,10 +156,6 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     String sanitizedExpression = expression.startsWith(DEFAULT_EXPRESSION_PREFIX)
         ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
         : expression;
-    // TODO: MULE-10410 - Remove once DW is the default language.
-    if (sanitizedExpression.startsWith(DW_PREFIX)) {
-      sanitizedExpression = sanitizedExpression.substring(DW_PREFIX.length());
-    }
     return sanitizedExpression;
   }
 

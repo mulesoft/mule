@@ -13,7 +13,7 @@
 
             <!--Converts SQL ARRAY to Java Array -->
             <foreach>
-                <expression-component>
+                <expression-component>mel:
                     payload.put("ZIPS", payload.get("ZIPS").getArray())
                 </expression-component>
             </foreach>
@@ -29,7 +29,7 @@
 
             <!--Converts SQL ARRAY to Java Array -->
             <foreach>
-                <expression-component>
+                <expression-component>mel:
                     payload.put("DETAILS", payload.get("DETAILS").getArray())
                 </expression-component>
             </foreach>

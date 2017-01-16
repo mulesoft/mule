@@ -7,7 +7,7 @@
 
     <flow name="invalidSelectorExpression" processingStrategy="synchronous">
         <poll frequency="1000">
-            <watermark variable="test1" default-expression="#[string:noKey]" selector="MAX" selector-expression="not an expression" />
+            <watermark variable="test1" default-expression="#[mel:string:noKey]" selector="MAX" selector-expression="not an expression" />
             <set-payload value="hello world" />
         </poll>
         <logger message="Executed With watermark"/>

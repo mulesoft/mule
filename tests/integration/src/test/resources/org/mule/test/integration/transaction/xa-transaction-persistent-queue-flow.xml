@@ -10,7 +10,7 @@
     <jbossts:transaction-manager />
 
     <flow name="XaTestService">
-        <test:component appendString=" Received" />
+        <test:component appendString="' Received'" />
         <test:queue name="finish" />
     </flow>
 

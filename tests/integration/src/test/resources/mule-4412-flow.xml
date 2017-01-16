@@ -7,7 +7,7 @@
 
     <flow name="AsyncRequest">
         <custom-filter class="org.mule.test.filters.FilterCounter"/>
-        <set-property propertyName="pass" value="#[message.inboundProperties.pass]" />
+        <set-property propertyName="pass" value="#[mel:message.inboundProperties.pass]" />
         <test:queue name="asyncResponse"/>
     </flow>
 

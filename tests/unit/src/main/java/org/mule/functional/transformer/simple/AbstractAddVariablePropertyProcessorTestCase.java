@@ -50,9 +50,9 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public static final Charset ENCODING = US_ASCII;
   public static final String PLAIN_STRING_KEY = "someText";
   public static final String PLAIN_STRING_VALUE = "someValue";
-  public static final String EXPRESSION = "#[string:someValue]";
+  public static final String EXPRESSION = "#[mel:string:someValue]";
   public static final String EXPRESSION_VALUE = "expressionValueResult";
-  public static final String NULL_EXPRESSION = "#[string:someValueNull]";
+  public static final String NULL_EXPRESSION = "#[mel:string:someValueNull]";
   public static final Charset CUSTOM_ENCODING = UTF_8;
 
   private Event event;

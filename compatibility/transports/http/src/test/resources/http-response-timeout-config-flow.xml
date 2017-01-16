@@ -20,7 +20,7 @@
                                 exchange-pattern="request-response" responseTimeout="1000"/>
         <error-handler>
             <on-error-continue>
-                <set-payload value="#[exception.getCause()]"/>
+                <set-payload value="#[mel:exception.getCause()]"/>
             </on-error-continue>
         </error-handler>
     </flow>
