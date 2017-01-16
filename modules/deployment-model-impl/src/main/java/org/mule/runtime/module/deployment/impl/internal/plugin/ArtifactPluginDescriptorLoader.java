@@ -42,8 +42,7 @@ public class ArtifactPluginDescriptorLoader {
     checkArgument(pluginZip.getName().endsWith("zip") || pluginZip.getName().endsWith("jar"),
                   "plugin zip must be a zip file ending with .zip or .jar, but the file name was " + pluginZip.getAbsolutePath());
 
-    //    final String pluginName = removeEnd(pluginZip.getName(), ".zip");
-    final String pluginName = pluginZip.getName().substring(0, pluginZip.getName().length() - ".zip".length());
+    final String pluginName = pluginZip.getName().substring(0, pluginZip.getName().length() - 4);
     // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
     final File tmpDir = new File(unpackDestination, pluginName);
     unzip(pluginZip, tmpDir);
