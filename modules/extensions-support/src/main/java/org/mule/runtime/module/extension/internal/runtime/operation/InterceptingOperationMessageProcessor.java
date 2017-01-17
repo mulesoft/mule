@@ -11,10 +11,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -26,12 +28,12 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,7 +53,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
   public InterceptingOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
                                                ConfigurationProvider configurationProvider, String target,
                                                ResolverSet resolverSet,
-                                               ExtensionManagerAdapter extensionManager,
+                                               ExtensionManager extensionManager,
                                                PolicyManager policyManager) {
     super(extensionModel, operationModel, configurationProvider, target, resolverSet, extensionManager, policyManager);
   }

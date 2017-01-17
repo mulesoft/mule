@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -41,7 +42,6 @@ import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.Serializable;
 import java.util.Collection;

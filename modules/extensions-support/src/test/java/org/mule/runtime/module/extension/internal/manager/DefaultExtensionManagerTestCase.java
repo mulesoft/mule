@@ -33,6 +33,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -41,6 +42,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
@@ -79,7 +81,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private static final String MULESOFT = "MuleSoft";
   private static final String OTHER_VENDOR = "OtherVendor";
   private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setNamespace("extension-namespace").build();
-  private ExtensionManagerAdapter extensionsManager;
+  private ExtensionManager extensionsManager;
 
   private static final String EXTENSION1_NAME = "extension1";
   private static final String EXTENSION1_CONFIG_NAME = "extension1Config";

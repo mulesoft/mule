@@ -15,10 +15,11 @@ import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
 import static org.mule.test.marvel.model.Villain.KABOOM;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.MarvelExtension;
+import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
 import org.mule.test.marvel.model.Villain;
 
@@ -53,7 +54,7 @@ public class NonBlockingOperationsTestCase extends ExtensionFunctionalTestCase {
     expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 
     Villain villain = new MissileProofVillain();
-    flowRunner("fireMissile").withPayload(villain).nonBlocking().run();
+    flowRunner("fireMissile").withPayload(villain).run();
 
     assertThat(villain.isAlive(), is(true));
   }
@@ -80,7 +81,7 @@ public class NonBlockingOperationsTestCase extends ExtensionFunctionalTestCase {
     Villain villain = new Villain();
     String result = (String) flowRunner(flowName)
         .withPayload(villain)
-        .nonBlocking().run().getMessage().getPayload().getValue();
+        .run().getMessage().getPayload().getValue();
 
     assertThat(villain.isAlive(), is(false));
     assertThat(result, is(KABOOM));

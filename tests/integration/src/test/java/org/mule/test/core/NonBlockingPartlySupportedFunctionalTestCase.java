@@ -7,9 +7,9 @@
 package org.mule.test.core;
 
 import static org.mule.functional.functional.FlowAssert.verify;
+
 import org.mule.test.AbstractIntegrationTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegrationTestCase {
@@ -21,12 +21,12 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegr
 
   @Test
   public void wiretap() throws Exception {
-    flowRunner("wiretap").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("wiretap").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void childDefaultFlow() throws Exception {
-    flowRunner("childDefaultFlow").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("childDefaultFlow").withPayload(TEST_MESSAGE).run();
     verify("childDefaultFlowChild");
   }
 

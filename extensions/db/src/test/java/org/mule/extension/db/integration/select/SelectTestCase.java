@@ -19,12 +19,13 @@ import static org.mule.extension.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import static org.mule.extension.db.integration.model.Planet.MARS;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Planet;
 import org.mule.extension.db.integration.model.Record;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Iterator;
@@ -101,7 +102,7 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void streamsRecords() throws Exception {
-    MuleEvent event = flowRunner("selectStreaming").run();
+    Event event = flowRunner("selectStreaming").run();
     Message response = event.getMessage();
 
     assertThat(response.getPayload().getValue(), CoreMatchers.is(instanceOf(Iterator.class)));

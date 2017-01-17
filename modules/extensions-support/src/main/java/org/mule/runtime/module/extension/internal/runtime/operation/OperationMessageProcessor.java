@@ -7,17 +7,17 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -27,7 +27,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -42,17 +44,16 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -66,6 +67,7 @@ import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -114,7 +116,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    ResolverSet resolverSet,
-                                   ExtensionManagerAdapter extensionManager,
+                                   ExtensionManager extensionManager,
                                    PolicyManager policyManager) {
     super(extensionModel, operationModel, configurationProvider, extensionManager);
     this.extensionModel = extensionModel;

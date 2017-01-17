@@ -12,10 +12,11 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.message.Message.builder;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -44,7 +45,7 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
   @Test
   public void inputStreamAttachmentWithUnsupportedContentType() throws Exception {
     MultiPartPayload partPayload = getMultiPartPayload(dataBytes);
-    final MuleEvent result = flowRunner("attachmentFromBytes").withPayload(partPayload).run();
+    final Event result = flowRunner("attachmentFromBytes").withPayload(partPayload).run();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
     FlowAssert.verify("reqWithAttachment");
   }
@@ -55,7 +56,7 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
   @Test
   public void byteArrayAttachmentWithUnsupportedContentType() throws Exception {
     MultiPartPayload partPayload = getMultiPartPayload(new ByteArrayInputStream(dataBytes));
-    final MuleEvent result = flowRunner("attachmentFromStream").withPayload(partPayload).run();
+    final Event result = flowRunner("attachmentFromStream").withPayload(partPayload).run();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
     FlowAssert.verify("reqWithAttachment");
   }

@@ -55,7 +55,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;

@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.el;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -137,10 +136,12 @@ public interface ExpressionManager {
   TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context) throws ExpressionRuntimeException;
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected result and an {@link MuleEvent}.
+   * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
+   * result and an {@link Event}.
    *
    * @param expression the EL expression
-   * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value type.
+   * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
+   *        type.
    * @param context an expression binding context to consider
    * @param event the current event to consider
    * @return the result of the expression plus its type

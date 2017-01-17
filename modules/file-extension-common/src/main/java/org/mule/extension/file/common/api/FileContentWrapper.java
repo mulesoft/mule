@@ -11,8 +11,8 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.extension.file.common.api.exceptions.IllegalContentException;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -38,7 +38,7 @@ public final class FileContentWrapper {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileContentWrapper.class);
 
   private final Object content;
-  private final MuleEvent event;
+  private final Event event;
   private final MuleContext muleContext;
 
   /**
@@ -46,7 +46,7 @@ public final class FileContentWrapper {
    *
    * @param content the content to be wrapped
    */
-  public FileContentWrapper(Object content, MuleEvent event, MuleContext muleContext) {
+  public FileContentWrapper(Object content, Event event, MuleContext muleContext) {
     checkArgument(content != null, "content cannot be null");
     checkArgument(event != null, "event cannot be null");
 
@@ -125,6 +125,6 @@ public final class FileContentWrapper {
   }
 
   private org.mule.runtime.core.api.Event castEvent() {
-    return (org.mule.runtime.core.api.Event) event;
+    return event;
   }
 }

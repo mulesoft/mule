@@ -32,8 +32,8 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModu
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.extension.api.ExtensionManager;
 
 import com.google.common.collect.ImmutableSet;
 

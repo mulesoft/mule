@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.api.message;
 
+import org.mule.runtime.core.api.Event;
+
 import java.io.Serializable;
 import java.util.Map;
 
 /**
  * <code>ExceptionPayload</code> is a message payload that contains exception information that occurred during message processing.
  *
- * @Deprecated Use {@link org.mule.runtime.api.message.Error} with {@link org.mule.runtime.api.message.MuleEvent} instead.
+ * @Deprecated Use {@link org.mule.runtime.api.message.Error} with {@link Event} instead.
  */
 @Deprecated
 public interface ExceptionPayload extends Serializable {

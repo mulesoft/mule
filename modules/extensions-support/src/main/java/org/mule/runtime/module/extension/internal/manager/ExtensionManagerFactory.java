@@ -7,19 +7,20 @@
 package org.mule.runtime.module.extension.internal.manager;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 
 /**
- * Factory to create instances of {@link ExtensionManagerAdapter}
+ * Factory to create instances of {@link ExtensionManager}
  *
  * @since 4.0
  */
-public interface ExtensionManagerAdapterFactory {
+public interface ExtensionManagerFactory {
 
   /**
-   * Creates a new {@link ExtensionManagerAdapter}
+   * Creates a new {@link ExtensionManager}
    *
    * @param muleContext the owning {@link MuleContext}
-   * @return a non {@code null} {@link ExtensionManagerAdapter}
+   * @return a non {@code null} {@link ExtensionManager}
    */
-  ExtensionManagerAdapter createExtensionManager(MuleContext muleContext);
+  ExtensionManager createExtensionManager(MuleContext muleContext);
 }

@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
@@ -82,13 +82,12 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
                  responseCompletionCallback);
   }
 
-  private void runAndNotify(Runnable runnable, MuleEvent event, ResponseCompletionCallback responseCompletionCallback) {
+  private void runAndNotify(Runnable runnable, Event event, ResponseCompletionCallback responseCompletionCallback) {
     try {
       runnable.run();
       responseCompletionCallback.responseSentSuccessfully();
     } catch (Exception e) {
-      responseCompletionCallback.responseSentWithFailure(new MessagingException((Event) event, e),
-                                                         (Event) event);
+      responseCompletionCallback.responseSentWithFailure(new MessagingException(event, e), event);
     }
   }
 }

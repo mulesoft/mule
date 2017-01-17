@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.runtime.operation.Opera
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -24,16 +25,15 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.util.TemplateParser;
-import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -68,7 +68,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private final Map<Pair<String, String>, OperationModel> operations = new LinkedHashMap<>();
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
 
-  private ExtensionManagerAdapter extensionManager;
+  private ExtensionManager extensionManager;
 
   /**
    * {@inheritDoc}
@@ -77,7 +77,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
    */
   @Override
   public void initialise() throws InitialisationException {
-    this.extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
+    this.extensionManager = muleContext.getExtensionManager();
   }
 
   /**

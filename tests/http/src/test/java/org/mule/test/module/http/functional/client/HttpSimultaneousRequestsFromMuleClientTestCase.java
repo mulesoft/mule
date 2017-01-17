@@ -17,7 +17,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -59,14 +59,14 @@ public class HttpSimultaneousRequestsFromMuleClientTestCase extends AbstractHttp
 
   @Test
   public void simultaneousRequests() throws Exception {
-    final Future<MuleEvent> result1 = executor.submit(new RequestThroughClient("/test1"));
-    final Future<MuleEvent> result2 = executor.submit(new RequestThroughClient("/test2"));
+    final Future<Event> result1 = executor.submit(new RequestThroughClient("/test1"));
+    final Future<Event> result2 = executor.submit(new RequestThroughClient("/test2"));
 
     assertThat(result1.get(), not(nullValue()));
     assertThat(result2.get(), not(nullValue()));
   }
 
-  private final class RequestThroughClient implements Callable<MuleEvent> {
+  private final class RequestThroughClient implements Callable<Event> {
 
     private final String path;
 
@@ -75,7 +75,7 @@ public class HttpSimultaneousRequestsFromMuleClientTestCase extends AbstractHttp
     }
 
     @Override
-    public MuleEvent call() throws Exception {
+    public Event call() throws Exception {
       Processor messageProcessor =
           connectorOperationLocator.locateConnectorOperation("http://localhost:" + listenPort.getNumber() + path,
                                                              newOptions().method(POST.name()).build(), REQUEST_RESPONSE);

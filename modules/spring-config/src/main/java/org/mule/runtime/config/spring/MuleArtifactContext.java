@@ -50,6 +50,7 @@ import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
@@ -67,7 +68,6 @@ import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-import org.mule.runtime.extension.api.ExtensionManager;
 
 import com.google.common.collect.ImmutableList;
 

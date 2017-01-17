@@ -7,6 +7,7 @@
 package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
+
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -17,8 +18,8 @@ import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -114,7 +115,7 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, Event event,
                     boolean lock, boolean createParentDirectories, String encoding) {
     getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectories, encoding);
   }
@@ -124,7 +125,7 @@ public abstract class AbstractFileSystem implements FileSystem {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
-                   boolean createParentDirectories, MuleEvent event) {
+                   boolean createParentDirectories, Event event) {
     getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories, event);
   }
 

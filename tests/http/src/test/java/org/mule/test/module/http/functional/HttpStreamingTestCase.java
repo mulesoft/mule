@@ -13,6 +13,14 @@ import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.extension.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Future;
@@ -26,13 +34,6 @@ import org.apache.http.nio.protocol.BasicAsyncResponseConsumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpStreamingTestCase extends AbstractHttpTestCase {
 
@@ -53,7 +54,7 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
 
   @Test
   public void requesterStreams() throws Exception {
-    Event response = flowRunner("client").nonBlocking().run();
+    Event response = flowRunner("client").run();
     stop.set(true);
     assertThat(response.getMessage(), hasAttributes(instanceOf(HttpResponseAttributes.class)));
     assertThat(response.getMessage().getPayload().getValue(), instanceOf(InputStream.class));

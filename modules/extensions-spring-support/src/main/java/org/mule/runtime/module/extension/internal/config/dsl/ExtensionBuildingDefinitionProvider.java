@@ -32,10 +32,10 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelP
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;

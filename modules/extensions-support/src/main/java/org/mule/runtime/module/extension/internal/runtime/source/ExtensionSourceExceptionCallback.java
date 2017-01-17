@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
-import org.mule.runtime.api.message.MuleEvent;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
@@ -31,8 +31,9 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
 
   /**
    * Creates a new instance
-   * @param completionCallback    the callback used to send the failure response
-   * @param event                 the related {@link MuleEvent}
+   * 
+   * @param completionCallback the callback used to send the failure response
+   * @param event the related {@link Event}
    * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link Event} which results
    * @param messageProcessContext
    */
@@ -46,11 +47,11 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
   }
 
   /**
-   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, Event)} over
-   * the {@link #completionCallback}, using the {@code exception} and {@link #event}
+   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, Event)} over the
+   * {@link #completionCallback}, using the {@code exception} and {@link #event}
    *
    * @param exception a {@link Throwable}
-   * @return a response {@link MuleEvent}
+   * @return a response {@link Event}
    */
   @Override
   public void onException(Throwable exception) {

@@ -6,9 +6,9 @@
  */
 package org.mule.extension.file.common.api.command;
 
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.runtime.core.api.Event;
 
 /**
  * Command for copying files
@@ -19,7 +19,7 @@ public interface CopyCommand {
 
   /**
    * Performs a copy operation under the considerations of
-   * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, MuleEvent)}
+   * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, Event)}
    *
    * @param config the config that is parameterizing this operation
    * @param sourcePath the path to the file to be copied
@@ -30,5 +30,5 @@ public interface CopyCommand {
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories,
-            MuleEvent event);
+            Event event);
 }

@@ -8,9 +8,9 @@ package org.mule.extension.file.common.api;
 
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -104,18 +104,18 @@ public interface FileSystem {
    * This method also supports locking support depending on the value of the {@code lock} argument, but following the same rules
    * and considerations as described in the {@link #read(FileConnectorConfig, String, MediaType, boolean)} method
    *
-   * @param filePath                the path of the file to be written
-   * @param content                 the content to be written into the file
-   * @param mode                    a {@link FileWriteMode}
-   * @param event                   the {@link MuleEvent} which processing triggers this operation
-   * @param lock                    whether or not to lock the file
+   * @param filePath the path of the file to be written
+   * @param content the content to be written into the file
+   * @param mode a {@link FileWriteMode}
+   * @param event the {@link Event} which processing triggers this operation
+   * @param lock whether or not to lock the file
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param encoding                when {@@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
-   *                                not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
+   * @param encoding when {@@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
+   *        not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock,
-             boolean createParentDirectories, String encoding);
+  void write(String filePath, Object content, FileWriteMode mode, Event event, boolean lock, boolean createParentDirectories,
+             String encoding);
 
   /**
    * Copies the file at the {@code sourcePath} into the {@code targetPath}.
@@ -143,7 +143,7 @@ public interface FileSystem {
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories,
-            MuleEvent event);
+            Event event);
 
   /**
    * Moves the file at the {@code sourcePath} into the {@code targetPath}.

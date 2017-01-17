@@ -8,6 +8,7 @@ package org.mule.extension.ftp.internal.sftp.command;
 
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -16,7 +17,7 @@ import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.io.OutputStream;
@@ -47,7 +48,7 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, Event event,
                     boolean lock, boolean createParentDirectory, String encoding) {
     Path path = resolvePath(filePath);
     FileAttributes file = getFile(filePath);

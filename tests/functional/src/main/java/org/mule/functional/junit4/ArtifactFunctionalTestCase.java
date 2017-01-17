@@ -62,7 +62,7 @@ import org.junit.runner.RunWith;
  * <p/>
  * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with
  * {@link org.mule.runtime.extension.api.annotation.Extension}, if a class is annotated it will generate the metadata for the
- * extension in runtime and it will also register it to the {@link org.mule.runtime.extension.api.ExtensionManager}. Non extension
+ * extension in runtime and it will also register it to the {@link org.mule.runtime.core.api.extension.ExtensionManager}. Non extension
  * plugins will set its filter based on {@code mule-module.properties} file.
  * <p/>
  * By default this test runs internally with a {@link org.junit.runners.BlockJUnit4ClassRunner} runner. On those cases where the
@@ -70,7 +70,7 @@ import org.junit.runner.RunWith;
  * <p/>
  * {@link PluginClassLoadersAware} will define that this class also needs to get access to plugin {@link ArtifactClassLoader} in
  * order to load extension classes (they are not exposed to the application) for registering them to the
- * {@link org.mule.runtime.extension.api.ExtensionManager}.
+ * {@link org.mule.runtime.core.api.extension.ExtensionManager}.
  * <p/>
  * Due to the cost of reading the classpath, scanning the dependencies and classes to generate the {@link ClassLoader} is high,
  * this runner will hold an static reference to the {@link ClassLoader} created for the first test and will use the same during
@@ -185,7 +185,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   /**
-   * Adds a {@link ConfigurationBuilder} that sets the {@link org.mule.runtime.extension.api.ExtensionManager} into the
+   * Adds a {@link ConfigurationBuilder} that sets the {@link org.mule.runtime.core.api.extension.ExtensionManager} into the
    * {@link #muleContext}. This {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
    *
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}

@@ -8,9 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.Consumer;
@@ -20,7 +22,6 @@ import org.mule.runtime.core.streaming.Producer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
@@ -39,7 +40,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         ConfigurationProvider configurationProvider,
                                         String target,
                                         ResolverSet resolverSet,
-                                        ExtensionManagerAdapter extensionManager,
+                                        ExtensionManager extensionManager,
                                         PolicyManager policyManager) {
     super(extensionModel, operationModel, configurationProvider, target, resolverSet, extensionManager, policyManager);
   }

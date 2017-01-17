@@ -6,27 +6,29 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 
 /**
- * Default implementation of {@link ExtensionManagerAdapterFactory} which creates instances of
+ * Default implementation of {@link ExtensionManagerFactory} which creates instances of
  * {@link DefaultExtensionManagerAdapterFactory} and sets them into the owning {@link MuleContext}
  *
  * @since 4.0
  */
-public class DefaultExtensionManagerAdapterFactory implements ExtensionManagerAdapterFactory {
+public class DefaultExtensionManagerAdapterFactory implements ExtensionManagerFactory {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ExtensionManagerAdapter createExtensionManager(MuleContext muleContext) {
-    ExtensionManagerAdapter extensionManager = new DefaultExtensionManager();
+  public ExtensionManager createExtensionManager(MuleContext muleContext) {
+    ExtensionManager extensionManager = new DefaultExtensionManager();
     ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
     try {
       initialiseIfNeeded(extensionManager, muleContext);
