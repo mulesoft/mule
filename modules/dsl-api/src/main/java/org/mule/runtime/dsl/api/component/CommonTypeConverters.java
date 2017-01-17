@@ -32,7 +32,7 @@ public class CommonTypeConverters {
   }
 
   /**
-   * @return a converter that transforms an String to an Enum.
+   * @return a converter that transforms a String to an Enum.
    */
   public static TypeConverter<String, Enum> stringToEnumConverter(Class<? extends Enum> enumType) {
     checkArgument(enumType != null, "enumType cannot be null");

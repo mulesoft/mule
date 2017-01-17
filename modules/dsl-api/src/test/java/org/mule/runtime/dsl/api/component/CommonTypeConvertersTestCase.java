@@ -10,13 +10,12 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToEnumConverter;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class CommonTypeConvertersTestCase extends AbstractMuleTestCase {
+public class CommonTypeConvertersTestCase {
 
   private enum TestEnum {
     ENUM1, ENUM2

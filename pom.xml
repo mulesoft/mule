@@ -107,8 +107,6 @@
     </modules>
 
     <properties>
-
-        <muleVersion>4.0-SNAPSHOT</muleVersion>
         <javaVersion>1.8</javaVersion>
     
         <!-- Properties that can be overriden in submodules -->
