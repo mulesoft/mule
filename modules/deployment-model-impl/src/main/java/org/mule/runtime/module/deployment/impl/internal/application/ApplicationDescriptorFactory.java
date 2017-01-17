@@ -127,11 +127,11 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   }
 
   private URL[] findSharedLibraries(ApplicationDescriptor descriptor) throws MalformedURLException {
-    return findJars(getAppSharedPluginLibsFolder(descriptor)).toArray(new URL[0]);
+    return findJars(getAppSharedLibsFolder(descriptor)).toArray(new URL[0]);
   }
 
-  protected File getAppSharedPluginLibsFolder(ApplicationDescriptor descriptor) {
-    return MuleFoldersUtil.getAppSharedPluginLibsFolder(descriptor.getName());
+  protected File getAppSharedLibsFolder(ApplicationDescriptor descriptor) {
+    return MuleFoldersUtil.getAppSharedLibsFolder(descriptor.getName());
   }
 
   private JarInfo findApplicationResources(ApplicationDescriptor descriptor, URL[] sharedLibraries) {

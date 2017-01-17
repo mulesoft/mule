@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.deployment.impl.internal.application.TemporaryApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -78,7 +77,7 @@ public class TemporaryApplicationDescriptorFactoryTestCase extends AbstractMuleT
 
   @Test
   public void relativeAppSharedPluginLibsFolder() throws Exception {
-    File appClassesFolder = this.temporaryApplicationDescriptorFactory.getAppSharedPluginLibsFolder(applicationDescriptor);
+    File appClassesFolder = this.temporaryApplicationDescriptorFactory.getAppSharedLibsFolder(applicationDescriptor);
     assertThat(appClassesFolder.getParentFile().getParentFile().getParentFile(), equalTo(rootArtifactFolder));
   }
 

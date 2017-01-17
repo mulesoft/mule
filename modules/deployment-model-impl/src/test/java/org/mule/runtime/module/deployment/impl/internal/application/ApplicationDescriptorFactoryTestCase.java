@@ -109,11 +109,11 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void readsSharedPluginLibs() throws Exception {
-    File pluginLibDir = MuleFoldersUtil.getAppSharedPluginLibsFolder(APP_NAME);
-    pluginLibDir.mkdirs();
+  public void readsSharedLibs() throws Exception {
+    File sharedLibsFolder = MuleFoldersUtil.getAppSharedLibsFolder(APP_NAME);
+    sharedLibsFolder.mkdirs();
 
-    File sharedLibFile = new File(pluginLibDir, JAR_FILE_NAME);
+    File sharedLibFile = new File(sharedLibsFolder, JAR_FILE_NAME);
     copyResourceAs(echoTestJarFile.getAbsolutePath(), sharedLibFile);
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =

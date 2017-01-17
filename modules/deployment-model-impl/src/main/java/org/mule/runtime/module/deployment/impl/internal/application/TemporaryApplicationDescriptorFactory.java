@@ -39,7 +39,7 @@ public class TemporaryApplicationDescriptorFactory extends ApplicationDescriptor
   }
 
   @Override
-  protected File getAppSharedPluginLibsFolder(ApplicationDescriptor descriptor) {
+  protected File getAppSharedLibsFolder(ApplicationDescriptor descriptor) {
     return new File(new File(getApplicationFolder(descriptor), PLUGINS_FOLDER), LIB_FOLDER);
   }
 

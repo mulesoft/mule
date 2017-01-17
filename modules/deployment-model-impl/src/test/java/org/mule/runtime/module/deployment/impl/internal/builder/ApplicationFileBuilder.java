@@ -8,11 +8,13 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppPluginsFolderPath;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedLibsFolderPath;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
@@ -148,7 +150,7 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
   public ApplicationFileBuilder sharingLibrary(String jarFile) {
     checkImmutable();
     checkArgument(!StringUtils.isEmpty(jarFile), "Jar file cannot be empty");
-    resources.add(new ZipResource(jarFile, "plugins/lib/" + FilenameUtils.getName(jarFile)));
+    resources.add(new ZipResource(jarFile, getAppSharedLibsFolderPath() + getName(jarFile)));
 
     return this;
   }
@@ -164,7 +166,8 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
 
     for (ArtifactPluginFileBuilder plugin : plugins) {
       customResources
-          .add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(), "plugins/" + plugin.getArtifactFile().getName()));
+          .add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(),
+                               getAppPluginsFolderPath() + plugin.getArtifactFile().getName()));
     }
 
     final ZipResource appProperties =
