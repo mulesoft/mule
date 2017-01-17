@@ -14,16 +14,15 @@ import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import org.mule.runtime.api.exception.ExceptionHelper;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.ResolverException;
-import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.util.SystemUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,9 +37,6 @@ import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
 
 @SmallTest
 public class ExceptionHelperTestCase extends AbstractMuleTestCase {
@@ -123,7 +119,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                                                        "  org.apache.commons.collections.CollectionUtils.forAllDo\\(CollectionUtils.java:[0-9]+\\)",
                                                        "  org.mule.test.config.ExceptionHelperTestCase\\$1.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  \\(" + (calls + 13) + " more...\\)")); // recursive
+                                                       "  \\(" + (calls + 15) + " more...\\)")); // recursive
     }
   }
 
@@ -158,7 +154,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                                                        "  java.util.*", // Collections.sort
                                                        "  org.mule.test.config.ExceptionHelperTestCase\\$2.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  \\(" + (calls + 13) + " more...\\)")); // recursive
+                                                       "  \\(" + (calls + 15) + " more...\\)")); // recursive
     }
   }
 
@@ -180,7 +176,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                                                        "  org.mule.test.config.ExceptionHelperTestCase\\$3.execute\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.mule.test.config.ExceptionHelperTestCase.generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  \\(" + (calls + 12) + " more...\\)")); // recursive
+                                                       "  \\(" + (calls + 14) + " more...\\)")); // recursive
     }
   }
 
