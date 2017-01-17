@@ -99,6 +99,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -106,6 +107,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -113,6 +115,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -120,6 +123,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
