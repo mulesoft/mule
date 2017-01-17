@@ -9,19 +9,18 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Provides utility methods to wrk with Maven
@@ -37,7 +36,7 @@ public class MavenUtils {
    *         file or the file can' be loaded
    */
   public static Model getPomModel(File artifactFolder) {
-    final File mulePluginPom = new File(artifactFolder, META_INF + separator + MULE_PLUGIN_POM);
+    final File mulePluginPom = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM);
     if (!mulePluginPom.exists()) {
       throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' (error found while reading plugin '%s')",
                                                          MAVEN, mulePluginPom.getName(),

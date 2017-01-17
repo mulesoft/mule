@@ -19,6 +19,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
+            <classifier>mule-plugin</classifier>
             <version>${project.version}</version>
         </dependency>
         <dependency>

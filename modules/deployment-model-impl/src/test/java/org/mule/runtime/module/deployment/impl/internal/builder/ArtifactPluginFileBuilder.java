@@ -10,7 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.io.File.separator;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.REPOSITORY;
@@ -88,7 +88,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   /**
    * Adds a describer into the plugin describer file.
    *
-   * @param mulePluginModel the describer to store under {@link ArtifactPluginDescriptor#META_INF}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
+   * @param mulePluginModel the describer to store under {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
    * @return the same builder instance
    */
   public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
@@ -112,20 +112,33 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   }
 
   /**
-   * Adds a resource file to the application {@link ArtifactPluginDescriptor#META_INF} folder.
+   * Adds a resource file to the artifact folder.
    *
    * @param resourceFile resource file from a external file or test resource.
    * @return the same builder instance
    */
-  public ArtifactPluginFileBuilder containingMetaInfResource(String resourceFile, String alias) {
+  public ArtifactPluginFileBuilder containingRootResource(String resourceFile, String alias) {
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, META_INF + "/" + alias));
+    resources.add(new ZipResource(resourceFile, alias));
     return this;
   }
 
   /**
-   * Adds a resource file to the application {@link ArtifactPluginDescriptor#META_INF} folder.
+   * Adds a resource file to the application {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder.
+   *
+   * @param resourceFile resource file from a external file or test resource.
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder containingMuleArtifactResource(String resourceFile, String alias) {
+    checkImmutable();
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+    resources.add(new ZipResource(resourceFile, MULE_ARTIFACT_FOLDER + "/" + alias));
+    return this;
+  }
+
+  /**
+   * Adds a resource file to the application {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder.
    *
    * @param resourceFile resource file from a external file or test resource.
    * @param alias relative path of the artifact to "install" in the plugin's {@link ArtifactPluginDescriptor#REPOSITORY}
@@ -173,7 +186,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
     }
 
     if (mulePluginModel != null) {
-      final File jsonDescriptorFile = new File(getTempFolder(), META_INF + separator + MULE_PLUGIN_JSON);
+      final File jsonDescriptorFile = new File(getTempFolder(), MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON);
       jsonDescriptorFile.deleteOnExit();
 
       String jsonDescriber = new MulePluginModelJsonSerializer().serialize(mulePluginModel);
@@ -182,7 +195,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       } catch (IOException e) {
         throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
       }
-      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), META_INF + "/" + MULE_PLUGIN_JSON));
+      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), MULE_ARTIFACT_FOLDER + "/" + MULE_PLUGIN_JSON));
     }
 
     return customResources;

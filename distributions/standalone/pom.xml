@@ -21,7 +21,8 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-container-app-plugins-dependencies</id>
+                        <id>copy-container-app-plugins-zip-dependencies</id>
+                        <!-- TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files, when done remove this plugin execution and leave only the copy-container-app-plugins-jar-dependencies-->
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
@@ -34,6 +35,24 @@
                                 org.mule.modules,
                                 com.mulesoft.weave  <!-- To add the DataWeave distribution plugin -->
                             </includeGroupIds>
+                            <excludeArtifactIds>mule-service-http</excludeArtifactIds>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-container-app-plugins-jar-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipDistributions}</skip>
+                            <outputDirectory>${project.build.directory}/plugins</outputDirectory>
+                            <includeTypes>jar</includeTypes>
+                            <includeGroupIds>
+                                org.mule.modules,
+                                com.mulesoft.weave  <!-- To add the DataWeave distribution plugin -->
+                            </includeGroupIds>
+                            <includeClassifiers>mule-plugin</includeClassifiers>
                             <excludeArtifactIds>mule-service-http</excludeArtifactIds>
                         </configuration>
                     </execution>
