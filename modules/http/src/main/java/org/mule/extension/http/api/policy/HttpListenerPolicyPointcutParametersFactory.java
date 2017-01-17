@@ -32,11 +32,11 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier sourceIdentifier, Attributes attributes,
                                                                  String flowName) {
     checkArgument(attributes instanceof HttpRequestAttributes, String
-        .format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: ",
+        .format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
                 HttpRequestAttributes.class.getName(), attributes != null ? attributes.getClass().getName() : "null"));
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes;
-    return new HttpListenerPolicyPointcutParameters(sourceIdentifier, httpRequestAttributes.getRequestPath(),
-                                                    httpRequestAttributes.getMethod(), flowName);
+    return new HttpListenerPolicyPointcutParameters(sourceIdentifier, flowName, httpRequestAttributes.getRequestPath(),
+                                                    httpRequestAttributes.getMethod());
   }
 
 }

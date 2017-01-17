@@ -18,22 +18,21 @@ public class HttpListenerPolicyPointcutParameters extends PolicyPointcutParamete
 
   private final String path;
   private final String method;
-  private final String flowName;
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
-   *  @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
+   * 
+   * @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
    *        operation identifier.
+   * @param flowName name of the flow where the listener is defined
    * @param path the target path of the incoming request
    * @param method the HTTP method of the incoming request
-   * @param flowName name of the flow processing the incoming request
    */
-  public HttpListenerPolicyPointcutParameters(ComponentIdentifier componentIdentifier, String path, String method,
-                                              String flowName) {
-    super(componentIdentifier);
+  public HttpListenerPolicyPointcutParameters(ComponentIdentifier componentIdentifier, String flowName, String path,
+                                              String method) {
+    super(componentIdentifier, flowName);
     this.path = path;
     this.method = method;
-    this.flowName = flowName;
   }
 
   /**
@@ -50,10 +49,4 @@ public class HttpListenerPolicyPointcutParameters extends PolicyPointcutParamete
     return method;
   }
 
-  /**
-   * @return the name of the flow processing the incoming request
-   */
-  public String getFlowName() {
-    return flowName;
-  }
 }

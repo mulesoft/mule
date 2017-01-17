@@ -19,15 +19,18 @@ import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 public class PolicyPointcutParameters {
 
   private final ComponentIdentifier componentIdentifier;
+  private final String flowName;
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
    * 
    * @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
    *        operation identifier.
+   * @param flowName name of the flow where the source / operation is defined
    */
-  public PolicyPointcutParameters(ComponentIdentifier componentIdentifier) {
+  public PolicyPointcutParameters(ComponentIdentifier componentIdentifier, String flowName) {
     this.componentIdentifier = componentIdentifier;
+    this.flowName = flowName;
   }
 
   /**
@@ -36,6 +39,13 @@ public class PolicyPointcutParameters {
    */
   public final ComponentIdentifier getComponentIdentifier() {
     return componentIdentifier;
+  }
+
+  /**
+   * @return the name of the flow where the source / operation is defined
+   */
+  public String getFlowName() {
+    return flowName;
   }
 
 }

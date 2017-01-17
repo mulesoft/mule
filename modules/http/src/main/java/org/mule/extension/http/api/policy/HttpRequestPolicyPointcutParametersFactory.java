@@ -35,6 +35,6 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
                                                                  String flowName) {
     String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
     String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
-    return new HttpRequestPolicyPointcutParameters(operationIdentifier, pathParameter, methodParameter, flowName);
+    return new HttpRequestPolicyPointcutParameters(operationIdentifier, flowName, pathParameter, methodParameter);
   }
 }
