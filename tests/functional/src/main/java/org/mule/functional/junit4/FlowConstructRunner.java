@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -211,19 +210,6 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    */
   public R withVariable(String key, Object value) {
     eventBuilder.withVariable(key, value);
-
-    return (R) this;
-  }
-
-  /**
-   * Configures this runner to run this flow as using the provided {@link MessageExchangePattern}.
-   *
-   * @return this {@link FlowRunner}
-   * @deprecated MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  public R withExchangePattern(MessageExchangePattern exchangePattern) {
-    eventBuilder.withExchangePattern(exchangePattern);
 
     return (R) this;
   }

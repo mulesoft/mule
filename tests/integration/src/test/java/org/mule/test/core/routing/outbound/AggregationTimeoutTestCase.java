@@ -12,9 +12,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class AggregationTimeoutTestCase extends AbstractIntegrationTestCase {
       MuleClient client = muleContext.getClient();
 
       // Need to return control to test case as soon as message is sent, and not wait for response.
-      flowRunner("main").withPayload(inputData).withExchangePattern(ONE_WAY).dispatchAsync();
+      flowRunner("main").withPayload(inputData).dispatchAsync();
 
       InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
       assertThat(response.getPayload().getValue(), instanceOf(List.class));

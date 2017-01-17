@@ -130,7 +130,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   /**
-   * Dispatchs to the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
+   * Dispatches to the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
    * afterwards.
    *
    * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
@@ -150,7 +150,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   /**
-   * Dispatchs to the specified flow with the provided event and configuration in a new IO thread, and performs a
+   * Dispatches to the specified flow with the provided event and configuration in a new IO thread, and performs a
    * {@link FlowAssert#verify(String))} afterwards.
    *
    * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
@@ -170,7 +170,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
     FlowAssert.verify(flowName);
   }
 
-  private ExecutionCallback getFlowRunCallback(final Flow flow) {
+  private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
     return () -> {
       if (nonBlocking) {
         return processWithMonoAndBlock(getOrBuildEvent(), flow);
@@ -180,7 +180,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
     };
   }
 
-  private ExecutionCallback getFlowDispatchCallback(final Flow flow) {
+  private ExecutionCallback<Event> getFlowDispatchCallback(final Flow flow) {
     return () -> {
       if (nonBlocking) {
         processWithMono(getOrBuildEvent(), flow);

@@ -10,10 +10,10 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -30,8 +30,8 @@ public class XaTransactionsPersistentQueueTestCase extends AbstractIntegrationTe
   public void testOutboundRouterTransactions() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    flowRunner("XaTestService").withPayload(TEST_MESSAGE).withExchangePattern(ONE_WAY)
-        .transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).run().getMessage();
+    flowRunner("XaTestService").withPayload(TEST_MESSAGE).transactionally(ACTION_ALWAYS_BEGIN, new XaTransactionFactory()).run()
+        .getMessage();
 
     assertThat(client.request("test://finish", RECEIVE_TIMEOUT), not(nullValue()));
   }
