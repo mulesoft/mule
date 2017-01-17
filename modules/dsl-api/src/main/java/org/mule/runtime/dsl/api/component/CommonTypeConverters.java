@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.dsl.api.component;
 
+import static java.lang.Enum.valueOf;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -31,13 +32,13 @@ public class CommonTypeConverters {
   }
 
   /**
-   * @return a converter that transforms an string to a enum.
+   * @return a converter that transforms an String to an Enum.
    */
   public static TypeConverter<String, Enum> stringToEnumConverter(Class<? extends Enum> enumType) {
     checkArgument(enumType != null, "enumType cannot be null");
     return enumAsString -> {
       checkArgument(enumAsString != null, "enumAsString cannot be null");
-      return Enum.valueOf(enumType, enumAsString);
+      return valueOf(enumType, enumAsString);
     };
   }
 
