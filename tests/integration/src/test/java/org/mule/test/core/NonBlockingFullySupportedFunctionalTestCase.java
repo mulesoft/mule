@@ -61,132 +61,132 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
 
   @Test
   public void flow() throws Exception {
-    flowRunner("flow").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("flow").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void subFlow() throws Exception {
-    flowRunner("subFlow").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("subFlow").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void childFlow() throws Exception {
-    flowRunner("childFlow").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("childFlow").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void childSyncFlow() throws Exception {
-    flowRunner("childSyncFlow").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("childSyncFlow").withPayload(TEST_MESSAGE).run();
     verify("childSyncFlowChild");
   }
 
   public void childAsyncFlow() throws Exception {
-    flowRunner("childAsyncFlow").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("childAsyncFlow").withPayload(TEST_MESSAGE).run();
     verify("childAsyncFlowChild");
   }
 
   @Test
   public void processorChain() throws Exception {
-    flowRunner("processorChain").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("processorChain").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void filterAccepts() throws Exception {
-    flowRunner("filterAccepts").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("filterAccepts").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void filterRejects() throws Exception {
-    Event result = flowRunner("filterRejects").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("filterRejects").withPayload(TEST_MESSAGE).run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void filterAfterNonBlockingAccepts() throws Exception {
-    flowRunner("filterAfterNonBlockingAccepts").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("filterAfterNonBlockingAccepts").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void filterAfterNonBlockingRejects() throws Exception {
-    Event result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE).run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void filterBeforeNonBlockingAccepts() throws Exception {
-    flowRunner("filterAfterNonBlockingAccepts").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("filterAfterNonBlockingAccepts").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void filterBeforeNonBlockingRejects() throws Exception {
-    Event result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE).run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void filterAfterEnricherBeforeNonBlocking() throws Exception {
-    Event result = flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE).run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void securityFilter() throws Exception {
-    flowRunner("security-filter").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("security-filter").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void transformer() throws Exception {
-    flowRunner("transformer").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("transformer").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void choice() throws Exception {
-    flowRunner("choice").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("choice").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void enricher() throws Exception {
-    flowRunner("enricher").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("enricher").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void response() throws Exception {
-    flowRunner("response").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("response").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   public void responseWithNullEvent() throws Exception {
-    Event result = flowRunner("responseWithNullEvent").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("responseWithNullEvent").withPayload(TEST_MESSAGE).run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void enricherIssue() throws Exception {
-    Event result = flowRunner("enricherIssue").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("enricherIssue").withPayload(TEST_MESSAGE).run();
     assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test
   public void enricherIssueNonBlocking() throws Exception {
-    Event result = flowRunner("enricherIssueNonBlocking").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("enricherIssueNonBlocking").withPayload(TEST_MESSAGE).run();
     assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test
   public void enricherFlowVar() throws Exception {
-    Event result = flowRunner("enricherFlowVar").withPayload(TEST_MESSAGE).nonBlocking().run();
+    Event result = flowRunner("enricherFlowVar").withPayload(TEST_MESSAGE).run();
     assertThat(result.getVariable(FOO).getValue(), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test
   public void async() throws Exception {
-    flowRunner("async").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("async").withPayload(TEST_MESSAGE).run();
   }
 
   @Test
   @Ignore("MULE-10617")
   public void catchExceptionStrategy() throws Exception {
-    flowRunner("catchExceptionStrategy").withPayload(TEST_MESSAGE).nonBlocking().run();
+    flowRunner("catchExceptionStrategy").withPayload(TEST_MESSAGE).run();
     verify("catchExceptionStrategyChild");
   }
 }

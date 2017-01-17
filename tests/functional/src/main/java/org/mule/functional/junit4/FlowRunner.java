@@ -9,8 +9,6 @@ package org.mule.functional.junit4;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.tck.MuleTestUtils.processWithMono;
-import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
 
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -39,7 +37,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   private ExecutionTemplate<Event> txExecutionTemplate = callback -> callback.process();
 
   private Transformer responseEventTransformer = input -> input;
-  private boolean nonBlocking = false;
 
   private Scheduler scheduler;
 
@@ -67,16 +64,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
     txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
 
-    return this;
-  }
-
-  /**
-   * Configures this runner's flow to be run non-blocking.
-   * 
-   * @return this {@link FlowRunner}
-   */
-  public FlowRunner nonBlocking() {
-    nonBlocking = true;
     return this;
   }
 
@@ -172,21 +159,13 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
     return () -> {
-      if (nonBlocking) {
-        return processWithMonoAndBlock(getOrBuildEvent(), flow);
-      } else {
-        return flow.process(getOrBuildEvent());
-      }
+      return flow.process(getOrBuildEvent());
     };
   }
 
   private ExecutionCallback<Event> getFlowDispatchCallback(final Flow flow) {
     return () -> {
-      if (nonBlocking) {
-        processWithMono(getOrBuildEvent(), flow);
-      } else {
-        flow.process(getOrBuildEvent());
-      }
+      flow.process(getOrBuildEvent());
       return null;
     };
   }
