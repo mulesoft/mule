@@ -77,10 +77,6 @@ public class DefaultMessageBuilder
 
   public DefaultMessageBuilder() {}
 
-  public DefaultMessageBuilder(InternalMessage message) {
-    this((org.mule.runtime.api.message.Message) message);
-  }
-
   private void copyMessageAttributes(InternalMessage message) {
     this.exceptionPayload = message.getExceptionPayload();
     message.getInboundPropertyNames().forEach(key -> {

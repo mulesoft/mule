@@ -7,11 +7,13 @@
 package org.mule.runtime.core.model.resolvers;
 
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_IGNORE_METHOD_PROPERTY;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
@@ -41,7 +43,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
   public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     // Transports such as SOAP need to ignore the method property
     boolean ignoreMethod =
-        BooleanUtils.toBoolean(context.getMessage().<Boolean>getInboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
+        BooleanUtils.toBoolean(((InternalMessage) context.getMessage()).<Boolean>getInboundProperty(MULE_IGNORE_METHOD_PROPERTY));
 
     if (ignoreMethod) {
       // TODO: Removed once we have property scoping
@@ -56,7 +58,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
     Object methodProp = getVariableValueOrNull(getMethodProperty(), context.getEvent());
     eventBuilder.removeVariable(getMethodProperty());
     if (methodProp == null) {
-      methodProp = context.getMessage().getInboundProperty(getMethodProperty());
+      methodProp = ((InternalMessage) context.getMessage()).getInboundProperty(getMethodProperty());
     }
     if (methodProp == null) {
       InvocationResult result = new InvocationResult(this, InvocationResult.State.FAILED);

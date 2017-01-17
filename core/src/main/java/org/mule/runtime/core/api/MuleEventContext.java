@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -26,7 +26,7 @@ public interface MuleEventContext {
    * 
    * @return the message payload for this event
    */
-  InternalMessage getMessage();
+  Message getMessage();
 
   /**
    * Returns the event
