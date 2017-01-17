@@ -9,7 +9,6 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -23,20 +22,23 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.DefaultEventBuilder;
 import org.mule.runtime.core.message.GroupCorrelation;
 
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 
 /**
- * Legacy implementation of {@link Event}
+ * Represents any data event occurring in the Mule environment. All data sent or received within the mule environment will be
+ * passed between components as an Event.
  * <p>
  * Holds a Message payload and provides helper methods for obtaining the data in a format that the receiving Mule component
  * understands. The event can also maintain any number of properties that can be set and retrieved by Mule components.
  *
- * @see org.mule.runtime.api.message.MuleEvent
  * @see Message
  */
-public interface Event extends MuleEvent {
+public interface Event extends Serializable {
 
   class CurrentEventHolder {
 
@@ -64,12 +66,41 @@ public interface Event extends MuleEvent {
   String getCorrelationId();
 
   /**
+   * Returns the variable registered under the given {@code key}
+   *
+   * @param key the name or key of the variable. This must be non-null.
+   * @param <T> the type of the variable value.
+   * @return a {@link TypedValue} containing the variable's value and {@link DataType}
+   * @throws java.util.NoSuchElementException if the flow variable does not exist.
+   */
+  <T> TypedValue<T> getVariable(String key);
+
+  /**
+   * Returns an immutable {@link Set} of variable names.
+   *
+   * @return the set of names
+   */
+  Set<String> getVariableNames();
+
+  /**
    * Returns the message payload for this event
    * 
    * @return the message payload for this event
    */
-  @Override
   InternalMessage getMessage();
+
+  /**
+   * When a mule component throws an error then an {@code Error} object gets generated with all the data associated to the error.
+   *
+   * This field will only contain a value within the error handler defined to handle errors. After the error handler is executed
+   * the event error field will be cleared. If another flow is called from within the error handler the flow will still have
+   * access to the error field.
+   *
+   * To avoid losing the error field after the error handler the user can define a variable pointing to the error field.
+   *
+   * @return an optional of the error associated with the event. Will be empty if there's no error associated with the event.
+   */
+  Optional<Error> getError();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -236,8 +267,7 @@ public interface Event extends MuleEvent {
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link org.mule.runtime.api.message.MuleEvent} instance. The existing
-   * {@link EventContext} is conserved.
+   * Create new {@link Builder} based on an existing {@link Event} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.

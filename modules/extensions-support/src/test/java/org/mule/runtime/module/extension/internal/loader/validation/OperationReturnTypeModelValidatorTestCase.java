@@ -12,10 +12,11 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -56,7 +57,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   @Test(expected = IllegalModelDefinitionException.class)
   public void muleEventReturnType() {
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(Event.class), false, emptySet()));
     validate(extensionModel, validator);
   }
 

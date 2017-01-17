@@ -7,11 +7,12 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
-import org.mule.extension.file.common.api.exceptions.IllegalPathException;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.extension.file.internal.LocalFileSystem;
+import org.mule.runtime.core.api.Event;
 
 import java.nio.file.CopyOption;
 import java.nio.file.FileAlreadyExistsException;
@@ -23,7 +24,7 @@ import java.nio.file.StandardCopyOption;
  * Base class for commands that generates copies of a local file, either by copying or moving them.
  * <p>
  * This class contains the logic to determine the actual target path in a way which provides bash semantics, as described in the
- * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, MuleEvent)} and
+ * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, Event)} and
  * {@link FileSystem#move(FileConnectorConfig, String, String, boolean, boolean)} methods.
  * <p>
  * This command also handles the concern of the target path already existing and whether or not overwrite it.

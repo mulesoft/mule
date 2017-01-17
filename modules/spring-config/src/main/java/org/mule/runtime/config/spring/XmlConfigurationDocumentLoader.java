@@ -11,7 +11,7 @@ import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 
 import java.io.InputStream;
 import java.util.List;

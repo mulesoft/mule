@@ -7,6 +7,7 @@
 package org.mule.extension.ftp;
 
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
@@ -14,7 +15,7 @@ import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -45,7 +46,7 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
     this.testHarness = testHarness;
   }
 
-  protected MuleEvent readHelloWorld() throws Exception {
+  protected Event readHelloWorld() throws Exception {
     return getPath(HELLO_PATH);
   }
 
@@ -67,7 +68,7 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
         .withVariable("encoding", encoding).withPayload(content).run();
   }
 
-  private MuleEvent getPath(String path) throws Exception {
+  private Event getPath(String path) throws Exception {
     return flowRunner("read").withVariable("path", path).run();
   }
 

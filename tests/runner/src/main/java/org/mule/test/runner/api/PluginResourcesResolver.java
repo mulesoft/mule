@@ -13,9 +13,9 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -37,14 +37,14 @@ public class PluginResourcesResolver {
   private static final String PLUGIN_PROPERTIES = "plugin.properties";
   private static final String COMMA_CHARACTER = ",";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final ExtensionManagerAdapter extensionManager;
+  private final ExtensionManager extensionManager;
 
   /**
    * Creates an instance of the resolver.
    *
-   * @param extensionManager {@link ExtensionManagerAdapter} to be used
+   * @param extensionManager {@link ExtensionManager} to be used
    */
-  public PluginResourcesResolver(ExtensionManagerAdapter extensionManager) {
+  public PluginResourcesResolver(ExtensionManager extensionManager) {
     checkNotNull(extensionManager, "extensionManager cannot be null");
     this.extensionManager = extensionManager;
   }

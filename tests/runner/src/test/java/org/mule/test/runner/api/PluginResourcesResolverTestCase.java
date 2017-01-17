@@ -22,11 +22,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -67,11 +68,11 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private ExtensionManagerAdapter extensionManager;
+  private ExtensionManager extensionManager;
 
   @Before
   public void before() throws Exception {
-    extensionManager = mock(ExtensionManagerAdapter.class);
+    extensionManager = mock(ExtensionManager.class);
   }
 
   @Test

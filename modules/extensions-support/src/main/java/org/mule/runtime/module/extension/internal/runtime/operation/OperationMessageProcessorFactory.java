@@ -8,15 +8,16 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -47,7 +48,7 @@ public class OperationMessageProcessorFactory {
       try {
         ResolverSet resolverSet = new ParametersResolver(muleContext, parameters).getParametersAsResolverSet(operationModel);
         OperationMessageProcessor processor;
-        ExtensionManagerAdapter extensionManager = (ExtensionManagerAdapter) muleContext.getExtensionManager();
+        ExtensionManager extensionManager = muleContext.getExtensionManager();
         if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
           processor = new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target,
                                                                 resolverSet, extensionManager, policyManager);

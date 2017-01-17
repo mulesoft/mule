@@ -12,22 +12,22 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXT
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
   public static final String META_INF_FOLDER = "META-INF";
   private static Logger LOGGER = getLogger(ApplicationExtensionsManagerConfigurationBuilder.class);
 
-  private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
+  private final ExtensionManagerFactory extensionManagerFactory;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
@@ -65,24 +65,24 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
    * Creates an instance of the configuration builder.
    *
    * @param artifactPlugins {@link List} of {@link ArtifactPlugin ArtifactPlugins} to be registered.
-   * @param extensionManagerAdapterFactory {@link ExtensionManagerAdapterFactory} in order to create the {@link ExtensionManagerAdapter}.
+   * @param extensionManagerFactory {@link ExtensionManagerFactory} in order to create the {@link ExtensionManager}.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
    */
   public ApplicationExtensionsManagerConfigurationBuilder(List<ArtifactPlugin> artifactPlugins,
-                                                          ExtensionManagerAdapterFactory extensionManagerAdapterFactory,
+                                                          ExtensionManagerFactory extensionManagerAdapterFactory,
                                                           ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     checkNotNull(artifactPlugins, "artifactPlugins cannot be null");
-    checkNotNull(extensionManagerAdapterFactory, "extensionManagerAdapterFactory cannot be null");
+    checkNotNull(extensionManagerAdapterFactory, "extensionManagerFactory cannot be null");
     checkNotNull(extensionModelLoaderRepository, "extensionModelLoaderRepository cannot be null");
 
     this.artifactPlugins = artifactPlugins;
-    this.extensionManagerAdapterFactory = extensionManagerAdapterFactory;
+    this.extensionManagerFactory = extensionManagerAdapterFactory;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
   }
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
-    final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
+    final ExtensionManager extensionManager = createExtensionManager(muleContext);
 
     for (ArtifactPlugin artifactPlugin : artifactPlugins) {
       URL manifestUrl =
@@ -117,7 +117,7 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
    * @throws IllegalArgumentException if the {@link MulePluginModel#getExtensionModelLoaderDescriptor()} is present, and
    *                                  the ID in it wasn't discovered through SPI.
    */
-  private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, ExtensionManagerAdapter extensionManager) {
+  private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, ExtensionManager extensionManager) {
     artifactPlugin.getDescriptor().getExtensionModelDescriptorProperty().ifPresent(descriptorProperty -> {
       final ExtensionModelLoader extensionModelLoader = extensionModelLoaderRepository.getExtensionModelLoader(descriptorProperty)
           .orElseThrow(() -> new IllegalArgumentException(format(
@@ -130,9 +130,9 @@ public class ApplicationExtensionsManagerConfigurationBuilder extends AbstractCo
     });
   }
 
-  private ExtensionManagerAdapter createExtensionManager(MuleContext muleContext) throws InitialisationException {
+  private ExtensionManager createExtensionManager(MuleContext muleContext) throws InitialisationException {
     try {
-      return extensionManagerAdapterFactory.createExtensionManager(muleContext);
+      return extensionManagerFactory.createExtensionManager(muleContext);
     } catch (Exception e) {
       throw new InitialisationException(e, muleContext);
     }

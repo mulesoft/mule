@@ -7,6 +7,7 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
@@ -17,7 +18,7 @@ import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,6 +74,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
   /**
    * {@inheritDoc}
    */
+  @Override
   protected boolean exists(Path path) {
     return getFile(path.toString()) != null;
   }
@@ -176,7 +178,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
 
   /**
    * Performs the base logic and delegates into
-   * {@link AbstractFtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean, MuleEvent)} to perform the actual
+   * {@link AbstractFtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean, Event)} to perform the actual
    * copying logic
    *
    * @param config the config that is parameterizing this operation
@@ -184,10 +186,10 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
    * @param target the path to the target destination
    * @param overwrite whether to overwrite existing target paths
    * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
-   * @param event the {@link MuleEvent} which triggered this operation
+   * @param event the {@link Event} which triggered this operation
    */
   protected final void copy(FileConnectorConfig config, String source, String target, boolean overwrite,
-                            boolean createParentDirectory, MuleEvent event, FtpCopyDelegate delegate) {
+                            boolean createParentDirectory, Event event, FtpCopyDelegate delegate) {
     FileAttributes sourceFile = getExistingFile(source);
     Path targetPath = resolvePath(target);
     FileAttributes targetFile = getFile(targetPath.toString());

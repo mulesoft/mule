@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * Dependencies resolution uses dependencies management declared by these artifacts while resolving the dependency graph.
  * <p/>
  * Plugins are discovered as {@link Extension} if they do have a annotated a {@link Class}. It generates the {@link Extension}
- * metadata in order to later register it to an {@link org.mule.runtime.extension.api.ExtensionManager}.
+ * metadata in order to later register it to an {@link org.mule.runtime.core.api.extension.ExtensionManager}.
  *
  * @since 4.0
  */

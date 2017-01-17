@@ -16,7 +16,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -90,7 +90,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
   @Test
   public void interceptingWithTarget() throws Exception {
     final String payload = "Hello!";
-    MuleEvent event = flowRunner("interceptingWithTarget").withPayload(payload).run();
+    Event event = flowRunner("interceptingWithTarget").withPayload(payload).run();
     assertThat(event.getMessage().getPayload().getValue(), is(payload));
 
     Message message = (Message) event.getVariable("banana").getValue();
@@ -107,7 +107,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
 
   @Test
   public void nestedInterceptingWithTarget() throws Exception {
-    MuleEvent event = flowRunner("nestedInterceptingWithTarget").run();
+    Event event = flowRunner("nestedInterceptingWithTarget").run();
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(Banana.class)));
 
     Message targetMessage = (Message) event.getVariable("banana").getValue();
@@ -122,7 +122,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
 
   @Test
   public void interceptingWithoutGenerics() throws Exception {
-    MuleEvent event = flowRunner("InterceptingWithoutGenerics").run();
+    Event event = flowRunner("InterceptingWithoutGenerics").run();
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(Banana.class)));
   }
 }

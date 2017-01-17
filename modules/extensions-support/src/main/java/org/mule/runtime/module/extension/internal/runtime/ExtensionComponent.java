@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -50,7 +52,6 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
@@ -78,7 +79,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
 
-  protected final ExtensionManagerAdapter extensionManager;
+  protected final ExtensionManager extensionManager;
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
@@ -100,7 +101,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   protected ExtensionComponent(ExtensionModel extensionModel,
                                ComponentModel componentModel,
                                ConfigurationProvider configurationProvider,
-                               ExtensionManagerAdapter extensionManager) {
+                               ExtensionManager extensionManager) {
     this.extensionModel = extensionModel;
     this.classLoader = getClassLoader(extensionModel);
     this.componentModel = componentModel;

@@ -7,6 +7,7 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -14,7 +15,7 @@ import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.io.OutputStream;
@@ -47,8 +48,8 @@ public final class FtpWriteCommand extends ClassicFtpCommand implements WriteCom
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
-                    boolean lock, boolean createParentDirectory, String encoding) {
+  public void write(String filePath, Object content, FileWriteMode mode, Event event, boolean lock, boolean createParentDirectory,
+                    String encoding) {
     Path path = resolvePath(filePath);
     FileAttributes file = getFile(filePath);
 

@@ -9,9 +9,11 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeLocatorFactory;
@@ -21,7 +23,6 @@ import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 
 import java.io.File;
@@ -78,13 +79,13 @@ public class ExtensionPluginMetadataGenerator {
   }
 
   /**
-   * Creates a {@link ExtensionManagerAdapter} needed for generating the metadata for an extension. It would be later discarded
-   * due to the manager would have references to classes loaded with the launcher class loader instead of the hierarchical class
-   * loaders created as result of the classification process.
+   * Creates a {@link ExtensionManager} needed for generating the metadata for an extension. It would be later discarded due to
+   * the manager would have references to classes loaded with the launcher class loader instead of the hierarchical class loaders
+   * created as result of the classification process.
    *
-   * @return an {@link ExtensionManagerAdapter} that would be used to register the extensions.
+   * @return an {@link ExtensionManager} that would be used to register the extensions.
    */
-  private ExtensionManagerAdapter createExtensionManager() {
+  private ExtensionManager createExtensionManager() {
     DefaultExtensionManager extensionManager = new DefaultExtensionManager();
     extensionManager.setMuleContext(new DefaultMuleContext() {
 

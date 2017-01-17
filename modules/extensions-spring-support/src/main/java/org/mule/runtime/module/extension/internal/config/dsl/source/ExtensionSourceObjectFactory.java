@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapter;
@@ -78,7 +78,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                    getSourceFactory(nonCallbackParameters, responseCallbackParameters, errorCallbackParameters),
                                    configurationProvider,
                                    getRetryPolicyTemplate(),
-                                   (ExtensionManagerAdapter) muleContext.getExtensionManager());
+                                   muleContext.getExtensionManager());
     try {
       muleContext.getInjector().inject(messageSource);
     } catch (MuleException e) {

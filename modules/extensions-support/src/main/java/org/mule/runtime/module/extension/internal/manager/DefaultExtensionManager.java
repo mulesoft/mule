@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.time.Time;
 import org.mule.runtime.core.util.StringUtils;
@@ -49,7 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI as a discovery mechanism.
+ * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI as a discovery mechanism.
  * <p/>
  * Although it allows registering {@link ConfigurationProvider} instances through the
  * {@link #registerConfigurationProvider(ConfigurationProvider)} method (and that's still the correct way of registering them),
@@ -57,8 +59,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager
-    implements ExtensionManagerAdapter, MuleContextAware, Initialisable, Startable, Stoppable {
+public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
@@ -134,8 +135,7 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(String configurationProviderName,
-                                                org.mule.runtime.api.message.MuleEvent muleEvent) {
+  public ConfigurationInstance getConfiguration(String configurationProviderName, Event muleEvent) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
         .orElseThrow(() -> new IllegalArgumentException(String
             .format(
@@ -147,13 +147,13 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, org.mule.runtime.api.message.MuleEvent muleEvent) {
+  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, Event muleEvent) {
     Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel);
     if (provider.isPresent()) {
       return provider.get().get(muleEvent);
     }
 
-    createImplicitConfiguration(extensionModel, (Event) muleEvent);
+    createImplicitConfiguration(extensionModel, muleEvent);
     return getConfiguration(extensionModel, muleEvent);
   }
 
