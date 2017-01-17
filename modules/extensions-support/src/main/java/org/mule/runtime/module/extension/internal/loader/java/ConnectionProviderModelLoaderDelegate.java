@@ -82,6 +82,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
         .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0)))
         .withModelProperty(new ImplementingTypeModelProperty(providerClass));
 
+    loader.parseExternalLibs(providerType, providerDeclarer);
+
     ConnectionManagementType managementType = NONE;
     if (PoolingConnectionProvider.class.isAssignableFrom(providerClass)) {
       managementType = POOLING;

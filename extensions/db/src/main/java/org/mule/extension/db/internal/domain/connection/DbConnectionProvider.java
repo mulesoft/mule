@@ -62,6 +62,7 @@ import org.slf4j.Logger;
 public abstract class DbConnectionProvider implements ConnectionProvider<DbConnection>, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DbConnectionProvider.class);
+  public static final String DRIVER_FILE_NAME_PATTERN = "(.*)\\.jar";
 
   @ConfigName
   private String configName;

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -17,12 +18,19 @@ import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.HasExternalLibraries;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -121,6 +129,35 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void contentParameterWithCustomDefault() {
     assertSinglePrimaryContentParameter(createExtension(VeganExtension.class), "tryToEatThisListOfMaps",
                                         "#[mel:new java.util.ArrayList()]");
+  }
+
+  @Test
+  public void exportedLibraries() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    assertExternalLibraries(extensionModel);
+    new IdempotentExtensionWalker() {
+
+      @Override
+      protected void onConfiguration(ConfigurationModel model) {
+        assertExternalLibraries(model);
+      }
+
+      @Override
+      protected void onConnectionProvider(ConnectionProviderModel model) {
+        assertExternalLibraries(model);
+      }
+    }.walk(extensionModel);
+  }
+
+  private void assertExternalLibraries(HasExternalLibraries model) {
+    assertThat(model.getExternalLibraryModels(), is(notNullValue()));
+    assertThat(model.getExternalLibraryModels(), hasSize(1));
+    ExternalLibraryModel library = model.getExternalLibraryModels().iterator().next();
+
+    assertThat(library.getName(), is(HEISENBERG_LIB_NAME));
+    assertThat(library.getDescription(), is(HEISENBERG_LIB_DESCRIPTION));
+    assertThat(library.getFileName().get(), is(HEISENBERG_LIB_FILE_NAME));
+    assertThat(library.getRequiredClassName().get(), is(HEISENBERG_LIB_CLASS_NAME));
   }
 
   private void assertSinglePrimaryContentParameter(ExtensionModel extensionModel, String operationName, String defaultValue) {

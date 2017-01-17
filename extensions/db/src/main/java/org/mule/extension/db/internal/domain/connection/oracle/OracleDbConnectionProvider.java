@@ -7,12 +7,15 @@
 package org.mule.extension.db.internal.domain.connection.oracle;
 
 import static java.util.Optional.empty;
+import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
+import static org.mule.extension.db.internal.domain.connection.oracle.OracleConnectionParameters.DRIVER_CLASS_NAME;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.extension.db.internal.domain.connection.JdbcConnectionFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -28,6 +31,8 @@ import javax.sql.DataSource;
  */
 @DisplayName("Oracle Connection")
 @Alias("oracle")
+@ExternalLib(name = "Oracle JDBC Driver", description = "A JDBC driver which supports connecting to an Oracle Database",
+    fileName = DRIVER_FILE_NAME_PATTERN, requiredClassName = DRIVER_CLASS_NAME)
 public class OracleDbConnectionProvider extends DbConnectionProvider {
 
   @ParameterGroup(name = CONNECTION)

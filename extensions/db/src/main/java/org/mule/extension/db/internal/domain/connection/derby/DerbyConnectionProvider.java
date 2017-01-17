@@ -8,10 +8,13 @@ package org.mule.extension.db.internal.domain.connection.derby;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
+import static org.mule.extension.db.internal.domain.connection.derby.DerbyConnectionParameters.DERBY_DRIVER_CLASS;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -26,6 +29,8 @@ import javax.sql.DataSource;
  */
 @DisplayName("Derby Connection")
 @Alias("derby")
+@ExternalLib(name = "Derby JDBC Driver", description = "A JDBC driver which supports connecting to a Derby Database",
+    fileName = DRIVER_FILE_NAME_PATTERN, requiredClassName = DERBY_DRIVER_CLASS)
 public class DerbyConnectionProvider extends DbConnectionProvider {
 
   @ParameterGroup(name = CONNECTION)

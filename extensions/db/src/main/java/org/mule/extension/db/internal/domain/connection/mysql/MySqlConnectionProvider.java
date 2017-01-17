@@ -6,10 +6,13 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
+import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
+import static org.mule.extension.db.internal.domain.connection.mysql.MySqlConnectionParameters.MYSQL_DRIVER_CLASS;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -24,6 +27,8 @@ import javax.sql.DataSource;
  */
 @DisplayName("MySQL Connection")
 @Alias("my-sql")
+@ExternalLib(name = "MySQL JDBC Driver", description = "A JDBC driver which supports connecting to the MySQL Database",
+    fileName = DRIVER_FILE_NAME_PATTERN, requiredClassName = MYSQL_DRIVER_CLASS)
 public class MySqlConnectionProvider extends DbConnectionProvider {
 
   @ParameterGroup(name = CONNECTION)

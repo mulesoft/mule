@@ -21,7 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  */
 public class OracleConnectionParameters extends BaseDbConnectionParameters implements DataSourceConfig {
 
-  private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+  static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
   private static final String JDBC_URL_PREFIX = "jdbc:oracle:thin:@";
 
   /**
