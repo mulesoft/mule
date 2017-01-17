@@ -6,22 +6,16 @@
  */
 package org.mule.runtime.core.management.stats;
 
+import org.mule.runtime.core.api.management.stats.Statistics;
+
 import java.util.concurrent.atomic.AtomicLong;
 
-public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics {
+public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements Statistics {
 
   private static final long serialVersionUID = 5337576392583767442L;
   private final AtomicLong executionError = new AtomicLong(0);
   private final AtomicLong fatalError = new AtomicLong(0);
   protected final ComponentStatistics flowStatistics = new ComponentStatistics();
-
-  // these can't sensibly converted to AtomicLong as they are processed together
-  // in incQueuedEvent
-  private long queuedEvent = 0;
-  private long maxQueuedEvent = 0;
-  private long averageQueueSize = 0;
-  private long totalQueuedEvent = 0;
-
 
   public FlowConstructStatistics(String flowConstructType, String name) {
     super(flowConstructType, name);
@@ -101,25 +95,6 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics imp
 
   public long getFatalErrors() {
     return fatalError.get();
-  }
-
-  @Override
-  public synchronized void incQueuedEvent() {
-    queuedEvent++;
-    totalQueuedEvent++;
-    if (queuedEvent > maxQueuedEvent) {
-      maxQueuedEvent = queuedEvent;
-    }
-    averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
-  }
-
-  @Override
-  public synchronized void decQueuedEvent() {
-    queuedEvent--;
-  }
-
-  public synchronized long getAverageQueueSize() {
-    return averageQueueSize;
   }
 
 }

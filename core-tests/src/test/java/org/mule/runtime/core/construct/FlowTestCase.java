@@ -25,7 +25,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -142,7 +141,6 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
     Event event = eventBuilder()
         .message(InternalMessage.of(TEST_PAYLOAD))
-        .exchangePattern(ONE_WAY)
         .build();
     Event response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 
@@ -224,9 +222,8 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     flow.stop();
     flow.start();
 
-    Event response =
-        triggerFunction.apply(directInboundMessageSource.getListener(),
-                              eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).synchronous(false).build());
+    Event response = triggerFunction.apply(directInboundMessageSource.getListener(),
+                                           eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build());
     assertThat(response, not(nullValue()));
   }
 

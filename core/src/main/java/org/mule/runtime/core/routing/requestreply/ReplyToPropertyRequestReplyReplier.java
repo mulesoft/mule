@@ -6,13 +6,22 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MessageExchangePattern;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
 
 public class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
   @Override
   protected boolean shouldProcessEvent(Event event) {
-    return event.getExchangePattern().hasResponse();
+    MessageExchangePattern mep = REQUEST_RESPONSE;
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyImmutableEndpoint) {
+      mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getMessageSource()).getExchangePattern();
+    }
+    return mep.hasResponse();
   }
 
 }

@@ -8,7 +8,7 @@ package org.mule.test.integration.message;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
+
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.IntegrationTestCaseRunnerConfig;
@@ -32,7 +32,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase impleme
 
   @Test
   public void testOneWay() throws Exception {
-    flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").withExchangePattern(ONE_WAY).run();
+    flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT).getRight().get();

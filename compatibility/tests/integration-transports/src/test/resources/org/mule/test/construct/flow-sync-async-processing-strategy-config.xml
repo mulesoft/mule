@@ -35,7 +35,7 @@
         <flow-ref name="testFlow" />
     </flow>
 
-    <flow name="testFlow">
+    <sub-flow name="testFlow">
     
         <expression-transformer
             expression="payload.split(';')" />
@@ -66,6 +66,6 @@
 
         </file:outbound-endpoint>
 
-    </flow>
+    </sub-flow>
 
 </mule>

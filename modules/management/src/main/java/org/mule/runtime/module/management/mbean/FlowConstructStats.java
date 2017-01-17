@@ -28,64 +28,69 @@ public class FlowConstructStats implements FlowConstructStatsMBean, MBeanRegistr
     this.statistics = statistics;
   }
 
+  @Override
   public long getAverageProcessingTime() {
     return statistics.getAverageProcessingTime();
   }
 
+  @Override
   public long getProcessedEvents() {
     return statistics.getProcessedEvents();
   }
 
+  @Override
   public long getMaxProcessingTime() {
     return statistics.getMaxProcessingTime();
   }
 
+  @Override
   public long getMinProcessingTime() {
     return statistics.getMinProcessingTime();
   }
 
+  @Override
   public long getTotalProcessingTime() {
     return statistics.getTotalProcessingTime();
   }
 
+  @Override
   public void clearStatistics() {
     statistics.clear();
   }
 
-  public long getAsyncEventsReceived() {
-    return statistics.getAsyncEventsReceived();
-  }
-
-  public long getSyncEventsReceived() {
-    return statistics.getSyncEventsReceived();
-  }
-
+  @Override
   public long getTotalEventsReceived() {
     return statistics.getTotalEventsReceived();
   }
 
+  @Override
   public long getExecutionErrors() {
     return statistics.getExecutionErrors();
   }
 
+  @Override
   public long getFatalErrors() {
     return statistics.getFatalErrors();
   }
 
+  @Override
   public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
     this.server = server;
     this.name = name;
     return name;
   }
 
+  @Override
   public void postRegister(Boolean registrationDone) {
     // nothing to do
   }
 
+  @Override
   public void preDeregister() throws Exception {
     // nothing to do
   }
 
+  @Override
   public void postDeregister() {
     // nothing to do
   }

@@ -12,6 +12,7 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -21,15 +22,16 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -38,7 +40,6 @@ import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.api.lock.LockFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -80,7 +81,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
   private String workFileNamePattern = null;
   private FilenameFilter filenameFilter = null;
   private FileFilter fileFilter = null;
-  private boolean forceSync;
   private LockFactory lockFactory;
   private boolean poolOnPrimaryInstanceOnly;
   private ObjectStore<String> filesBeingProcessingObjectStore;
@@ -107,13 +107,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
       throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
     }
 
-    checkMustForceSync();
+    checkMustForceSync(flowConstruct instanceof ProcessingDescriptor && ((ProcessingDescriptor) flowConstruct).isSynchronous());
   }
 
   /**
    * If we will be autodeleting File objects, events must be processed synchronously to avoid a race
    */
-  protected void checkMustForceSync() throws CreateException {
+  protected void checkMustForceSync(boolean flowSynchronous) throws CreateException {
     boolean connectorIsAutoDelete = false;
     boolean isStreaming = false;
     if (connector instanceof FileConnector) {
@@ -123,7 +123,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
 
     boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
 
-    forceSync = connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming;
+    if ((connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming) && !flowSynchronous) {
+      throw new CreateException(createStaticMessage("File message receiver for endpoint " + endpoint.getName()
+          + " must have a synchrouns processing strategy"), this);
+    }
   }
 
   @Override
@@ -332,14 +335,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     } else {
       processWithoutStreaming(originalSourceFilePath, originalSourceFileName, originalSourceDirectory, sourceFile,
                               destinationFile, executionTemplate, finalMessage);
-    }
-  }
-
-  @Override
-  protected void configureMuleEventBuilder(Builder builder) {
-    super.configureMuleEventBuilder(builder);
-    if (forceSync) {
-      builder.synchronous(true);
     }
   }
 

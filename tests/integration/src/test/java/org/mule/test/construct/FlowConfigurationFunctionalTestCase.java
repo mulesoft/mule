@@ -19,11 +19,10 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -82,7 +81,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testFlowAynchronous() throws Exception {
-    flowRunner("asynchronousFlow").withPayload("0").withExchangePattern(ONE_WAY).run();
+    flowRunner("asynchronousFlow").withPayload("0").run();
     InternalMessage message = muleContext.getClient().request("test://asynchronous-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
     Thread thread = (Thread) message.getPayload().getValue();
@@ -395,7 +394,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
   @Test
   public void testAsyncTransactionalEndpoint() throws Exception {
     Exception e = flowRunner("async-tx").withPayload("0").transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
-        .withExchangePattern(ONE_WAY).runExpectingException();
+        .runExpectingException();
 
     assertThat(e, instanceOf(MessagingException.class));
     assertThat(e.getMessage(), containsString("The <async> element cannot be used with transactions"));

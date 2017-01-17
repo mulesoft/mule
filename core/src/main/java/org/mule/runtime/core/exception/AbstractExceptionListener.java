@@ -7,19 +7,18 @@
 package org.mule.runtime.core.exception;
 
 import static java.text.MessageFormat.format;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityException;
@@ -27,7 +26,6 @@ import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.management.stats.ServiceStatistics;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -193,7 +191,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       }
     }
 
-    processOutboundRouterStatistics();
     return result;
   }
 
@@ -328,18 +325,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     if (ex instanceof MessagingException) {
       MessagingException messagingException = (MessagingException) ex;
       messagingException.setCauseRollback(true);
-    }
-  }
-
-  void processOutboundRouterStatistics() {
-    List<Processor> processors = getMessageProcessors();
-    FlowConstructStatistics statistics = flowConstruct.getStatistics();
-    if (isNotEmpty(processors) && statistics instanceof ServiceStatistics) {
-      if (statistics.isEnabled()) {
-        for (Processor endpoint : processors) {
-          ((ServiceStatistics) statistics).getOutboundRouterStat().incrementRoutedMessage(endpoint);
-        }
-      }
     }
   }
 

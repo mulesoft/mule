@@ -10,7 +10,6 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
@@ -142,8 +141,6 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
   List<Processor> getMessageProcessors();
 
   List<Processor> getResponseMessageProcessors();
-
-  MessageExchangePattern getExchangePattern();
 
   /**
    * The timeout value for waiting for a response from a remote invocation or back channel. Mule will only wait for a response if

@@ -8,7 +8,6 @@ package org.mule.runtime.core.source.polling;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -182,7 +181,7 @@ public class PollingMessageSource
         public Event process() throws Exception {
           return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
             Event event = Event.builder(create(flowConstruct, getPollingUniqueName())).message(request)
-                .exchangePattern(ONE_WAY).flow(flowConstruct).build();
+                .flow(flowConstruct).build();
             event = interceptor.prepareSourceEvent(event);
 
             setCurrentEvent(event);
@@ -192,7 +191,7 @@ public class PollingMessageSource
               muleContext.getNotificationManager()
                   .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
                                                                      flowConstruct, MESSAGE_RECEIVED));
-              event = interceptor.prepareRouting(sourceEvent, sourceEvent);
+              event = interceptor.prepareRouting(sourceEvent, sourceEvent, flowConstruct);
               interceptor.postProcessRouting(listener.process(event));
             } else {
               logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());

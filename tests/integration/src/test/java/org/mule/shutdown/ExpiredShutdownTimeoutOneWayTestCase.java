@@ -7,7 +7,6 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -50,7 +49,7 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
       @Override
       public void run() {
         try {
-          flowRunner(flowName).withPayload(TEST_MESSAGE).withExchangePattern(ONE_WAY).dispatch();
+          flowRunner(flowName).withPayload(TEST_MESSAGE).dispatch();
           results[0] = !client.request("test://response", RECEIVE_TIMEOUT).getRight().isPresent();
         } catch (Exception e) {
           e.printStackTrace();

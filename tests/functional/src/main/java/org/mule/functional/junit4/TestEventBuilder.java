@@ -7,17 +7,15 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -54,8 +52,6 @@ public class TestEventBuilder {
   private GroupCorrelation correlation = new GroupCorrelation(null, null);
 
   private Map<String, Object> variables = new HashMap<>();
-
-  private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
 
   private ReplyToHandler replyToHandler;
 
@@ -252,19 +248,6 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@link MessageExchangePattern}.
-   *
-   * @return this {@link TestEventBuilder}
-   * @deprecated MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  public TestEventBuilder withExchangePattern(MessageExchangePattern exchangePattern) {
-    this.exchangePattern = exchangePattern;
-
-    return this;
-  }
-
-  /**
    * Will spy the built {@link Message} and {@link Event}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link TestEventBuilder}
@@ -295,7 +278,7 @@ public class TestEventBuilder {
 
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
         .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(variables).groupCorrelation(correlation)
-        .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).build();
+        .flow(flow).replyToHandler(replyToHandler).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

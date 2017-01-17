@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core;
 
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -148,11 +147,6 @@ public class DefaultMuleEventContext implements MuleEventContext {
   @Override
   public FlowConstruct getFlowConstruct() {
     return flow;
-  }
-
-  @Override
-  public MessageExchangePattern getExchangePattern() {
-    return event.getExchangePattern();
   }
 
   /**

@@ -22,15 +22,15 @@ import org.mule.compatibility.core.context.notification.EndpointMessageNotificat
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -180,7 +180,9 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     endpointBuilder.setExchangePattern(exchangePattern);
     endpointBuilder.setTransactionConfig(txConfig);
     customizeEndpointBuilder(endpointBuilder);
-    return endpointBuilder.buildOutboundEndpoint();
+    final OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
+    outboundEndpoint.setFlowConstruct(new Flow("Flow for " + uri, muleContext));
+    return outboundEndpoint;
   }
 
   protected void customizeEndpointBuilder(EndpointBuilder endpointBuilder) {

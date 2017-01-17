@@ -8,16 +8,13 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -96,20 +93,6 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  @Test
-  public void testProcessingIsForcedOnSameThread() throws Exception {
-    Processor checkForceSyncFlag = event -> {
-      assertTrue(event.isSynchronous());
-      return event;
-    };
-    FirstSuccessful router = createFirstSuccessfulRouter(checkForceSyncFlag);
-    router.initialise();
-
-    // the configured message processor will blow up if the router did not force processing
-    // on same thread
-    router.process(testEvent());
-  }
-
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws MuleException {
     FirstSuccessful fs = new FirstSuccessful();
     fs.setMuleContext(muleContext);
@@ -123,7 +106,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     InternalMessage msg = InternalMessage.builder().payload(message).build();
     try {
-      Event event = mp.process(eventBuilder().message(msg).exchangePattern(REQUEST_RESPONSE).session(session).build());
+      Event event = mp.process(eventBuilder().message(msg).session(session).build());
       InternalMessage returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
@@ -158,7 +141,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = InternalMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        Event muleEvent = eventBuilder().message(msg).exchangePattern(ONE_WAY).error(error).build();
+        Event muleEvent = eventBuilder().message(msg).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

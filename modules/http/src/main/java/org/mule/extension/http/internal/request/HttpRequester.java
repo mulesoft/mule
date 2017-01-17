@@ -6,8 +6,9 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -107,9 +108,7 @@ public class HttpRequester {
             //TODO: MULE-10340 - Add notifications to HTTP request
             //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
             // Create a new muleEvent based on the old and the response so that the auth can use it
-            Event responseEvent =
-                Event.builder(muleEvent).message(InternalMessage.builder(responseMessage).build())
-                    .synchronous(muleEvent.isSynchronous()).build();
+            Event responseEvent = Event.builder(muleEvent).message(InternalMessage.builder(responseMessage).build()).build();
             if (resendRequest(responseEvent, checkRetry, authentication)) {
               consumePayload(responseEvent, muleContext);
               doRequest(responseEvent, client, requestBuilder, false, muleContext, flowConstruct, callback);

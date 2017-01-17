@@ -63,7 +63,7 @@ public class LegacyDefaultFlowProcessingStrategyFactory extends LegacyAsynchrono
     }
 
     protected boolean canProcessAsync(Event event) {
-      return !(event.isSynchronous() || isTransactionActive());
+      return !isTransactionActive();
     }
   }
 }

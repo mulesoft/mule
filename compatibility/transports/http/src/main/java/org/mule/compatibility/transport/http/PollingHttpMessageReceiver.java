@@ -27,11 +27,11 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -117,7 +117,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
 
     // TODO can a correlation id come as a header?
     Event event = Event.builder(DefaultEventContext.create(flowConstruct, getEndpoint().getAddress()))
-        .message(requestBuider.build()).exchangePattern(outboundEndpoint.getExchangePattern()).flow(flowConstruct).build();
+        .message(requestBuider.build()).flow(flowConstruct).build();
 
     Event result = outboundEndpoint.process(event);
     CompatibilityMessage message = null;

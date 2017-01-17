@@ -51,9 +51,9 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.Connectable;
@@ -2106,6 +2106,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
       DispatcherAsyncInterceptingMessageProcessor async =
           new DispatcherAsyncInterceptingMessageProcessor(() -> getDispatcherWorkManager());
+      async.setFlowConstruct(endpoint.getFlowConstruct());
       builder.chain(async);
       builder.chain(new DispatcherMessageProcessor(endpoint));
       return builder.build();

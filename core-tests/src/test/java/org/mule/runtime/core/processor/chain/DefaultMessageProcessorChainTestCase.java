@@ -26,7 +26,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
@@ -485,7 +484,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
             .build();
     nested.setMuleContext(muleContext);
     builder.chain(getAppendingMP("1"), event -> nested.process(Event.builder(event)
-        .message(event.getMessage()).exchangePattern(REQUEST_RESPONSE).flow(flow).build()), getAppendingMP("2"));
+        .message(event.getMessage()).flow(flow).build()), getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
   }
 
@@ -1043,9 +1042,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     InternalMessage message = InternalMessage.builder().payload(data).build();
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getMessage()).thenReturn(message);
-    when(event.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
-    when(event.isSynchronous()).thenReturn(false);
     when(event.getError()).thenReturn(empty());
     when(event.getContext()).thenReturn(eventContext);
     return event;

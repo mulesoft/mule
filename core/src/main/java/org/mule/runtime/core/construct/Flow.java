@@ -7,12 +7,11 @@
 package org.mule.runtime.core.construct;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -97,8 +96,7 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
 
     // TODO MULE-10013
     // Create new event for current flow with current flowConstruct, replyToHandler etc.
-    event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination)
-        .synchronous(event.isSynchronous() || isSynchronous()).build();
+    event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
     resetRequestContextEvent(event);
     return event;
   }
@@ -109,7 +107,7 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
       // TODO MULE-10013
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
       result = Event.builder(result).flow(original.getFlowConstruct()).replyToHandler(original.getReplyToHandler())
-          .replyToDestination(original.getReplyToDestination()).synchronous(original.isSynchronous())
+          .replyToDestination(original.getReplyToDestination())
           .error(errorOptional.orElse(null)).build();
     }
     resetRequestContextEvent(result);

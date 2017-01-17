@@ -10,20 +10,20 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -161,7 +161,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         };
 
         endpoint.process(Event.builder(create(flowConstruct, "EndpointNotificationLoggerAgent")).message(msg)
-            .exchangePattern(endpoint.getExchangePattern()).flow(flowConstruct).disableNotifications().build());
+            .flow(flowConstruct).disableNotifications().build());
       } catch (Exception e1) {
         // TODO MULE-863: If this is an error, do something better than this
         logger
