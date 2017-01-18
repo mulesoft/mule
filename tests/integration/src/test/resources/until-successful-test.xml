@@ -8,6 +8,9 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <configuration defaultProcessingStrategy="synchronous"/>
+
     <!-- use a persistent object store to pinpoint any Event de/serialization issue -->
     <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.PartitionedPersistentObjectStore" />
 

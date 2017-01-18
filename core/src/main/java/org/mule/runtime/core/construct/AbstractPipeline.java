@@ -249,7 +249,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return pipeline.process(event);
           } else {
             try {
-              return just(event).transform(processFlowFunction()).block();
+              just(event).transform(processFlowFunction()).subscribe();
+              return Mono.from(event.getContext()).block();
             } catch (Exception e) {
               throw rxExceptionToMuleException(e);
             }
@@ -258,7 +259,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher).transform(processFlowFunction());
+          return from(publisher).flatMap(event -> {
+            just(event).transform(processFlowFunction()).subscribe();
+            return Mono.from(event.getContext());
+          });
         }
       });
     }
@@ -276,12 +280,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
     return stream -> from(stream).transform(pipeline)
         .doOnNext(response -> response.getContext().success(response))
-        .doOnError(MessagingException.class, me -> from(getExceptionListener().apply(me))
-            .doOnNext(event -> event.getContext().success(event))
-            .doOnError(MessagingException.class, me2 -> me2.getEvent().getContext().error(me2))
-            .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                       throwable -> LOGGER.error("Unhandled exception thrown during error handling" + throwable))
-            .subscribe())
+        .doOnError(MessagingException.class,
+                   me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
+                       .doOnNext(event -> event.getContext().success(event))
+                       .doOnError(MessagingException.class, me2 -> me2.getEvent().getContext().error(me2))
+                       .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                                  throwable -> LOGGER.error("Unhandled exception thrown during error handling" +
+                                      throwable))
+                       .subscribe())
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                    throwable -> LOGGER.error("Unhandled exception in async processing " + throwable))
         .onErrorResumeWith(EventDroppedException.class, ede -> {

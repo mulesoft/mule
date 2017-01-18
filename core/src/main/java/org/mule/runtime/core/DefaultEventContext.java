@@ -60,13 +60,13 @@ public final class DefaultEventContext implements EventContext, Serializable {
   }
 
   /**
-   * Builds a new child execution context from a parent context. A child context delegates to the parent context but has has it's
-   * own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is typically
-   * use in flow-ref type scenarios where a the referenced flow will complete the child context, but should not complete the
-   * parent context
+   * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
+   * has has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
+   * typically used in flow-ref type scenarios where a the referenced Flow should complete the child context, but should not
+   * complete the parent context
    * 
    * @param parent the parent context
-   * @return
+   * @return a new child context
    */
   public static EventContext child(EventContext parent) {
     return parent instanceof CoreEventContext ? new ChildCoreEventContext((CoreEventContext) parent)
@@ -173,7 +173,7 @@ public final class DefaultEventContext implements EventContext, Serializable {
     monoProcessor.subscribe(s);
   }
 
-  static class ChildEventContext implements EventContext, Serializable {
+  private static class ChildEventContext implements EventContext, Serializable {
 
     private static final long serialVersionUID = 1054412872901205234L;
 
@@ -244,7 +244,7 @@ public final class DefaultEventContext implements EventContext, Serializable {
 
   }
 
-  static class ChildCoreEventContext extends ChildEventContext implements CoreEventContext {
+  private static class ChildCoreEventContext extends ChildEventContext implements CoreEventContext {
 
     private CoreEventContext parent;
 

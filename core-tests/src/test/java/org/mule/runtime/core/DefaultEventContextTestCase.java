@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -19,13 +20,15 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
-  private static int BLOCK_TIMEOUT = 200;
+  private static int BLOCK_TIMEOUT = 50;
+  private static String TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE = "Timeout on blocking read";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -71,6 +74,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertThat(from(childEventContext).block(), equalTo(event));
 
     expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
     from(eventContext).blockMillis(BLOCK_TIMEOUT);
   }
 
@@ -84,6 +88,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertThat(from(childEventContext).block(), is(nullValue()));
 
     expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
     from(eventContext).blockMillis(BLOCK_TIMEOUT);
   }
 
@@ -96,9 +101,19 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     childEventContext.error(exception);
 
     expectedException.expectCause(is(exception));
-    from(childEventContext).block();
+    from(childEventContext).blockMillis(BLOCK_TIMEOUT);
+  }
+
+  @Test
+  public void childErrorDoesNotCompleteParentContext() throws Exception {
+    EventContext eventContext = create(getTestFlow(muleContext), "");
+    EventContext childEventContext = DefaultEventContext.child(eventContext);
+
+    MessagingException exception = new MessagingException(testEvent(), new RuntimeException());
+    childEventContext.error(exception);
 
     expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
     from(eventContext).blockMillis(BLOCK_TIMEOUT);
   }
 

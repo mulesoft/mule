@@ -26,7 +26,8 @@
         </error-handler>
     </flow>
 
-    <flow name="untilSuccessfulInFlow">
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <flow name="untilSuccessfulInFlow" processingStrategy="synchronous">
         <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
             <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
         </until-successful>
@@ -76,7 +77,8 @@
         </block>
     </flow>
 
-    <flow name="untilSuccessfulInTransactionalScope">
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <flow name="untilSuccessfulInTransactionalScope" processingStrategy="synchronous">
         <block>
             <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
                 <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
@@ -116,7 +118,8 @@
         </error-handler>
     </flow>
 
-    <flow name="untilSuccessfulInExceptionStrategy">
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <flow name="untilSuccessfulInExceptionStrategy" processingStrategy="synchronous">
         <test:component throwException="true"/>
         <error-handler>
             <on-error-continue>
@@ -131,7 +134,8 @@
         </error-handler>
     </flow>
 
-    <flow name="untilSuccessfulInExceptionStrategyRollback">
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <flow name="untilSuccessfulInExceptionStrategyRollback" processingStrategy="synchronous">
         <test:component throwException="true"/>
         <error-handler>
             <on-error-propagate>
