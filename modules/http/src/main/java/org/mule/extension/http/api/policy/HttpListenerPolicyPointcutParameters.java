@@ -6,8 +6,8 @@
  */
 package org.mule.extension.http.api.policy;
 
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.core.policy.PolicyPointcutParameters;
 
 /**
  * Specific implementation of {@link PolicyPointcutParameters} for http:listener operation.
@@ -22,13 +22,15 @@ public class HttpListenerPolicyPointcutParameters extends PolicyPointcutParamete
   /**
    * Creates a new {@link PolicyPointcutParameters}
    *
+   * @param flowName name of the flow where the listener is defined. Not empty.
    * @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
    *        operation identifier.
    * @param path the target path of the incoming request
    * @param method the HTTP method of the incoming request
    */
-  public HttpListenerPolicyPointcutParameters(ComponentIdentifier componentIdentifier, String path, String method) {
-    super(componentIdentifier);
+  public HttpListenerPolicyPointcutParameters(String flowName, ComponentIdentifier componentIdentifier, String path,
+                                              String method) {
+    super(flowName, componentIdentifier);
     this.path = path;
     this.method = method;
   }
@@ -46,4 +48,5 @@ public class HttpListenerPolicyPointcutParameters extends PolicyPointcutParamete
   public String getMethod() {
     return method;
   }
+
 }

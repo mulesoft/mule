@@ -28,11 +28,12 @@ public interface OperationPolicyPointcutParametersFactory {
   /**
    * Creates an specific {@link PolicyPointcutParameters} for a particular operation identifier by {@code operationIdentifier}.
    *
+   * @param flowName name of the flow executing the operation. Not empty.
    * @param operationIdentifier identifier of the message source
    * @param operationParameters set of parameters that are going to be used to execute the operation.
    * @return the pointcut parameters.
    */
-  PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier operationIdentifier,
+  PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier operationIdentifier,
                                                           Map<String, Object> operationParameters);
 
 }

@@ -6,9 +6,13 @@
  */
 package org.mule.extension.http.api.policy;
 
+
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
+
+import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.core.policy.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 
 import java.util.Map;
 
@@ -30,10 +34,11 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier operationIdentifier,
+  public PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier operationIdentifier,
                                                                  Map<String, Object> operationParameters) {
+    checkArgument(isNotEmpty(flowName), "Cannot create a policy pointcut parameter instance with an empty flow name");
     String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
     String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
-    return new HttpRequestPolicyPointcutParameters(operationIdentifier, pathParameter, methodParameter);
+    return new HttpRequestPolicyPointcutParameters(flowName, operationIdentifier, pathParameter, methodParameter);
   }
 }

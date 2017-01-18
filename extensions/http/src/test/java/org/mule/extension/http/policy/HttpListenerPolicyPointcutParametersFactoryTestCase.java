@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.dsl.config.ComponentIdentifier.Builder;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -26,6 +26,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
       new Builder().withNamespace("http").withName("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
+  private static final String FLOW_NAME = "flow-name";
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
@@ -47,7 +48,12 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
 
   @Test(expected = IllegalArgumentException.class)
   public void failIfAttributesIsNotHttpRequestAttributes() {
-    factory.createPolicyPointcutParameters(HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
+    factory.createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void failIfFlowNameIsEmpty() {
+    factory.createPolicyPointcutParameters("", HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
   }
 
   @Test
@@ -55,7 +61,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     HttpListenerPolicyPointcutParameters policyPointcutParameters = (HttpListenerPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(HTTP_LISTENER_COMPONENT_IDENTIFIER, httpAttributes);
+        .createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, httpAttributes);
     assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_LISTENER_COMPONENT_IDENTIFIER));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
