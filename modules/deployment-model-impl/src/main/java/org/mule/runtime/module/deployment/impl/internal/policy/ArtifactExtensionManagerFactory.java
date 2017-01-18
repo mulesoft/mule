@@ -15,7 +15,6 @@ import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensi
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -61,7 +60,7 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
 
   @Override
   public ExtensionManager create(MuleContext muleContext) {
-    final ExtensionManager extensionManager = createExtensionManager(muleContext);
+    final ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
 
     for (ArtifactPlugin artifactPlugin : artifactPlugins) {
       URL manifestUrl =
@@ -109,13 +108,5 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
           .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(), descriptorProperty.getAttributes());
       extensionManager.registerExtension(extensionModel);
     });
-  }
-
-  private ExtensionManager createExtensionManager(MuleContext muleContext) {
-    ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
-
-    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
-
-    return extensionManager;
   }
 }
