@@ -67,8 +67,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         .findAny();
 
     if (!registeredPolicyTemplate.isPresent()) {
-      PolicyTemplate policyTemplate =
-          policyTemplateFactory.createArtifact(policyTemplateDescriptor, application.getRegionClassLoader());
+      PolicyTemplate policyTemplate = policyTemplateFactory.createArtifact(application, policyTemplateDescriptor);
       registeredPolicyTemplate = of(new RegisteredPolicyTemplate(policyTemplate));
       registeredPolicyTemplates.add(registeredPolicyTemplate.get());
     }

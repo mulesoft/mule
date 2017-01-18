@@ -108,8 +108,8 @@ public class MuleArtifactResourcesRegistry {
     domainFactory = new DefaultDomainFactory(this.domainClassLoaderFactory, domainManager, containerClassLoader,
                                              artifactClassLoaderManager, serviceManager);
 
-    ArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
-        trackArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
+    DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
+        trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
         new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, artifactPluginRepository,
                                                                artifactPluginClassLoaderFactory,

@@ -14,15 +14,19 @@ import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBui
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+
+import java.io.IOException;
 
 /**
  * Builds the class loader to use on a {@link org.mule.runtime.deployment.model.api.policy.PolicyTemplate}
  */
-public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder {
+public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<PolicyTemplateClassLoaderBuilder> {
 
-  private final ArtifactClassLoaderFactory artifactClassLoaderFactory;
+  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private ArtifactClassLoader parentClassLoader;
 
   /**
@@ -34,7 +38,7 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
    * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
-  public PolicyTemplateClassLoaderBuilder(ArtifactClassLoaderFactory artifactClassLoaderFactory,
+  public PolicyTemplateClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                           ArtifactPluginRepository artifactPluginRepository,
                                           ArtifactClassLoaderFactory artifactPluginClassLoaderFactory,
                                           PluginDependenciesResolver pluginDependenciesResolver) {
@@ -45,12 +49,17 @@ public class PolicyTemplateClassLoaderBuilder extends AbstractArtifactClassLoade
 
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
-    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor);
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
   }
 
   @Override
   protected ArtifactClassLoader getParentClassLoader() {
     return parentClassLoader;
+  }
+
+  @Override
+  public MuleDeployableArtifactClassLoader build() throws IOException {
+    return (MuleDeployableArtifactClassLoader) super.build();
   }
 
   public PolicyTemplateClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {

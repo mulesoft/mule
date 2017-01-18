@@ -10,15 +10,15 @@ package org.mule.test.runner.api;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +42,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
 
   private static Logger LOGGER = LoggerFactory.getLogger(IsolatedClassLoaderExtensionsManagerConfigurationBuilder.class);
 
-  private final ExtensionManagerFactory extensionManagerAdapterFactory;
+  private final ExtensionManagerFactory extensionManagerFactory;
   private final List<ArtifactClassLoader> pluginsClassLoaders;
 
   /**
@@ -55,7 +55,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    *        plugin or extension plugin).
    */
   public IsolatedClassLoaderExtensionsManagerConfigurationBuilder(final List<ArtifactClassLoader> pluginsClassLoaders) {
-    this.extensionManagerAdapterFactory = new DefaultExtensionManagerAdapterFactory();
+    this.extensionManagerFactory = new DefaultExtensionManagerFactory();
     this.pluginsClassLoaders = pluginsClassLoaders;
   }
 
@@ -63,7 +63,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    * Goes through the list of plugins {@link ArtifactClassLoader}s to check if they have an extension descriptor and if they do it
    * will parse it and register the extension into the {@link org.mule.runtime.core.api.extension.ExtensionManager}
    * <p/>
-   * It has to use reflection to access these classes due to the current execution of this method would be with the applciation
+   * It has to use reflection to access these classes due to the current execution of this method would be with the application
    * {@link ArtifactClassLoader} and the list of plugin {@link ArtifactClassLoader} was instantiated with the Launcher
    * {@link ClassLoader} so casting won't work here.
    *
@@ -112,21 +112,21 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   }
 
   /**
-   * Creates an {@link ExtensionManagerAdapter} to be used for registering the extensions.
+   * Creates an {@link ExtensionManager} to be used for registering the extensions.
    *
    * @param muleContext a {@link MuleContext} needed for creating the manager
-   * @return an {@link ExtensionManagerAdapter}
-   * @throws InitialisationException if an error occurrs while initializing the manager.
+   * @return an {@link ExtensionManager}
+   * @throws InitialisationException if an error occurs while initializing the manager.
    */
   private ExtensionManager createExtensionManager(final MuleContext muleContext) throws InitialisationException {
-    try {
-      if (muleContext.getExtensionManager() != null) {
-        // TODO MULE-10982: implement a testing framework for XML based connectors, for now we workaround the current generation of the ExtensionManager if it was already created (see org.mule.test.operation.AbstractXmlExtensionMuleArtifactFunctionalTestCase)
-        return muleContext.getExtensionManager();
-      }
-      return extensionManagerAdapterFactory.createExtensionManager(muleContext);
-    } catch (Exception e) {
-      throw new InitialisationException(e, muleContext);
+    if (muleContext.getExtensionManager() != null) {
+      // TODO MULE-10982: implement a testing framework for XML based connectors, for now we workaround the current generation of the ExtensionManager if it was already created (see org.mule.test.operation.AbstractXmlExtensionMuleArtifactFunctionalTestCase)
+      return muleContext.getExtensionManager();
     }
+    ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
+
+    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+
+    return extensionManager;
   }
 }

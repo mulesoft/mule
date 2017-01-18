@@ -7,18 +7,23 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory.createPolicyTemplateCreationErrorMessage;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -49,12 +54,12 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     RegionClassLoader regionClassLoader = createRegionClassLoader();
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = createPolicyTemplateClassLoaderBuilder(regionClassLoader);
 
-    ArtifactClassLoader policyClassLoader = mock(ArtifactClassLoader.class);
+    MuleDeployableArtifactClassLoader policyClassLoader = mock(MuleDeployableArtifactClassLoader.class);
     when(policyClassLoader.getArtifactId()).thenReturn(POLICY_ID);
     when(policyTemplateClassLoaderBuilder.build()).thenReturn(policyClassLoader);
     when(classLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(policyTemplateClassLoaderBuilder);
 
-    PolicyTemplate policyTemplate = policyTemplateFactory.createArtifact(descriptor, regionClassLoader);
+    PolicyTemplate policyTemplate = policyTemplateFactory.createArtifact(createApplication(regionClassLoader), descriptor);
 
     assertThat(policyTemplate.getArtifactClassLoader(), is(policyClassLoader));
     assertThat(policyTemplate.getDescriptor(), is(descriptor));
@@ -75,16 +80,26 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     this.expectedException.expect(PolicyTemplateCreationException.class);
     this.expectedException.expectMessage(createPolicyTemplateCreationErrorMessage(POLICY_NAME));
     this.expectedException.expectCause(equalTo(exceptionCause));
-    policyTemplateFactory.createArtifact(descriptor, regionClassLoader);
+    policyTemplateFactory.createArtifact(createApplication(regionClassLoader), descriptor);
 
     // Checks that the region was not updated
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().size(), equalTo(0));
+  }
+
+  private Application createApplication(RegionClassLoader regionClassLoader) {
+    ApplicationDescriptor appDescriptor = mock(ApplicationDescriptor.class);
+    when(appDescriptor.getPlugins()).thenReturn(emptySet());
+    Application application = mock(Application.class);
+    when(application.getRegionClassLoader()).thenReturn(regionClassLoader);
+    when(application.getDescriptor()).thenReturn(appDescriptor);
+    return application;
   }
 
   private PolicyTemplateClassLoaderBuilder createPolicyTemplateClassLoaderBuilder(RegionClassLoader regionClassLoader) {
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = mock(PolicyTemplateClassLoaderBuilder.class);
     when(policyTemplateClassLoaderBuilder.setParentClassLoader(regionClassLoader)).thenReturn(policyTemplateClassLoaderBuilder);
     when(policyTemplateClassLoaderBuilder.setArtifactDescriptor(descriptor)).thenReturn(policyTemplateClassLoaderBuilder);
+    when(policyTemplateClassLoaderBuilder.addArtifactPluginDescriptors(anyVararg())).thenReturn(policyTemplateClassLoaderBuilder);
     return policyTemplateClassLoaderBuilder;
   }
 

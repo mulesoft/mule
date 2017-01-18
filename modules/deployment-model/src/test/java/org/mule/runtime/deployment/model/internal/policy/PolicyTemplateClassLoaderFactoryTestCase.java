@@ -7,7 +7,9 @@
 
 package org.mule.runtime.deployment.model.internal.policy;
 
+import static java.util.Collections.emptyList;
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -19,11 +21,14 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,7 +60,7 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
 
   @Test
   public void createsEmptyClassLoader() throws Exception {
-    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor);
+    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor, emptyList());
     final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
     assertThat(classLoader.getURLs(), equalTo(new URL[0]));
   }
@@ -64,12 +69,12 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
   public void validatesPolicyFolder() throws Exception {
     File fakePolicyFolder = new File("./fake/folder/for/test");
     descriptor.setRootFolder(fakePolicyFolder);
-    factory.create(POLICY_ID, null, descriptor);
+    factory.create(POLICY_ID, null, descriptor, emptyList());
   }
 
   @Test
   public void usesClassLoaderLookupPolicy() throws Exception {
-    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor);
+    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor, emptyList());
     final MuleArtifactClassLoader classLoader = (MuleArtifactClassLoader) artifactClassLoader.getClassLoader();
 
     final String className = "com.dummy.Foo";
@@ -81,5 +86,21 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
     }
 
     verify(lookupPolicy).getLookupStrategy(className);
+  }
+
+  @Test
+  public void createsClassLoaderWithPlugins() throws Exception {
+    ArtifactClassLoader pluginClassLoader1 = mock(ArtifactClassLoader.class);
+    ArtifactClassLoader pluginClassLoader2 = mock(ArtifactClassLoader.class);
+    List<ArtifactClassLoader> artifactPluginClassLoaders = new ArrayList<>();
+    artifactPluginClassLoaders.add(pluginClassLoader1);
+    artifactPluginClassLoaders.add(pluginClassLoader2);
+
+    final ArtifactClassLoader artifactClassLoader = factory.create(POLICY_ID, parentClassLoader, descriptor,
+                                                                   artifactPluginClassLoaders);
+    final MuleDeployableArtifactClassLoader classLoader =
+        (MuleDeployableArtifactClassLoader) artifactClassLoader.getClassLoader();
+
+    assertThat(classLoader.getArtifactPluginClassLoaders(), contains(pluginClassLoader1, pluginClassLoader2));
   }
 }

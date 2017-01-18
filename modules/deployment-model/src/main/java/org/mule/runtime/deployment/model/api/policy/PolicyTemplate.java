@@ -7,7 +7,10 @@
 
 package org.mule.runtime.deployment.model.api.policy;
 
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.Artifact;
+
+import java.util.List;
 
 /**
  * Represents a policy template artifact.
@@ -20,4 +23,9 @@ public interface PolicyTemplate extends Artifact<PolicyTemplateDescriptor> {
    * Disposes the artifact releasing any held resources
    */
   void dispose();
+
+  /**
+   * @return plugins deployed inside the policy template
+   */
+  List<ArtifactPlugin> getArtifactPlugins();
 }

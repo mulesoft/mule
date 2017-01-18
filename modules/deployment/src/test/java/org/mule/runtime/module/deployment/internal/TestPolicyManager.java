@@ -36,17 +36,20 @@ public class TestPolicyManager implements DeploymentListener {
   private final DeploymentService deploymentService;
   private final Map<String, List<AppPolicyParametrization>> registeredPolicies = new HashMap<>();
   private final List<PolicyTemplateDescriptor> policyTemplateDescriptors = new ArrayList<>();
-  private final PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory = new PolicyTemplateDescriptorFactory();
+  private final PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory;
 
   /**
    * Creates a new manager
    *
    * @param deploymentService service that deploys applications in the container. Non null.
+   * @param policyTemplateDescriptorFactory  creates descriptors for the policy templates. Non null
    */
-  public TestPolicyManager(DeploymentService deploymentService) {
+  public TestPolicyManager(DeploymentService deploymentService, PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory) {
     checkArgument(deploymentService != null, "deploymentService cannot be null");
+    checkArgument(policyTemplateDescriptorFactory != null, "policyTemplateDescriptorFactory cannot be null");
 
     this.deploymentService = deploymentService;
+    this.policyTemplateDescriptorFactory = policyTemplateDescriptorFactory;
   }
 
   @Override

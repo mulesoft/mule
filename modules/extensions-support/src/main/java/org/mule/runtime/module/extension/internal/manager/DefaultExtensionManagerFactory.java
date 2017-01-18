@@ -17,17 +17,17 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 
 /**
  * Default implementation of {@link ExtensionManagerFactory} which creates instances of
- * {@link DefaultExtensionManagerAdapterFactory} and sets them into the owning {@link MuleContext}
+ * {@link DefaultExtensionManager} and sets them into the owning {@link MuleContext}
  *
  * @since 4.0
  */
-public class DefaultExtensionManagerAdapterFactory implements ExtensionManagerFactory {
+public class DefaultExtensionManagerFactory implements ExtensionManagerFactory {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ExtensionManager createExtensionManager(MuleContext muleContext) {
+  public ExtensionManager create(MuleContext muleContext) {
     ExtensionManager extensionManager = new DefaultExtensionManager();
     ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
     try {

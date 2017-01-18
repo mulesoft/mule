@@ -121,7 +121,8 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                           new DefaultPolicyTemplateFactory(policyTemplateClassLoaderBuilderFactory),
                                           new DefaultPolicyInstanceProviderFactory(
                                                                                    serviceRepository,
-                                                                                   classLoaderRepository));
+                                                                                   classLoaderRepository,
+                                                                                   extensionModelLoaderRepository));
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),

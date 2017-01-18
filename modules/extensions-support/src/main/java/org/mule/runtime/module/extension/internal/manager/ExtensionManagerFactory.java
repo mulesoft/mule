@@ -22,5 +22,5 @@ public interface ExtensionManagerFactory {
    * @param muleContext the owning {@link MuleContext}
    * @return a non {@code null} {@link ExtensionManager}
    */
-  ExtensionManager createExtensionManager(MuleContext muleContext);
+  ExtensionManager create(MuleContext muleContext);
 }

@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROV
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
+import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,13 +36,14 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
 import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
-import org.mule.runtime.module.deployment.impl.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -93,6 +95,7 @@ public class ArtifactContextBuilder {
   private ClassLoaderRepository classLoaderRepository;
   private PolicyProvider policyProvider;
   private List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
+  private ExtensionManagerFactory extensionManagerFactory;
 
   private ArtifactContextBuilder() {}
 
@@ -326,7 +329,13 @@ public class ArtifactContextBuilder {
         List<ConfigurationBuilder> builders = new LinkedList<>();
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
-        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins, extensionModelLoaderRepository));
+        if (extensionManagerFactory == null) {
+          extensionManagerFactory =
+              new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
+                                                  new DefaultExtensionManagerFactory());
+        }
+        builders.add(new ArtifactExtensionManagerConfigurationBuilder(artifactPlugins,
+                                                                      extensionManagerFactory));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         ArtifactConfigurationProcessor artifactConfigurationProcessor = ArtifactConfigurationProcessor.discover();
         AtomicReference<ArtifactContext> artifactContext = new AtomicReference<>();
@@ -407,5 +416,11 @@ public class ArtifactContextBuilder {
     }
     artifactProperties.put(APP_NAME_PROPERTY, artifactName);
     return new SimpleConfigurationBuilder(artifactProperties);
+  }
+
+  public ArtifactContextBuilder setExtensionManagerFactory(ExtensionManagerFactory extensionManagerFactory) {
+    this.extensionManagerFactory = extensionManagerFactory;
+
+    return this;
   }
 }

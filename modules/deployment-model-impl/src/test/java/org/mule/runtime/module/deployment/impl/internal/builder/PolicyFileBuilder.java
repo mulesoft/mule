@@ -94,6 +94,20 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
   }
 
   /**
+   * Adds an application plugin to the policy template.
+   *
+   * @param plugin builder defining the plugin. Non null.
+   * @return the same builder instance
+   */
+  public PolicyFileBuilder containingPlugin(ArtifactPluginFileBuilder plugin) {
+    checkImmutable();
+    checkArgument(plugin != null, "Plugin cannot be null");
+    this.plugins.add(plugin);
+
+    return this;
+  }
+
+  /**
    * Adds a dependency against another plugin
    *
    * @param pluginName name of the plugin to be dependent. Non empty.

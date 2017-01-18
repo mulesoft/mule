@@ -7,11 +7,15 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Default implementation of {@link PolicyTemplate}
@@ -21,6 +25,7 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
   private final String artifactId;
   private final PolicyTemplateDescriptor descriptor;
   private final ArtifactClassLoader policyClassLoader;
+  private final List<ArtifactPlugin> artifactPlugins;
 
   /**
    * Creates a new policy template artifact
@@ -28,11 +33,19 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
    * @param artifactId artifact unique ID. Non empty.
    * @param descriptor describes the policy to create. Non null.
    * @param policyClassLoader classloader to use on this policy. Non null.
+   * @param artifactPlugins artifact plugins deployed inside the policy. Non null.
    */
-  public DefaultPolicyTemplate(String artifactId, PolicyTemplateDescriptor descriptor, ArtifactClassLoader policyClassLoader) {
+  public DefaultPolicyTemplate(String artifactId, PolicyTemplateDescriptor descriptor, ArtifactClassLoader policyClassLoader,
+                               List<ArtifactPlugin> artifactPlugins) {
+    checkArgument(!isEmpty(artifactId), "artifactId cannot be empty");
+    checkArgument(descriptor != null, "descriptor cannot be null");
+    checkArgument(policyClassLoader != null, "policyClassLoader cannot be null");
+    checkArgument(artifactPlugins != null, "artifactPlugins cannot be null");
+
     this.artifactId = artifactId;
     this.descriptor = descriptor;
     this.policyClassLoader = policyClassLoader;
+    this.artifactPlugins = artifactPlugins;
   }
 
   @Override
@@ -65,4 +78,7 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
     policyClassLoader.dispose();
   }
 
+  public List<ArtifactPlugin> getArtifactPlugins() {
+    return artifactPlugins;
+  }
 }

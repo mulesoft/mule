@@ -11,13 +11,14 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
 /**
  * Creates {@link PolicyTemplateClassLoaderBuilder} for application artifacts.
  */
 public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements PolicyTemplateClassLoaderBuilderFactory {
 
-  private final ArtifactClassLoaderFactory artifactClassLoaderFactory;
+  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
@@ -31,7 +32,7 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
    * @param artifactPluginClassLoaderFactory factory to create class loaders for each used plugin. Non be not null.
    * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
-  public ApplicationPolicyTemplateClassLoaderBuilderFactory(ArtifactClassLoaderFactory artifactClassLoaderFactory,
+  public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                                             ArtifactPluginRepository artifactPluginRepository,
                                                             ArtifactClassLoaderFactory artifactPluginClassLoaderFactory,
                                                             PluginDependenciesResolver pluginDependenciesResolver) {
