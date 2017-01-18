@@ -61,9 +61,9 @@ public final class DefaultEventContext implements EventContext, Serializable {
 
   /**
    * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
-   * has has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
-   * typically used in flow-ref type scenarios where a the referenced Flow should complete the child context, but should not
-   * complete the parent context
+   * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
+   * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
+   * not complete the parent context
    * 
    * @param parent the parent context
    * @return a new child context

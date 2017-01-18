@@ -101,7 +101,7 @@ public class Flow extends AbstractPipeline implements Processor {
 
     // TODO MULE-10013
     // Create new event for current flow with current flowConstruct, replyToHandler etc.
-    event = new DefaultEventBuilder(DefaultEventContext.child(event.getContext()), event).flow(this)
+    event = Event.builder(DefaultEventContext.child(event.getContext()), event).flow(this)
         .replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
     resetRequestContextEvent(event);
     return event;
@@ -112,7 +112,7 @@ public class Flow extends AbstractPipeline implements Processor {
       Optional<Error> errorOptional = result.getError();
       // TODO MULE-10013
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-      result = new DefaultEventBuilder(original.getContext(), result).flow(original.getFlowConstruct())
+      result = Event.builder(original.getContext(), result).flow(original.getFlowConstruct())
           .replyToHandler(original.getReplyToHandler())
           .replyToDestination(original.getReplyToDestination())
           .error(errorOptional.orElse(null)).build();
