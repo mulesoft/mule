@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestRep
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
@@ -79,10 +81,16 @@ public class Flow extends AbstractPipeline implements Processor {
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).concatMap(event -> just(event)
-        .map(request -> createMuleEventForCurrentFlow(request, request.getReplyToDestination(), request.getReplyToHandler()))
-        .transform(processFlowFunction())
-        .map(response -> createReturnEventForParentFlowConstruct(response, event)));
+    return from(publisher).flatMap(event -> {
+      Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+      just(request).transform(processFlowFunction()).subscribe();
+      return Mono.from(request.getContext())
+          .map(r -> createReturnEventForParentFlowConstruct(r, event))
+          .otherwise(MessagingException.class, me -> {
+            me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
+            return error(me);
+          });
+    });
   }
 
   private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
