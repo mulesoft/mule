@@ -6,11 +6,16 @@
  */
 package org.mule.service.scheduler.internal.executor;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -26,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -182,7 +188,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
     LinkedList<Thread> submitters = this.execute(tasks);
     assertFalse(submitters.isEmpty());
 
-    assertFalse(executor.awaitTermination(5000, TimeUnit.MILLISECONDS));
+    assertFalse(executor.awaitTermination(5000, MILLISECONDS));
     assertSame(waiting, policy.lastRejectedRunnable());
     assertEquals(0, SleepyTask.activeTasks.get());
   }
@@ -193,7 +199,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
 
     // set a really short wait interval
     long failureInterval = 100L;
-    LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(failureInterval, TimeUnit.MILLISECONDS);
+    LastRejectedWaitPolicy policy = new LastRejectedWaitPolicy(failureInterval, MILLISECONDS);
     executor.setRejectedExecutionHandler(policy);
 
     // create tasks
@@ -215,17 +221,17 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
 
     // make sure there was one failure
     LinkedList<Map<Thread, Throwable>> exceptions = threadGroup.collectedExceptions();
-    assertEquals(1, exceptions.size());
+    assertThat(exceptions, hasSize(1));
 
     // make sure the failed task was the right one
     Map.Entry<Thread, Throwable> threadFailure = exceptions.getFirst().entrySet().iterator().next();
-    assertEquals(submitters.getLast(), threadFailure.getKey());
-    assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
+    assertThat(threadFailure.getKey(), is(submitters.getLast()));
+    assertThat(threadFailure.getValue(), instanceOf(SchedulerBusyException.class));
 
     executor.shutdown();
-    assertTrue(executor.awaitTermination(2500, TimeUnit.MILLISECONDS));
-    assertSame(failedTask, policy.lastRejectedRunnable());
-    assertEquals(0, SleepyTask.activeTasks.get());
+    assertThat(executor.awaitTermination(2500, MILLISECONDS), is(true));
+    assertThat(policy.lastRejectedRunnable(), Matchers.sameInstance(failedTask));
+    assertThat(SleepyTask.activeTasks.get(), is(0));
   }
 }
 

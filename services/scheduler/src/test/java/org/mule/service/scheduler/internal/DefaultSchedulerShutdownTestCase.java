@@ -31,22 +31,22 @@ import ru.yandex.qatools.allure.annotations.Features;
 @Features("Scheduler Shutdown")
 public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCase {
 
-  private ScheduledExecutorService executor1;
-  private ScheduledExecutorService executor2;
+  private ScheduledExecutorService executor;
+  private ScheduledExecutorService otherExecutor;
 
   @Override
   public void before() throws SchedulerException {
     super.before();
-    executor1 = createExecutor();
-    executor2 = createExecutor();
+    executor = createExecutor();
+    otherExecutor = createExecutor();
   }
 
   @Override
   public void after() throws SchedulerException, InterruptedException {
-    executor1.shutdownNow();
-    executor2.shutdownNow();
-    executor1.awaitTermination(5, SECONDS);
-    executor2.awaitTermination(5, SECONDS);
+    executor.shutdownNow();
+    otherExecutor.shutdownNow();
+    executor.awaitTermination(5, SECONDS);
+    otherExecutor.awaitTermination(5, SECONDS);
     super.after();
   }
 
@@ -55,14 +55,14 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   public void shutdownWhileRunningTasksFromDifferentSources() throws InterruptedException, ExecutionException, TimeoutException {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    final Future<Boolean> result1 = executor1.submit(() -> {
+    final Future<Boolean> result1 = executor.submit(() -> {
       return awaitLatch(latch);
     });
-    final Future<Boolean> result2 = executor2.submit(() -> {
+    final Future<Boolean> result2 = otherExecutor.submit(() -> {
       return awaitLatch(latch);
     });
 
-    executor2.shutdown();
+    otherExecutor.shutdown();
 
     latch.countDown();
 
@@ -77,15 +77,15 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
       throws InterruptedException, ExecutionException, TimeoutException {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    final Future<Boolean> result1 = executor1.submit(() -> {
+    final Future<Boolean> result1 = executor.submit(() -> {
       return awaitLatch(latch);
     });
     final Runnable task2 = () -> {
       awaitLatch(latch);
     };
-    executor2.submit(task2);
+    otherExecutor.submit(task2);
 
-    final List<Runnable> notStartedTasks = executor2.shutdownNow();
+    final List<Runnable> notStartedTasks = otherExecutor.shutdownNow();
 
     latch.countDown();
 
@@ -97,19 +97,19 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdown() is rejected")
   public void submitAfterShutdownSameExecutor() throws InterruptedException, ExecutionException {
-    executor1.shutdown();
+    executor.shutdown();
 
-    assertRejected(executor1, SUBMIT_EMPTY_RUNNABLE);
+    assertRejected(executor, SUBMIT_EMPTY_RUNNABLE);
   }
 
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdown() on another Scheduler is NOT rejected")
   public void submitAfterShutdownOtherExecutor() throws InterruptedException, ExecutionException, TimeoutException {
-    executor1.shutdown();
+    executor.shutdown();
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    final Future<Boolean> result = executor2.submit(() -> {
+    final Future<Boolean> result = otherExecutor.submit(() -> {
       return awaitLatch(latch);
     });
 
@@ -121,21 +121,21 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdownNow() is rejected")
   public void submitAfterShutdownNowSameExecutor() throws InterruptedException, ExecutionException {
-    final List<Runnable> notStartedTasks = executor1.shutdownNow();
+    final List<Runnable> notStartedTasks = executor.shutdownNow();
 
     assertThat(notStartedTasks, is(empty()));
 
-    assertRejected(executor1, SUBMIT_EMPTY_RUNNABLE);
+    assertRejected(executor, SUBMIT_EMPTY_RUNNABLE);
   }
 
   @Test
   @Description("Tests that a task submitted to a Scheduler after calling shutdownNow() on another Scheduler is NOT rejected")
   public void submitAfterShutdownNowOtherExecutor() throws InterruptedException, ExecutionException, TimeoutException {
-    executor1.shutdownNow();
+    executor.shutdownNow();
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    final Future<Boolean> result = executor2.submit(() -> {
+    final Future<Boolean> result = otherExecutor.submit(() -> {
       return awaitLatch(latch);
     });
 
@@ -149,7 +149,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
   public void submitAfterShutdownSharedExecutor() throws InterruptedException, ExecutionException {
     sharedExecutor.shutdown();
 
-    assertRejected(executor1, SUBMIT_EMPTY_RUNNABLE);
+    assertRejected(executor, SUBMIT_EMPTY_RUNNABLE);
   }
 
   @Test
@@ -159,7 +159,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
 
     assertThat(notStartedTasks, is(empty()));
 
-    assertRejected(executor1, SUBMIT_EMPTY_RUNNABLE);
+    assertRejected(executor, SUBMIT_EMPTY_RUNNABLE);
   }
 
   @Test
@@ -169,7 +169,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
     final CountDownLatch triggeredLatch = new CountDownLatch(1);
     final CountDownLatch interruptionLatch = new CountDownLatch(1);
 
-    final Future<Boolean> result = executor1.submit(() -> {
+    final Future<Boolean> result = executor.submit(() -> {
       triggeredLatch.countDown();
       final boolean awaited = awaitLatch(latch);
       assertThat(Thread.interrupted(), is(true));
@@ -178,7 +178,7 @@ public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCa
     });
 
     triggeredLatch.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
-    final List<Runnable> notStartedTasks = executor1.shutdownNow();
+    final List<Runnable> notStartedTasks = executor.shutdownNow();
     interruptionLatch.await(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
 
     assertThat(notStartedTasks, is(empty()));

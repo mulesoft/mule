@@ -78,9 +78,10 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private final ThreadGroup computationGroup = new ThreadGroup(schedulerGroup, COMPUTATION_THREADS_NAME);
   private final ThreadGroup timerGroup = new ThreadGroup(schedulerGroup, TIMER_THREADS_NAME);
   private final ThreadGroup customGroup = new ThreadGroup(schedulerGroup, CUSTOM_THREADS_NAME);
+  private final ThreadGroup customWaitGroup = new ThreadGroup(customGroup, CUSTOM_THREADS_NAME);
 
   private final RejectedExecutionHandler byCallerThreadGroupPolicy =
-      new ByCallerThreadGroupPolicy(new HashSet<>(asList(ioGroup, customGroup)));
+      new ByCallerThreadGroupPolicy(new HashSet<>(asList(ioGroup, customWaitGroup)));
 
   private ThreadPoolExecutor cpuLightExecutor;
   private ThreadPoolExecutor ioExecutor;
@@ -130,6 +131,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config) {
     checkStarted();
+    if (config.getWaitDispatchingToBusyScheduler() != null) {
+      throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
+    }
     final String schedulerName = resolveSchedulerName(config, CPU_LIGHT_THREADS_NAME);
     Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
@@ -146,6 +150,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler ioScheduler(SchedulerConfig config) {
     checkStarted();
+    if (config.getWaitDispatchingToBusyScheduler() != null) {
+      throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
+    }
     final String schedulerName = resolveSchedulerName(config, IO_THREADS_NAME);
     Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
@@ -162,6 +169,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     checkStarted();
+    if (config.getWaitDispatchingToBusyScheduler() != null) {
+      throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
+    }
     final String schedulerName = resolveSchedulerName(config, COMPUTATION_THREADS_NAME);
     Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
@@ -193,7 +203,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     final ThreadPoolExecutor executor =
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
                                new SynchronousQueue<Runnable>(),
-                               new SchedulerThreadFactory(customGroup,
+                               new SchedulerThreadFactory(resolveThreadGroupForCustomScheduler(config),
                                                           "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"),
                                byCallerThreadGroupPolicy);
 
@@ -213,7 +223,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     final ThreadPoolExecutor executor =
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
                                new LinkedBlockingQueue<Runnable>(queueSize),
-                               new SchedulerThreadFactory(customGroup,
+                               new SchedulerThreadFactory(resolveThreadGroupForCustomScheduler(config),
                                                           "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"),
                                byCallerThreadGroupPolicy);
 
@@ -223,6 +233,14 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     customSchedulersExecutors.add(customScheduler);
     activeSchedulers.add(customScheduler);
     return customScheduler;
+  }
+
+  private ThreadGroup resolveThreadGroupForCustomScheduler(SchedulerConfig config) {
+    if (config.getWaitDispatchingToBusyScheduler() != null && config.getWaitDispatchingToBusyScheduler()) {
+      return customWaitGroup;
+    } else {
+      return customGroup;
+    }
   }
 
   private void checkStarted() {

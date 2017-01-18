@@ -9,7 +9,7 @@ package org.mule.service.scheduler.internal.executor;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableSet;
 
-import org.mule.runtime.core.api.scheduler.exception.SchedulerBusyException;
+import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 
 import java.util.Set;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -51,6 +51,7 @@ public final class ByCallerThreadGroupPolicy implements RejectedExecutionHandler
   @Override
   public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
     if (currentThread().getThreadGroup() != null && waitGroups.contains(currentThread().getThreadGroup())) {
+      // MULE-11460 Make CPU-intensive pool a ForkJoinPool - keep the parallelism when waiting.
       wait.rejectedExecution(r, executor);
     } else {
       abort.rejectedExecution(r, executor);

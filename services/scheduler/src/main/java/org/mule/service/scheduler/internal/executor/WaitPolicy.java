@@ -6,7 +6,11 @@
  */
 package org.mule.service.scheduler.internal.executor;
 
+import static java.lang.Long.MAX_VALUE;
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -18,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  * the jsr166 repository at:
  * <a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java"></a>.
  */
-// @Immutable
 public class WaitPolicy implements RejectedExecutionHandler {
 
   private final long time;
@@ -29,7 +32,7 @@ public class WaitPolicy implements RejectedExecutionHandler {
    */
   public WaitPolicy() {
     // effectively waits forever
-    this(Long.MAX_VALUE, TimeUnit.SECONDS);
+    this(MAX_VALUE, SECONDS);
   }
 
   /**
@@ -38,7 +41,7 @@ public class WaitPolicy implements RejectedExecutionHandler {
    */
   public WaitPolicy(long time, TimeUnit timeUnit) {
     super();
-    this.time = (time < 0 ? Long.MAX_VALUE : time);
+    this.time = (time < 0 ? MAX_VALUE : time);
     this.timeUnit = timeUnit;
   }
 
@@ -49,8 +52,7 @@ public class WaitPolicy implements RejectedExecutionHandler {
       if (e.isShutdown()) {
         throw new RejectedExecutionException("ThreadPoolExecutor is already shut down");
       } else if (!e.getQueue().offer(r, time, timeUnit)) {
-        String message = format("Scheduler did not accept within %1d %2s", time, timeUnit);
-        throw new RejectedExecutionException(message);
+        throw new SchedulerBusyException(format("Scheduler did not accept within %1d %2s", time, timeUnit));
       }
     } catch (InterruptedException ie) {
       Thread.currentThread().interrupt();

@@ -12,6 +12,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * <b>This is a copy of the same class in the scheduler service. It is copied here instead of reused from mule-core so it isn't
+ * over-exposed from a classlaoding pespective.</b>
+ * <p>
  * A handler for unexecutable tasks that waits until the task can be submitted for execution or times out. Generously snipped from
  * the jsr166 repository at:
  * <a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java"></a>.
@@ -40,12 +43,11 @@ public class WaitPolicy implements RejectedExecutionHandler {
     this.timeUnit = timeUnit;
   }
 
+  @Override
   @SuppressWarnings("boxing")
   public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
     try {
-      if (e.isShutdown()) {
-        throw new RejectedExecutionException("ThreadPoolExecutor is already shut down");
-      } else if (!e.getQueue().offer(r, time, timeUnit)) {
+      if (!e.getQueue().offer(r, time, timeUnit)) {
         String message = String.format("ThreadPoolExecutor did not accept within %1d %2s", time, timeUnit);
         throw new RejectedExecutionException(message);
       }

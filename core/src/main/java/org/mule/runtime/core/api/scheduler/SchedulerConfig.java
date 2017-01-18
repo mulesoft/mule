@@ -24,6 +24,7 @@ public class SchedulerConfig {
 
   private Integer maxConcurrentTasks;
   private String schedulerName;
+  private Boolean waitDispatchingToBusyScheduler;
 
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
@@ -62,5 +63,14 @@ public class SchedulerConfig {
    */
   public String getSchedulerName() {
     return schedulerName;
+  }
+
+  public SchedulerConfig withWaitDispatchingToBusyScheduler() {
+    this.waitDispatchingToBusyScheduler = true;
+    return this;
+  }
+
+  public Boolean getWaitDispatchingToBusyScheduler() {
+    return waitDispatchingToBusyScheduler;
   }
 }
