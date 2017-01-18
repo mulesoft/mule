@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
@@ -17,6 +18,7 @@ import static org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
@@ -31,8 +33,11 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.api.meta.model.ExternalLibraryModel.ExternalLibraryModelBuilder;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.DeclaresExternalLibraries;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
@@ -43,6 +48,8 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
+import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -153,6 +160,7 @@ public final class JavaModelLoaderDelegate {
             .describedAs(extension.description())
             .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
+    parseExternalLibs(extensionElement, declarer);
     addExceptionEnricher(extensionElement, declarer);
 
     configLoaderDelegate.declareConfigurations(declarer, extensionElement);
@@ -166,6 +174,28 @@ public final class JavaModelLoaderDelegate {
     }
 
     return declarer;
+  }
+
+  protected void parseExternalLibs(WithAnnotations withAnnotations, DeclaresExternalLibraries declarer) {
+    Optional<ExternalLibs> externalLibs = withAnnotations.getAnnotation(ExternalLibs.class);
+    if (externalLibs.isPresent()) {
+      stream(externalLibs.get().value()).forEach(lib -> parseExternalLib(declarer, lib));
+    } else {
+      withAnnotations.getAnnotation(ExternalLib.class).ifPresent(lib -> parseExternalLib(declarer, lib));
+    }
+  }
+
+  private void parseExternalLib(DeclaresExternalLibraries declarer, ExternalLib externalLibAnnotation) {
+
+    ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
+        .withName(externalLibAnnotation.name())
+        .withDescription(externalLibAnnotation.description());
+
+
+    ifNotBlank(externalLibAnnotation.fileName(), builder::withFileName);
+    ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
+
+    declarer.withExternalLibrary(builder.build());
   }
 
   <M extends WithAnnotations> HasModelProperties addExceptionEnricher(M model, HasModelProperties declarer) {

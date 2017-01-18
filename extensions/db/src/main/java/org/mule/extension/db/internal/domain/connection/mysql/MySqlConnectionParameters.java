@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public final class MySqlConnectionParameters extends BaseDbConnectionParameters implements DataSourceConfig {
 
-  private static final String MYSQL_DRIVER_CLASS = "com.mysql.jdbc.Driver";
+  static final String MYSQL_DRIVER_CLASS = "com.mysql.jdbc.Driver";
   private static final String MY_SQL_PREFIX = "jdbc:mysql://";
 
   /**

@@ -24,7 +24,7 @@ import java.util.Map;
 public final class DerbyConnectionParameters extends BaseDbConnectionParameters implements DataSourceConfig {
 
   private static final String JDBC_URL_PREFIX = "jdbc:derby";
-  private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
+  static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
 
   /**
    * Name of the database

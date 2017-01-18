@@ -8,6 +8,7 @@ package org.mule.runtime.core.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,7 +94,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
   /**
    * Convert a byte array to a hexadecimal string.
    *
-   * @param bytes The bytes to format.
+   * @param bytes     The bytes to format.
    * @param uppercase When <code>true</code> creates uppercase hex characters instead of lowercase (the default).
    * @return A hexadecimal representation of the specified bytes.
    */
@@ -118,8 +119,8 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
   /**
    * Matches the given value to the given pattern. Then returns the group at matchIndex.
    *
-   * @param pattern the pattern to use as regexp
-   * @param value the value to evaluate
+   * @param pattern    the pattern to use as regexp
+   * @param value      the value to evaluate
    * @param matchIndex the group index to be returned
    * @return the value of the group at the given index. <code>null</code> if no match found
    * @throws IllegalArgumentException if pattern or value are null.
@@ -134,6 +135,19 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
 
     return null;
+  }
+
+  /**
+   * If {@code value} is not {@link #isBlank(String)}, then it feeds the value
+   * into the {@code consumer}
+   *
+   * @param value    a value
+   * @param consumer a String {@link Consumer}
+   */
+  public static void ifNotBlank(String value, Consumer<String> consumer) {
+    if (!isBlank(value)) {
+      consumer.accept(value);
+    }
   }
 
   // lookup tables needed for toHexString(byte[], boolean)

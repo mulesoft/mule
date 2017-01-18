@@ -23,12 +23,10 @@ import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -93,7 +91,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -572,13 +569,5 @@ public class MuleExtensionUtils {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, getProductVersion());
     return new JavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), params);
-  }
-
-  private static class NamedObjectComparator implements Comparator<NamedObject> {
-
-    @Override
-    public int compare(NamedObject o1, NamedObject o2) {
-      return o1.getName().compareTo(o2.getName());
-    }
   }
 }

@@ -68,6 +68,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                                                                         .getClassLoader())))
         .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaringClass()));
 
+    loader.parseExternalLibs(configurationType, configurationDeclarer);
     loader.declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters(),
                                        new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration()));
 

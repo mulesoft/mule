@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
@@ -65,10 +66,17 @@ import javax.inject.Inject;
 @Export(classes = {HeisenbergException.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
+@ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
+    fileName = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME, requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME)
 @ErrorTypes(HeisenbergErrors.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public static final String HEISENBERG = "Heisenberg";
+  public static final String HEISENBERG_LIB_NAME = "Heisenberg.so";
+  public static final String HEISENBERG_LIB_DESCRIPTION = "Native Heisenberg support";
+  public static final String HEISENBERG_LIB_FILE_NAME = "heisenberg.so";
+  public static final String HEISENBERG_LIB_CLASS_NAME = "org.heisenberg.HeisenbergJNI";
+
   public static final String AGE = "50";
   public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
   public static final String RICIN_GROUP_NAME = "Dangerous-Ricin";
