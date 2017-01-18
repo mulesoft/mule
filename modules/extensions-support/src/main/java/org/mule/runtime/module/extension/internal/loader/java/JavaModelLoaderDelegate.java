@@ -18,6 +18,7 @@ import static org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
@@ -45,7 +46,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
@@ -99,7 +99,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -197,12 +196,6 @@ public final class JavaModelLoaderDelegate {
     ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
 
     declarer.withExternalLibrary(builder.build());
-  }
-
-  private void ifNotBlank(String value, Consumer<String> consumer) {
-    if (!StringUtils.isBlank(value)) {
-      consumer.accept(value);
-    }
   }
 
   <M extends WithAnnotations> HasModelProperties addExceptionEnricher(M model, HasModelProperties declarer) {
