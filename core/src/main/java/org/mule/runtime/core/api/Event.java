@@ -284,7 +284,7 @@ public interface Event extends Serializable {
      * @param message the message instance.
      * @return the builder instance
      */
-    Builder message(InternalMessage message);
+    Builder message(Message message);
 
     /**
      * Set a map of variables. Any existing variables added to the builder will be removed.

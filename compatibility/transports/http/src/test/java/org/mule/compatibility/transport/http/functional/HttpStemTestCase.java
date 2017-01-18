@@ -8,6 +8,9 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PROPERTY;
 
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
@@ -46,10 +49,10 @@ public class HttpStemTestCase extends CompatibilityFunctionalTestCase {
     assertNotNull(testComponent);
 
     EventCallback callback = (context, component, muleContext) -> {
-      InternalMessage msg = context.getMessage();
-      assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-      assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-      assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
+      InternalMessage msg = (InternalMessage) context.getMessage();
+      assertEquals(requestPath, msg.getInboundProperty(HTTP_REQUEST_PROPERTY));
+      assertEquals(requestPath, msg.getInboundProperty(HTTP_REQUEST_PATH_PROPERTY));
+      assertEquals(contextPath, msg.getInboundProperty(HTTP_CONTEXT_PATH_PROPERTY));
     };
 
     testComponent.setEventCallback(callback);

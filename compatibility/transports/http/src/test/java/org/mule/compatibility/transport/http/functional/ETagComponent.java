@@ -6,11 +6,14 @@
  */
 package org.mule.compatibility.transport.http.functional;
 
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.compatibility.transport.http.HttpConstants;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_ETAG;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_IF_NONE_MATCH;
+import static org.mule.compatibility.transport.http.HttpConstants.SC_NOT_MODIFIED;
+
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 
 public class ETagComponent implements Callable {
@@ -19,16 +22,16 @@ public class ETagComponent implements Callable {
 
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
-    InternalMessage message = eventContext.getMessage();
+    InternalMessage message = (InternalMessage) eventContext.getMessage();
 
     InternalMessage.Builder messageBuilder = InternalMessage.builder(message);
-    String etag = message.getOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH);
+    String etag = message.getOutboundProperty(HEADER_IF_NONE_MATCH);
     if ((etag != null) && etag.equals(ETAG_VALUE)) {
       messageBuilder.payload(StringUtils.EMPTY);
-      messageBuilder.addOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_MODIFIED);
+      messageBuilder.addOutboundProperty(HTTP_STATUS_PROPERTY, SC_NOT_MODIFIED);
     }
 
-    messageBuilder.addOutboundProperty(HttpConstants.HEADER_ETAG, ETAG_VALUE);
+    messageBuilder.addOutboundProperty(HEADER_ETAG, ETAG_VALUE);
     return messageBuilder.build();
   }
 }

@@ -41,8 +41,9 @@ public class HttpAttachmentsFunctionalTestCase extends CompatibilityFunctionalTe
     ftc.setEventCallback((context, component, muleContext) -> {
       assertThat(context.getMessage().getPayload().getDataType().getMediaType().toRfcString(),
                  is("application/octet-stream; charset=ISO-8859-1"));
-      assertEquals("We should have an attachment", 1, context.getMessage().getInboundAttachmentNames().size());
-      DataHandler dh = context.getMessage().getInboundAttachment("attach1");
+      assertEquals("We should have an attachment", 1,
+                   ((InternalMessage) context.getMessage()).getInboundAttachmentNames().size());
+      DataHandler dh = ((InternalMessage) context.getMessage()).getInboundAttachment("attach1");
       assertNotNull("DataHandler with name 'attach1' should not be null", dh);
       assertEquals("We should have an attachment with foo", "foo", IOUtils.toString(dh.getInputStream()));
       assertEquals("text/plain; charset=ISO-8859-1", dh.getContentType());

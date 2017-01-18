@@ -123,7 +123,7 @@ public class VmExceptionStrategyOneWayTestCase extends CompatibilityFunctionalTe
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
       deadLetterQueueLatch.release();
-      InternalMessage message = eventContext.getMessage();
+      InternalMessage message = (InternalMessage) eventContext.getMessage();
       assertThat(message, notNullValue());
       assertThat(message.getExceptionPayload(), nullValue());
       assertThat(message.getPayload().getValue(), instanceOf(ExceptionMessage.class));

@@ -22,6 +22,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -51,7 +52,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTes
   private static final String SOAP_RESPONSE =
       "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:onReceiveResponse xmlns:ns1=\"http://functional.functional.mule.org/\"><ns1:return xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xsd:string\">Test String Received</ns1:return></ns1:onReceiveResponse></soap:Body></soap:Envelope>";
 
-  private List<InternalMessage> notificationMsgList = new ArrayList<>();
+  private List<Message> notificationMsgList = new ArrayList<>();
   private Latch latch = new Latch();
 
   @Rule

@@ -9,12 +9,14 @@ package org.mule.compatibility.transport.file;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -41,7 +43,7 @@ public class FileComparatorTestCase extends CompatibilityFunctionalTestCase {
     final CountDownLatch countDown = new CountDownLatch(2);
     EventCallback callback = (context, component, muleContext) -> {
       int index = (int) countDown.getCount() - 1;
-      assertEquals(FILE_NAMES[index], context.getMessage().getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
+      assertEquals(FILE_NAMES[index], ((InternalMessage) context.getMessage()).getInboundProperty(PROPERTY_ORIGINAL_FILENAME));
       countDown.countDown();
     };
 

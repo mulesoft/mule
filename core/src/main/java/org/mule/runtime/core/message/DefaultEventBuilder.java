@@ -12,6 +12,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -51,7 +52,7 @@ public class DefaultEventBuilder implements Event.Builder {
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
 
   private EventContext context;
-  private InternalMessage message;
+  private Message message;
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
   private Error error;
   private FlowConstruct flow;
@@ -93,7 +94,7 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   @Override
-  public Event.Builder message(InternalMessage message) {
+  public Event.Builder message(Message message) {
     this.message = message;
     this.modified = true;
     return this;
@@ -190,7 +191,8 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, message, flowVariables, flow, session, replyToDestination, replyToHandler,
+      return new EventImplementation(context, (InternalMessage) message, flowVariables, flow, session, replyToDestination,
+                                     replyToHandler,
                                      flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
     }
   }

@@ -15,7 +15,7 @@ import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
@@ -44,13 +44,13 @@ public class HeaderPropertiesTestCase extends AbstractCxfOverHttpExtensionTestCa
     assertNotNull(testComponent);
 
     EventCallback callback = (context, component, muleContext) -> {
-      InternalMessage msg = context.getMessage();
+      Message msg = context.getMessage();
       // TODO MULE-9857 Make message properties case sensitive
       assertThat(((HttpAttributes) msg.getAttributes()).getHeaders().get("FOO".toLowerCase()), is("BAR"));
     };
     testComponent.setEventCallback(callback);
 
-    InternalMessage result = flowRunner("clientFlow").withPayload("Dan").withOutboundProperty("operation", "greetMe")
+    Message result = flowRunner("clientFlow").withPayload("Dan").withOutboundProperty("operation", "greetMe")
         .withOutboundProperty("FOO", "BAR").run().getMessage();
 
     assertEquals("Hello Dan Received", result.getPayload().getValue());

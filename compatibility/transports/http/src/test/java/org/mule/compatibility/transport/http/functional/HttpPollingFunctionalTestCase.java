@@ -35,7 +35,7 @@ public class HttpPollingFunctionalTestCase extends CompatibilityFunctionalTestCa
     ftc.setEventCallback((context, component, muleContext) -> assertEquals(
                                                                            "The Accept header should be set on the incoming message",
                                                                            "application/xml",
-                                                                           context.getMessage()
+                                                                           ((InternalMessage) context.getMessage())
                                                                                .<String>getInboundProperty("Accept")));
 
     MuleClient client = muleContext.getClient();

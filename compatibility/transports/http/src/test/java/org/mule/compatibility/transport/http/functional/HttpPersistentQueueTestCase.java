@@ -10,6 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONNECTION;
+import static org.mule.compatibility.transport.http.HttpConstants.HEADER_KEEP_ALIVE;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
@@ -90,7 +92,7 @@ public class HttpPersistentQueueTestCase extends CompatibilityFunctionalTestCase
 
     @Override
     public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
-      InternalMessage message = context.getMessage();
+      InternalMessage message = (InternalMessage) context.getMessage();
 
       Object httpMethod = message.getInboundProperty("http.method");
       if (HttpConstants.METHOD_GET.equals(httpMethod)) {
@@ -103,8 +105,8 @@ public class HttpPersistentQueueTestCase extends CompatibilityFunctionalTestCase
         fail("invalid HTTP method : " + httpMethod);
       }
 
-      assertEquals("true", message.getInboundProperty(HttpConstants.HEADER_CONNECTION));
-      assertEquals("true", message.getInboundProperty(HttpConstants.HEADER_KEEP_ALIVE));
+      assertEquals("true", message.getInboundProperty(HEADER_CONNECTION));
+      assertEquals("true", message.getInboundProperty(HEADER_KEEP_ALIVE));
 
       messageDidArrive.countDown();
     }

@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -81,7 +82,7 @@ public class EndpointContentTypeTestCase extends CompatibilityFunctionalTestCase
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      InternalMessage message = eventContext.getMessage();
+      Message message = eventContext.getMessage();
       final MediaType parse = MediaType.parse(expectedContentType);
       assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), is(parse.getPrimaryType()));
       assertThat(message.getPayload().getDataType().getMediaType().getSubType(), is(parse.getSubType()));
