@@ -16,9 +16,6 @@ org.mule.registry.DuplicateRegistrationTestCase
 # MULE-4034
 org.mule.util.TimedSocketTestCase
 
-# MULE-3670
-org.mule.util.store.TextFileStoreTestCase
-
 #Fails on CE CI server MULE-4008
 org.mule.util.TimedSocketTestCase
 

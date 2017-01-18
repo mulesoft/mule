@@ -105,7 +105,38 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
             throw new ObjectStoreException(iox);
         }
     }
-    
+
+    @Override
+    public void expire()
+    {
+        int expiredEntries = doTrimAndExpire();
+
+        if (expiredEntries > 0)
+        {
+            updateTextFile();
+        }
+
+        if (logger.isDebugEnabled() && expiredEntries != 0)
+        {
+            logger.debug("Expired " + expiredEntries + " old entries");
+        }
+    }
+
+    private void updateTextFile()
+    {
+        Properties props = getStoreAsProperties();
+
+        try
+        {
+            output = new FileOutputStream(fileStore, false);
+            props.store(output, StringUtils.EMPTY);
+        }
+        catch (IOException e)
+        {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
     @Override
     public void clear()
     {
@@ -135,13 +166,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
     @Override
     public synchronized void dispose()
     {
-        Properties props = new Properties();
-
-        for (Iterator<?> iterator = super.store.values().iterator(); iterator.hasNext();)
-        {
-            StoredObject<?> storedObject = (StoredObject<?>) iterator.next();
-            props.put(storedObject.getId(), storedObject.getItem());
-        }
+        Properties props = getStoreAsProperties();
 
         if (output == null)
         {
@@ -162,5 +187,17 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
         }
 
         super.dispose();
+    }
+
+    private Properties getStoreAsProperties()
+    {
+        Properties props = new Properties();
+
+        for (Iterator<?> iterator = super.store.values().iterator(); iterator.hasNext(); )
+        {
+            StoredObject<?> storedObject = (StoredObject<?>) iterator.next();
+            props.put(storedObject.getId(), storedObject.getItem());
+        }
+        return props;
     }
 }
