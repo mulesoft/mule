@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -19,9 +18,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.processor.DynamicPipeline;
-import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
-import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -47,9 +43,7 @@ import org.reactivestreams.Publisher;
  * <li>Supports the optional configuration of a {@link ProcessingStrategy} that determines how message processors are processed.
  * </ul>
  */
-public class Flow extends AbstractPipeline implements Processor, DynamicPipeline {
-
-  private DynamicPipelineMessageProcessor dynamicPipelineMessageProcessor;
+public class Flow extends AbstractPipeline implements Processor {
 
   public Flow(String name, MuleContext muleContext) {
     super(name, muleContext);
@@ -125,9 +119,6 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
     builder.chain(new ProcessIfPipelineStartedMessageProcessor());
     builder.chain(new ProcessingTimeInterceptor());
     builder.chain(new FlowConstructStatisticsMessageProcessor());
-
-    dynamicPipelineMessageProcessor = new DynamicPipelineMessageProcessor(this);
-    builder.chain(dynamicPipelineMessageProcessor);
   }
 
   @Override
@@ -156,11 +147,6 @@ public class Flow extends AbstractPipeline implements Processor, DynamicPipeline
     statistics = new FlowConstructStatistics(getConstructType(), name);
     statistics.setEnabled(muleContext.getStatistics().isEnabled());
     muleContext.getStatistics().add(statistics);
-  }
-
-  @Override
-  public DynamicPipelineBuilder dynamicPipeline(String id) throws DynamicPipelineException {
-    return dynamicPipelineMessageProcessor.dynamicPipeline(id);
   }
 
   @Override
