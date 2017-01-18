@@ -20,9 +20,11 @@ import java.io.IOException;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-11450: Migrate Contiperf tests to JMH")
 public class FtpPerformanceTestCase extends AbstractIsolatedFunctionalPerformanceTestCase {
 
   private static final String DEFAULT_FTP_HOST = "localhost";

@@ -30,9 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
 import org.databene.contiperf.junit.ContiPerfRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-11450: Migrate Contiperf tests to JMH")
 public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleContextTestCase {
 
   @Rule

@@ -33,7 +33,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTestCase {
 
   private static final String ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY = "enablePerformanceTests";
-  private static final String NORM_ALLOCATION_RESULT_KEY = "gc.alloc.rate.norm";
+  private static final String NORM_ALLOCATION_RESULT_KEY = "·gc.alloc.rate.norm";
 
   @Override
   public int getTestTimeoutSecs() {
@@ -41,7 +41,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   }
 
   /**
-   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
    * @param clazz the JMS benchmark class.
    * @param testName the name of the test method.
@@ -53,7 +53,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   }
 
   /**
-   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
    * @param clazz the JMS benchmark class.
    * @param testName the name of the test method.
@@ -67,7 +67,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   }
 
   /**
-   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
    * @param clazz the JMS benchmark class.
    * @param testName the name of the test method.
@@ -82,7 +82,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   }
 
   /**
-   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
    * @param clazz the JMS benchmark class.
    * @param testName the name of the test method.
@@ -104,7 +104,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   }
 
   /**
-   * Run a JMH benchmark and assert that the primery result is less than or equal to an expected value.
+   * Run a JMH benchmark and assert that the primary result is less than or equal to an expected value.
    *
    * @param clazz the JMS benchmark class.
    * @param testName the name of the test method.
@@ -119,7 +119,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
       if (getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY) != null) {
         ChainedOptionsBuilder optionsBuilder = createCommonOptionsBuilder(clazz, testName, params, timeUnit, profileGC);
         optionsBuilder = optionsBuilder
-            .forks(0)
+            .forks(1)
             .threads(threads)
             .warmupIterations(10)
             .measurementIterations(10);
