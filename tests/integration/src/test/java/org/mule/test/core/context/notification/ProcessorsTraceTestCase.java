@@ -13,8 +13,8 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
 
-import org.mule.runtime.core.api.CoreEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
@@ -48,7 +48,7 @@ public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      processorsTraceToAssert = ((CoreEventContext) event.getContext()).getProcessorsTrace();
+      processorsTraceToAssert = ((EventContext) event.getContext()).getProcessorsTrace();
       return event;
     }
   }

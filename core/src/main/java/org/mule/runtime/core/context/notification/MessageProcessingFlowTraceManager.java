@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.CoreEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -103,8 +103,8 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     String resolveProcessorRepresentation =
         resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(),
                                        notification.getProcessor());
-    if (((CoreEventContext) notification.getSource().getContext()).getProcessorsTrace() instanceof DefaultProcessorsTrace) {
-      ((DefaultProcessorsTrace) ((CoreEventContext) notification.getSource().getContext()).getProcessorsTrace())
+    if (((EventContext) notification.getSource().getContext()).getProcessorsTrace() instanceof DefaultProcessorsTrace) {
+      ((DefaultProcessorsTrace) ((EventContext) notification.getSource().getContext()).getProcessorsTrace())
           .addExecutedProcessors(resolveProcessorRepresentation);
     }
     if (notification.getSource().getFlowCallStack() instanceof DefaultFlowCallStack) {

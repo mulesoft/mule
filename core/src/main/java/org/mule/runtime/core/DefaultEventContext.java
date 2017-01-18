@@ -8,7 +8,6 @@ package org.mule.runtime.core;
 
 import static java.time.OffsetTime.now;
 
-import org.mule.runtime.core.api.CoreEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-import reactor.core.publisher.Mono;
+
 import reactor.core.publisher.MonoProcessor;
 
 /**
@@ -34,7 +32,7 @@ import reactor.core.publisher.MonoProcessor;
  *
  * @since 4.0
  */
-public final class DefaultEventContext implements CoreEventContext, Serializable {
+public final class DefaultEventContext implements EventContext, Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 

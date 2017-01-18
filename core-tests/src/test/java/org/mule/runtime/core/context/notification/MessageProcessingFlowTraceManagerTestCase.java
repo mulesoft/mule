@@ -15,7 +15,6 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.context.notification.MessageProcessingFlowTraceManager.FLOW_STACK_INFO_KEY;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.CoreEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -219,7 +218,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(eventCopy, mock(Processor.class),
                                                                                "/asyncComp"));
 
-    assertThat(((CoreEventContext) event.getContext()).getProcessorsTrace(),
+    assertThat(((EventContext) event.getContext()).getProcessorsTrace(),
                hasExecutedProcessors("/comp @ " + APP_ID, "/asyncComp @ " + APP_ID));
   }
 
@@ -288,7 +287,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
 
     manager.onPipelineNotificationComplete(pipelineNotification);
 
-    assertThat(((CoreEventContext) event.getContext()).getProcessorsTrace(),
+    assertThat(((EventContext) event.getContext()).getProcessorsTrace(),
                hasExecutedProcessors("/scatter-gather @ " + APP_ID, "/route_0 @ " + APP_ID,
                                      NESTED_FLOW_NAME + "_ref @ " + APP_ID, "/route_1 @ " + APP_ID));
   }
