@@ -23,14 +23,14 @@ public class PolicyPointcutParameters {
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
-   * 
+   *
+   * @param flowName name of the flow where the source / operation is defined. Not empty.
    * @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
    *        operation identifier.
-   * @param flowName name of the flow where the source / operation is defined
    */
-  public PolicyPointcutParameters(ComponentIdentifier componentIdentifier, String flowName) {
-    this.componentIdentifier = componentIdentifier;
+  public PolicyPointcutParameters(String flowName, ComponentIdentifier componentIdentifier) {
     this.flowName = flowName;
+    this.componentIdentifier = componentIdentifier;
   }
 
   /**

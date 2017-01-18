@@ -21,16 +21,16 @@ public class HttpRequestPolicyPointcutParameters extends PolicyPointcutParameter
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
-   * 
+   *
+   * @param flowName name of the flow where the requester is defined. Not empty.
    * @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
    *        operation identifier.
-   * @param flowName name of the flow where the requester is defined
    * @param path the target path of the http:request operation.
    * @param method the HTTP method of the http:request operation.
    */
-  public HttpRequestPolicyPointcutParameters(ComponentIdentifier componentIdentifier, String flowName, String path,
+  public HttpRequestPolicyPointcutParameters(String flowName, ComponentIdentifier componentIdentifier, String path,
                                              String method) {
-    super(componentIdentifier, flowName);
+    super(flowName, componentIdentifier);
     this.path = path;
     this.method = method;
   }

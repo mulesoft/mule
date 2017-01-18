@@ -48,7 +48,12 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
 
   @Test(expected = IllegalArgumentException.class)
   public void failIfAttributesIsNotHttpRequestAttributes() {
-    factory.createPolicyPointcutParameters(HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes, FLOW_NAME);
+    factory.createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void failIfFlowNameIsEmpty() {
+    factory.createPolicyPointcutParameters("", HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
   }
 
   @Test
@@ -56,7 +61,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     HttpListenerPolicyPointcutParameters policyPointcutParameters = (HttpListenerPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(HTTP_LISTENER_COMPONENT_IDENTIFIER, httpAttributes, FLOW_NAME);
+        .createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, httpAttributes);
     assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_LISTENER_COMPONENT_IDENTIFIER));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));

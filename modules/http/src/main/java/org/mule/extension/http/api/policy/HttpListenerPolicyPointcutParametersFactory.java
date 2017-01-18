@@ -7,6 +7,8 @@
 package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
@@ -29,13 +31,14 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(ComponentIdentifier sourceIdentifier, Attributes attributes,
-                                                                 String flowName) {
+  public PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier sourceIdentifier,
+                                                                 Attributes attributes) {
+    checkArgument(isNotEmpty(flowName), "Cannot create a policy pointcut parameter instance with an empty flow name");
     checkArgument(attributes instanceof HttpRequestAttributes, String
         .format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
                 HttpRequestAttributes.class.getName(), attributes != null ? attributes.getClass().getName() : "null"));
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes;
-    return new HttpListenerPolicyPointcutParameters(sourceIdentifier, flowName, httpRequestAttributes.getRequestPath(),
+    return new HttpListenerPolicyPointcutParameters(flowName, sourceIdentifier, httpRequestAttributes.getRequestPath(),
                                                     httpRequestAttributes.getMethod());
   }
 

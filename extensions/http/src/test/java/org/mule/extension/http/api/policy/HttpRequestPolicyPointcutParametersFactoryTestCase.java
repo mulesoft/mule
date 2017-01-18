@@ -6,9 +6,11 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
+
 import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -42,13 +44,18 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
                is(false));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void failIfFlowNameIsEmpty() {
+    factory.createPolicyPointcutParameters("", HTTP_REQUEST_COMPONENT_IDENTIFIER, emptyMap());
+  }
+
   @Test
   public void policyPointcutParameters() {
     Map<String, Object> parametersMap =
         ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
             .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
     HttpRequestPolicyPointcutParameters policyPointcutParameters = (HttpRequestPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(HTTP_REQUEST_COMPONENT_IDENTIFIER, parametersMap, FLOW_NAME);
+        .createPolicyPointcutParameters(FLOW_NAME, HTTP_REQUEST_COMPONENT_IDENTIFIER, parametersMap);
     assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_REQUEST_COMPONENT_IDENTIFIER));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
