@@ -21,11 +21,13 @@ import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+@Ignore("MULE-11450: Migrate Contiperf tests to JMH")
 public class FilePerformanceTestCase extends AbstractIsolatedFunctionalPerformanceTestCase {
 
   private static final String HELLO_WORLD = "Hello World!";

@@ -11,8 +11,10 @@ import org.mule.test.performance.util.AbstractIsolatedFunctionalPerformanceTestC
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-11450: Migrate Contiperf tests to JMH")
 public class ScatterGatherRouterPerformanceTestCase extends AbstractIsolatedFunctionalPerformanceTestCase {
 
   @Override
