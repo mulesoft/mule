@@ -20,7 +20,7 @@ public class SchedulerBusyException extends RejectedExecutionException {
   private static final long serialVersionUID = 9047649377760686741L;
 
   /**
-   * Cosntructs a new exception with the specified message.
+   * Constructs a new exception with the specified message.
    * 
    * @param message the detail message
    */
