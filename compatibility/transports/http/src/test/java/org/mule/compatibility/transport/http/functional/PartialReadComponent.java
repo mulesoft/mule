@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.InputStream;
 
@@ -21,7 +22,7 @@ public class PartialReadComponent implements Callable, MuleContextAware {
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
     InputStream stream = (InputStream) muleContext.getTransformationService()
-        .transform(eventContext.getMessage(), DataType.INPUT_STREAM).getPayload().getValue();
+        .transform((InternalMessage) eventContext.getMessage(), DataType.INPUT_STREAM).getPayload().getValue();
     stream.read();
     return "Hello";
   }

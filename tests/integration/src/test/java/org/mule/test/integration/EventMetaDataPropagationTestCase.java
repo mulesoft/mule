@@ -18,8 +18,8 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
@@ -66,7 +66,7 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
                                                      .attributes(new PartAttributes("test1")).build()))
             .outboundProperties(props).build();
       } else {
-        InternalMessage msg = context.getMessage();
+        InternalMessage msg = (InternalMessage) context.getMessage();
         assertEquals("param1", msg.getInboundProperty("stringParam"));
         final Object o = msg.getInboundProperty("objectParam");
         assertTrue(o instanceof Apple);

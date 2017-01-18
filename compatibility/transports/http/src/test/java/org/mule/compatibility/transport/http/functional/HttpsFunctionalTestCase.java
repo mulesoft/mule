@@ -9,14 +9,14 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.compatibility.transport.http.HttpsConnector.LOCAL_CERTIFICATES;
 
-import org.mule.compatibility.transport.http.HttpsConnector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,9 +46,9 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase {
 
     final AtomicBoolean callbackMade = new AtomicBoolean(false);
     EventCallback callback = (context, component, muleContext) -> {
-      InternalMessage msg = context.getMessage();
+      InternalMessage msg = (InternalMessage) context.getMessage();
       assertTrue(callbackMade.compareAndSet(false, true));
-      assertNotNull(msg.getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
+      assertNotNull(msg.getOutboundProperty(LOCAL_CERTIFICATES));
     };
     testComponent.setEventCallback(callback);
 

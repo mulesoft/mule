@@ -7,23 +7,24 @@
 package org.mule.functional.functional;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.functional.functional.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.DefaultMuleEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -224,7 +225,7 @@ public class FunctionalTestComponent
       logger.info(msg);
     }
 
-    final InternalMessage message = context.getMessage();
+    final Message message = context.getMessage();
     if (isLogMessageDetails() && logger.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
 
@@ -254,9 +255,7 @@ public class FunctionalTestComponent
     }
 
     if (isEnableNotifications()) {
-      muleContext.fireNotification(
-                                   new FunctionalTestNotification(context, replyMessage,
-                                                                  FunctionalTestNotification.EVENT_RECEIVED));
+      muleContext.fireNotification(new FunctionalTestNotification(context, replyMessage, EVENT_RECEIVED));
     }
 
     // Time to wait before returning

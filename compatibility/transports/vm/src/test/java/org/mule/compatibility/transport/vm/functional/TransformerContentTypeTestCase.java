@@ -6,12 +6,14 @@
  */
 package org.mule.compatibility.transport.vm.functional;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -22,7 +24,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +86,7 @@ public class TransformerContentTypeTestCase extends CompatibilityFunctionalTestC
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      InternalMessage message = eventContext.getMessage();
+      Message message = eventContext.getMessage();
       String contentType = message.getPayload().getDataType().getMediaType().withoutParameters().toRfcString();
       assertThat(contentType, is(expectedMimeType));
       return message;
@@ -100,7 +101,7 @@ public class TransformerContentTypeTestCase extends CompatibilityFunctionalTestC
 
     @Override
     public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-      return InternalMessage.builder(event.getMessage()).mediaType(MediaType.TEXT.withCharset(StandardCharsets.UTF_8)).build();
+      return InternalMessage.builder(event.getMessage()).mediaType(MediaType.TEXT.withCharset(UTF_8)).build();
     }
 
   }
@@ -109,7 +110,7 @@ public class TransformerContentTypeTestCase extends CompatibilityFunctionalTestC
 
     @Override
     public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-      return InternalMessage.builder(event.getMessage()).mediaType(MediaType.XML.withCharset(StandardCharsets.UTF_8)).build();
+      return InternalMessage.builder(event.getMessage()).mediaType(MediaType.XML.withCharset(UTF_8)).build();
     }
 
   }

@@ -8,8 +8,10 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_CONTEXT_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PATH_PROPERTY;
+import static org.mule.compatibility.transport.http.HttpConnector.HTTP_REQUEST_PROPERTY;
 
-import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
@@ -41,10 +43,10 @@ public class HttpFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
     if (checkPathProperties) {
       EventCallback callback = (context, component, muleContext) -> {
-        InternalMessage msg = context.getMessage();
-        assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-        assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-        assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
+        InternalMessage msg = (InternalMessage) context.getMessage();
+        assertEquals("/", msg.getInboundProperty(HTTP_REQUEST_PROPERTY));
+        assertEquals("/", msg.getInboundProperty(HTTP_REQUEST_PATH_PROPERTY));
+        assertEquals("/", msg.getInboundProperty(HTTP_CONTEXT_PATH_PROPERTY));
       };
 
       testComponent.setEventCallback(callback);

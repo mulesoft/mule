@@ -8,16 +8,19 @@ package org.mule.compatibility.transport.vm.functional.transactions;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.config.i18n.CoreMessages.failedToBuildMessage;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -142,7 +145,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends CompatibilityFun
 
     @Override
     protected Object doTransform(Object src, Charset enc) throws TransformerException {
-      throw new TransformerException(CoreMessages.failedToBuildMessage(), this);
+      throw new TransformerException(failedToBuildMessage(), this);
     }
   }
 
@@ -151,9 +154,9 @@ public class VmExceptionStrategyRequestResponseTestCase extends CompatibilityFun
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
       deadLetterQueueLatch.release();
-      InternalMessage message = eventContext.getMessage();
-      assertThat(message, IsNull.<Object>notNullValue());
-      assertThat(message.getPayload().getValue(), IsInstanceOf.instanceOf(ExceptionMessage.class));
+      Message message = eventContext.getMessage();
+      assertThat(message, notNullValue());
+      assertThat(message.getPayload().getValue(), instanceOf(ExceptionMessage.class));
       return eventContext.getMessage();
     }
   }

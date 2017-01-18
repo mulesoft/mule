@@ -8,9 +8,9 @@ package org.mule.compatibility.transport.vm.functional;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ public class AttachmentsComponent implements Callable, MuleContextAware {
 
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
-    InternalMessage msg = eventContext.getMessage();
+    InternalMessage msg = (InternalMessage) eventContext.getMessage();
     if (msg.getInboundAttachmentNames().size() == 2) {
       throw new IllegalArgumentException("There shuold be 2 attachments");
     }

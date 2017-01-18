@@ -6,9 +6,12 @@
  */
 package org.mule.compatibility.transport.ssl;
 
+import static org.mule.compatibility.transport.ssl.SslConnector.LOCAL_CERTIFICATES;
+
 import org.mule.functional.functional.EventCallback;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.security.cert.Certificate;
 import java.util.Collections;
@@ -31,7 +34,7 @@ public class SaveCertificatesCallback implements EventCallback {
     // surely it would if it was thread scribbling?
     Thread.sleep(100);
 
-    Certificate[] certs = context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES);
+    Certificate[] certs = ((InternalMessage) context.getMessage()).getOutboundProperty(LOCAL_CERTIFICATES);
     certificates.add(certs);
   }
 
