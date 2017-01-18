@@ -8,6 +8,8 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -73,31 +76,34 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
                                                                   PolicyTemplateDescriptor descriptor) {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     for (ArtifactPluginDescriptor policyPluginDescriptor : descriptor.getPlugins()) {
-      ArtifactPluginDescriptor appPluginDescriptor = findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
-      if (appPluginDescriptor == null) {
+      Optional<ArtifactPluginDescriptor> appPluginDescriptor =
+          findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
+
+      if (!appPluginDescriptor.isPresent()) {
         artifactPluginDescriptors.add(policyPluginDescriptor);
-      } else if (!isCompatibleVersion(appPluginDescriptor.getBundleDescriptor().getVersion(),
+      } else if (!isCompatibleVersion(appPluginDescriptor.get().getBundleDescriptor().getVersion(),
                                       policyPluginDescriptor.getBundleDescriptor().getVersion())) {
         throw new IllegalStateException(
                                         format("Incompatible version of plugin '%s' found. Policy requires version'%s' but application provides version'%s'",
                                                policyPluginDescriptor.getName(),
                                                policyPluginDescriptor.getBundleDescriptor().getVersion(),
-                                               appPluginDescriptor.getBundleDescriptor().getVersion()));
+                                               appPluginDescriptor.get().getBundleDescriptor().getVersion()));
       }
     }
 
     return artifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]);
   }
 
-  private ArtifactPluginDescriptor findPlugin(Set<ArtifactPluginDescriptor> appPlugins, BundleDescriptor bundleDescriptor) {
+  private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
+                                                        BundleDescriptor bundleDescriptor) {
     for (ArtifactPluginDescriptor appPlugin : appPlugins) {
       if (appPlugin.getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
           && appPlugin.getBundleDescriptor().getGroupId().equals(bundleDescriptor.getGroupId())) {
-        return appPlugin;
+        return of(appPlugin);
       }
     }
 
-    return null;
+    return empty();
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader policyClassLoader,
