@@ -81,7 +81,7 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     policyClassLoader = null;
     when(policyTemplate.getArtifactClassLoader()).thenReturn(policyClassLoader);
 
-    when(policyTemplateFactory.createArtifact(policyTemplateDescriptor, regionClassLoader)).thenReturn(policyTemplate);
+    when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptor)).thenReturn(policyTemplate);
     when(applicationPolicyInstance1.getPointcut()).thenReturn(pointcut);
     when(applicationPolicyInstance1.getOrder()).thenReturn(ORDER_POLICY1);
     when(applicationPolicyInstance1.getOperationPolicy()).thenReturn(of(policy1));
@@ -311,7 +311,7 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
     policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
 
-    verify(policyTemplateFactory).createArtifact(policyTemplateDescriptor, regionClassLoader);
+    verify(policyTemplateFactory).createArtifact(application, policyTemplateDescriptor);
   }
 
   @Test

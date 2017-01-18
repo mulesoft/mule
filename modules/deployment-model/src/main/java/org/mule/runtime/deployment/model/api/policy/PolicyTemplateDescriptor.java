@@ -7,10 +7,12 @@
 
 package org.mule.runtime.deployment.model.api.policy;
 
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.File;
-
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Describes how to create a {@link PolicyTemplate} artifact
@@ -24,6 +26,7 @@ public class PolicyTemplateDescriptor extends ArtifactDescriptor {
   public static final String MULE_POLICY_JSON = "mule-policy.json";
 
   private File[] configResourceFiles;
+  private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
 
   /**
    * Creates a new descriptor for a named artifact
@@ -40,5 +43,13 @@ public class PolicyTemplateDescriptor extends ArtifactDescriptor {
 
   public void setConfigResourceFiles(File[] configResourceFiles) {
     this.configResourceFiles = configResourceFiles;
+  }
+
+  public Set<ArtifactPluginDescriptor> getPlugins() {
+    return plugins;
+  }
+
+  public void setPlugins(Set<ArtifactPluginDescriptor> plugins) {
+    this.plugins = plugins;
   }
 }

@@ -9,19 +9,21 @@ package org.mule.runtime.deployment.model.internal.policy;
 
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Creates {@link ArtifactClassLoader} for policy templates artifact.
  */
-public class PolicyTemplateClassLoaderFactory implements ArtifactClassLoaderFactory<PolicyTemplateDescriptor> {
+public class PolicyTemplateClassLoaderFactory implements DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> {
 
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, PolicyTemplateDescriptor descriptor) {
+  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, PolicyTemplateDescriptor descriptor,
+                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
     File rootFolder = descriptor.getRootFolder();
     if (rootFolder == null || !rootFolder.exists()) {
       throw new IllegalArgumentException("Policy folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
@@ -29,9 +31,11 @@ public class PolicyTemplateClassLoaderFactory implements ArtifactClassLoaderFact
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = parent.getClassLoaderLookupPolicy();
 
-    return new MuleArtifactClassLoader(artifactId, descriptor,
-                                       descriptor.getClassLoaderModel().getUrls(),
-                                       parent.getClassLoader(),
-                                       classLoaderLookupPolicy);
+    MuleDeployableArtifactClassLoader deployableArtifactClassLoader =
+        new MuleDeployableArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
+                                              parent.getClassLoader(),
+                                              classLoaderLookupPolicy, artifactPluginClassLoaders);
+
+    return deployableArtifactClassLoader;
   }
 }

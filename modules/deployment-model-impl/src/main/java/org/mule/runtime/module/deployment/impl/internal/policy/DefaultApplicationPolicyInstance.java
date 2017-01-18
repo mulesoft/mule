@@ -20,9 +20,12 @@ import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -42,6 +45,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final PolicyParametrization parametrization;
   private final ServiceRepository serviceRepository;
   private final ClassLoaderRepository classLoaderRepository;
+  private final List<ArtifactPlugin> artifactPlugins;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private PolicyInstance policyInstance;
 
   /**
@@ -52,15 +57,20 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @param parametrization parameters used to configure the created instance. Non null
    * @param serviceRepository repository of available services. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
+   * @param artifactPlugins artifact plugins deployed inside the policy. Non null.
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization, ServiceRepository serviceRepository,
-                                          ClassLoaderRepository classLoaderRepository) {
+                                          ClassLoaderRepository classLoaderRepository, List<ArtifactPlugin> artifactPlugins,
+                                          ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
     this.serviceRepository = serviceRepository;
     this.classLoaderRepository = classLoaderRepository;
+    this.artifactPlugins = artifactPlugins;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
   }
 
   private void initPolicyContext() {
@@ -72,7 +82,11 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
               .setConfigurationFiles(getResourcePaths(template.getDescriptor().getConfigResourceFiles()))
               .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
               .setServiceRepository(serviceRepository)
-              .setClassLoaderRepository(classLoaderRepository);
+              .setClassLoaderRepository(classLoaderRepository)
+              .setArtifactPlugins(artifactPlugins)
+              .setExtensionManagerFactory(new PolicyTemplateExtensionManagerFactory(application, extensionModelLoaderRepository,
+                                                                                    artifactPlugins,
+                                                                                    new DefaultExtensionManagerFactory()));
 
       artifactBuilder.withServiceConfigurator(customizationService -> customizationService
           .overrideDefaultServiceImpl(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER,

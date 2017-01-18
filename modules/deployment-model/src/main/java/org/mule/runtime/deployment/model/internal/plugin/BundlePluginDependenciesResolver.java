@@ -8,9 +8,9 @@
 package org.mule.runtime.deployment.model.internal.plugin;
 
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
-import org.mule.runtime.deployment.model.api.artifact.InvalidDependencyVersionException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -26,10 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
 
 /**
  * Resolves plugin dependencies considering the plugin name only.
@@ -216,32 +212,6 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     return availableBundleDescriptor.getArtifactId().equals(expectedBundleDescriptor.getArtifactId()) &&
         availableBundleDescriptor.getGroupId().equals(expectedBundleDescriptor.getGroupId()) &&
         isCompatibleVersion(availableBundleDescriptor.getVersion(), expectedBundleDescriptor.getVersion());
-  }
-
-  private static boolean isCompatibleVersion(String availableVersion, String expectedVersion) {
-    if (availableVersion.equals(expectedVersion)) {
-      return true;
-    }
-
-    Version available = getBundleVersion(availableVersion);
-    Version expected = getBundleVersion(expectedVersion);
-
-    if (available.compareTo(expected) >= 0) {
-      String availableMajorVersion = availableVersion.substring(0, availableVersion.indexOf("."));
-      String expectedMajorVersion = expectedVersion.substring(0, expectedVersion.indexOf("."));
-
-      return availableMajorVersion.equals(expectedMajorVersion);
-    }
-
-    return false;
-  }
-
-  private static Version getBundleVersion(String version) {
-    try {
-      return new GenericVersionScheme().parseVersion(version);
-    } catch (InvalidVersionSpecificationException e) {
-      throw new InvalidDependencyVersionException("Unable to parse bundle version: " + version);
-    }
   }
 
   private boolean hasPluginDependenciesResolved(Set<BundleDependency> pluginDependencies,

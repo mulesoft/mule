@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.deployment.model.api.artifact;
+package org.mule.runtime.module.artifact.descriptor;
 
 /**
  * Thrown to indicate that a given bundle dependency version is not well formed.

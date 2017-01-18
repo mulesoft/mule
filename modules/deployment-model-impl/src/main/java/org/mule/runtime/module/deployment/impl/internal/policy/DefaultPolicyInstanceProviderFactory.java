@@ -12,6 +12,7 @@ import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 /**
@@ -21,16 +22,21 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
 
   private final ServiceRepository serviceRepository;
   private final ClassLoaderRepository classLoaderRepository;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
   /**
    * Creates a new factory
    *
    * @param serviceRepository contains available service instances. Non null.
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    */
-  public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository) {
+  public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository,
+                                              ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     checkArgument(serviceRepository != null, "serviceRepository cannot be null");
     checkArgument(classLoaderRepository != null, "classLoaderRepository cannot be null");
+    checkArgument(extensionModelLoaderRepository != null, "extensionModelLoaderRepository cannot be null");
 
     this.serviceRepository = serviceRepository;
     this.classLoaderRepository = classLoaderRepository;
@@ -40,7 +46,8 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
   public ApplicationPolicyInstance create(Application application, PolicyTemplate policyTemplate,
                                           PolicyParametrization parametrization) {
     return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
-                                                classLoaderRepository);
+                                                classLoaderRepository, policyTemplate.getArtifactPlugins(),
+                                                extensionModelLoaderRepository);
   }
 
 }

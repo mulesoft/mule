@@ -62,6 +62,7 @@ import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_BUNDLE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
@@ -75,15 +76,6 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -125,6 +117,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -155,6 +148,16 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
@@ -172,13 +175,16 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
+  private static final String APP_WITH_EXTENSION_PLUGIN_CONFIG = "app-with-extension-plugin-config.xml";
   private static final String FOO_POLICY_NAME = "fooPolicy";
   private static final String BAR_POLICY_NAME = "barPolicy";
+  private static final String BAZ_POLICY_NAME = "bazPolicy";
   private static final String FOO_POLICY_ID = "fooPolicy";
   private static final String BAR_POLICY_ID = "barPolicy";
+  private static final String BAZ_POLICY_ID = "bazPolicy";
   private static final String MIN_MULE_VERSION = "4.0.0";
-  public static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
-  public static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
+  private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
+  private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
 
@@ -211,11 +217,24 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
           .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
           .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
 
-  private static final File helloExtensionJarFile = new CompilerUtils.ExtensionCompiler()
+  private static final File helloExtensionV1JarFile = new CompilerUtils.ExtensionCompiler()
       .compiling(
                  getResourceFile("/org/foo/hello/HelloExtension.java"),
                  getResourceFile("/org/foo/hello/HelloOperation.java"))
-      .compile("mule-module-hello-4.0-SNAPSHOT.jar", "1.0");
+      .compile("mule-module-hello-1.0.jar", "1.0");
+
+  private static final File helloExtensionV2JarFile = new CompilerUtils.ExtensionCompiler()
+      .compiling(
+                 getResourceFile("/org/foo/hello/HelloExtension.java"),
+                 getResourceFile("/org/foo/hello/HelloOperation.java"))
+      .compile("mule-module-hello-2.0.jar", "2.0");
+
+
+  private static final File simpleExtensionJarFile = new CompilerUtils.ExtensionCompiler()
+      .compiling(
+                 getResourceFile("/org/foo/simple/SimpleExtension.java"),
+                 getResourceFile("/org/foo/simple/SimpleOperation.java"))
+      .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0");
 
   private static final File echoTestClassFile = new SingleClassCompiler()
       .compile(getResourceFile("/org/foo/EchoTest.java"));
@@ -257,6 +276,23 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private final ArtifactPluginFileBuilder pluginUsingAppResource =
       new ArtifactPluginFileBuilder("appResourcePlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.resource")
           .containingClass(resourceConsumerClassFile, "org/foo/resource/ResourceConsumer.class");
+
+  private final ArtifactPluginFileBuilder helloExtensionV1Plugin =
+      new ArtifactPluginFileBuilder("helloExtensionPlugin").usingLibrary(helloExtensionV1JarFile.getAbsolutePath())
+          .configuredWith(PLUGIN_BUNDLE, "org.mule.test:helloExtensionPlugin:1.0")
+          .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                          "/,  META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+
+  private final ArtifactPluginFileBuilder helloExtensionV2Plugin =
+      new ArtifactPluginFileBuilder("helloExtensionPlugin").usingLibrary(helloExtensionV2JarFile.getAbsolutePath())
+          .configuredWith(PLUGIN_BUNDLE, "org.mule.test:helloExtensionPlugin:2.0")
+          .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                          "/,  META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+
+  private final ArtifactPluginFileBuilder simpleExtensionPlugin =
+      new ArtifactPluginFileBuilder("simpleExtensionPlugin").usingLibrary(simpleExtensionJarFile.getAbsolutePath())
+          .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                          "/,  META-INF/mule-simple.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
 
   // Application file builders
   private final ApplicationFileBuilder emptyAppFileBuilder =
@@ -319,19 +355,42 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       .definedBy("shared-domain-config.xml").containing(sharedAAppFileBuilder).containing(sharedBAppFileBuilder);
 
   // Policy file builders
-  private static final PolicyFileBuilder fooPolicyFileBuilder =
+  private final PolicyFileBuilder fooPolicyFileBuilder =
       new PolicyFileBuilder(FOO_POLICY_NAME).definedBy("fooPolicy.xml").describedBy(new MulePolicyModelBuilder()
           .setMinMuleVersion(MIN_MULE_VERSION).setName(FOO_POLICY_NAME)
           .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(FOO_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                          PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
           .build());
 
-  private static final PolicyFileBuilder barPolicyFileBuilder =
+  private final PolicyFileBuilder barPolicyFileBuilder =
       new PolicyFileBuilder(BAR_POLICY_NAME).definedBy("barPolicy.xml").describedBy(new MulePolicyModelBuilder()
           .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
           .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                          PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
           .build());
+
+
+  private final PolicyFileBuilder policyUsingAppPluginFileBuilder =
+      new PolicyFileBuilder(BAR_POLICY_NAME).definedBy("appPluginPolicy.xml").describedBy(new MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
+          .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                         PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .build());
+
+  private final PolicyFileBuilder policyIncludingPluginFileBuilder =
+      new PolicyFileBuilder(BAZ_POLICY_NAME).definedBy("appPluginPolicy.xml").describedBy(new MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
+          .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                         PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .build()).containingPlugin(helloExtensionV1Plugin);
+
+  private final PolicyFileBuilder policyIncludingHelloPluginV2FileBuilder =
+      new PolicyFileBuilder(BAZ_POLICY_NAME).definedBy("appPluginPolicy.xml").describedBy(new MulePolicyModelBuilder()
+          .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
+          .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                         PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .build()).containingPlugin(
+                                     helloExtensionV2Plugin);
 
   private final boolean parallelDeployment;
   protected File muleHome;
@@ -401,7 +460,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
 
-    policyManager = new TestPolicyManager(deploymentService);
+    policyManager = new TestPolicyManager(deploymentService,
+                                          new PolicyTemplateDescriptorFactory(
+                                                                              muleArtifactResourcesRegistry
+                                                                                  .getArtifactPluginDescriptorLoader()));
     configurePolicyManagerListener();
 
     // Reset test component state
@@ -1556,7 +1618,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysAppZipWithExtensionPlugin() throws Exception {
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -1701,9 +1764,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void failsToDeployApplicationOnMissingService() throws Exception {
     ArtifactPluginFileBuilder extensionPlugin = new ArtifactPluginFileBuilder("extensionPlugin")
-        .usingLibrary(helloExtensionJarFile.getAbsolutePath()).configuredWith(EXPORTED_RESOURCE_PROPERTY, "/, META-INF");
+        .usingLibrary(helloExtensionV1JarFile.getAbsolutePath()).configuredWith(EXPORTED_RESOURCE_PROPERTY, "/, META-INF");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
-        .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+        .definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG).containingPlugin(extensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -3012,7 +3075,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
     policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
@@ -3037,7 +3101,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
 
@@ -3057,7 +3122,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void removesApplicationPolicy() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices();
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
@@ -3076,7 +3142,82 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertThat("Policy is still applied on the application", invocationCount, equalTo(1));
   }
 
-  private ApplicationFileBuilder createExtensionApplicationWithServices() throws Exception {
+
+  @Test
+  public void appliesApplicationPolicyUsingAppPlugin() throws Exception {
+    policyManager.registerPolicyTemplate(policyUsingAppPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.getId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap()));
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void appliesApplicationPolicyIncludingPlugin() throws Exception {
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+                                                                                           simpleExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap()));
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap()));
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void failsToApplyApplicationPolicyWithPluginVersionMismatch() throws Exception {
+    policyManager.registerPolicyTemplate(policyIncludingHelloPluginV2FileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap()));
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(0));
+  }
+
+  private ApplicationFileBuilder createExtensionApplicationWithServices(String appConfigFile,
+                                                                        ArtifactPluginFileBuilder... plugins)
+      throws Exception {
     final ServiceFileBuilder echoService =
         new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
             .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
@@ -3089,12 +3230,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     installedService = new File(services, fooService.getArtifactFile().getName());
     copyFile(fooService.getArtifactFile(), installedService);
 
-    ArtifactPluginFileBuilder extensionPlugin =
-        new ArtifactPluginFileBuilder("extensionPlugin").usingLibrary(helloExtensionJarFile.getAbsolutePath())
-            .configuredWith(EXPORTED_RESOURCE_PROPERTY,
-                            "/,  META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
-        .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+        .definedBy(appConfigFile);
+
+    for (ArtifactPluginFileBuilder plugin : plugins) {
+      applicationFileBuilder.containingPlugin(plugin);
+    }
 
     return applicationFileBuilder;
   }

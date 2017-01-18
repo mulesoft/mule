@@ -9,23 +9,34 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.Arrays.sort;
+import static java.util.Collections.emptySet;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleTmpDir;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
  * Creates descriptors for policy templates
@@ -35,6 +46,27 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
   public static final String PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID = "PROPERTIES";
   protected static final String FILE_SYSTEM_MODEL_LOADER_ID = "FILE_SYSTEM";
   protected static final String MISSING_POLICY_DESCRIPTOR_ERROR = "Policy must contain a " + MULE_POLICY_JSON + " file";
+
+  private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+
+  /**
+   * Creates a default factory
+   */
+  @SuppressWarnings({"unused"})
+  public PolicyTemplateDescriptorFactory() {
+    this(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()));
+  }
+
+  /**
+   * Creates a new factory
+   *
+   * @param artifactPluginDescriptorLoader loads the artifact descriptor for plugins used on the policy template. Non null
+   */
+  public PolicyTemplateDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
+    checkArgument(artifactPluginDescriptorLoader != null, "artifactPluginDescriptorLoader cannot be null");
+
+    this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+  }
 
   @Override
   public PolicyTemplateDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
@@ -66,10 +98,41 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
       throw new ArtifactDescriptorCreateException("Unknown bundle descriptor loader: " + bundleDescriptorLoader.getId());
     }
 
+    final Set<ArtifactPluginDescriptor> plugins = parseArtifactPluginDescriptors(artifactFolder, descriptor);
+    // TODO(pablo.kraan): MULE-9649 - verify exported packages
+    descriptor.setPlugins(plugins);
+
     PropertiesBundleDescriptorLoader propertiesBundleDescriptorLoader = new PropertiesBundleDescriptorLoader();
     descriptor.setBundleDescriptor(propertiesBundleDescriptorLoader.loadBundleDescriptor(bundleDescriptorLoader.getAttributes()));
 
     return descriptor;
+  }
+
+  private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(File artifactFolder, PolicyTemplateDescriptor descriptor) {
+    final File pluginsDir = new File(artifactFolder, PLUGINS_FOLDER);
+    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
+    if (pluginZips == null) {
+      return emptySet();
+    }
+
+    final Set<ArtifactPluginDescriptor> plugins = new HashSet<>(pluginZips.length);
+
+    if (pluginZips != null && pluginZips.length != 0) {
+      sort(pluginZips);
+
+      for (String pluginZip : pluginZips) {
+        String unpackDestinationFolder = descriptor.getName() + separator + PLUGINS_FOLDER + separator;
+        File pluginZipFile = new File(pluginsDir, pluginZip);
+        try {
+          plugins.add(artifactPluginDescriptorLoader
+              .load(pluginZipFile, new File(getMuleTmpDir(), unpackDestinationFolder)));
+        } catch (IOException e) {
+          throw new ArtifactDescriptorCreateException("Cannot load plugin descriptor: " + pluginZip, e);
+        }
+      }
+    }
+
+    return plugins;
   }
 
   private MulePolicyModel getMulePolicyJsonDescriber(File jsonFile) {
