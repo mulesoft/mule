@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -16,9 +18,6 @@ import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.logging.LogConfigChangeSubject;
@@ -103,8 +102,8 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     String resolveProcessorRepresentation =
         resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(),
                                        notification.getProcessor());
-    if (((EventContext) notification.getSource().getContext()).getProcessorsTrace() instanceof DefaultProcessorsTrace) {
-      ((DefaultProcessorsTrace) ((EventContext) notification.getSource().getContext()).getProcessorsTrace())
+    if (notification.getSource().getContext().getProcessorsTrace() instanceof DefaultProcessorsTrace) {
+      ((DefaultProcessorsTrace) notification.getSource().getContext().getProcessorsTrace())
           .addExecutedProcessors(resolveProcessorRepresentation);
     }
     if (notification.getSource().getFlowCallStack() instanceof DefaultFlowCallStack) {
