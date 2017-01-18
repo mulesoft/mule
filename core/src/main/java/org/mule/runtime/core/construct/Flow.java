@@ -13,6 +13,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageP
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.message.DefaultEventBuilder;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
@@ -90,7 +92,8 @@ public class Flow extends AbstractPipeline implements Processor {
 
     // TODO MULE-10013
     // Create new event for current flow with current flowConstruct, replyToHandler etc.
-    event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
+    event = new DefaultEventBuilder(DefaultEventContext.child(event.getContext()), event).flow(this)
+        .replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
     resetRequestContextEvent(event);
     return event;
   }
@@ -100,7 +103,8 @@ public class Flow extends AbstractPipeline implements Processor {
       Optional<Error> errorOptional = result.getError();
       // TODO MULE-10013
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-      result = Event.builder(result).flow(original.getFlowConstruct()).replyToHandler(original.getReplyToHandler())
+      result = new DefaultEventBuilder(original.getContext(), result).flow(original.getFlowConstruct())
+          .replyToHandler(original.getReplyToHandler())
           .replyToDestination(original.getReplyToDestination())
           .error(errorOptional.orElse(null)).build();
     }

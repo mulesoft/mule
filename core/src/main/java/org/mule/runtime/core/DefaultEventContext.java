@@ -59,6 +59,20 @@ public final class DefaultEventContext implements EventContext, Serializable {
     return new DefaultEventContext(flow, connectorName, correlationId);
   }
 
+  /**
+   * Builds a new child execution context from a parent context. A child context delegates to the parent context but has has it's
+   * own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is typically
+   * use in flow-ref type scenarios where a the referenced flow will complete the child context, but should not complete the
+   * parent context
+   * 
+   * @param parent the parent context
+   * @return
+   */
+  public static EventContext child(EventContext parent) {
+    return parent instanceof CoreEventContext ? new ChildCoreEventContext((CoreEventContext) parent)
+        : new ChildEventContext(parent);
+  }
+
   private final String id;
   private final String correlationId;
   private final OffsetTime receivedDate = now();
@@ -158,4 +172,101 @@ public final class DefaultEventContext implements EventContext, Serializable {
   public void subscribe(Subscriber<? super Event> s) {
     monoProcessor.subscribe(s);
   }
+
+  static class ChildEventContext implements EventContext, Serializable {
+
+    private static final long serialVersionUID = 1054412872901205234L;
+
+    private transient MonoProcessor<Event> monoProcessor = MonoProcessor.create();
+    private List<Subscriber> subscribers = new ArrayList<>();
+    private final EventContext parent;
+
+    private ChildEventContext(EventContext parent) {
+      this.parent = parent;
+    }
+
+    @Override
+    public String getId() {
+      return parent.getId();
+    }
+
+    @Override
+    public String getCorrelationId() {
+      return parent.getCorrelationId();
+    }
+
+    @Override
+    public OffsetTime getReceivedTime() {
+      return parent.getReceivedTime();
+    }
+
+    @Override
+    public String getOriginatingFlowName() {
+      return parent.getOriginatingFlowName();
+    }
+
+    @Override
+    public String getOriginatingConnectorName() {
+      return parent.getOriginatingConnectorName();
+    }
+
+    @Override
+    public void success() {
+      monoProcessor.onComplete();
+    }
+
+    @Override
+    public void success(Event event) {
+      monoProcessor.onNext(event);
+    }
+
+    @Override
+    public void error(MessagingException messagingException) {
+      monoProcessor.onError(messagingException);
+    }
+
+    @Override
+    public String toString() {
+      return parent.toString();
+    }
+
+    private void readObject(ObjectInputStream in) throws Exception {
+      in.defaultReadObject();
+      monoProcessor = MonoProcessor.create();
+      subscribers.forEach(s -> monoProcessor.subscribe(s));
+    }
+
+    @Override
+    public void subscribe(Subscriber<? super Event> s) {
+      subscribers.add(s);
+      monoProcessor.subscribe(s);
+    }
+
+  }
+
+  static class ChildCoreEventContext extends ChildEventContext implements CoreEventContext {
+
+    private CoreEventContext parent;
+
+    private ChildCoreEventContext(CoreEventContext parent) {
+      super(parent);
+      this.parent = parent;
+    }
+
+    @Override
+    public ProcessingTime getProcessingTime() {
+      return parent.getProcessingTime();
+    }
+
+    @Override
+    public ProcessorsTrace getProcessorsTrace() {
+      return parent.getProcessorsTrace();
+    }
+
+    @Override
+    public boolean isCorrelationIdFromSource() {
+      return parent.isCorrelationIdFromSource();
+    }
+  }
+
 }

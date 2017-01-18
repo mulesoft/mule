@@ -78,6 +78,7 @@ import java.util.function.Function;
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -273,11 +274,20 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
-    return mono -> Mono.from(mono).transform(pipeline)
-        .otherwise(MessagingException.class, me -> Mono.from(getExceptionListener().apply(me)))
-        .otherwise(EventDroppedException.class, mde -> empty())
+    return stream -> from(stream).transform(pipeline)
+        .doOnNext(response -> response.getContext().success(response))
+        .doOnError(MessagingException.class, me -> from(getExceptionListener().apply(me))
+            .doOnNext(event -> event.getContext().success(event))
+            .doOnError(MessagingException.class, me2 -> me2.getEvent().getContext().error(me2))
+            .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                       throwable -> LOGGER.error("Unhandled exception thrown during error handling" + throwable))
+            .subscribe())
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                   throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
+                   throwable -> LOGGER.error("Unhandled exception in async processing " + throwable))
+        .onErrorResumeWith(EventDroppedException.class, ede -> {
+          ede.getEvent().getContext().success();
+          return empty();
+        });
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {

@@ -72,22 +72,22 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   public DefaultEventBuilder(Event event) {
+    this(event.getContext(), event);
+  }
+
+  public DefaultEventBuilder(EventContext messageContext, Event event) {
+    this.context = messageContext;
     this.originalEvent = event;
-    this.context = event.getContext();
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
     this.groupCorrelation = event.getGroupCorrelation();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
-
     this.flowCallStack = event.getFlowCallStack().clone();
-
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
     this.message = event.getMessage();
-
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
-
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     event.getVariableNames().forEach(key -> this.flowVariables
