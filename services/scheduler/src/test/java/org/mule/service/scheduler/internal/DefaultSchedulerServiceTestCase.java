@@ -7,12 +7,15 @@
 package org.mule.service.scheduler.internal;
 
 import static java.lang.Thread.currentThread;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
@@ -20,13 +23,17 @@ import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.exception.SchedulerBusyException;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +44,9 @@ import ru.yandex.qatools.allure.annotations.Features;
 
 @Features("SchedulerService")
 public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Test
   @Description("Tests that the threads of the SchedulerService are correcly created and destroyed.")
@@ -53,9 +63,6 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
       return true;
     }));
   }
-
-  @Rule
-  public ExpectedException expected = none();
 
   @Test
   @Description("Tests that dispatching a task to a throttled scheduler already running its maximum tasks throws the appropriate exception.")
@@ -75,7 +82,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
       }
     });
 
-    expected.expect(RejectedExecutionException.class);
+    expected.expect(SchedulerBusyException.class);
 
     final Runnable task = () -> {
     };
@@ -105,4 +112,125 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
     submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
   }
+
+  @Test
+  @Description("Tests that tasks dispatched from a CPU Light thread to a busy Scheduler are rejected.")
+  public void rejectionPolicyCpuLight() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    Scheduler sourceScheduler = service.cpuLightScheduler();
+    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+
+    Latch latch = new Latch();
+
+    Future<Object> submit = sourceScheduler.submit(threadsConsumer(targetScheduler, latch));
+
+    expected.expect(ExecutionException.class);
+    expected.expectCause(instanceOf(SchedulerBusyException.class));
+    submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+  }
+
+  @Test
+  @Description("Tests that tasks dispatched from a CPU Intensive thread to a busy Scheduler are rejected.")
+  public void rejectionPolicyCpuIntensive() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    Scheduler sourceScheduler = service.cpuIntensiveScheduler();
+    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+
+    Latch latch = new Latch();
+
+    Future<Object> submit = sourceScheduler.submit(threadsConsumer(targetScheduler, latch));
+
+    expected.expect(ExecutionException.class);
+    expected.expectCause(instanceOf(SchedulerBusyException.class));
+    submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+  }
+
+  @Test
+  @Description("Tests that tasks dispatched from an IO thread to a busy Scheduler waits for execution.")
+  public void rejectionPolicyIO() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    Scheduler sourceScheduler = service.ioScheduler();
+    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+
+    Latch latch = new Latch();
+
+    Future<Object> submit = sourceScheduler.submit(threadsConsumer(targetScheduler, latch));
+
+    try {
+      submit.get(1, SECONDS);
+      fail();
+    } catch (TimeoutException te) {
+    }
+
+    latch.countDown();
+    submit.get(5, SECONDS);
+  }
+
+  @Test
+  @Description("Tests that tasks dispatched from a Custom scheduler thread to a busy Scheduler waits for execution.")
+  public void rejectionPolicyCustom() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    Scheduler sourceScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+
+    Latch latch = new Latch();
+
+    Future<Object> submit = sourceScheduler.submit(threadsConsumer(targetScheduler, latch));
+
+    try {
+      submit.get(1, SECONDS);
+      fail();
+    } catch (TimeoutException te) {
+    }
+
+    latch.countDown();
+    submit.get(5, SECONDS);
+  }
+
+  @Test
+  @Description("Tests that tasks dispatched from any other thread to a busy Scheduler are rejected.")
+  public void rejectionPolicyOther() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
+    final DefaultSchedulerService service = new DefaultSchedulerService();
+
+    service.start();
+
+    ExecutorService sourceExecutor = newSingleThreadExecutor();
+    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+
+    Latch latch = new Latch();
+
+    Future<Object> submit = sourceExecutor.submit(threadsConsumer(targetScheduler, latch));
+
+    expected.expect(ExecutionException.class);
+    expected.expectCause(instanceOf(SchedulerBusyException.class));
+    submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+  }
+
+  private Callable<Object> threadsConsumer(Scheduler targetScheduler, Latch latch) {
+    return () -> {
+      while (latch.getCount() > 0) {
+        targetScheduler.submit(() -> {
+          try {
+            latch.await();
+          } catch (InterruptedException e) {
+            currentThread().interrupt();
+          }
+        });
+      }
+      return null;
+    };
+  }
+
 }

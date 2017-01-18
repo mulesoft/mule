@@ -8,7 +8,6 @@ package org.mule.service.scheduler.internal;
 
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.number.IsCloseTo.closeTo;
@@ -83,16 +82,19 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
   }
 
   @After
-  public void after() throws SchedulerException {
+  public void after() throws SchedulerException, InterruptedException {
     sharedExecutor.shutdownNow();
     sharedScheduledExecutor.shutdownNow();
-    sharedQuartzScheduler.shutdown();
+    sharedQuartzScheduler.shutdown(true);
+
+    sharedExecutor.awaitTermination(5, SECONDS);
+    sharedScheduledExecutor.awaitTermination(5, SECONDS);
   }
 
   protected void assertTerminationIsNotDelayed(final ScheduledExecutorService executor) throws InterruptedException {
     long startTime = nanoTime();
     executor.shutdown();
-    executor.awaitTermination(1000, MILLISECONDS);
+    executor.awaitTermination(1, SECONDS);
 
     assertThat((double) NANOSECONDS.toMillis(nanoTime() - startTime), closeTo(0, DELTA_MILLIS));
   }

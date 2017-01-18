@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.scheduler.exception.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Inject;
 
@@ -48,6 +48,8 @@ import ru.yandex.qatools.allure.annotations.Features;
 
 @Features("Scheduler Service")
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
+
+  private static final int CUSTOM_SCHEDULER_SIZE = 4;
 
   @Override
   protected String getConfigFile() {
@@ -81,8 +83,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Test
   @Description("Tests that the exception that happens when a thread pool is full is properly handled.")
   public void overloadErrorHandling() throws Exception {
-    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize() + ThreadPoolsConfig#getIoQueueSize().
-    for (int i = 0; i < 256 + 1024; ++i) {
+    for (int i = 0; i < CUSTOM_SCHEDULER_SIZE; ++i) {
       flowRunner("delaySchedule").run();
     }
 
@@ -90,7 +91,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
     assertThat(exception.getEvent().getError().isPresent(), is(true));
     assertThat(exception.getEvent().getError().get().getErrorType().getIdentifier(), is("OVERLOAD"));
-    assertThat(exception.getCause(), instanceOf(RejectedExecutionException.class));
+    assertThat(exception.getCause(), instanceOf(SchedulerBusyException.class));
 
     WaitingProcessor.latch.countDown();
   }
@@ -105,8 +106,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     FlowConstruct delayScheduleFlow = getFlowConstruct("delaySchedule");
     MessageSource messageSource = ((Flow) delayScheduleFlow).getMessageSource();
 
-    // This has to match the default value returned by ThreadPoolsConfig#getIoMaxPoolSize() + ThreadPoolsConfig#getIoQueueSize().
-    for (int i = 0; i < 256 + 1024; ++i) {
+    for (int i = 0; i < CUSTOM_SCHEDULER_SIZE; ++i) {
       ((SkeletonSource) messageSource).getListener()
           .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).build());
     }
@@ -127,7 +127,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
         return "OVERLOAD".equals(errorTypeId);
       }
     });
-    expected.expectCause(instanceOf(RejectedExecutionException.class));
+    expected.expectCause(instanceOf(SchedulerBusyException.class));
 
     try {
       ((SkeletonSource) messageSource).getListener()
@@ -180,7 +180,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     @Override
     public void initialise() throws InitialisationException {
       latch = new Latch();
-      scheduler = schedulerService.ioScheduler();
+      scheduler = schedulerService.customScheduler(config().withMaxConcurrentTasks(CUSTOM_SCHEDULER_SIZE));
     }
 
     @Override

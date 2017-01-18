@@ -9,6 +9,7 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.scheduler.ThreadType;
 import org.mule.service.scheduler.internal.config.ThreadPoolsConfig;
+import org.mule.service.scheduler.internal.executor.ByCallerThreadGroupPolicy;
 import org.mule.service.scheduler.internal.threads.SchedulerThreadFactory;
 
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
@@ -54,9 +56,6 @@ import org.slf4j.Logger;
  * {@link Scheduler}s provided by this implementation of {@link SchedulerService} use a shared single-threaded
  * {@link ScheduledExecutorService} for scheduling work. When a scheduled tasks is fired, they are executed using the
  * {@link Scheduler}'s own executor.
- * <p>
- * The returned {@link Scheduler}s have an {@code AbortPolicy} rejection policy. That means that when sending a task to a full
- * {@link Scheduler} a {@link RejectedExecutionException} will be thrown.
  *
  * @since 4.0
  */
@@ -79,6 +78,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private final ThreadGroup computationGroup = new ThreadGroup(schedulerGroup, COMPUTATION_THREADS_NAME);
   private final ThreadGroup timerGroup = new ThreadGroup(schedulerGroup, TIMER_THREADS_NAME);
   private final ThreadGroup customGroup = new ThreadGroup(schedulerGroup, CUSTOM_THREADS_NAME);
+
+  private final RejectedExecutionHandler byCallerThreadGroupPolicy =
+      new ByCallerThreadGroupPolicy(new HashSet<>(asList(ioGroup, customGroup)));
 
   private ThreadPoolExecutor cpuLightExecutor;
   private ThreadPoolExecutor ioExecutor;
@@ -192,7 +194,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
                                new SynchronousQueue<Runnable>(),
                                new SchedulerThreadFactory(customGroup,
-                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"),
+                               byCallerThreadGroupPolicy);
 
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
@@ -211,7 +214,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
                                new LinkedBlockingQueue<Runnable>(queueSize),
                                new SchedulerThreadFactory(customGroup,
-                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"));
+                                                          "%s." + resolveSchedulerName(config, CUSTOM_THREADS_NAME) + ".%02d"),
+                               byCallerThreadGroupPolicy);
 
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores, scheduledExecutor,
@@ -282,15 +286,15 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     cpuLightExecutor = new ThreadPoolExecutor(threadPoolsConfig.getCpuLightPoolSize(), threadPoolsConfig.getCpuLightPoolSize(),
                                               0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuLightQueueSize()),
-                                              new SchedulerThreadFactory(cpuLightGroup));
+                                              new SchedulerThreadFactory(cpuLightGroup), byCallerThreadGroupPolicy);
     ioExecutor = new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize(), threadPoolsConfig.getIoMaxPoolSize(),
                                         threadPoolsConfig.getIoKeepAlive(), MILLISECONDS,
                                         new LinkedBlockingQueue<>(threadPoolsConfig.getIoQueueSize()),
-                                        new SchedulerThreadFactory(ioGroup));
+                                        new SchedulerThreadFactory(ioGroup), byCallerThreadGroupPolicy);
     computationExecutor =
         new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize(), threadPoolsConfig.getCpuIntensivePoolSize(),
                                0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuIntensiveQueueSize()),
-                               new SchedulerThreadFactory(computationGroup));
+                               new SchedulerThreadFactory(computationGroup), byCallerThreadGroupPolicy);
 
     scheduledExecutor = new ScheduledThreadPoolExecutor(1, new SchedulerThreadFactory(timerGroup, "%s"));
     scheduledExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
