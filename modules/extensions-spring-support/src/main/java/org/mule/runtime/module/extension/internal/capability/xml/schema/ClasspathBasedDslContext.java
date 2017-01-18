@@ -8,12 +8,18 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.annotation.AnnotationUtils.getAnnotation;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.reflections.util.ClasspathHelper.forClassLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.net.URL;
 import java.util.Collection;
@@ -21,11 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ConfigurationBuilder;
 
 /**
  * Implementation of {@link DslResolvingContext} that scans the Classpath looking for the {@link Class} associated to the provided
@@ -57,8 +58,10 @@ class ClasspathBasedDslContext implements DslResolvingContext {
   }
 
   private void findExtensionsInClasspath() {
-
-    Set<Class<?>> annotated = getExtensionTypes(forClassLoader(classLoader));
+    final Collection<URL> mulePluginsUrls = forClassLoader(classLoader).stream()
+        .filter(url -> url.getFile().contains(MULE_PLUGIN_CLASSIFIER))
+        .collect(toList());
+    Set<Class<?>> annotated = getExtensionTypes(mulePluginsUrls);
 
     annotated.forEach(type -> getAnnotation(type, Extension.class)
         .ifPresent(extension -> extensionsByName.put(extension.name(), type)));
