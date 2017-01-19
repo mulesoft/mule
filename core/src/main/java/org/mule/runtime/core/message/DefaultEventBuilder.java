@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityContext;
@@ -211,7 +212,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     /** Immutable MuleEvent state **/
 
-    private final EventContext context;
+    private EventContext context;
     // TODO MULE-10013 make this final
     private InternalMessage message;
     private final MuleSession session;
@@ -231,6 +232,9 @@ public class DefaultEventBuilder implements Event.Builder {
     private final String legacyCorrelationId;
     private final Error error;
 
+    // Used in deserialization to obtain instance of flowConstruct via registry lookup.
+    private String flowName;
+
     // Use this constructor from the builder
     private EventImplementation(EventContext context, InternalMessage message, Map<String, TypedValue<Object>> variables,
                                 FlowConstruct flowConstruct, MuleSession session,
@@ -239,6 +243,10 @@ public class DefaultEventBuilder implements Event.Builder {
                                 String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
+      if(flowConstruct != null)
+      {
+        this.flowName = flowConstruct.getName();
+      }
       this.session = session;
       this.message = message;
       variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
@@ -375,6 +383,7 @@ public class DefaultEventBuilder implements Event.Builder {
      */
     @SuppressWarnings({"unused"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {
+      // TODO MULE-10013 remove this logic from here
       if (message instanceof InternalMessage) {
         setMessage(message);
       }
@@ -389,9 +398,16 @@ public class DefaultEventBuilder implements Event.Builder {
         }
 
       }
-      // Can be null if service call originates from MuleClient
-      if (context.getOriginatingFlowName() != null) {
-        flowConstruct = muleContext.getRegistry().lookupFlowConstruct(context.getOriginatingFlowName());
+      if (flowName != null) {
+        flowConstruct = muleContext.getRegistry().lookupFlowConstruct(flowName);
+        // If flow construct is a Pipeline and has a EventContext instance cache, then reestablish the event context here with
+        // that instance in order to conserve non-serializable subscribers which in turn reference callbacks. Otherwise use the
+        // serialized version with no subscribers.
+        if (flowConstruct instanceof Pipeline) {
+          // TODO MULE-11349 Use unique id's for child flows
+          EventContext cachedValue = ((Pipeline) flowConstruct).getSerializedEventContextCache().remove(context.getId());
+          context = cachedValue != null ? cachedValue : context;
+        }
       }
     }
 
@@ -415,7 +431,13 @@ public class DefaultEventBuilder implements Event.Builder {
     // //////////////////////////
 
     private void writeObject(ObjectOutputStream out) throws IOException {
+      // TODO MULE-10013 remove this logic from here
       out.defaultWriteObject();
+      if(flowName !=null && flowConstruct instanceof Pipeline)
+      {
+        // TODO MULE-11349 Use unique id's for child flows
+        ((Pipeline)flowConstruct).getSerializedEventContextCache().put(context.getId(), context);
+      }
       for (Map.Entry<String, TypedValue> entry : variables.entrySet()) {
         Object value = entry.getValue();
         if (value != null && !(value instanceof Serializable)) {
@@ -425,7 +447,6 @@ public class DefaultEventBuilder implements Event.Builder {
           throw new IOException(message);
         }
       }
-
     }
 
     private void setMessage(InternalMessage message) {

@@ -37,7 +37,6 @@ public final class DefaultEventContext implements EventContext, Serializable {
   private static final long serialVersionUID = -3664490832964509653L;
 
   private transient MonoProcessor<Event> monoProcessor = MonoProcessor.create();
-  private List<Subscriber> subscribers = new ArrayList<>();
 
   /**
    * Builds a new execution context with the given parameters.
@@ -153,12 +152,10 @@ public final class DefaultEventContext implements EventContext, Serializable {
   private void readObject(ObjectInputStream in) throws Exception {
     in.defaultReadObject();
     monoProcessor = MonoProcessor.create();
-    subscribers.forEach(s -> monoProcessor.subscribe(s));
   }
 
   @Override
   public void subscribe(Subscriber<? super Event> s) {
-    subscribers.add(s);
     monoProcessor.subscribe(s);
   }
 }

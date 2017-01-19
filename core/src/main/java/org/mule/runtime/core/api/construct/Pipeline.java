@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -14,6 +16,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
@@ -32,5 +35,14 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
   void setProcessingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
 
   ProcessingStrategy getProcessingStrategy();
+
+  /**
+   * Map of current {@link EventContext} instances for {@link Event}'s that have been serialized. Entries will removed on
+   * deserialization or in the last resort purged through garbage collection when there are no longer and hard references to the
+   * EventContext left. {@link EventContext}'s for {@link Event}'s that are not serialized will never be added to this cache.
+   *
+   * @return map of event context keyed by their id as obtained from {@link EventContext#getId()}
+   */
+  Map<String, EventContext> getSerializedEventContextCache();
 
 }
