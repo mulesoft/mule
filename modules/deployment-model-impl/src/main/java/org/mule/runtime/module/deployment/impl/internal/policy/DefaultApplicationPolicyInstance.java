@@ -9,11 +9,12 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.policy.DefaultPolicyInstance;
@@ -53,7 +54,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private PolicyInstance policyInstance;
 
   /**
-   * Creates and initialises a new policy instance
+   * Creates a new policy instance
    *
    * @param application application artifact owning the created policy. Non null
    * @param template policy template from which the instance will be created. Non null
@@ -76,7 +77,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
   }
 
-  private void initPolicyContext() {
+  private void initPolicyContext() throws InitialisationException {
     ArtifactContextBuilder artifactBuilder =
         newBuilder().setArtifactType(APP)
             .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
@@ -99,7 +100,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
       policyContext = artifactBuilder.build();
       policyContext.getMuleContext().start();
     } catch (MuleException e) {
-      throw new IllegalStateException("Cannot create artifact context for the policy instance", e);
+      throw new InitialisationException(createStaticMessage("Cannot create artifact context for the policy instance"), e, this);
     }
   }
 
@@ -112,11 +113,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     return paths.toArray(new String[0]);
   }
 
-  private void initPolicyInstance() {
+  private void initPolicyInstance() throws InitialisationException {
     try {
       policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(DefaultPolicyInstance.class);
     } catch (RegistrationException e) {
-      throw new IllegalStateException(String.format("More than one %s found on context", ApplicationPolicyInstance.class), e);
+      throw new InitialisationException(createStaticMessage(
+                                                            String.format("More than one %s found on context",
+                                                                          ApplicationPolicyInstance.class)),
+                                        e, this);
     }
 
     // TODO(pablo.kraan): lifecycle has to be manually applied because of MULE-11242
@@ -124,7 +128,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
       policyInstance.initialise();
       policyInstance.start();
     } catch (Exception e) {
-      throw new IllegalStateException("Unable to apply lifecycle to policy instance", e);
+      throw new InitialisationException(createStaticMessage("Unable to apply lifecycle to policy instance"), e, this);
     }
   }
 
@@ -139,9 +143,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   @Override
-  public void initialise() {
-    initPolicyContext();
-    initPolicyInstance();
+  public void initialise() throws InitialisationException {
+    if (policyContext == null) {
+      initPolicyContext();
+    }
+
+    if (policyInstance == null) {
+      initPolicyInstance();
+    }
   }
 
   @Override
