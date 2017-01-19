@@ -176,7 +176,6 @@ public final class DefaultEventContext implements EventContext, Serializable {
     private static final long serialVersionUID = 1054412872901205234L;
 
     private transient MonoProcessor<Event> monoProcessor = MonoProcessor.create();
-    private List<Subscriber> subscribers = new ArrayList<>();
     private final EventContext parent;
 
     private ChildEventContext(EventContext parent) {
@@ -185,7 +184,7 @@ public final class DefaultEventContext implements EventContext, Serializable {
 
     @Override
     public String getId() {
-      return parent.getId();
+      return parent.getId() + System.identityHashCode(this);
     }
 
     @Override
@@ -246,12 +245,10 @@ public final class DefaultEventContext implements EventContext, Serializable {
     private void readObject(ObjectInputStream in) throws Exception {
       in.defaultReadObject();
       monoProcessor = MonoProcessor.create();
-      subscribers.forEach(s -> monoProcessor.subscribe(s));
     }
 
     @Override
     public void subscribe(Subscriber<? super Event> s) {
-      subscribers.add(s);
       monoProcessor.subscribe(s);
     }
 

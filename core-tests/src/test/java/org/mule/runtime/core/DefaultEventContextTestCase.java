@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core;
 
-import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -17,17 +16,14 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
-  private static int BLOCK_TIMEOUT = 50;
   private static String TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE = "Timeout on blocking read";
 
   @Rule
