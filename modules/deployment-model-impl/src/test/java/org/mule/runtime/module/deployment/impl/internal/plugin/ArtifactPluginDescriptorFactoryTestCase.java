@@ -21,6 +21,10 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -39,11 +43,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
@@ -229,7 +228,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
       assertThat(pluginDescriptor.getName(), equalTo(pluginFolder.getName()));
       try {
         assertThat(pluginDescriptor.getClassLoaderModel().getUrls()[0],
-                   equalTo(new File(pluginFolder, "classes").toURI().toURL()));
+                   equalTo(pluginFolder.toURI().toURL()));
       } catch (MalformedURLException e) {
         throw new AssertionError("Can't compare classes dir", e);
       }
@@ -252,7 +251,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     private void assertUrls(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
       assertThat(pluginDescriptor.getClassLoaderModel().getUrls().length, equalTo(libraries.length + 1));
       assertThat(pluginDescriptor.getClassLoaderModel().getUrls(),
-                 hasItemInArray(equalTo(new File(pluginFolder, "classes").toURI().toURL())));
+                 hasItemInArray(equalTo(pluginFolder.toURI().toURL())));
 
       for (URL libUrl : libraries) {
         assertThat(pluginDescriptor.getClassLoaderModel().getUrls(), hasItemInArray(equalTo(libUrl)));
