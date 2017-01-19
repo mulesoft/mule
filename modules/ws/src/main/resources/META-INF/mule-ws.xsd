@@ -241,6 +241,17 @@
                                                 </xsd:documentation>
                                             </xsd:annotation>
                                         </xsd:attribute>
+                                        <xsd:attribute name="checkResponseTimestamp" type="xsd:boolean"
+                                            use="optional" default="false">
+                                            <xsd:annotation>
+                                                <xsd:documentation>
+                                                    If true, the difference between creation and expiry time
+                                                    is verified in the response. You should set this attribute
+                                                    to boolean if the server sends a timestamp as a response
+                                                    to a timestamp header in the security header.
+                                                </xsd:documentation>
+                                             </xsd:annotation>
+                                        </xsd:attribute>
                                     </xsd:complexType>
                                 </xsd:element>
                                 <xsd:element name="wss-sign" minOccurs="0">

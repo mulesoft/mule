@@ -36,7 +36,7 @@
 			<ws:wss-username-token username="admin"
 				password="textPassword" passwordType="TEXT" addCreated="true"
 				addNonce="true" />
-			<ws:wss-timestamp expires="60" />
+			<ws:wss-timestamp expires="60" checkResponseTimestamp="true"/>
 			<!-- I add the following actions because if I let the timestamp alone,
 				 no verification on incoming requests are performed 
 			-->
