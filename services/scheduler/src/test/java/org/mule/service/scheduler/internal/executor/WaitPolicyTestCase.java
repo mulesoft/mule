@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,34 +107,6 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
 
     executorLock.unlock();
     return submitters;
-  }
-
-  @Test
-  public void testWaitPolicyWithShutdownExecutor() throws Exception {
-    assertEquals(0, SleepyTask.activeTasks.get());
-
-    // wants to wait forever, but will fail immediately
-    executor.setRejectedExecutionHandler(new LastRejectedWaitPolicy());
-    executor.shutdown();
-
-    // create a task
-    List<Runnable> tasks = new ArrayList<>();
-    tasks.add(new SleepyTask("rejected", 1000));
-
-    // should fail and return immediately
-    LinkedList<Thread> submitters = this.execute(tasks);
-    assertFalse(submitters.isEmpty());
-
-    // let submitted tasks run
-    Thread.sleep(1000);
-
-    LinkedList<Map<Thread, Throwable>> exceptions = threadGroup.collectedExceptions();
-    assertEquals(1, exceptions.size());
-
-    Map.Entry<Thread, Throwable> threadFailure = exceptions.getFirst().entrySet().iterator().next();
-    assertEquals(submitters.getFirst(), threadFailure.getKey());
-    assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
-    assertEquals(0, SleepyTask.activeTasks.get());
   }
 
   @Test

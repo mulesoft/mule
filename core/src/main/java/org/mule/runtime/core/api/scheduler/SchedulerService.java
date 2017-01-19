@@ -12,7 +12,6 @@ import org.mule.runtime.api.service.Service;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 /**
  * Provides access to the different schedulers and thread pools that exist in the Mule runtime, allowing an artifact to schedule
@@ -110,8 +109,8 @@ public interface SchedulerService extends Service {
 
   /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
-   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads, a {@link SynchronousQueue}
-   * and an {@link AbortPolicy abort} rejection policy.
+   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads and a
+   * {@link SynchronousQueue}.
    * 
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
@@ -119,8 +118,8 @@ public interface SchedulerService extends Service {
 
   /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
-   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads a {@link LinkedBlockingQueue}
-   * with the given {@code queueSize} and an {@link AbortPolicy abort} rejection policy.
+   * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads and a
+   * {@link LinkedBlockingQueue} with the given {@code queueSize}.
    * 
    * @return a scheduler whose threads manage {@code custom} tasks.
    */

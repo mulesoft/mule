@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
+import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.DispatchingRejectionPolicy.DEFAULT;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 
 /**
@@ -16,6 +19,24 @@ import org.mule.runtime.api.scheduler.Scheduler;
 public class SchedulerConfig {
 
   /**
+   * Different values on how to handle the scenario where a task is dispatched to a busy {@link Scheduler}.
+   * <p>
+   * A {@link Scheduler} is considered busy when all of its threads are busy and it cannot accept a new task for execution.
+   */
+  public enum DispatchingRejectionPolicy {
+    /**
+     * The actual rejection policy will depend on the type of scheduler the thread is. For cpu-bound threads it will be
+     * <b>abort</b>, and for the other cases it will be <b>wait</b>.
+     */
+    DEFAULT,
+
+    /**
+     * The dispatcher thread will wait for the task to be taken by the target scheduler, effectively blocking until that happens.
+     */
+    WAIT;
+  }
+
+  /**
    * @return a default configuration, which can be further customized.
    */
   public static SchedulerConfig config() {
@@ -24,7 +45,7 @@ public class SchedulerConfig {
 
   private Integer maxConcurrentTasks;
   private String schedulerName;
-  private Boolean waitDispatchingToBusyScheduler;
+  private DispatchingRejectionPolicy dispatchingRejectionPolicy = DEFAULT;
 
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
@@ -65,12 +86,26 @@ public class SchedulerConfig {
     return schedulerName;
   }
 
-  public SchedulerConfig withWaitDispatchingToBusyScheduler() {
-    this.waitDispatchingToBusyScheduler = true;
+  /**
+   * Sets the rejection policy to use when dispatching to a busy {@link Scheduler}.
+   * <p>
+   * This is only applicable for <b>custom</b> {@link Scheduler}s. The policy cannot be changed for the runtime managed
+   * {@link Scheduler}.
+   * 
+   * @see SchedulerBusyException
+   * 
+   * @return the updated configuration
+   */
+  public SchedulerConfig withDispatchingRejectionPolicy(DispatchingRejectionPolicy dispatchingRejectionPolicy) {
+    requireNonNull(dispatchingRejectionPolicy);
+    this.dispatchingRejectionPolicy = dispatchingRejectionPolicy;
     return this;
   }
 
-  public Boolean getWaitDispatchingToBusyScheduler() {
-    return waitDispatchingToBusyScheduler;
+  /**
+   * @return the {@link DispatchingRejectionPolicy} for the target custom {@link Scheduler}.
+   */
+  public DispatchingRejectionPolicy getDispatchingRejectionPolicy() {
+    return dispatchingRejectionPolicy;
   }
 }

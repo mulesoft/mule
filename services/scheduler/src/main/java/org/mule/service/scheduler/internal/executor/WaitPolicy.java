@@ -49,9 +49,7 @@ public class WaitPolicy implements RejectedExecutionHandler {
   @SuppressWarnings("boxing")
   public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
     try {
-      if (e.isShutdown()) {
-        throw new RejectedExecutionException("ThreadPoolExecutor is already shut down");
-      } else if (!e.getQueue().offer(r, time, timeUnit)) {
+      if (!e.getQueue().offer(r, time, timeUnit)) {
         throw new SchedulerBusyException(format("Scheduler did not accept within %1d %2s", time, timeUnit));
       }
     } catch (InterruptedException ie) {
@@ -59,5 +57,6 @@ public class WaitPolicy implements RejectedExecutionHandler {
       throw new RejectedExecutionException(ie);
     }
   }
+
 
 }

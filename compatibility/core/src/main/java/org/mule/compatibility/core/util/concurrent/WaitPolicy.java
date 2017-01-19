@@ -6,6 +6,10 @@
  */
 package org.mule.compatibility.core.util.concurrent;
 
+import static java.lang.Long.MAX_VALUE;
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,7 +34,7 @@ public class WaitPolicy implements RejectedExecutionHandler {
    */
   public WaitPolicy() {
     // effectively waits forever
-    this(Long.MAX_VALUE, TimeUnit.SECONDS);
+    this(MAX_VALUE, SECONDS);
   }
 
   /**
@@ -39,7 +43,7 @@ public class WaitPolicy implements RejectedExecutionHandler {
    */
   public WaitPolicy(long time, TimeUnit timeUnit) {
     super();
-    this.time = (time < 0 ? Long.MAX_VALUE : time);
+    this.time = (time < 0 ? MAX_VALUE : time);
     this.timeUnit = timeUnit;
   }
 
@@ -47,14 +51,14 @@ public class WaitPolicy implements RejectedExecutionHandler {
   @SuppressWarnings("boxing")
   public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
     try {
-      if (!e.getQueue().offer(r, time, timeUnit)) {
-        String message = String.format("ThreadPoolExecutor did not accept within %1d %2s", time, timeUnit);
-        throw new RejectedExecutionException(message);
+      if (e.isShutdown()) {
+        throw new RejectedExecutionException("ThreadPoolExecutor is already shut down");
+      } else if (!e.getQueue().offer(r, time, timeUnit)) {
+        throw new RejectedExecutionException(format("ThreadPoolExecutor did not accept within %1d %2s", time, timeUnit));
       }
     } catch (InterruptedException ie) {
       Thread.currentThread().interrupt();
       throw new RejectedExecutionException(ie);
     }
   }
-
 }

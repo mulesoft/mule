@@ -4,14 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.concurrent;
+package org.mule.compatibility.core.util.concurrent;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.core.util.concurrent.WaitPolicy;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -31,6 +30,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * <b>This is a copy of the same class in the scheduler service. It is copied here instead of reused from mule-core so it isn't
+ * over-exposed from a classlaoding pespective.</b>
+ * <p>
+ */
 public class WaitPolicyTestCase extends AbstractMuleTestCase {
 
   private ExceptionCollectingThreadGroup threadGroup;
