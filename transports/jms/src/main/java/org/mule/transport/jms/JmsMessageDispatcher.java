@@ -6,6 +6,12 @@
  */
 package org.mule.transport.jms;
 
+import static javax.jms.Message.DEFAULT_PRIORITY;
+import static javax.jms.Message.DEFAULT_TIME_TO_LIVE;
+import static org.mule.transport.jms.JmsConstants.PERSISTENT_DELIVERY_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.PRIORITY_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.TIME_TO_LIVE_PROPERTY;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -94,6 +100,21 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return disableTemporaryDestinations;
     }
 
+    protected long getTimeToLive(MuleMessage message)
+    {
+        return message.getOutboundProperty(TIME_TO_LIVE_PROPERTY, DEFAULT_TIME_TO_LIVE);
+    }
+
+    protected int getPriority(MuleMessage message)
+    {
+        return message.getOutboundProperty(PRIORITY_PROPERTY, DEFAULT_PRIORITY);
+    }
+
+    protected boolean getPersistentDelivery(MuleMessage message)
+    {
+        return message.getOutboundProperty(PERSISTENT_DELIVERY_PROPERTY, connector.isPersistentDelivery());
+    }
+
     private MuleMessage dispatchMessage(MuleEvent event, boolean doSend) throws Exception
     {
         Session session = null;
@@ -152,9 +173,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             processMessage(msg, event);
 
             // QoS support
-            long ttl = eventMsg.getOutboundProperty(JmsConstants.TIME_TO_LIVE_PROPERTY, Message.DEFAULT_TIME_TO_LIVE);
-            int priority = eventMsg.getOutboundProperty(JmsConstants.PRIORITY_PROPERTY, Message.DEFAULT_PRIORITY);
-            boolean persistent= eventMsg.getOutboundProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY, connector.isPersistentDelivery());
+            long ttl = getTimeToLive(eventMsg);
+            int priority = getPriority(eventMsg);
+            boolean persistent = getPersistentDelivery(eventMsg);
 
             // If we are honouring the current QoS message headers we need to use the ones set on the current message
             if (connector.isHonorQosHeaders())

@@ -215,7 +215,7 @@
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
-        <mockitoVersion>1.9.5</mockitoVersion>
+        <mockitoVersion>1.10.19</mockitoVersion>
         <muleExtensionsApiVersion>1.0.0-alpha-1</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
