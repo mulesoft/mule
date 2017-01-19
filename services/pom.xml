@@ -19,6 +19,7 @@
     <modules>
         <module>http</module>
         <module>scheduler</module>
+        <module>oauth</module>
         <module>services-all</module>
     </modules>
 </project>

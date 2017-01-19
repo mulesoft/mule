@@ -6,26 +6,32 @@
  */
 package org.mule.extension.oauth2.internal.clientcredentials;
 
-import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
-import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
+import static org.mule.runtime.oauth.api.ClientCredentialsConfig.builder;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -33,12 +39,18 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
+
+import org.slf4j.Logger;
 
 /**
  * Authorization element for client credentials oauth grant type
  */
-public class ClientCredentialsGrantType extends AbstractGrantType implements Initialisable, Startable, Stoppable {
+public class ClientCredentialsGrantType extends AbstractGrantType implements Initialisable, Startable, Stoppable, Disposable {
+
+  private static final Logger LOGGER = getLogger(ClientCredentialsGrantType.class);
 
   /**
    * Application identifier as defined in the oauth authentication server.
@@ -70,24 +82,25 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
   @Placement(tab = SECURITY_TAB)
   private TlsContextFactory tlsContextFactory;
 
+  private OAuthDancer dancer;
+
   public TlsContextFactory getTlsContext() {
     return tlsContextFactory;
   }
 
   @Override
   public void start() throws MuleException {
-    tokenRequestHandler.start();
-    try {
-      tokenRequestHandler.refreshAccessToken();
-    } catch (Exception e) {
-      tokenRequestHandler.stop();
-      throw e;
-    }
+    startIfNeeded(dancer);
   }
 
   @Override
   public void stop() throws MuleException {
-    tokenRequestHandler.stop();
+    stopIfNeeded(dancer);
+  }
+
+  @Override
+  public void dispose() {
+    LifecycleUtils.disposeIfNeeded(dancer, LOGGER);
   }
 
   @Override
@@ -105,26 +118,40 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     if (tokenManager == null) {
       this.tokenManager = TokenManagerConfig.createDefault(muleContext);
     }
+    initialiseIfNeeded(tokenManager, muleContext);
 
-    tokenRequestHandler.setApplicationCredentials(this);
-    tokenRequestHandler.setTokenManager(tokenManager);
     if (tlsContextFactory != null) {
       initialiseIfNeeded(tlsContextFactory);
-      tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
     }
-    tokenRequestHandler.setMuleContext(muleContext);
-    tokenRequestHandler.initialise();
+
+    try {
+      OAuthService oauthService = muleContext.getRegistry().lookupObject(OAuthService.class);
+
+      dancer =
+          oauthService.createClientCredentialsGrantTypeDancer(builder(clientId, clientSecret, tokenRequestHandler.getTokenUrl())
+              .encodeClientCredentialsInBody(tokenRequestHandler.isEncodeClientCredentialsInBody())
+              .scopes(tokenRequestHandler.getScopes())
+              .encoding(getDefaultEncoding(muleContext))
+              .tlsContextFactory(tlsContextFactory)
+              .responseAccessTokenExpr(resolver.getExpression(tokenRequestHandler.getResponseAccessToken()))
+              .responseRefreshTokenExpr(resolver.getExpression(tokenRequestHandler.getResponseRefreshToken()))
+              .responseExpiresInExpr(resolver.getExpression(tokenRequestHandler.getResponseExpiresIn()))
+              .customParametersExtractorsExprs(tokenRequestHandler.getCustomParameterExtractors().stream()
+                  .collect(toMap(extractor -> extractor.getParamName(),
+                                 extractor -> resolver.getExpression(extractor.getValue()))))
+              .build(),
+                                                              lockId -> muleContext.getLockFactory().createLock(lockId),
+                                                              new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                              muleContext.getExpressionManager());
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
+    initialiseIfNeeded(dancer);
   }
 
   @Override
   public void authenticate(HttpRequestBuilder builder) throws MuleException {
-    final String accessToken =
-        tokenManager.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
-    if (accessToken == null) {
-      throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
-          + "Verify that you have authenticated before trying to execute an operation to the API.")));
-    }
-    builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
+    builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(dancer.accessToken(DEFAULT_RESOURCE_OWNER_ID)));
   }
 
   @Override
@@ -132,11 +159,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     final Boolean shouldRetryRequest =
         resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
-      try {
-        tokenRequestHandler.refreshAccessToken();
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
-      }
+      dancer.refreshToken(DEFAULT_RESOURCE_OWNER_ID, null);
     }
     return shouldRetryRequest;
   }

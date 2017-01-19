@@ -7,6 +7,7 @@
 package org.mule.extension.oauth2.internal;
 
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
@@ -42,6 +43,17 @@ public class DeferredExpressionResolver {
           .build();
 
       return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), resultContext).getValue();
+    }
+  }
+
+  public <T> String getExpression(ParameterResolver<T> expr) {
+    if (expr == null) {
+      return null;
+    } else if (!expr.getExpression().isPresent()
+        || !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+      return (String) expr.resolve();
+    } else {
+      return expr.getExpression().get();
     }
   }
 

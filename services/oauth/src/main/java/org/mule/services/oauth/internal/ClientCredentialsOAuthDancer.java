@@ -1,0 +1,105 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.services.oauth.internal;
+
+import static java.lang.String.format;
+import static org.apache.commons.codec.binary.Base64.encodeBase64String;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.oauth.api.ClientCredentialsConfig;
+import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
+import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.service.http.api.HttpService;
+import org.mule.services.oauth.internal.state.TokenResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
+
+import org.slf4j.Logger;
+
+
+public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements OAuthDancer, Startable {
+
+  private static final Logger LOGGER = getLogger(ClientCredentialsOAuthDancer.class);
+
+  private final ClientCredentialsConfig config;
+
+  public ClientCredentialsOAuthDancer(ClientCredentialsConfig config, Function<String, Lock> lockProvider,
+                                      Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
+                                      ExpressionEvaluator expressionEvaluator) {
+    super(lockProvider, tokensStore,
+          buildHttpClient(httpService, format("%s.oauthToken.requester", config.toString()), config.getTlsContextFactory()),
+          expressionEvaluator);
+    this.config = config;
+  }
+
+  @Override
+  public ClientCredentialsConfig getConfig() {
+    return config;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    super.start();
+    refreshToken(null, null);
+  }
+
+  @Override
+  public void refreshToken(String resourceOwner, TokenRefreshCallback callback) {
+    final Map<String, String> formData = new HashMap<>();
+
+    formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);
+    if (config.getScopes() != null) {
+      formData.put(SCOPE_PARAMETER, config.getScopes());
+    }
+    String authorization = null;
+    if (config.isEncodeClientCredentialsInBody()) {
+      formData.put(CLIENT_ID_PARAMETER, config.getClientId());
+      formData.put(CLIENT_SECRET_PARAMETER, config.getClientSecret());
+    } else {
+      authorization = "Basic " + encodeBase64String(format("%s:%s", config.getClientId(), config.getClientSecret()).getBytes());
+    }
+
+    try {
+      TokenResponse tokenResponse = invokeTokenUrl(config.getTokenUrl(), formData, authorization, false, config.getEncoding());
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Retrieved access token, refresh token and expires from token url are: %s, %s, %s",
+                     tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), tokenResponse.getExpiresIn());
+      }
+
+      final ResourceOwnerOAuthContext defaultUserState = getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
+      defaultUserState.setAccessToken(tokenResponse.getAccessToken());
+      defaultUserState.setExpiresIn(tokenResponse.getExpiresIn());
+      for (Entry<String, Object> customResponseParameterEntry : tokenResponse.getCustomResponseParameters().entrySet()) {
+        defaultUserState.getTokenResponseParameters().put(customResponseParameterEntry.getKey(),
+                                                          customResponseParameterEntry.getValue());
+      }
+
+      updateResourceOwnerOAuthContext(defaultUserState);
+    } catch (TokenUrlResponseException | TokenNotFoundException e) {
+      throw new MuleRuntimeException(e);
+    }
+
+  }
+
+}

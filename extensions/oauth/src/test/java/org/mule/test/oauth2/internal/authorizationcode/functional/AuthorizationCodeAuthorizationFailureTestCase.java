@@ -13,20 +13,20 @@ import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
-import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.NO_AUTHORIZATION_CODE_STATUS;
-import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_NOT_FOUND_STATUS;
-import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_URL_CALL_FAILED_STATUS;
-import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.oauth.api.OAuthAuthorizationStatusCode.NO_AUTHORIZATION_CODE_STATUS;
+import static org.mule.runtime.oauth.api.OAuthAuthorizationStatusCode.TOKEN_NOT_FOUND_STATUS;
+import static org.mule.runtime.oauth.api.OAuthAuthorizationStatusCode.TOKEN_URL_CALL_FAILED_STATUS;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
+import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.functional.functional.FlowAssert;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;

@@ -10,7 +10,6 @@ import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.oauth2.internal.ApplicationCredentials;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.service.http.api.server.HttpServer;
 
 /**
  * Provides access to the general configuration of an authorization code oauth config.
@@ -46,10 +45,5 @@ public interface AuthorizationCodeGrantType extends ApplicationCredentials {
    * @return the tls configuration to use for listening and sending http request
    */
   TlsContextFactory getTlsContext();
-
-  /**
-   * @return the http server to listen for requests during the OAuth dance.
-   */
-  HttpServer getServer();
 
 }

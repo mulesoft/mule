@@ -66,6 +66,20 @@
             <classifier>mule-service</classifier>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-service-oauth-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-oauth</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <classifier>mule-service</classifier>
+        </dependency>
+
         <!--TODO: MULE-10837 remove dependency-->
         <dependency>
             <groupId>org.mule.services</groupId>

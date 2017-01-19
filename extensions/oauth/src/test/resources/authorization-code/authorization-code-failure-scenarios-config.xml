@@ -32,6 +32,7 @@
 
     <flow name="someFlow">
         <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
+        <logger level="WARN"/>
         <test:assert expression="#[mel:message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
     </flow>
 </mule>
