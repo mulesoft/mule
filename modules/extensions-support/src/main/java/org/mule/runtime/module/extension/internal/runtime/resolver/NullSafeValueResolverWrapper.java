@@ -20,12 +20,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
@@ -77,7 +76,12 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        Class<?> clazz = getType(objectType);
+        Class clazz = getType(objectType);
+
+        if (objectType.isOpen()) {
+          value.set(MapValueResolver.of(clazz, emptyList(), emptyList()));
+          return;
+        }
 
         String requiredFields = objectType.getFields().stream()
             .filter(f -> f.isRequired() && !isParameterGroup(f))
@@ -143,12 +147,6 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
       public void visitArrayType(ArrayType arrayType) {
         Class collectionClass = getType(arrayType);
         value.set(CollectionValueResolver.of(collectionClass, emptyList()));
-      }
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        Class mapClass = getType(dictionaryType);
-        value.set(MapValueResolver.of(mapClass, emptyList(), emptyList()));
       }
 
       @Override

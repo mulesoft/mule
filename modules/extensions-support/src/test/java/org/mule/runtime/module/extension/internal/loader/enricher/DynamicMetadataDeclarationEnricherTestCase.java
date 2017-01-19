@@ -110,16 +110,16 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     List<SourceDeclaration> messageSources = declaration.getConfigurations().get(0).getMessageSources();
     SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
 
-    assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-        .ofKey(TYPE_LOADER.load(String.class)).ofValue(TYPE_LOADER.load(Object.class)).build(), true);
+    assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.objectType().id(Map.class.getName())
+        .openWith(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
     assertParameterType(getDeclaration(sourceDynamicAttributes.getAllParameters(), "type"), toMetadataType(String.class));
 
     messageSources = declaration.getMessageSources();
     SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
 
-    assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-        .ofKey(TYPE_LOADER.load(String.class)).ofValue(TYPE_LOADER.load(Object.class)).build(), true);
+    assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.objectType().id(Map.class.getName())
+        .openWith(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
     List<ParameterDeclaration> locationKey = sourceStaticAttributes.getAllParameters();

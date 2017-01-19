@@ -17,7 +17,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
@@ -33,7 +32,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Builder delegation class to generate an XSD schema that describes an {@link DictionaryType}
+ * Builder delegation class to generate an XSD schema that describes an open {@link ObjectType}
  *
  * @since 4.0.0
  */
@@ -46,7 +45,7 @@ final class MapSchemaDelegate {
     this.builder = builder;
   }
 
-  void generateMapElement(DictionaryType metadataType, DslElementSyntax paramDsl, String description, boolean required,
+  void generateMapElement(ObjectType metadataType, DslElementSyntax paramDsl, String description, boolean required,
                           List<TopLevelElement> all) {
     BigInteger minOccurs = required ? ONE : ZERO;
     LocalComplexType mapComplexType = generateMapComplexType(paramDsl, metadataType);
@@ -58,11 +57,10 @@ final class MapSchemaDelegate {
     all.add(mapElement);
   }
 
-  private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final DictionaryType metadataType) {
-    final MetadataType keyType = metadataType.getKeyType();
-    final MetadataType valueType = metadataType.getValueType();
+  private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final ObjectType metadataType) {
+    final MetadataType valueType = metadataType.getOpenRestriction().get();
     final LocalComplexType entryComplexType = new LocalComplexType();
-    final Attribute keyAttribute = builder.createAttribute(KEY_ATTRIBUTE_NAME, keyType, true, REQUIRED);
+    final Attribute keyAttribute = builder.createAttribute(KEY_ATTRIBUTE_NAME, true, REQUIRED);
     entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
 
     final LocalComplexType mapComplexType = new LocalComplexType();

@@ -41,7 +41,6 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -342,6 +341,10 @@ public final class SchemaBuilder {
     return createAttribute(name, EMPTY, type, null, required, expressionSupport);
   }
 
+  Attribute createAttribute(String name, boolean required, ExpressionSupport expressionSupport) {
+    return createAttribute(name, EMPTY, typeLoader.load(String.class), null, required, expressionSupport);
+  }
+
   private Attribute createAttribute(final String name, String description, final MetadataType type, Object defaultValue,
                                     boolean required, final ExpressionSupport expressionSupport) {
     final Attribute attribute = new Attribute();
@@ -526,16 +529,6 @@ public final class SchemaBuilder {
       }
 
       @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        defaultVisit(dictionaryType);
-        if (paramDsl.supportsChildDeclaration()) {
-          mapDelegate.generateMapElement(dictionaryType, paramDsl, description,
-                                         !paramDsl.supportsAttributeDeclaration(),
-                                         childElements);
-        }
-      }
-
-      @Override
       public void visitObject(ObjectType objectType) {
         final String id = getId(objectType);
         if (id.equals(TlsContextFactory.class.getName())) {
@@ -544,7 +537,13 @@ public final class SchemaBuilder {
         }
 
         defaultVisit(objectType);
-        objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
+        if (objectType.isOpen()) {
+          mapDelegate.generateMapElement(objectType, paramDsl, description,
+                                         !paramDsl.supportsAttributeDeclaration(),
+                                         childElements);
+        } else {
+          objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
+        }
       }
 
       @Override

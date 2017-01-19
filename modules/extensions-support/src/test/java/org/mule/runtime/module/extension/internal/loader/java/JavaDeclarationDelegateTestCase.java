@@ -389,18 +389,19 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, "dateOfGraduation", "", toMetadataType(Calendar.class), false, NOT_SUPPORTED, null);
 
     assertParameter(parameters, "recipe", "",
-                    TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                        .ofValue(TYPE_BUILDER.numberType().id("java.lang.Long")).build(),
+                    TYPE_BUILDER.objectType()
+                        .id(Map.class.getName())
+                        .openWith(TYPE_BUILDER.numberType().id("java.lang.Long"))
+                        .build(),
                     false, SUPPORTED, null);
 
     assertParameter(parameters, "ricinPacks", "", arrayOf(Set.class, objectTypeBuilder(Ricin.class)), false, SUPPORTED, null);
 
     assertParameter(parameters, "nextDoor", "", toMetadataType(KnockeableDoor.class), false, SUPPORTED, null);
     assertParameter(parameters, "candidateDoors", "",
-                    TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName()))
-                        .ofValue(objectTypeBuilder(KnockeableDoor.class)).build(),
+                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                        .openWith((objectTypeBuilder(KnockeableDoor.class)).build())
+                        .build(),
                     false, SUPPORTED, null);
 
     assertParameter(parameters, "initialHealth", "", toMetadataType(HealthStatus.class), false, SUPPORTED, "CANCER");
@@ -413,20 +414,22 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
                     null);
     assertParameter(parameters, "wildCards", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
     assertParameter(parameters,
-                    "wildCardWeaponMap", "", TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(objectTypeBuilder(Weapon.class)).ofValue(objectTypeBuilder(Object.class)).build(),
+                    "wildCardWeaponMap", "", TYPE_BUILDER.objectType()
+                        .id(Map.class.getName())
+                        .openWith(objectTypeBuilder(Object.class)).build(),
                     false, SUPPORTED, null);
+    // .ofKey(objectTypeBuilder(Weapon.class)).ofValue(objectTypeBuilder(Object.class)).build(),
 
     assertParameter(parameters, "monthlyIncomes", "", arrayOf(List.class, TYPE_BUILDER.numberType().id(Long.class.getName())),
                     true, SUPPORTED, null);
     assertParameter(parameters, "labeledRicin", "",
-                    TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(objectTypeBuilder(Ricin.class))
+                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                        .openWith(objectTypeBuilder(Ricin.class))
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "deathsBySeasons", "",
-                    TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_BUILDER.arrayType()
+                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                        .openWith(TYPE_BUILDER.arrayType()
                             .id(List.class.getName())
                             .of(TYPE_BUILDER.stringType()
                                 .id(String.class
@@ -434,8 +437,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "weaponValueMap", "",
-                    TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(TYPE_BUILDER.stringType().id(String.class.getName())).ofValue(TYPE_LOADER.load(Weapon.class))
+                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                        .openWith(TYPE_LOADER.load(Weapon.class))
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "healthProgressions", "",
@@ -626,9 +629,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, GET_MEDICAL_HISTORY);
     assertParameter(operation.getAllParameters(), "healthByYear", "",
-                    TYPE_BUILDER.dictionaryType().id(Map.class.getName())
-                        .ofKey(TYPE_BUILDER.numberType().id(Integer.class.getName()))
-                        .ofValue(TYPE_LOADER.load(HealthStatus.class)).build(),
+                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                        .openWith(TYPE_LOADER.load(HealthStatus.class))
+                        .build(),
                     true, SUPPORTED, null);
     assertConnected(operation, false);
     assertTransactional(operation, false);

@@ -110,11 +110,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private MetadataType topLevelTestList = baseTypeBuilder.arrayType()
       .id(ArrayList.class.getName()).of(toMetadataType(TopLevelTest.class)).build();
 
-  private MetadataType childTestMap = baseTypeBuilder.dictionaryType()
-      .id(HashMap.class.getName()).ofKey(toMetadataType(String.class)).ofValue(toMetadataType(ChildTest.class)).build();
+  private MetadataType childTestMap = baseTypeBuilder.objectType()
+      .id(HashMap.class.getName()).openWith(toMetadataType(ChildTest.class)).build();
 
-  private MetadataType topLevelMap = baseTypeBuilder.dictionaryType()
-      .id(HashMap.class.getName()).ofKey(toMetadataType(String.class)).ofValue(toMetadataType(TopLevelTest.class)).build();
+  private MetadataType topLevelMap = baseTypeBuilder.objectType()
+      .id(HashMap.class.getName()).openWith(toMetadataType(TopLevelTest.class)).build();
 
   private NameClashModelValidator validator = new NameClashModelValidator();
 
