@@ -11,7 +11,6 @@ import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authNoCredentials;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -155,7 +154,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       event.getSession().setSecurityContext(context);
       return event;
     } else if (header == null) {
-      throw new BasicUnauthorisedException(authNoCredentials(), createUnauthenticatedMessage());
+      throw new BasicUnauthorisedException(null, this, "HTTP listener", createUnauthenticatedMessage());
     } else {
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), createUnauthenticatedMessage());

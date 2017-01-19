@@ -35,6 +35,10 @@ public class UnauthorisedException extends SecurityException {
     super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter));
   }
 
+  public UnauthorisedException(SecurityContext context, SecurityFilter filter, String connector) {
+    super(constructMessage(context, connector, filter));
+  }
+
   private static I18nMessage constructMessage(SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
     I18nMessage m;
     if (context == null) {

@@ -39,7 +39,7 @@
     
     <flow name="secure">
         <httpn:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
-        <httpn:basic-security-filter realm="mule-realm"/>
+        <httpn:basic-security-filter realm="mule-realm" attributes="#[message.attributes]"/>
         <cxf:simple-service serviceClass="org.mule.runtime.core.component.simple.EchoComponent"/>
 
         <echo-component/>
