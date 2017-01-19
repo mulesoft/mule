@@ -101,6 +101,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
@@ -368,14 +369,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
           .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                          PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
           .build());
-
-  private final PolicyFileBuilder brokenPolicyFileBuilder =
-      new PolicyFileBuilder(BAR_POLICY_NAME).definedBy("brokenPolicy.xml").describedBy(new MulePolicyModelBuilder()
-          .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
-          .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                         PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-          .build());
-
 
   private final PolicyFileBuilder policyUsingAppPluginFileBuilder =
       new PolicyFileBuilder(BAR_POLICY_NAME).definedBy("appPluginPolicy.xml").describedBy(new MulePolicyModelBuilder()
@@ -3090,6 +3083,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failsToApplyBrokenApplicationPolicy() throws Exception {
+    PolicyFileBuilder brokenPolicyFileBuilder =
+        new PolicyFileBuilder(BAR_POLICY_NAME).definedBy("brokenPolicy.xml").describedBy(new MulePolicyModelBuilder()
+            .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
+            .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                           PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+            .build());
+
     policyManager.registerPolicyTemplate(brokenPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
@@ -3103,7 +3103,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       policyManager.addPolicy(applicationFileBuilder.getId(), brokenPolicyFileBuilder.getId(),
                               new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1, emptyMap()));
       fail("Policy application should have failed");
-    } catch(IllegalStateException expected) {
+    } catch (PolicyRegistrationException expected) {
     }
   }
 
@@ -3227,7 +3227,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap()));
       fail("Policy application should have failed");
-    } catch(IllegalStateException expected) {
+    } catch (PolicyRegistrationException expected) {
     }
   }
 

@@ -12,8 +12,11 @@ import static java.util.Optional.of;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyInstance;
 import org.mule.runtime.core.policy.PolicyParametrization;
@@ -71,9 +74,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.classLoaderRepository = classLoaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
-
-    initPolicyContext();
-    initPolicyInstance();
   }
 
   private void initPolicyContext() {
@@ -114,8 +114,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   private void initPolicyInstance() {
     try {
-      policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(
-                                                                                 org.mule.runtime.core.policy.DefaultPolicyInstance.class);
+      policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(DefaultPolicyInstance.class);
     } catch (RegistrationException e) {
       throw new IllegalStateException(String.format("More than one %s found on context", ApplicationPolicyInstance.class), e);
     }
@@ -137,6 +136,12 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   @Override
   public int getOrder() {
     return parametrization.getOrder();
+  }
+
+  @Override
+  public void initialise() {
+    initPolicyContext();
+    initPolicyInstance();
   }
 
   @Override
@@ -163,4 +168,5 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
       return empty();
     }
   }
+
 }

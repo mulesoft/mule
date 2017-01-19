@@ -15,6 +15,7 @@ import static org.mule.runtime.core.util.FileUtils.unzip;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
+import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
@@ -73,7 +74,8 @@ public class TestPolicyManager implements DeploymentListener {
    * @param policyTemplateName template that must be used to instantiate the parametrized policy. Non empty.
    * @param policyParametrization parametrization to instantiate the policy. Non null.
    */
-  public void addPolicy(String appName, String policyTemplateName, PolicyParametrization policyParametrization) {
+  public void addPolicy(String appName, String policyTemplateName, PolicyParametrization policyParametrization)
+      throws PolicyRegistrationException {
 
     checkArgument(!isEmpty(appName), "appName cannot be empty");
     checkArgument(!isEmpty(policyTemplateName), "policyTemplateName cannot be empty");

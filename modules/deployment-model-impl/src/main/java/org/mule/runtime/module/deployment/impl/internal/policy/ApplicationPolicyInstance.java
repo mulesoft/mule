@@ -28,6 +28,11 @@ public interface ApplicationPolicyInstance {
   int getOrder();
 
   /**
+   * Initialises the instance
+   */
+  void initialise();
+
+  /**
    * Disposes the instance releasing any held resources
    */
   void dispose();
