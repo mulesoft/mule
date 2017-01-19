@@ -14,8 +14,8 @@ import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.DispatchingRejectionPolicy.DEFAULT;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.DispatchingRejectionPolicy.WAIT;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.DEFAULT;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 import static org.mule.service.scheduler.ThreadType.CPU_INTENSIVE;
 import static org.mule.service.scheduler.ThreadType.CPU_LIGHT;
 import static org.mule.service.scheduler.ThreadType.CUSTOM;
@@ -133,7 +133,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config) {
     checkStarted();
-    if (config.getDispatchingRejectionPolicy() != DEFAULT) {
+    if (config.getRejectionAction() != DEFAULT) {
       throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
     }
     final String schedulerName = resolveSchedulerName(config, CPU_LIGHT_THREADS_NAME);
@@ -152,7 +152,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler ioScheduler(SchedulerConfig config) {
     checkStarted();
-    if (config.getDispatchingRejectionPolicy() != DEFAULT) {
+    if (config.getRejectionAction() != DEFAULT) {
       throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
     }
     final String schedulerName = resolveSchedulerName(config, IO_THREADS_NAME);
@@ -171,7 +171,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
     checkStarted();
-    if (config.getDispatchingRejectionPolicy() != DEFAULT) {
+    if (config.getRejectionAction() != DEFAULT) {
       throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
     }
     final String schedulerName = resolveSchedulerName(config, COMPUTATION_THREADS_NAME);
@@ -238,7 +238,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   private ThreadGroup resolveThreadGroupForCustomScheduler(SchedulerConfig config) {
-    if (config.getDispatchingRejectionPolicy() == WAIT) {
+    if (config.getRejectionAction() == WAIT) {
       return customWaitGroup;
     } else {
       return customGroup;

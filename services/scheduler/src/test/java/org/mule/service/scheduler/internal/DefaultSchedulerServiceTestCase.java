@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.DispatchingRejectionPolicy.WAIT;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -130,21 +130,21 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   public void onlyCustomMayConfigureWaitCpuLight() {
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Only custom schedulers may define waitDispatchingToBusyScheduler");
-    service.cpuLightScheduler(config().withDispatchingRejectionPolicy(WAIT));
+    service.cpuLightScheduler(config().withRejectionAction(WAIT));
   }
 
   @Test
   public void onlyCustomMayConfigureWaitCpuIntensive() {
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Only custom schedulers may define waitDispatchingToBusyScheduler");
-    service.cpuIntensiveScheduler(config().withDispatchingRejectionPolicy(WAIT));
+    service.cpuIntensiveScheduler(config().withRejectionAction(WAIT));
   }
 
   @Test
   public void onlyCustomMayConfigureWaitIO() {
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Only custom schedulers may define waitDispatchingToBusyScheduler");
-    service.ioScheduler(config().withDispatchingRejectionPolicy(WAIT));
+    service.ioScheduler(config().withRejectionAction(WAIT));
   }
 
   @Test
@@ -216,7 +216,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Description("Tests that tasks dispatched from a Custom scheduler with 'Wait' allowed thread to a busy Scheduler waits for execution.")
   public void rejectionPolicyCustomWithConfig() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
     Scheduler sourceScheduler =
-        service.customScheduler(config().withDispatchingRejectionPolicy(WAIT).withMaxConcurrentTasks(1), 1);
+        service.customScheduler(config().withRejectionAction(WAIT).withMaxConcurrentTasks(1), 1);
     Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
 
     Latch latch = new Latch();
