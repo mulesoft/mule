@@ -28,7 +28,6 @@ import java.util.List;
  */
 class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder {
 
-  private static final String EXTENSION_BUNDLE_TYPE = "zip";
   private static final String EXTENSION_BUNDLE_CLASSIFIER = "mule-plugin";
   private static final String JAR_BUNDLE_TYPE = "jar";
   private final RepositoryService repositoryService;
@@ -67,7 +66,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
     BundleDescriptor bundleDescriptor =
         new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
-            .setType(EXTENSION_BUNDLE_TYPE).setClassifier(EXTENSION_BUNDLE_CLASSIFIER).build();
+            .setType(JAR_BUNDLE_TYPE).setClassifier(EXTENSION_BUNDLE_CLASSIFIER).build();
     this.extensionsBundleDependencies
         .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
     return this;
