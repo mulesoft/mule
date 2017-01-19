@@ -37,9 +37,10 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
   ProcessingStrategy getProcessingStrategy();
 
   /**
-   * Map of current {@link EventContext} instances for {@link Event}'s that have been serialized. Entries will removed on
-   * deserialization or in the last resort purged through garbage collection when there are no longer and hard references to the
-   * EventContext left. {@link EventContext}'s for {@link Event}'s that are not serialized will never be added to this cache.
+   * Map of current {@link EventContext} instances for {@link Event}'s that have been serialized. Entries will be removed on
+   * deserialization or in the last resort purged through garbage collection when there are no longer any hard references to the
+   * {@link EventContext} left. {@link EventContext}'s for {@link Event}'s that are not serialized will never be added to this
+   * cache.
    *
    * @return map of event context keyed by their id as obtained from {@link EventContext#getId()}
    */
