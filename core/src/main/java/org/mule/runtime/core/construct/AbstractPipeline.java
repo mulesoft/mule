@@ -430,7 +430,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return isTransactionActive() || processingStrategy.isSynchronous();
   }
 
-  public Map<String, EventContext> getSerializedEventContextCache() {
+  public Map<String, EventContext> getSerializationEventContextCache() {
     return eventContextCache.asMap();
   }
 

@@ -219,7 +219,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     System.gc();
 
     // The event is never deserialized but it is cleaned up by garbage collection due to WeakReference
-    assertThat(flow.getSerializedEventContextCache().get(beforeId), is(nullValue()));
+    assertThat(flow.getSerializationEventContextCache().get(beforeId), is(nullValue()));
   }
 
   @Test
@@ -237,7 +237,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertThat(from(before.getContext()).block(), equalTo(result));
 
     // Cache entry is removed on deserialization
-    assertThat(((Pipeline) before.getFlowConstruct()).getSerializedEventContextCache().get(before.getContext().getId()),
+    assertThat(((Pipeline) before.getFlowConstruct()).getSerializationEventContextCache().get(before.getContext().getId()),
                is(nullValue()));
 
   }

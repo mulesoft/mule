@@ -404,7 +404,7 @@ public class DefaultEventBuilder implements Event.Builder {
         // serialized version with no subscribers.
         if (flowConstruct instanceof Pipeline) {
           // TODO MULE-11349 Use unique id's for child flows
-          EventContext cachedValue = ((Pipeline) flowConstruct).getSerializedEventContextCache().remove(context.getId());
+          EventContext cachedValue = ((Pipeline) flowConstruct).getSerializationEventContextCache().remove(context.getId());
           context = cachedValue != null ? cachedValue : context;
         }
       }
@@ -434,7 +434,7 @@ public class DefaultEventBuilder implements Event.Builder {
       out.defaultWriteObject();
       if (flowName != null && flowConstruct instanceof Pipeline) {
         // TODO MULE-11349 Use unique id's for child flows
-        ((Pipeline) flowConstruct).getSerializedEventContextCache().put(context.getId(), context);
+        ((Pipeline) flowConstruct).getSerializationEventContextCache().put(context.getId(), context);
       }
       for (Map.Entry<String, TypedValue> entry : variables.entrySet()) {
         Object value = entry.getValue();

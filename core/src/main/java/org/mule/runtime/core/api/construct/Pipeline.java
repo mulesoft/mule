@@ -44,6 +44,6 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
    *
    * @return map of event context keyed by their id as obtained from {@link EventContext#getId()}
    */
-  Map<String, EventContext> getSerializedEventContextCache();
+  Map<String, EventContext> getSerializationEventContextCache();
 
 }
