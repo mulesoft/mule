@@ -4,14 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.concurrent;
+package org.mule.compatibility.core.util.concurrent;
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +30,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
+/**
+ * <b>This is a copy of the same class in the scheduler service. It is copied here instead of reused from mule-core so it isn't
+ * over-exposed from a classlaoding pespective.</b>
+ * <p>
+ */
 public class WaitPolicyTestCase extends AbstractMuleTestCase {
 
   private ExceptionCollectingThreadGroup threadGroup;
@@ -73,26 +77,20 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
       throw new IllegalArgumentException("List<Runnable> must not be empty");
     }
 
-    LinkedList<Thread> submitters = new LinkedList<Thread>();
+    LinkedList<Thread> submitters = new LinkedList<>();
 
     executorLock.lock();
 
-    for (Iterator<Runnable> i = tasks.iterator(); i.hasNext();) {
-      final Runnable task = i.next();
-
-      Runnable submitterAction = new Runnable() {
-
-        @Override
-        public void run() {
-          // the lock is important because otherwise two submitters might
-          // stumble over each other, submitting their runnables out-of-order
-          // and causing test failures.
-          try {
-            executorLock.lock();
-            executor.execute(task);
-          } finally {
-            executorLock.unlock();
-          }
+    for (Runnable task : tasks) {
+      Runnable submitterAction = () -> {
+        // the lock is important because otherwise two submitters might
+        // stumble over each other, submitting their runnables out-of-order
+        // and causing test failures.
+        try {
+          executorLock.lock();
+          executor.execute(task);
+        } finally {
+          executorLock.unlock();
         }
       };
 
@@ -120,7 +118,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
     executor.shutdown();
 
     // create a task
-    List<Runnable> tasks = new ArrayList<Runnable>();
+    List<Runnable> tasks = new ArrayList<>();
     tasks.add(new SleepyTask("rejected", 1000));
 
     // should fail and return immediately
@@ -148,7 +146,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
     executor.setRejectedExecutionHandler(policy);
 
     // create tasks
-    List<Runnable> tasks = new ArrayList<Runnable>();
+    List<Runnable> tasks = new ArrayList<>();
     // task 1 runs immediately
     tasks.add(new SleepyTask("run", 1000));
     // task 2 is queued
@@ -176,7 +174,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
     executor.setRejectedExecutionHandler(policy);
 
     // create tasks
-    List<Runnable> tasks = new ArrayList<Runnable>();
+    List<Runnable> tasks = new ArrayList<>();
     // task 1 runs immediately
     tasks.add(new SleepyTask("run", 1000));
     // task 2 is queued
@@ -204,7 +202,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase {
     executor.setRejectedExecutionHandler(policy);
 
     // create tasks
-    List<Runnable> tasks = new ArrayList<Runnable>();
+    List<Runnable> tasks = new ArrayList<>();
     // task 1 runs immediately
     tasks.add(new SleepyTask("run", 1000));
     // task 2 is queued
@@ -303,7 +301,7 @@ class SleepyTask extends Object implements Runnable {
 // ThreadGroup wrapper that collects uncaught exceptions
 class ExceptionCollectingThreadGroup extends ThreadGroup {
 
-  private final LinkedList<Map<Thread, Throwable>> exceptions = new LinkedList<Map<Thread, Throwable>>();
+  private final LinkedList<Map<Thread, Throwable>> exceptions = new LinkedList<>();
 
   public ExceptionCollectingThreadGroup() {
     super("ExceptionCollectingThreadGroup");

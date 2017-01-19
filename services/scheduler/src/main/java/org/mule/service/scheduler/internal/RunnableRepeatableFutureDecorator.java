@@ -95,9 +95,9 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   @Override
   protected void wrapUp() {
-    super.wrapUp();
-    running = false;
     wrapUpCallback.accept(this);
+    running = false;
+    super.wrapUp();
   }
 
   @Override

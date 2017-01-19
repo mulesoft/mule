@@ -30,8 +30,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
@@ -50,7 +48,6 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
   private DefaultScheduler executor;
 
   @Override
-  @Before
   public void before() throws SchedulerException {
     super.before();
     executor = new DefaultScheduler(DefaultSchedulerQuartzTestCase.class.getSimpleName(), sharedExecutor, 1,
@@ -58,16 +55,15 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
   }
 
   @Override
-  @After
-  public void after() throws SchedulerException {
+  public void after() throws SchedulerException, InterruptedException {
     executor.shutdownNow();
+    executor.awaitTermination(5, SECONDS);
     super.after();
   }
 
   @Test
   @Description("Tests that a ScheduledFuture from a cron is properly cancelled before it starts executing")
   public void cancelCronBeforeFire() throws InterruptedException {
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleWithCronExpression(() -> {

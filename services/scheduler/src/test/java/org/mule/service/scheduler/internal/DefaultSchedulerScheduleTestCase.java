@@ -9,6 +9,7 @@ package org.mule.service.scheduler.internal;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.quartz.SchedulerException;
 
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -42,7 +44,12 @@ import ru.yandex.qatools.allure.annotations.Features;
 @Features("Scheduler Task Scheduling")
 public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCase {
 
+  private static final int TASK_DURATION_MILLIS = 200;
+  private static final int TEST_DELAY_MILLIS = 1000;
+
   private Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService> executorFactory;
+
+  private ScheduledExecutorService executor;
 
   public DefaultSchedulerScheduleTestCase(Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService> executorFactory) {
     this.executorFactory = executorFactory;
@@ -57,11 +64,22 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     });
   }
 
+  @Override
+  public void before() throws SchedulerException {
+    super.before();
+    executor = createExecutor();
+  }
+
+  @Override
+  public void after() throws SchedulerException, InterruptedException {
+    executor.shutdownNow();
+    executor.awaitTermination(5, SECONDS);
+    super.after();
+  }
+
   @Test
   @Description("Tests scheduling a Runnable in the future")
   public void scheduleRunnable() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
@@ -81,8 +99,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling get on a ScheduledFuture with a time lower than the duration of the Runnable task throws a TimeoutException")
   public void scheduleRunnableGetTimeout() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
@@ -97,8 +113,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests scheduling a Callable in the future")
   public void scheduleCallable() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
@@ -118,8 +132,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling get on a ScheduledFuture with a time lower than the duration of the Callable task throws a TimeoutException")
   public void scheduleCallableGetTimeout() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
@@ -134,8 +146,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling shutdown() on a Scheduler with a Runnable scheduled in the future will wait for that task to finish")
   public void scheduleRunnableShutdownBeforeFire() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
@@ -158,8 +168,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling shutdown() on a Scheduler with a Callable scheduled in the future will wait for that task to finish")
   public void scheduleCallableShutdownBeforeFire() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
@@ -182,11 +190,9 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling shutdownNow() on a Scheduler with a Runnable scheduled in the future will cancel that task")
   public void scheduleRunnableShutdownNowBeforeFire() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     executor.schedule(() -> {
       fail("Called after shutdown");
-    }, 1, SECONDS);
+    }, TEST_DELAY_MILLIS, MILLISECONDS);
 
     assertThat(executor.shutdownNow(), hasSize(1));
   }
@@ -194,8 +200,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that calling shutdownNow() on a Scheduler with a Callable scheduled in the future will cancel that task")
   public void scheduleCallableShutdownNowBeforeFire() throws InterruptedException, ExecutionException, TimeoutException {
-    final ScheduledExecutorService executor = createExecutor();
-
     executor.schedule(() -> {
       fail("Called after shutdown");
     }, 1, SECONDS);
@@ -206,8 +210,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a one-shot Runnable before it starts executing")
   public void cancelRunnableBeforeFire() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
@@ -223,8 +225,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a one-shot Runnable while it's executing")
   public void cancelRunnableWhileRunning() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
@@ -243,8 +243,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a one-shot Callable before it starts executing")
   public void cancelCallableBeforeFire() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
@@ -260,15 +258,13 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a one-shot Callable while it's executing")
   public void cancelCallableWhileRunning() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
       latch1.countDown();
       return awaitLatch(latch2);
-    }, 1, SECONDS);
+    }, TEST_DELAY_MILLIS, MILLISECONDS);
 
     latch1.await();
     scheduled.cancel(true);
@@ -280,13 +276,11 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-rate Callable before it starts executing")
   public void cancelFixedRateBeforeFire() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
       awaitLatch(latch);
-    }, DEFAULT_TEST_TIMEOUT_SECS, 10, SECONDS);
+    }, SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS), 10 * TEST_DELAY_MILLIS, MILLISECONDS);
 
     scheduled.cancel(true);
 
@@ -297,15 +291,13 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-rate Callable while it's executing")
   public void cancelFixedRateWhileRunning() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
       latch1.countDown();
       awaitLatch(latch2);
-    }, 1, 10, SECONDS);
+    }, TEST_DELAY_MILLIS, 10 * TEST_DELAY_MILLIS, MILLISECONDS);
 
     latch1.await();
     scheduled.cancel(true);
@@ -317,13 +309,11 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-rate Callable in-between executions")
   public void cancelFixedRateInBetweenRuns() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
       sharedScheduledExecutor.schedule(() -> latch.countDown(), 0, SECONDS);
-    }, 0, DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+    }, TEST_DELAY_MILLIS, 10 * TEST_DELAY_MILLIS, MILLISECONDS);
 
     latch.await();
     scheduled.cancel(true);
@@ -335,13 +325,11 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-delay Callable before it starts executing")
   public void cancelFixedDelayBeforeFire() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleWithFixedDelay(() -> {
       awaitLatch(latch);
-    }, DEFAULT_TEST_TIMEOUT_SECS, 10, SECONDS);
+    }, DEFAULT_TEST_TIMEOUT_SECS, 10 * TEST_DELAY_MILLIS, MILLISECONDS);
 
     scheduled.cancel(true);
 
@@ -352,15 +340,13 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-delay Callable while it's executing")
   public void cancelFixedDelayWhileRunning() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleWithFixedDelay(() -> {
       latch1.countDown();
       awaitLatch(latch2);
-    }, 1, 10, SECONDS);
+    }, TEST_DELAY_MILLIS, 10 * TEST_DELAY_MILLIS, MILLISECONDS);
 
     latch1.await();
     scheduled.cancel(true);
@@ -372,8 +358,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that a ScheduledFuture is properly cancelled for a fixed-delay Callable in-between executions")
   public void cancelFixedDelayInBetweenRuns() throws InterruptedException, ExecutionException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleWithFixedDelay(() -> {
@@ -395,8 +379,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that shutdownNow after cancelling a running ScheduledFuture before being fired returns the cancelled task")
   public void shutdownNowAfterCancelCallableBeforeFire() {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
@@ -412,15 +394,13 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that shutdownNow after cancelling a running ScheduledFuture returns the cancelled task")
   public void shutdownNowAfterCancelCallableWhileRunning() throws InterruptedException {
-    final ScheduledExecutorService executor = createExecutor();
-
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.schedule(() -> {
       latch1.countDown();
       return awaitLatch(latch2);
-    }, 1, SECONDS);
+    }, TEST_DELAY_MILLIS, MILLISECONDS);
 
     latch1.await();
     scheduled.cancel(true);
@@ -434,8 +414,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that scheduleAtFixedRate parameters are honored")
   public void fixedRateRepeats() {
-    final ScheduledExecutorService executor = createExecutor();
-
     List<Long> startTimes = new ArrayList<>();
     List<Long> endTimes = new ArrayList<>();
 
@@ -444,25 +422,24 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
       startTimes.add(System.nanoTime());
       try {
-        sleep(200);
+        sleep(TASK_DURATION_MILLIS);
       } catch (InterruptedException e) {
         currentThread().interrupt();
       }
       latch.countDown();
       endTimes.add(System.nanoTime());
-    }, 0, 1, SECONDS);
+    }, 0, TEST_DELAY_MILLIS, MILLISECONDS);
 
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(800, DELTA_MILLIS));
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)),
+               closeTo(TEST_DELAY_MILLIS - TASK_DURATION_MILLIS, DELTA_MILLIS));
   }
 
   @Test
   @Description("Tests that scheduleAtFixedRate parameters are honored even if the task takes longer than the rate")
   public void fixedRateExceeds() {
-    final ScheduledExecutorService executor = createExecutor();
-
     List<Long> startTimes = new ArrayList<>();
     List<Long> endTimes = new ArrayList<>();
 
@@ -471,13 +448,13 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     final ScheduledFuture<?> scheduled = executor.scheduleAtFixedRate(() -> {
       startTimes.add(System.nanoTime());
       try {
-        sleep(1200);
+        sleep(TEST_DELAY_MILLIS + TASK_DURATION_MILLIS);
       } catch (InterruptedException e) {
         currentThread().interrupt();
       }
       latch.countDown();
       endTimes.add(System.nanoTime());
-    }, 0, 1, SECONDS);
+    }, 0, TEST_DELAY_MILLIS, MILLISECONDS);
 
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
@@ -488,8 +465,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that scheduleAtFixedDelay parameters are honored")
   public void fixedDelayRepeats() {
-    final ScheduledExecutorService executor = createExecutor();
-
     List<Long> startTimes = new ArrayList<>();
     List<Long> endTimes = new ArrayList<>();
 
@@ -498,18 +473,18 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     final ScheduledFuture<?> scheduled = executor.scheduleWithFixedDelay(() -> {
       startTimes.add(System.nanoTime());
       try {
-        sleep(200);
+        sleep(TASK_DURATION_MILLIS);
       } catch (InterruptedException e) {
         currentThread().interrupt();
       }
       latch.countDown();
       endTimes.add(System.nanoTime());
-    }, 0, 1, SECONDS);
+    }, 0, TEST_DELAY_MILLIS, MILLISECONDS);
 
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(1000, DELTA_MILLIS));
+    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(TEST_DELAY_MILLIS, DELTA_MILLIS));
   }
 
   @Override

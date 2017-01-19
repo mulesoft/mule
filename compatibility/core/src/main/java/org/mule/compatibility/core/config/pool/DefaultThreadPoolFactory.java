@@ -7,9 +7,9 @@
 package org.mule.compatibility.core.config.pool;
 
 import org.mule.compatibility.core.api.config.ThreadingProfile;
+import org.mule.compatibility.core.util.concurrent.WaitPolicy;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
-import org.mule.runtime.core.util.concurrent.WaitPolicy;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;

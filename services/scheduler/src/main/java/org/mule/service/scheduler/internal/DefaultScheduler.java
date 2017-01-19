@@ -279,7 +279,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
         return true;
       }
     }
-    return false;
+    return isTerminated();
   }
 
   @Override

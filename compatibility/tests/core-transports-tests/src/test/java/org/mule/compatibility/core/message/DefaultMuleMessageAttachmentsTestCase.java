@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.message;
+package org.mule.compatibility.core.message;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -19,6 +19,7 @@ import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.message.DefaultMessageBuilder;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
