@@ -190,7 +190,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file-extension-common</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
         </dependency>
 
         <!-- Include DataWeave Plugin -->

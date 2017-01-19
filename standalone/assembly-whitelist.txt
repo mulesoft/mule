@@ -166,7 +166,7 @@
 /mule-standalone-${productVersion}/plugins
 /mule-standalone-${productVersion}/plugins/mule-module-db-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-file-extension-common-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-file-extension-common-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}-mule-plugin.jar
