@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.ObjectInputStream;
