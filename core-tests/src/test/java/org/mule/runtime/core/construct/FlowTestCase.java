@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -50,7 +51,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -226,7 +226,6 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     assertThat(response, not(nullValue()));
   }
 
-  @Ignore
   @Test
   public void testFailStartingMessageSourceOnLifecycleShouldStopStartedPipelineProcesses() throws Exception {
     // Need to start mule context to have endpoints started during flow start
