@@ -247,7 +247,7 @@
                                                 <xsd:documentation>
                                                     If true, the difference between creation and expiry time
                                                     is verified in the response. You should set this attribute
-                                                    to boolean if the server sends a timestamp as a response
+                                                    to true if the server sends a timestamp as a response
                                                     to a timestamp header in the security header.
                                                 </xsd:documentation>
                                              </xsd:annotation>
