@@ -12,7 +12,8 @@
         <flow-ref name="ChunkingReceiver"/>
     </flow>
 
-    <flow name="ChunkingReceiver">
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <flow name="ChunkingReceiver" processingStrategy="synchronous">
         <message-chunk-aggregator/>
         <test:component appendString="' Received'" logMessageDetails="true"/>
     </flow>
@@ -24,7 +25,8 @@
         <flow-ref name="ChunkingObjectReceiver"/>
     </flow>
 
-    <flow name="ChunkingObjectReceiver">
+    <!-- TODO MULE-11344 Make MuleEventContext Serializable -->
+    <flow name="ChunkingObjectReceiver" processingStrategy="synchronous">
         <message-chunk-aggregator/>
         <test:component doInboundTransform="false" logMessageDetails="true"/>
         <!--<component> -->
