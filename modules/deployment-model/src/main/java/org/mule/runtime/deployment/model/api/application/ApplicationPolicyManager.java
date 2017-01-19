@@ -8,6 +8,7 @@
 package org.mule.runtime.deployment.model.api.application;
 
 import org.mule.runtime.core.policy.PolicyParametrization;
+import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 
 /**
@@ -20,8 +21,10 @@ public interface ApplicationPolicyManager {
    *
    * @param policyTemplateDescriptor describes how to create the policy template. Non null
    * @param parametrization parametrization used to instantiate the policy. Non null
+   * @throws PolicyRegistrationException if an error occurs registering the policy
    */
-  void addPolicy(PolicyTemplateDescriptor policyTemplateDescriptor, PolicyParametrization parametrization);
+  void addPolicy(PolicyTemplateDescriptor policyTemplateDescriptor, PolicyParametrization parametrization)
+      throws PolicyRegistrationException;
 
   /**
    * Removes a policy from the application

@@ -15,6 +15,7 @@ import static org.mule.runtime.core.util.FileUtils.unzip;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
+import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
@@ -23,9 +24,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDes
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -34,7 +33,6 @@ import java.util.Optional;
 public class TestPolicyManager implements DeploymentListener {
 
   private final DeploymentService deploymentService;
-  private final Map<String, List<AppPolicyParametrization>> registeredPolicies = new HashMap<>();
   private final List<PolicyTemplateDescriptor> policyTemplateDescriptors = new ArrayList<>();
   private final PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory;
 
@@ -50,22 +48,6 @@ public class TestPolicyManager implements DeploymentListener {
 
     this.deploymentService = deploymentService;
     this.policyTemplateDescriptorFactory = policyTemplateDescriptorFactory;
-  }
-
-  @Override
-  public void onDeploymentSuccess(String artifactName) {
-    List<AppPolicyParametrization> appPolicyParametrizations = registeredPolicies.get(artifactName);
-
-    if (appPolicyParametrizations == null) {
-      return;
-    }
-
-    Application application = deploymentService.findApplication(artifactName);
-    ApplicationPolicyManager policyManager = application.getPolicyManager();
-
-    for (AppPolicyParametrization appPolicyParametrization : appPolicyParametrizations) {
-      policyManager.addPolicy(appPolicyParametrization.policyTemplateDescriptor, appPolicyParametrization.policyParametrization);
-    }
   }
 
   /**
@@ -92,7 +74,8 @@ public class TestPolicyManager implements DeploymentListener {
    * @param policyTemplateName template that must be used to instantiate the parametrized policy. Non empty.
    * @param policyParametrization parametrization to instantiate the policy. Non null.
    */
-  public void addPolicy(String appName, String policyTemplateName, PolicyParametrization policyParametrization) {
+  public void addPolicy(String appName, String policyTemplateName, PolicyParametrization policyParametrization)
+      throws PolicyRegistrationException {
 
     checkArgument(!isEmpty(appName), "appName cannot be empty");
     checkArgument(!isEmpty(policyTemplateName), "policyTemplateName cannot be empty");
@@ -105,14 +88,9 @@ public class TestPolicyManager implements DeploymentListener {
       throw new IllegalStateException("Cannot find policy template descriptor with name: " + policyTemplateName);
     }
 
-    List<AppPolicyParametrization> appPolicyParametrizations = registeredPolicies.get(appName);
-
-    if (appPolicyParametrizations == null) {
-      appPolicyParametrizations = new ArrayList<>();
-      registeredPolicies.put(appName, appPolicyParametrizations);
-    }
-
-    appPolicyParametrizations.add(new AppPolicyParametrization(policyTemplateDescriptor.get(), policyParametrization));
+    Application application = deploymentService.findApplication(appName);
+    ApplicationPolicyManager policyManager = application.getPolicyManager();
+    policyManager.addPolicy(policyTemplateDescriptor.get(), policyParametrization);
   }
 
   /**
@@ -139,15 +117,4 @@ public class TestPolicyManager implements DeploymentListener {
     return new File(getExecutionFolder(), "policies");
   }
 
-  private static class AppPolicyParametrization {
-
-    private final PolicyTemplateDescriptor policyTemplateDescriptor;
-    private final PolicyParametrization policyParametrization;
-
-    private AppPolicyParametrization(PolicyTemplateDescriptor policyTemplateDescriptor,
-                                     PolicyParametrization policyParametrization) {
-      this.policyTemplateDescriptor = policyTemplateDescriptor;
-      this.policyParametrization = policyParametrization;
-    }
-  }
 }

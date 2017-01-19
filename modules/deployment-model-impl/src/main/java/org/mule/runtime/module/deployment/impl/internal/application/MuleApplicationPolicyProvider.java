@@ -17,6 +17,7 @@ import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
@@ -52,33 +53,41 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   }
 
   @Override
-  public synchronized void addPolicy(PolicyTemplateDescriptor policyTemplateDescriptor, PolicyParametrization parametrization) {
-    checkArgument(application != null, "application was not configured on the policy provider");
+  public synchronized void addPolicy(PolicyTemplateDescriptor policyTemplateDescriptor, PolicyParametrization parametrization)
+      throws PolicyRegistrationException {
+    try {
+      checkArgument(application != null, "application was not configured on the policy provider");
 
-    Optional<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProvider = registeredPolicyInstanceProviders.stream()
-        .filter(p -> p.getPolicyId().equals(parametrization.getId())).findFirst();
-    if (registeredPolicyInstanceProvider.isPresent()) {
-      throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
+      Optional<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProvider = registeredPolicyInstanceProviders.stream()
+          .filter(p -> p.getPolicyId().equals(parametrization.getId())).findFirst();
+      if (registeredPolicyInstanceProvider.isPresent()) {
+        throw new IllegalArgumentException(createPolicyAlreadyRegisteredError(parametrization.getId()));
+      }
+
+      Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
+          .filter(p -> p.policyTemplate.getDescriptor().getBundleDescriptor().getArtifactId()
+              .equals(policyTemplateDescriptor.getBundleDescriptor().getArtifactId()))
+          .findAny();
+
+      if (!registeredPolicyTemplate.isPresent()) {
+        PolicyTemplate policyTemplate = policyTemplateFactory.createArtifact(application, policyTemplateDescriptor);
+        registeredPolicyTemplate = of(new RegisteredPolicyTemplate(policyTemplate));
+        registeredPolicyTemplates.add(registeredPolicyTemplate.get());
+      }
+
+      ApplicationPolicyInstance applicationPolicyInstance = policyInstanceProviderFactory
+          .create(application, registeredPolicyTemplate.get().policyTemplate, parametrization);
+
+      applicationPolicyInstance.initialise();
+
+      registeredPolicyInstanceProviders
+          .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance,
+                                                    parametrization.getId()));
+      registeredPolicyInstanceProviders.sort(null);
+      registeredPolicyTemplate.get().count++;
+    } catch (Exception e) {
+      throw new PolicyRegistrationException(createPolicyRegistrationError(parametrization.getId()), e);
     }
-
-    Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
-        .filter(p -> p.policyTemplate.getDescriptor().getBundleDescriptor().getArtifactId()
-            .equals(policyTemplateDescriptor.getBundleDescriptor().getArtifactId()))
-        .findAny();
-
-    if (!registeredPolicyTemplate.isPresent()) {
-      PolicyTemplate policyTemplate = policyTemplateFactory.createArtifact(application, policyTemplateDescriptor);
-      registeredPolicyTemplate = of(new RegisteredPolicyTemplate(policyTemplate));
-      registeredPolicyTemplates.add(registeredPolicyTemplate.get());
-    }
-
-    ApplicationPolicyInstance applicationPolicyInstance = policyInstanceProviderFactory
-        .create(application, registeredPolicyTemplate.get().policyTemplate, parametrization);
-    registeredPolicyInstanceProviders
-        .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance,
-                                                  parametrization.getId()));
-    registeredPolicyInstanceProviders.sort(null);
-    registeredPolicyTemplate.get().count++;
   }
 
   @Override
@@ -169,6 +178,10 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
   static String createPolicyAlreadyRegisteredError(String policyId) {
     return format("Policy already registered: '%s'", policyId);
+  }
+
+  static String createPolicyRegistrationError(String policyId) {
+    return format("Error occured registering policy '%s'", policyId);
   }
 
   private static class RegisteredPolicyTemplate {

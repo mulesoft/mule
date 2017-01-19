@@ -9,11 +9,15 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyInstance;
 import org.mule.runtime.core.policy.PolicyParametrization;
@@ -39,7 +43,6 @@ import java.util.Optional;
  */
 public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstance {
 
-  private ArtifactContext policyContext;
   private final Application application;
   private final PolicyTemplate template;
   private final PolicyParametrization parametrization;
@@ -47,6 +50,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final ClassLoaderRepository classLoaderRepository;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
+  private ArtifactContext policyContext;
   private PolicyInstance policyInstance;
 
   /**
@@ -73,32 +77,30 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
   }
 
-  private void initPolicyContext() {
-    if (policyContext == null) {
-      ArtifactContextBuilder artifactBuilder =
-          newBuilder().setArtifactType(APP)
-              .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
-              .setArtifactName(parametrization.getId())
-              .setConfigurationFiles(getResourcePaths(template.getDescriptor().getConfigResourceFiles()))
-              .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
-              .setServiceRepository(serviceRepository)
-              .setClassLoaderRepository(classLoaderRepository)
-              .setArtifactPlugins(artifactPlugins)
-              .setExtensionManagerFactory(new PolicyTemplateExtensionManagerFactory(application, extensionModelLoaderRepository,
-                                                                                    artifactPlugins,
-                                                                                    new DefaultExtensionManagerFactory()));
+  private void initPolicyContext() throws InitialisationException {
+    ArtifactContextBuilder artifactBuilder =
+        newBuilder().setArtifactType(APP)
+            .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
+            .setArtifactName(parametrization.getId())
+            .setConfigurationFiles(getResourcePaths(template.getDescriptor().getConfigResourceFiles()))
+            .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
+            .setServiceRepository(serviceRepository)
+            .setClassLoaderRepository(classLoaderRepository)
+            .setArtifactPlugins(artifactPlugins)
+            .setExtensionManagerFactory(new PolicyTemplateExtensionManagerFactory(application, extensionModelLoaderRepository,
+                                                                                  artifactPlugins,
+                                                                                  new DefaultExtensionManagerFactory()));
 
-      artifactBuilder.withServiceConfigurator(customizationService -> customizationService
-          .overrideDefaultServiceImpl(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER,
-                                      application.getMuleContext().getRegistry()
-                                          .lookupObject(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER)));
+    artifactBuilder.withServiceConfigurator(customizationService -> customizationService
+        .overrideDefaultServiceImpl(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER,
+                                    application.getMuleContext().getRegistry()
+                                        .lookupObject(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER)));
 
-      try {
-        policyContext = artifactBuilder.build();
-        policyContext.getMuleContext().start();
-      } catch (MuleException e) {
-        throw new IllegalStateException("Cannot create artifact context for the policy instance", e);
-      }
+    try {
+      policyContext = artifactBuilder.build();
+      policyContext.getMuleContext().start();
+    } catch (MuleException e) {
+      throw new InitialisationException(createStaticMessage("Cannot create artifact context for the policy instance"), e, this);
     }
   }
 
@@ -111,26 +113,22 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     return paths.toArray(new String[0]);
   }
 
-  private void initPolicyInstance() {
-    if (policyInstance == null) {
-      synchronized (this) {
-        initPolicyContext();
+  private void initPolicyInstance() throws InitialisationException {
+    try {
+      policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(DefaultPolicyInstance.class);
+    } catch (RegistrationException e) {
+      throw new InitialisationException(createStaticMessage(
+                                                            String.format("More than one %s found on context",
+                                                                          ApplicationPolicyInstance.class)),
+                                        e, this);
+    }
 
-        try {
-          policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(
-                                                                                     org.mule.runtime.core.policy.DefaultPolicyInstance.class);
-        } catch (RegistrationException e) {
-          throw new IllegalStateException(String.format("More than one %s found on context", ApplicationPolicyInstance.class), e);
-        }
-
-        // TODO(pablo.kraan): lifecycle has to be manually applied because of MULE-11242
-        try {
-          policyInstance.initialise();
-          policyInstance.start();
-        } catch (Exception e) {
-          throw new IllegalStateException("Unable to apply lifecycle to policy instance", e);
-        }
-      }
+    // TODO(pablo.kraan): lifecycle has to be manually applied because of MULE-11242
+    try {
+      policyInstance.initialise();
+      policyInstance.start();
+    } catch (Exception e) {
+      throw new InitialisationException(createStaticMessage("Unable to apply lifecycle to policy instance"), e, this);
     }
   }
 
@@ -145,6 +143,18 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   @Override
+  public void initialise() throws InitialisationException {
+    if (policyInstance == null) {
+      synchronized (this) {
+        if (policyContext == null) {
+          initPolicyContext();
+        }
+        initPolicyInstance();
+      }
+    }
+  }
+
+  @Override
   public void dispose() {
     if (policyContext != null) {
       policyContext.getMuleContext().dispose();
@@ -153,8 +163,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public Optional<Policy> getSourcePolicy() {
-    initPolicyInstance();
-
     if (policyInstance.getSourcePolicyChain().isPresent()) {
       return of(new Policy(policyInstance.getSourcePolicyChain().get(), parametrization.getId()));
     } else {
@@ -164,12 +172,11 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public Optional<Policy> getOperationPolicy() {
-    initPolicyInstance();
-
     if (policyInstance.getOperationPolicyChain().isPresent()) {
       return of(new Policy(policyInstance.getOperationPolicyChain().get(), parametrization.getId()));
     } else {
       return empty();
     }
   }
+
 }

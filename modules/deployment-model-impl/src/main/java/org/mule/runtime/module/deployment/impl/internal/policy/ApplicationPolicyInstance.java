@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyPointcut;
 
@@ -15,7 +17,7 @@ import java.util.Optional;
 /**
  * Defines a policy provider for a given parametrized policy
  */
-public interface ApplicationPolicyInstance {
+public interface ApplicationPolicyInstance extends Initialisable, Disposable {
 
   /**
    * @return the policy's pointcut used to determine whether to apply or ignore the policy when a request arrives. No null.
@@ -26,11 +28,6 @@ public interface ApplicationPolicyInstance {
    * @return order that must be used to apply the policy
    */
   int getOrder();
-
-  /**
-   * Disposes the instance releasing any held resources
-   */
-  void dispose();
 
   /**
    * @return policy to intercept the source execution

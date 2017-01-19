@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -17,12 +18,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.createPolicyAlreadyRegisteredError;
+import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.createPolicyRegistrationError;
+
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -339,8 +342,9 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void detectsDuplicatePolicyId() throws Exception {
     policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
 
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(createPolicyAlreadyRegisteredError(POLICY_ID1));
+    expectedException.expect(PolicyRegistrationException.class);
+    expectedException.expectMessage(createPolicyRegistrationError(POLICY_ID1));
+    expectedException.expectCause(isA(IllegalArgumentException.class));
 
     policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
   }
