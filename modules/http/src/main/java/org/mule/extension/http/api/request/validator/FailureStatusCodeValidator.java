@@ -8,8 +8,8 @@ package org.mule.extension.http.api.request.validator;
 
 import static java.lang.String.format;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 /**
  * Response validator that allows specifying which status codes should be treated as failures. Responses with such status codes
@@ -20,8 +20,8 @@ import org.mule.runtime.core.api.MuleContext;
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
   @Override
-  public void validate(Message responseMessage, MuleContext context) throws ResponseValidatorException {
-    int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
+  public void validate(Result<Object, HttpResponseAttributes> result, MuleContext context) throws ResponseValidatorException {
+    int status = result.getAttributes().get().getStatusCode();
 
     if (belongs(status)) {
       throw new ResponseValidatorException(format("Response code %d mapped as failure", status));

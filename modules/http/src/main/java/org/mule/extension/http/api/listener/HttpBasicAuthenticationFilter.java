@@ -9,17 +9,15 @@ package org.mule.extension.http.api.listener;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authNoCredentials;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
@@ -29,11 +27,11 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,6 +46,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   private String realm;
 
   private boolean realmRequired = true;
+  private HttpRequestAttributes attributes;
 
   /**
    * Creates a filter based on the HTTP listener error response builder status code and headers configuration.
@@ -83,25 +82,25 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     this.realmRequired = realmRequired;
   }
 
-
-  protected Authentication createAuthentication(String username, String password, Event event) {
-    return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
+  public void setAttributes(HttpRequestAttributes attributes) {
+    this.attributes = attributes;
   }
 
-  protected Event setUnauthenticated(Event event, InternalMessage message) {
-    return Event.builder(event).message(message).build();
+
+  protected Authentication createAuthentication(String username, String password) {
+    return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()));
   }
 
-  private Message createUnauthenticatedMessage(Message message) {
+  private Message createUnauthenticatedMessage() {
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
     ParameterMap headers = new ParameterMap();
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    return Message.builder(message).nullPayload().attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(),
-                                                                                        UNAUTHORIZED.getReasonPhrase(),
-                                                                                        headers))
+    return Message.builder().nullPayload().attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(),
+                                                                                 UNAUTHORIZED.getReasonPhrase(),
+                                                                                 headers))
         .build();
   }
 
@@ -116,9 +115,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   public Event authenticate(Event event)
       throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-    checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes,
-                  "Message attributes must be HttpRequestAttributes.");
-    String header = ((HttpRequestAttributes) event.getMessage().getAttributes()).getHeaders().get(AUTHORIZATION.toLowerCase());
+    String header = attributes.getHeaders().get(AUTHORIZATION.toLowerCase());
 
     if (logger.isDebugEnabled()) {
       logger.debug("Authorization header: " + header);
@@ -138,7 +135,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       }
 
       Authentication authResult;
-      Authentication authentication = createAuthentication(username, password, event);
+      Authentication authentication = createAuthentication(username, password);
 
       try {
         authResult = getSecurityManager().authenticate(authentication);
@@ -146,7 +143,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
-        throw new BasicUnauthorisedException(authFailedForUser(username), e, createUnauthenticatedMessage(event.getMessage()));
+        throw new BasicUnauthorisedException(authFailedForUser(username), e, createUnauthenticatedMessage());
       }
 
       if (logger.isDebugEnabled()) {
@@ -158,11 +155,10 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       event.getSession().setSecurityContext(context);
       return event;
     } else if (header == null) {
-      event = setUnauthenticated(event, (InternalMessage) createUnauthenticatedMessage(event.getMessage()));
-      throw new BasicUnauthorisedException(event, event.getSession().getSecurityContext(), this);
+      throw new BasicUnauthorisedException(authNoCredentials(), createUnauthenticatedMessage());
     } else {
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
-          + header), createUnauthenticatedMessage(event.getMessage()));
+          + header), createUnauthenticatedMessage());
     }
   }
 }

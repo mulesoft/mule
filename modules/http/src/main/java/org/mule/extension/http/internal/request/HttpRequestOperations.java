@@ -10,7 +10,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;

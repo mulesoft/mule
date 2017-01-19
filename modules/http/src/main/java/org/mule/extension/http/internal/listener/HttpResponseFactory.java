@@ -9,10 +9,12 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -20,17 +22,19 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.listener.HttpResponseHeaderBuilder;
+import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
+import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
@@ -38,9 +42,6 @@ import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.runtime.module.http.internal.listener.HttpResponseHeaderBuilder;
-import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
-import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -51,7 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component that transforms a {@link Event} to an {@link HttpResponse}.
+ * Component that creates {@link HttpResponse HttpResponses}.
  *
  * @since 4.0
  */
@@ -101,7 +102,7 @@ public class HttpResponseFactory {
       }
     });
 
-    if (httpResponseHeaderBuilder.getContentType() == null && !MediaType.ANY.matches(listenerResponseBuilder.getMediaType())) {
+    if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(listenerResponseBuilder.getMediaType())) {
       httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, listenerResponseBuilder.getMediaType().toString());
     }
 
@@ -117,8 +118,8 @@ public class HttpResponseFactory {
       httpEntity = new EmptyHttpEntity();
     } else if (payload instanceof Map) {
       if (configuredContentType == null) {
-        httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
-      } else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
+        httpResponseHeaderBuilder.addContentType(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
+      } else if (!configuredContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
         warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
       }
       httpEntity = createUrlEncodedEntity(listenerResponseBuilder.getMediaType(), (Map) payload);
@@ -254,7 +255,7 @@ public class HttpResponseFactory {
     if (!mapPayloadButNoUrlEncodedContentTypeWarned) {
       logger.warn(String.format(
                                 "Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.",
-                                contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+                                contentType, APPLICATION_X_WWW_FORM_URLENCODED));
       mapPayloadButNoUrlEncodedContentTypeWarned = true;
     }
   }

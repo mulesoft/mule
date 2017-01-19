@@ -20,18 +20,17 @@ import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
@@ -39,7 +38,6 @@ import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
-import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
 import com.google.common.collect.Lists;
 
@@ -60,9 +58,9 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class MuleEventToHttpRequest {
+public class HttpRequestFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
+  private static final Logger logger = LoggerFactory.getLogger(HttpRequestFactory.class);
   public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
   private static final String APPLICATION_JAVA = "application/java";
 
@@ -74,8 +72,8 @@ public class MuleEventToHttpRequest {
   private final TransformationService transformationService;
 
 
-  public MuleEventToHttpRequest(HttpRequesterCookieConfig config, String uri, String method, HttpStreamingType streamingMode,
-                                HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
+  public HttpRequestFactory(HttpRequesterCookieConfig config, String uri, String method, HttpStreamingType streamingMode,
+                            HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
     this.config = config;
     this.uri = uri;
     this.method = method;
@@ -128,7 +126,7 @@ public class MuleEventToHttpRequest {
 
     }
 
-    builder.setEntity(createRequestEntity(builder, event, this.method, muleContext, requestBuilder.getBody(), mediaType));
+    builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody(), mediaType));
 
     if (authentication != null) {
       authentication.authenticate(event, builder);
@@ -143,15 +141,15 @@ public class MuleEventToHttpRequest {
     return parameterMap;
   }
 
-  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, Event muleEvent, String resolvedMethod,
+  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod,
                                          MuleContext muleContext, Object body, MediaType mediaType)
-      throws MessagingException {
+      throws TransformerException {
     HttpEntity entity;
 
     if (isEmptyBody(body, resolvedMethod)) {
       entity = new EmptyHttpEntity();
     } else {
-      entity = createRequestEntityFromPayload(requestBuilder, muleEvent, body, muleContext, mediaType);
+      entity = createRequestEntityFromPayload(requestBuilder, body, muleContext, mediaType);
     }
 
     return entity;
@@ -174,17 +172,12 @@ public class MuleEventToHttpRequest {
     return emptyBody;
   }
 
-  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent, Object payload,
-                                                    MuleContext muleContext, MediaType mediaType)
-      throws MessagingException {
-
+  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Object payload, MuleContext muleContext,
+                                                    MediaType mediaType)
+      throws TransformerException {
     if (payload instanceof MultiPartPayload) {
-      try {
-        Transformer objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
-        return new MultipartHttpEntity(HttpPartDataSource.createFrom((MultiPartPayload) payload, objectToByteArray));
-      } catch (Exception e) {
-        throw new MessagingException(muleEvent, e);
-      }
+      Transformer objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
+      return new MultipartHttpEntity(HttpPartDataSource.createFrom((MultiPartPayload) payload, objectToByteArray));
     }
 
     if (doStreaming(requestBuilder, payload)) {
@@ -192,11 +185,7 @@ public class MuleEventToHttpRequest {
       if (payload instanceof InputStream) {
         return new InputStreamHttpEntity((InputStream) payload);
       } else {
-        try {
-          return new InputStreamHttpEntity(new ByteArrayInputStream(getMessageAsBytes(payload)));
-        } catch (Exception e) {
-          throw new MessagingException(muleEvent, e);
-        }
+        return new InputStreamHttpEntity(new ByteArrayInputStream(getMessageAsBytes(payload)));
       }
 
     } else {
@@ -212,23 +201,15 @@ public class MuleEventToHttpRequest {
         }
       }
 
-      try {
-        return new ByteArrayHttpEntity(getMessageAsBytes(payload));
-      } catch (Exception e) {
-        throw new MessagingException(muleEvent, e);
-      }
+      return new ByteArrayHttpEntity(getMessageAsBytes(payload));
     }
   }
 
-  private byte[] getMessageAsBytes(Object payload) {
-    try {
-      return (byte[]) transformationService.transform(InternalMessage.of(payload), BYTE_ARRAY).getPayload().getValue();
-    } catch (TransformerException e) {
-      throw new MuleRuntimeException(e);
-    }
+  private byte[] getMessageAsBytes(Object payload) throws TransformerException {
+    return (byte[]) transformationService.transform(InternalMessage.of(payload), BYTE_ARRAY).getPayload().getValue();
   }
 
-  private boolean doStreaming(HttpRequestBuilder requestBuilder, Object payload) throws MessagingException {
+  private boolean doStreaming(HttpRequestBuilder requestBuilder, Object payload) {
     Optional<String> transferEncodingHeader = requestBuilder.getHeaderValue(TRANSFER_ENCODING);
     Optional<String> contentLengthHeader = requestBuilder.getHeaderValue(CONTENT_LENGTH);
 

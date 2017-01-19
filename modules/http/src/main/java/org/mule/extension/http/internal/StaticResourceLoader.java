@@ -9,15 +9,14 @@ package org.mule.extension.http.internal;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.module.http.internal.component.ResourceNotFoundException;
 
 import java.io.ByteArrayOutputStream;
@@ -48,11 +47,15 @@ public class StaticResourceLoader {
   @Optional(defaultValue = "index.html")
   private String defaultFile;
 
-  public InternalMessage load(Event event) throws ResourceNotFoundException {
+  /**
+   * The {@link Attributes} coming from an HTTP listener source to check the required resources.
+   */
+  @Parameter
+  @Optional(defaultValue = "#[attributes]")
+  private HttpRequestAttributes attributes;
+
+  public InternalMessage load() throws ResourceNotFoundException {
     // TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
-    checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes,
-                  "Message attributes must be HttpRequestAttributes.");
-    HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes();
     String path = attributes.getRequestPath();
     String contextPath = attributes.getListenerPath();
 

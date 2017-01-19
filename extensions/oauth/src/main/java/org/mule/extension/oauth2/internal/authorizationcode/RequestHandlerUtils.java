@@ -13,7 +13,6 @@ import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
-
 import org.mule.extension.http.api.HttpConstants;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -23,7 +22,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
+import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
@@ -105,7 +104,7 @@ class RequestHandlerUtils {
           @Override
           public void responseSendSuccessfully() {}
         });
-      } catch (HttpRequestParsingException e) {
+      } catch (HttpMessageParsingException e) {
         logger.warn("Exception occurred parsing request:", e);
         sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback, logger);
       } catch (MuleException e) {

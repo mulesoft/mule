@@ -6,19 +6,19 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.api.HttpHeaders;
-import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
+import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
@@ -30,7 +30,7 @@ import org.mule.service.http.api.domain.request.HttpRequestContext;
 import java.io.IOException;
 
 /**
- * Component that transforms an HTTP request to a proper {@link Message}.
+ * Component that transforms an HTTP request to a proper {@link Result}.
  *
  * @since 4.0
  */
@@ -40,7 +40,7 @@ public class HttpRequestToResult {
                                                                 final MuleContext muleContext,
                                                                 Boolean parseRequest,
                                                                 ListenerPath listenerPath)
-      throws HttpRequestParsingException {
+      throws HttpMessageParsingException {
     final HttpRequest request = requestContext.getRequest();
 
     final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
@@ -53,7 +53,7 @@ public class HttpRequestToResult {
           try {
             payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
           } catch (IOException e) {
-            throw new HttpRequestParsingException(e.getMessage(), e);
+            throw new HttpMessageParsingException(createStaticMessage("Unable to process multipart request"), e);
           }
         } else {
           if (mediaType != null) {
@@ -62,7 +62,7 @@ public class HttpRequestToResult {
                 payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
                                                mediaType.getCharset().get());
               } catch (IllegalArgumentException e) {
-                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
+                throw new HttpMessageParsingException(createStaticMessage("Cannot decode x-www-form-urlencoded payload"), e);
               }
             } else if (entity instanceof InputStreamHttpEntity) {
               payload = ((InputStreamHttpEntity) entity).getInputStream();

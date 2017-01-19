@@ -17,14 +17,14 @@ import static org.mule.extension.oauth2.api.exception.OAuthErrors.TOKEN_URL_FAIL
 import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_EXPRESSION;
 import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRATION_TIME_EXPRESSION;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_EXPRESSION;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterCookieConfig;
-import org.mule.extension.http.internal.request.HttpResponseToMuleMessage;
-import org.mule.extension.http.internal.request.MuleEventToHttpRequest;
+import org.mule.extension.http.internal.request.HttpResponseToResult;
+import org.mule.extension.http.internal.request.HttpRequestFactory;
 import org.mule.extension.oauth2.internal.clientcredentials.OAuthAuthorizationAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -32,7 +32,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -46,6 +46,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -117,8 +118,8 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
   private TlsContextFactory tlsContextFactory;
 
   private HttpClient client;
-  private MuleEventToHttpRequest eventToHttpRequest;
-  private HttpResponseToMuleMessage httpResponseToMuleMessage;
+  private HttpRequestFactory eventToHttpRequest;
+  private HttpResponseToResult httpResponseToMuleMessage;
 
   private static final int TOKEN_REQUEST_TIMEOUT_MILLIS = 60000;
   private static final HttpRequesterCookieConfig REQUESTER_NO_COOKIE_CONFIG = new HttpRequesterCookieConfig() {
@@ -166,16 +167,20 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
           client.send(eventToHttpRequest.create(event, requestBuilder, null, muleContext), TOKEN_REQUEST_TIMEOUT_MILLIS, true,
                       null);
 
-      Message responseMessage = httpResponseToMuleMessage.convert(event, response, tokenUrl);
-      final Builder responseEventBuilder = Event.builder(event).message((InternalMessage) responseMessage);
+      MediaType mediaType = event.getMessage().getPayload().getDataType().getMediaType();
+      Result<Object, HttpResponseAttributes> responseResult = httpResponseToMuleMessage.convert(mediaType, response, tokenUrl);
+      final Builder responseEventBuilder = Event.builder(event).message(buildMessageFromResult(responseResult,
+                                                                                               responseResult.getOutput()));
 
-      if (((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode() >= BAD_REQUEST.getStatusCode()) {
+      if (responseResult.getAttributes().get().getStatusCode() >= BAD_REQUEST.getStatusCode()) {
         throw new TokenUrlResponseException(getTokenUrl(), responseEventBuilder.build());
       }
 
-      if (responseMessage.getPayload().getDataType().isStreamType()) {
-        return responseEventBuilder.message(InternalMessage.builder(responseMessage)
-            .payload(org.mule.runtime.core.util.IOUtils.toString((InputStream) responseMessage.getPayload().getValue())).build())
+      if (responseResult.getOutput() instanceof InputStream) {
+        return responseEventBuilder.message(
+                                            buildMessageFromResult(responseResult,
+                                                                   org.mule.runtime.core.util.IOUtils
+                                                                       .toString((InputStream) responseResult.getOutput())))
             .build();
       } else {
         return responseEventBuilder.build();
@@ -185,6 +190,14 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
     } catch (TimeoutException e) {
       throw new TokenUrlResponseException(e, getTokenUrl());
     }
+  }
+
+  private InternalMessage buildMessageFromResult(Result<Object, HttpResponseAttributes> responseResult, Object payload) {
+    return InternalMessage.builder()
+        .payload(payload)
+        .attributes(responseResult.getAttributes().get())
+        .mediaType(responseResult.getMediaType().orElse(ANY))
+        .build();
   }
 
   protected String getTokenUrl() {
@@ -275,8 +288,8 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
       throw new InitialisationException(e, this);
     }
 
-    eventToHttpRequest = new MuleEventToHttpRequest(REQUESTER_NO_COOKIE_CONFIG, tokenUrl, POST.name(), NEVER, ALWAYS, null);
-    httpResponseToMuleMessage = new HttpResponseToMuleMessage(REQUESTER_NO_COOKIE_CONFIG, true, muleContext);
+    eventToHttpRequest = new HttpRequestFactory(REQUESTER_NO_COOKIE_CONFIG, tokenUrl, POST.name(), NEVER, ALWAYS, null);
+    httpResponseToMuleMessage = new HttpResponseToResult(REQUESTER_NO_COOKIE_CONFIG, true, muleContext);
 
     String threadNamePrefix = format("%soauthToken.requester", getPrefix(muleContext));
     HttpClientConfiguration clientConfiguration = new HttpClientConfiguration.Builder()
