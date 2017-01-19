@@ -243,8 +243,7 @@ public class DefaultEventBuilder implements Event.Builder {
                                 String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
-      if(flowConstruct != null)
-      {
+      if (flowConstruct != null) {
         this.flowName = flowConstruct.getName();
       }
       this.session = session;
@@ -433,10 +432,9 @@ public class DefaultEventBuilder implements Event.Builder {
     private void writeObject(ObjectOutputStream out) throws IOException {
       // TODO MULE-10013 remove this logic from here
       out.defaultWriteObject();
-      if(flowName !=null && flowConstruct instanceof Pipeline)
-      {
+      if (flowName != null && flowConstruct instanceof Pipeline) {
         // TODO MULE-11349 Use unique id's for child flows
-        ((Pipeline)flowConstruct).getSerializedEventContextCache().put(context.getId(), context);
+        ((Pipeline) flowConstruct).getSerializedEventContextCache().put(context.getId(), context);
       }
       for (Map.Entry<String, TypedValue> entry : variables.entrySet()) {
         Object value = entry.getValue();
