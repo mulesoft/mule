@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -225,29 +223,6 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
     Event response = triggerFunction.apply(directInboundMessageSource.getListener(),
                                            eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build());
     assertThat(response, not(nullValue()));
-  }
-
-  @Test
-  public void testDynamicPipeline() throws Exception {
-    flow.initialise();
-    flow.start();
-
-    Processor appendPre = new StringAppendTransformer("1");
-    Processor appendPost2 = new StringAppendTransformer("4");
-
-    String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
-        .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
-    assertEquals(TEST_PAYLOAD + "12abcdef34", response.getMessageAsString(muleContext));
-
-    flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
-        .resetAndUpdate();
-    response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
-    assertEquals(TEST_PAYLOAD + "2abcdef3", response.getMessageAsString(muleContext));
-
-    flow.dynamicPipeline(pipelineId).reset();
-    response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
-    assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
   }
 
   @Test
