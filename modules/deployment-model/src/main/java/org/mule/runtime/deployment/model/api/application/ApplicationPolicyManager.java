@@ -16,7 +16,7 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 public interface ApplicationPolicyManager {
 
   /**
-   * Add a new policy
+   * Adds and initialises a new policy
    *
    * @param policyTemplateDescriptor describes how to create the policy template. Non null
    * @param parametrization parametrization used to instantiate the policy. Non null
