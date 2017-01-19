@@ -13,7 +13,7 @@ package org.mule.runtime.core.util.func;
  * @since 4.0
  */
 @FunctionalInterface
-public interface UnsafeRunnable {
+public interface CheckedRunnable {
 
   /**
    * Executes an unsafe operation

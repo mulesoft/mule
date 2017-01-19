@@ -26,6 +26,7 @@
 
     <flow name="testFlowHttps">
         <httpn:request path="testPath" config-ref="httpsConfig"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

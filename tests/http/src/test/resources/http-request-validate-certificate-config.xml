@@ -31,6 +31,7 @@
 
     <flow name="validCertFlow">
         <httpn:request config-ref="validCertHttpConfig" path="requestPath" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="missingCertFlow">

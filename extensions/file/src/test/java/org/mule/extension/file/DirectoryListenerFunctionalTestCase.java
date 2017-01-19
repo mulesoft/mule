@@ -17,23 +17,19 @@ import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.File;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
@@ -113,13 +109,13 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
 
     final File file = new File(listenerFolder, WATCH_FILE);
     file.delete();
-    assertEvent(listen(DELETE, file), null);
+    assertEvent(listen(DELETE, file), "null");
   }
 
   @Test
   public void onDirectoryCreated() throws Exception {
     matcherLessFolder.mkdir();
-    assertEvent(listen(CREATE, matcherLessFolder), null);
+    assertEvent(listen(CREATE, matcherLessFolder), "null");
 
     final File file = new File(matcherLessFolder, WATCH_FILE);
     write(file, WATCH_CONTENT);
@@ -130,7 +126,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
   public void onDirectoryDeleted() throws Exception {
     onDirectoryCreated();
     deleteTree(matcherLessFolder);
-    assertEvent(listen(DELETE, matcherLessFolder), null);
+    assertEvent(listen(DELETE, matcherLessFolder), "null");
   }
 
   @Test
@@ -141,15 +137,15 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
     final File renamedDirectory = new File(listenerFolder, updatedName);
     Files.move(matcherLessFolder.toPath(), renamedDirectory.toPath());
 
-    assertEvent(listen(DELETE, matcherLessFolder), null);
-    assertEvent(listen(CREATE, renamedDirectory), null);
+    assertEvent(listen(DELETE, matcherLessFolder), "null");
+    assertEvent(listen(CREATE, renamedDirectory), "null");
   }
 
   @Test
   public void onDeleteFileAtSubfolder() throws Exception {
     onDirectoryCreated();
     deleteTree(matcherLessFolder);
-    assertEvent(listen(DELETE, matcherLessFolder), null);
+    assertEvent(listen(DELETE, matcherLessFolder), "null");
   }
 
   @Test
@@ -161,34 +157,9 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
     assertThat(message.getPayload().getValue(), equalTo(DR_MANHATTAN));
   }
 
-  @Test
-  public void stop() throws Exception {
-    muleContext.getRegistry().lookupObjects(ExtensionMessageSource.class).forEach(source -> {
-      try {
-        source.stop();
-      } catch (MuleException e) {
-        throw new RuntimeException(e);
-      }
-    });
-
-    PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    prober.check(new JUnitLambdaProbe(() -> {
-      try {
-        onFileCreated();
-        return false;
-      } catch (Throwable e) {
-        return true;
-      }
-    }, "source did not stop"));
-  }
-
   private void assertEvent(Message message, Object expectedContent) throws Exception {
-    Object payload = message.getPayload().getValue();
-    if (payload instanceof InputStream) {
-      payload = IOUtils.toString((InputStream) payload);
-      assertThat((String) payload, not(containsString(DR_MANHATTAN)));
-    }
-
+    String payload = toString(message.getPayload().getValue());
+    assertThat(payload, not(containsString(DR_MANHATTAN)));
     assertThat(payload, equalTo(expectedContent));
   }
 

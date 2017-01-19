@@ -18,9 +18,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import org.apache.commons.collections.Transformer;
@@ -40,6 +42,8 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   private Scheduler scheduler;
 
+  private StreamingManagerAdapter streamingManager;
+
   /**
    * Initializes this flow runner.
    * 
@@ -49,6 +53,11 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   public FlowRunner(MuleContext muleContext, String flowName) {
     super(muleContext);
     this.flowName = flowName;
+    try {
+      streamingManager = muleContext.getRegistry().lookupObject(StreamingManagerAdapter.class);
+    } catch (RegistrationException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -159,7 +168,16 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
     return () -> {
-      return flow.process(getOrBuildEvent());
+      Event event = getOrBuildEvent();
+      try {
+        Event result = flow.process(event);
+        event.getContext().success(result);
+        return result;
+      } catch (Exception e) {
+        event.getContext().error(e);
+        streamingManager.error(event);
+        throw e;
+      }
     };
   }
 

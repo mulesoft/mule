@@ -11,8 +11,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -25,7 +23,6 @@ import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensi
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -40,7 +37,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -64,7 +60,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
@@ -80,9 +75,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Operation
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
-import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageCollection;
-import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageList;
-import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
@@ -90,11 +82,9 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -105,49 +95,6 @@ import java.util.function.Supplier;
  * @since 3.7.0
  */
 public class MuleExtensionUtils {
-
-  /**
-   * Transforms the given {@code result} into a {@link Message}
-   *
-   * @param result a {@link Result} object
-   * @return a {@link Message}
-   */
-  public static Message toMessage(Result result) {
-    return toMessage(result, (MediaType) result.getMediaType().orElse(ANY));
-  }
-
-  /**
-   * Transforms the given {@code result} into a {@link Message}
-   *
-   * @param result    a {@link Result} object
-   * @param mediaType the {@link MediaType} for the message payload
-   * @return a {@link Message}
-   */
-  public static Message toMessage(Result result, MediaType mediaType) {
-    return Message.builder()
-        .payload(result.getOutput())
-        .mediaType(mediaType)
-        .attributes((Attributes) result.getAttributes().orElse(NULL_ATTRIBUTES))
-        .build();
-  }
-
-  /**
-   * Transforms the given {@code results} into a similar collection of {@link Message}
-   * objects
-   *
-   * @param results a collection of {@link Result} items
-   * @param mediaType the {@link MediaType} of the generated {@link Message} instances
-   * @return a similar collection of {@link Message}
-   */
-  public static Collection<Message> toMessageCollection(Collection<Result> results, MediaType mediaType) {
-    if (results instanceof List) {
-      return new ResultsToMessageList((List<Result>) results, mediaType);
-    } else if (results instanceof Set) {
-      return new ResultsToMessageSet((Set<Result>) results, mediaType);
-    } else {
-      return new ResultsToMessageCollection(results, mediaType);
-    }
-  }
 
   /**
    * @param componentModel a {@link ComponentModel}

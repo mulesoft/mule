@@ -11,17 +11,22 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.core.util.message.MessageUtils.valueOrStreamProvider;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessageCollection;
+import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Optional;
@@ -31,6 +36,11 @@ import java.util.Optional;
  * <p/>
  * Contains the logic for taking an operation's output value and turn it into a {@link Message} which not only contains the
  * updated payload but also the proper {@link DataType} and attributes.
+ * <p>
+ * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}.
+ * For any of this cases, it also allows specifying a {@link CursorStreamProviderFactory} which will transform {@link InputStream}
+ * values into {@link CursorStreamProvider} instances. As said before, this is also applied then the value is a message or list of
+ * them
  *
  * @since 4.0
  */
@@ -38,27 +48,37 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private final boolean returnsListOfMessages;
+  private final CursorStreamProviderFactory cursorStreamProviderFactory;
 
   /**
    * Creates a new instance
    *
-   * @param componentModel the component which produces the return value
-   * @param muleContext    the {@link MuleContext} of the owning application
+   * @param componentModel              the component which produces the return value
+   * @param cursorStreamProviderFactory the {@link CursorStreamProviderFactory} to use when a message payload is an {@link InputStream}. Can be {@code null}
+   * @param muleContext                 the {@link MuleContext} of the owning application
    */
-  protected AbstractReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
+  protected AbstractReturnDelegate(ComponentModel componentModel,
+                                   CursorStreamProviderFactory cursorStreamProviderFactory,
+                                   MuleContext muleContext) {
     returnsListOfMessages = returnsListOfMessages(componentModel);
     this.muleContext = muleContext;
+    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
-    MediaType mediaType = resolveMediaType(value, operationContext);
+    final MediaType mediaType = resolveMediaType(value, operationContext);
+    final Event event = operationContext.getEvent();
+
     if (value instanceof Result) {
-      return MuleExtensionUtils.toMessage((Result) value, mediaType);
+      return MessageUtils.toMessage((Result) value, mediaType, cursorStreamProviderFactory, event);
     } else {
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toMessageCollection((Collection<Result>) value, mediaType);
+        value = toMessageCollection((Collection<Result>) value, mediaType, cursorStreamProviderFactory, event);
       }
-      return Message.builder().payload(value).mediaType(mediaType).attributes(NULL_ATTRIBUTES).build();
+      return Message.builder()
+          .payload(valueOrStreamProvider(value, cursorStreamProviderFactory, event).getValue().orElse(null))
+          .mediaType(mediaType)
+          .attributes(NULL_ATTRIBUTES).build();
     }
   }
 
@@ -88,12 +108,12 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)) {
-      mediaType = MediaType.parse(operationContext.getTypeSafeParameter(MIME_TYPE_PARAMETER_NAME, String.class));
+      mediaType = MediaType.parse(operationContext.getParameter(MIME_TYPE_PARAMETER_NAME));
     }
 
     if (operationContext.hasParameter(ENCODING_PARAMETER_NAME)) {
       mediaType =
-          mediaType.withCharset(Charset.forName(operationContext.getTypeSafeParameter(ENCODING_PARAMETER_NAME, String.class)));
+          mediaType.withCharset(Charset.forName(operationContext.getParameter(ENCODING_PARAMETER_NAME)));
     } else {
       mediaType = mediaType.withCharset(existingEncoding);
     }

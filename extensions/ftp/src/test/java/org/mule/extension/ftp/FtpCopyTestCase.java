@@ -219,11 +219,6 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
     assertThat(readPathAsString(target), equalTo(HELLO_WORLD));
   }
 
-  @Override
-  protected String readPathAsString(String path) throws Exception {
-    return super.readPathAsString(path);
-  }
-
   protected String getFlowName() {
     return "copy";
   }

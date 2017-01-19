@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.core.util;
 
-import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedSet;
-
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 
 import java.util.Collection;

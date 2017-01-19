@@ -8,14 +8,18 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
+import org.mule.runtime.core.util.func.CheckedConsumer;
+import org.mule.runtime.core.util.func.CheckedFunction;
+import org.mule.runtime.core.exception.NotAnInputStreamException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,6 +178,18 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
   }
 
   /**
+   * Similar to {@link #toByteArray(InputStream)} but obtaining the stream from the given
+   * {@code cursorStreamProvider}
+   */
+  public static String toString(CursorStreamProvider cursorStreamProvider) {
+    try (InputStream input = cursorStreamProvider.openCursor()) {
+      return org.apache.commons.io.IOUtils.toString(input);
+    } catch (IOException iox) {
+      throw new RuntimeException(iox);
+    }
+  }
+
+  /**
    * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code> method but catches any
    * {@link IOException} and wraps it into a {@link RuntimeException}.
    */
@@ -182,6 +198,18 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
       return org.apache.commons.io.IOUtils.toByteArray(input);
     } catch (IOException iox) {
       throw new RuntimeException(iox);
+    }
+  }
+
+  /**
+   * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code> method but catches any
+   * {@link IOException} and wraps it into a {@link RuntimeException}.
+   */
+  public static byte[] toByteArray(CursorStreamProvider cursorStreamProvider) {
+    try (InputStream input = cursorStreamProvider.openCursor()) {
+      return toByteArray(input);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -287,5 +315,33 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
     }
 
     return builder.attributes(new PartAttributes(name)).build();
+  }
+
+  public static void ifInputStream(Object value, CheckedConsumer<InputStream> consumer) throws NotAnInputStreamException {
+    ifInputStream(value, stream -> {
+      consumer.accept(stream);
+      return null;
+    });
+  }
+
+  public static <T> T ifInputStream(Object value, CheckedFunction<InputStream, T> function) throws NotAnInputStreamException {
+    boolean shouldCloseStream = false;
+    InputStream stream;
+    if (value instanceof CursorStreamProvider) {
+      stream = ((CursorStreamProvider) value).openCursor();
+      shouldCloseStream = true;
+    } else if (value instanceof InputStream) {
+      stream = (InputStream) value;
+    } else {
+      throw new NotAnInputStreamException();
+    }
+
+    try {
+      return function.apply(stream);
+    } finally {
+      if (shouldCloseStream) {
+        closeQuietly(stream);
+      }
+    }
   }
 }

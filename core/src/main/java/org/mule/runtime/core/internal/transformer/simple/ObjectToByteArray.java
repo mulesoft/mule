@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
@@ -27,9 +29,10 @@ public class ObjectToByteArray extends SerializableToByteArray {
   public ObjectToByteArray() {
     this.registerSourceType(DataType.INPUT_STREAM);
     this.registerSourceType(DataType.STRING);
-    this.registerSourceType(DataType.fromType(OutputHandler.class));
-    this.registerSourceType(DataType.fromType(Byte.class));
-    this.registerSourceType(DataType.fromType(byte.class));
+    this.registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
+    this.registerSourceType(fromType(OutputHandler.class));
+    this.registerSourceType(fromType(Byte.class));
+    this.registerSourceType(fromType(byte.class));
     setReturnDataType(DataType.BYTE_ARRAY);
   }
 
@@ -38,15 +41,10 @@ public class ObjectToByteArray extends SerializableToByteArray {
     try {
       if (src instanceof String) {
         return src.toString().getBytes(outputEncoding);
+      } else if (src instanceof CursorStreamProvider) {
+        return transformStream(((CursorStreamProvider) src).openCursor());
       } else if (src instanceof InputStream) {
-        InputStream is = (InputStream) src;
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        try {
-          IOUtils.copyLarge(is, byteOut);
-        } finally {
-          is.close();
-        }
-        return byteOut.toByteArray();
+        return transformStream((InputStream) src);
       } else if (src instanceof OutputHandler) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
@@ -65,5 +63,15 @@ public class ObjectToByteArray extends SerializableToByteArray {
     }
 
     return super.doTransform(src, outputEncoding);
+  }
+
+  private Object transformStream(InputStream is) throws IOException {
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    try {
+      IOUtils.copyLarge(is, byteOut);
+    } finally {
+      is.close();
+    }
+    return byteOut.toByteArray();
   }
 }

@@ -55,6 +55,12 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
+import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -222,7 +228,7 @@ public final class ExtensionsTestUtils {
    * Receives to {@link String} representation of two XML files and verify that they are semantically equivalent
    *
    * @param expected the reference content
-   * @param actual the actual content
+   * @param actual   the actual content
    * @throws Exception if comparison fails
    */
   public static void compareXML(String expected, String actual) throws Exception {
@@ -347,5 +353,18 @@ public final class ExtensionsTestUtils {
   public static void mockExecutorFactory(OperationModel operationModel, OperationExecutorFactory operationExecutorFactory) {
     when(operationModel.getModelProperty(OperationExecutorModelProperty.class))
         .thenReturn(of(new OperationExecutorModelProperty(operationExecutorFactory)));
+  }
+
+  public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory(MuleContext muleContext) {
+    try {
+      return muleContext.getRegistry().lookupObject(StreamingManager.class).forBytes().getDefaultCursorStreamProviderFactory();
+    } catch (RegistrationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory() {
+    return new InMemoryCursorStreamProviderFactory(mock(ByteStreamingManagerAdapter.class),
+                                                   InMemoryCursorStreamConfig.getDefault());
   }
 }

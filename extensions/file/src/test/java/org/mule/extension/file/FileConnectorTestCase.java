@@ -6,20 +6,22 @@
  */
 package org.mule.extension.file;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
 import org.mule.extension.file.common.api.FileWriteMode;
-import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.ClassRule;
@@ -72,11 +74,43 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
   }
 
   protected Event getPath(String path) throws Exception {
-    return flowRunner("read").withVariable("path", path).run();
+    return getPath(path, true);
+  }
+
+  protected Event getPath(String path, boolean streaming) throws Exception {
+    return flowRunner("read")
+        .withVariable("path", path)
+        .withVariable("streaming", streaming)
+        .run();
   }
 
   protected String readPathAsString(String path) throws Exception {
-    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload().getValue());
+    return toString(readPath(path).getPayload().getValue());
+  }
+
+  protected String toString(Object value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value instanceof String) {
+      return (String) value;
+    }
+
+    InputStream inputStream;
+    if (value instanceof CursorStreamProvider) {
+      inputStream = ((CursorStreamProvider) value).openCursor();
+    } else if (value instanceof InputStream) {
+      inputStream = (InputStream) value;
+    } else {
+      throw new IllegalArgumentException("Result was not of expected type");
+    }
+
+    try {
+      return IOUtils.toString(inputStream);
+    } finally {
+      closeQuietly(inputStream);
+    }
   }
 
   protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {

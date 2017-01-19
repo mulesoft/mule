@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.message;
+package org.mule.runtime.core.util.message;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Set;
@@ -23,7 +25,13 @@ import java.util.Set;
  */
 public final class ResultsToMessageSet extends ResultsToMessageCollection implements Set<Message> {
 
-  public ResultsToMessageSet(Set<Result> delegate, MediaType mediaType) {
-    super(delegate, mediaType);
+  /**
+   * {@inheritDoc}
+   */
+  public ResultsToMessageSet(Set<Result> delegate,
+                             MediaType mediaType,
+                             CursorStreamProviderFactory cursorStreamProviderFactory,
+                             Event event) {
+    super(delegate, mediaType, cursorStreamProviderFactory, event);
   }
 }

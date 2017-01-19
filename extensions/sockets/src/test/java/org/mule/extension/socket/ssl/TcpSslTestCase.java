@@ -14,10 +14,7 @@ import org.mule.extension.socket.SocketExtensionTestCase;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.io.InputStream;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,9 +56,7 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
   private Message sendStringAndAssertResponse(String flowName) throws Exception {
     InternalMessage muleMessage = flowRunner(flowName).withPayload(TEST_STRING).run().getMessage();
 
-    InputStream inputStream = (InputStream) muleMessage.getPayload().getValue();
-
-    String response = IOUtils.toString(inputStream);
+    String response = (String) muleMessage.getPayload().getValue();
     assertThat(RESPONSE_TEST_STRING, is(response));
     return muleMessage;
   }

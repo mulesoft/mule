@@ -72,7 +72,7 @@
 
     <flow name="helloFaultFlow">
         <httpn:listener path="helloFault" config-ref="listenerConfig">
-            <httpn:response statusCode="#[mel:message.attributes.statusCode]"/>
+            <httpn:response statusCode="#[attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.TestServiceFaultImpl"/>
         <component class="org.mule.compatibility.module.cxf.TestServiceFaultImpl" />
@@ -112,7 +112,7 @@
 
     <flow name="FlowProxyWithFault">
         <httpn:listener path="testProxyWithFault" config-ref="listenerConfig">
-            <httpn:response statusCode="#[mel:message.attributes.statusCode]"/>
+            <httpn:response statusCode="#[attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
         <cxf:proxy-client />
@@ -126,7 +126,7 @@
 
     <flow name="FlowProxyWithTransformerException">
         <httpn:listener path="testProxyWithTransformerException" config-ref="listenerConfig">
-            <httpn:response statusCode="#[mel:message.attributes.statusCode]"/>
+            <httpn:response statusCode="#[attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
         <transformer ref="throwsException"/>
@@ -136,7 +136,7 @@
 
     <flow name="FlowJaxWsProxyWithUnwrapFault">
         <httpn:listener path="testUnwrapProxyFault" config-ref="listenerConfig">
-            <httpn:response statusCode="#[mel:message.attributes.statusCode]"/>
+            <httpn:response statusCode="#[attributes.statusCode]"/>
         </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.compatibility.module.cxf.example.HelloWorld"/>
         <component class="org.mule.compatibility.module.cxf.example.HelloWorldImpl" />

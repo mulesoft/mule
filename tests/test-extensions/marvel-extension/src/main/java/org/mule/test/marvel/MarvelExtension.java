@@ -8,10 +8,11 @@ package org.mule.test.marvel;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.test.marvel.drstrange.DrStrange;
 import org.mule.test.marvel.ironman.IronMan;
 
 @Extension(name = "Marvel")
-@Configurations(IronMan.class)
+@Configurations({IronMan.class, DrStrange.class})
 public class MarvelExtension {
 
 }

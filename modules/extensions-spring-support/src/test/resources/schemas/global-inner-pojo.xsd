@@ -39,7 +39,9 @@
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/inner-pojo" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-operator" name="foo"></xs:element>
     <xs:complexType name="FooType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType"></xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+            </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 </xs:schema>

@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import static org.mule.runtime.core.util.IOUtils.ifInputStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -66,56 +67,57 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
 
   @Override
   public Object onCall(MuleEventContext context) throws Exception {
-    InputStream in = (InputStream) context.getMessage().getPayload().getValue();
-    try {
-      logger.debug("arrived at " + toString());
-      byte[] startData = new byte[STREAM_SAMPLE_SIZE];
-      long startDataSize = 0;
-      byte[] endData = new byte[STREAM_SAMPLE_SIZE]; // ring buffer
-      long endDataSize = 0;
-      long endRingPointer = 0;
-      long streamLength = 0;
-      byte[] buffer = new byte[STREAM_BUFFER_SIZE];
+    return ifInputStream(context.getMessage().getPayload().getValue(), in -> {
+      try {
+        logger.debug("arrived at " + toString());
+        byte[] startData = new byte[STREAM_SAMPLE_SIZE];
+        long startDataSize = 0;
+        byte[] endData = new byte[STREAM_SAMPLE_SIZE]; // ring buffer
+        long endDataSize = 0;
+        long endRingPointer = 0;
+        long streamLength = 0;
+        byte[] buffer = new byte[STREAM_BUFFER_SIZE];
 
-      // throw data on the floor, but keep a record of size, start and end values
-      long bytesRead = 0;
+        // throw data on the floor, but keep a record of size, start and end values
+        long bytesRead = 0;
 
-      while (bytesRead >= 0) {
-        bytesRead = read(in, buffer);
-        if (bytesRead > 0) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("read " + bytesRead + " bytes");
-          }
+        while (bytesRead >= 0) {
+          bytesRead = read(in, buffer);
+          if (bytesRead > 0) {
+            if (logger.isDebugEnabled()) {
+              logger.debug("read " + bytesRead + " bytes");
+            }
 
-          streamLength += bytesRead;
-          long startOfEndBytes = 0;
-          for (long i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i) {
-            startData[(int) startDataSize++] = buffer[(int) i];
-            ++startOfEndBytes; // skip data included in startData
-          }
-          startOfEndBytes = Math.max(startOfEndBytes, bytesRead - STREAM_SAMPLE_SIZE);
-          for (long i = startOfEndBytes; i < bytesRead; ++i) {
-            ++endDataSize;
-            endData[(int) (endRingPointer++ % STREAM_SAMPLE_SIZE)] = buffer[(int) i];
-          }
-          if (streamLength >= targetSize) {
-            doCallback(startData, startDataSize, endData, endDataSize, endRingPointer, streamLength, context);
+            streamLength += bytesRead;
+            long startOfEndBytes = 0;
+            for (long i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i) {
+              startData[(int) startDataSize++] = buffer[(int) i];
+              ++startOfEndBytes; // skip data included in startData
+            }
+            startOfEndBytes = Math.max(startOfEndBytes, bytesRead - STREAM_SAMPLE_SIZE);
+            for (long i = startOfEndBytes; i < bytesRead; ++i) {
+              ++endDataSize;
+              endData[(int) (endRingPointer++ % STREAM_SAMPLE_SIZE)] = buffer[(int) i];
+            }
+            if (streamLength >= targetSize) {
+              doCallback(startData, startDataSize, endData, endDataSize, endRingPointer, streamLength, context);
+            }
           }
         }
+
+        in.close();
+      } catch (Exception e) {
+        in.close();
+
+        e.printStackTrace();
+        if (logger.isDebugEnabled()) {
+          logger.debug("Error on test component", e);
+        }
+        throw e;
       }
 
-      in.close();
-    } catch (Exception e) {
-      in.close();
-
-      e.printStackTrace();
-      if (logger.isDebugEnabled()) {
-        logger.debug("Error on test component", e);
-      }
-      throw e;
-    }
-
-    return null;
+      return null;
+    });
   }
 
   protected int read(InputStream in, byte[] buffer) throws IOException {

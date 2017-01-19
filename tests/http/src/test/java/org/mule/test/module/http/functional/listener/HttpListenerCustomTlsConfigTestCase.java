@@ -35,13 +35,13 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
   @Test
   public void customTlsGlobalContext() throws Exception {
     final Event res = flowRunner("testFlowGlobalContextClient").withPayload("data").run();
-    assertThat(getPayloadAsString(res.getMessage()), is("ok"));
+    assertThat(res.getMessage().getPayload().getValue(), is("ok"));
   }
 
   @Test
   public void customTlsNestedContext() throws Exception {
     final Event res = flowRunner("testFlowNestedContextClient").withPayload("data").run();
-    assertThat(getPayloadAsString(res.getMessage()), is("all right"));
+    assertThat(res.getMessage().getPayload().getValue(), is("all right"));
   }
 
 }

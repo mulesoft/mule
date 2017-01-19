@@ -20,7 +20,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultEventContext;
@@ -43,7 +42,6 @@ import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
 import java.util.List;
@@ -204,11 +202,17 @@ public class DefaultFlowBuilder implements Builder {
         ExecutionTemplate<Event> executionTemplate =
             createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
         Event result = executionTemplate.execute(() -> pipeline.process(newEvent));
+        newEvent.getContext().success(result);
+        streamingManager.success(result);
         return createReturnEventForParentFlowConstruct(result, event);
       } catch (MessagingException e) {
         e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
+        newEvent.getContext().error(e);
+        streamingManager.error(newEvent);
         throw e;
       } catch (Exception e) {
+        newEvent.getContext().error(e);
+        streamingManager.error(newEvent);
         resetRequestContextEvent(event);
         throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"), e);
       }
@@ -225,12 +229,19 @@ public class DefaultFlowBuilder implements Builder {
               Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
               sink.accept(request);
               return Mono.from(request.getContext())
-                  .map(r -> createReturnEventForParentFlowConstruct(r, event))
+                  .map(r -> {
+                    Event result = createReturnEventForParentFlowConstruct(r, event);
+                    streamingManager.success(result);
+                    return result;
+                  })
                   .mapError(MessagingException.class, me -> {
                     me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
+                    streamingManager.error(event);
                     return me;
                   })
                   .otherwiseIfEmpty(fromCallable(() -> {
+                    event.getContext().success();
+                    streamingManager.success(event);
                     throw newEventDroppedException(event);
                   }));
             }
@@ -240,7 +251,7 @@ public class DefaultFlowBuilder implements Builder {
 
     private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
-      // referenced flows. If it is passded on they two replyTo responses are sent.
+      // referenced flows. If it is passed on they two replyTo responses are sent.
       replyToHandler = null;
 
       // TODO MULE-10013

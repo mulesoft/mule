@@ -44,7 +44,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
+public class StreamingInterceptorTestCase extends AbstractMuleContextTestCase {
 
   private static final String USER = "john";
   private static final String PASSWORD = "doe";

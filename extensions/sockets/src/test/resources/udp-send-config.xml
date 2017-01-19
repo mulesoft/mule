@@ -19,10 +19,12 @@
 
     <flow name="udp-send">
         <sockets:send config-ref="udp-requester"/>
+        <object-to-byte-array-transformer />
     </flow>
 
     <flow name="udp-listen">
         <sockets:socket-listener config-ref="udp-listener"/>
+        <object-to-byte-array-transformer />
         <flow-ref name="onIncomingConnection"/>
         <set-payload value="Consumed"/>
     </flow>

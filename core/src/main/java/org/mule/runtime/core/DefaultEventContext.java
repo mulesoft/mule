@@ -8,7 +8,8 @@ package org.mule.runtime.core;
 
 import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
-
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -20,6 +21,8 @@ import org.mule.runtime.core.management.stats.ProcessingTime;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.OffsetTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Subscriber;
 import reactor.core.publisher.MonoProcessor;
@@ -29,7 +32,7 @@ import reactor.core.publisher.MonoProcessor;
  *
  * @since 4.0
  */
-public final class DefaultEventContext implements EventContext, Serializable {
+public final class DefaultEventContext extends AbstractEventContext implements Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 
@@ -66,7 +69,12 @@ public final class DefaultEventContext implements EventContext, Serializable {
    * @return a new child context
    */
   public static EventContext child(EventContext parent) {
-    return new ChildEventContext(parent);
+    EventContext child = new ChildEventContext(parent);
+    if (parent instanceof AbstractEventContext) {
+      ((AbstractEventContext) parent).addChildContext(child);
+    }
+
+    return child;
   }
 
   private final String id;
@@ -78,7 +86,6 @@ public final class DefaultEventContext implements EventContext, Serializable {
   private final String connectorName;
 
   private final ProcessingTime processingTime;
-
   private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
 
   @Override
@@ -121,6 +128,11 @@ public final class DefaultEventContext implements EventContext, Serializable {
     return processorsTrace;
   }
 
+  @Override
+  public Optional<EventContext> getParentContext() {
+    return empty();
+  }
+
   /**
    * Builds a new execution context with the given parameters.
    *
@@ -139,17 +151,17 @@ public final class DefaultEventContext implements EventContext, Serializable {
   }
 
   @Override
-  public void success() {
+  protected void doSuccess() {
     monoProcessor.onComplete();
   }
 
   @Override
-  public void success(Event event) {
+  protected void doSuccess(Event event) {
     monoProcessor.onNext(event);
   }
 
   @Override
-  public void error(Throwable messagingException) {
+  protected void doError(Throwable messagingException) {
     monoProcessor.onError(messagingException);
   }
 
@@ -169,7 +181,7 @@ public final class DefaultEventContext implements EventContext, Serializable {
     monoProcessor.subscribe(s);
   }
 
-  private static class ChildEventContext implements EventContext, Serializable {
+  private static class ChildEventContext extends AbstractEventContext implements Serializable {
 
     private static final long serialVersionUID = 1054412872901205234L;
 
@@ -221,17 +233,17 @@ public final class DefaultEventContext implements EventContext, Serializable {
     }
 
     @Override
-    public void success() {
+    protected void doSuccess() {
       monoProcessor.onComplete();
     }
 
     @Override
-    public void success(Event event) {
+    protected void doSuccess(Event event) {
       monoProcessor.onNext(event);
     }
 
     @Override
-    public void error(Throwable throwable) {
+    protected void doError(Throwable throwable) {
       monoProcessor.onError(throwable);
     }
 
@@ -250,6 +262,15 @@ public final class DefaultEventContext implements EventContext, Serializable {
       monoProcessor.subscribe(s);
     }
 
+    @Override
+    public List<EventContext> getChildContexts() {
+      return null;
+    }
+
+    @Override
+    public Optional<EventContext> getParentContext() {
+      return of(parent);
+    }
   }
 
 }

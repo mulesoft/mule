@@ -12,13 +12,16 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
+import org.mule.runtime.core.util.UUID;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 /**
@@ -32,13 +35,27 @@ public class MuleContextUtils {
     // No instances of this class allowed
   }
 
+  public static MuleContext mockMuleContext() {
+    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
+    StreamingManagerAdapter streamingManager = mock(StreamingManagerAdapter.class, RETURNS_DEEP_STUBS);
+    try {
+      when(muleContext.getRegistry().lookupObject(StreamingManagerAdapter.class)).thenReturn(streamingManager);
+      when(muleContext.getRegistry().lookupObject(StreamingManager.class)).thenReturn(streamingManager);
+    } catch (RegistrationException e) {
+      throw new RuntimeException(e);
+    }
+
+    return muleContext;
+  }
+
   /**
    * Creates and configures a mock {@link MuleContext} to return testing services implementations.
    * 
    * @return the created {@code muleContext}.
    */
   public static MuleContext mockContextWithServices() {
-    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    final MuleContext muleContext = mockMuleContext();
     when(muleContext.getSchedulerService()).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
     return muleContext;
   }

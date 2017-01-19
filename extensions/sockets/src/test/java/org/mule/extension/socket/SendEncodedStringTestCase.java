@@ -11,9 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.util.IOUtils;
 
-import java.io.InputStream;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -40,7 +38,6 @@ public class SendEncodedStringTestCase extends SocketExtensionTestCase {
     flowRunner("tcp-send").withVariable("encoding", customEncoding).withPayload(WEIRD_CHAR_MESSAGE).run();
 
     Message message = receiveConnection();
-    byte[] byteArray = IOUtils.toByteArray((InputStream) message.getPayload().getValue());
-    assertThat(Arrays.equals(byteArray, WEIRD_CHAR_MESSAGE.getBytes(customEncoding)), is(true));
+    assertThat(Arrays.equals((byte[]) message.getPayload().getValue(), WEIRD_CHAR_MESSAGE.getBytes(customEncoding)), is(true));
   }
 }

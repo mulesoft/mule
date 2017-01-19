@@ -17,6 +17,7 @@
 
     <flow name="udp-send-and-receive">
         <sockets:send-and-receive config-ref="udp-requester"/>
+        <object-to-byte-array-transformer />
     </flow>
 
     <flow name="udp-listen-and-modify-pojo">

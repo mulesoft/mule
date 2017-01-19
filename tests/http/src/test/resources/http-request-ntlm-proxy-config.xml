@@ -15,6 +15,7 @@
     </httpn:request-config>
     <flow name="ntlmFlow">
         <httpn:request config-ref="ntlmProxy" path="requestPath"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

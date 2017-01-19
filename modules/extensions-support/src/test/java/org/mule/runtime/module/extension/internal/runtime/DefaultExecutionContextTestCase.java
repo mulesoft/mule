@@ -89,21 +89,10 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     assertThat(operationContext.getParameter(PARAM_NAME), is(VALUE));
   }
 
-  @Test
-  public void getTypeSafeParameter() {
-    assertThat(operationContext.hasParameter(PARAM_NAME), is(true));
-    assertThat(operationContext.getTypeSafeParameter(PARAM_NAME, String.class), is(VALUE));
-  }
-
   @Test(expected = NoSuchElementException.class)
-  public void getNonExistantTypeSafeParameter() {
+  public void getNonExistentParameter() {
     assertThat(operationContext.hasParameter(PARAM_NAME + "_"), is(false));
-    operationContext.getTypeSafeParameter(PARAM_NAME + "_", String.class);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void getTypeSafeParameterFails() {
-    operationContext.getTypeSafeParameter(PARAM_NAME, Integer.class);
+    operationContext.getParameter(PARAM_NAME + "_");
   }
 
   @Test

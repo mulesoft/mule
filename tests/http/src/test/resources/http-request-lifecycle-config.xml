@@ -15,10 +15,12 @@
 
     <flow name="simpleRequest">
         <httpn:request config-ref="requestConfig" path="/test" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="otherRequest">
         <httpn:request config-ref="otherRequestConfig" path="/otherTest" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

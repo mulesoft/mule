@@ -4,11 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.message;
+package org.mule.runtime.core.util.message;
 
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessage;
+import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Iterator;
@@ -27,10 +29,17 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   private final Iterator<Result> delegate;
   private final MediaType mediaType;
+  private final CursorStreamProviderFactory cursorStreamProviderFactory;
+  private final Event event;
 
-  ResultToMessageIterator(Iterator<Result> delegate, MediaType mediaType) {
+  ResultToMessageIterator(Iterator<Result> delegate,
+                          MediaType mediaType,
+                          CursorStreamProviderFactory cursorStreamProviderFactory,
+                          Event event) {
     this.delegate = delegate;
     this.mediaType = mediaType;
+    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    this.event = event;
   }
 
   @Override
@@ -41,7 +50,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), mediaType);
+    return toMessage(delegate.next(), mediaType, cursorStreamProviderFactory, event);
   }
 
   @Override
@@ -51,6 +60,6 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType, cursorStreamProviderFactory, event)));
   }
 }

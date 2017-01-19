@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
@@ -21,29 +22,58 @@ import org.mule.runtime.module.extension.internal.loader.java.property.PagedOper
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Factory class, that returns instances of different {@link OperationMessageProcessor}s depending on the operation type.
- *
- * @since 4.0
- */
-public class OperationMessageProcessorFactory {
+public final class OperationMessageProcessorBuilder {
 
-  /**
-   * Returns an {@link OperationMessageProcessor} implementation depending whether the operation is paginated, intercepting or a
-   * regular operation.
-   *
-   * @return a new {@link OperationMessageProcessor} instance.
-   */
-  public static OperationMessageProcessor getOperationMessageProcessor(ExtensionModel extensionModel,
-                                                                       OperationModel operationModel,
-                                                                       ConfigurationProvider configurationProvider,
-                                                                       PolicyManager policyManager,
-                                                                       Map<String, ?> parameters,
-                                                                       MuleContext muleContext,
-                                                                       String target)
-      throws Exception {
+  private final ExtensionModel extensionModel;
+  private final OperationModel operationModel;
+  private final PolicyManager policyManager;
+  private final MuleContext muleContext;
+
+  private ConfigurationProvider configurationProvider;
+  private Map<String, ?> parameters;
+  private String target;
+  private CursorStreamProviderFactory cursorStreamProviderFactory;
+
+  public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
+                                          OperationModel operationModel,
+                                          PolicyManager policyManager,
+                                          MuleContext muleContext) {
+
+    checkArgument(extensionModel != null, "ExtensionModel cannot be null");
+    checkArgument(operationModel != null, "OperationModel cannot be null");
+    checkArgument(policyManager != null, "PolicyManager cannot be null");
+    checkArgument(muleContext != null, "muleContext cannot be null");
+
+    this.extensionModel = extensionModel;
+    this.operationModel = operationModel;
+    this.policyManager = policyManager;
+    this.muleContext = muleContext;
+  }
+
+  public OperationMessageProcessorBuilder setConfigurationProvider(ConfigurationProvider configurationProvider) {
+    this.configurationProvider = configurationProvider;
+    return this;
+  }
+
+  public OperationMessageProcessorBuilder setParameters(Map<String, ?> parameters) {
+    this.parameters = parameters != null ? parameters : new HashMap<>();
+    return this;
+  }
+
+  public OperationMessageProcessorBuilder setTarget(String target) {
+    this.target = target;
+    return this;
+  }
+
+  public OperationMessageProcessorBuilder setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
+    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    return this;
+  }
+
+  public OperationMessageProcessor build() {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       try {
         ResolverSet resolverSet =
@@ -52,14 +82,15 @@ public class OperationMessageProcessorFactory {
         ExtensionManager extensionManager = muleContext.getExtensionManager();
         if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
           processor = new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target,
-                                                                resolverSet, extensionManager, policyManager);
+                                                                resolverSet, cursorStreamProviderFactory, extensionManager,
+                                                                policyManager);
         } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                 extensionManager, policyManager);
+                                                 cursorStreamProviderFactory, extensionManager, policyManager);
         } else {
           processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                    extensionManager, policyManager);
+                                                    cursorStreamProviderFactory, extensionManager, policyManager);
         }
         // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
         muleContext.getInjector().inject(processor);

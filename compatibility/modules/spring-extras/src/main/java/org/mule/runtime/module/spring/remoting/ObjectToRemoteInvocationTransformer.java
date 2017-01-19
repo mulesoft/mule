@@ -9,6 +9,7 @@ package org.mule.runtime.module.spring.remoting;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
@@ -30,6 +31,7 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer {
     this.registerSourceType(DataType.fromType(RemoteInvocation.class));
     this.registerSourceType(DataType.BYTE_ARRAY);
     this.registerSourceType(DataType.INPUT_STREAM);
+    this.registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     this.setReturnDataType(DataType.fromType(RemoteInvocation.class));
   }
 
@@ -41,12 +43,10 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer {
 
     Object o = null;
 
-    if (src instanceof InputStream) {
-      try (ObjectInputStream ois = new ClassLoaderObjectInputStream(currentThread().getContextClassLoader(), (InputStream) src)) {
-        o = ois.readObject();
-      } catch (Exception e) {
-        throw new TransformerException(this, e);
-      }
+    if (src instanceof CursorStreamProvider) {
+      o = handleStream(((CursorStreamProvider) src).openCursor());
+    } else if (src instanceof InputStream) {
+      o = handleStream((InputStream) src);
     } else {
       byte[] data = (byte[]) src;
       ByteArrayInputStream bais = new ByteArrayInputStream(data);
@@ -72,5 +72,15 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer {
       }
     }
     return ri;
+  }
+
+  private Object handleStream(InputStream src) throws TransformerException {
+    Object o;
+    try (ObjectInputStream ois = new ClassLoaderObjectInputStream(currentThread().getContextClassLoader(), src)) {
+      o = ois.readObject();
+    } catch (Exception e) {
+      throw new TransformerException(this, e);
+    }
+    return o;
   }
 }

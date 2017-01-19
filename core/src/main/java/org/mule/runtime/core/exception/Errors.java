@@ -17,6 +17,7 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.REDELIVERY_EXHA
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -90,6 +91,8 @@ public abstract class Errors {
      */
     public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
 
+    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
+
   }
 
   public static final class ComponentIdentifiers {
@@ -114,7 +117,12 @@ public abstract class Errors {
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
+
+
     public static final ComponentIdentifier UNKNOWN =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
+
   }
 }

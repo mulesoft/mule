@@ -9,6 +9,7 @@
     <xs:complexType name="Some-operationType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

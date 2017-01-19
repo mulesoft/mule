@@ -46,6 +46,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
@@ -117,9 +118,10 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    ResolverSet resolverSet,
+                                   CursorStreamProviderFactory cursorStreamProviderFactory,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager) {
-    super(extensionModel, operationModel, configurationProvider, extensionManager);
+    super(extensionModel, operationModel, configurationProvider, cursorStreamProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.resolverSet = resolverSet;
@@ -191,6 +193,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
                                                                          Map<String, Object> resolvedParameters,
                                                                          Event event)
       throws MuleException {
+
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
                                          muleContext);
   }
@@ -209,8 +212,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
 
     return !isTargetPresent()
-        ? new ValueReturnDelegate(operationModel, muleContext)
-        : new TargetReturnDelegate(target, operationModel, muleContext);
+        ? new ValueReturnDelegate(operationModel, getCursorStreamProviderFactory(), muleContext)
+        : new TargetReturnDelegate(target, operationModel, getCursorStreamProviderFactory(), muleContext);
   }
 
   private boolean isTargetPresent() {
@@ -271,7 +274,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   /**
    * Validates that the {@link #operationModel} is valid for the given {@code configurationProvider}
    *
-   * @throws IllegalSourceException If the validation fails
+   * @throws IllegalOperationException If the validation fails
    */
   @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {

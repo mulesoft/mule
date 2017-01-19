@@ -17,6 +17,7 @@
 
     <flow name="tcp-send-and-receive">
         <sockets:send-and-receive config-ref="tcp-requester"/>
+        <object-to-byte-array-transformer />
     </flow>
 
     <flow name="tcp-listen-and-modify-pojo">

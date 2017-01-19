@@ -11,15 +11,15 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
- * A delegate interface to decouple a {@link OperationExecutor}'s return value from the format in which it is to be handed back
- * into the pipeline
+ * A delegate interface to decouple a {@link OperationExecutor}'s return value from how it is transformed
+ * into an {@link Event} to be handed back into the pipeline
  *
  * @since 4.0
  */
 interface ReturnDelegate {
 
   /**
-   * Adapts the {@code value} to another format
+   * Adapts the {@code value} into an {@link Event}
    *
    * @param value the value to be returned
    * @param operationContext the {@link ExecutionContextAdapter} on which the operation was executed

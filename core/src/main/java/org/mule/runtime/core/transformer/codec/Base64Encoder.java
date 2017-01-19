@@ -7,12 +7,14 @@
 package org.mule.runtime.core.transformer.codec;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.Base64;
 import org.mule.runtime.core.util.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -26,6 +28,7 @@ public class Base64Encoder extends AbstractTransformer {
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     setReturnDataType(DataType.STRING);
   }
 
@@ -36,13 +39,10 @@ public class Base64Encoder extends AbstractTransformer {
 
       if (src instanceof String) {
         buf = ((String) src).getBytes(encoding);
+      } else if (src instanceof CursorStreamProvider) {
+        buf = handleStream(((CursorStreamProvider) src).openCursor(), encoding);
       } else if (src instanceof InputStream) {
-        InputStreamReader input = new InputStreamReader((InputStream) src);
-        try {
-          buf = IOUtils.toByteArray(input, encoding);
-        } finally {
-          input.close();
-        }
+        buf = handleStream((InputStream) src, encoding);
       } else {
         buf = (byte[]) src;
       }
@@ -56,6 +56,15 @@ public class Base64Encoder extends AbstractTransformer {
       }
     } catch (Exception ex) {
       throw new TransformerException(CoreMessages.transformFailed(src.getClass().getName(), "base64"), this, ex);
+    }
+  }
+
+  private byte[] handleStream(InputStream src, Charset encoding) throws IOException {
+    InputStreamReader input = new InputStreamReader(src);
+    try {
+      return IOUtils.toByteArray(input, encoding);
+    } finally {
+      input.close();
     }
   }
 

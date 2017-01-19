@@ -44,7 +44,7 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
   @Test
   public void acceptsInvalidCertificateIfInsecure() throws Exception {
     final Event res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
-    assertThat(res.getMessageAsString(muleContext), is(TEST_PAYLOAD));
+    assertThat(res.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
   @Test
