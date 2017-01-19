@@ -9,6 +9,8 @@ package org.mule.runtime.core.construct;
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
@@ -16,8 +18,6 @@ import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStra
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
@@ -43,6 +43,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
@@ -65,7 +66,6 @@ import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFac
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -73,12 +73,11 @@ import com.google.common.cache.CacheBuilder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -249,8 +248,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return pipeline.process(event);
           } else {
             try {
-              just(event).transform(processFlowFunction()).subscribe();
-              return Mono.from(event.getContext()).block();
+              return just(event).transform(this).block();
             } catch (Exception e) {
               throw rxExceptionToMuleException(e);
             }
@@ -259,11 +257,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher).flatMap(event -> {
-            just(event).transform(processFlowFunction()).subscribe();
-            return Mono.from(event.getContext());
-          });
-        }
+          return from(publisher)
+                  .doOnNext(event -> just(event).transform(processFlowFunction()).subscribe())
+                  .flatMap(event -> Mono.from(event.getContext()));
+          }
       });
     }
 
@@ -278,22 +275,23 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
-    return stream -> from(stream).transform(pipeline)
+    return stream -> from(stream)
+        .transform(pipeline)
         .doOnNext(response -> response.getContext().success(response))
-        .doOnError(MessagingException.class,
-                   me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
-                       .doOnNext(event -> event.getContext().success(event))
-                       .doOnError(MessagingException.class, me2 -> me2.getEvent().getContext().error(me2))
-                       .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                                  throwable -> LOGGER.error("Unhandled exception thrown during error handling" +
-                                      throwable))
-                       .subscribe())
-        .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                   throwable -> LOGGER.error("Unhandled exception in async processing " + throwable))
+        .doOnError(MessagingException.class, handleError())
         .onErrorResumeWith(EventDroppedException.class, ede -> {
           ede.getEvent().getContext().success();
           return empty();
-        });
+        })
+        .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                   throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
+  }
+
+  private Consumer<MessagingException> handleError() {
+    return me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
+        .doOnNext(event -> event.getContext().success(event))
+        .doOnError(throwable -> me.getEvent().getContext().error(throwable))
+        .subscribe();
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {

@@ -56,10 +56,10 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public void error() throws Exception {
     EventContext eventContext = create(getTestFlow(muleContext), "");
 
-    MessagingException exception = new MessagingException(testEvent(), new RuntimeException());
+    RuntimeException exception = new RuntimeException();
     eventContext.error(exception);
 
-    expectedException.expectCause(is(exception));
+    expectedException.expect(is(exception));
     from(eventContext).block();
   }
 
@@ -97,10 +97,10 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext eventContext = create(getTestFlow(muleContext), "");
     EventContext childEventContext = DefaultEventContext.child(eventContext);
 
-    MessagingException exception = new MessagingException(testEvent(), new RuntimeException());
+    RuntimeException exception = new RuntimeException();
     childEventContext.error(exception);
 
-    expectedException.expectCause(is(exception));
+    expectedException.expect(is(exception));
     from(childEventContext).blockMillis(BLOCK_TIMEOUT);
   }
 

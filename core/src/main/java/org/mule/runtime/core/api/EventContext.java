@@ -79,9 +79,9 @@ public interface EventContext extends Publisher<Event> {
   /**
    * Complete this {@link EventContext} unsuccessfully with an error
    *
-   * @param messagingException the messaging exception .
+   * @param throwable the throwable.
    */
-  void error(MessagingException messagingException);
+  void error(Throwable throwable);
 
   /**
    * @returns information about the times spent processing the events for this context (so far).
