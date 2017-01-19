@@ -26,6 +26,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -66,8 +67,12 @@ import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.commons.collections.Predicate;
@@ -94,6 +99,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected ProcessingStrategyFactory processingStrategyFactory;
   protected ProcessingStrategy processingStrategy;
   private boolean canProcessMessage = false;
+  private Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
 
   private static final Predicate sourceCompatibleWithAsync = new Predicate() {
 
@@ -422,6 +428,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected boolean useBlockingCodePath() {
     return isTransactionActive() || processingStrategy.isSynchronous();
+  }
+
+  @Override
+  public Map<String, EventContext> getSerializationEventContextCache() {
+    return eventContextCache.asMap();
   }
 
   private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalMessageProcessor {
