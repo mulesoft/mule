@@ -6,13 +6,12 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
 import static org.mule.extension.http.api.HttpConstants.Methods.GET;
 import static org.mule.extension.http.api.HttpHeaders.Names.LOCATION;
-import static org.mule.extension.oauth2.internal.DynamicFlowFactory.createDynamicFlow;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -23,16 +22,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -41,8 +37,8 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -117,8 +113,8 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
                             // TODO MULE-11283 improve this API
                             new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()),
                                                        new URL(localAuthorizationUrl).getPath()),
-                            createDynamicFlow(muleContext, "authorization-request-handler-" + localAuthorizationUrl,
-                                              createLocalAuthorizationUrlListener()),
+                            getDefaultEncoding(muleContext),
+                            createLocalAuthorizationUrlListener(),
                             LOGGER);
     } catch (MalformedURLException e) {
       LOGGER.warn("Could not parse provided url %s. Validate that the url is correct", localAuthorizationUrl);
@@ -126,16 +122,12 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
     }
   }
 
-  private List<Processor> createLocalAuthorizationUrlListener() {
-    final Processor listenerMessageProcessor = muleEvent -> {
-      final Builder builder = Event.builder(muleEvent);
+  private Function<Result<Object, HttpRequestAttributes>, Result<Object, HttpResponseAttributes>> createLocalAuthorizationUrlListener() {
+    return in -> {
+      final String onCompleteRedirectToValue = in.getAttributes().get().getQueryParams().get("onCompleteRedirectTo");
+      final String resourceOwnerId = resolver.resolveExpression(localAuthorizationUrlResourceOwnerId, in);
 
-      final String onCompleteRedirectToValue =
-          ((HttpRequestAttributes) muleEvent.getMessage().getAttributes()).getQueryParams().get("onCompleteRedirectTo");
-      final String resourceOwnerId = resolver.resolveExpression(localAuthorizationUrlResourceOwnerId, muleEvent);
-      muleEvent = builder.addVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
-
-      final StateEncoder stateEncoder = new StateEncoder(resolver.resolveExpression(state, muleEvent));
+      final StateEncoder stateEncoder = new StateEncoder(resolver.resolveExpression(state, in));
       if (resourceOwnerId != null) {
         stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
       }
@@ -147,12 +139,11 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
           .setCustomParameters(customParameters).setRedirectUrl(oauthConfig.getExternalCallbackUrl())
           .setState(stateEncoder.getEncodedState()).setScope(scopes).buildUrl();
 
-      return builder.message(InternalMessage.builder(muleEvent.getMessage())
+      return Result.<Object, HttpResponseAttributes>builder().output(in.getOutput()).mediaType(in.getMediaType().get())
           .attributes(new HttpResponseAttributes(MOVED_TEMPORARILY.getStatusCode(), MOVED_TEMPORARILY.getReasonPhrase(),
                                                  new ParameterMap(singletonMap(LOCATION, authorizationUrlWithParams))))
-          .build()).build();
+          .build();
     };
-    return asList(listenerMessageProcessor);
   }
 
   @Override
@@ -170,7 +161,7 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
   }
 
   @Override
-  public void start() throws MuleException {
+  public void start() {
     redirectUrlHandlerManager.start();
   }
 

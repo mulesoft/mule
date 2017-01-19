@@ -20,27 +20,24 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_EX
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.internal.request.HttpRequestFactory;
 import org.mule.extension.http.internal.request.HttpRequesterCookieConfig;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
-import org.mule.extension.http.internal.request.HttpRequestFactory;
-import org.mule.extension.oauth2.internal.clientcredentials.OAuthAuthorizationAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -151,39 +148,33 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
     this.tlsContextFactory = tlsContextFactory;
   }
 
-  protected Event invokeTokenUrl(final Event event) throws MuleException, TokenUrlResponseException {
+  protected Result<Object, HttpResponseAttributes> invokeTokenUrl(Map<String, String> tokenRequestFormToSend,
+                                                                  String authorization)
+      throws MuleException, TokenUrlResponseException {
     try {
       final HttpRequesterRequestBuilder requestBuilder = new HttpRequesterRequestBuilder();
-      requestBuilder.setBody(event.getMessage().getPayload().getValue());
+      requestBuilder.setBody(tokenRequestFormToSend);
 
-      final Attributes attributes = event.getMessage().getAttributes();
-      if (attributes instanceof OAuthAuthorizationAttributes
-          && ((OAuthAuthorizationAttributes) attributes).getAuthorization() != null) {
-        requestBuilder.setHeaders(singletonMap(AUTHORIZATION, ((OAuthAuthorizationAttributes) attributes).getAuthorization()));
+      if (authorization != null) {
+        requestBuilder.setHeaders(singletonMap(AUTHORIZATION, authorization));
       }
 
       // TODO MULE-11272 Support doing non-blocking requests
-      final HttpResponse response =
-          client.send(eventToHttpRequest.create(event, requestBuilder, null, muleContext), TOKEN_REQUEST_TIMEOUT_MILLIS, true,
-                      null);
+      final HttpResponse response = client.send(eventToHttpRequest.create(null, requestBuilder, null, muleContext),
+                                                TOKEN_REQUEST_TIMEOUT_MILLIS, true, null);
 
-      MediaType mediaType = event.getMessage().getPayload().getDataType().getMediaType();
-      Result<Object, HttpResponseAttributes> responseResult = httpResponseToMuleMessage.convert(mediaType, response, tokenUrl);
-      final Builder responseEventBuilder = Event.builder(event).message(buildMessageFromResult(responseResult,
-                                                                                               responseResult.getOutput()));
+      Result<Object, HttpResponseAttributes> responseResult = httpResponseToMuleMessage.convert(ANY, response, tokenUrl);
+      final Result.Builder<Object, HttpResponseAttributes> responseBuilder =
+          Result.<Object, HttpResponseAttributes>builder(responseResult);
 
       if (responseResult.getAttributes().get().getStatusCode() >= BAD_REQUEST.getStatusCode()) {
-        throw new TokenUrlResponseException(getTokenUrl(), responseEventBuilder.build());
+        throw new TokenUrlResponseException(getTokenUrl(), responseBuilder.build());
       }
 
       if (responseResult.getOutput() instanceof InputStream) {
-        return responseEventBuilder.message(
-                                            buildMessageFromResult(responseResult,
-                                                                   org.mule.runtime.core.util.IOUtils
-                                                                       .toString((InputStream) responseResult.getOutput())))
-            .build();
+        return responseBuilder.output(IOUtils.toString((InputStream) responseResult.getOutput())).build();
       } else {
-        return responseEventBuilder.build();
+        return responseBuilder.build();
       }
     } catch (IOException e) {
       throw new TokenUrlResponseException(e, getTokenUrl());
@@ -204,24 +195,25 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
     return tokenUrl;
   }
 
-  public TokenResponse processTokenResponse(Event muleEvent, boolean retrieveRefreshToken) {
+  public TokenResponse processTokenResponse(Result<Object, HttpResponseAttributes> tokenUrlResponse,
+                                            boolean retrieveRefreshToken) {
     TokenResponse response = new TokenResponse();
 
-    response.accessToken = resolver.resolveExpression(responseAccessToken, muleEvent);
+    response.accessToken = resolver.resolveExpression(responseAccessToken, tokenUrlResponse);
     response.accessToken = isEmpty(response.accessToken) ? null : response.accessToken;
     if (response.accessToken == null) {
       LOGGER.error("Could not extract access token from token URL. "
           + "Expressions used to retrieve access token was " + responseAccessToken);
     }
     if (retrieveRefreshToken) {
-      response.refreshToken = resolver.resolveExpression(responseRefreshToken, muleEvent);
+      response.refreshToken = resolver.resolveExpression(responseRefreshToken, tokenUrlResponse);
       response.refreshToken = isEmpty(response.refreshToken) ? null : response.refreshToken;
     }
-    response.expiresIn = resolver.resolveExpression(responseExpiresIn, muleEvent);
+    response.expiresIn = resolver.resolveExpression(responseExpiresIn, tokenUrlResponse);
     if (!CollectionUtils.isEmpty(parameterExtractors)) {
       for (ParameterExtractor parameterExtractor : parameterExtractors) {
         response.customResponseParameters.put(parameterExtractor.getParamName(),
-                                              resolver.resolveExpression(parameterExtractor.getValue(), muleEvent));
+                                              resolver.resolveExpression(parameterExtractor.getValue(), tokenUrlResponse));
       }
     }
 
@@ -242,9 +234,9 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
 
     private Object tokenUrlResponse;
 
-    public TokenUrlResponseException(String tokenUrl, final Event tokenUrlResponse) {
+    public TokenUrlResponseException(String tokenUrl, Result<Object, HttpResponseAttributes> build) {
       super(format("HTTP response from token URL %s returned a failure status code", tokenUrl), TOKEN_URL_FAIL);
-      this.tokenUrlResponse = tokenUrlResponse.getMessage().getPayload().getValue();
+      this.tokenUrlResponse = build.getOutput();
     }
 
     public TokenUrlResponseException(final Exception cause, String tokenUrl) {
@@ -301,7 +293,7 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
   }
 
   @Override
-  public void start() throws MuleException {
+  public void start() {
     client.start();
   }
 

@@ -8,19 +8,12 @@ package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.DefaultEventContext.create;
+
 import org.mule.extension.http.api.HttpConstants;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
@@ -34,7 +27,9 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
+import java.nio.charset.Charset;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -49,42 +44,34 @@ class RequestHandlerUtils {
    * 
    * @param server
    * @param matcher
-   * @param listenerPath
-   * @param flow
+   * @param encoding
+   * @param callbackHandler
    * @param logger
    * @return
    */
-  public static RequestHandlerManager addRequestHandler(HttpServer server, PathAndMethodRequestMatcher matcher,
-                                                        Flow flow, Logger logger) {
+  public static <T> RequestHandlerManager addRequestHandler(HttpServer server, PathAndMethodRequestMatcher matcher,
+                                                            Charset encoding,
+                                                            Function<Result<Object, HttpRequestAttributes>, Result<T, HttpResponseAttributes>> callbackHandler,
+                                                            Logger logger) {
     // MULE-11277 Support non-blocking in OAuth http listeners
     return server.addRequestHandler(matcher, (requestContext, responseCallback) -> {
-      Result<Object, HttpRequestAttributes> result;
       final ClassLoader previousCtxClassLoader = currentThread().getContextClassLoader();
       try {
         currentThread().setContextClassLoader(RequestHandlerUtils.class.getClassLoader());
 
-        result = transform(requestContext, flow.getMuleContext(), true, new ListenerPath(matcher.getPath(), "/"));
-        final Message message = Message.builder()
-            .payload(result.getOutput())
-            .mediaType(result.getMediaType().orElse(ANY))
-            .attributes(result.getAttributes().get())
-            .build();
+        Result<?, HttpResponseAttributes> processed =
+            callbackHandler.apply(transform(requestContext, encoding, true, new ListenerPath(matcher.getPath(), "/")));
 
-        final Event processed =
-            flow.process(Event.builder(create(flow, "OAuthCallback")).message((InternalMessage) message).build());
-
-        final String body = (String) processed.getMessage().getPayload().getValue();
-        final HttpResponseAttributes responseAttributes = (HttpResponseAttributes) processed.getMessage().getAttributes();
+        final String body = (String) processed.getOutput();
+        final HttpResponseAttributes responseAttributes = processed.getAttributes().get();
         final HttpResponseBuilder responseBuilder = HttpResponse.builder()
             .setStatusCode(responseAttributes.getStatusCode())
             .setReasonPhrase(responseAttributes.getReasonPhrase());
 
         if (body != null) {
-          responseBuilder.setEntity(new ByteArrayHttpEntity(body.getBytes()))
-              .addHeader(CONTENT_LENGTH, "" + body.length());
+          responseBuilder.setEntity(new ByteArrayHttpEntity(body.getBytes())).addHeader(CONTENT_LENGTH, "" + body.length());
         } else {
-          responseBuilder.setEntity(new EmptyHttpEntity())
-              .addHeader(CONTENT_LENGTH, "" + 0);
+          responseBuilder.setEntity(new EmptyHttpEntity()).addHeader(CONTENT_LENGTH, "" + 0);
         }
 
         for (Entry<String, String> entry : responseAttributes.getHeaders().entrySet()) {
@@ -107,9 +94,6 @@ class RequestHandlerUtils {
       } catch (HttpMessageParsingException e) {
         logger.warn("Exception occurred parsing request:", e);
         sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback, logger);
-      } catch (MuleException e) {
-        logger.warn("Exception occurred processing request:", e);
-        sendErrorResponse(INTERNAL_SERVER_ERROR, "Server encountered a problem", responseCallback, logger);
       } finally {
         currentThread().setContextClassLoader(previousCtxClassLoader);
       }

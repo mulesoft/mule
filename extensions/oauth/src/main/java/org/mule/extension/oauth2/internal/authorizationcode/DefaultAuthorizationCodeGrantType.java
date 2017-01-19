@@ -24,7 +24,6 @@ import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthCon
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -268,12 +267,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   public boolean shouldRetry(final Event firstAttemptResponseEvent) throws MuleException {
     Boolean shouldRetryRequest = resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
     if (shouldRetryRequest) {
-      try {
-        tokenRequestHandler.refreshToken(firstAttemptResponseEvent,
-                                         resolver.resolveExpression(resourceOwnerId, firstAttemptResponseEvent));
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
-      }
+      tokenRequestHandler.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResponseEvent));
     }
     return shouldRetryRequest;
   }

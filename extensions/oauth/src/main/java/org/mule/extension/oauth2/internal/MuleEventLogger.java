@@ -6,10 +6,8 @@
  */
 package org.mule.extension.oauth2.internal;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import org.slf4j.Logger;
 
@@ -19,27 +17,19 @@ import org.slf4j.Logger;
 public class MuleEventLogger {
 
   private final Logger logger;
-  private MuleContext muleContext;
 
-  public MuleEventLogger(Logger logger, MuleContext muleContext) {
+  public MuleEventLogger(Logger logger) {
     this.logger = logger;
-    this.muleContext = muleContext;
   }
 
   /**
-   * Logs the event message payload type, the payload as string and the message properties.
+   * Logs the result message payload type and the payload as string.
    * 
-   * @param muleEvent event to log.
+   * @param result result to log.
    */
-  public void logContent(Event muleEvent) {
-    logger.error("Message content type is " + muleEvent.getMessage().getPayload().getDataType().getType());
-    logger.error("Message content is " + muleEvent.getMessage());
-    try {
-      String payloadAsString = muleContext.getTransformationService().getPayloadForLogging(muleEvent.getMessage());
-      logger.error("Message payload is " + (isEmpty(payloadAsString) ? "EMPTY CONTENT" : payloadAsString));
-    } catch (Exception e) {
-      // just skip the logging message if we couldn't convert the payload to string.
-    }
+  public void logContent(Result<Object, HttpRequestAttributes> result) {
+    logger.error("Message content type is " + result.getMediaType().get());
+    logger.error("Message content is " + result.getOutput());
   }
 
 }
