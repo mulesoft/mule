@@ -60,7 +60,6 @@ public class WssTimestampInResponseTestCase extends FunctionalTestCase
     @Test
     public void checkTSInResponseAndTSInResponseReturnsEchoMessage() throws Exception
     {
-
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST_WITH_HEADERS, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPortTSInResponseTSCheck.getNumber() + "/in",
@@ -73,7 +72,6 @@ public class WssTimestampInResponseTestCase extends FunctionalTestCase
     @Test
     public void noCheckTSInResponseAndTSInResponseReturnsErrorMessage() throws Exception
     {
-
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST_WITH_HEADERS, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPortTSInResponseNoTSCheck.getNumber() + "/in",
@@ -86,7 +84,6 @@ public class WssTimestampInResponseTestCase extends FunctionalTestCase
     @Test
     public void checkTSInResponseAndNoTSInResponseReturnsErrorMessage() throws Exception
     {
-
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST_WITH_HEADERS, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPortNoTSInResponseTSCheck.getNumber() + "/in",
@@ -99,7 +96,6 @@ public class WssTimestampInResponseTestCase extends FunctionalTestCase
     @Test
     public void noCheckTSInResponseAndNoTSInResponseReturnsEchoMessage() throws Exception
     {
-
         MuleMessage request = new DefaultMuleMessage(ECHO_REQUEST_WITH_HEADERS, muleContext);
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPortNoTSInResponseNoTSCheck.getNumber() + "/in",
