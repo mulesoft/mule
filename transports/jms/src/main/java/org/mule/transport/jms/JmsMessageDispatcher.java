@@ -6,7 +6,12 @@
  */
 package org.mule.transport.jms;
 
+import static javax.jms.Message.DEFAULT_PRIORITY;
+import static javax.jms.Message.DEFAULT_TIME_TO_LIVE;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.PERSISTENT_DELIVERY_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.PRIORITY_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.TIME_TO_LIVE_PROPERTY;
 import static org.mule.util.NumberUtils.toInt;
 import org.mule.api.CompletionHandler;
 import org.mule.api.MuleEvent;
@@ -97,6 +102,21 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return disableTemporaryDestinations;
     }
 
+    protected long getTimeToLive(MuleMessage message)
+    {
+        return message.getOutboundProperty(TIME_TO_LIVE_PROPERTY, DEFAULT_TIME_TO_LIVE);
+    }
+
+    protected int getPriority(MuleMessage message)
+    {
+        return message.getOutboundProperty(PRIORITY_PROPERTY, DEFAULT_PRIORITY);
+    }
+
+    protected boolean getPersistentDelivery(MuleMessage message)
+    {
+        return message.getOutboundProperty(PERSISTENT_DELIVERY_PROPERTY, connector.isPersistentDelivery());
+    }
+
     private MuleMessage dispatchMessage(MuleEvent event, boolean doSend, final CompletionHandler<MuleMessage, Exception> completionHandler) throws Exception
     {
         if (logger.isDebugEnabled())
@@ -113,10 +133,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         final boolean useReplyToDestination = isUseReplyToDestination(event, doSend, transacted);
         final boolean topic = connector.getTopicResolver().isTopic(endpoint, true);
 
+        final long ttl = getTimeToLive(muleRequestMessage);
         // QoS support
-        final long ttl = muleRequestMessage.getOutboundProperty(JmsConstants.TIME_TO_LIVE_PROPERTY, Message.DEFAULT_TIME_TO_LIVE);
-        int priority = muleRequestMessage.getOutboundProperty(JmsConstants.PRIORITY_PROPERTY, Message.DEFAULT_PRIORITY);
-        boolean persistent= muleRequestMessage.getOutboundProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY, connector.isPersistentDelivery());
+        int priority = getPriority(muleRequestMessage);
+        boolean persistent = getPersistentDelivery(muleRequestMessage);
 
         // If we are honouring the current QoS message headers we need to use the ones set on the current message
         if (connector.isHonorQosHeaders())
