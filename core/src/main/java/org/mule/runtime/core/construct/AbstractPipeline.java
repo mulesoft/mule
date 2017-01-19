@@ -258,9 +258,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
           return from(publisher)
-                  .doOnNext(event -> just(event).transform(processFlowFunction()).subscribe())
-                  .flatMap(event -> Mono.from(event.getContext()));
-          }
+              .doOnNext(event -> just(event).transform(processFlowFunction()).subscribe())
+              .flatMap(event -> Mono.from(event.getContext()));
+        }
       });
     }
 
@@ -274,7 +274,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     createFlowMap();
   }
 
-  Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
+  protected Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
     return stream -> from(stream)
         .transform(pipeline)
         .doOnNext(response -> response.getContext().success(response))
