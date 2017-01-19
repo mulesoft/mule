@@ -109,7 +109,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext eventContext = create(getTestFlow(muleContext), "");
     EventContext childEventContext = DefaultEventContext.child(eventContext);
 
-    MessagingException exception = new MessagingException(testEvent(), new RuntimeException());
+    RuntimeException exception = new RuntimeException();
     childEventContext.error(exception);
 
     expectedException.expect(IllegalStateException.class);
