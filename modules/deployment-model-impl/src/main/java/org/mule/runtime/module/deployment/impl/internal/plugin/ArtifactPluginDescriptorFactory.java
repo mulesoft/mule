@@ -108,7 +108,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   }
 
   /**
-   * Given a {@code pluginFolder} as a starting point, it will add a /classes and every JAR file {@link URL}s into the
+   * Given a {@code pluginFolder} as a starting point, it will add a the root folder of it and every JAR file {@link URL}s into the
    * {@link ClassLoaderModelBuilder}.
    *
    * @param pluginFolder plugin's location
@@ -116,7 +116,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
    */
   private void loadUrlsToClassLoaderModelBuilder(File pluginFolder, ClassLoaderModelBuilder classLoaderModelBuilder) {
     try {
-      classLoaderModelBuilder.containing(new File(pluginFolder, "classes").toURI().toURL());
+      classLoaderModelBuilder.containing(pluginFolder.toURI().toURL());
       final File libDir = new File(pluginFolder, "lib");
       if (libDir.exists()) {
         final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(".jar"));

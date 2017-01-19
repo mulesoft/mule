@@ -66,28 +66,6 @@
 
     <build>
         <plugins>
-            <!--TODO (MULE-10540) parent pom for mule plugins -->
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>mule-plugin</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>mule-plugin</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.mule.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
