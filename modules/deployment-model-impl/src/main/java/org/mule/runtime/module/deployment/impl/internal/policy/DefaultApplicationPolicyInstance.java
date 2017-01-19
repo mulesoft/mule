@@ -144,12 +144,13 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public void initialise() throws InitialisationException {
-    if (policyContext == null) {
-      initPolicyContext();
-    }
-
     if (policyInstance == null) {
-      initPolicyInstance();
+      synchronized (this) {
+        if (policyContext == null) {
+          initPolicyContext();
+        }
+        initPolicyInstance();
+      }
     }
   }
 
