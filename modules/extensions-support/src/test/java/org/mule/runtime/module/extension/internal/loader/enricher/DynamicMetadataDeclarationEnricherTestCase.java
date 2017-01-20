@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,6 +18,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -110,7 +112,9 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     List<SourceDeclaration> messageSources = declaration.getConfigurations().get(0).getMessageSources();
     SourceDeclaration sourceDynamicAttributes = getDeclaration(messageSources, "MetadataSource");
 
-    assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.objectType().id(Map.class.getName())
+    assertOutputType(sourceDynamicAttributes.getOutput(), TYPE_BUILDER.objectType()
+        .id(Map.class.getName())
+        .with(new ClassInformationAnnotation(Map.class, asList(String.class, Object.class)))
         .openWith(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceDynamicAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
     assertParameterType(getDeclaration(sourceDynamicAttributes.getAllParameters(), "type"), toMetadataType(String.class));
@@ -118,7 +122,9 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
     messageSources = declaration.getMessageSources();
     SourceDeclaration sourceStaticAttributes = getDeclaration(messageSources, "MetadataSourceWithMultilevel");
 
-    assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.objectType().id(Map.class.getName())
+    assertOutputType(sourceStaticAttributes.getOutput(), TYPE_BUILDER.objectType()
+        .id(Map.class.getName())
+        .with(new ClassInformationAnnotation(Map.class, asList(String.class, Object.class)))
         .openWith(TYPE_LOADER.load(Object.class)).build(), true);
     assertOutputType(sourceStaticAttributes.getOutputAttributes(), toMetadataType(StringAttributes.class), false);
 
