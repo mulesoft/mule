@@ -9,8 +9,10 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 import static java.util.Collections.emptySet;
+import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
@@ -110,7 +112,8 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
   private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(File artifactFolder, PolicyTemplateDescriptor descriptor) {
     final File pluginsDir = new File(artifactFolder, PLUGINS_FOLDER);
-    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
+    //TODO(pablo.kraan): MULE-11383 all artifacts must be .jar files
+    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE));
     if (pluginZips == null) {
       return emptySet();
     }
