@@ -14,9 +14,11 @@ import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-11439: Different values in a connection don't trigger a new connect() for cached providers")
 public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends AbstractAuthorizationCodeRefreshTokenConfigTestCase {
 
   public static final String MULTITENANT_OAUTH_CONFIG = "multitenantOauthConfig";

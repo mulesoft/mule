@@ -160,7 +160,7 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
       }
 
       // TODO MULE-11272 Support doing non-blocking requests
-      final HttpResponse response = client.send(eventToHttpRequest.create(null, requestBuilder, null, muleContext),
+      final HttpResponse response = client.send(eventToHttpRequest.create(requestBuilder, null, muleContext),
                                                 TOKEN_REQUEST_TIMEOUT_MILLIS, true, null);
 
       Result<Object, HttpResponseAttributes> responseResult = httpResponseToMuleMessage.convert(ANY, response, tokenUrl);

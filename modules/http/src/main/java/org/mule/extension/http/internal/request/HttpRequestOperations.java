@@ -23,7 +23,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
@@ -65,7 +64,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
    * @param client                     the http connection
    * @param config                     the configuration for this operation. All parameters not configured will be taken from
    *                                   it.
-   * @param muleEvent                  the current {@link Event}
    * @return an {@link Result} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
@@ -78,7 +76,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
-                      @UseConfig HttpRequesterConfig config, Event muleEvent,
+                      @UseConfig HttpRequesterConfig config,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
@@ -111,7 +109,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
       final Flow flowConstruct = new Flow("httpRequestOperation", muleContext);
-      requester.doRequest(muleEvent, client, resolvedBuilder, true, muleContext, flowConstruct, callback);
+      requester.doRequest(client, resolvedBuilder, true, muleContext, flowConstruct, callback);
     } catch (Exception e) {
       callback.error(e);
     }

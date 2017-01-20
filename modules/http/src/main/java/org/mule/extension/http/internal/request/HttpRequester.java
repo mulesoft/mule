@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
@@ -20,11 +19,9 @@ import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.util.IOUtils;
@@ -42,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component capable of performing an HTTP request given a {@link Event}.
+ * Component capable of performing an HTTP request given a request.
  *
  * @since 4.0
  */
@@ -77,20 +74,20 @@ public class HttpRequester {
         new NotificationHelper(config.getMuleContext().getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
-  public void doRequest(Event muleEvent, HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
+  public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext, FlowConstruct flowConstruct,
                         CompletionCallback<Object, HttpResponseAttributes> callback)
       throws MuleException {
-    HttpRequest httpRequest = eventToHttpRequest.create(muleEvent, requestBuilder, authentication, muleContext);
+    HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication, muleContext);
 
     //TODO: MULE-10340 - Add notifications to HTTP request
     //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication),
-                createResponseHandler(muleEvent, muleContext, flowConstruct, requestBuilder, client, httpRequest, checkRetry,
+                createResponseHandler(muleContext, flowConstruct, requestBuilder, client, httpRequest, checkRetry,
                                       callback));
   }
 
-  private ResponseHandler createResponseHandler(Event muleEvent, MuleContext muleContext, FlowConstruct flowConstruct,
+  private ResponseHandler createResponseHandler(MuleContext muleContext, FlowConstruct flowConstruct,
                                                 HttpRequesterRequestBuilder requestBuilder, HttpExtensionClient client,
                                                 HttpRequest httpRequest,
                                                 boolean checkRetry, CompletionCallback<Object, HttpResponseAttributes> callback) {
@@ -106,17 +103,9 @@ public class HttpRequester {
                                                                                          httpRequest.getUri());
             //TODO: MULE-10340 - Add notifications to HTTP request
             //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
-            // Create a new muleEvent based on the old and the result so that the auth can use it
-            Event responseEvent = Event.builder(muleEvent)
-                .message(InternalMessage.builder()
-                    .payload(result.getOutput())
-                    .attributes(result.getAttributes().get())
-                    .mediaType(result.getMediaType().orElse(ANY))
-                    .build())
-                .build();
-            if (resendRequest(responseEvent, checkRetry, authentication)) {
+            if (resendRequest(result, checkRetry, authentication)) {
               consumePayload(result);
-              doRequest(responseEvent, client, requestBuilder, false, muleContext, flowConstruct, callback);
+              doRequest(client, requestBuilder, false, muleContext, flowConstruct, callback);
             } else {
               responseValidator.validate(result, muleContext);
               callback.success(result);
@@ -141,8 +130,8 @@ public class HttpRequester {
     return String.format("Error sending HTTP request to %s", httpRequest.getUri());
   }
 
-  private boolean resendRequest(Event muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException {
-    return retry && authentication != null && authentication.shouldRetry(muleEvent);
+  private boolean resendRequest(Result result, boolean retry, HttpAuthentication authentication) throws MuleException {
+    return retry && authentication != null && authentication.shouldRetry(result);
   }
 
   private void consumePayload(final Result result) {
