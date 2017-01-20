@@ -10,8 +10,8 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.context.ModuleOperationVariableMapContext;
@@ -28,6 +28,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   private static final String EXCEPTION = "exception";
   private static final String ERROR = "error";
   public static final String PAYLOAD = "payload";
+  public static final String ATTRIBUTES = "attributes";
   public static final String MESSAGE_PAYLOAD = MESSAGE + "." + PAYLOAD;
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
@@ -61,7 +62,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
 
   @Override
   public boolean isTarget(String name) {
-    return MESSAGE.equals(name) || PAYLOAD.equals(name) || FLOW_VARS.equals(name) || EXCEPTION.equals(name) || ERROR.equals(name)
+    return MESSAGE.equals(name) || PAYLOAD.equals(name) || ATTRIBUTES.equals(name) || FLOW_VARS.equals(name) || EXCEPTION.equals(name) || ERROR.equals(name)
         || SESSION_VARS.equals(name) || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)
         || PARAM_VARS.equals(name) || PROPERTY_VARS.equals(name); //TODO until MULE-10291 & MULE-10353 are done, we will use flowVars to store the parameter.value and property.value
   }
@@ -75,6 +76,8 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
         return new MuleVariableResolver<>(PAYLOAD, new MessageContext(event, eventBuilder, muleContext).getPayload(), null,
                                           (name1, value, newValue) -> eventBuilder
                                               .message(InternalMessage.builder(event.getMessage()).payload(newValue).build()));
+      } else if (ATTRIBUTES.equals(name)) {
+        return new MuleImmutableVariableResolver<>(ATTRIBUTES, event.getMessage().getAttributes(), null);
       } else if (FLOW_VARS.equals(name)) {
         return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS, new FlowVariableMapContext(event, eventBuilder),
                                                                       null);
