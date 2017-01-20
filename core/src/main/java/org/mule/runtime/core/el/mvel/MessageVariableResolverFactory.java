@@ -62,8 +62,9 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
 
   @Override
   public boolean isTarget(String name) {
-    return MESSAGE.equals(name) || PAYLOAD.equals(name) || ATTRIBUTES.equals(name) || FLOW_VARS.equals(name) || EXCEPTION.equals(name) || ERROR.equals(name)
-        || SESSION_VARS.equals(name) || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)
+    return MESSAGE.equals(name) || PAYLOAD.equals(name) || ATTRIBUTES.equals(name) || FLOW_VARS.equals(name)
+        || EXCEPTION.equals(name) || ERROR.equals(name) || SESSION_VARS.equals(name)
+        || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)
         || PARAM_VARS.equals(name) || PROPERTY_VARS.equals(name); //TODO until MULE-10291 & MULE-10353 are done, we will use flowVars to store the parameter.value and property.value
   }
 
