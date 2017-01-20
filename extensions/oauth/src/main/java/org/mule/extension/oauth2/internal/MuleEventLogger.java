@@ -23,7 +23,7 @@ public class MuleEventLogger {
   }
 
   /**
-   * Logs the result message payload type and the payload as string.
+   * Logs the result message payload type and the payload.
    * 
    * @param result result to log.
    */

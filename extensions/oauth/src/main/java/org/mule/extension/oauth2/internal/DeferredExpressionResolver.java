@@ -49,6 +49,9 @@ public class DeferredExpressionResolver {
                           .mediaType(result.getMediaType().orElse(ANY)).build()))
           .addBinding("attributes",
                       new TypedValue(result.getAttributes().get(), DataType.fromObject(result.getAttributes().get())))
+          .addBinding("dataType",
+                      new TypedValue(DataType.builder().fromObject(result.getOutput()).mediaType(result.getMediaType().get())
+                          .build(), DataType.fromType(DataType.class)))
           .build();
 
       return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), resultContext).getValue();
