@@ -31,6 +31,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
         super();
         registerSourceType(DataTypeFactory.create(Source.class));
         registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY_OUTPUT_STREAM);
         registerSourceType(DataTypeFactory.create(Document.class));
         registerSourceType(DataTypeFactory.BYTE_ARRAY);
         registerSourceType(DataTypeFactory.STRING);

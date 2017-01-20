@@ -11,6 +11,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -42,6 +43,7 @@ public class DataTypeFactory
     public static final DataType<String> OBJECT = new SimpleDataType<String>(Object.class);
     public static final DataType<String> BYTE_ARRAY = new SimpleDataType<String>(byte[].class);
     public static final DataType<String> INPUT_STREAM = new SimpleDataType<String>(InputStream.class);
+    public static final DataType<String> BYTE_ARRAY_OUTPUT_STREAM = new SimpleDataType<String>(ByteArrayOutputStream.class);
     public static final DataType<String> MULE_MESSAGE = new SimpleDataType<String>(MuleMessage.class);
 
     public static <T> DataType<T> create(Class<T> type)
