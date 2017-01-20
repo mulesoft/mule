@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
 
 import org.mule.runtime.core.api.Event;
@@ -184,7 +185,7 @@ public final class DefaultEventContext implements EventContext, Serializable {
 
     @Override
     public String getId() {
-      return parent.getId() + System.identityHashCode(this);
+      return parent.getId() + identityHashCode(this);
     }
 
     @Override
