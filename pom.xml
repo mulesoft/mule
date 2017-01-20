@@ -1730,7 +1730,7 @@
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
                     <configuration>
-                        <skip>${skipDistributions}</skip>
+                        <skip>${skipVerifications}</skip>
                     </configuration>
                     <dependencies>
                         <!--
