@@ -276,6 +276,20 @@ public interface Event extends Serializable {
     return new DefaultEventBuilder(event);
   }
 
+  /**
+   * Create new {@link Builder} based on an existing {@link Event} instance and and {@link EventContext}. A new
+   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link Event}. This builder should
+   * only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link Event} needs a new
+   * context.
+   *
+   * @param event existing event to use as a template to create builder instance
+   * @param context the context to create event instance with.
+   * @return new builder instance.
+   */
+  static Builder builder(EventContext context, Event event) {
+    return new DefaultEventBuilder(context, event);
+  }
+
   interface Builder {
 
     /**

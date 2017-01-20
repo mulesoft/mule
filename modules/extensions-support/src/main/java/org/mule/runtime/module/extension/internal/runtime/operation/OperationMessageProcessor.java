@@ -46,6 +46,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
@@ -167,7 +168,9 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
       ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
 
-      return doProcess(event, operationContext);
+      // TODO: MULE-11184 - it shouldn't be necessary to create the MessagingException here.
+      return doProcess(event, operationContext).mapError(e -> !(e instanceof MessagingException),
+                                                         e -> new MessagingException(event, e, this));
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     })));

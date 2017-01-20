@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
 
 import org.mule.runtime.core.api.Event;
@@ -14,7 +15,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.io.ObjectInputStream;
@@ -57,6 +57,19 @@ public final class DefaultEventContext implements EventContext, Serializable {
    */
   public static EventContext create(FlowConstruct flow, String connectorName, String correlationId) {
     return new DefaultEventContext(flow, connectorName, correlationId);
+  }
+
+  /**
+   * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
+   * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
+   * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
+   * not complete the parent context
+   * 
+   * @param parent the parent context
+   * @return a new child context
+   */
+  public static EventContext child(EventContext parent) {
+    return new ChildEventContext(parent);
   }
 
   private final String id;
@@ -139,7 +152,7 @@ public final class DefaultEventContext implements EventContext, Serializable {
   }
 
   @Override
-  public void error(MessagingException messagingException) {
+  public void error(Throwable messagingException) {
     monoProcessor.onError(messagingException);
   }
 
@@ -158,4 +171,88 @@ public final class DefaultEventContext implements EventContext, Serializable {
   public void subscribe(Subscriber<? super Event> s) {
     monoProcessor.subscribe(s);
   }
+
+  private static class ChildEventContext implements EventContext, Serializable {
+
+    private static final long serialVersionUID = 1054412872901205234L;
+
+    private transient MonoProcessor<Event> monoProcessor = MonoProcessor.create();
+    private final EventContext parent;
+
+    private ChildEventContext(EventContext parent) {
+      this.parent = parent;
+    }
+
+    @Override
+    public String getId() {
+      return parent.getId() + identityHashCode(this);
+    }
+
+    @Override
+    public String getCorrelationId() {
+      return parent.getCorrelationId();
+    }
+
+    @Override
+    public OffsetTime getReceivedTime() {
+      return parent.getReceivedTime();
+    }
+
+    @Override
+    public String getOriginatingFlowName() {
+      return parent.getOriginatingFlowName();
+    }
+
+    @Override
+    public String getOriginatingConnectorName() {
+      return parent.getOriginatingConnectorName();
+    }
+
+    @Override
+    public ProcessingTime getProcessingTime() {
+      return parent.getProcessingTime();
+    }
+
+    @Override
+    public ProcessorsTrace getProcessorsTrace() {
+      return parent.getProcessorsTrace();
+    }
+
+    @Override
+    public boolean isCorrelationIdFromSource() {
+      return parent.isCorrelationIdFromSource();
+    }
+
+    @Override
+    public void success() {
+      monoProcessor.onComplete();
+    }
+
+    @Override
+    public void success(Event event) {
+      monoProcessor.onNext(event);
+    }
+
+    @Override
+    public void error(Throwable throwable) {
+      monoProcessor.onError(throwable);
+    }
+
+    @Override
+    public String toString() {
+      return parent.toString();
+    }
+
+    private void readObject(ObjectInputStream in) throws Exception {
+      in.defaultReadObject();
+      monoProcessor = MonoProcessor.create();
+    }
+
+    @Override
+    public void subscribe(Subscriber<? super Event> s) {
+      monoProcessor.subscribe(s);
+    }
+
+  }
+
 }

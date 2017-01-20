@@ -100,7 +100,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     switch (mode) {
       case BLOCKING:
         return flow.process(event);
-      case MONO:
+      default:
         try {
           return just(event)
               .transform(flow)
@@ -109,16 +109,6 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
         } catch (Throwable exception) {
           throw (Exception) unwrap(exception);
         }
-      case FLUX:
-        Flux.just(event).transform(flow).doOnNext(response -> response.getContext().success(response))
-            .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me)).subscribe();
-        try {
-          return from(event.getContext()).block();
-        } catch (Throwable exception) {
-          throw (Exception) unwrap(exception);
-        }
-      default:
-        return null;
     }
   }
 
