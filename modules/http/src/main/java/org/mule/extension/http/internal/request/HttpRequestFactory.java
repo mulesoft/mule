@@ -22,7 +22,6 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -54,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component that transforms a {@link Event} to a {@link HttpRequest}.
+ * Component that generates {@link HttpRequest HttpRequests}.
  *
  * @since 4.0
  */
@@ -85,7 +84,6 @@ public class HttpRequestFactory {
   /**
    * Creates an {@HttpRequest}.
    *
-   * @param event The {@link Event} that should be used to set the {@link HttpRequest} content.
    * @param requestBuilder The generic {@link HttpRequesterRequestBuilder} from the request component that should be used to
    *        create the {@link HttpRequest}.
    * @param authentication The {@link HttpAuthentication} that should be used to create the {@link HttpRequest}.
@@ -93,7 +91,7 @@ public class HttpRequestFactory {
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
-  public HttpRequest create(Event event, HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
+  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
                             MuleContext muleContext)
       throws MuleException {
     HttpRequestBuilder builder = HttpRequest.builder();
@@ -129,7 +127,7 @@ public class HttpRequestFactory {
     builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody(), mediaType));
 
     if (authentication != null) {
-      authentication.authenticate(event, builder);
+      authentication.authenticate(builder);
     }
 
     return builder.build();

@@ -15,6 +15,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
@@ -25,13 +26,13 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
@@ -111,7 +112,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
   }
 
   @Override
-  public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
+  public void authenticate(HttpRequestBuilder builder) throws MuleException {
     final String accessToken =
         tokenManager.getConfigOAuthContext().getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
     if (accessToken == null) {
@@ -122,9 +123,9 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
   }
 
   @Override
-  public boolean shouldRetry(final Event firstAttemptResponseEvent) {
+  public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) {
     final Boolean shouldRetryRequest =
-        resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
+        resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
       try {
         tokenRequestHandler.refreshAccessToken();

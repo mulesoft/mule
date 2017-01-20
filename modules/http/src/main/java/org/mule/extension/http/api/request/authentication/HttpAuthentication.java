@@ -6,8 +6,9 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
@@ -21,19 +22,18 @@ public interface HttpAuthentication {
    * Adds authentication information to the request. This method will be executed before creating and sending the request.
    * Implementations will usually add some authentication header, but there is no restriction on this.
    *
-   * @param muleEvent The event that is being processed.
    * @param builder The builder that is being used to create the HTTP request.
    */
-  void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException;
+  void authenticate(HttpRequestBuilder builder) throws MuleException;
 
   /**
-   * Detects if there was an authentication failure in the response. After sending an HTTP request and creating an event with the
+   * Detects if there was an authentication failure in the response. After sending an HTTP request and creating a result with the
    * response, this method will be executed. If it returns false, the flow continues executing. If it returns true, the requester
    * will try to send the request again.
    *
-   * @param firstAttemptResponseEvent The event with the response of the request.
+   * @param firstAttemptResult The result with the response of the request.
    * @return True if the request should be sent again, false otherwise.
    */
-  boolean shouldRetry(Event firstAttemptResponseEvent) throws MuleException;
+  boolean shouldRetry(Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException;
 
 }

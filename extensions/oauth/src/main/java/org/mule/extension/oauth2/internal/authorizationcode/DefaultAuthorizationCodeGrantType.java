@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
@@ -28,7 +29,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -40,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
@@ -253,9 +254,9 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   }
 
   @Override
-  public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
+  public void authenticate(HttpRequestBuilder builder) throws MuleException {
     final String accessToken =
-        getUserOAuthContext().getContextForResourceOwner(resolver.resolveExpression(resourceOwnerId, muleEvent)).getAccessToken();
+        getUserOAuthContext().getContextForResourceOwner(resourceOwnerId.resolve()).getAccessToken();
     if (accessToken == null) {
       throw new RequestAuthenticationException(createStaticMessage(format("No access token for the '%s' user. Verify that you have authenticated the user before trying to execute an operation to the API.",
                                                                           resourceOwnerId.resolve())));
@@ -264,10 +265,10 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   }
 
   @Override
-  public boolean shouldRetry(final Event firstAttemptResponseEvent) throws MuleException {
-    Boolean shouldRetryRequest = resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResponseEvent);
+  public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
+    Boolean shouldRetryRequest = resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
-      tokenRequestHandler.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResponseEvent));
+      tokenRequestHandler.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult));
     }
     return shouldRetryRequest;
   }
