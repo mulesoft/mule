@@ -87,12 +87,7 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
     wireMockRule
         .stubFor(post(urlEqualTo(RESOURCE_PATH)).withHeader(AUTHORIZATION, containing(REFRESHED_ACCESS_TOKEN))
             .willReturn(aResponse().withStatus(tokenFailureStatusCode).withBody("")));
-    runFlow(flowName, userId);
-  }
-
-  private Event runFlow(String flowName, String userId) throws Exception {
-    final Event result = flowRunner(flowName).withPayload("message").withVariable("userId", userId).run();
-    return result;
+    flowRunner(flowName).withPayload("message").withVariable("userId", userId).run();
   }
 
   private void configureResourceResponsesForRefreshToken(String oauthConfigName, String userId, int failureStatusCode) {

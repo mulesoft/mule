@@ -17,11 +17,13 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapping;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -317,7 +319,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   private Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext)
       throws HttpMessageParsingException {
-    return transform(requestContext, muleContext, parseRequest, listenerPath);
+    return transform(requestContext, getDefaultEncoding(muleContext), parseRequest, listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility
     // setCurrentEvent(muleEvent);

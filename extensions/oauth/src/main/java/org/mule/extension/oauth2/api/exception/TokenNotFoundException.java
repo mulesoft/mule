@@ -9,8 +9,9 @@ package org.mule.extension.oauth2.api.exception;
 import static java.lang.String.format;
 import static org.mule.extension.oauth2.api.exception.OAuthErrors.TOKEN_NOT_FOUND;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 /**
  * It was not possible to retrieve the access token or the refresh token from the token URL response
@@ -19,9 +20,9 @@ public class TokenNotFoundException extends ModuleException {
 
   private static final long serialVersionUID = -4161482371227766961L;
 
-  public TokenNotFoundException(Event tokenUrlResponse) {
+  public TokenNotFoundException(Result<Object, HttpResponseAttributes> tokenUrlResponse) {
     super(format("Could not extract access token or refresh token from token URL response: %s",
-                 tokenUrlResponse.getMessage().getPayload().getValue()),
+                 tokenUrlResponse.getOutput()),
           TOKEN_NOT_FOUND);
   }
 }

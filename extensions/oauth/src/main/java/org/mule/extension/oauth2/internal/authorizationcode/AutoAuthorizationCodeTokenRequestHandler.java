@@ -7,8 +7,8 @@
 package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static java.lang.String.valueOf;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
@@ -23,6 +23,7 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_REFRE
 import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -37,17 +38,15 @@ import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerO
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -76,27 +75,30 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   @Override
   public void init() throws MuleException {
     createListenerForCallbackUrl();
-    muleEventLogger = new MuleEventLogger(LOGGER, muleContext);
+    muleEventLogger = new MuleEventLogger(LOGGER);
   }
 
   @Override
-  protected Processor createRedirectUrlProcessor() {
-    return event -> {
+  protected Function<Result<Object, HttpRequestAttributes>, Result<String, HttpResponseAttributes>> createRedirectUrlProcessor() {
+    return in -> {
       int authorizationStatus = 0;
       HttpStatus statusCodeToReturn = OK;
       String responseMessage = "Successfully retrieved access token";
-      final Map<String, String> queryParams = ((HttpRequestAttributes) event.getMessage().getAttributes()).getQueryParams();
-      final String state = queryParams.get(STATE_PARAMETER);
+
+      final HttpRequestAttributes callbackHttpRequestAttributes = in.getAttributes().get();
+
+      final String state = callbackHttpRequestAttributes.getQueryParams().get(STATE_PARAMETER);
       final StateDecoder stateDecoder = new StateDecoder(state);
       try {
-        final String authorizationCode = processAuthorizationCode(event);
+        final String authorizationCode = processAuthorizationCode(callbackHttpRequestAttributes);
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Redirect url request state: " + state);
           LOGGER.debug("Redirect url request code: " + authorizationCode);
         }
 
-        Event tokenUrlResponse = callTokenUrl(event, authorizationCode);
+        Result<Object, HttpResponseAttributes> tokenUrlResponse =
+            invokeTokenUrl(setMapPayloadWithTokenRequestParameters(authorizationCode), null);
 
         String decodedState = stateDecoder.decodeOriginalState();
         String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
@@ -113,11 +115,11 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         getOauthConfig().getUserOAuthContext().updateResourceOwnerOAuthContext(resourceOwnerOAuthContext);
       } catch (NoAuthorizationCodeException e1) {
         LOGGER.error("Could not extract authorization code from OAuth provider HTTP request done to the redirect URL");
-        muleEventLogger.logContent(event);
+        muleEventLogger.logContent(in);
         authorizationStatus = NO_AUTHORIZATION_CODE_STATUS;
         statusCodeToReturn = BAD_REQUEST;
-        responseMessage = "Failure retrieving access token.\n OAuth Server uri from callback: "
-            + ((HttpRequestAttributes) event.getMessage().getAttributes()).getRequestUri();
+        responseMessage =
+            "Failure retrieving access token.\n OAuth Server uri from callback: " + callbackHttpRequestAttributes.getRequestUri();
       } catch (TokenUrlResponseException e) {
         LOGGER.error(e.getMessage());
         LOGGER.error("Token URL response body was: " + e.getTokenUrlResponse());
@@ -151,20 +153,14 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                                        new ParameterMap());
       }
 
-      InternalMessage.Builder builder =
-          InternalMessage.builder(event.getMessage()).payload(responseMessage).attributes(responseAttributes);
-      return Event.builder(event).message(builder.build()).build();
+      return Result.<String, HttpResponseAttributes>builder().output(responseMessage).attributes(responseAttributes)
+          .mediaType(TEXT).build();
     };
   }
 
-  private Event callTokenUrl(Event event, String authorizationCode) throws MuleException, TokenUrlResponseException {
-    event = setMapPayloadWithTokenRequestParameters(event, authorizationCode);
-    return invokeTokenUrl(event);
-  }
-
-  private String processAuthorizationCode(final Event event) throws NoAuthorizationCodeException {
-    final Map<String, String> queryParams = ((HttpRequestAttributes) event.getMessage().getAttributes()).getQueryParams();
-    final String authorizationCode = queryParams.get(CODE_PARAMETER);
+  private String processAuthorizationCode(final HttpRequestAttributes callbackHttpRequestAttributes)
+      throws NoAuthorizationCodeException {
+    final String authorizationCode = callbackHttpRequestAttributes.getQueryParams().get(CODE_PARAMETER);
     if (authorizationCode == null) {
       LOGGER.info("HTTP Request to redirect URL done by the OAuth provider does not contains a code query parameter. "
           + "Code query parameter is required to get the access token.");
@@ -173,24 +169,24 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     return authorizationCode;
   }
 
-  private Event setMapPayloadWithTokenRequestParameters(final Event event, final String authorizationCode) {
+  private Map<String, String> setMapPayloadWithTokenRequestParameters(final String authorizationCode) {
     final Map<String, String> formData = new HashMap<>();
     formData.put(CODE_PARAMETER, authorizationCode);
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
     formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getExternalCallbackUrl());
-    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(formData).build()).build();
+    return unmodifiableMap(formData);
   }
 
-  private Event setMapPayloadWithRefreshTokenRequestParameters(final Event event, final String refreshToken) {
+  private Map<String, String> setMapPayloadWithRefreshTokenRequestParameters(final String refreshToken) {
     final Map<String, String> formData = new HashMap<>();
     formData.put(OAuthConstants.REFRESH_TOKEN_PARAMETER, refreshToken);
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_REFRESH_TOKEN);
     formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getExternalCallbackUrl());
-    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(formData).build()).build();
+    return unmodifiableMap(formData);
   }
 
   private void logResourceOwnerOAuthContextBeforeUpdate(ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
@@ -199,7 +195,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     }
   }
 
-  private TokenResponse processTokenUrlResponse(Event tokenUrlResponse)
+  private TokenResponse processTokenUrlResponse(Result<Object, HttpResponseAttributes> tokenUrlResponse)
       throws TokenNotFoundException, TransformerException {
     TokenResponse tokenResponse = processTokenResponse(tokenUrlResponse, true);
 
@@ -249,23 +245,19 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
    * Executes a refresh token for a particular user. It will call the OAuth Server token url and provide the refresh token to get
    * a new access token.
    *
-   * @param currentEvent the event being processed when the refresh token was required.
    * @param resourceOwnerOAuthContext oauth context for who we need to update the access token.
    */
   @Override
-  public void doRefreshToken(final Event currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
+  public void doRefreshToken(final ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
     try {
-      Event muleEvent = Event.builder(currentEvent)
-          .message(InternalMessage.builder(currentEvent.getMessage()).outboundProperties(emptyMap()).build())
-          .session(new DefaultMuleSession(currentEvent.getSession())).build();
       final String userRefreshToken = resourceOwnerOAuthContext.getRefreshToken();
       if (userRefreshToken == null) {
         throw new DefaultMuleException(CoreMessages.createStaticMessage(
                                                                         "The user with user id %s has no refresh token in his OAuth state so we can't execute the refresh token call",
                                                                         resourceOwnerOAuthContext.getResourceOwnerId()));
       }
-      muleEvent = setMapPayloadWithRefreshTokenRequestParameters(muleEvent, userRefreshToken);
-      final Event refreshTokenResponse = invokeTokenUrl(muleEvent);
+      final Result<Object, HttpResponseAttributes> refreshTokenResponse =
+          invokeTokenUrl(setMapPayloadWithRefreshTokenRequestParameters(userRefreshToken), null);
 
       logResourceOwnerOAuthContextBeforeUpdate(resourceOwnerOAuthContext);
       TokenResponse tokenResponse = processTokenUrlResponse(refreshTokenResponse);

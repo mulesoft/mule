@@ -20,7 +20,7 @@
                         externalCallbackUrl="${local.callback.url}"
                         localAuthorizationUrlResourceOwnerId="#[attributes.queryParams.userId]"
                         tokenManager="multitenantConfig"
-                        state="#[mel:message.attributes.queryParams == null ? '' : message.attributes.queryParams.state]"
+                        state="#[attributes.queryParams.state when attributes.queryParams != null otherwise '']"
                         localAuthorizationUrl="${local.authorization.url}"
                         authorizationUrl="${authorization.url}"
                         tokenUrl="${token.url}">

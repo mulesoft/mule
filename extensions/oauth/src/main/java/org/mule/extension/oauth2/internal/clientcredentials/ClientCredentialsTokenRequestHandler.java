@@ -14,10 +14,10 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_CLIEN
 import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.api.exception.TokenNotFoundException;
 import org.mule.extension.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.extension.oauth2.internal.ApplicationCredentials;
@@ -26,12 +26,10 @@ import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,33 +76,30 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     initialiseIfNeeded(tokenManager, muleContext);
   }
 
-  private Event setMapPayloadWithTokenRequestParameters(final Event event) throws MuleException {
+  private Result<Object, HttpResponseAttributes> doRefreshAccessToken() throws MuleException {
     final Map<String, String> formData = new HashMap<>();
+
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);
+
+    if (scopes != null) {
+      formData.put(SCOPE_PARAMETER, scopes);
+    }
+
+    String authorization = null;
     String clientId = applicationCredentials.getClientId();
     String clientSecret = applicationCredentials.getClientSecret();
-
-    InternalMessage.Builder builder = InternalMessage.builder(event.getMessage());
     if (encodeClientCredentialsInBody) {
       formData.put(CLIENT_ID_PARAMETER, clientId);
       formData.put(CLIENT_SECRET_PARAMETER, clientSecret);
     } else {
-      String encodedCredentials = encodeBase64String(format("%s:%s", clientId, clientSecret).getBytes());
-      builder.attributes(new OAuthAuthorizationAttributes("Basic " + encodedCredentials));
+      authorization = "Basic " + encodeBase64String(format("%s:%s", clientId, clientSecret).getBytes());
     }
-    if (scopes != null) {
-      formData.put(SCOPE_PARAMETER, scopes);
-    }
-    return Event.builder(event).message(builder.payload(formData).build()).build();
+
+    return invokeTokenUrl(formData, authorization);
   }
 
   public void refreshAccessToken() throws MuleException {
-    Flow flow = new Flow("test", getMuleContext());
-    Event accessTokenEvent = Event.builder(create(flow, "ClientCredentialsTokenRequestHandler"))
-        .message(InternalMessage.builder().nullPayload().build()).flow(flow).build();
-    accessTokenEvent = setMapPayloadWithTokenRequestParameters(accessTokenEvent);
-    final Event response;
-    response = invokeTokenUrl(accessTokenEvent);
+    Result<Object, HttpResponseAttributes> response = doRefreshAccessToken();
     TokenResponse tokenResponse = processTokenResponse(response, false);
 
     if (LOGGER.isDebugEnabled()) {

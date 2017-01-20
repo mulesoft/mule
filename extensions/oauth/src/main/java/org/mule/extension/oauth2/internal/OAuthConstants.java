@@ -26,11 +26,7 @@ public interface OAuthConstants {
   String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
 
   // Expressions to extract parameters from standard token url response.
-  String ACCESS_TOKEN_EXPRESSION = "#[mel:regex('" + ".*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
-  String REFRESH_TOKEN_EXPRESSION = "#[mel:regex('" + ".*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*" + "')]";
-  String EXPIRATION_TIME_EXPRESSION = "#[mel:regex('" + ".*\"expires_in\"[ ]*:[ ]*([\\\\d]*).*" + "')]";
-
-  String DEFAULT_REFRESH_TOKEN_WHEN_EXPRESSION =
-      "#[mel:message.inboundProperties['http.status'] == 401 || message.inboundProperties['http.status'] == 403]";
-
+  String ACCESS_TOKEN_EXPRESSION = "#[(payload match /.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
+  String REFRESH_TOKEN_EXPRESSION = "#[(payload match /.*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
+  String EXPIRATION_TIME_EXPRESSION = "#[(payload match /.*\"expires_in\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
 }

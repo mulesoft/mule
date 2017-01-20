@@ -7,14 +7,13 @@
 package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -28,6 +27,7 @@ import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Component that transforms an HTTP request to a proper {@link Result}.
@@ -37,13 +37,13 @@ import java.io.IOException;
 public class HttpRequestToResult {
 
   public static Result<Object, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
-                                                                final MuleContext muleContext,
+                                                                final Charset encoding,
                                                                 Boolean parseRequest,
                                                                 ListenerPath listenerPath)
       throws HttpMessageParsingException {
     final HttpRequest request = requestContext.getRequest();
 
-    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), getDefaultEncoding(muleContext));
+    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), encoding);
 
     Object payload = null;
     if (parseRequest) {
