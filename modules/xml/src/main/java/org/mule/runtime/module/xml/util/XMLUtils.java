@@ -286,6 +286,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     } else if (obj instanceof byte[]) {
       // TODO Handle encoding/charset?
       return factory.createXMLStreamReader(new ByteArrayInputStream((byte[]) obj));
+    } else if (obj instanceof java.io.ByteArrayOutputStream) {
+      return factory.createXMLStreamReader(new ByteArrayInputStream(((java.io.ByteArrayOutputStream) obj).toByteArray()));
     } else if (obj instanceof OutputHandler) {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       try {
