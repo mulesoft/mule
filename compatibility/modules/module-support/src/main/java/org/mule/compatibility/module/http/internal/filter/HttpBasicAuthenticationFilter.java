@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal.filter;
+package org.mule.compatibility.module.http.internal.filter;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeExcepti
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import org.slf4j.Logger;

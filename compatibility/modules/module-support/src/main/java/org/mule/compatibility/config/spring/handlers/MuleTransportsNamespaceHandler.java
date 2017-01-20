@@ -56,7 +56,7 @@ import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataT
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
-import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
+import org.mule.compatibility.module.http.internal.filter.HttpBasicAuthenticationFilter;
 
 public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler {
 
