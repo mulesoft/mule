@@ -77,6 +77,11 @@ class CollectionSchemaDelegate {
        */
       @Override
       public void visitObject(ObjectType objectType) {
+        if (objectType.isOpen()) {
+          defaultVisit(objectType);
+          return;
+        }
+
         DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType)
             .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] cannot be represented as a collection item",
                                                                    getId(objectType))));

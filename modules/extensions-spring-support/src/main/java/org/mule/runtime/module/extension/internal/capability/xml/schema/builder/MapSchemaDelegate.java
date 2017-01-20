@@ -60,7 +60,7 @@ final class MapSchemaDelegate {
   private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final ObjectType metadataType) {
     final MetadataType valueType = metadataType.getOpenRestriction().get();
     final LocalComplexType entryComplexType = new LocalComplexType();
-    final Attribute keyAttribute = builder.createAttribute(KEY_ATTRIBUTE_NAME, true, REQUIRED);
+    final Attribute keyAttribute = builder.createStringAttribute(KEY_ATTRIBUTE_NAME, true, REQUIRED);
     entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
 
     final LocalComplexType mapComplexType = new LocalComplexType();
@@ -92,6 +92,11 @@ final class MapSchemaDelegate {
        */
       @Override
       public void visitObject(ObjectType objectType) {
+        if (objectType.isOpen()) {
+          defaultVisit(objectType);
+          return;
+        }
+
         final boolean shouldGenerateChildElement = entryValueDsl.supportsChildDeclaration();
 
         entryComplexType.getAttributeOrAttributeGroup()

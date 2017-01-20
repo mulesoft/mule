@@ -37,7 +37,7 @@
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
-                <xs:attribute use="optional" name="previous"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="previous"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -54,7 +54,7 @@
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionLong" use="required" name="microgramsPerKilo"></xs:attribute>
-                <xs:attribute use="optional" name="destination"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="destination"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -126,7 +126,7 @@
                                             <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
                                         </xs:choice>
                                         <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute use="optional" name="value"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                     </xs:complexType>
                                 </xs:element>
                             </xs:sequence>
@@ -144,7 +144,7 @@
                 <xs:attribute type="mule:expressionString" use="required" name="commercialName"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="discardedInvestments"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="investmentSpinOffs"></xs:attribute>
-                <xs:attribute use="optional" name="investmentPlanB"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="investmentPlanB"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="required" name="valuation"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
@@ -186,14 +186,14 @@
                                             <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-recursive-pojo"></xs:element>
                                         </xs:sequence>
                                         <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute use="optional" name="value"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                     </xs:complexType>
                                 </xs:element>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute use="optional" name="next"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="next"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="childs"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="mappedChilds"></xs:attribute>
             </xs:extension>
@@ -229,7 +229,7 @@
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="required" name="fieldA"></xs:attribute>
-                <xs:attribute use="optional" name="chainB"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="chainB"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="bChains"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
@@ -264,7 +264,7 @@
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="required" name="fieldB"></xs:attribute>
-                <xs:attribute use="optional" name="chainA"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="chainA"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="aChains"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
@@ -357,18 +357,6 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapon-maps">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="wild-card-weapon-map">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="weapon-value-maps">
                             <xs:complexType>
                                 <xs:sequence>
@@ -379,7 +367,7 @@
                                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                             </xs:choice>
                                             <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute use="optional" name="value"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                         </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
@@ -394,7 +382,7 @@
                                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-door"></xs:element>
                                             </xs:sequence>
                                             <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute use="optional" name="value"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                         </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
@@ -432,7 +420,7 @@
                                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
                                             </xs:sequence>
                                             <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute use="optional" name="value"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                         </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
@@ -472,11 +460,10 @@
                     <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
-                    <xs:attribute use="optional" name="weapon"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="optional" name="weaponTypeFunction"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCards"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="wildCardWeaponMap"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="weaponValueMap"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="candidateDoors"></xs:attribute>
                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.HealthStatusEnumType" use="optional" default="CANCER" name="initialHealth"></xs:attribute>
@@ -491,7 +478,7 @@
                     <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
-                    <xs:attribute use="optional" name="nextDoor"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
@@ -561,7 +548,7 @@
                                             <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-ricin"></xs:element>
                                         </xs:sequence>
                                         <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute use="optional" name="value"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                     </xs:complexType>
                                 </xs:element>
                             </xs:sequence>
@@ -599,9 +586,9 @@
                 <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
-                <xs:attribute use="optional" name="nextDoor"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
-                <xs:attribute use="optional" name="methylamine"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="methylamine"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -875,10 +862,10 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute use="optional" name="investment"></xs:attribute>
-                <xs:attribute use="optional" name="recursivePojo"></xs:attribute>
-                <xs:attribute use="optional" name="recursiveChainB"></xs:attribute>
-                <xs:attribute use="optional" name="recursiveChainA"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="investment"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="recursivePojo"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="recursiveChainB"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="recursiveChainA"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1261,9 +1248,9 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute use="optional" name="weapon"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
                 <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="required" name="type"></xs:attribute>
-                <xs:attribute use="optional" name="attributesOfWeapon"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="attributesOfWeapon"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1292,7 +1279,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute use="optional" name="knockedDoor"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="knockedDoor"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1393,7 +1380,7 @@
                                             <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-sale-info"></xs:element>
                                         </xs:sequence>
                                         <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                        <xs:attribute use="optional" name="value"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                     </xs:complexType>
                                 </xs:element>
                             </xs:sequence>
@@ -1439,7 +1426,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute use="optional" name="weapon"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1512,7 +1499,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute use="optional" default="#[payload]" name="weapon"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" default="#[payload]" name="weapon"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

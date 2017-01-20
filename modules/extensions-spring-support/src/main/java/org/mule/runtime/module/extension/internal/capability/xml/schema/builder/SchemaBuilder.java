@@ -341,7 +341,7 @@ public final class SchemaBuilder {
     return createAttribute(name, EMPTY, type, null, required, expressionSupport);
   }
 
-  Attribute createAttribute(String name, boolean required, ExpressionSupport expressionSupport) {
+  Attribute createStringAttribute(String name, boolean required, ExpressionSupport expressionSupport) {
     return createAttribute(name, EMPTY, typeLoader.load(String.class), null, required, expressionSupport);
   }
 
@@ -538,9 +538,11 @@ public final class SchemaBuilder {
 
         defaultVisit(objectType);
         if (objectType.isOpen()) {
-          mapDelegate.generateMapElement(objectType, paramDsl, description,
-                                         !paramDsl.supportsAttributeDeclaration(),
-                                         childElements);
+          if (paramDsl.supportsChildDeclaration()) {
+            mapDelegate.generateMapElement(objectType, paramDsl, description,
+                                           !paramDsl.supportsAttributeDeclaration(),
+                                           childElements);
+          }
         } else {
           objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
         }

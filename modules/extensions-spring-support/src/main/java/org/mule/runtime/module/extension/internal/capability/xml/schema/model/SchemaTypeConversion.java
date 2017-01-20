@@ -90,6 +90,8 @@ public final class SchemaTypeConversion {
       public void visitObject(ObjectType objectType) {
         if (objectType.isOpen()) {
           qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
+        } else {
+          defaultVisit(objectType);
         }
       }
 
