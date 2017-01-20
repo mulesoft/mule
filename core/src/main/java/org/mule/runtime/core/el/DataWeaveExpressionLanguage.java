@@ -20,6 +20,7 @@ import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -35,8 +36,9 @@ import org.slf4j.Logger;
 public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
   private static final Logger logger = getLogger(DataWeaveExpressionLanguage.class);
-  public static final String ATTRIBUTES = "attributes";
   public static final String PAYLOAD = "payload";
+  public static final String DATA_TYPE = "dataType";
+  public static final String ATTRIBUTES = "attributes";
   public static final String ERROR = "error";
   public static final String VARIABLES = "variables";
   public static final String FLOW = "flow";
@@ -141,6 +143,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
       Attributes attributes = message.getAttributes();
       contextBuilder.addBinding(ATTRIBUTES, new TypedValue(attributes, fromType(attributes.getClass())));
       contextBuilder.addBinding(PAYLOAD, message.getPayload());
+      contextBuilder.addBinding(DATA_TYPE, new TypedValue(message.getPayload().getDataType(), fromType(DataType.class)));
       Error error = event.getError().isPresent() ? event.getError().get() : null;
       contextBuilder.addBinding(ERROR, new TypedValue(error, fromType(Error.class)));
     }

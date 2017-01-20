@@ -7,13 +7,14 @@
 package org.mule.extension.http.internal;
 
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.internal.component.ResourceNotFoundException;
 
@@ -38,9 +39,10 @@ public class HttpOperations {
    *        security managers defined in your configuration.
    * @throws MuleException if unauthenticated.
    */
-  public void basicSecurityFilter(String realm, @Optional String securityProviders, Event event)
+  public void basicSecurityFilter(String realm, @Optional String securityProviders,
+                                  @Optional(defaultValue = "#[attributes]") HttpRequestAttributes attributes, Event event)
       throws MuleException {
-    HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders);
+    HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders, attributes);
 
     filter.doFilter(event);
   }
@@ -50,17 +52,18 @@ public class HttpOperations {
    *
    * @return the resource defined by the path of an HTTP request
    */
-  public Result<?, ?> loadStaticResource(@ParameterGroup(name = "Resource") StaticResourceLoader resourceLoader, Event event)
+  public Result<?, ?> loadStaticResource(@ParameterGroup(name = "Resource") StaticResourceLoader resourceLoader)
       throws ResourceNotFoundException, InitialisationException {
-    return builder(resourceLoader.load(event)).build();
+    return builder(resourceLoader.load()).build();
   }
 
-  private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders)
+  private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders, HttpRequestAttributes attributes)
       throws InitialisationException {
     HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
     filter.setRealm(realm);
     filter.setSecurityProviders(securityProviders);
     filter.setMuleContext(muleContext);
+    filter.setAttributes(attributes);
     filter.initialise();
     return filter;
   }

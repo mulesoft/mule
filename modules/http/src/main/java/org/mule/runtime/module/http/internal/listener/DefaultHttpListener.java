@@ -36,6 +36,7 @@ import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
@@ -136,7 +137,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
               new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(),
                                             muleContext.getExecutionClassLoader(), muleContext.getErrorTypeLocator());
           messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
-        } catch (HttpRequestParsingException | IllegalArgumentException e) {
+        } catch (HttpMessageParsingException | IllegalArgumentException e) {
           logger.warn("Exception occurred parsing request:", e);
           sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
         } catch (RuntimeException e) {
@@ -169,7 +170,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     };
   }
 
-  private Event createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException {
+  private Event createEvent(HttpRequestContext requestContext) throws HttpMessageParsingException {
     Event muleEvent = Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(
                                                                                                           transform(requestContext,
                                                                                                                     SystemUtils

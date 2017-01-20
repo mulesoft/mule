@@ -11,7 +11,6 @@ import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJE
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.IDENTIFIER_PROPERTY;
 import static org.mule.runtime.config.spring.handlers.MuleNamespaceHandler.VARIABLE_NAME_ATTRIBUTE;
-
 import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.parsers.specific.BindingDefinitionParser;
@@ -43,7 +42,6 @@ import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpoint
 import org.mule.compatibility.module.cxf.config.ProxyClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.cxf.config.SimpleClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.management.agent.DefaultTransportJmxSupportAgent;
-import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
@@ -58,6 +56,7 @@ import org.mule.runtime.config.spring.parsers.specific.MessageProcessorWithDataT
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.compatibility.module.http.internal.filter.HttpBasicAuthenticationFilter;
 
 public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler {
 

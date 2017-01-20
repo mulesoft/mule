@@ -16,7 +16,6 @@ import org.mule.runtime.module.http.internal.HttpMessageBuilderRef;
 import org.mule.runtime.module.http.internal.HttpParamType;
 import org.mule.runtime.module.http.internal.HttpSingleParam;
 import org.mule.runtime.module.http.internal.component.StaticResourceMessageProcessor;
-import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListener;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
@@ -67,9 +66,6 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("basic-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.BASIC));
     registerBeanDefinitionParser("digest-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.DIGEST));
     registerBeanDefinitionParser("ntlm-authentication", new HttpAuthenticationDefinitionParser(HttpAuthenticationType.NTLM));
-
-    registerMuleBeanDefinitionParser("basic-security-filter",
-                                     new SecurityFilterDefinitionParser(HttpBasicAuthenticationFilter.class));
 
     registerBeanDefinitionParser("success-status-code-validator",
                                  new ChildDefinitionParser("responseValidator", SuccessStatusCodeValidator.class));

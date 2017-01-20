@@ -6,9 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -20,7 +19,6 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,7 +27,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -61,10 +59,10 @@ public class HttpRequester {
 
   private final HttpRequesterConfig config;
   private final NotificationHelper notificationHelper;
-  private final MuleEventToHttpRequest eventToHttpRequest;
+  private final HttpRequestFactory eventToHttpRequest;
   private final Scheduler scheduler;
 
-  public HttpRequester(MuleEventToHttpRequest eventToHttpRequest, boolean followRedirects, HttpAuthentication authentication,
+  public HttpRequester(HttpRequestFactory eventToHttpRequest, boolean followRedirects, HttpAuthentication authentication,
                        boolean parseResponse, int responseTimeout, ResponseValidator responseValidator,
                        HttpRequesterConfig config, Scheduler scheduler) {
     this.followRedirects = followRedirects;
@@ -102,19 +100,26 @@ public class HttpRequester {
       public void onCompletion(HttpResponse response) {
         //TODO: MULE-11310 - Make HTTP request scheduling fine grained
         scheduler.execute(() -> {
-          HttpResponseToMuleMessage httpResponseToMuleMessage = new HttpResponseToMuleMessage(config, parseResponse, muleContext);
+          HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, parseResponse, muleContext);
           try {
-            Message responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
+            Result<Object, HttpResponseAttributes> result = httpResponseToResult.convert(requestBuilder.getMediaType(), response,
+                                                                                         httpRequest.getUri());
             //TODO: MULE-10340 - Add notifications to HTTP request
             //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
-            // Create a new muleEvent based on the old and the response so that the auth can use it
-            Event responseEvent = Event.builder(muleEvent).message(InternalMessage.builder(responseMessage).build()).build();
+            // Create a new muleEvent based on the old and the result so that the auth can use it
+            Event responseEvent = Event.builder(muleEvent)
+                .message(InternalMessage.builder()
+                    .payload(result.getOutput())
+                    .attributes(result.getAttributes().get())
+                    .mediaType(result.getMediaType().orElse(ANY))
+                    .build())
+                .build();
             if (resendRequest(responseEvent, checkRetry, authentication)) {
-              consumePayload(responseEvent, muleContext);
+              consumePayload(result);
               doRequest(responseEvent, client, requestBuilder, false, muleContext, flowConstruct, callback);
             } else {
-              responseValidator.validate(responseMessage, muleContext);
-              callback.success(Result.<Object, HttpResponseAttributes>builder(responseMessage).build());
+              responseValidator.validate(result, muleContext);
+              callback.success(result);
             }
           } catch (MuleException e) {
             callback.error(e);
@@ -125,7 +130,8 @@ public class HttpRequester {
       @Override
       public void onFailure(Exception exception) {
         checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
-        callback.error(new MessagingException(createStaticMessage(getErrorMessage(httpRequest)), muleEvent, exception));
+        logger.error(getErrorMessage(httpRequest));
+        callback.error(exception);
       }
 
     };
@@ -139,10 +145,10 @@ public class HttpRequester {
     return retry && authentication != null && authentication.shouldRetry(muleEvent);
   }
 
-  private void consumePayload(final Event event, MuleContext muleContext) {
-    if (event.getMessage().getPayload().getValue() instanceof InputStream) {
+  private void consumePayload(final Result result) {
+    if (result.getOutput() instanceof InputStream) {
       try {
-        event.getMessageAsBytes(muleContext);
+        IOUtils.toByteArray((InputStream) result.getOutput());
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
       }
@@ -243,8 +249,8 @@ public class HttpRequester {
     }
 
     public HttpRequester build() {
-      MuleEventToHttpRequest eventToHttpRequest =
-          new MuleEventToHttpRequest(config, uri, method, requestStreamingMode, sendBodyMode, transformationService);
+      HttpRequestFactory eventToHttpRequest =
+          new HttpRequestFactory(config, uri, method, requestStreamingMode, sendBodyMode, transformationService);
       return new HttpRequester(eventToHttpRequest, followRedirects, authentication, parseResponse, responseTimeout,
                                responseValidator, config, scheduler);
     }

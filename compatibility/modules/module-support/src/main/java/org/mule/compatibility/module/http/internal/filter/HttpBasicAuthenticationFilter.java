@@ -4,17 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal.filter;
+package org.mule.compatibility.module.http.internal.filter;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.core.api.Event;
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -28,6 +30,8 @@ import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeExcepti
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,10 +91,15 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
+    ParameterMap headers = new ParameterMap();
+    headers.put(WWW_AUTHENTICATE, realmHeader);
     String finalRealmHeader = realmHeader;
     return Event.builder(event)
-        .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(WWW_AUTHENTICATE, finalRealmHeader)
-            .addOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode()).build())
+        .message(InternalMessage.builder(event.getMessage())
+            .attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(), UNAUTHORIZED.getReasonPhrase(), headers))
+            .addOutboundProperty(WWW_AUTHENTICATE, finalRealmHeader)
+            .addOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode())
+            .build())
         .build();
   }
 
@@ -105,7 +114,12 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   public Event authenticate(Event event)
       throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-    String header = event.getMessage().getInboundProperty(AUTHORIZATION);
+    String header;
+    if (event.getMessage().getAttributes() instanceof HttpRequestAttributes) {
+      header = ((HttpRequestAttributes) event.getMessage().getAttributes()).getHeaders().get(AUTHORIZATION.toLowerCase());
+    } else {
+      header = event.getMessage().getInboundProperty(AUTHORIZATION);
+    }
 
     if (logger.isDebugEnabled()) {
       logger.debug("Authorization header: " + header);

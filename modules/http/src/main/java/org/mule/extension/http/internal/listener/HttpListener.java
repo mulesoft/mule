@@ -55,8 +55,8 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.listener.HttpRequestParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
@@ -253,7 +253,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
       @Override
       public Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext)
-          throws HttpRequestParsingException {
+          throws HttpMessageParsingException {
         return HttpListener.this.createResult(requestContext);
       }
 
@@ -271,7 +271,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
           context.addVariable(RESPONSE_CONTEXT, responseContext);
 
           sourceCallback.handle(createResult(requestContext), context);
-        } catch (HttpRequestParsingException | IllegalArgumentException e) {
+        } catch (HttpMessageParsingException | IllegalArgumentException e) {
           LOGGER.warn("Exception occurred parsing request:", e);
           sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
         } catch (RuntimeException e) {
@@ -316,7 +316,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   }
 
   private Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext)
-      throws HttpRequestParsingException {
+      throws HttpMessageParsingException {
     return transform(requestContext, muleContext, parseRequest, listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility

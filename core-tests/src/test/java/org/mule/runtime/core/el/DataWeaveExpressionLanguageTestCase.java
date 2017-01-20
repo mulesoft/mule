@@ -21,18 +21,20 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ATTRIBUTES;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.DATA_TYPE;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ERROR;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.FLOW;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.PAYLOAD;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.VARIABLES;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.NullAttributes;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -47,7 +49,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -99,6 +100,19 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
     TypedValue result = expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(payload.getValue())));
     assertThat(result.getDataType(), is(equalTo(payload.getDataType())));
+  }
+
+  @Test
+  public void dataTypeBinding() throws Exception {
+    Event event = getEventWithError(empty());
+    InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
+    when(event.getMessage()).thenReturn(message);
+    TypedValue payload = new TypedValue("hey", STRING);
+    when(message.getPayload()).thenReturn(payload);
+
+    TypedValue result = expressionLanguage.evaluate(DATA_TYPE, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(equalTo(STRING)));
+    assertThat(fromType(DataType.class).isCompatibleWith(result.getDataType()), is(true));
   }
 
   @Test

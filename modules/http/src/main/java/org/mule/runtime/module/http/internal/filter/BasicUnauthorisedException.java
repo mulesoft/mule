@@ -33,6 +33,11 @@ public class BasicUnauthorisedException extends UnauthorisedException implements
     this.errorMessage = event.getMessage();
   }
 
+  public BasicUnauthorisedException(SecurityContext context, SecurityFilter filter, String connector, Message errorMessage) {
+    super(context, filter, connector);
+    this.errorMessage = errorMessage;
+  }
+
   @Override
   public Message getErrorMessage() {
     return errorMessage;

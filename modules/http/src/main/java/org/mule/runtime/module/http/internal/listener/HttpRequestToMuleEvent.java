@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
@@ -15,6 +16,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -34,7 +36,7 @@ public class HttpRequestToMuleEvent {
 
   public static InternalMessage transform(final HttpRequestContext requestContext, final Charset charset,
                                           Boolean parseRequest, ListenerPath listenerPath)
-      throws HttpRequestParsingException {
+      throws HttpMessageParsingException {
     final HttpRequest request = requestContext.getRequest();
     final Collection<String> headerNames = request.getHeaderNames();
     Map<String, Serializable> inboundProperties = new HashMap<>();
@@ -66,7 +68,7 @@ public class HttpRequestToMuleEvent {
           try {
             payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
           } catch (IOException e) {
-            throw new HttpRequestParsingException(e.getMessage(), e);
+            throw new HttpMessageParsingException(createStaticMessage(e.getMessage()), e);
           }
         } else {
           if (mediaType != null) {
@@ -75,7 +77,7 @@ public class HttpRequestToMuleEvent {
                 payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
                                                mediaType.getCharset().get());
               } catch (IllegalArgumentException e) {
-                throw new HttpRequestParsingException("Cannot decode x-www-form-urlencoded payload", e);
+                throw new HttpMessageParsingException(createStaticMessage("Cannot decode x-www-form-urlencoded payload"), e);
               }
             } else if (entity instanceof InputStreamHttpEntity) {
               payload = ((InputStreamHttpEntity) entity).getInputStream();
