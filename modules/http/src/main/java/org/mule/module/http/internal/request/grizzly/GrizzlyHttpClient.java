@@ -189,6 +189,7 @@ public class GrizzlyHttpClient implements HttpClient
         if (clientSocketProperties != null)
         {
             compositeTransportCustomizer.addTransportCustomizer(new SocketConfigTransportCustomizer(clientSocketProperties));
+            builder.setConnectTimeout(clientSocketProperties.getConnectionTimeout());
         }
 
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
