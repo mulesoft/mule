@@ -14,6 +14,7 @@ import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -72,6 +73,15 @@ public class XmlToXMLStreamReaderTestCase extends AbstractXmlTransformerTestCase
                 out.write(TEST_XML.getBytes());
             }
         };
+        XMLStreamReader result = (XMLStreamReader) getTransformer().transform(outputHandler);
+        compareResults(getResultData(), result);
+    }
+    
+    @Test
+    public void supportsByteArrayOutputStreamAsSourceType() throws Exception
+    {
+        ByteArrayOutputStream outputHandler = new ByteArrayOutputStream();
+        outputHandler.write(TEST_XML.getBytes());
         XMLStreamReader result = (XMLStreamReader) getTransformer().transform(outputHandler);
         compareResults(getResultData(), result);
     }
