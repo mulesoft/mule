@@ -47,7 +47,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
    */
   //TODO: MULE-10877 this should be replaced by having body as a TypedValue
   @Parameter
-  @Optional(defaultValue = "#[dataType.mediaType]")
+  @Optional(defaultValue = "#[mel:message.dataType.mediaType]")
   private ParameterResolver<MediaType> mediaType = new ParameterResolver<MediaType>() {
 
     @Override
