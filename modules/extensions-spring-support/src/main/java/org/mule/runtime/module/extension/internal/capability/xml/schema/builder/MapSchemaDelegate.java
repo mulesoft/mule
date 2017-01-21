@@ -16,6 +16,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -40,9 +41,11 @@ final class MapSchemaDelegate {
 
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final SchemaBuilder builder;
+  private final MetadataType keyType;
 
-  MapSchemaDelegate(SchemaBuilder builder) {
+  MapSchemaDelegate(SchemaBuilder builder, ClassTypeLoader typeLoader) {
     this.builder = builder;
+    this.keyType = typeLoader.load(String.class);
   }
 
   void generateMapElement(ObjectType metadataType, DslElementSyntax paramDsl, String description, boolean required,
@@ -60,7 +63,7 @@ final class MapSchemaDelegate {
   private LocalComplexType generateMapComplexType(DslElementSyntax mapDsl, final ObjectType metadataType) {
     final MetadataType valueType = metadataType.getOpenRestriction().get();
     final LocalComplexType entryComplexType = new LocalComplexType();
-    final Attribute keyAttribute = builder.createStringAttribute(KEY_ATTRIBUTE_NAME, true, REQUIRED);
+    final Attribute keyAttribute = builder.createAttribute(KEY_ATTRIBUTE_NAME, keyType, true, REQUIRED);
     entryComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
 
     final LocalComplexType mapComplexType = new LocalComplexType();

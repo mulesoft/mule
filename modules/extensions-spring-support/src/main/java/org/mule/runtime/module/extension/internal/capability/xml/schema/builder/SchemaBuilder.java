@@ -159,7 +159,7 @@ public final class SchemaBuilder {
     sourceSchemaDelegate = new SourceSchemaDelegate(this);
     collectionDelegate = new CollectionSchemaDelegate(this);
     objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
-    mapDelegate = new MapSchemaDelegate(this);
+    mapDelegate = new MapSchemaDelegate(this, typeLoader);
   }
 
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
@@ -339,10 +339,6 @@ public final class SchemaBuilder {
 
   Attribute createAttribute(String name, MetadataType type, boolean required, ExpressionSupport expressionSupport) {
     return createAttribute(name, EMPTY, type, null, required, expressionSupport);
-  }
-
-  Attribute createStringAttribute(String name, boolean required, ExpressionSupport expressionSupport) {
-    return createAttribute(name, EMPTY, typeLoader.load(String.class), null, required, expressionSupport);
   }
 
   private Attribute createAttribute(final String name, String description, final MetadataType type, Object defaultValue,
