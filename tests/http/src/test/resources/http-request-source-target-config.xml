@@ -12,21 +12,17 @@
 
     <flow name="payloadSourceFlow">
         <httpn:request config-ref="config" path="test" method="POST">
-            <httpn:request-builder>
-                <httpn:body>
-                    #[payload]
-                </httpn:body>
-            </httpn:request-builder>
+            <httpn:body>
+                #[payload]
+            </httpn:body>
         </httpn:request>
     </flow>
 
     <flow name="customSourceFlow">
         <httpn:request config-ref="config" path="test" method="POST">
-            <httpn:request-builder>
-                <httpn:body>
-                    #[customSource]
-                </httpn:body>
-            </httpn:request-builder>
+            <httpn:body>
+                #[customSource]
+            </httpn:body>
         </httpn:request>
     </flow>
 

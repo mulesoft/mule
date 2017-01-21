@@ -36,9 +36,7 @@
     <flow name="complexMapping">
         <httpn:request config-ref="simpleConfig" path="testPath">
             <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
-            <httpn:request-builder>
-                <httpn:headers>#[mel:headers]</httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>#[mel:headers]</httpn:headers>
         </httpn:request>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">
@@ -54,9 +52,7 @@
         <httpn:request config-ref="simpleConfig" path="testPath">
             <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
             <error-mapping sourceType="TRANSFORMATION" targetType="MY_OTHER_ERROR"/>
-            <httpn:request-builder>
-                <httpn:headers>#[mel:headers]</httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>#[mel:headers]</httpn:headers>
         </httpn:request>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">

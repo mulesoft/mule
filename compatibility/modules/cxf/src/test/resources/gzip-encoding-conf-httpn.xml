@@ -22,11 +22,11 @@
 
     <flow name="proxy-gzip">
         <httpn:listener path="/proxy" config-ref="listenerConfig2" allowedMethods="POST">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Encoding' : 'gzip']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <cxf:proxy-service payload="body" service="ArtistRegistryWebServicesService"
                            namespace="http://example.cxf.module.compatibility.mule.org/"
@@ -42,21 +42,19 @@
             </cxf:features>
         </cxf:proxy-client>
         <httpn:request config-ref="requestConfig" path="/artistRegistry" method="POST">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[mel:['Content-Encoding' : message.attributes.headers['content-encoding']]]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['Content-Encoding' : message.attributes.headers['content-encoding']]]
+            </httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="gzip-service">
         <httpn:listener path="/artistRegistry" config-ref="listenerConfig1" allowedMethods="POST">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Encoding' : 'gzip']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <response>
             <object-to-byte-array-transformer />

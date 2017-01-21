@@ -76,11 +76,11 @@
 
     <flow name="httpListenerFlowNestedBuilder">
         <httpn:listener config-ref="httpConfig" path="/nested">
-            <httpn:response-builder>
+            <httpn:response>
             	<httpn:headers>
                     #[mel:['testHeader' : 'testValue']]
                	</httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <echo-component />
     </flow>

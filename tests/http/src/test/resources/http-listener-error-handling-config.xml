@@ -19,11 +19,11 @@
 
     <flow name="exceptionBuildingResponseParameters">
         <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseParameters">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[{ Content-Type: contentType}]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>

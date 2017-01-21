@@ -18,11 +18,11 @@
 
     <flow name="listenerContentTypeBuilder" >
         <httpn:listener config-ref="httpConf" path="testBuilder">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['content-type' : 'text/plain']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>

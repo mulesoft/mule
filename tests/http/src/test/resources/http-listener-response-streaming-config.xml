@@ -26,33 +26,33 @@
 
     <flow name="stringWithContentLengthHeaderFlow">
         <httpn:listener config-ref="listenerConfig" path="/stringWithContentLengthHeader">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="stringWithTransferEncodingFlow">
         <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeader">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="stringWithTransferEncodingAndContentLengthFlow">
         <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthHeader">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Transfer-Encoding' : 'chunked', 'Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
@@ -64,33 +64,33 @@
 
     <flow name="inputStreamWithContentLengthHeaderFlow">
         <httpn:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthHeader">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingFlow">
         <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeader">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingAndContentLengthFlow">
         <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthHeader">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Transfer-Encoding' : 'chunked', 'Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
@@ -102,11 +102,11 @@
 
     <flow name="neverStringTransferEncodingHeaderFlow">
         <httpn:listener config-ref="listenerConfig" path="/neverStringTransferEncodingHeader" responseStreamingMode="NEVER">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
@@ -118,11 +118,11 @@
 
     <flow name="neverInputStreamTransferEncodingHeaderFlow">
         <httpn:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingHeader"  responseStreamingMode="NEVER">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
@@ -134,11 +134,11 @@
 
     <flow name="alwaysStringContentLengthHeaderFlow">
         <httpn:listener config-ref="listenerConfig" path="/alwaysStringContentLengthHeader" responseStreamingMode="ALWAYS">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
@@ -150,44 +150,44 @@
 
     <flow name="alwaysInputStreamContentLengthHeaderFlow">
         <httpn:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthHeader" responseStreamingMode="ALWAYS">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="mapFlow">
         <httpn:listener config-ref="listenerConfig" path="/map">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 
     <flow name="alwaysMapFlow">
         <httpn:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 
     <flow name="neverMapFlow">
         <httpn:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="#[mel:mapPayload]"/>
     </flow>

@@ -24,11 +24,9 @@
 
     <flow name="simple">
         <httpn:request config-ref="simpleConfig" path="testPath">
-            <httpn:request-builder>
-                <httpn:query-params>
-                    #[mel:['testName1' : 'testValue1']]
-                </httpn:query-params>
-            </httpn:request-builder>
+             <httpn:query-params>
+                #[mel:['testName1' : 'testValue1']]
+            </httpn:query-params>
         </httpn:request>
     </flow>
 

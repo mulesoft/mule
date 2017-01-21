@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
-@Alias("error-response-builder")
+@Alias("error-response")
 @XmlHints(allowTopLevelDefinition = true)
 public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilder {
 
