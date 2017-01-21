@@ -7,6 +7,8 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -46,7 +48,18 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   //TODO: MULE-10877 this should be replaced by having body as a TypedValue
   @Parameter
   @Optional(defaultValue = "#[dataType.mediaType]")
-  private ParameterResolver<MediaType> mediaType;
+  private ParameterResolver<MediaType> mediaType = new ParameterResolver<MediaType>() {
+
+    @Override
+    public MediaType resolve() {
+      return ANY;
+    }
+
+    @Override
+    public java.util.Optional<String> getExpression() {
+      return of("#['*/*']");
+    }
+  };
 
 
   // For now, only handle single params

@@ -207,7 +207,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     ComponentConfiguration responseBuilder = listener.getNestedComponents().get(1);
 
     DslElementModel<ParameterModel> responseBuilderElement = getChild(listenerElement, responseBuilder);
-    assertElementName(responseBuilderElement, "response-builder");
+    assertElementName(responseBuilderElement, "response");
 
     assertThat(responseBuilderElement.getDsl().getChild("headers").isPresent(), is(true));
   }
