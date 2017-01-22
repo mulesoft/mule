@@ -20,9 +20,11 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderM
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,6 +55,14 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   @Override
   public List<ArtifactPluginDescriptor> resolve(List<ArtifactPluginDescriptor> descriptors) {
 
+    List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
+
+    verifyPluginExportedPackages(resolvedPlugins);
+
+    return resolvedPlugins;
+  }
+
+  private List<ArtifactPluginDescriptor> resolvePluginsDependencies(List<ArtifactPluginDescriptor> descriptors) {
     Set<BundleDescriptor> knownPlugins =
         descriptors.stream().map(ArtifactPluginDescriptor::getBundleDescriptor).collect(Collectors.toSet());
     descriptors = getArtifactsWithDependencies(descriptors, knownPlugins);
@@ -90,6 +100,29 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     }
 
     return resolvedPlugins;
+  }
+
+  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
+    final Map<String, List<String>> exportedPackages = new HashMap<>();
+
+    boolean error = false;
+    for (ArtifactPluginDescriptor plugin : plugins) {
+      for (String packageName : plugin.getClassLoaderModel().getExportedPackages()) {
+        List<String> exportedOn = exportedPackages.get(packageName);
+
+        if (exportedOn == null) {
+          exportedOn = new LinkedList<>();
+          exportedPackages.put(packageName, exportedOn);
+        } else {
+          error = true;
+        }
+        exportedOn.add(plugin.getName());
+      }
+    }
+
+    if (error) {
+      throw new DuplicateExportedPackageException(exportedPackages);
+    }
   }
 
   /**

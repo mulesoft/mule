@@ -11,11 +11,9 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,14 +21,12 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppPluginsFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
@@ -42,12 +38,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -146,59 +139,6 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
     assertThat(desc.getClassLoaderModel().getUrls()[0].getFile(), equalTo(getAppClassesFolder(APP_NAME).toString()));
     assertThat(desc.getClassLoaderModel().getUrls()[1].getFile(), equalTo(libFile.toString()));
-  }
-
-  @Test
-  @Ignore("MULE-9649")
-  public void validatesExportedPackageDuplication() throws Exception {
-    File pluginDir = getAppPluginsFolder(APP_NAME);
-    pluginDir.mkdirs();
-
-    final File pluginFile = createApplicationPluginFile();
-    copyFile(pluginFile, new File(pluginDir, "plugin1.zip"));
-    copyFile(pluginFile, new File(pluginDir, "plugin2.zip"));
-
-    doPackageValidationTest(applicationPluginRepository);
-  }
-
-  @Test
-  @Ignore("MULE-9649")
-  public void validatesExportedPackageDuplicationAgainstContainerPlugin() throws Exception {
-    File pluginDir = getAppPluginsFolder(APP_NAME);
-    pluginDir.mkdirs();
-    copyFile(createApplicationPluginFile(), new File(pluginDir, "plugin1.zip"));
-
-    final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
-    final ArtifactPluginDescriptor plugin2Descriptor = new ArtifactPluginDescriptor("plugin2");
-    final Set<String> exportedPackages = new HashSet<>();
-    exportedPackages.add("org.foo");
-    exportedPackages.add("org.bar");
-    plugin2Descriptor.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(exportedPackages).build());
-    when(applicationPluginRepository.getContainerArtifactPluginDescriptors())
-        .thenReturn(Collections.singletonList(plugin2Descriptor));
-
-    doPackageValidationTest(applicationPluginRepository);
-  }
-
-  private File createApplicationPluginFile() throws Exception {
-    return new ArtifactPluginFileBuilder("plugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo, org.bar")
-        .getArtifactFile();
-  }
-
-  private void doPackageValidationTest(ArtifactPluginRepository applicationPluginRepository) {
-    final ArtifactPluginDescriptorFactory pluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory();
-    final ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
-                                         applicationPluginRepository);
-
-    try {
-      applicationDescriptorFactory.create(getAppFolder(APP_NAME));
-      fail("Descriptor creation was supposed to fail as the same packages are exported by two plugins");
-    } catch (DuplicateExportedPackageException e) {
-      assertThat(e.getMessage(), containsString("Package org.foo is exported on artifacts: plugin1, plugin2"));
-      assertThat(e.getMessage(), containsString("Package org.bar is exported on artifacts: plugin1, plugin2"));
-    }
   }
 
   private void copyResourceAs(String resourceName, File destination) throws IOException {

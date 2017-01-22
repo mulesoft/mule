@@ -99,10 +99,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
     if (!bundleDescriptorLoader.getId().equals(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID)) {
       throw new ArtifactDescriptorCreateException("Unknown bundle descriptor loader: " + bundleDescriptorLoader.getId());
     }
-
-    final Set<ArtifactPluginDescriptor> plugins = parseArtifactPluginDescriptors(artifactFolder, descriptor);
-    // TODO(pablo.kraan): MULE-9649 - verify exported packages
-    descriptor.setPlugins(plugins);
+    descriptor.setPlugins(parseArtifactPluginDescriptors(artifactFolder, descriptor));
 
     PropertiesBundleDescriptorLoader propertiesBundleDescriptorLoader = new PropertiesBundleDescriptorLoader();
     descriptor.setBundleDescriptor(propertiesBundleDescriptorLoader.loadBundleDescriptor(bundleDescriptorLoader.getAttributes()));
