@@ -20,17 +20,17 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 /**
- * {@link AbstractDescriptionDeclarer} implementation that fills {@link WithSourcesDeclaration}s
+ * {@link AbstractDescriptionDocumenter} implementation that fills {@link WithSourcesDeclaration}s
  *
  * @since 4.0
  */
-final class SourcesDescriptionDeclarer extends AbstractDescriptionDeclarer<WithSourcesDeclaration<?>> {
+final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<WithSourcesDeclaration<?>> {
 
-  private final ParameterDescriptionDeclarer parameterDeclarer;
+  private final ParameterDescriptionDocumenter parameterDeclarer;
 
-  SourcesDescriptionDeclarer(ProcessingEnvironment processingEnv) {
+  SourcesDescriptionDocumenter(ProcessingEnvironment processingEnv) {
     super(processingEnv);
-    this.parameterDeclarer = new ParameterDescriptionDeclarer(processingEnv);
+    this.parameterDeclarer = new ParameterDescriptionDocumenter(processingEnv);
   }
 
   void document(WithSourcesDeclaration<?> declaration, TypeElement element) {

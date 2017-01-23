@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.mule.runtime.extension.internal.ExtensionXmlSerializer.deserialize;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_DESCRIPTIONS_FILE_NAME;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -20,8 +18,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionDocumenter;
-import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionElementDocumenter;
+import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer;
+import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.net.URL;
@@ -41,15 +40,19 @@ import org.apache.commons.io.IOUtils;
  */
 public final class ExtensionDescriptionsEnricher implements DeclarationEnricher {
 
+  private static final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
+
   /**
    * {@inheritDoc}
    */
   @Override
   public void enrich(ExtensionLoadingContext loadingContext) {
-    URL resource = loadingContext.getExtensionClassLoader().getResource("META-INF/" + EXTENSION_DESCRIPTIONS_FILE_NAME);
+    String name = loadingContext.getExtensionDeclarer().getDeclaration().getName();
+    ClassLoader classLoader = loadingContext.getExtensionClassLoader();
+    URL resource = classLoader.getResource("META-INF/" + serializer.getFileName(name));
     if (resource != null) {
       try {
-        XmlExtensionDocumenter documenter = deserialize(IOUtils.toString(resource.openStream()), XmlExtensionDocumenter.class);
+        XmlExtensionDocumentation documenter = serializer.deserialize(IOUtils.toString(resource.openStream()));
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter.getElements());
       } catch (IOException e) {
         throw new RuntimeException("Cannot get descriptions persisted in the extensions-descriptions.xml file", e);
@@ -64,7 +67,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * @param declaration the declaration to describe.
    * @param elements    the extension elements with its corresponding description.
    */
-  private void document(ExtensionDeclaration declaration, List<XmlExtensionElementDocumenter> elements) {
+  private void document(ExtensionDeclaration declaration, List<XmlExtensionElementDocumentation> elements) {
     new DeclarationWalker() {
 
       @Override

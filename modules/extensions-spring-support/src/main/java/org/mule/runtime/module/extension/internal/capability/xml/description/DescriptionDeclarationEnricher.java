@@ -30,7 +30,7 @@ import javax.lang.model.element.TypeElement;
  * {@link ExtensionResourcesGeneratorAnnotationProcessor#PROCESSING_ENVIRONMENT} and
  * {@link ExtensionResourcesGeneratorAnnotationProcessor#EXTENSION_ELEMENT}.
  *
- * @since 3.7.0
+ * @since 4.0
  */
 public final class DescriptionDeclarationEnricher implements DeclarationEnricher {
 
@@ -39,7 +39,7 @@ public final class DescriptionDeclarationEnricher implements DeclarationEnricher
     ProcessingEnvironment processingEnv = getParameterOrFail(loadingContext, PROCESSING_ENVIRONMENT);
     TypeElement extensionElement = getParameterOrFail(loadingContext, EXTENSION_ELEMENT);
     RoundEnvironment roundEnvironment = getParameterOrFail(loadingContext, ROUND_ENVIRONMENT);
-    ExtensionDescriptionDeclarer declarer = new ExtensionDescriptionDeclarer(processingEnv, roundEnvironment);
+    ExtensionDescriptionDocumenter declarer = new ExtensionDescriptionDocumenter(processingEnv, roundEnvironment);
     declarer.document(loadingContext.getExtensionDeclarer().getDeclaration(), extensionElement);
   }
 

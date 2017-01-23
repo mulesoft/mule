@@ -51,9 +51,11 @@ public class ExtensionProperties {
   public static final String ENCODING_PARAMETER_NAME = "outputEncoding";
 
   /**
-   * The name of a file which contains the {@link ExtensionModel} elements descriptions.
+   * The name mask of a file which contains the {@link ExtensionModel} elements descriptions.
+   * <p>
+   * The final name of the file is formed like this: {extension-namespace}-extension-descriptions.xml.
    */
-  public static final String EXTENSION_DESCRIPTIONS_FILE_NAME = "extension-descriptions.xml";
+  public static final String EXTENSION_DESCRIPTIONS_FILE_NAME_MASK = "%s-extension-descriptions.xml";
 
   /**
    * The name of a file which contains each plugin's {@link ExtensionManifest}

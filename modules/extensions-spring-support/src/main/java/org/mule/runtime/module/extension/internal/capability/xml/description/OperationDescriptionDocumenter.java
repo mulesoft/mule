@@ -28,17 +28,17 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 /**
- * {@link AbstractDescriptionDeclarer} implementation that fills {@link WithOperationsDeclaration}s
+ * {@link AbstractDescriptionDocumenter} implementation that fills {@link WithOperationsDeclaration}s
  *
  * @since 4.0
  */
-final class OperationDescriptionDeclarer extends AbstractDescriptionDeclarer<WithOperationsDeclaration<?>> {
+final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter<WithOperationsDeclaration<?>> {
 
-  private final ParameterDescriptionDeclarer parameterDeclarer;
+  private final ParameterDescriptionDocumenter parameterDeclarer;
 
-  OperationDescriptionDeclarer(ProcessingEnvironment processingEnv) {
+  OperationDescriptionDocumenter(ProcessingEnvironment processingEnv) {
     super(processingEnv);
-    this.parameterDeclarer = new ParameterDescriptionDeclarer(processingEnv);
+    this.parameterDeclarer = new ParameterDescriptionDocumenter(processingEnv);
   }
 
   void document(WithOperationsDeclaration<?> declaration, TypeElement element) {

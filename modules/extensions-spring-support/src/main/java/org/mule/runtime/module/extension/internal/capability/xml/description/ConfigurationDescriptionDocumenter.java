@@ -21,21 +21,21 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 /**
- * {@link AbstractDescriptionDeclarer} implementation that fills {@link ConfigurationDeclaration}s
+ * {@link AbstractDescriptionDocumenter} implementation that fills {@link ConfigurationDeclaration}s
  *
  * @since 4.0
  */
-final class ConfigurationDescriptionDeclarer extends AbstractDescriptionDeclarer<ConfigurationDeclaration> {
+final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocumenter<ConfigurationDeclaration> {
 
-  private final ParameterDescriptionDeclarer parameterDeclarer;
-  private final OperationDescriptionDeclarer operationDeclarer;
-  private final SourcesDescriptionDeclarer sourceDeclarer;
+  private final ParameterDescriptionDocumenter parameterDeclarer;
+  private final OperationDescriptionDocumenter operationDeclarer;
+  private final SourcesDescriptionDocumenter sourceDeclarer;
 
-  ConfigurationDescriptionDeclarer(ProcessingEnvironment processingEnv) {
+  ConfigurationDescriptionDocumenter(ProcessingEnvironment processingEnv) {
     super(processingEnv);
-    this.parameterDeclarer = new ParameterDescriptionDeclarer(processingEnv);
-    this.operationDeclarer = new OperationDescriptionDeclarer(processingEnv);
-    this.sourceDeclarer = new SourcesDescriptionDeclarer(processingEnv);
+    this.parameterDeclarer = new ParameterDescriptionDocumenter(processingEnv);
+    this.operationDeclarer = new OperationDescriptionDocumenter(processingEnv);
+    this.sourceDeclarer = new SourcesDescriptionDocumenter(processingEnv);
   }
 
   @Override

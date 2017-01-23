@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.internal.ExtensionXmlSerializer.serialize;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_DESCRIPTIONS_FILE_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -35,17 +33,19 @@ import java.util.Optional;
  */
 public class ExtensionDocumentationResourceGenerator implements GeneratedResourceFactory {
 
+  private static final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
+
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
     ExtensionDocumenterWalker walker = new ExtensionDocumenterWalker();
     walker.walk(extensionModel);
-    String documenter = serialize(walker.getDocumenter(extensionModel));
-    return Optional.of(new GeneratedResource(EXTENSION_DESCRIPTIONS_FILE_NAME, documenter.getBytes()));
+    String documenter = serializer.serialize(walker.getDocumenter(extensionModel));
+    return Optional.of(new GeneratedResource(serializer.getFileName(extensionModel.getName()), documenter.getBytes()));
   }
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {
 
-    ImmutableList.Builder<XmlExtensionElementDocumenter> elements = ImmutableList.builder();
+    ImmutableList.Builder<XmlExtensionElementDocumentation> elements = ImmutableList.builder();
 
     @Override
     protected void onConfiguration(ConfigurationModel model) {
@@ -68,18 +68,18 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
     }
 
     private void createParameterizedElement(ParameterizedModel model) {
-      XmlExtensionElementDocumenter element = new XmlExtensionElementDocumenter();
+      XmlExtensionElementDocumentation element = new XmlExtensionElementDocumentation();
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(model.getAllParameterModels().stream()
-          .map(p -> new XmlExtensionParameterDocumenter(p.getName(), p.getDescription()))
+          .map(p -> new XmlExtensionParameterDocumentation(p.getName(), p.getDescription()))
           .collect(toList()));
       elements.add(element);
     }
 
-    private XmlExtensionDocumenter getDocumenter(ExtensionModel model) {
-      final XmlExtensionDocumenter documenter = new XmlExtensionDocumenter();
-      XmlExtensionElementDocumenter element = new XmlExtensionElementDocumenter();
+    private XmlExtensionDocumentation getDocumenter(ExtensionModel model) {
+      final XmlExtensionDocumentation documenter = new XmlExtensionDocumentation();
+      XmlExtensionElementDocumentation element = new XmlExtensionElementDocumentation();
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(emptyList());

@@ -19,16 +19,16 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 4.0
  */
 @XmlRootElement(name = "extension-documentation")
-public class XmlExtensionDocumenter {
+public class XmlExtensionDocumentation {
 
-  private List<XmlExtensionElementDocumenter> elements = new LinkedList<>();
+  private List<XmlExtensionElementDocumentation> elements = new LinkedList<>();
 
   @XmlElement
-  public List<XmlExtensionElementDocumenter> getElements() {
+  public List<XmlExtensionElementDocumentation> getElements() {
     return elements;
   }
 
-  public void setElements(List<XmlExtensionElementDocumenter> elements) {
+  public void setElements(List<XmlExtensionElementDocumentation> elements) {
     this.elements = elements;
   }
 }

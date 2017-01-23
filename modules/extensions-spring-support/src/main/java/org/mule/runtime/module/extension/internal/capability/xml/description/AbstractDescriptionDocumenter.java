@@ -22,13 +22,13 @@ import javax.lang.model.element.TypeElement;
  * @param <T> the type to document.
  * @since 4.0
  */
-abstract class AbstractDescriptionDeclarer<T> {
+abstract class AbstractDescriptionDocumenter<T> {
 
   protected static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
 
   final ProcessingEnvironment processingEnv;
 
-  AbstractDescriptionDeclarer(ProcessingEnvironment processingEnvironment) {
+  AbstractDescriptionDocumenter(ProcessingEnvironment processingEnvironment) {
     this.processingEnv = processingEnvironment;
   }
 

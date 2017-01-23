@@ -19,13 +19,13 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
 /**
- * {@link AbstractDescriptionDeclarer} implementation that fills {@link ParameterizedDeclaration}s
+ * {@link AbstractDescriptionDocumenter} implementation that fills {@link ParameterizedDeclaration}s
  *
  * @since 4.0
  */
-final class ParameterDescriptionDeclarer extends AbstractDescriptionDeclarer<ParameterizedDeclaration<?>> {
+final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter<ParameterizedDeclaration<?>> {
 
-  ParameterDescriptionDeclarer(ProcessingEnvironment processingEnv) {
+  ParameterDescriptionDocumenter(ProcessingEnvironment processingEnv) {
     super(processingEnv);
   }
 

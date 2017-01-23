@@ -22,24 +22,24 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 
 /**
- * {@link AbstractDescriptionDeclarer} implementation that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel}
+ * {@link AbstractDescriptionDocumenter} implementation that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel}
  * has already been described.
  *
  * @since 4.0
  */
-final class ExtensionDescriptionDeclarer extends AbstractDescriptionDeclarer<ExtensionDeclaration> {
+final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter<ExtensionDeclaration> {
 
   private final RoundEnvironment roundEnv;
-  private final ConfigurationDescriptionDeclarer configDeclarer;
-  private final OperationDescriptionDeclarer operationDeclarer;
-  private final SourcesDescriptionDeclarer sourceDeclarer;
+  private final ConfigurationDescriptionDocumenter configDeclarer;
+  private final OperationDescriptionDocumenter operationDeclarer;
+  private final SourcesDescriptionDocumenter sourceDeclarer;
 
-  ExtensionDescriptionDeclarer(ProcessingEnvironment processingEnvironment, RoundEnvironment roundEnvironment) {
+  ExtensionDescriptionDocumenter(ProcessingEnvironment processingEnvironment, RoundEnvironment roundEnvironment) {
     super(processingEnvironment);
     this.roundEnv = roundEnvironment;
-    this.operationDeclarer = new OperationDescriptionDeclarer(processingEnv);
-    this.sourceDeclarer = new SourcesDescriptionDeclarer(processingEnv);
-    this.configDeclarer = new ConfigurationDescriptionDeclarer(processingEnvironment);
+    this.operationDeclarer = new OperationDescriptionDocumenter(processingEnv);
+    this.sourceDeclarer = new SourcesDescriptionDocumenter(processingEnv);
+    this.configDeclarer = new ConfigurationDescriptionDocumenter(processingEnvironment);
   }
 
   /**
