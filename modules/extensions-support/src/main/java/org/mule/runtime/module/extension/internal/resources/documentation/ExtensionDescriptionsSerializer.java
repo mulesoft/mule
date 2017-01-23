@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_DESCRIPTIONS_FILE_NAME_MASK;
 import org.mule.runtime.extension.internal.GenericXmlSerializer;
 
@@ -22,6 +23,7 @@ public class ExtensionDescriptionsSerializer extends GenericXmlSerializer<XmlExt
   }
 
   public String getFileName(String extensionName) {
-    return format(EXTENSION_DESCRIPTIONS_FILE_NAME_MASK, extensionName);
+    String key = hyphenize(extensionName.replace(" ", ""));
+    return format(EXTENSION_DESCRIPTIONS_FILE_NAME_MASK, key);
   }
 }
