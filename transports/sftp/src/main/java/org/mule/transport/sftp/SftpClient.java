@@ -316,7 +316,7 @@ public class SftpClient
 
     public String[] listFiles() throws IOException
     {
-        return listFiles(".");
+        return listFiles("*");
     }
 
     public String[] listFiles(String path) throws IOException
@@ -326,7 +326,7 @@ public class SftpClient
 
     public String[] listDirectories() throws IOException
     {
-        return listDirectory(".", false, true);
+        return listDirectory("*", false, true);
     }
 
     public String[] listDirectories(String path) throws IOException
