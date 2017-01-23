@@ -12,21 +12,17 @@
 
     <flow name="default">
         <httpn:request config-ref="requestConfig" path="status">
-            <httpn:request-builder>
-                <httpn:query-params>
-                    #[mel:['code' : code]]
-                </httpn:query-params>
-            </httpn:request-builder>
+            <httpn:query-params>
+                #[mel:['code' : code]]
+            </httpn:query-params>
         </httpn:request>
     </flow>
 
     <flow name="success">
         <httpn:request config-ref="requestConfig" path="status">
-            <httpn:request-builder>
-                <httpn:query-params>
-                    #[mel:['code' : code]]
-                </httpn:query-params>
-            </httpn:request-builder>
+            <httpn:query-params>
+                #[mel:['code' : code]]
+            </httpn:query-params>
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="409" />
             </httpn:response-validator>
@@ -35,11 +31,9 @@
 
     <flow name="failure">
         <httpn:request config-ref="requestConfig" path="status">
-            <httpn:request-builder>
-                <httpn:query-params>
-                    #[mel:['code' : code]]
-                </httpn:query-params>
-            </httpn:request-builder>
+            <httpn:query-params>
+                #[mel:['code' : code]]
+            </httpn:query-params>
             <httpn:response-validator>
                 <httpn:failure-status-code-validator values="201" />
             </httpn:response-validator>

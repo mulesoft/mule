@@ -19,11 +19,9 @@
 
     <flow name="client2" >
         <httpn:request config-ref="dynamicConfig2" path="testPath" method="POST">
-            <httpn:request-builder>
-                <httpn:body>
-                    #[body]
-                </httpn:body>
-            </httpn:request-builder>
+            <httpn:body>
+                #[body]
+            </httpn:body>
         </httpn:request>
     </flow>
 </mule>

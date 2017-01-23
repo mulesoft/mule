@@ -37,11 +37,11 @@
 
     <flow name="redirectFlow">
         <httpn:listener path="redirectPath" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="302">
+            <httpn:response statusCode="302">
                 <httpn:headers>
                     <httpn:header key="Location" value="http://localhost:${port}/path"/>
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <set-payload value="test-response"/>
     </flow>
@@ -53,7 +53,7 @@
 
     <flow name="failureStatusCodeFlow">
         <httpn:listener path="failurePath" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="500"/>
+            <httpn:response statusCode="500"/>
         </httpn:listener>
         <set-payload value="test-response"/>
     </flow>

@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
-@Alias("response-builder")
+@Alias("response")
 @XmlHints(allowTopLevelDefinition = true)
 public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuilder {
 

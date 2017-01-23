@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -26,10 +26,8 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -73,7 +71,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
                       @ParameterGroup(
                           name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
-                      @Optional @NullSafe @Expression(NOT_SUPPORTED) HttpRequesterRequestBuilder requestBuilder,
+                      @ParameterGroup(name = REQUEST_SETTINGS, showInDsl = false) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @UseConfig HttpRequesterConfig config,

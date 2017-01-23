@@ -32,11 +32,9 @@
             </cxf:outInterceptors>
         </cxf:jaxws-client>
         <httpn:request path="services/greeter" method="POST" config-ref="requestConfig">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[mel:['FOO' : message.outboundProperties['FOO'], 'operation' : message.outboundProperties['operation']]]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['FOO' : message.outboundProperties['FOO'], 'operation' : message.outboundProperties['operation']]]
+            </httpn:headers>
         </httpn:request>
     </flow>
 

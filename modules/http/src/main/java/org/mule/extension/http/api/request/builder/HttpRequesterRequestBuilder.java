@@ -7,14 +7,14 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +24,6 @@ import java.util.Map;
  *
  * @since 4.0
  */
-@Alias("request-builder")
-@XmlHints(allowTopLevelDefinition = true)
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   /**
@@ -50,7 +48,18 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   //TODO: MULE-10877 this should be replaced by having body as a TypedValue
   @Parameter
   @Optional(defaultValue = "#[mel:message.dataType.mediaType]")
-  private MediaType mediaType = ANY;
+  private ParameterResolver<MediaType> mediaType = new ParameterResolver<MediaType>() {
+
+    @Override
+    public MediaType resolve() {
+      return ANY;
+    }
+
+    @Override
+    public java.util.Optional<String> getExpression() {
+      return of("#['*/*']");
+    }
+  };
 
 
   // For now, only handle single params
@@ -85,6 +94,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public MediaType getMediaType() {
-    return mediaType;
+    return mediaType.resolve();
   }
 }

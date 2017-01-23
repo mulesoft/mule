@@ -27,8 +27,8 @@ public class HttpListenerResponseSender {
     this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService);
   }
 
-  public void sendResponse(HttpResponseContext context, HttpListenerSuccessResponseBuilder responseBuilder) throws Exception {
-    HttpResponse httpResponse = buildResponse(responseBuilder, context.isSupportStreaming());
+  public void sendResponse(HttpResponseContext context, HttpListenerSuccessResponseBuilder response) throws Exception {
+    HttpResponse httpResponse = buildResponse(response, context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback));
   }

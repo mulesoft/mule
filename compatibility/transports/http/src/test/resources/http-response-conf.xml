@@ -76,22 +76,22 @@
 
     <flow name="httpListenerFlowNestedBuilder">
         <httpn:listener config-ref="httpConfig" path="/nested">
-            <httpn:response-builder>
+            <httpn:response>
             	<httpn:headers>
                     #[mel:['testHeader' : 'testValue']]
                	</httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <echo-component />
     </flow>
 
     <flow name="httpListenerFlowNestedErrorBuilder">
         <httpn:listener config-ref="httpConfig" path="/nestedError">
-            <httpn:error-response-builder statusCode="200">
+            <httpn:error-response statusCode="200">
             	<httpn:headers>
                     #[mel:['testHeader' : 'testValue']]
                 </httpn:headers>
-            </httpn:error-response-builder>
+            </httpn:error-response>
         </httpn:listener>
         <test:component throwException="true" />
     </flow>

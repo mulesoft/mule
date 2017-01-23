@@ -62,12 +62,12 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Map<String, Object> fromMessageToSuccessResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), "responseBuilder", message);
+    return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), "response", message);
   }
 
   @Override
   public Map<String, Object> fromMessageToErrorResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), "errorResponseBuilder", message);
+    return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), "errorResponse", message);
   }
 
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,

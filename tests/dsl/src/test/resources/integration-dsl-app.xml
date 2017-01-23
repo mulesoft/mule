@@ -32,11 +32,11 @@
         <httpn:listener config-ref="httpListener" path="testBuilder">
             <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
             <reconnect blocking="true" count="1" frequency="0"/>
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['content-type' : 'text/plain']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
 
         <db:bulk-insert>

@@ -19,11 +19,11 @@
 
     <flow name="testFlow2">
         <httpn:listener config-ref="listenerConfig" path="${mixedPath}">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
                     #[mel:['Content-Type' : 'multipart/mixed']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <test:queue name="out"/>
     </flow>

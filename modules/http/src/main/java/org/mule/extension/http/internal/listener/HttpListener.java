@@ -155,26 +155,26 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @OnSuccess
   public void onSuccess(
                         @Optional @Placement(
-                            tab = RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder responseBuilder,
+                            tab = RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder response,
                         SourceCallbackContext callbackContext)
       throws Exception {
 
     HttpResponseContext context = callbackContext.getVariable(RESPONSE_CONTEXT);
-    responseSender.sendResponse(context, responseBuilder);
+    responseSender.sendResponse(context, response);
   }
 
   //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
   public void onError(
                       @Optional @Placement(
-                          tab = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponseBuilder,
+                          tab = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
-    if (errorResponseBuilder.getBody() == null) {
-      errorResponseBuilder.setBody(error.getCause().getMessage());
+    if (errorResponse.getBody() == null) {
+      errorResponse.setBody(error.getCause().getMessage());
     }
 
     HttpResponseContext context = callbackContext.getVariable("responseContext");
@@ -182,7 +182,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     HttpResponse response;
     try {
       response = responseFactory
-          .create(failureResponseBuilder, errorResponseBuilder, context.isSupportStreaming());
+          .create(failureResponseBuilder, errorResponse, context.isSupportStreaming());
     } catch (Exception e) {
       response = buildErrorResponse();
     }
