@@ -14,6 +14,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 import java.util.HashMap;
@@ -27,20 +28,22 @@ import java.util.Map;
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   /**
-   * Query parameters the request should include.
-   */
-  @Parameter
-  @Optional
-  @Content
-  private Map<String, String> queryParams = new HashMap<>();
-
-  /**
    * URI parameters that should be used to create the request.
    */
   @Parameter
   @Optional
   @Content
+  @DisplayName("URI Parameters")
   private Map<String, String> uriParams = new HashMap<>();
+
+  /**
+   * Query parameters the request should include.
+   */
+  @Parameter
+  @Optional
+  @Content
+  @DisplayName("Query Parameters")
+  private Map<String, String> queryParams = new HashMap<>();
 
   /**
    * The mediaType of the body to respond
