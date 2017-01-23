@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.io.File.separator;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 
 import java.io.File;
