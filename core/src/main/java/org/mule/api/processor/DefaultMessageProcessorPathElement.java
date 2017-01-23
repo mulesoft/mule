@@ -74,7 +74,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
      * wrapped with a MessageFilter, it would end duplicating the path elements for the filter and the message
      * processors that come after it.
      */
-    public boolean alreadyAddedChild(MessageProcessor messageProcessor)
+    private boolean alreadyAddedChild(MessageProcessor messageProcessor)
     {
         for (MessageProcessorPathElement child : children)
         {
