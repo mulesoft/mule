@@ -10,12 +10,13 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.construct.FlowValidationTestCase.FLOW_NAME;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier.Builder;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

@@ -32,7 +32,7 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.Map;
 import java.util.function.Consumer;

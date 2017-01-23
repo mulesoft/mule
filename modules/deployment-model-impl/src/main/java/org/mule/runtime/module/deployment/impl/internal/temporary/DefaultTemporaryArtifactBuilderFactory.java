@@ -13,6 +13,7 @@ import static org.apache.logging.log4j.core.util.FileUtils.getFileExtension;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -79,7 +79,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
       private File artifactRootFolder;
       private ArtifactContextBuilder artifactContextBuilder;
       private MuleDeployableArtifactClassLoader temporaryContextClassLoader;
-      private ArtifactConfiguration artifactConfiguration;
+      private ArtifactDeclaration artifactDeclaration;
       private List<File> artifactPluginFiles = new ArrayList<>();
       private List<File> artifactLibraryFiles = new ArrayList<>();
       private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
@@ -171,7 +171,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
           artifactContextBuilder = ArtifactContextBuilder.newBuilder().setArtifactType(DOMAIN)
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(temporaryContextClassLoader)
               .setServiceRepository(muleArtifactResourcesRegistry.getServiceManager())
-              .setArtifactConfiguration(artifactConfiguration).setMuleContextListener(createMuleContextListener())
+              .setArtifactDeclaration(artifactDeclaration).setMuleContextListener(createMuleContextListener())
               .setClassLoaderRepository(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
 
           return new TemporaryArtifact() {
@@ -233,8 +233,8 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
        * {@inheritDoc}
        */
       @Override
-      public TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
-        this.artifactConfiguration = artifactConfiguration;
+      public TemporaryArtifactBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
+        this.artifactDeclaration = artifactDeclaration;
         return this;
       }
     };

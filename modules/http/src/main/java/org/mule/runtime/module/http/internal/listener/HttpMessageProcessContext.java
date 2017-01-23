@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.concurrent.Executor;
 

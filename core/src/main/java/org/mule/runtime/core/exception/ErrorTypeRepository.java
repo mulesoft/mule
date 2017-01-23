@@ -18,7 +18,7 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_I
 
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -16,7 +16,7 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttribut
 import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.List;
 import java.util.Properties;

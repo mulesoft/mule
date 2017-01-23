@@ -10,17 +10,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.dsl.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.dsl.model.DslElementModel;
+import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 
+import org.junit.Before;
 import org.junit.Test;
 
-public class DslElementModelResolverTestCase extends AbstractElementModelTestCase {
+public class ConfigurationBasedElementModelFactoryTestCase extends AbstractElementModelTestCase {
+
+  @Before
+  public void initApp() throws Exception {
+    applicationModel = loadApplicationModel();
+  }
 
   @Test
   public void resolveSimpleConfigWithFlatConnection() throws Exception {
@@ -63,7 +69,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     ComponentConfiguration config = getAppElement(applicationModel, DB_CONFIG);
     ComponentConfiguration connection = config.getNestedComponents().get(0);
 
-    assertThat(modelResolver.resolve(connection).isPresent(), is(false));
+    assertThat(modelResolver.create(connection).isPresent(), is(false));
   }
 
   @Test
@@ -71,7 +77,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     ComponentConfiguration config = getAppElement(applicationModel, HTTP_LISTENER_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
 
-    assertThat(configElement.findElement(newIdentifier("request-connection", DB_NS)).isPresent(),
+    assertThat(configElement.findElement(newIdentifier("request-connection", HTTP_NS)).isPresent(),
                is(false));
   }
 
@@ -91,7 +97,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     assertAttributeIsPresent(connectionElement, "host");
     assertAttributeIsPresent(connectionElement, "port");
 
-    assertThat(configElement.findElement(newIdentifier("request-connection", DB_NS)).isPresent(),
+    assertThat(configElement.findElement(newIdentifier("request-connection", HTTP_NS)).isPresent(),
                is(false));
   }
 
@@ -99,6 +105,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
   public void resolveConnectionWithSubtypes() throws Exception {
     ComponentConfiguration config = getAppElement(applicationModel, HTTP_REQUESTER_CONFIG);
     DslElementModel<ConfigurationModel> configElement = resolve(config);
+
     assertElementName(configElement, "request-config");
 
     ComponentConfiguration connection = config.getNestedComponents().get(0);
@@ -119,7 +126,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     assertThat(basicAuthElement.getDsl().isWrapped(), is(false));
     assertThat(basicAuthElement.getDsl().supportsAttributeDeclaration(), is(false));
 
-    assertThat(configElement.findElement(newIdentifier("listener-connection", DB_NS)).isPresent(),
+    assertThat(configElement.findElement(newIdentifier("listener-connection", HTTP_NS)).isPresent(),
                is(false));
   }
 
@@ -149,7 +156,7 @@ public class DslElementModelResolverTestCase extends AbstractElementModelTestCas
     assertThat(propertiesElement.getDsl().isWrapped(), is(true));
     assertThat(propertiesElement.getDsl().supportsAttributeDeclaration(), is(false));
 
-    assertThat(configElement.findElement(newIdentifier("listener-connection", DB_NS)).isPresent(),
+    assertThat(configElement.findElement(newIdentifier("listener-connection", HTTP_NS)).isPresent(),
                is(false));
   }
 

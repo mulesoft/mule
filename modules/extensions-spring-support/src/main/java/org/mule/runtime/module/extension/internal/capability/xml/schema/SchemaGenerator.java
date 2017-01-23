@@ -17,7 +17,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;

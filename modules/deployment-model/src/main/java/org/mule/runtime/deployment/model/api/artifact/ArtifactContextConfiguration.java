@@ -10,9 +10,9 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class ArtifactContextConfiguration {
 
   private MuleContext muleContext;
   private String[] configResources;
-  private ArtifactConfiguration artifactConfiguration;
+  private ArtifactDeclaration artifactDeclaration;
   private Map<String, String> artifactProperties = emptyMap();
   private ArtifactType artifactType;
   private boolean enableLazyInitialization;
@@ -62,8 +62,8 @@ public class ArtifactContextConfiguration {
   /**
    * @return configuration of the artifact.
    */
-  public ArtifactConfiguration getArtifactConfiguration() {
-    return artifactConfiguration;
+  public ArtifactDeclaration getArtifactDeclaration() {
+    return artifactDeclaration;
   }
 
   /**
@@ -130,11 +130,11 @@ public class ArtifactContextConfiguration {
     }
 
     /**
-     * @param artifactConfiguration configuration of the artifact.
+     * @param artifactDeclaration configuration of the artifact.
      * @return {@code this} builder
      */
-    public ArtifactContextConfigurationBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
-      artifactContextConfiguration.artifactConfiguration = artifactConfiguration;
+    public ArtifactContextConfigurationBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
+      artifactContextConfiguration.artifactDeclaration = artifactDeclaration;
       return this;
     }
 

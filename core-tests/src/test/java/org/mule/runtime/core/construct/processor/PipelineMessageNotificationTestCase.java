@@ -20,7 +20,6 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultEventContext;
@@ -42,6 +41,7 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.AllStatistics;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import java.util.ArrayList;

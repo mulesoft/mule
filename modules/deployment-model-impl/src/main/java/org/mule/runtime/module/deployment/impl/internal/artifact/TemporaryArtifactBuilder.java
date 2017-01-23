@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 
 import java.io.File;
 
@@ -36,10 +36,10 @@ public interface TemporaryArtifactBuilder {
   /**
    * Allows to configure the set of mule components to be used by the artifact.
    *
-   * @param artifactConfiguration the mule configuration used by the artifact
+   * @param artifactDeclaration the mule configuration used by the artifact
    * @return the builder
    */
-  TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
+  TemporaryArtifactBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration);
 
   /**
    * Builds a {@code ToolingArtifact} with the provided configuration.

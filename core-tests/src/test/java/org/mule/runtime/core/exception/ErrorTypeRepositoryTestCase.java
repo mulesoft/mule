@@ -18,7 +18,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;

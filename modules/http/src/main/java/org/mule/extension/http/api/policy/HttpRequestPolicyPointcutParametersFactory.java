@@ -10,9 +10,9 @@ package org.mule.extension.http.api.policy;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
 
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.core.policy.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.Map;
 

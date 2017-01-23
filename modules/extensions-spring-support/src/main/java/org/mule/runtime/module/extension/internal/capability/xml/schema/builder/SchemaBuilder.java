@@ -9,13 +9,14 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.Collections.singleton;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.api.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -45,11 +46,11 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
-import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -58,14 +59,13 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.extension.internal.util.ParameterModelComparator;
@@ -117,9 +117,10 @@ public final class SchemaBuilder {
 
   private ExtensionModel extensionModel;
   private DslSyntaxResolver dslResolver;
-  private SubTypesMappingContainer subTypesMapping;
   private Set<ImportedTypeModel> importedTypes;
-  private DslResolvingContext dslExtensionContext;
+
+  private TypeCatalog typesMapping;
+  private DslResolvingContext dslContext;
   private ConfigurationSchemaDelegate configurationSchemaDelegate;
   private ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate;
   private OperationSchemaDelegate operationSchemaDelegate;
@@ -146,7 +147,7 @@ public final class SchemaBuilder {
     builder.initialiseDelegates();
 
     builder.withImportedTypes(extensionModel.getImportedTypes());
-    builder.withTypeMapping(extensionModel.getSubTypes());
+    builder.withTypeMapping(extensionModel);
     builder.withTypes(extensionModel.getTypes());
 
     return builder;
@@ -163,20 +164,20 @@ public final class SchemaBuilder {
   }
 
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
-    this.dslExtensionContext = dslContext;
+    this.dslContext = dslContext;
     this.dslResolver = DslSyntaxResolver.getDefault(model, dslContext);
     return this;
   }
 
-  private SchemaBuilder withTypeMapping(Collection<SubTypesModel> subTypesModels) {
-    this.subTypesMapping = new SubTypesMappingContainer(subTypesModels);
-    subTypesModels.forEach(objectTypeDelegate::registerPojoSubtypes);
+  private SchemaBuilder withTypeMapping(ExtensionModel model) {
+    this.typesMapping = TypeCatalog.getDefault(singleton(model));
+    model.getSubTypes().forEach(objectTypeDelegate::registerPojoSubtypes);
     return this;
   }
 
   private SchemaBuilder withImportedTypes(Set<ImportedTypeModel> importedTypes) {
     this.importedTypes = importedTypes;
-    importedTypes.forEach(type -> dslExtensionContext.getExtension(type.getOriginExtensionName())
+    importedTypes.forEach(type -> dslContext.getExtension(type.getOriginExtensionName())
         .ifPresent(this::registerExtensionImport));
     return this;
   }
@@ -188,10 +189,6 @@ public final class SchemaBuilder {
     }).forEach(t -> objectTypeDelegate.registerPojoType(t, t.getDescription().orElse(EMPTY)));
 
     return this;
-  }
-
-  SubTypesMappingContainer getSubTypesMapping() {
-    return subTypesMapping;
   }
 
   DslSyntaxResolver getDslResolver() {
@@ -592,7 +589,7 @@ public final class SchemaBuilder {
       requiresTls = true;
     }
 
-    addAttributeAndElement(extensionType, childElements, TLS_ATTRIBUTE_NAME, TLS_CONTEXT_TYPE);
+    addAttributeAndElement(extensionType, childElements, TLS_PARAMETER_NAME, TLS_CONTEXT_TYPE);
   }
 
   private void addAttributeAndElement(ExtensionType extensionType, List<TopLevelElement> childElements,
@@ -627,6 +624,10 @@ public final class SchemaBuilder {
 
   Schema getSchema() {
     return schema;
+  }
+
+  TypeCatalog getTypesMapping() {
+    return typesMapping;
   }
 
   Annotation createDocAnnotation(String content) {

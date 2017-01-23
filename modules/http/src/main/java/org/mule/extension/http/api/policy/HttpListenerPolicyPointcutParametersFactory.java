@@ -10,10 +10,10 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.SourcePolicyPointcutParametersFactory;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 /**
  * HTTP request operation policy pointcut parameters factory.

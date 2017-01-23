@@ -9,7 +9,7 @@ package org.mule.test.runner.api;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 
 import java.util.Optional;

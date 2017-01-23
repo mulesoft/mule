@@ -20,12 +20,13 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslResolvingContext;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.util.NullDslResolvingContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +34,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.jar.Manifest;
 
 /**
@@ -111,8 +111,8 @@ public class ExtensionsTestInfrastructureDiscoverer {
   public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory, ExtensionModel forExtensionModel) {
     DslResolvingContext context =
         extensionManager.getExtensions().stream().anyMatch(e -> !e.getImportedTypes().isEmpty())
-            ? name -> extensionManager.getExtension(name).map(e -> e)
-            : name -> Optional.empty();
+            ? DslResolvingContext.getDefault(extensionManager.getExtensions())
+            : new NullDslResolvingContext();
 
     ExtensionsTestDslResourcesGenerator dslResourceGenerator =
         new ExtensionsTestDslResourcesGenerator(getDslResourceFactories(), generatedResourcesDirectory, context);

@@ -7,12 +7,12 @@
 package org.mule.extension.http.api.policy;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.dsl.config.ComponentIdentifier.parseComponentIdentifier;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import com.google.common.collect.ImmutableMap;
