@@ -10,7 +10,8 @@ package org.mule.runtime.core.execution;
  * Handles the result of asynchronous processing.
  *
  * @param <R> The type of the processing response value
- * configuration
+ *
+ * @since 1.0
  */
 public interface CompletionHandler<R, E extends Throwable> {
 
