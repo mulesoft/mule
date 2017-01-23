@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.Ignore;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 public class TestDocumentedExtensionOperations {
 
@@ -33,7 +34,7 @@ public class TestDocumentedExtensionOperations {
    *
    * @param value
    */
-  public void operationWithBlankParameterDescription(String value) {
+  public void operationWithBlankParameterDescription(@Connection String con, String value) {
 
   }
 

@@ -10,8 +10,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.classFor;
-import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -21,7 +19,8 @@ import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactor
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaDocumenterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
+import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
 
 import com.google.common.base.Joiner;
@@ -60,6 +59,8 @@ import javax.tools.Diagnostic;
 @SupportedOptions(ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION)
 public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 
+  private static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
+
   public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
   public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
   public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
@@ -74,7 +75,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
 
     try {
       getExtension(roundEnv).ifPresent(extensionElement -> {
-        final Class<?> extensionClass = classFor(extensionElement, processingEnv);
+        final Class<?> extensionClass = processor.classFor(extensionElement, processingEnv);
         withContextClassLoader(extensionClass.getClassLoader(), () -> {
           ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
           generator.generateFor(extensionModel);
@@ -89,7 +90,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
   }
 
   private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment) {
-    Class<?> extensionClass = classFor(extensionElement, processingEnv);
+    Class<?> extensionClass = processor.classFor(extensionElement, processingEnv);
 
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, extensionClass.getName());
@@ -103,13 +104,13 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
       @Override
       protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
         super.configureContextBeforeDeclaration(context);
-        context.addCustomDeclarationEnricher(new SchemaDocumenterDeclarationEnricher());
+        context.addCustomDeclarationEnricher(new DescriptionDeclarationEnricher());
       }
     }.loadExtensionModel(extensionClass.getClassLoader(), params);
   }
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {
-    Set<TypeElement> elements = getTypeElementsAnnotatedWith(Extension.class, env);
+    Set<TypeElement> elements = processor.getTypeElementsAnnotatedWith(Extension.class, env);
     if (elements.size() > 1) {
 
       String message =

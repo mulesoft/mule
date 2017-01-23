@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.DataTypeDeclar
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ImportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
@@ -74,6 +75,7 @@ public class JavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new JavaConfigurationDeclarationEnricher(),
                                                                                                new JavaExportedTypesDeclarationEnricher(),
                                                                                                new SubTypesDeclarationEnricher(),
+                                                                                               new ExtensionDescriptionsEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher()));
 
   /**
