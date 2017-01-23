@@ -49,7 +49,10 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     {
         int size = children.size();
         DefaultMessageProcessorPathElement result = new DefaultMessageProcessorPathElement(mp, String.valueOf(size));
-        addChild(result);
+        if (!alreadyAddedChild(mp))
+        {
+            addChild(result);
+        }
         return result;
     }
 
@@ -66,6 +69,22 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
         return messageProcessor;
     }
 
+    /**
+     * MULE-11358: since the ForEach does not wrapps its components in any wrapper if there is a filter inside of it,
+     * wrapped with a MessageFilter, it would end duplicating the path elements for the filter and the message
+     * processors that come after it.
+     */
+    private boolean alreadyAddedChild(MessageProcessor messageProcessor)
+    {
+        for (MessageProcessorPathElement child : children)
+        {
+            if (messageProcessor.equals(child.getMessageProcessor()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void addChild(MessageProcessorPathElement mp)
     {
