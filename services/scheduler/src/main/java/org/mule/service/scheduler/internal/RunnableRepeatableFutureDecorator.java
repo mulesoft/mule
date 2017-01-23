@@ -82,7 +82,7 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
     } catch (ExecutionException e) {
       logger.error("Uncaught throwable in task " + toString(), e);
     } catch (CancellationException e) {
-      logger.warn("Task " + toString() + " cancelled");
+      logger.trace("Task " + toString() + " cancelled");
     } catch (InterruptedException e) {
       currentThread().interrupt();
     } finally {
