@@ -90,9 +90,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
       setApplicationProperties(desc, appPropsFile);
 
-      final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
-      verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
-      desc.setPlugins(plugins);
+      desc.setPlugins(parsePluginDescriptors(artifactFolder, desc));
       File appClassesFolder = getAppClassesFolder(desc);
       URL[] libraries = findLibraries(desc);
       URL[] sharedLibraries = findSharedLibraries(desc);
@@ -201,27 +199,6 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     });
 
     return result;
-  }
-
-  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
-    final Map<String, List<String>> exportedPackages = new HashMap<>();
-
-    boolean error = false;
-    for (ArtifactPluginDescriptor plugin : plugins) {
-      for (String packageName : plugin.getClassLoaderModel().getExportedPackages()) {
-        List<String> exportedOn = exportedPackages.get(packageName);
-
-        if (exportedOn == null) {
-          exportedOn = new LinkedList<>();
-          exportedPackages.put(packageName, exportedOn);
-        } else {
-          error = true;
-        }
-        exportedOn.add(plugin.getName());
-      }
-    }
-
-    // TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
   }
 
   private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor)

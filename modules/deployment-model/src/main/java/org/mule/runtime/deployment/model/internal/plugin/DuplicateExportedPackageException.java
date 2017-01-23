@@ -5,9 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.application;
-
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+package org.mule.runtime.deployment.model.internal.plugin;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,7 @@ import java.util.Map;
 /**
  * Thrown to indicate that more than one artifact is exporting a given package.
  */
-public class DuplicateExportedPackageException extends ArtifactDescriptorCreateException {
+public class DuplicateExportedPackageException extends PluginResolutionError {
 
   /**
    * {@inheritDoc}
