@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
 /**
  * Default implementation of {@link XmlDslElementModelConverter}
  *
- * @since 1.0
+ * @since 4.0
  */
 public class DefaultXmlDslElementModelConverter implements XmlDslElementModelConverter {
 

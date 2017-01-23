@@ -21,9 +21,9 @@ import java.util.Optional;
  * A {@code ComponentConfiguration} allows to define a mule component configuration programmatically by defining the component
  * namespace, name and the set of simple attributes or complex nested attributes required by the component.
  *
- * @since 1.0
+ * @since 4.0
  */
-//TODO MULE-???????????? Delete this configuration once everything has an ExtensionModel and can be represented with ComponentDeclaration
+//TODO MULE-11496 Delete this configuration once everything has an ExtensionModel and can be represented with ComponentDeclaration
 public class ComponentConfiguration {
 
   private ComponentIdentifier identifier;

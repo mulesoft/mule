@@ -120,7 +120,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                    .withParameter(COUNT, "1")
                                    .withParameter(FREQUENCY, "0")
                                    .build())
-                .withParameter("responseBuilder",
+                .withParameter("response",
                                newObjectValue()
                                    .withParameter("headers", "#[mel:['content-type' : 'text/plain']]")
                                    .build())

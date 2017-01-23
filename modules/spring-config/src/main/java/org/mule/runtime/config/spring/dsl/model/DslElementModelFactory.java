@@ -25,15 +25,12 @@ import java.util.Optional;
  * the context of the available application plugins, provided for each instance
  * of this {@link DslElementModelFactory}
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface DslElementModelFactory {
 
   /**
    * Provides a default implementation of the {@link DslElementModelFactory}
-   * <p>
-   * <p>
-   * //TODO
    *
    * @param context the {@link DslResolvingContext} to be used when performing a
    *                {@link ComponentIdentifier#getNamespace namespace} or {@link ElementDeclaration#getName}
@@ -48,7 +45,6 @@ public interface DslElementModelFactory {
    * Resolves the {@link DslElementModel} for the given {@link ElementDeclaration},
    * providing an element with all the required information for representing this {@code elementDeclaration}
    * element in the DSL and binding it to its {@link ExtensionModel model} component or {@link MetadataType}.
-   * <p>
    * This resolution can only be performed from DSL top-level-elements, which have global representations
    * in the {@link ExtensionModel}, so this method will return an {@link Optional#empty} result if the
    * given {@code applicationElement} does not identify either a {@link ConfigurationModel},
@@ -68,7 +64,6 @@ public interface DslElementModelFactory {
    * Resolves the {@link DslElementModel} for the given {@link ComponentConfiguration applicationElement},
    * providing an element with all the required information for representing this {@code applicationElement}
    * element in the DSL and binding it to its {@link ExtensionModel model} component or {@link MetadataType}.
-   * <p>
    * This resolution can only be performed from DSL top-level-elements, which have global representations
    * in the {@link ExtensionModel}, so this method will return an {@link Optional#empty} result if the
    * given {@code applicationElement} does not identify either a {@link ConfigurationModel},

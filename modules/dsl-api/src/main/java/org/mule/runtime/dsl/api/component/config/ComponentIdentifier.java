@@ -19,7 +19,7 @@ import javax.xml.namespace.QName;
  * The namespace define the extension that defines the component. Even core configuration has a namespace even though there's no
  * namespace used in the configuration files.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class ComponentIdentifier {
 

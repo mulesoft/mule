@@ -31,7 +31,7 @@ import java.util.function.Function;
  * thus providing a way to relate an {@link ComponentConfiguration} to the {@link ExtensionModel} component
  * or {@link MetadataType} it represents.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class DslElementModel<T> {
 

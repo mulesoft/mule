@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>
  * This type also allows a mime type and encoding to be associated with the Java type.
  *
- * @since 1.0
+ * configuration
  */
 public class SimpleDataType implements DataType {
 

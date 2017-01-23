@@ -35,10 +35,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Default implementation of a {@link DslElementModelFactory}
+ * Implementation of {@link DslElementModelFactory} that creates
+ * a {@link DslElementModel} based on its {@link ComponentConfiguration} representation.
  *
- * @since 1.0
+ * @since 4.0
  */
+//TODO MULE-11496 Delete this factory once everything has an ExtensionModel and can be represented with an ElementDeclaration
 class ConfigurationBasedElementModelFactory {
 
   private Map<ExtensionModel, DslSyntaxResolver> resolvers;

@@ -14,9 +14,9 @@ import java.util.List;
 /**
  * An {@code ArtifactConfiguration} is a programmatic descriptor of a mule configuration.
  *
- * @since 1.0
+ * @since 4.0
  */
-//TODO MULE-???????????? Delete this configuration once everything has an ExtensionModel and can be represented with ArtifactDeclaration
+//TODO MULE-11496 Delete this configuration once everything has an ExtensionModel and can be represented with ArtifactDeclaration
 public class ArtifactConfiguration {
 
   private List<ComponentConfiguration> componentConfiguration = new ArrayList<>();

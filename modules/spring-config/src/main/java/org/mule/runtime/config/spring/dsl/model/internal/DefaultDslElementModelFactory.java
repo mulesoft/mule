@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  * Default implementation of a {@link DslElementModelFactory}
  *
- * @since 1.0
+ * @since 4.0
  */
 public class DefaultDslElementModelFactory implements DslElementModelFactory {
 

@@ -21,20 +21,20 @@ import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STR
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
-import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 /**
- * Default implementation of a {@link DslElementModelFactory}
+ * Delegate to be used by a {@link DeclarationBasedElementModelFactory} in order to
+ * resolve the {@link DslElementModel} of an infrastructure parameter.
  *
- * @since 1.0
+ * @since 4.0
  */
 class InfrastructureElementModelDelegate {
 

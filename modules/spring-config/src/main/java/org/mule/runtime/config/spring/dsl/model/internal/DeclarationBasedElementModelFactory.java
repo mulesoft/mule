@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
@@ -59,15 +60,17 @@ import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Default implementation of a {@link DslElementModelFactory}
+ * Implementation of {@link DslElementModelFactory} that creates
+ * a {@link DslElementModel} based on its {@link ElementDeclaration} representation.
  *
- * @since 1.0
+ * @since 4.0
  */
 class DeclarationBasedElementModelFactory {
 
@@ -252,6 +255,7 @@ class DeclarationBasedElementModelFactory {
                                         ComponentConfiguration.Builder parentConfig,
                                         DslElementModel.Builder parentElement) {
 
+    List<String> configuredParameters = new LinkedList<>();
     parameterModels
         .forEach(paramModel -> parentDsl.getContainedElement(paramModel.getName())
             .ifPresent(paramDsl -> {
@@ -261,11 +265,22 @@ class DeclarationBasedElementModelFactory {
 
               if (declared.isPresent()) {
                 addParameter(declared.get(), paramModel, paramDsl, parentConfig, parentElement);
+                configuredParameters.add(declared.get().getName());
               } else {
                 getDefaultValue(paramModel)
                     .ifPresent(value -> createSimpleParameter(value, paramDsl, parentConfig, parentElement, paramModel));
               }
             }));
+
+    if (parameterDeclarations.size() > configuredParameters.size()) {
+      String missing = parameterDeclarations.stream()
+          .filter(p -> !configuredParameters.contains(p.getName()))
+          .map(ElementDeclaration::getName)
+          .collect(joining(","));
+
+      throw new IllegalArgumentException(format("The parameter%s [%s] were declared but they do not exist in the associated model",
+                                                missing));
+    }
   }
 
   private <T extends ParameterizedModel> void addInlineGroupElement(ParameterGroupModel group,

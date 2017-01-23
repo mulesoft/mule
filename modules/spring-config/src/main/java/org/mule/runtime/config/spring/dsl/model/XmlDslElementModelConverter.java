@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
  * Provides a way to convert any {@link DslElementModel} into a its XML {@link Element}
  * representation.
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface XmlDslElementModelConverter {
 
