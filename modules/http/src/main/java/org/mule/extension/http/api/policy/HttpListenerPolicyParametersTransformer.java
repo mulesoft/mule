@@ -35,7 +35,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Message fromSuccessResponseParametersToMessage(Map<String, Object> parameters) {
-    HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("responseBuilder");
+    HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("response");
     return responseParametersToMessage(responseBuilder, 200);
   }
 
@@ -56,7 +56,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Message fromFailureResponseParametersToMessage(Map<String, Object> parameters) {
-    HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("errorResponseBuilder");
+    HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("errorResponse");
     return responseParametersToMessage(responseBuilder, 500);
   }
 

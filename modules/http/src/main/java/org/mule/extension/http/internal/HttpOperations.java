@@ -31,8 +31,7 @@ public class HttpOperations {
   private MuleContext muleContext;
 
   /**
-   * Authenticates received HTTP requests. Must be used after a listener component, setup with an error-response-builder that
-   * takes flow variables as statusCode and headersRef.
+   * Authenticates received HTTP requests. Must be used after a listener component.
    *
    * @param realm Authentication realm.
    * @param securityProviders The delegate-security-provider to use for authenticating. Use this in case you have multiple
