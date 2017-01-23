@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-final class MethodDocumentation {
+public final class MethodDocumentation {
 
   private final String summary;
   private final Map<String, String> parameters;
@@ -26,14 +26,14 @@ final class MethodDocumentation {
   /**
    * the method's javadoc block without tags
    */
-  String getSummary() {
+  public String getSummary() {
     return summary;
   }
 
   /**
    * A non {@code null} {@link java.util.Map} with each parameter's comments
    */
-  Map<String, String> getParameters() {
+  public Map<String, String> getParameters() {
     return parameters;
   }
 }

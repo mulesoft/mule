@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -48,6 +49,13 @@ public class ExtensionProperties {
    * The name of a parameter that allows configuring the encoding that should be applied
    */
   public static final String ENCODING_PARAMETER_NAME = "outputEncoding";
+
+  /**
+   * The name mask of a file which contains the {@link ExtensionModel} elements descriptions.
+   * <p>
+   * The final name of the file is formed like this: {extension-namespace}-extension-descriptions.xml.
+   */
+  public static final String EXTENSION_DESCRIPTIONS_FILE_NAME_MASK = "%s-extension-descriptions.xml";
 
   /**
    * The name of a file which contains each plugin's {@link ExtensionManifest}
