@@ -8,7 +8,7 @@ package org.mule.runtime.module.xml.transformer.datatype;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.metadata.SimpleDataType;
+import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.runtime.core.util.ClassUtils;
 
 import com.thoughtworks.xstream.converters.Converter;

@@ -4,13 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.metadata;
+package org.mule.runtime.core.internal.metadata;
 
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-
-import java.util.Iterator;
 
 /**
  * A data type that represents a generified collection.
