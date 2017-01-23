@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.io.File.separator;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -94,6 +95,6 @@ public class PropertiesDescriptorParser {
    * @return absolute path, may not actually exist (check with File.exists())
    */
   protected String toAbsoluteFile(String path, File location) {
-    return location.getAbsolutePath() + File.separator + path;
+    return location.getAbsolutePath() + separator + path;
   }
 }
