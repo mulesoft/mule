@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
+import org.mule.runtime.core.api.model.resolvers.EntryPointNotFoundException;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;

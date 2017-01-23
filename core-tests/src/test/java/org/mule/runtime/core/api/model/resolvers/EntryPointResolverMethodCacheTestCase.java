@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.model.resolvers;
+package org.mule.runtime.core.api.model.resolvers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

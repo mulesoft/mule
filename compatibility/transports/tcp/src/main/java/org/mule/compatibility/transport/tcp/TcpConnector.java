@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.model.streaming.CallbackOutputStream;
+import org.mule.runtime.core.api.model.streaming.CallbackOutputStream;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.monitor.ExpiryMonitor;
 
