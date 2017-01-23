@@ -38,8 +38,6 @@ public class FlowStackTestCase extends FunctionalTestCase
         return "org/mule/test/integration/notifications/flow-stack-config.xml";
     }
 
-    private static final String TEST_MESSAGE = "payload";
-
     @Before
     public void before()
     {
