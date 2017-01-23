@@ -72,7 +72,8 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     /**
      * MULE-11358: since the ForEach does not wrapps its components in any wrapper if there is a filter inside of it,
      * wrapped with a MessageFilter, it would end duplicating the path elements for the filter and the message
-     * processors that come after it. */
+     * processors that come after it.
+     */
     public boolean alreadyAddedChild(MessageProcessor messageProcessor)
     {
         for (MessageProcessorPathElement child : children)
