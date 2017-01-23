@@ -231,5 +231,40 @@
             </processor-chain>
         </scatter-gather>
     </flow>
+
+    <!-- Filter -->
+
+    <flow name="flowChainedFilter">
+        <processor-chain>
+            <expression-filter expression="#[true]"/>
+            <flow-ref name="flow"/>
+        </processor-chain>
+    </flow>
+
+    <flow name="flowChainedFilterManyProcessors">
+        <processor-chain>
+            <expression-filter expression="#[true]"/>
+            <test:component/>
+            <flow-ref name="flow"/>
+        </processor-chain>
+    </flow>
+
+    <!-- For Each -->
+
+    <flow name="flowForEach">
+        <foreach collection="#[['foo', 'bar']]">
+            <test:component/>
+            <flow-ref name="flow"/>
+        </foreach>
+    </flow>
+
+    <!-- For Each + Filter -->
+
+    <flow name="flowForEachFilter">
+        <foreach collection="#[['foo', 'bar']]">
+            <expression-filter expression="#[true]"/>
+            <flow-ref name="flow"/>
+        </foreach>
+    </flow>
     
 </mule>
