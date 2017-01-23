@@ -8,6 +8,7 @@
 package org.mule.runtime.module.extension.internal.xml;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.DEFAULT_SCHEMA_LOCATION_MASK;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_PREFIX;
@@ -57,7 +58,7 @@ public final class SchemaConstants {
       new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-message-source", MULE_PREFIX);
   public static final QName MULE_MESSAGE_PROCESSOR_TYPE =
       new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "messageProcessorOrMixedContentMessageProcessor", MULE_PREFIX);
-  public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, "context", "tls");
+  public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, TLS_CONTEXT_ELEMENT_IDENTIFIER, "tls");
 
   // TYPES
   public static final QName SUBSTITUTABLE_INT = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableInt", MULE_PREFIX);

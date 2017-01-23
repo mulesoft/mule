@@ -8,41 +8,40 @@ package org.mule.test.extension.dsl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
-import org.mule.runtime.api.dsl.config.ComponentConfiguration;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.DslElementModel;
+import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.dsl.model.DslElementModel;
-import org.mule.runtime.extension.api.dsl.model.DslElementModelResolver;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -73,26 +72,31 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   protected static final int DB_INSERT_PATH = 2;
   protected static final int REQUESTER_PATH = 3;
 
+  protected DslResolvingContext dslContext;
+  protected DslElementModelFactory modelResolver;
   protected ApplicationModel applicationModel;
-  protected DslElementModelResolver modelResolver;
   protected Document doc;
 
   @Override
   protected String getConfigFile() {
-    return "integration-dsl-app.xml";
+    return "integration-multi-config-dsl-app.xml";
   }
 
   @Before
   public void setup() throws Exception {
-    applicationModel = loadApplicationModel();
-
-    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    modelResolver = DslElementModelResolver.getDefault(extensions);
+    dslContext = DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions());
+    modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
   // Scaffolding
   protected <T extends NamedObject> DslElementModel<T> resolve(ComponentConfiguration component) {
-    Optional<DslElementModel<T>> elementModel = modelResolver.resolve(component);
+    Optional<DslElementModel<T>> elementModel = modelResolver.create(component);
+    assertThat(elementModel.isPresent(), is(true));
+    return elementModel.get();
+  }
+
+  protected <T extends NamedObject> DslElementModel<T> resolve(ElementDeclaration component) {
+    Optional<DslElementModel<T>> elementModel = modelResolver.create(component);
     assertThat(elementModel.isPresent(), is(true));
     return elementModel.get();
   }
@@ -111,6 +115,15 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
                                             ComponentIdentifier identifier) {
     Optional<DslElementModel<T>> elementModel = parent.findElement(identifier);
     assertThat(format("Failed fetching child '%s' from parent '%s'", identifier.getName(),
+                      parent.getModel().getName()),
+               elementModel.isPresent(), is(true));
+    return elementModel.get();
+  }
+
+  protected <T> DslElementModel<T> getChild(DslElementModel<? extends NamedObject> parent,
+                                            String name) {
+    Optional<DslElementModel<T>> elementModel = parent.findElement(name);
+    assertThat(format("Failed fetching child '%s' from parent '%s'", name,
                       parent.getModel().getName()),
                elementModel.isPresent(), is(true));
     return elementModel.get();
@@ -144,7 +157,7 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   }
 
   // Scaffolding
-  private ApplicationModel loadApplicationModel() throws Exception {
+  protected ApplicationModel loadApplicationModel() throws Exception {
     InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(getConfigFile());
     checkArgument(appIs != null, "The given application was not found as resource");
 
@@ -160,26 +173,26 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
         .addConfigFile(new ConfigFile(getConfigFile(), singletonList(configLine)))
         .build();
 
-    return new ApplicationModel(artifactConfig, new ArtifactConfiguration(emptyList()));
+    return new ApplicationModel(artifactConfig, new ArtifactDeclaration());
   }
 
-  protected void addSchemaLocation(Document document, ExtensionModel extension) {
+  protected void addSchemaLocation(ExtensionModel extension) {
 
     XmlDslModel xmlDslModel = extension.getXmlDslModel();
     String location = xmlDslModel.getNamespaceUri() + " " + xmlDslModel.getSchemaLocation();
 
-    Attr schemaLocation = document.getDocumentElement().getAttributeNodeNS("http://www.w3.org/2001/XMLSchema-instance",
-                                                                           "schemaLocation");
+    Attr schemaLocation = doc.getDocumentElement().getAttributeNodeNS("http://www.w3.org/2001/XMLSchema-instance",
+                                                                      "schemaLocation");
     if (schemaLocation != null) {
       location = schemaLocation.getValue().concat(" ").concat(location);
     }
 
-    document.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
-                                                 "xsi:schemaLocation",
-                                                 location);
+    doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                                            "xsi:schemaLocation",
+                                            location);
   }
 
-  protected String write() throws TransformerException {
+  protected String write() throws Exception {
     // write the content into xml file
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
@@ -189,16 +202,12 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
     DOMSource source = new DOMSource(doc);
 
-    // Output for debugging
-    StreamResult sout = new StreamResult(System.out);
-    transformer.transform(source, sout);
-
     StringWriter writer = new StringWriter();
     transformer.transform(source, new StreamResult(writer));
     return writer.getBuffer().toString().replaceAll("\n|\r", "");
   }
 
-  protected void initializeMuleApp() throws ParserConfigurationException {
+  protected void createAppDocument() throws ParserConfigurationException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     DocumentBuilder docBuilder = factory.newDocumentBuilder();
@@ -208,6 +217,9 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     doc.appendChild(mule);
     mule.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.mulesoft.org/schema/mule/core");
     mule.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation",
-                        "http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd");
+                        "http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd");
+
+    muleContext.getExtensionManager().getExtensions().forEach(this::addSchemaLocation);
   }
+
 }

@@ -43,7 +43,7 @@ import javax.jms.ConnectionFactory;
  *
  * @since 4.0
  */
-@Extension(name = "JMS Extension")
+@Extension(name = "JMS")
 @Xml(namespace = "jmsn")
 @Configurations({JmsConfig.class})
 @ConnectionProviders({GenericConnectionProvider.class, ActiveMQConnectionProvider.class})

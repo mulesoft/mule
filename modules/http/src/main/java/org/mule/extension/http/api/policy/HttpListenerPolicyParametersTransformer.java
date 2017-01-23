@@ -6,14 +6,14 @@
  */
 package org.mule.extension.http.api.policy;
 
-import static org.mule.runtime.api.dsl.config.ComponentIdentifier.parseComponentIdentifier;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import com.google.common.collect.ImmutableMap;

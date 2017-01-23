@@ -3,15 +3,20 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <db:config name="dbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true"/>
     </db:config>
 
     <httpn:listener-config name="httpListener" basePath="/">
-        <httpn:listener-connection host="localhost" port="49019"/>
+        <httpn:listener-connection host="localhost" port="49019" protocol="HTTPS">
+            <tls:context>
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </httpn:listener-connection>
     </httpn:listener-config>
 
     <httpn:request-config name="httpRequester">

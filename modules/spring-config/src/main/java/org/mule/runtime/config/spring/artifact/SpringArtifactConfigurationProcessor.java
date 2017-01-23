@@ -25,7 +25,7 @@ public class SpringArtifactConfigurationProcessor implements ArtifactConfigurati
       throws ConfigurationException {
     SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
         new SpringXmlConfigurationBuilder(artifactContextConfiguration.getConfigResources(),
-                                          artifactContextConfiguration.getArtifactConfiguration(),
+                                          artifactContextConfiguration.getArtifactDeclaration(),
                                           artifactContextConfiguration.getArtifactProperties(),
                                           artifactContextConfiguration.getArtifactType(),
                                           artifactContextConfiguration.isEnableLazyInitialization());

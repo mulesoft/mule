@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SE
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -52,16 +52,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * registry implementation to wraps the spring ApplicationContext
    *
    * @param muleContext               the {@link MuleContext} that own this context
-   * @param artifactConfiguration     the mule configuration defined programmatically
+   * @param artifactDeclaration       the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *                                  org.mule.runtime.config.spring.SpringRegistry
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                                 ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
+                                 ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                                  Map<String, String> artifactProperties, ArtifactType artifactType)
       throws BeansException {
-    super(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController, artifactProperties,
+    super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, artifactProperties,
           artifactType);
   }
 

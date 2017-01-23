@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;

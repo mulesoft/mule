@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 public final class InfrastructureTypeMapping {
 
   private static Map<Class<?>, String> mapping = ImmutableMap.<Class<?>, String>builder()
-      .put(TlsContextFactory.class, TLS_ATTRIBUTE_NAME).build();
+      .put(TlsContextFactory.class, TLS_PARAMETER_NAME).build();
 
   private static Map<String, String> nameMap = mapping.entrySet().stream()
       .collect(new ImmutableMapCollector<>(e -> e.getKey().getName(), Map.Entry::getValue));

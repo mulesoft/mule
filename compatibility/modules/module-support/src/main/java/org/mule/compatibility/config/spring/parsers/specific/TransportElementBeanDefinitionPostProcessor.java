@@ -16,7 +16,7 @@ import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.g
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 
 import org.mule.compatibility.core.endpoint.URIBuilder;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;

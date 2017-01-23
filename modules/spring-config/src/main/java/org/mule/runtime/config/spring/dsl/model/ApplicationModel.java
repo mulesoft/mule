@@ -24,9 +24,8 @@ import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SO
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
-import org.mule.runtime.api.dsl.config.ComponentConfiguration;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
@@ -34,6 +33,8 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -253,12 +254,12 @@ public class ApplicationModel {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig the mule artifact configuration content.
-   * @param artifactConfiguration an {@link ArtifactConfiguration}
+   * @param artifactConfig      the mule artifact configuration content.
+   * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @throws Exception when the application configuration has semantic errors.
    */
-  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration) throws Exception {
-    this(artifactConfig, artifactConfiguration, empty(), empty());
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration) throws Exception {
+    this(artifactConfig, artifactDeclaration, empty(), empty());
   }
 
   /**
@@ -266,20 +267,20 @@ public class ApplicationModel {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig the mule artifact configuration content.
-   * @param artifactConfiguration an {@link ArtifactConfiguration}
+   * @param artifactConfig                      the mule artifact configuration content.
+   * @param artifactDeclaration                 an {@link ArtifactDeclaration}
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *        this model to their definitions
+   *                                            this model to their definitions
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
-  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactConfiguration artifactConfiguration,
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
                           Optional<ExtensionManager> extensionManager,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
       throws Exception {
     configurePropertyPlaceholderResolver(artifactConfig);
     convertConfigFileToComponentModel(artifactConfig);
-    convertArtifactConfigurationToComponentModel(artifactConfiguration);
+    convertArtifactConfigurationToComponentModel(extensionManager, artifactDeclaration);
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
 
@@ -311,17 +312,28 @@ public class ApplicationModel {
     });
   }
 
-  private void convertArtifactConfigurationToComponentModel(ArtifactConfiguration artifactConfiguration) {
-    if (artifactConfiguration != null) {
-      for (ComponentConfiguration componentConfiguration : artifactConfiguration.getComponentConfiguration()) {
-        ComponentModel componentModel = convertComponentConfiguration(componentConfiguration, true);
-        this.muleComponentModels.add(componentModel);
-      }
+  private void convertArtifactConfigurationToComponentModel(Optional<ExtensionManager> extensionManager,
+                                                            ArtifactDeclaration artifactDeclaration) {
+    if (artifactDeclaration != null && extensionManager.isPresent()) {
+      DslElementModelFactory elementFactory = DslElementModelFactory
+          .getDefault(DslResolvingContext.getDefault(extensionManager.get().getExtensions()));
+
+      artifactDeclaration.getConfigs().stream()
+          .map(elementFactory::create)
+          .filter(Optional::isPresent)
+          .map(e -> e.get().getConfiguration())
+          .forEach(config -> config
+              .ifPresent(c -> this.muleComponentModels.add(convertComponentConfiguration(c, true))));
     }
   }
 
   private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration, boolean isRoot) {
-    ComponentModel.Builder builder = new ComponentModel.Builder().setIdentifier(componentConfiguration.getIdentifier());
+    ComponentModel.Builder builder = new ComponentModel.Builder().setIdentifier(ComponentIdentifier.builder()
+        .withName(componentConfiguration.getIdentifier()
+            .getName())
+        .withNamespace(
+                       getPrefix(componentConfiguration))
+        .build());
     if (isRoot) {
       builder.markAsRootComponent();
     }
@@ -336,6 +348,11 @@ public class ApplicationModel {
 
     return builder.build();
 
+  }
+
+  private String getPrefix(ComponentConfiguration componentConfiguration) {
+    String namespaceUri = componentConfiguration.getIdentifier().getNamespace();
+    return namespaceUri.substring(namespaceUri.lastIndexOf("/") + 1);
   }
 
   private void configurePropertyPlaceholderResolver(ArtifactConfig artifactConfig) {
@@ -450,8 +467,11 @@ public class ApplicationModel {
           Optional<ComponentModel> childOptional =
               findRelatedChildForParameter(componentModel.getInnerComponents(), mapChildName, listOrPojoChildName);
           if (childOptional.isPresent() && !childOptional.get().getIdentifier().equals(SPRING_PROPERTY_IDENTIFIER)) {
-            throw new MuleRuntimeException(createStaticMessage(format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
-                + "Only one must be used.", componentModel.getIdentifier(), childOptional.get().getIdentifier(), parameterName)));
+            throw new MuleRuntimeException(createStaticMessage(
+                                                               format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
+                                                                   + "Only one must be used.", componentModel.getIdentifier(),
+                                                                      childOptional.get().getIdentifier(),
+                                                                      parameterName)));
           }
         }
       }
@@ -485,7 +505,8 @@ public class ApplicationModel {
       String nameAttributeValue = componentModel.getNameAttribute();
       if (nameAttributeValue != null && !ignoredNameValidationComponentList.contains(componentModel.getIdentifier())) {
         if (existingObjectsWithName.containsKey(nameAttributeValue)) {
-          throw new MuleRuntimeException(createStaticMessage("Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
+          throw new MuleRuntimeException(createStaticMessage(
+                                                             "Two configuration elements have been defined with the same global name. Global name [%s] must be unique. Clashing components are %s and %s",
                                                              nameAttributeValue,
                                                              existingObjectsWithName.get(nameAttributeValue).getIdentifier(),
                                                              componentModel.getIdentifier()));
@@ -508,12 +529,14 @@ public class ApplicationModel {
         if (anyMappings.size() > 1) {
           throw new MuleRuntimeException(createStaticMessage("Only one mapping for ANY or an empty source type is allowed."));
         } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
-          throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
+          throw new MuleRuntimeException(
+                                         createStaticMessage("Only the last error mapping can have ANY or an empty source type."));
         }
         List<String> sources = errorMappings.stream().map(model -> model.getParameters().get(SOURCE_TYPE)).collect(toList());
         List<String> distinctSources = sources.stream().distinct().collect(toList());
         if (sources.size() != distinctSources.size()) {
-          throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
+          throw new MuleRuntimeException(
+                                         createStaticMessage(format("Repeated source types are not allowed. Offending types are %s.",
                                                                     on(", ").join(disjunction(sources, distinctSources)))));
         }
       }
@@ -538,7 +561,8 @@ public class ApplicationModel {
     if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> {
       return exceptionStrategyComponent.getParameters().get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null;
     }).count() > 1) {
-      throw new MuleRuntimeException(createStaticMessage("Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
+      throw new MuleRuntimeException(createStaticMessage(
+                                                         "Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
     }
   }
 
@@ -547,7 +571,8 @@ public class ApplicationModel {
     for (int i = 0; i < innerComponents.size() - 1; i++) {
       Map<String, String> parameters = innerComponents.get(i).getParameters();
       if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
-        throw new MuleRuntimeException(createStaticMessage("Every handler (except for the last one) within an error-handler must specify the when or type attribute"));
+        throw new MuleRuntimeException(createStaticMessage(
+                                                           "Every handler (except for the last one) within an error-handler must specify the when or type attribute"));
       }
     }
   }
@@ -559,7 +584,8 @@ public class ApplicationModel {
         if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
             && !componentNode.getParentNode().getLocalName().equals(ERROR_HANDLER)
             && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT)) {
-          throw new MuleRuntimeException(createStaticMessage("Only handlers within an error-handler can have when attribute specified"));
+          throw new MuleRuntimeException(
+                                         createStaticMessage("Only handlers within an error-handler can have when attribute specified"));
         }
       }
     });
@@ -572,7 +598,8 @@ public class ApplicationModel {
         topLevelComponent.getInnerComponents().stream().filter(this::isMuleComponent).forEach((topLevelComponentChild -> {
           executeOnComponentTree(topLevelComponentChild, (component) -> {
             if (component.getNameAttribute() != null && !ignoredNameValidationComponentList.contains(component.getIdentifier())) {
-              throw new MuleRuntimeException(createStaticMessage("Only top level elements can have a name attribute. Component %s has attribute name with value %s",
+              throw new MuleRuntimeException(createStaticMessage(
+                                                                 "Only top level elements can have a name attribute. Component %s has attribute name with value %s",
                                                                  component.getIdentifier(), component.getNameAttribute()));
             }
           }, true);

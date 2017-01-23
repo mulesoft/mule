@@ -9,8 +9,8 @@ package org.mule.test.extension.dsl;
 import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-import org.mule.runtime.api.dsl.config.ComponentConfiguration;
-import org.mule.runtime.extension.api.dsl.converter.XmlDslElementModelConverter;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
 
 import java.io.IOException;
 
@@ -18,14 +18,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
-public class IntegrationDslModelSerializerTestCase extends AbstractElementModelTestCase {
+public class ConfigurationBasedDslElementModelSerializerTestCase extends AbstractElementModelTestCase {
 
   private Element flow;
   private String expectedAppXml;
 
   @Before
   public void createDocument() throws Exception {
-    initializeMuleApp();
+    applicationModel = loadApplicationModel();
+    createAppDocument();
 
     Element flow = doc.createElement("flow");
     flow.setAttribute("name", "testFlow");
@@ -58,8 +59,6 @@ public class IntegrationDslModelSerializerTestCase extends AbstractElementModelT
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(REQUESTER_PATH))));
 
     doc.getDocumentElement().appendChild(flow);
-
-    muleContext.getExtensionManager().getExtensions().forEach(e -> addSchemaLocation(doc, e));
 
     String serializationResult = write();
 

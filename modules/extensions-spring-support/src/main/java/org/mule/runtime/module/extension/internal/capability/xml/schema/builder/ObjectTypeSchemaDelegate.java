@@ -113,7 +113,7 @@ final class ObjectTypeSchemaDelegate {
 
   private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description,
                                 List<TopLevelElement> all) {
-    registerPojoSubtypes(objectType, builder.getSubTypesMapping().getSubTypes(objectType));
+    registerPojoSubtypes(objectType, builder.getTypesMapping().getSubTypes(objectType));
     addAbstractTypeRef(paramDsl, description, objectType, all);
   }
 
@@ -239,7 +239,7 @@ final class ObjectTypeSchemaDelegate {
    */
   private boolean shouldRegisterTypeAsElement(MetadataType type, DslElementSyntax typeDsl) {
     return typeDsl.supportsTopLevelDeclaration() || typeDsl.isWrapped() ||
-        !builder.getSubTypesMapping().getSuperTypes(type).isEmpty();
+        (type instanceof ObjectType && !builder.getTypesMapping().getSuperTypes((ObjectType) type).isEmpty());
   }
 
   /**
@@ -359,7 +359,7 @@ final class ObjectTypeSchemaDelegate {
     QName typeQName = getTypeQName(typeDsl, type);
     TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, baseType);
     if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped()) ||
-        !builder.getSubTypesMapping().getSuperTypes(type).isEmpty()) {
+        !builder.getTypesMapping().getSuperTypes(type).isEmpty()) {
       registerConcreteGlobalElement(typeDsl, description, abstractElement.getName(), typeQName);
     }
   }
@@ -482,7 +482,7 @@ final class ObjectTypeSchemaDelegate {
     registerPojoSubtypes(subTypesModel.getBaseType(), subTypesModel.getSubTypes());
   }
 
-  void registerPojoSubtypes(MetadataType baseType, Collection<MetadataType> subTypes) {
+  void registerPojoSubtypes(MetadataType baseType, Collection<ObjectType> subTypes) {
     if (!builder.isImported(baseType)) {
       registerPojoType(baseType, EMPTY);
     }

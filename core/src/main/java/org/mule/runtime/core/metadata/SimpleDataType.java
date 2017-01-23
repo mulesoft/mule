@@ -6,18 +6,8 @@
  */
 package org.mule.runtime.core.metadata;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.ClassUtils;
-
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A data type that simply wraps a Java type.

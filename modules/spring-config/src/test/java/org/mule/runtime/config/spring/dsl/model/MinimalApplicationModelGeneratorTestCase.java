@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
@@ -18,7 +18,6 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
@@ -100,7 +99,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);
     return new MinimalApplicationModelGenerator(new ApplicationModel(new ArtifactConfig.Builder().addConfigFile(configFile)
-        .build(), new ArtifactConfiguration(emptyList()), Optional.empty(), Optional.of(componentBuildingDefinitionRegistry)),
+        .build(), new ArtifactDeclaration(), Optional.empty(), Optional.of(componentBuildingDefinitionRegistry)),
                                                 componentBuildingDefinitionRegistry);
   }
 

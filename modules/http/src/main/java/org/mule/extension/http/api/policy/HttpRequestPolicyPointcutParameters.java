@@ -6,7 +6,8 @@
  */
 package org.mule.extension.http.api.policy;
 
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
+import org.mule.runtime.core.policy.PolicyPointcutParameters;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 
 /**

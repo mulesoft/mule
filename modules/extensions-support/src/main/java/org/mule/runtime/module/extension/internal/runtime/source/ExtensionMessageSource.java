@@ -14,9 +14,8 @@ import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionExcepti
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.dsl.config.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;

@@ -21,7 +21,7 @@ import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
@@ -717,7 +717,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(parameters, hasSize(2));
 
     assertParameter(parameters, "saulPhoneNumber", "", toMetadataType(String.class), false, SUPPORTED, SAUL_OFFICE_NUMBER);
-    assertParameter(parameters, TLS_ATTRIBUTE_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);
+    assertParameter(parameters, TLS_PARAMETER_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);
     ImplementingTypeModelProperty typeModelProperty =
         connectionProvider.getModelProperty(ImplementingTypeModelProperty.class).get();
     assertThat(typeModelProperty.getType(), equalTo(HeisenbergConnectionProvider.class));

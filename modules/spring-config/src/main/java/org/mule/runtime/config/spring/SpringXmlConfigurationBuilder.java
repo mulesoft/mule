@@ -6,21 +6,20 @@
  */
 package org.mule.runtime.config.spring;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
-import org.mule.runtime.api.dsl.config.ArtifactConfiguration;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
     implements ParentMuleContextAwareConfigurationBuilder {
 
-  private ArtifactConfiguration artifactConfiguration = new ArtifactConfiguration(emptyList());
+  private ArtifactDeclaration artifactDeclaration = new ArtifactDeclaration();
   private boolean enableLazyInit = false;
   protected boolean useDefaultConfigResource = true;
   protected boolean useMinimalConfigResource = false;
@@ -77,12 +76,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this.enableLazyInit = enableLazyInit;
   }
 
-  public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactConfiguration artifactConfiguration,
+  public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
                                        Map<String, String> artifactProperties, ArtifactType artifactType,
                                        boolean enableLazyInitialisation)
       throws ConfigurationException {
     this(configurationFiles, artifactProperties, artifactType);
-    this.artifactConfiguration = artifactConfiguration;
+    this.artifactDeclaration = artifactDeclaration;
     this.artifactType = APP;
     this.enableLazyInit = enableLazyInitialisation;
   }
@@ -134,19 +133,19 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
     final MuleArtifactContext muleArtifactContext =
-        doCreateApplicationContext(muleContext, artifactConfigResources, artifactConfiguration, applicationObjectcontroller);
+        doCreateApplicationContext(muleContext, artifactConfigResources, artifactDeclaration, applicationObjectcontroller);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     return muleArtifactContext;
   }
 
   protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                                                           ArtifactConfiguration artifactConfiguration,
+                                                           ArtifactDeclaration artifactDeclaration,
                                                            OptionalObjectsController optionalObjectsController) {
     if (enableLazyInit) {
-      return new LazyMuleArtifactContext(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController,
+      return new LazyMuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
                                          getArtifactProperties(), artifactType);
     }
-    return new MuleArtifactContext(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController,
+    return new MuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
                                    getArtifactProperties(), artifactType);
   }
 
