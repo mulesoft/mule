@@ -7,23 +7,22 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Ignore;
+import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
@@ -42,7 +41,7 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
   }
 
   void document(WithOperationsDeclaration<?> declaration, TypeElement element) {
-    final Map<String, Element> methods = getOperationMethods(processingEnv, element);
+    final Map<String, Element> methods = getAllOperations(processingEnv, element);
     try {
       for (OperationDeclaration operation : declaration.getOperations()) {
         Element method = methods.get(operation.getName());
@@ -64,25 +63,33 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
     }
   }
 
-  /**
-   * Scans all the classes annotated with {@link Extension}, takes the {@link Operations} from those and returns the methods which
-   * are public and are not annotated with {@link Ignore}
-   *
-   * @return a {@link Map} which keys are the method names and the values are the method represented as a {@link Element}
-   */
-  private Map<String, Element> getOperationMethods(ProcessingEnvironment processingEnv, Element element) {
+  private Map<String, Element> getAllOperations(ProcessingEnvironment processingEnv, Element element) {
+    Map<String, Element> elements = new LinkedHashMap<>();
+    Configurations configurations = processor.getAnnotationFromType(processingEnv, (TypeElement) element, Configurations.class);
+    if (configurations != null) {
+      List<TypeElement> configs = processor.getAnnotationClassesValue(element, Configurations.class, configurations.value());
+      configs.forEach(c -> elements.putAll(getOperationMethodElements(processingEnv, c)));
+    }
+    elements.putAll(getOperationMethodElements(processingEnv, element));
+    return elements;
+  }
+
+  private Map<String, Element> getOperationMethodElements(ProcessingEnvironment processingEnv, Element withOperationsElement) {
     ImmutableMap.Builder<String, Element> methods = ImmutableMap.builder();
-    Operations operationsAnnotation = processor.getAnnotationFromType(processingEnv, (TypeElement) element, Operations.class);
+    Operations operationsAnnotation =
+        processor.getAnnotationFromType(processingEnv, (TypeElement) withOperationsElement, Operations.class);
     if (operationsAnnotation != null) {
       final Class<?>[] operationsClasses = operationsAnnotation.value();
-      List<AnnotationValue> annotationValues = processor.getAnnotationValue(element, Operations.class);
       for (Class<?> operationClass : operationsClasses) {
-        Element operationClassElement = processor.getElementForClass(annotationValues, operationClass);
-        if (operationClassElement != null) {
-          for (Method operation : IntrospectionUtils.getOperationMethods(operationClass)) {
-            operationClassElement.getEnclosedElements().stream()
-                .filter(e -> e.getSimpleName().toString().equals(operation.getName())).findFirst()
-                .ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
+        while (operationClass != null && !operationClass.equals(Object.class)) {
+          TypeElement operationElement = processingEnv.getElementUtils().getTypeElement(operationClass.getName());
+          if (operationElement != null) {
+            for (Method operation : getOperationMethods(operationClass)) {
+              operationElement.getEnclosedElements().stream()
+                  .filter(e -> e.getSimpleName().toString().equals(operation.getName())).findFirst()
+                  .ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
+            }
+            operationClass = operationClass.getSuperclass();
           }
         }
       }

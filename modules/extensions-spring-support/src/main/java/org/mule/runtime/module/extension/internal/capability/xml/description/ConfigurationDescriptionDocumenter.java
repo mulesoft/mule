@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static java.util.Collections.emptyList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -57,12 +58,16 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
   }
 
   private Optional<ConnectionProviderDeclaration> findMatchingProvider(ConnectedDeclaration<?> declaration, Element element) {
+    String alias = getAliasValue(element);
+    String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Provider", ""));
     return declaration.getConnectionProviders().stream()
         .filter(provider -> {
           String name = provider.getName().replace("-connection", "");
-          String alias = getAliasValue(element);
-          String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Provider", ""));
-          return name.equals(defaultNaming) || name.equals("connection") || name.equals(alias);
+          if (isNotBlank(alias)) {
+            return name.equals(alias);
+          } else {
+            return name.equals(defaultNaming) || name.equals("connection");
+          }
         })
         .findAny();
   }
