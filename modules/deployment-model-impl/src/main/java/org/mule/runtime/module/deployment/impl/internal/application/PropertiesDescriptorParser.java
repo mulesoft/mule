@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.io.File.separator;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -53,6 +54,9 @@ public class PropertiesDescriptorParser {
       urls = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     } else {
       urls = resProps.split(",");
+      for (int i = 0; i < urls.length; i++) {
+        urls[i] = getAppConfigFolderPath() + urls[i];
+      }
     }
     appDescriptor.setConfigResources(urls);
 
