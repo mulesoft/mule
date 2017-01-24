@@ -10,11 +10,11 @@ import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -56,7 +56,7 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
 
           @Override
           public void visitObject(ObjectType objectType) {
-            if (objectType.getMetadataFormat().equals(JAVA)) {
+            if (objectType.getMetadataFormat().equals(JAVA) && !isMap(objectType)) {
               objectType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue)
                   .ifPresent(typeId -> typeLoader.load(typeId).ifPresent(fieldMetadataType -> objectType
                       .getFields().stream()
@@ -100,6 +100,21 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
 
               @Override
               public void visitObject(ObjectType objectType) {
+                if (objectType.isOpen()) {
+                  if (hasDefaultOverride) {
+                    problemsReporter.addError(
+                                              new Problem(extensionModel,
+                                                          format("Field '%s' in class '%s' is annotated with '@%s' is of type '%s'"
+                                                              + " but a 'defaultImplementingType' was provided."
+                                                              + " Type override is not allowed for Maps",
+                                                                 fieldName,
+                                                                 declaringClass.getName(),
+                                                                 NullSafe.class.getSimpleName(),
+                                                                 fieldType.getName())));
+                  }
+                  return;
+                }
+
                 if (hasDefaultOverride && isInstantiable(fieldType)) {
                   problemsReporter.addError(new Problem(extensionModel, format(
                                                                                "Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
@@ -130,21 +145,6 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
                                                                                NullSafe.class.getSimpleName(),
                                                                                fieldType.getName(),
                                                                                nullSafeType.getName())));
-                }
-              }
-
-              @Override
-              public void visitDictionary(DictionaryType dictionaryType) {
-                if (hasDefaultOverride) {
-                  problemsReporter.addError(
-                                            new Problem(extensionModel,
-                                                        format("Field '%s' in class '%s' is annotated with '@%s' is of type '%s'"
-                                                            + " but a 'defaultImplementingType' was provided."
-                                                            + " Type override is not allowed for Maps",
-                                                               fieldName,
-                                                               declaringClass.getName(),
-                                                               NullSafe.class.getSimpleName(),
-                                                               fieldType.getName())));
                 }
               }
             });

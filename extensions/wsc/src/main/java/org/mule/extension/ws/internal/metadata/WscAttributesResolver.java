@@ -8,7 +8,6 @@ package org.mule.extension.ws.internal.metadata;
 
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.extension.ws.internal.introspection.OutputTypeIntrospecterDelegate;
-import org.mule.metadata.api.builder.DictionaryTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -38,9 +37,8 @@ public final class WscAttributesResolver extends BaseWscResolver implements Attr
     MetadataType soapHeadersType = outputHeadersResolver.getMetadata(context, operationName);
     ObjectTypeBuilder attributes = context.getTypeBuilder().objectType();
     attributes.addField().key(HEADERS_FIELD).value(soapHeadersType);
-    DictionaryTypeBuilder protocolHeaders = attributes.addField().key("protocolHeaders").value().dictionaryType();
-    protocolHeaders.ofKey().stringType();
-    protocolHeaders.ofValue().stringType();
+    ObjectTypeBuilder protocolHeaders = attributes.addField().key("protocolHeaders").value().objectType();
+    protocolHeaders.openWith().stringType();
     return attributes.build();
   }
 }

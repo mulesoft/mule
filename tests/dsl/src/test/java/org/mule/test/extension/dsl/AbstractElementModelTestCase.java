@@ -216,10 +216,10 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     Element mule = doc.createElement("mule");
     doc.appendChild(mule);
     mule.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.mulesoft.org/schema/mule/core");
-    mule.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation",
-                        "http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd");
 
-    muleContext.getExtensionManager().getExtensions().forEach(this::addSchemaLocation);
+    mule.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                        "xsi:schemaLocation",
+                        "http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd");
   }
 
 }
