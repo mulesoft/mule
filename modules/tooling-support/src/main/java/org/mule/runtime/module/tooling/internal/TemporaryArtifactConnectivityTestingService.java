@@ -51,13 +51,11 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
       if (!temporaryArtifact.isStarted()) {
         try {
           temporaryArtifact.start();
-        } catch (InitialisationException e) {
-          return failure(e.getMessage(), UNKNOWN, e);
-        } catch (ConfigurationException e) {
-          return failure(e.getMessage(), UNKNOWN, e);
+        } catch (InitialisationException | ConfigurationException e) {
+          return failure(e.getMessage(), e);
         } catch (Exception e) {
           if (from(getCausalChain(e)).filter(instanceOf(ConnectionException.class)).first().isPresent()) {
-            return failure(e.getMessage(), UNKNOWN, e);
+            return failure(e.getMessage(), e);
           }
           throw new MuleRuntimeException(e);
         }

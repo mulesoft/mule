@@ -12,10 +12,13 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
@@ -27,12 +30,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
  *
  * @since 4.0
  */
-public final class ConnectionProviderObjectBuilder extends ResolverSetBasedObjectBuilder<ConnectionProvider> {
+public final class ConnectionProviderObjectBuilder<C> extends ResolverSetBasedObjectBuilder<ConnectionProvider<C>> {
 
   private final ConnectionProviderModel providerModel;
   private final boolean disableValidation;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final PoolingProfile poolingProfile;
+  private final ExtensionModel extensionModel;
+  private final MuleContext muleContext;
 
   private String ownerConfigName = "";
 
@@ -45,33 +50,38 @@ public final class ConnectionProviderObjectBuilder extends ResolverSetBasedObjec
    *                          is provided
    */
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                         ConnectionManagerAdapter connectionManager) {
-    this(providerModel, resolverSet, null, false, null, connectionManager);
+                                         ConnectionManagerAdapter connectionManager, ExtensionModel extensionModel,
+                                         MuleContext muleContext) {
+    this(providerModel, resolverSet, null, false, null, connectionManager, extensionModel, muleContext);
   }
 
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
                                          PoolingProfile poolingProfile, boolean disableValidation,
-                                         RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager) {
+                                         RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager,
+                                         ExtensionModel extensionModel, MuleContext muleContext) {
     super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
+    this.extensionModel = extensionModel;
+    this.muleContext = muleContext;
     this.retryPolicyTemplate =
         retryPolicyTemplate != null ? retryPolicyTemplate : connectionManager.getDefaultRetryPolicyTemplate();
     this.disableValidation = disableValidation;
   }
 
   @Override
-  public ConnectionProvider build(ResolverSetResult result) throws MuleException {
-    ConnectionProvider provider = super.build(result);
+  public ConnectionProvider<C> build(ResolverSetResult result) throws MuleException {
+    ConnectionProvider<C> provider = super.build(result);
     injectConfigName(providerModel, provider, ownerConfigName);
 
     final ConnectionManagementType connectionManagementType = providerModel.getConnectionManagementType();
     if (connectionManagementType == POOLING) {
-      provider = new PoolingConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
+      provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, disableValidation, retryPolicyTemplate);
     } else {
-      provider = new ReconnectableConnectionProviderWrapper(provider, disableValidation, retryPolicyTemplate);
+      provider = new ReconnectableConnectionProviderWrapper<>(provider, disableValidation, retryPolicyTemplate);
     }
 
+    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
     return provider;
   }
 

@@ -67,8 +67,7 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
     if (connection.getUsername().equals("john") && connection.getPassword().equals("doe")) {
       return ConnectionValidationResult.success();
     } else {
-      return ConnectionValidationResult.failure("Invalid credentials", ConnectionExceptionCode.INCORRECT_CREDENTIALS,
-                                                new Exception("Invalid credentials"));
+      return ConnectionValidationResult.failure("Invalid credentials", new Exception("Invalid credentials"));
     }
   }
 

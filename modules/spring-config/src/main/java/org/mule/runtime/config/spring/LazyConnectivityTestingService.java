@@ -48,6 +48,6 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
   }
 
   private ConnectionValidationResult unknownFailureResponse(Exception e) {
-    return failure(e.getMessage(), UNKNOWN, e);
+    return failure(e.getMessage(), e);
   }
 }

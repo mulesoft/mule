@@ -7,14 +7,13 @@
 package org.mule.runtime.module.extension.internal.tooling;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -71,7 +70,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
                                                                   connectivityTestingObject.getClass().getName())));
       }
     } catch (Exception e) {
-      return failure("Failed to obtain connectivity testing object", UNKNOWN, e);
+      return failure("Failed to obtain connectivity testing object", e);
     }
   }
 

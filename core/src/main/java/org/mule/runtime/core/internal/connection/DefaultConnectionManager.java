@@ -129,9 +129,14 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     return doTestConnectivity(() -> {
       ConnectionProvider<Object> connectionProvider = configurationInstance.getConnectionProvider().get();
       final Object config = configurationInstance.getValue();
-      ConnectionHandler<Object> connectionHandler = hasBinding(config)
-          ? getConnection(config)
-          : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+      ConnectionHandler<Object> connectionHandler;
+      try {
+        connectionHandler = hasBinding(config)
+            ? getConnection(config)
+            : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+      } catch (ConnectionException e) {
+        return failure(e.getMessage(), e.getErrorType().orElse(null), e);
+      }
 
       return testConnectivity(connectionProvider, connectionHandler);
     });
@@ -142,7 +147,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     try {
       return callable.call();
     } catch (Exception e) {
-      return failure("Exception was found trying to test connectivity", UNKNOWN, e);
+      return failure("Exception was found trying to test connectivity", e);
     }
   }
 
@@ -151,6 +156,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
       throws Exception {
     try {
       return connectionProvider.validate(connectionHandler.getConnection());
+    } catch (ConnectionException e) {
+      return failure(e.getMessage(), e.getErrorType().orElse(null), e);
     } finally {
       if (connectionHandler != null) {
         connectionHandler.release();

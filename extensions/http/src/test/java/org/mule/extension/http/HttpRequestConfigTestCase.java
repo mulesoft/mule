@@ -33,8 +33,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public void requestConfigDefaultPortHttp() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     assertThat(provider.getPort(), is(HTTP.getDefaultPort()));
   }
 
@@ -42,8 +41,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public void requestConfigDefaultPortHttps() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     assertThat(provider.getPort(), is(HTTPS.getDefaultPort()));
   }
 
@@ -51,8 +49,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public void requestConfigDefaultTlsContextHttps() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     assertThat(provider.getTlsContext(), notNullValue());
   }
 

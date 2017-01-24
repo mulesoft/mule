@@ -46,7 +46,7 @@ public abstract class AbstractUdpConnection extends AbstractSocketConnection {
   @Override
   public ConnectionValidationResult validate() {
     if (socket.isClosed()) {
-      return ConnectionValidationResult.failure("UDP socket was closed", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("UDP socket was closed", null);
     }
 
     return ConnectionValidationResult.success();

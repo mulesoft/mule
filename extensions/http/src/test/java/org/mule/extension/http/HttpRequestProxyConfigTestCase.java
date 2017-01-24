@@ -98,8 +98,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
 
   private void checkProxyConfig() throws Exception {
     ConfigurationInstance config = getConfigurationInstanceFromRegistry("config" + flowName, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     ProxyConfig proxyConfig = provider.getProxyConfig();
 
     assertThat(proxyConfig.getHost(), is(PROXY_HOST));

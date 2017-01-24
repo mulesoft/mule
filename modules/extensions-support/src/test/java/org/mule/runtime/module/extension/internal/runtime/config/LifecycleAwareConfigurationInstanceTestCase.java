@@ -222,7 +222,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
     if (connectionProvider.isPresent()) {
       Exception connectionException = new ConnectionException("Oops!");
       when(connectionManager.testConnectivity(interceptable))
-          .thenReturn(failure(connectionException.getMessage(), UNKNOWN, connectionException));
+          .thenReturn(failure(connectionException.getMessage(), connectionException));
 
       try {
         interceptable.start();

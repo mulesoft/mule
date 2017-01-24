@@ -157,7 +157,7 @@ public class MailboxConnection extends AbstractEmailConnection {
   @Override
   public ConnectionValidationResult validate() {
     String errorMessage = "Store is not connected";
-    return store.isConnected() ? success() : failure(errorMessage, DISCONNECTED, new EmailConnectionException(errorMessage));
+    return store.isConnected() ? success() : failure(errorMessage, new EmailConnectionException(errorMessage));
   }
 
   /**

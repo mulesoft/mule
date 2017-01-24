@@ -225,7 +225,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   public ConnectionValidationResult validate(HttpServer server) {
     if (server.isStopped() || server.isStopping()) {
       ServerAddress serverAddress = server.getServerAddress();
-      return failure(format("Server on host %s and port %s is stopped.", serverAddress.getIp(), serverAddress.getPort()), UNKNOWN,
+      return failure(format("Server on host %s and port %s is stopped.", serverAddress.getIp(), serverAddress.getPort()),
                      new ConnectionException("Server stopped."));
     } else {
       return ConnectionValidationResult.success();

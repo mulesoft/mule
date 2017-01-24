@@ -73,7 +73,7 @@ public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTest
   public void failDueToInvalidConnection() throws ConnectionException {
     String errorMessage = "Invalid username or password";
     when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult
-        .failure(errorMessage, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("401: UNAUTHORIZED")));
+        .failure(errorMessage, new Exception("401: UNAUTHORIZED")));
     CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
     ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
 

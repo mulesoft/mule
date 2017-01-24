@@ -32,6 +32,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -94,7 +95,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
               .get(testEvent())
               .getConnectionProvider().get();
 
-      return ((DbConnectionProvider) connectionProviderWrapper.getDelegate()).getConfiguredDataSource();
+      return ((DbConnectionProvider) unwrapProviderWrapper(connectionProviderWrapper)).getConfiguredDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -221,6 +222,12 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     assertThat(metadata.isSuccess(), is(true));
     return metadata.get().getModel().getAllParameterModels().stream()
         .filter(p -> p.getName().equals("parameterValues")).findFirst().get().getType();
+  }
+
+  private ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
+    return connectionProvider instanceof ConnectionProviderWrapper
+        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
+        : connectionProvider;
   }
 
 }

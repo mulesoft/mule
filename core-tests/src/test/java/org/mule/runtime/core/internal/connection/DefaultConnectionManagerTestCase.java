@@ -130,7 +130,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failingConnectionProviderConnectivity() throws Exception {
-    ConnectionValidationResult validationResult = failure("oops", UNKNOWN, new Exception());
+    ConnectionValidationResult validationResult = failure("oops", new Exception());
     when(testeableConnectionProvider.validate(connection)).thenReturn(validationResult);
     ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
     assertThat(result, is(sameInstance(validationResult)));

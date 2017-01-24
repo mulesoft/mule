@@ -86,12 +86,12 @@ public class TcpRequesterConnection extends AbstractTcpConnection implements Req
   public ConnectionValidationResult validate() {
 
     if (!socket.isBound()) {
-      return ConnectionValidationResult.failure("TCP client socket was not bounded", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("TCP client socket was not bounded", null);
 
     } else if (!socket.isConnected()) {
-      return ConnectionValidationResult.failure("TCP client socket was not connected", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("TCP client socket was not connected", null);
     } else if (socket.isClosed()) {
-      return ConnectionValidationResult.failure("TCP client socket was closed", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("TCP client socket was closed", null);
     }
 
     return ConnectionValidationResult.success();

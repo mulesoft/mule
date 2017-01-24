@@ -51,13 +51,13 @@ public abstract class FtpFileSystem extends AbstractFileSystem {
    */
   public ConnectionValidationResult validateConnection() {
     if (!isConnected()) {
-      return failure("Connection is stale", UNKNOWN, null);
+      return failure("Connection is stale", null);
     }
 
     try {
       changeToBaseDir();
     } catch (Exception e) {
-      failure("Configured workingDir is unavailable", UNKNOWN, e);
+      failure("Configured workingDir is unavailable", e);
     }
     return success();
   }

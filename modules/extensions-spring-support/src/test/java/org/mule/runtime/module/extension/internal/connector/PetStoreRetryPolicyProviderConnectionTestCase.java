@@ -97,8 +97,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends ExtensionFunc
 
     @Override
     public ConnectionValidationResult validate(PetStoreClient connection) {
-      return ConnectionValidationResult.failure(CONNECTION_FAIL, ConnectionExceptionCode.INCORRECT_CREDENTIALS,
-                                                new Exception("Invalid credentials"));
+      return ConnectionValidationResult.failure(CONNECTION_FAIL, new Exception("Invalid credentials"));
     }
   }
 

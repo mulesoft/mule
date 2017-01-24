@@ -155,7 +155,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Validation failed: ", e);
       }
-      return failure("Invalid connection provided: Connection could not be started.", DISCONNECTED, e);
+      return failure("Invalid connection provided: Connection could not be started.", e);
     }
   }
 
