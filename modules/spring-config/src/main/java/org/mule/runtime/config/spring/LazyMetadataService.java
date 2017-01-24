@@ -10,6 +10,8 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -54,18 +56,37 @@ public class LazyMetadataService implements MetadataService {
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId) {
-    return (MetadataResult<ComponentMetadataDescriptor>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getMetadata(componentId));
+  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId) {
+    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getOperationMetadata(componentId));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key) {
-    return (MetadataResult<ComponentMetadataDescriptor>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getMetadata(componentId, key));
+  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId,
+                                                                                          MetadataKey key) {
+    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getOperationMetadata(componentId, key));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(ComponentId componentId) {
+    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getSourceMetadata(componentId));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(ComponentId componentId, MetadataKey key) {
+    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getSourceMetadata(componentId, key));
   }
 
   /**

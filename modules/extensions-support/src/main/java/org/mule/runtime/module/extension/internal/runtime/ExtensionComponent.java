@@ -74,17 +74,17 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent extends AbstractAnnotatedObject
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider, FlowConstructAware, Lifecycle {
+public abstract class ExtensionComponent<T extends ComponentModel<T>> extends AbstractAnnotatedObject
+    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, FlowConstructAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
 
   protected final ExtensionManager extensionManager;
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
-  private final ComponentModel componentModel;
+  private final T componentModel;
   private final ConfigurationProvider configurationProvider;
-  private final MetadataMediator metadataMediator;
+  private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
   protected final ClassLoader classLoader;
@@ -99,7 +99,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
   private MuleMetadataService metadataService;
 
   protected ExtensionComponent(ExtensionModel extensionModel,
-                               ComponentModel componentModel,
+                               T componentModel,
                                ConfigurationProvider configurationProvider,
                                ExtensionManager extensionManager) {
     this.extensionModel = extensionModel;
@@ -107,7 +107,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
     this.componentModel = componentModel;
     this.configurationProvider = configurationProvider;
     this.extensionManager = extensionManager;
-    this.metadataMediator = new MetadataMediator(componentModel);
+    this.metadataMediator = new MetadataMediator<>(componentModel);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -231,7 +231,7 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata() throws MetadataResolvingException {
+  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator
@@ -245,10 +245,9 @@ public abstract class ExtensionComponent extends AbstractAnnotatedObject
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(MetadataKey key) throws MetadataResolvingException {
+  public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(getClassLoader(this.extensionModel),
+      return runWithMetadataContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
                                                                       () -> metadataMediator.getMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());

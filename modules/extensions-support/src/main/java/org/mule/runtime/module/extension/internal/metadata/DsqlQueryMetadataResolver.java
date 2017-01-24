@@ -48,7 +48,7 @@ final class DsqlQueryMetadataResolver implements OutputTypeResolver {
    */
   @Override
   public String getCategoryName() {
-    return "DsqlQueryCategory";
+    return nativeOutputResolver.getCategoryName();
   }
 
   /**

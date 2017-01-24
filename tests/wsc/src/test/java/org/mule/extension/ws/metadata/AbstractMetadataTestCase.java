@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -44,16 +45,19 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
   }
 
   @Step("Retrieve Dynamic Metadata")
-  protected MetadataResult<ComponentMetadataDescriptor> getMetadata(String flow, String key) {
-    MetadataResult<ComponentMetadataDescriptor> result = service.getMetadata(id(flow), newKey(key).build());
+  protected MetadataResult<ComponentMetadataDescriptor<OperationModel>> getMetadata(String flow, String key) {
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> result =
+        service.getOperationMetadata(id(flow), newKey(key).build());
     assertThat(result.isSuccess(), is(true));
     return result;
   }
 
   @Step("Retrieve Dynamic Metadata for the Message Builder parameter")
   protected ObjectType getMessageBuilderType(String flow, String key) {
-    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, key);
-    return toObjectType(metadata.get().getInputMetadata().getParameterMetadata(MESSAGE_PARAM).getType());
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata(flow, key);
+    return toObjectType(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals(MESSAGE_PARAM))
+        .findFirst().get().getType());
   }
 
   protected ProcessorId id(String flow) {

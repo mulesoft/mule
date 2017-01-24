@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -45,19 +46,19 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExecutionType;
+import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.Event;
@@ -318,21 +319,37 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void getExplicitOperationDynamicMetadata() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());
-
+    mockMetadataResolution();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata =
+        messageProcessor.getMetadata(newKey("person", "Person").build());
+    verify(operationModel).getTypedModel(any(), any());
     assertThat(metadata.isSuccess(), is(true));
 
-    OutputMetadataDescriptor outputMetadataDescriptor = metadata.get().getOutputMetadata();
+    MetadataType payloadMetadata = metadata.get().getModel().getOutput().getType();
+    assertThat(payloadMetadata, is(TYPE_BUILDER.booleanType().build()));
 
-    TypeMetadataDescriptor payloadMetadata = outputMetadataDescriptor.getPayloadMetadata();
-    assertThat(payloadMetadata.getType(), is(TYPE_BUILDER.booleanType().build()));
+    MetadataType attributesMetadata = metadata.get().getModel().getOutputAttributes().getType();
+    assertThat(attributesMetadata, is(TYPE_BUILDER.booleanType().build()));
 
-    TypeMetadataDescriptor attributesMetadata = outputMetadataDescriptor.getAttributesMetadata();
-    assertThat(attributesMetadata.getType(), is(TYPE_BUILDER.booleanType().build()));
+    assertThat(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("content"))
+        .findFirst().get().getType(), is(TYPE_BUILDER.stringType().build()));
 
-    assertThat(metadata.get().getInputMetadata().getParameterMetadata("content").getType(),
-               is(TYPE_BUILDER.stringType().build()));
-    assertThat(metadata.get().getInputMetadata().getParameterMetadata("type").getType(), is(stringType));
+    assertThat(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("type"))
+        .findFirst().get().getType(), is(stringType));
+  }
+
+  private void mockMetadataResolution() {
+    OperationModel typedModel = mock(OperationModel.class);
+    OutputModel resolvedOutputModel = mock(OutputModel.class);
+    when(resolvedOutputModel.getType()).thenReturn(TYPE_BUILDER.booleanType().build());
+    when(resolvedOutputModel.hasDynamicType()).thenReturn(true);
+    when(operationModel.getTypedModel(any(), any())).thenReturn(typedModel);
+    when(typedModel.getOutput()).thenReturn(resolvedOutputModel);
+    when(typedModel.getOutputAttributes()).thenReturn(resolvedOutputModel);
+    when(contentMock.getType()).thenReturn(TYPE_BUILDER.stringType().build());
+    when(typedModel.getAllParameterModels()).thenReturn(asList(keyParamMock, contentMock));
   }
 
   @Test
@@ -341,15 +358,20 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .create(JAVA).objectType()
         .with(new DescriptionAnnotation("Some Description"))
         .build();
+    mockMetadataResolution();
+    when(operationModel.getTypedModel(any(), any()).getOutput().getType()).thenReturn(objectType);
+
     setUpValueResolvers();
     final OutputTypeResolver outputTypeResolver = mock(OutputTypeResolver.class);
     when(outputTypeResolver.getOutputType(any(), eq("person"))).thenReturn(objectType);
     when(metadataResolverFactory.getOutputResolver()).thenReturn(outputTypeResolver);
+    //verify(operationModel).getTypedModel(any(), any());
 
-    final MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata();
+    final MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = messageProcessor.getMetadata();
     assertThat(metadata.isSuccess(), is(true));
-    OutputMetadataDescriptor outputMetadata = metadata.get().getOutputMetadata();
-    assertThat(outputMetadata.getPayloadMetadata().getType(), is(objectType));
+
+    MetadataType outputMetadata = metadata.get().getModel().getOutput().getType();
+    assertThat(outputMetadata, is(objectType));
 
     verify(resolverSet.getResolvers(), times(1));
   }

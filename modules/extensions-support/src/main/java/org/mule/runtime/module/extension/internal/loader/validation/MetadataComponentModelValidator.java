@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getAllResolvers;
+import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNullResolver;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
@@ -43,7 +44,6 @@ import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 
 import java.util.LinkedList;
@@ -198,15 +198,11 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     }
   }
 
+  // todo refactor with metadata factory getCategoryName()
   private void validateCategoriesInScope(ComponentModel componentModel, MetadataResolverFactory metadataResolverFactory,
                                          ProblemsReporter problemsReporter) {
 
-    ImmutableList.Builder<NamedTypeResolver> resolvers = ImmutableList.<NamedTypeResolver>builder()
-        .add(metadataResolverFactory.getKeyResolver())
-        .add(metadataResolverFactory.getOutputResolver())
-        .addAll(getAllInputResolvers(componentModel, metadataResolverFactory));
-
-    validateCategoryNames(componentModel, problemsReporter, resolvers.build().toArray(new NamedTypeResolver[] {}));
+    validateCategoryNames(componentModel, problemsReporter, getAllResolvers(metadataResolverFactory));
   }
 
   private List<InputTypeResolver<Object>> getAllInputResolvers(ComponentModel componentModel,
@@ -216,15 +212,15 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   }
 
   private void validateCategoryNames(ComponentModel componentModel, ProblemsReporter problemsReporter,
-                                     NamedTypeResolver... resolvers) {
-    stream(resolvers).filter(r -> StringUtils.isBlank(r.getCategoryName()))
+                                     List<NamedTypeResolver> resolvers) {
+    resolvers.stream().filter(r -> StringUtils.isBlank(r.getCategoryName()))
         .findFirst().ifPresent(r -> problemsReporter.addError(new Problem(componentModel, String
             .format(EMPTY_RESOLVER_NAME,
                     getComponentModelTypeName(componentModel), componentModel.getName(),
                     r.getClass().getSimpleName(), "category"))));
 
-    Set<String> names = stream(resolvers)
-        .filter(r -> !r.getClass().equals(NullMetadataResolver.class))
+    Set<String> names = resolvers.stream()
+        .filter(r -> !isNullResolver(r))
         .map(NamedTypeResolver::getCategoryName)
         .collect(toSet());
 

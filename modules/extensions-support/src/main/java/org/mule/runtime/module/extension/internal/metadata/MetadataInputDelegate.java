@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.parameterDescriptor;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -20,13 +19,12 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.builder.InputMetadataDescriptorBuilder;
-import org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder;
-import org.mule.runtime.api.metadata.descriptor.builder.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,7 +50,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    */
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
-    InputMetadataDescriptorBuilder input = MetadataDescriptorBuilder.inputDescriptor();
+    InputMetadataDescriptor.InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
     List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
     for (ParameterModel parameter : component.getAllParameterModels()) {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
@@ -61,6 +59,16 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     }
     List<MetadataFailure> failures = results.stream().flatMap(e -> e.getFailures().stream()).collect(toList());
     return failures.isEmpty() ? success(input.build()) : failure(input.build(), failures);
+  }
+
+  /**
+   * Given a parameters name, returns the associated {@link NamedTypeResolver}.
+   * 
+   * @param parameterName name of the parameter
+   * @return {@link NamedTypeResolver} of the parameter
+   */
+  NamedTypeResolver getParameterResolver(String parameterName) {
+    return resolverFactory.getInputResolver(parameterName);
   }
 
   /**
@@ -77,7 +85,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
                                                                                      MetadataContext context, Object key) {
 
-    ParameterMetadataDescriptorBuilder descriptorBuilder = parameterDescriptor(parameter.getName());
+    ParameterMetadataDescriptorBuilder descriptorBuilder = ParameterMetadataDescriptor.builder(parameter.getName());
     if (!parameter.hasDynamicType()) {
       return success(descriptorBuilder.withType(parameter.getType()).build());
     }

@@ -94,7 +94,8 @@ import reactor.core.publisher.Mono;
  *
  * @since 3.7.0
  */
-public class OperationMessageProcessor extends ExtensionComponent implements Processor, EntityMetadataProvider, Lifecycle {
+public class OperationMessageProcessor extends ExtensionComponent<OperationModel>
+    implements Processor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = getLogger(OperationMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
@@ -257,9 +258,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Pro
   @Override
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(context -> withContextClassLoader(classLoader,
-                                                                      () -> entityMetadataMediator
-                                                                          .getEntityMetadata(context, key)));
+      return runWithMetadataContext(context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
+          .getEntityMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }

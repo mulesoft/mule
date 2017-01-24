@@ -29,7 +29,7 @@ public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
 
   @Override
   public String getCategoryName() {
-    return "NativeQueryOutputCategory";
+    return "MetadataExtensionEntityResolver";
   }
 
   @Override

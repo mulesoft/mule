@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static java.util.Collections.emptySet;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -14,10 +15,11 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 
 import java.util.Arrays;
@@ -25,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputTypeResolver<Object>,
-    OutputTypeResolver<Object>, AttributesTypeResolver<Object> {
+    OutputTypeResolver<Object>, AttributesTypeResolver<Object>, QueryEntityResolver {
 
   @Override
   public String getCategoryName() {
@@ -35,6 +37,17 @@ public class TestNoConfigMetadataResolver implements TypeKeysResolver, InputType
   @Override
   public String getResolverName() {
     return "TestNoConfigMetadataResolver";
+  }
+
+  @Override
+  public Set<MetadataKey> getEntityKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+    return emptySet();
+  }
+
+  @Override
+  public MetadataType getEntityMetadata(MetadataContext context, String key)
+      throws MetadataResolvingException, ConnectionException {
+    return BaseTypeBuilder.create(JAVA).voidType().build();
   }
 
   @Override

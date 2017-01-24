@@ -21,6 +21,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
@@ -37,33 +38,38 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void returnsNullSelectMetadataUnParameterizedQuery() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("selectMetadata", "select * from PLANET");
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata("selectMetadata", "select * from PLANET");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType(),
+    assertThat(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("inputParameters"))
+        .findFirst().get().getType(),
                is(instanceOf(NullType.class)));
   }
 
   @Test
   public void returnsAnySelectInputMetadataFromNotSupportedParameterizedQuery() throws Exception {
 
-    MetadataResult<ComponentMetadataDescriptor> metadata =
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata =
         getMetadata("selectMetadata",
                     "select * from PLANET where id = #[mel:payload.id] and name = #[mel:message.outboundProperties.updateCount]");
 
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType(),
+    assertThat(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("inputParameters"))
+        .findFirst().get().getType(),
                is(typeBuilder.anyType().build()));
   }
 
   @Test
   public void returnsSelectInputMetadataFromBeanParameterizedQuery() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata("selectMetadata",
-                                                                       "select * from PLANET where id = :id and name = :name");
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata("selectMetadata",
+                                                                                       "select * from PLANET where id = :id and name = :name");
 
     assertThat(metadata.isSuccess(), is(true));
-    ObjectType type =
-        (ObjectType) metadata.get().getInputMetadata().getParameterMetadata("inputParameters").getType();
+    ObjectType type = (ObjectType) metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("inputParameters"))
+        .findFirst().get().getType();
     assertThat(type.getFields().size(), equalTo(2));
 
     Optional<ObjectFieldType> id = type.getFieldByName("id");
