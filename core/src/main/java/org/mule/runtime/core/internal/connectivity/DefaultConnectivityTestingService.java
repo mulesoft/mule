@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.connectivity;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.connection.ConnectionValidationResult;

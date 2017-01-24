@@ -15,6 +15,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 /**
  * Utils to do connectivity testing over configurations on a Mule application
@@ -54,8 +55,8 @@ public class TestConnectivityUtils {
   /**
    * Injects a System property to disable automatic test connectivity when the Mule app starts
    */
-  public static void disableAutomaticTestConnectivity() {
-    System.setProperty("doTestConnectivity", "false");
+  public static SystemProperty disableAutomaticTestConnectivity() {
+    return new SystemProperty("doTestConnectivity", "false");
   }
 
   private void assertConnection(String configName, boolean isSuccess, Matcher<Exception> exceptionMatcher,

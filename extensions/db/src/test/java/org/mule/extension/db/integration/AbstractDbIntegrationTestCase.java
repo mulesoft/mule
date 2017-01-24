@@ -19,6 +19,7 @@ import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
@@ -32,7 +33,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -222,12 +222,6 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     assertThat(metadata.isSuccess(), is(true));
     return metadata.get().getModel().getAllParameterModels().stream()
         .filter(p -> p.getName().equals("parameterValues")).findFirst().get().getType();
-  }
-
-  private ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
-        : connectionProvider;
   }
 
 }

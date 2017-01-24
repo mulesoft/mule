@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;

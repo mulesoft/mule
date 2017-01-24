@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ftp.internal.ftp.connection;
 
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.file.common.api.AbstractFileSystem;

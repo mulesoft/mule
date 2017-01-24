@@ -9,7 +9,6 @@ package org.mule.runtime.module.tooling.internal;
 import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.collect.FluentIterable.from;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionException;

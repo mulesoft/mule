@@ -93,14 +93,6 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
    * {@inheritDoc}
    */
   @Override
-  public void disconnect(C connection) {
-    getDelegate().disconnect(connection);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public RetryPolicyTemplate getRetryPolicyTemplate() {
     final ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper ? ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate()

@@ -19,10 +19,4 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
         HttpRequesterConfig.class})
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
-  ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
-        : connectionProvider;
-  }
-
 }
