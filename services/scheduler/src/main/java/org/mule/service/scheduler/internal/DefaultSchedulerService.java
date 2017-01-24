@@ -309,7 +309,8 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
                                               new SchedulerThreadFactory(cpuLightGroup), byCallerThreadGroupPolicy);
     ioExecutor = new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize(), threadPoolsConfig.getIoMaxPoolSize(),
                                         threadPoolsConfig.getIoKeepAlive(), MILLISECONDS,
-                                        // TODO Determine improved mechanism to have a cached pool that still uses queue.
+                                        // TODO MULE-11505 - Implement cached IO scheduler that grows and uses async hand-off
+                                        // with queue.
                                         new SynchronousQueue<>(),
                                         new SchedulerThreadFactory(ioGroup), byCallerThreadGroupPolicy);
     computationExecutor =
