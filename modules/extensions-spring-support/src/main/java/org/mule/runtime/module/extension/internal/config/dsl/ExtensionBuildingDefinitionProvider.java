@@ -13,7 +13,6 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
@@ -212,14 +211,13 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
       @Override
       public void visitObject(ObjectType objectType) {
-        parsingContext.getSubTypes(objectType)
-            .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                                          parsingContext));
-      }
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        dictionaryType.getValueType().accept(this);
+        if (objectType.isOpen()) {
+          objectType.getOpenRestriction().get().accept(this);
+        } else {
+          parsingContext.getSubTypes(objectType)
+              .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                                            parsingContext));
+        }
       }
     });
   }
@@ -260,13 +258,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
       public void visitArrayType(ArrayType arrayType) {
         registerTopLevelParameter(arrayType.getType(), definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver,
                                   parsingContext);
-      }
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        MetadataType keyType = dictionaryType.getKeyType();
-        keyType.accept(this);
-        registerTopLevelParameter(keyType, definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver, parsingContext);
       }
 
       @Override

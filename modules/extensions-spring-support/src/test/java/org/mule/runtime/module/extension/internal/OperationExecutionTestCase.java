@@ -414,13 +414,13 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void getMedicalHistory() throws Exception {
-    Map<Integer, HealthStatus> getMedicalHistory =
-        (Map<Integer, HealthStatus>) flowRunner("getMedicalHistory").run().getMessage().getPayload().getValue();
+    Map<String, HealthStatus> getMedicalHistory =
+        (Map<String, HealthStatus>) flowRunner("getMedicalHistory").run().getMessage().getPayload().getValue();
     assertThat(getMedicalHistory, is(notNullValue()));
     assertThat(getMedicalHistory.entrySet().size(), is(3));
-    assertThat(getMedicalHistory.get(2013), is(HEALTHY));
-    assertThat(getMedicalHistory.get(2014), is(CANCER));
-    assertThat(getMedicalHistory.get(2015), is(DEAD));
+    assertThat(getMedicalHistory.get("2013"), is(HEALTHY));
+    assertThat(getMedicalHistory.get("2014"), is(CANCER));
+    assertThat(getMedicalHistory.get("2015"), is(DEAD));
   }
 
   @Test

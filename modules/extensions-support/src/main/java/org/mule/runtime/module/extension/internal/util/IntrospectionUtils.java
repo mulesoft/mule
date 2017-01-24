@@ -29,7 +29,6 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -656,7 +655,7 @@ public final class IntrospectionUtils {
 
   /**
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
-   * {@link ArrayType}, key and value of an {@link DictionaryType} and classes from the fields of {@link ObjectType}.
+   * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
    *
    * @param type                 {@link MetadataType} to inspect
    * @param extensionClassLoader extension class loader
@@ -665,12 +664,6 @@ public final class IntrospectionUtils {
   public static Set<Class<?>> collectRelativeClasses(MetadataType type, ClassLoader extensionClassLoader) {
     Set<Class<?>> relativeClasses = new HashSet<>();
     type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        dictionaryType.getKeyType().accept(this);
-        dictionaryType.getValueType().accept(this);
-      }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
@@ -686,6 +679,7 @@ public final class IntrospectionUtils {
       public void visitObject(ObjectType objectType) {
         if (!relativeClasses.contains(getType(objectType))) {
 
+
           Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
           if (classInformation.isPresent()) {
             classInformation.get().getGenericTypes()
@@ -694,6 +688,7 @@ public final class IntrospectionUtils {
 
           relativeClasses.add(getType(objectType));
           objectType.getFields().stream().forEach(objectFieldType -> objectFieldType.accept(this));
+          objectType.getOpenRestriction().ifPresent(t -> t.accept(this));
         }
       }
 

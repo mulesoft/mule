@@ -24,7 +24,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.d
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -69,7 +68,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void getMethodReturnType() throws Exception {
     MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod(FOO), TYPE_LOADER);
-    assertDictionary(metadataType, String.class, Apple.class);
+    assertDictionary(metadataType, Apple.class);
   }
 
   @Test
@@ -111,7 +110,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertType(types[0], String.class);
     assertType(types[1], Long.class);
     assertType(types[2], Apple.class);
-    assertDictionary(types[3], Banana.class, Kiwi.class);
+    assertDictionary(types[3], Kiwi.class);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -151,11 +150,11 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);
     assertField("wildCardList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
     assertField("rawList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
-    assertField("wildCardMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Object.class)),
+    assertField("wildCardMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class)),
                 exposedFields);
-    assertField("rawMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Object.class)),
+    assertField("rawMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class)),
                 exposedFields);
-    assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class), objectTypeBuilder(Fruit.class)),
+    assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Fruit.class)),
                 exposedFields);
   }
 
@@ -196,13 +195,13 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return getClass().getMethod(methodName, parameterTypes);
   }
 
-  private void assertDictionary(MetadataType metadataType, Class<?> keyType, Class<?> valueType) {
-    assertThat(metadataType, is(instanceOf(DictionaryType.class)));
-    DictionaryType dictionaryType = (DictionaryType) metadataType;
+  private void assertDictionary(MetadataType metadataType, Class<?> valueType) {
+    assertThat(metadataType, is(instanceOf(ObjectType.class)));
+    ObjectType dictionaryType = (ObjectType) metadataType;
     assertType(dictionaryType, Map.class);
 
-    assertType(dictionaryType.getKeyType(), keyType);
-    assertType(dictionaryType.getValueType(), valueType);
+    assertThat(dictionaryType.getOpenRestriction().isPresent(), is(true));
+    assertType(dictionaryType.getOpenRestriction().get(), valueType);
   }
 
   private void assertList(MetadataType metadataType, Class<?> listItemType) {

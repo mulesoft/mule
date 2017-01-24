@@ -127,7 +127,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidParameterDictionaryDueToReservedName() {
     when(invalidParameterModel.getType())
-        .thenReturn(dictionaryOf(Map.class, objectTypeBuilder(String.class), objectTypeBuilder(InvalidPojo.class)));
+        .thenReturn(dictionaryOf(Map.class, objectTypeBuilder(InvalidPojo.class)));
     when(invalidParameterModel.getName()).thenReturn("pojos");
     mockParameters(operationModel, invalidParameterModel);
     validate(extensionModel, validator);
