@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -46,7 +47,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen()) {
+        if (isMap(objectType)) {
           objectType.getAnnotation(ClassInformationAnnotation.class)
               .filter(classInformation -> !classInformation.getGenericTypes().isEmpty())
               .filter(classInformation -> !Objects.equals(classInformation.getGenericTypes().get(0), String.class.getName()))

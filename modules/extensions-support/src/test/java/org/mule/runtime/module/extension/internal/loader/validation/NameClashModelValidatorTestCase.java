@@ -23,6 +23,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -111,10 +112,16 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
       .id(ArrayList.class.getName()).of(toMetadataType(TopLevelTest.class)).build();
 
   private MetadataType childTestMap = baseTypeBuilder.objectType()
-      .id(HashMap.class.getName()).openWith(toMetadataType(ChildTest.class)).build();
+      .id(HashMap.class.getName())
+      .openWith(toMetadataType(ChildTest.class))
+      .with(new ClassInformationAnnotation(HashMap.class, asList(String.class, ChildTest.class)))
+      .build();
 
   private MetadataType topLevelMap = baseTypeBuilder.objectType()
-      .id(HashMap.class.getName()).openWith(toMetadataType(TopLevelTest.class)).build();
+      .id(HashMap.class.getName())
+      .openWith(toMetadataType(TopLevelTest.class))
+      .with(new ClassInformationAnnotation(HashMap.class, asList(String.class, TopLevelTest.class)))
+      .build();
 
   private NameClashModelValidator validator = new NameClashModelValidator();
 

@@ -19,6 +19,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
@@ -533,7 +534,7 @@ public final class SchemaBuilder {
         }
 
         defaultVisit(objectType);
-        if (objectType.isOpen()) {
+        if (isMap(objectType)) {
           if (paramDsl.supportsChildDeclaration()) {
             mapDelegate.generateMapElement(objectType, paramDsl, description,
                                            !paramDsl.supportsAttributeDeclaration(),

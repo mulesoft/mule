@@ -260,13 +260,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                   parsingContext);
       }
 
-      //@Override
-      //public void visitDictionary(DictionaryType dictionaryType) {
-      //  MetadataType keyType = dictionaryType.getKeyType();
-      //  keyType.accept(this);
-      //  registerTopLevelParameter(keyType, definitionBuilder.copy(), extensionClassLoader, dslSyntaxResolver, parsingContext);
-      //}
-
       @Override
       public void visitUnion(UnionType unionType) {
         unionType.getTypes().forEach(type -> type.accept(this));

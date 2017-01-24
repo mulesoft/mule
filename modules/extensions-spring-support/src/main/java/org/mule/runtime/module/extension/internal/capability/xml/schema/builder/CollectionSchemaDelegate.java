@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
@@ -63,21 +64,23 @@ class CollectionSchemaDelegate {
     genericType.accept(new MetadataTypeVisitor() {
 
       /**
-       * For a Collection with an {@link ObjectType} as generic.
-       * The generated {@link ComplexType} declares a sequence of either a {@code ref} or a {@code choice}.
+       * For a Collection with an {@link ObjectType} as generic. The generated {@link ComplexType} declares a sequence of either a
+       * {@code ref} or a {@code choice}.
        * <p/>
-       * It creates an element {@code ref} to the concrete element whose {@code type} is the {@link ComplexType} associated
-       * to the {@code objectType}
+       * It creates an element {@code ref} to the concrete element whose {@code type} is the {@link ComplexType} associated to the
+       * {@code objectType}
        * <p/>
-       * In the case of having a {@link DslElementSyntax#isWrapped wrapped} {@link ObjectType}, then a
-       * {@link ExplicitGroup Choice} group that can receive a {@code ref} to any subtype that this wrapped type might have,
-       * be it either a top-level element for the mule schema, or if it can only be declared as child of this element.
+       * In the case of having a {@link DslElementSyntax#isWrapped wrapped} {@link ObjectType}, then a {@link ExplicitGroup
+       * Choice} group that can receive a {@code ref} to any subtype that this wrapped type might have, be it either a top-level
+       * element for the mule schema, or if it can only be declared as child of this element.
        *
+       * If the collections's value is a map, then a value attribute is created for the value map.
+       * 
        * @param objectType the item's type
        */
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen()) {
+        if (isMap(objectType)) {
           defaultVisit(objectType);
           return;
         }

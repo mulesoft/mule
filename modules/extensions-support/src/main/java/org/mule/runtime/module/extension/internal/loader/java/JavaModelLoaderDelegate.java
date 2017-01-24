@@ -19,6 +19,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StringUtils.ifNotBlank;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
@@ -430,7 +431,7 @@ public final class JavaModelLoaderDelegate {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (hasDefaultOverride && objectType.isOpen()) {
+          if (hasDefaultOverride && isMap(objectType)) {
             throw new IllegalParameterModelDefinitionException(format("Parameter '%s' is annotated with '@%s' is of type '%s'"
                 + " but a 'defaultImplementingType' was provided."
                 + " Type override is not allowed for Maps",

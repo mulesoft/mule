@@ -14,6 +14,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
@@ -78,7 +79,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
       public void visitObject(ObjectType objectType) {
         Class clazz = getType(objectType);
 
-        if (objectType.isOpen()) {
+        if (isMap(objectType)) {
           value.set(MapValueResolver.of(clazz, emptyList(), emptyList()));
           return;
         }
