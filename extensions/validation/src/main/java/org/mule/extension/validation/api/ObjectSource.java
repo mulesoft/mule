@@ -7,16 +7,16 @@
 package org.mule.extension.validation.api;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.lang.reflect.Constructor;
 
@@ -48,27 +48,18 @@ public class ObjectSource<T> {
 
   @Parameter
   @Optional
-  private String ref;
+  @XmlHints(allowInlineDefinition = false)
+  private T ref;
 
   public ObjectSource() {}
 
-  public ObjectSource(String type, String ref) {
+  public ObjectSource(String type, T ref) {
     this.type = type;
     this.ref = ref;
   }
 
-  public final T getObject(MuleContext muleContext) {
-    boolean hasType = !StringUtils.isBlank(type);
-    boolean hasRef = !StringUtils.isBlank(ref);
-
-    checkArgument(!(hasType && hasRef), "type and ref attributes are mutually exclusive. Please provide only one of them");
-    checkArgument(hasType ^ hasRef, "One of class or ref attributes are required. Please provide one of them");
-
-    if (hasRef) {
-      return doGetByRef(muleContext);
-    } else {
-      return doGetByClassName();
-    }
+  public final T getObject() {
+    return !isBlank(type) ? doGetByClassName() : ref;
   }
 
   protected T doGetByClassName() {
@@ -86,15 +77,11 @@ public class ObjectSource<T> {
     }
   }
 
-  protected T doGetByRef(MuleContext muleContext) {
-    return muleContext.getRegistry().get(ref);
+  public T getRef() {
+    return ref;
   }
 
   public final String getType() {
     return type;
-  }
-
-  public final String getRef() {
-    return ref;
   }
 }

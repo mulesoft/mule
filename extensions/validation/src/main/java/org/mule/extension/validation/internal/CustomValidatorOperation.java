@@ -6,18 +6,18 @@
  */
 package org.mule.extension.validation.internal;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.mule.extension.validation.api.ObjectSource;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Defines a stateful operation of {@link ValidationExtension} which is capable of executing custom validators provided by a third
@@ -47,27 +47,24 @@ public final class CustomValidatorOperation extends ValidationSupport {
 
   public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") ObjectSource<Validator> source,
                               @Placement(order = 1) @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
-                              Event event,
                               @UseConfig ValidationExtension config)
       throws Exception {
     ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
-    Validator validator = validatorSource.getObject(muleContext);
-    event.getMuleContext().getRegistry().applyProcessors(validator);
-
-    validateWith(validator, createContext(options, event, config), event);
+    Validator validator = validatorSource.getObject();
+    config.getMuleContext().getRegistry().applyProcessors(validator);
+    validateWith(validator, createContext(options, config));
   }
 
   @Override
-  protected void logSuccessfulValidation(Validator validator, Event event) {
+  protected void logSuccessfulValidation(Validator validator) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Successfully executed custom validator of type {} on message: {}", validator.getClass().getName(),
-                   event.getMessage());
+      LOGGER.debug("Successfully executed custom validator of type {}", validator.getClass().getName());
     }
   }
 
   private class ValidatorSource extends ObjectSource<Validator> {
 
-    public ValidatorSource(String type, String ref) {
+    public ValidatorSource(String type, Validator ref) {
       super(type, ref);
     }
 

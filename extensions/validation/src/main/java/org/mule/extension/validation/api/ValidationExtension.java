@@ -17,19 +17,21 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 /**
  * An extension which provides validation capabilities by exposing a series of {@link Validator}s as {@link ExtensionModel}
@@ -56,6 +58,9 @@ public class ValidationExtension implements Config, NamedObject, Initialisable {
 
   private ValidationMessages messageFactory;
 
+  @Inject
+  private MuleContext muleContext;
+
   @Parameter
   @Optional
   private I18NConfig i18n;
@@ -80,5 +85,9 @@ public class ValidationExtension implements Config, NamedObject, Initialisable {
   @Override
   public String getName() {
     return "Validation";
+  }
+
+  public MuleContext getMuleContext() {
+    return muleContext;
   }
 }

@@ -6,8 +6,12 @@
  */
 package org.mule.extension.validation;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import org.mule.extension.validation.api.ObjectSource;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationResult;
@@ -19,24 +23,19 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public class CustomValidationInjectionTestCase extends AbstractMuleTestCase {
 
   private final MuleRegistryHelper registryHelper = mock(MuleRegistryHelper.class);
-  private final Event event = mock(Event.class);
   private final ValidationExtension config = mock(ValidationExtension.class);
 
   @Before
   public void initializeMocks() throws Exception {
     MuleContext muleContext = mock(MuleContext.class);
-    when(event.getMuleContext()).thenReturn(muleContext);
+    when(config.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getRegistry()).thenReturn(registryHelper);
   }
 
@@ -44,7 +43,7 @@ public class CustomValidationInjectionTestCase extends AbstractMuleTestCase {
   public void injectionInCustomValidator() throws Exception {
     CustomValidatorOperation validator = new CustomValidatorOperation();
     ObjectSource<Validator> objectSource = new ObjectSource<>(TestValidator.class.getName(), null);
-    validator.customValidator(objectSource, null, event, config);
+    validator.customValidator(objectSource, null, config);
 
     verify(registryHelper, atLeastOnce()).applyProcessors(any(TestValidator.class));
   }
