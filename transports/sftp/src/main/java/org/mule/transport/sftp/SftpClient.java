@@ -46,6 +46,10 @@ public class SftpClient
     public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
     public static final String PREFERRED_AUTHENTICATION_METHODS = "PreferredAuthentications";
 
+    // MULE-11498: some servers don't support using "." (which results in a string like "/a/path/.")
+    // The "*" is actually not sent to the server, but matched locally in jsch
+    public static final String DIR_LIST_WILDCARD = "*";
+
     private Log logger = LogFactory.getLog(getClass());
 
     private ChannelSftp channelSftp;
@@ -315,7 +319,7 @@ public class SftpClient
 
     public String[] listFiles() throws IOException
     {
-        return listFiles(".");
+        return listFiles(DIR_LIST_WILDCARD);
     }
 
     public String[] listFiles(String path) throws IOException
@@ -325,7 +329,7 @@ public class SftpClient
 
     public String[] listDirectories() throws IOException
     {
-        return listDirectory(".", false, true);
+        return listDirectory(DIR_LIST_WILDCARD, false, true);
     }
 
     public String[] listDirectories(String path) throws IOException
