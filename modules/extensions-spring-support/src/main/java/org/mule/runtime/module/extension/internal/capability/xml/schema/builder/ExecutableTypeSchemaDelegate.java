@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -46,12 +47,11 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypeRestrictionModelProperty;
 
+import javax.xml.namespace.QName;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 /**
  * Base builder delegation class to generate an XSD schema that describes an executable {@link ComponentModel}
@@ -172,6 +172,9 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   private boolean isOperation(MetadataType type) {
+    if (!type.getMetadataFormat().equals(JAVA)) {
+      return false;
+    }
     Reference<Boolean> isOperation = new Reference<>(false);
     type.accept(new MetadataTypeVisitor() {
 

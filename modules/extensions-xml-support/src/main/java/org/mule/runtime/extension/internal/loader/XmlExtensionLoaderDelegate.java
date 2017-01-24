@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
@@ -39,8 +40,9 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-
-import com.google.common.collect.ImmutableMap;
+import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
+import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.net.URL;
@@ -52,8 +54,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -71,14 +71,21 @@ final class XmlExtensionLoaderDelegate {
   protected static final String CONFIG_NAME = "config";
 
   private static final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  private static final Map<String, MetadataType> types = ImmutableMap.<String, MetadataType>builder()
-      .put("string", typeLoader.load(String.class))
-      .put("boolean", typeLoader.load(Boolean.class))
-      .put("datetime", typeLoader.load(Calendar.class))
-      .put("date", typeLoader.load(Date.class))
-      .put("integer", typeLoader.load(Integer.class))
-      .put("time", typeLoader.load(LocalTime.class))
+  private static final Map<String, MetadataType> defaultInputTypes = getCommonTypesBuilder()
       .build();
+  private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
+      .put("void", typeLoader.load(Void.class))
+      .build();
+
+  private static ImmutableMap.Builder<String, MetadataType> getCommonTypesBuilder() {
+    return ImmutableMap.<String, MetadataType>builder()
+        .put("string", typeLoader.load(String.class))
+        .put("boolean", typeLoader.load(Boolean.class))
+        .put("datetime", typeLoader.load(Calendar.class))
+        .put("date", typeLoader.load(Date.class))
+        .put("integer", typeLoader.load(Integer.class))
+        .put("time", typeLoader.load(LocalTime.class));
+  }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
       new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
@@ -97,8 +104,11 @@ final class XmlExtensionLoaderDelegate {
           .build();
   private static final String SEPARATOR = "/";
   public static final String XSD_SUFFIX = ".xsd";
+  private static final String XML_SUFFIX = ".xml";
+  private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
+  private Optional<TypesCatalog> typesCatalog;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
@@ -110,9 +120,16 @@ final class XmlExtensionLoaderDelegate {
 
   public void declare(ExtensionLoadingContext context) {
     // We will assume the context classLoader of the current thread will be the one defined for the plugin (which is not filtered and will allow us to access any resource in it
-    URL resource = currentThread().getContextClassLoader().getResource(modulePath);
+    URL resource = getResource(modulePath);
     if (resource == null) {
       throw new IllegalArgumentException(format("There's no reachable XML in the path '%s'", modulePath));
+    }
+    try {
+      loadCustomTypes();
+    } catch (Exception e) {
+      throw new IllegalArgumentException(format("The custom type file [%s] for the module '%s' cannot be read properly",
+                                                getCustomTypeFilename(), modulePath),
+                                         e);
     }
 
     XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = new XmlConfigurationDocumentLoader();
@@ -129,6 +146,35 @@ final class XmlExtensionLoaderDelegate {
         componentModelReader.extractComponentDefinitionModel(parseModule.get(), resource.getFile());
 
     loadModuleExtension(context.getExtensionDeclarer(), componentModel);
+  }
+
+  private URL getResource(String resource) {
+    return currentThread().getContextClassLoader().getResource(resource);
+  }
+
+  /**
+   * Custom types might not exist for the current module, that's why it's handled with {@link Optional}
+   *
+   * @throws Exception
+   */
+  private void loadCustomTypes() throws Exception {
+    TypesCatalog typesCatalog = null;
+    final String customTypes = getCustomTypeFilename();
+    final URL resourceCustomType = getResource(customTypes);
+    if (resourceCustomType != null) {
+      TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
+      typesCatalog = typesCatalogXmlLoader.load(resourceCustomType);
+    }
+    this.typesCatalog = ofNullable(typesCatalog);
+  }
+
+  /**
+   * Possible file with the custom types, works by convention.
+   *
+   * @return given a {@code modulePath} such as "module-custom-types.xml" returns "module-custom-types-types.xml". Not null
+   */
+  private String getCustomTypeFilename() {
+    return modulePath.replace(XML_SUFFIX, TYPES_XML_SUFFIX);
   }
 
   private Document getModuleDocument(XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader, URL resource) {
@@ -235,8 +281,8 @@ final class XmlExtensionLoaderDelegate {
     Map<String, String> parameters = param.getParameters();
     String parameterName = parameters.get(PARAMETER_NAME);
     String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
-    MetadataType parameterType = extractParameterType(parameters.get(TYPE_ATTRIBUTE));
-
+    String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
+    MetadataType parameterType = extractType(defaultInputTypes, receivedInputType);
 
     ParameterDeclarer parameterDeclarer =
         parameterDefaultValue == null ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
@@ -245,40 +291,37 @@ final class XmlExtensionLoaderDelegate {
     parameterDeclarer.ofType(parameterType);
   }
 
-  private MetadataType extractParameterType(String type) {
-    Optional<MetadataType> metadataType = extractType(type);
-
-    if (!metadataType.isPresent()) {
-      throw new IllegalArgumentException(String.format(
-                                                       "should not have reach here, supported types for <parameter>(simple) are string, boolean, datetime, date, number or time for now. Type obtained [%s]",
-                                                       type));
-    }
-    return metadataType.get();
-  }
-
   private void extractOutputType(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
     ComponentModel outputComponentModel = componentModel.getInnerComponents()
         .stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_IDENTIFIER)).findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Having an operation without <output> is not supported"));
 
-    String type = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
-    Optional<MetadataType> metadataType = extractType(type);
+    String receivedOutputType = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
+    MetadataType metadataType = extractType(defaultOutputTypes, receivedOutputType);
 
-    if (!metadataType.isPresent()) {
-      if ("void".equals(type)) {
-        metadataType = of(typeLoader.load(Void.class));
-      } else {
-        throw new IllegalArgumentException(String.format(
-                                                         "should not have reach here, supported types for <parameter>(simple) are string, boolean, datetime, date, number or time for now. Type obtained [%s]",
-                                                         type));
-      }
-    }
-    operationDeclarer.withOutput().ofType(metadataType.get());
+    operationDeclarer.withOutput().ofType(metadataType);
     operationDeclarer.withOutputAttributes().ofType(typeLoader.load(Void.class));
   }
 
-  private Optional<MetadataType> extractType(String type) {
-    return Optional.ofNullable(types.get(type));
+  private MetadataType extractType(Map<String, MetadataType> types, String receivedType) {
+    Optional<MetadataType> metadataType = empty();
+    if (types.containsKey(receivedType)) {
+      metadataType = of(types.get(receivedType));
+    } else if (typesCatalog.isPresent()) {
+      metadataType = typesCatalog.get().resolveType(receivedType);
+    }
+    if (!metadataType.isPresent()) {
+      String errorMessage = format(
+                                   "should not have reach here. Type obtained [%s] when supported default types are [%s].",
+                                   receivedType,
+                                   String.join(", ", types.keySet()));
+      if (typesCatalog.isPresent()) {
+        errorMessage +=
+            format(" Custom types [%s] doesn't have support for the specified [%s] type", getCustomTypeFilename(), receivedType);
+      }
+      throw new IllegalArgumentException(errorMessage);
+    }
+    return metadataType.get();
   }
 }

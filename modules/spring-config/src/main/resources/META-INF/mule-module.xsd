@@ -47,7 +47,7 @@
                                     <xsd:complexType>
                                         <xsd:attribute name="name"/>
                                         <xsd:attribute name="defaultValue" use="optional"/>
-                                        <xsd:attribute name="type" type="inputType" use="required"/>
+                                        <xsd:attribute name="type" type="xsd:string"/>
                                     </xsd:complexType>
                                 </xsd:element>
                             </xsd:sequence>
@@ -72,7 +72,7 @@
                             </xsd:documentation>
                         </xsd:annotation>
                         <xsd:complexType>
-                            <xsd:attribute name="type" type="outputSimpleType" use="required"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
@@ -106,7 +106,7 @@
                             <xsd:complexType>
                                 <xsd:attribute name="name" use="required"/>
                                 <xsd:attribute name="defaultValue" use="optional"/>
-                                <xsd:attribute name="type" type="inputType" use="required"/>
+                                <xsd:attribute name="type" type="xsd:string" use="required"/>
                             </xsd:complexType>
                         </xsd:element>
                         <xsd:element ref="operation" />
@@ -136,37 +136,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:simpleType name="inputType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Set of defined primitive types inputs for any operation or property.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="string"/>
-            <xsd:enumeration value="boolean"/>
-            <xsd:enumeration value="datetime"/>
-            <xsd:enumeration value="date"/>
-            <xsd:enumeration value="integer"/>
-            <xsd:enumeration value="time"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-    <xsd:simpleType name="outputSimpleType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Set of defined primitive types output for any operation.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="string"/>
-            <xsd:enumeration value="boolean"/>
-            <xsd:enumeration value="datetime"/>
-            <xsd:enumeration value="date"/>
-            <xsd:enumeration value="integer"/>
-            <xsd:enumeration value="time"/>
-            <xsd:enumeration value="void"/>
-        </xsd:restriction>
-    </xsd:simpleType>
 </xsd:schema>
