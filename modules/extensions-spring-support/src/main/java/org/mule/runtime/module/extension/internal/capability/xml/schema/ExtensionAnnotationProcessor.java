@@ -93,7 +93,7 @@ public final class ExtensionAnnotationProcessor {
       return emptyList();
     }
     return Stream.of(valueClasses)
-        .map(sourceClass -> (TypeElement) getElementForClass(annotationValues, sourceClass))
+        .map(c -> (TypeElement) getElementForClass(annotationValues, c))
         .collect(new ImmutableListCollector<>());
   }
 

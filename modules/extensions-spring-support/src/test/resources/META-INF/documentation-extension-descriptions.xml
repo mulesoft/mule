@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension-documentation>
+    <elements name="anotherConfig">
+        <description><![CDATA[This is some Another Config documentation.]]></description>
+        <parameters>
+            <parameter name="magicParam">
+                <description><![CDATA[Connection parameter]]></description>
+            </parameter>
+        </parameters>
+    </elements>
+    <elements name="aliased-connection">
+        <description><![CDATA[Provider Documentation]]></description>
+        <parameters>
+            <parameter name="reconnectionStrategy">
+                <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+            </parameter>
+        </parameters>
+    </elements>
+    <elements name="operationWithBlankParameterDescription">
+        <description><![CDATA[Test Operation with blank parameter description]]></description>
+        <parameters>
+            <parameter name="value">
+                <description><![CDATA[]]></description>
+            </parameter>
+        </parameters>
+    </elements>
     <elements name="config">
-        <description><![CDATA[This is some documentation.]]></description>
+        <description><![CDATA[This is some Config documentation.]]></description>
         <parameters>
             <parameter name="configParameter">
                 <description><![CDATA[Config parameter]]></description>
@@ -30,14 +54,6 @@
         <parameters>
             <parameter name="value">
                 <description><![CDATA[]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="connection">
-        <description><![CDATA[Provider Documentation]]></description>
-        <parameters>
-            <parameter name="reconnectionStrategy">
-                <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
             </parameter>
         </parameters>
     </elements>

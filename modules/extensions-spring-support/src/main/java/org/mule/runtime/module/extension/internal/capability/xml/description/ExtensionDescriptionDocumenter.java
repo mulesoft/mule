@@ -69,12 +69,17 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
   }
 
   private Optional<ConfigurationDeclaration> findMatchingConfiguration(ExtensionDeclaration declaration, TypeElement element) {
-    return declaration.getConfigurations().stream()
+    List<ConfigurationDeclaration> configurations = declaration.getConfigurations();
+    if (configurations.size() == 1) {
+      return Optional.of(configurations.get(0));
+    }
+    return configurations.stream()
         .filter(config -> {
+          Configuration configurationAnnotation = element.getAnnotation(Configuration.class);
           String name = config.getName();
-          String alias = getAliasValue(element);
-          String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Configuration", ""));
-          return name.equals(defaultNaming) || name.equals("config") || name.equals(alias);
+          String annotationName = configurationAnnotation != null ? configurationAnnotation.name() : "";
+          String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Configuration", "").replace("Config", ""));
+          return name.equals(defaultNaming) || name.equals(annotationName);
         })
         .findAny();
   }
