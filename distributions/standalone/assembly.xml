@@ -148,7 +148,6 @@
                 <include>org.mule.modules:mule-module-extensions-xml-support</include>
                 <include>org.mule.modules:mule-module-http</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
-                <include>org.mule.modules:mule-module-json</include>
                 <include>org.mule.modules:mule-module-management</include>
                 <include>org.mule.modules:mule-module-repository</include>
                 <include>org.mule.modules:mule-module-scripting</include>
@@ -218,9 +217,7 @@
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
                 <exclude>org.mule.modules:mule-module-email</exclude>
                 <exclude>org.mule.modules:mule-module-wsc</exclude>
-                <!--<exclude>org.mule.modules:mule-module-jms</exclude>-->
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
-                <exclude>org.mule.modules:mule-module-json</exclude>
                 <exclude>org.mule.modules:mule-module-container</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-deployment</exclude>

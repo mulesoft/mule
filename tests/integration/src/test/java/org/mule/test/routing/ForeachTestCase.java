@@ -22,10 +22,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -243,9 +243,14 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void jsonUpdate() throws Exception {
-    String json =
-        "{\"order\": {\"name\": \"Ellen\", \"email\": \"ellen@mail.com\", \"items\": [{\"key1\": \"value1\"}, {\"key2\": \"value2\"}] } }";
-    flowRunner("process-json-update").withPayload(json).run();
+    List<Object> items = new ArrayList<>();
+    items.add(singletonMap("key1", "value1"));
+    items.add(singletonMap("key2", "value2"));
+    Map<String, Object> order = new HashMap<>();
+    order.put("name", "Ellen");
+    order.put("email", "ellen.mail.com");
+    order.put("items", items);
+    flowRunner("process-json-update").withPayload(singletonMap("order", order)).run();
     FlowAssert.verify("process-json-update");
   }
 

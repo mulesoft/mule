@@ -29,7 +29,6 @@
         <module>http-api</module>
         <module>http</module>
         <module>jboss-transactions</module>
-        <module>json</module>
         <module>management</module>
         <module>reboot</module>
         <module>schedulers</module>
