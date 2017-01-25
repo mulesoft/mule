@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.manager;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -33,7 +34,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -137,6 +137,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     extensionsManager.initialise();
     this.extensionsManager = extensionsManager;
 
+    mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+    mockClassLoaderModelProperty(extensionModel2, getClass().getClassLoader());
+    mockClassLoaderModelProperty(extensionModel3WithRepeatedName, getClass().getClassLoader());
+
     when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
     mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
 
@@ -164,8 +168,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 
-    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
-    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(Optional.of(extension1OperationModel));
+    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(of(extension1ConfigurationModel));
+    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(of(extension1OperationModel));
     when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
 
     when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);

@@ -7,19 +7,14 @@
 package org.mule.runtime.extension.internal.loader;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Test;
 import org.mule.metadata.api.model.MetadataFormat;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.json.handler.HandlerManager;
-import org.mule.metadata.json.handler.ParsingContext;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -29,7 +24,6 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponent
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -144,24 +138,18 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     final ParameterModel parameterValueModel = operation.getAllParameterModels().get(0);
     assertThat(parameterValueModel.getName(), is("value"));
     assertThat(operation.getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(parameterValueModel.getType(), is(loadTypeFrom("module-custom-types/type1-schema.json")));
+    assertThat(parameterValueModel.getType().getMetadataFormat(), is(MetadataFormat.JSON));
+    assertThat(parameterValueModel.getType(), instanceOf(ObjectType.class));
+    assertThat(((ObjectType) parameterValueModel.getType()).getFields().size(), is(2));
 
     assertThat(operation.getOutput().getType().getMetadataFormat(), is(MetadataFormat.JSON));
-    assertThat(operation.getOutput().getType(), is(loadTypeFrom("module-custom-types/type2-schema.json")));
+    assertThat(operation.getOutput().getType(), instanceOf(ObjectType.class));
+    assertThat(((ObjectType) operation.getOutput().getType()).getFields().size(), is(3));
+
     Optional<OperationComponentModelModelProperty> modelProperty =
         operation.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
     assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
-  }
-
-  private MetadataType loadTypeFrom(String file) throws IOException {
-    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(file)) {
-      final JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
-      final Schema jsonSchema = SchemaLoader.load(rawSchema);
-      return new HandlerManager().handle(jsonSchema, new ParsingContext()).build();
-    } catch (IOException e) {
-      throw e;
-    }
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

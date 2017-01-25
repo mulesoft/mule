@@ -25,6 +25,7 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forType;
+import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -69,8 +70,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-
-import com.google.common.collect.ImmutableList;
+import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -93,8 +93,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -684,6 +682,10 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitObject(ObjectType objectType) {
+        if (objectType.getMetadataFormat() != JAVA) {
+          return;
+        }
+
         if (!relativeClasses.contains(getType(objectType))) {
 
           Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
@@ -699,7 +701,7 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitString(StringType stringType) {
-        if (isEnum(stringType)) {
+        if (stringType.getMetadataFormat() == JAVA && isEnum(stringType)) {
           relativeClasses.add(getType(stringType));
         }
       }
