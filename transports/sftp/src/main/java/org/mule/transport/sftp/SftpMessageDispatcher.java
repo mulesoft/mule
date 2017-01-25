@@ -25,6 +25,7 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * <code>SftpMessageDispatcher</code> dispatches files via sftp to a remote sftp
@@ -189,7 +190,14 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
         }
         else if (data instanceof String)
         {
-            inputStream = new ByteArrayInputStream(((String) data).getBytes());
+            if (endpoint.getEncoding() == null)
+            {
+                inputStream = new ByteArrayInputStream(((String) data).getBytes());
+            }
+            else
+            {
+                inputStream = new ByteArrayInputStream(((String) data).getBytes(Charset.forName(endpoint.getEncoding())));
+            }
         }
         else
         {

@@ -6,7 +6,13 @@
  */
 package org.mule.transport.sftp;
 
+import static java.nio.charset.Charset.defaultCharset;
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.Assert.assertEquals;
+import static org.apache.commons.io.IOUtils.copy;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -21,7 +27,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.file.FilenameParser;
 import org.mule.transport.sftp.notification.SftpNotifier;
-import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -37,7 +42,8 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
 
     private final String PROPERTY_OUTPUT_PATTERN = "outPattern";
     private final String PROPERTY_FILENAME = "outFilename";
-    private String payload = "HelloWorld!";
+    private String otherEncoding;
+    private String payload = "HelloWorld, España!";
     private EndpointURI endpointUri = mock(EndpointURI.class);
     private OutboundEndpoint outboundEndpoint = mock(OutboundEndpoint.class);
     private MuleEvent muleEvent = mock(MuleEvent.class);
@@ -50,8 +56,9 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
     private FilenameParser filenameParser = mock(FilenameParser.class);
 
     @Before
-    public void initializeMocks() throws Exception
+    public void initializeMocksAndEncodingVar() throws Exception
     {
+        otherEncoding = defaultCharset().equals(UTF_8.name()) ? UTF_16.name() : UTF_8.name();
         when(sftpConnector.createSftpClient(eq(outboundEndpoint), any(SftpNotifier.class))).thenReturn(sftpClient);
         when(sftpConnector.getFilenameParser()).thenReturn(filenameParser);
         when(filenameParser.getFilename(any(MuleMessage.class), anyString())).thenAnswer(
@@ -61,10 +68,9 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
                     public String answer(InvocationOnMock invocation) throws Throwable
                     {
                         Object[] args = invocation.getArguments();
-                        return (String) args[1];    // outPattern
+                        return (String) args[1]; // outPattern
                     }
-                }
-        );
+                });
         when(outboundEndpoint.getConnector()).thenReturn(sftpConnector);
         when(outboundEndpoint.getEndpointURI()).thenReturn(endpointUri);
         when(muleEvent.getMessage()).thenReturn(muleMessage);
@@ -77,10 +83,9 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
                     public String answer(InvocationOnMock invocation) throws Throwable
                     {
                         Object[] args = invocation.getArguments();
-                        return (String) args[1];    // filename
+                        return (String) args[1]; // filename
                     }
-                }
-        );
+                });
     }
 
     @Test
@@ -91,13 +96,11 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
 
         sftpMessageDispatcher.doDispatch(muleEvent);
         verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture());
-        assertEquals("Output filename was not set correctly.", PROPERTY_OUTPUT_PATTERN,
-                     transferFilenameCaptor.getValue());
-
+        assertThat(PROPERTY_OUTPUT_PATTERN, equalTo(transferFilenameCaptor.getValue()));
         InputStream inputStream = inputStreamCaptor.getValue();
         StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(inputStream, stringWriter, "UTF-8");
-        assertEquals(payload, stringWriter.toString());
+        copy(inputStream, stringWriter, defaultCharset());
+        assertThat(payload, equalTo(stringWriter.toString()));
     }
 
     @Test
@@ -109,14 +112,14 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
         sftpMessageDispatcher.doDispatch(muleEvent);
         verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture());
         assertEquals("Output filename was not set correctly.", PROPERTY_FILENAME,
-                     transferFilenameCaptor.getValue());
+                transferFilenameCaptor.getValue());
 
         InputStream inputStream = inputStreamCaptor.getValue();
         StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(inputStream, stringWriter, "UTF-8");
-        assertEquals(payload, stringWriter.toString());
+        copy(inputStream, stringWriter, defaultCharset());
+        assertThat(payload, equalTo(stringWriter.toString()));
     }
-    
+
     @Test
     public void appendFile() throws Exception
     {
@@ -126,8 +129,21 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
         verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture(), writeModeCaptor.capture());
         InputStream inputStream = inputStreamCaptor.getValue();
         StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(inputStream, stringWriter, "UTF-8");
-        assertEquals(payload, stringWriter.toString());
+        copy(inputStream, stringWriter, defaultCharset());
+        assertThat(payload, equalTo(stringWriter.toString()));
+    }
+
+    @Test
+    public void whenAnotherEncodingIsSetTheResultRespectsTheEncodingParameter() throws Exception
+    {
+        when(outboundEndpoint.getEncoding()).thenReturn(otherEncoding);
+        SftpMessageDispatcher sftpMessageDispatcher = new SftpMessageDispatcher(outboundEndpoint);
+        sftpMessageDispatcher.doDispatch(muleEvent);
+        verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture());
+        InputStream inputStream = inputStreamCaptor.getValue();
+        StringWriter stringWriterOtherEncoding = new StringWriter();
+        copy(inputStream, stringWriterOtherEncoding, otherEncoding);
+        assertThat(payload, equalTo(stringWriterOtherEncoding.toString()));
     }
 
     @Test
@@ -138,8 +154,8 @@ public class SftpMessageDispatcherTestCase extends AbstractMuleTestCase
         verify(sftpClient).storeFile(transferFilenameCaptor.capture(), inputStreamCaptor.capture());
         InputStream inputStream = inputStreamCaptor.getValue();
         StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(inputStream, stringWriter, "UTF-8");
-        assertEquals(payload, stringWriter.toString());        
+        copy(inputStream, stringWriter, defaultCharset());
+        assertThat(payload, equalTo(stringWriter.toString()));
     }
-    
+
 }
