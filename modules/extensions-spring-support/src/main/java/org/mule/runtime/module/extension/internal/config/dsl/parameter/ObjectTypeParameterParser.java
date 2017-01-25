@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -128,14 +129,6 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen()) {
-          if (!parseAsContent(isContent, objectType)) {
-            parseMapParameters(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, fieldDsl.get(),
-                               emptySet());
-          }
-          return;
-        }
-
         if (isParameterGroup(objectField)) {
           objectType.getFields().forEach(field -> parseField(field));
           return;
@@ -161,6 +154,14 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         if (!parseAsContent(isContent, arrayType)) {
           parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
                                    emptySet());
+        }
+      }
+
+      @Override
+      public void visitDictionary(DictionaryType dictionaryType) {
+        if (!parseAsContent(isContent, dictionaryType)) {
+          parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                             emptySet());
         }
       }
 

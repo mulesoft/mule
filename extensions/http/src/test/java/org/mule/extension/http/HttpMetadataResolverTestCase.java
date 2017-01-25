@@ -16,6 +16,7 @@ import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -85,7 +86,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
   @Test
   public void resolveForm() {
-    verifyType(FORM, ObjectType.class, ParameterMap.class);
+    verifyType(FORM, DictionaryType.class, ParameterMap.class);
   }
 
   @Test

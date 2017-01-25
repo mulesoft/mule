@@ -215,7 +215,7 @@ public class HeisenbergOperations {
     return investment;
   }
 
-  public Map<String, HealthStatus> getMedicalHistory(Map<String, HealthStatus> healthByYear) {
+  public Map<Integer, HealthStatus> getMedicalHistory(Map<Integer, HealthStatus> healthByYear) {
     return healthByYear;
   }
 

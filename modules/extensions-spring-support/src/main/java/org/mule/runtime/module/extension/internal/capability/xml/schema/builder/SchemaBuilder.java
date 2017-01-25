@@ -19,7 +19,6 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
@@ -42,6 +41,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -160,7 +160,7 @@ public final class SchemaBuilder {
     sourceSchemaDelegate = new SourceSchemaDelegate(this);
     collectionDelegate = new CollectionSchemaDelegate(this);
     objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
-    mapDelegate = new MapSchemaDelegate(this, typeLoader);
+    mapDelegate = new MapSchemaDelegate(this);
   }
 
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
@@ -526,6 +526,16 @@ public final class SchemaBuilder {
       }
 
       @Override
+      public void visitDictionary(DictionaryType dictionaryType) {
+        defaultVisit(dictionaryType);
+        if (paramDsl.supportsChildDeclaration()) {
+          mapDelegate.generateMapElement(dictionaryType, paramDsl, description,
+                                         !paramDsl.supportsAttributeDeclaration(),
+                                         childElements);
+        }
+      }
+
+      @Override
       public void visitObject(ObjectType objectType) {
         final String id = getId(objectType);
         if (id.equals(TlsContextFactory.class.getName())) {
@@ -534,15 +544,7 @@ public final class SchemaBuilder {
         }
 
         defaultVisit(objectType);
-        if (isMap(objectType)) {
-          if (paramDsl.supportsChildDeclaration()) {
-            mapDelegate.generateMapElement(objectType, paramDsl, description,
-                                           !paramDsl.supportsAttributeDeclaration(),
-                                           childElements);
-          }
-        } else {
-          objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
-        }
+        objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
       }
 
       @Override

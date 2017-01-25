@@ -32,10 +32,10 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -62,7 +62,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.ParameterResolverTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -158,7 +157,6 @@ public abstract class ExtensionDefinitionParser {
   private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
   protected final MuleContext muleContext;
   protected final Map<String, String> infrastructureParameterMap = getNameMap();
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   /**
    * Creates a new instance
@@ -246,12 +244,6 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (objectType.isOpen()) {
-            if (!(parseAsContent(objectType))) {
-              parseMapParameters(parameter, objectType, paramDsl);
-            }
-            return;
-          }
           if (isNestedProcessor(objectType)) {
             parseNestedProcessor(parameter);
           } else {
@@ -263,6 +255,13 @@ public abstract class ExtensionDefinitionParser {
                           parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
                           paramDsl, parameter.getModelProperties());
             }
+          }
+        }
+
+        @Override
+        public void visitDictionary(DictionaryType dictionaryType) {
+          if (!parseAsContent(dictionaryType)) {
+            parseMapParameters(parameter, dictionaryType, paramDsl);
           }
         }
 
@@ -296,27 +295,27 @@ public abstract class ExtensionDefinitionParser {
   }
 
   /**
-   * Registers a definition for a {@link ParameterModel} which represents an open {@link ObjectType}
+   * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param parameter a {@link ParameterModel}
-   * @param objectType a {@link ObjectType}
+   * @param parameter      a {@link ParameterModel}
+   * @param dictionaryType a {@link DictionaryType}
    */
-  protected void parseMapParameters(ParameterModel parameter, ObjectType objectType, DslElementSyntax paramDsl) {
-    parseMapParameters(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
+  protected void parseMapParameters(ParameterModel parameter, DictionaryType dictionaryType, DslElementSyntax paramDsl) {
+    parseMapParameters(getKey(parameter), parameter.getName(), dictionaryType, parameter.getDefaultValue(),
                        parameter.getExpressionSupport(), parameter.isRequired(), paramDsl, parameter.getModelProperties());
   }
 
   /**
-   * Registers a definition for a {@link ParameterModel} which represents an open {@link ObjectType}
+   * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param dictionaryType the parameter's open {@link ObjectType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param dictionaryType    the parameter's {@link DictionaryType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required
+   * @param required          whether the parameter is required
    */
-  protected void parseMapParameters(String key, String name, ObjectType dictionaryType, Object defaultValue,
+  protected void parseMapParameters(String key, String name, DictionaryType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
                                     Set<ModelProperty> modelProperties) {
     parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required, modelProperties);
@@ -328,14 +327,14 @@ public abstract class ExtensionDefinitionParser {
       mapType = LinkedHashMap.class;
     }
 
-    final MetadataType valueType = dictionaryType.getOpenRestriction().get();
+    final MetadataType keyType = dictionaryType.getKeyType();
+    final MetadataType valueType = dictionaryType.getValueType();
+    final Class<?> keyClass = getType(keyType);
     final Class<?> valueClass = getType(valueType);
-    final MetadataType keyType = typeLoader.load(String.class);
-    final Class<?> keyClass = String.class;
 
     final String mapElementName = paramDsl.getElementName();
 
-    addParameter(getChildKey(key), fromChildMapConfiguration(valueClass).withWrapperIdentifier(mapElementName)
+    addParameter(getChildKey(key), fromChildMapConfiguration(keyClass, valueClass).withWrapperIdentifier(mapElementName)
         .withDefaultValue(defaultValue));
 
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(mapElementName).withTypeDefinition(fromType(mapType)).build());

@@ -150,6 +150,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   @Parameter
   @Optional
+  private Map<? extends Weapon, ?> wildCardWeaponMap;
+
+  @Parameter
+  @Optional
   @DisplayName(PARAMETER_OVERRIDED_DISPLAY_NAME)
   private Map<String, Weapon> weaponValueMap;
 

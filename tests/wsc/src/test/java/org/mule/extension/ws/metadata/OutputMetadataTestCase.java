@@ -21,6 +21,7 @@ import static org.mule.extension.ws.internal.metadata.BaseWscResolver.ATTACHMENT
 import static org.mule.extension.ws.internal.metadata.BaseWscResolver.BODY_FIELD;
 import static org.mule.extension.ws.internal.metadata.BaseWscResolver.HEADERS_FIELD;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -86,8 +87,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
     MetadataType soapHeaders = iterator.next().getValue();
     MetadataType protocolHeaders = iterator.next().getValue();
     assertThat(soapHeaders, is(instanceOf(NullType.class)));
-    assertThat(protocolHeaders, is(instanceOf(ObjectType.class)));
-    assertThat(((ObjectType) protocolHeaders).isOpen(), is(true));
+    assertThat(protocolHeaders, is(instanceOf(DictionaryType.class)));
   }
 
   @Test

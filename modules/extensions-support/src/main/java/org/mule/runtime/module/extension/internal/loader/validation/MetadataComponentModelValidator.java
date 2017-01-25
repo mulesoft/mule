@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getA
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNullResolver;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
@@ -181,8 +182,12 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
         @Override
         public void visitObject(ObjectType objectType) {
-          objectType.getOpenRestriction().ifPresent(t -> failIfTypeIsObject(component, extensionModel, t, problemsReporter));
           failIfTypeIsObject(component, extensionModel, objectType, problemsReporter);
+        }
+
+        @Override
+        public void visitDictionary(DictionaryType dictionaryType) {
+          failIfTypeIsObject(component, extensionModel, dictionaryType.getValueType(), problemsReporter);
         }
 
         @Override

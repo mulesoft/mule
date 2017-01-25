@@ -26,8 +26,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.v
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -103,7 +103,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   private SourceCallbackModel sourceCallbackModel;
 
   private BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
-  private ObjectType dictionaryType;
+  private DictionaryType dictionaryType;
   private ArrayType arrayType;
 
   private MetadataComponentModelValidator validator = new MetadataComponentModelValidator();
@@ -240,10 +240,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
 
-    dictionaryType = typeBuilder.objectType()
-        .id(HashMap.class.getName())
-        .openWith(toMetadataType(Object.class))
-        .build();
+    dictionaryType = typeBuilder.dictionaryType().id(HashMap.class.getName()).ofKey(toMetadataType(String.class))
+        .ofValue(toMetadataType(Object.class)).build();
   }
 
   @Test
@@ -286,9 +284,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void operationReturnsDictionaryTypeWithPojoValue() {
-    dictionaryType = typeBuilder.objectType()
-        .id(HashMap.class.getName())
-        .openWith(toMetadataType(Apple.class)).build();
+    dictionaryType = typeBuilder.dictionaryType().id(HashMap.class.getName()).ofKey(toMetadataType(String.class))
+        .ofValue(toMetadataType(Apple.class)).build();
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(MOCK_RESOLVER_SUPPLIER, emptyMap(), MOCK_RESOLVER_SUPPLIER,

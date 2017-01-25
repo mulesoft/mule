@@ -38,7 +38,6 @@ import org.mule.runtime.module.extension.internal.loader.validation.MetadataComp
 import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
 
 import java.util.List;
 
@@ -61,8 +60,7 @@ public class JavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new MetadataComponentModelValidator(),
                                                                                          new NullSafeModelValidator(),
                                                                                          new OperationReturnTypeModelValidator(),
-                                                                                         new ParameterGroupModelValidator(),
-                                                                                         new ParameterTypeModelValidator()));
+                                                                                         new ParameterGroupModelValidator()));
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new ClassLoaderDeclarationEnricher(),
                                                                                                new JavaXmlDeclarationEnricher(),

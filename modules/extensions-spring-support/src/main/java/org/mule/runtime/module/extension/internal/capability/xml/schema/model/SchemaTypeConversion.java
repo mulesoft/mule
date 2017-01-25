@@ -29,9 +29,9 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
+import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
@@ -87,12 +87,8 @@ public final class SchemaTypeConversion {
       }
 
       @Override
-      public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen()) {
-          qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
-        } else {
-          defaultVisit(objectType);
-        }
+      public void visitDictionary(DictionaryType dictionaryType) {
+        qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
       }
 
       @Override

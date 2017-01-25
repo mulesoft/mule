@@ -33,7 +33,7 @@ public class AttributeDefinition {
   private String referenceSimpleParameter;
   private boolean collection;
   private boolean map;
-  private Class<?> mapKeyType = String.class;
+  private Class<?> mapKeyType;
   private boolean valueFromTextContent;
   private TypeConverter typeConverter;
   private KeyAttributeDefinitionPair[] definitions;
@@ -235,12 +235,14 @@ public class AttributeDefinition {
     /**
      * Used when an attribute must be set with a map of objects created from the user configuration.
      *
+     * @param keyType the map key type.
      * @param valueType the map value type.
      * @return the builder
      */
-    public static Builder fromChildMapConfiguration(Class<?> valueType) {
+    public static Builder fromChildMapConfiguration(Class<?> keyType, Class<?> valueType) {
       Builder builder = new Builder();
       builder.attributeDefinition.childObjectType = valueType;
+      builder.attributeDefinition.mapKeyType = keyType;
       builder.attributeDefinition.map = true;
       return builder;
     }
