@@ -15,6 +15,14 @@ import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.XSD_SUFFIX;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
@@ -29,15 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * Tests to ensure XSD generation coming from an XML using the {@link ExtensionModel} mechanism.
@@ -65,6 +64,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
 
       {
         add("module-param-default-types");
+        add("module-param-custom-types");
         add("module-param-types");
         add("module-properties-default-types");
         add("module-properties-types");
