@@ -41,6 +41,7 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.dom.NodeOverNodeInfo;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -230,8 +231,10 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
           transformer.bindDouble(paramKey, ((Double) o).doubleValue(), connection.createAtomicType(XQItemType.XQBASETYPE_DOUBLE));
         } else if (o instanceof Document) {
           transformer.bindDocument(paramKey, new DOMSource(((Document) o).getFirstChild()), connection.createNodeType());
-        } else if (o instanceof Node) {
+        } else if (o instanceof NodeOverNodeInfo) {
           transformer.bindDocument(paramKey, new DOMSource((Node) o), connection.createNodeType());
+        } else if (o instanceof Node) {
+          transformer.bindNode(paramKey, (Node) o, connection.createNodeType());
         } else {
           logger.warn(String.format("Cannot bind value for key '%s' because type '%s' is not supported", key,
                                     o.getClass().getName()));
