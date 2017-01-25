@@ -5224,6 +5224,94 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--===========-->
+    <!-- Streaming -->
+    <!--===========-->
+
+    <xsd:element name="abstract-streaming-strategy" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for a reconnection strategy element. Reconnection strategies define how Mule should attempt to handle a connection failure.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="repeatable-file-store-stream" type="repeatableFileStoreStreamType" substitutionGroup="abstract-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                //TODO: ADD docs
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="repeatableFileStoreStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="maxInMemorySize" type="substitutableDecimal" use="optional" default="256">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then
+                            it will start to buffer the content on disk. Default value is 256 KB.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sizeUnit" type="byteUnitType" use="optional" default="KB">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The unit in which maxInMemorySize is expressed
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                //TODO: ADD docs
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="repeatableInMemoryStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="maxInMemorySize" type="substitutableDecimal" use="optional" default="256">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised.
+                            Default value is 256 KB.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sizeUnit" type="byteUnitType" use="optional" default="KB">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The unit in which maxInMemorySize is expressed
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="in-memory-stream" type="inMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                This configuration allows the input stream to be read only once. It will not allow to seek randomly
+                which will limit the transformations that DW can perform on this stream.
+                Use this option for use cases which just require moving data around from one system to another to get optimum performance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="inMemoryStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType" />
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!--==============================================================-->
     <!--  Lifecycle Adapters                                            -->
     <!--==============================================================-->
