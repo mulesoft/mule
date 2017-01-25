@@ -90,7 +90,7 @@ final class ExtensionRegistry {
               registry.registerTransformer(new StringToEnum(enumClass));
             } catch (MuleException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
-                                                                     + enumClass.getName()), e);
+                  + enumClass.getName()), e);
             }
           }
         });
