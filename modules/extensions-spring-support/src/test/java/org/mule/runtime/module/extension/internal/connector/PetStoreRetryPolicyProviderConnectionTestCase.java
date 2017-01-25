@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.exception.MessagingException;
@@ -97,8 +96,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends ExtensionFunc
 
     @Override
     public ConnectionValidationResult validate(PetStoreClient connection) {
-      return ConnectionValidationResult.failure(CONNECTION_FAIL, ConnectionExceptionCode.INCORRECT_CREDENTIALS,
-                                                new Exception("Invalid credentials"));
+      return ConnectionValidationResult.failure(CONNECTION_FAIL, new Exception("Invalid credentials"));
     }
   }
 

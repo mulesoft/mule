@@ -14,6 +14,8 @@
     <artifactId>mule-module-email</artifactId>
     <packaging>mule-extension</packaging>
 
+    <name>Mule Email Connector</name>
+
     <properties>
         <javaMailVersion>1.5.6</javaMailVersion>
         <javaxActivationVersion>1.1</javaxActivationVersion>

@@ -6,7 +6,6 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
@@ -67,8 +66,7 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
     if (connection.getUsername().equals("john") && connection.getPassword().equals("doe")) {
       return ConnectionValidationResult.success();
     } else {
-      return ConnectionValidationResult.failure("Invalid credentials", ConnectionExceptionCode.INCORRECT_CREDENTIALS,
-                                                new Exception("Invalid credentials"));
+      return ConnectionValidationResult.failure("Invalid credentials", new Exception("Invalid credentials"));
     }
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -64,6 +65,7 @@ import org.slf4j.Logger;
 public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
 
   private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationInstance.class);
+  private static final String DO_TEST_CONNECTIVITY_PROPERTY_NAME = "doTestConnectivity";
 
   private final String name;
   private final ConfigurationModel model;
@@ -85,6 +87,8 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private ConnectionManagerAdapter connectionManager;
 
   private Scheduler retryScheduler;
+
+  private boolean doTestConnectivity = getDoTestConnectivityProperty();
 
   /**
    * Creates a new instance
@@ -141,7 +145,9 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       if (!connectionManager.hasBinding(value)) {
         connectionManager.bind(value, connectionProvider.get());
       }
-      testConnectivity();
+      if (doTestConnectivity) {
+        testConnectivity();
+      }
     }
     startIfNeeded(value);
     super.start();
@@ -276,5 +282,11 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
 
     configurationStats = new DefaultMutableConfigurationStats(timeSupplier);
+  }
+
+  private boolean getDoTestConnectivityProperty() {
+    return System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME) != null
+        ? valueOf(System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME))
+        : true;
   }
 }

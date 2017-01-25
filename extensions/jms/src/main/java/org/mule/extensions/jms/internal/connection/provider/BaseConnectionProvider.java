@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_1_0_2b;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.DISCONNECTED;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -155,7 +154,8 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Validation failed: ", e);
       }
-      return failure("Invalid connection provided: Connection could not be started.", DISCONNECTED, e);
+      //TODO - MULE-11433: Useful error never informed by connectivity testing
+      return failure("Invalid connection provided: Connection could not be started.", e);
     }
   }
 

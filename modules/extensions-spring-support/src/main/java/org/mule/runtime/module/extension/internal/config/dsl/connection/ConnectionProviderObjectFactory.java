@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -27,14 +28,17 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFactory<ConnectionProviderResolver> {
 
   private final ConnectionProviderModel providerModel;
+  private final ExtensionModel extensionModel;
 
   private PoolingProfile poolingProfile = null;
   private RetryPolicyTemplate retryPolicyTemplate = null;
   private boolean disableValidation = false;
 
-  public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel, MuleContext muleContext) {
+  public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel, MuleContext muleContext,
+                                         ExtensionModel extensionModel) {
     super(muleContext);
     this.providerModel = providerModel;
+    this.extensionModel = extensionModel;
   }
 
   @Override
@@ -42,7 +46,8 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(providerModel);
     return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                                               disableValidation, retryPolicyTemplate,
-                                                                              getConnectionManager()));
+                                                                              getConnectionManager(), extensionModel,
+                                                                              muleContext));
   }
 
   private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {

@@ -170,7 +170,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
         @Override
         public void onConnectionProvider(ConnectionProviderModel model) {
-          parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, dslSyntaxResolver, muleContext,
+          parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
+                                                           muleContext,
                                                            parsingContext));
         }
 

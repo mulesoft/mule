@@ -10,11 +10,11 @@ package org.mule.extension.http;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import org.junit.Test;
@@ -33,8 +33,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public void requestConfigDefaultPortHttp() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     assertThat(provider.getPort(), is(HTTP.getDefaultPort()));
   }
 
@@ -42,8 +41,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public void requestConfigDefaultPortHttps() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     assertThat(provider.getPort(), is(HTTPS.getDefaultPort()));
   }
 
@@ -51,8 +49,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public void requestConfigDefaultTlsContextHttps() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     assertThat(provider.getTlsContext(), notNullValue());
   }
 

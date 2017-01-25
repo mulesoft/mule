@@ -7,12 +7,15 @@
 package org.mule.tck.junit4.matcher;
 
 import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsAnything;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 /**
  * {@link Matcher} for {@link ErrorType} instances.
@@ -21,12 +24,17 @@ import org.mule.runtime.api.message.ErrorType;
  */
 public final class ErrorTypeMatcher extends TypeSafeMatcher<ErrorType> {
 
+  private static Matcher anything = IsAnything.anything();
   private final Matcher<String> namespace;
   private final Matcher<String> type;
 
   private ErrorTypeMatcher(Matcher<String> namespace, Matcher<String> type) {
     this.namespace = namespace;
     this.type = type;
+  }
+
+  public static ErrorTypeMatcher errorType(ErrorTypeDefinition type) {
+    return errorType(anything, is(type.getType()));
   }
 
   public static ErrorTypeMatcher errorType(String namespace, String type) {

@@ -13,6 +13,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.exception.MessagingException;
@@ -98,8 +99,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
 
   private void checkProxyConfig() throws Exception {
     ConfigurationInstance config = getConfigurationInstanceFromRegistry("config" + flowName, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     ProxyConfig proxyConfig = provider.getProxyConfig();
 
     assertThat(proxyConfig.getHost(), is(PROXY_HOST));

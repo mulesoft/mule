@@ -6,7 +6,6 @@
  */
 package org.mule.extension.ftp.internal.ftp.connection;
 
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.file.common.api.AbstractFileSystem;
@@ -51,13 +50,13 @@ public abstract class FtpFileSystem extends AbstractFileSystem {
    */
   public ConnectionValidationResult validateConnection() {
     if (!isConnected()) {
-      return failure("Connection is stale", UNKNOWN, null);
+      return failure("Connection is stale", null);
     }
 
     try {
       changeToBaseDir();
     } catch (Exception e) {
-      failure("Configured workingDir is unavailable", UNKNOWN, e);
+      failure("Configured workingDir is unavailable", e);
     }
     return success();
   }

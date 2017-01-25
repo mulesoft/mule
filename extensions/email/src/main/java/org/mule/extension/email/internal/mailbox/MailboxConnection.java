@@ -7,7 +7,6 @@
 package org.mule.extension.email.internal.mailbox;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.DISCONNECTED;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.email.api.exception.EmailAccessingFolderException;
@@ -157,7 +156,8 @@ public class MailboxConnection extends AbstractEmailConnection {
   @Override
   public ConnectionValidationResult validate() {
     String errorMessage = "Store is not connected";
-    return store.isConnected() ? success() : failure(errorMessage, DISCONNECTED, new EmailConnectionException(errorMessage));
+    // TODO - MULE-11433 : Useful error never informed by connectivity testing
+    return store.isConnected() ? success() : failure(errorMessage, new EmailConnectionException(errorMessage));
   }
 
   /**

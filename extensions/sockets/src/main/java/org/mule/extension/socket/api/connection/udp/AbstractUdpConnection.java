@@ -11,7 +11,6 @@ import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.connection.AbstractSocketConnection;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -46,7 +45,7 @@ public abstract class AbstractUdpConnection extends AbstractSocketConnection {
   @Override
   public ConnectionValidationResult validate() {
     if (socket.isClosed()) {
-      return ConnectionValidationResult.failure("UDP socket was closed", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("UDP socket was closed", null);
     }
 
     return ConnectionValidationResult.success();

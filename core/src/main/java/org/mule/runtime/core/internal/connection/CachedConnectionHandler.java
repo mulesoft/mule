@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
@@ -130,14 +129,13 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
     } catch (Exception e) {
       validationResult = ConnectionValidationResult.failure(
                                                             "Error validating connection. Unexpected exception was thrown by the extension when validating the connection",
-                                                            ConnectionExceptionCode.UNKNOWN, e);
+                                                            e);
     }
 
     if (validationResult == null) {
       String errorMessage =
           "Error validating connection. validate() method from the connection provider can not return a null ConnectionValidationResult";
-      validationResult = ConnectionValidationResult.failure(errorMessage, ConnectionExceptionCode.UNKNOWN,
-                                                            new ConnectionException(errorMessage));
+      validationResult = ConnectionValidationResult.failure(errorMessage, new ConnectionException(errorMessage));
     }
 
     return validationResult;

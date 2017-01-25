@@ -19,6 +19,7 @@ import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
@@ -94,7 +95,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
               .get(testEvent())
               .getConnectionProvider().get();
 
-      return ((DbConnectionProvider) connectionProviderWrapper.getDelegate()).getConfiguredDataSource();
+      return ((DbConnectionProvider) unwrapProviderWrapper(connectionProviderWrapper)).getConfiguredDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
