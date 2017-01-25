@@ -8,18 +8,31 @@ package org.mule.module.ws.security;
 
 import static org.apache.ws.security.handler.WSHandlerConstants.TIMESTAMP;
 import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
+import static org.mule.api.config.MuleProperties.MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE;
 
 import java.util.Map;
 
 public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
 {
     private long expires;
+    private boolean checkResponseTimestamp;
+    
+    public WssTimestampSecurityStrategy()
+    {
+        String checkResponseTimestampValue = System.getProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, "false");
+        checkResponseTimestamp = Boolean.parseBoolean(checkResponseTimestampValue);
+    }
 
     @Override
     public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
     {
         appendAction(outConfigProperties, TIMESTAMP);
         outConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
+        if (checkResponseTimestamp)
+        {
+            appendAction(inConfigProperties, TIMESTAMP);
+            inConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
+        }
     }
 
     public long getExpires()
@@ -30,5 +43,10 @@ public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy imple
     public void setExpires(long expires)
     {
         this.expires = expires;
+    }
+
+    public boolean isCheckResponseTimestamp()
+    {
+        return checkResponseTimestamp;
     }
 }

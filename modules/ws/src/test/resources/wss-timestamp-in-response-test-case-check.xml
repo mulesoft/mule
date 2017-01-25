@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+			   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+
+	<http:listener-config name="listenerConfigTSInResponse"
+		host="localhost" port="${portServerTSInResponse}" />
+
+	<http:listener-config name="listenerConfigNoTSInResponse"
+		host="localhost" port="${portServerNoTSInResponse}" />
+
+	<http:listener-config name="listenerConfigTSInResponseTSCheck"
+		host="localhost" port="${portTSInResponseTSCheck}" />
+
+	<http:listener-config name="listenerConfigNoTSInResponseTSCheck"
+		host="localhost" port="${portNoTSInResponseTSCheck}" />
+
+	<tls:context name="tlsContextSignature">
+		<tls:trust-store path="trustStore" password="mulepassword"
+			type="jks" />
+		<tls:key-store path="clientKeystore" keyPassword="mulepassword"
+			password="mulepassword" alias="muleclient" type="jks" />
+	</tls:context>
+
+	<tls:context name="tlsContextEncryption">
+		<tls:trust-store path="ssltest-cacerts.jks" password="changeit"
+			type="jks" />
+		<tls:key-store path="ssltest-keystore.jks" keyPassword="changeit"
+			password="changeit" alias="s1as" type="jks" />
+	</tls:context>
+	<ws:consumer-config wsdlLocation="Test.wsdl"
+		service="TestService" port="TestPort"
+		serviceAddress="http://localhost:${portServerTSInResponse}/services/Test"
+		name="TSCheckTSInResponse">
+		<ws:security>
+			<ws:wss-username-token username="admin"
+				password="textPassword" passwordType="TEXT" addCreated="true"
+				addNonce="true" />
+			<ws:wss-timestamp expires="60" />
+			<!-- I add the following actions because if I let the timestamp alone, 
+				no verification on incoming requests are performed -->
+			<ws:wss-sign tlsContext-ref="tlsContextSignature" />
+			<ws:wss-verify-signature tlsContext-ref="tlsContextSignature" />
+			<ws:wss-encrypt tlsContext-ref="tlsContextEncryption"
+				alias="s1as" />
+			<ws:wss-decrypt tlsContext-ref="tlsContextEncryption" />
+		</ws:security>
+	</ws:consumer-config>
+
+	<ws:consumer-config wsdlLocation="Test.wsdl"
+		service="TestService" port="TestPort"
+		serviceAddress="http://localhost:${portServerNoTSInResponse}/services/Test"
+		name="TSCheckNoTSInResponse">
+		<ws:security>
+			<ws:wss-username-token username="admin"
+				password="textPassword" passwordType="TEXT" addCreated="true"
+				addNonce="true" />
+			<ws:wss-timestamp expires="60" />
+			<!-- I add the following actions because if I let the timestamp alone, 
+				no verification on incoming requests are performed -->
+			<ws:wss-sign tlsContext-ref="tlsContextSignature" />
+			<ws:wss-verify-signature tlsContext-ref="tlsContextSignature" />
+			<ws:wss-encrypt tlsContext-ref="tlsContextEncryption"
+				alias="s1as" />
+			<ws:wss-decrypt tlsContext-ref="tlsContextEncryption" />
+		</ws:security>
+	</ws:consumer-config>
+
+
+
+	<flow name="serverNoTSInResponse">
+		<http:listener path="services/Test" config-ref="listenerConfigNoTSInResponse" />
+		<cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+			<cxf:inInterceptors>
+				<spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+					<spring:constructor-arg>
+						<spring:map>
+							<spring:entry key="action"
+								value="UsernameToken Timestamp Signature Encrypt" />
+							<spring:entry key="passwordCallbackClass"
+								value="org.mule.module.ws.functional.CombinedSecurityFunctionalTestCase$ServerPasswordCallback" />
+							<spring:entry key="signaturePropRefId" value="signatureProperties" />
+							<spring:entry key="signatureProperties">
+								<spring:props>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.password">mulepassword</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.file">trustStore</spring:prop>
+								</spring:props>
+							</spring:entry>
+							<spring:entry key="decryptionPropRefId" value="decryptionProperties" />
+							<spring:entry key="decryptionProperties">
+								<spring:props>
+									<spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin
+									</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.password">changeit</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.private.password">changeit</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.alias">s1as</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.file">ssltest-keystore.jks</spring:prop>
+								</spring:props>
+							</spring:entry>
+						</spring:map>
+					</spring:constructor-arg>
+				</spring:bean>
+			</cxf:inInterceptors>
+			<cxf:outInterceptors>
+				<spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+					<spring:constructor-arg>
+						<spring:map>
+							<spring:entry key="action" value="Signature Encrypt" />
+							<spring:entry key="signatureUser" value="muleserver" />
+							<spring:entry key="passwordCallbackClass"
+								value="org.mule.module.ws.functional.CombinedSecurityFunctionalTestCase$ServerPasswordCallback" />
+							<spring:entry key="signaturePropRefId" value="signatureProperties" />
+							<spring:entry key="signatureProperties">
+								<spring:props>
+									<spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin
+									</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.password">mulepassword</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.private.password">mulepassword</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.alias">muleserver</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.file">serverKeystore</spring:prop>
+								</spring:props>
+							</spring:entry>
+							<spring:entry key="encryptionUser" value="s1as" />
+							<spring:entry key="encryptionPropRefId" value="encryptionProperties" />
+							<spring:entry key="encryptionProperties">
+								<spring:props>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.password">changeit</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.file">ssltest-cacerts.jks</spring:prop>
+								</spring:props>
+							</spring:entry>
+						</spring:map>
+					</spring:constructor-arg>
+				</spring:bean>
+			</cxf:outInterceptors>
+		</cxf:jaxws-service>
+		<component class="org.mule.module.ws.consumer.TestService" />
+	</flow>
+
+	<flow name="serverTSInResponse">
+		<http:listener path="services/Test" config-ref="listenerConfigTSInResponse" />
+		<cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService">
+			<cxf:inInterceptors>
+				<spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+					<spring:constructor-arg>
+						<spring:map>
+							<spring:entry key="action"
+								value="UsernameToken Timestamp Signature Encrypt" />
+							<spring:entry key="passwordCallbackClass"
+								value="org.mule.module.ws.functional.CombinedSecurityFunctionalTestCase$ServerPasswordCallback" />
+							<spring:entry key="signaturePropRefId" value="signatureProperties" />
+							<spring:entry key="signatureProperties">
+								<spring:props>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.password">mulepassword</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.file">trustStore</spring:prop>
+								</spring:props>
+							</spring:entry>
+							<spring:entry key="decryptionPropRefId" value="decryptionProperties" />
+							<spring:entry key="decryptionProperties">
+								<spring:props>
+									<spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin
+									</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.password">changeit</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.private.password">changeit</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.alias">s1as</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.file">ssltest-keystore.jks</spring:prop>
+								</spring:props>
+							</spring:entry>
+						</spring:map>
+					</spring:constructor-arg>
+				</spring:bean>
+			</cxf:inInterceptors>
+			<cxf:outInterceptors>
+				<spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+					<spring:constructor-arg>
+						<spring:map>
+							<spring:entry key="action" value="Signature Encrypt Timestamp" />
+							<spring:entry key="signatureUser" value="muleserver" />
+							<spring:entry key="passwordCallbackClass"
+								value="org.mule.module.ws.functional.CombinedSecurityFunctionalTestCase$ServerPasswordCallback" />
+							<spring:entry key="signaturePropRefId" value="signatureProperties" />
+							<spring:entry key="signatureProperties">
+								<spring:props>
+									<spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin
+									</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.password">mulepassword</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.private.password">mulepassword</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.alias">muleserver</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.keystore.file">serverKeystore</spring:prop>
+								</spring:props>
+							</spring:entry>
+							<spring:entry key="encryptionUser" value="s1as" />
+							<spring:entry key="encryptionPropRefId" value="encryptionProperties" />
+							<spring:entry key="encryptionProperties">
+								<spring:props>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.type">jks</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.password">changeit</spring:prop>
+									<spring:prop
+										key="org.apache.ws.security.crypto.merlin.truststore.file">ssltest-cacerts.jks</spring:prop>
+								</spring:props>
+							</spring:entry>
+						</spring:map>
+					</spring:constructor-arg>
+				</spring:bean>
+			</cxf:outInterceptors>
+		</cxf:jaxws-service>
+		<component class="org.mule.module.ws.consumer.TestService" />
+	</flow>
+
+	<flow name="timestampInResponseTSCheck">
+		<http:listener path="in" config-ref="listenerConfigTSInResponseTSCheck" />
+		<set-property propertyName="mustUnderstand" value="false" />
+		<ws:consumer config-ref="TSCheckTSInResponse" operation="echoWithHeaders" />
+	</flow>
+
+	<flow name="noTimestampInResponseTSCheck">
+		<http:listener path="in"
+			config-ref="listenerConfigNoTSInResponseTSCheck" />
+		<set-property propertyName="mustUnderstand" value="false" />
+		<ws:consumer config-ref="TSCheckNoTSInResponse" operation="echoWithHeaders" />
+	</flow>
+
+</mule>
