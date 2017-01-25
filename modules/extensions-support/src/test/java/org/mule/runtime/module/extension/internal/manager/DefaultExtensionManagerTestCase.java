@@ -34,12 +34,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import com.google.common.collect.ImmutableList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -57,11 +51,12 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +67,12 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -136,12 +137,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     extensionsManager.initialise();
     this.extensionsManager = extensionsManager;
 
-    when(extensionModel1.getModelProperty(ImplementingTypeModelProperty.class))
-        .thenReturn(of(new ImplementingTypeModelProperty(String.class)));
-    when(extensionModel2.getModelProperty(ImplementingTypeModelProperty.class))
-        .thenReturn(of(new ImplementingTypeModelProperty(String.class)));
-    when(extensionModel3WithRepeatedName.getModelProperty(ImplementingTypeModelProperty.class))
-        .thenReturn(of(new ImplementingTypeModelProperty(String.class)));
+    mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+    mockClassLoaderModelProperty(extensionModel2, getClass().getClassLoader());
+    mockClassLoaderModelProperty(extensionModel3WithRepeatedName, getClass().getClassLoader());
 
     when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
     mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());

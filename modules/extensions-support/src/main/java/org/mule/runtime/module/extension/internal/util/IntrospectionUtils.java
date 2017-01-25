@@ -684,6 +684,10 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitObject(ObjectType objectType) {
+        if (objectType.getMetadataFormat() != JAVA) {
+          return;
+        }
+        
         if (!relativeClasses.contains(getType(objectType))) {
 
           Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
@@ -699,7 +703,7 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitString(StringType stringType) {
-        if (isEnum(stringType)) {
+        if (stringType.getMetadataFormat() == JAVA && isEnum(stringType)) {
           relativeClasses.add(getType(stringType));
         }
       }
