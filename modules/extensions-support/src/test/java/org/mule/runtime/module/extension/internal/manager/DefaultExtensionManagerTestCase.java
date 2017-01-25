@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.manager;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -33,7 +34,12 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
+import com.google.common.collect.ImmutableList;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -51,12 +57,11 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,12 +72,6 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -137,6 +136,13 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     extensionsManager.initialise();
     this.extensionsManager = extensionsManager;
 
+    when(extensionModel1.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(of(new ImplementingTypeModelProperty(String.class)));
+    when(extensionModel2.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(of(new ImplementingTypeModelProperty(String.class)));
+    when(extensionModel3WithRepeatedName.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(of(new ImplementingTypeModelProperty(String.class)));
+
     when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
     mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
 
@@ -164,8 +170,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 
-    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
-    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(Optional.of(extension1OperationModel));
+    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(of(extension1ConfigurationModel));
+    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(of(extension1OperationModel));
     when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
 
     when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
