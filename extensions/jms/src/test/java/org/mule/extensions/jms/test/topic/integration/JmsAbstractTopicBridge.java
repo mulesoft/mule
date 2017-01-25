@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public abstract class JmsAbstractTopicBridge extends JmsAbstractTestCase {
@@ -58,6 +59,7 @@ public abstract class JmsAbstractTopicBridge extends JmsAbstractTestCase {
   }
 
   @Test
+  @Ignore("MULE-11512: replace consumer with listener to avoid flakyness")
   public void bridge() throws Exception {
 
     //Subscribe to source topic
