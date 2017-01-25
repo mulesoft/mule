@@ -9,10 +9,16 @@ package org.mule.runtime.extension.internal.loader.catalog.model.resolver;
 import com.google.common.base.Preconditions;
 import org.apache.commons.io.FileUtils;
 import org.mule.metadata.api.TypeLoader;
+import org.mule.metadata.api.annotation.TypeAnnotation;
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.impl.BaseMetadataType;
 import org.mule.metadata.json.JsonTypeLoader;
 
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -35,6 +41,31 @@ public class SingleTypeResolver implements TypeResolver {
 
   @Override
   public Optional<MetadataType> resolveType(String typeIdentifier) {
-    return this.typeIdentifier.equals(typeIdentifier) ? typeLoader.load(typeIdentifier) : Optional.empty();
+    return this.typeIdentifier.equals(typeIdentifier) ? getTypeWhileAddingIDToMakeItSerializable(typeIdentifier)
+        : Optional.empty();
+  }
+
+  /**
+   * TODO(fernandezlautaro): MULE-11508 this method is needed for Mozart consumption of the serialized ExtensionModel, we need to force an ID on the type or it fails when doing the ExtensionModelJsonSerializer#serialize
+   * @param typeIdentifier
+   * @return
+   */
+  private Optional<MetadataType> getTypeWhileAddingIDToMakeItSerializable(String typeIdentifier) {
+    final Optional<MetadataType> load = typeLoader.load(typeIdentifier);
+    load.ifPresent(metadataType -> {
+      if (metadataType instanceof ObjectType) {
+        try {
+          final Field annotationsField = BaseMetadataType.class.getDeclaredField("annotations");
+          annotationsField.setAccessible(true);
+          Map<Class<? extends TypeAnnotation>, TypeAnnotation> mapa =
+              (Map<Class<? extends TypeAnnotation>, TypeAnnotation>) annotationsField.get(metadataType);
+          mapa.put(TypeIdAnnotation.class, new TypeIdAnnotation(typeIdentifier));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+          e.printStackTrace();
+          throw new RuntimeException("this code must be removed", e);
+        }
+      }
+    });
+    return load;
   }
 }
