@@ -54,7 +54,13 @@
             <groupId>jboss</groupId>
             <artifactId>javassist</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>${java.version}</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -90,6 +96,12 @@
             <groupId>com.google.testing.compile</groupId>
             <artifactId>compile-testing</artifactId>
             <version>0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
         <dependency>
