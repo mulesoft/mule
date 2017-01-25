@@ -115,7 +115,7 @@ public abstract class ConnectionProviderWrapper<C>
 
   public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
     return connectionProvider instanceof ConnectionProviderWrapper
-            ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
-            : connectionProvider;
+        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
+        : connectionProvider;
   }
 }
