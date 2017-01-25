@@ -14,12 +14,18 @@ import java.util.Map;
 public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy implements SecurityStrategy
 {
     private long expires;
+    private boolean checkResponseTimestamp;
 
     @Override
     public void apply(Map<String, Object> outConfigProperties, Map<String, Object> inConfigProperties)
     {
         appendAction(outConfigProperties, TIMESTAMP);
         outConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
+        if (checkResponseTimestamp)
+        {
+            appendAction(inConfigProperties, TIMESTAMP);
+            inConfigProperties.put(TTL_TIMESTAMP, String.valueOf(expires));
+        }
     }
 
     public long getExpires()
@@ -30,5 +36,15 @@ public class WssTimestampSecurityStrategy extends AbstractSecurityStrategy imple
     public void setExpires(long expires)
     {
         this.expires = expires;
+    }
+
+    public boolean isCheckResponseTimestamp()
+    {
+        return checkResponseTimestamp;
+    }
+
+    public void setCheckResponseTimestamp(boolean checkResponseTimestamp)
+    {
+        this.checkResponseTimestamp = checkResponseTimestamp;
     }
 }
