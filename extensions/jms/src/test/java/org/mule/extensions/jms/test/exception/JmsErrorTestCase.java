@@ -6,6 +6,7 @@
  */
 package org.mule.extensions.jms.test.exception;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.extensions.jms.api.exception.JmsErrors.CONSUMING;
 import static org.mule.extensions.jms.api.exception.JmsErrors.ILLEGAL_BODY;
 import static org.mule.extensions.jms.api.exception.JmsErrors.PUBLISHING;
@@ -61,6 +62,6 @@ public class JmsErrorTestCase extends JmsAbstractTestCase {
     expectedError.expectError(NAMESPACE, TIMEOUT.getType(), JmsConsumeException.class,
                               AN_ERROR_OCCURRED_WHILE_CONSUMING_A_MESSAGE);
     destination = newDestination(TEST_DESTINATION);
-    consume();
+    consume(destination, emptyMap(), 5);
   }
 }
