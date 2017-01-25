@@ -101,7 +101,7 @@ public class XQuery3TestCase extends FunctionalTestCase
     public void multipleInputsByParam() throws Exception
     {
         try (InputStream books = IOUtils.getResourceAsStream("books.xml", getClass());
-             InputStream cities = IOUtils.getResourceAsStream("cities.xml", getClass()))
+                InputStream cities = IOUtils.getResourceAsStream("cities.xml", getClass()))
         {
 
             DocumentBuilder documentBuilder = new DocumentBuilderImpl();
@@ -111,6 +111,31 @@ public class XQuery3TestCase extends FunctionalTestCase
             // test both parameters as a document or as a node
             assertMultipleInputs("multipleInputsByParam", booksDocument, citiesDocument.getFirstChild());
         }
+    }
+
+    @Test
+    public void nodeFromXPath3() throws Exception
+    {
+        InputStream books = IOUtils.getResourceAsStream("books.xml", getClass());
+        DocumentBuilder documentBuilder = new DocumentBuilderImpl();
+        Document booksDocument = documentBuilder.parse(books);
+        assertNodeGotFromXpath3("inputGotFromXpath3", booksDocument);
+    }
+
+    private void assertNodeGotFromXpath3(String flowName, Object books) throws Exception
+    {
+        MuleEvent event = getTestEvent(input);
+        event.getMessage().setPayload(books);
+
+        Flow flow = (Flow) getFlowConstruct(flowName);
+        List<Element> elements = (List<Element>) flow.process(event).getMessage().getPayload();
+        assertThat(elements, hasSize(1));
+
+        NodeList childNodes = elements.get(0).getChildNodes();
+        assertThat(childNodes.getLength(), greaterThan(0));
+
+        NamedNodeMap firstChildAttributes = childNodes.item(0).getAttributes();
+        assertThat(firstChildAttributes.getNamedItem("title").getNodeValue(), equalTo("Pride and Prejudice"));
     }
 
     private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception

@@ -39,6 +39,7 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.dom.NodeOverNodeInfo;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -292,9 +293,13 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
                 {
                     transformer.bindDocument(paramKey, new DOMSource(((Document) o).getFirstChild()), connection.createNodeType());
                 }
-                else if (o instanceof Node)
+                else if (o instanceof NodeOverNodeInfo)
                 {
                     transformer.bindDocument(paramKey, new DOMSource((Node) o), connection.createNodeType());
+                }
+                else if (o instanceof Node)
+                {
+                    transformer.bindNode(paramKey, (Node) o, connection.createNodeType());
                 }
                 else
                 {
@@ -350,9 +355,13 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         {
             transformer.bindNode(new QName(SOURCE_DOCUMENT_NAMESPACE), (Document) src, connection.createDocumentType());
         }
-        else if (src instanceof Element)
+        else if (src instanceof NodeOverNodeInfo)
         {
             transformer.bindNode(new QName(SOURCE_DOCUMENT_NAMESPACE), (Element) src, connection.createDocumentType());
+        }
+        else if (src instanceof Node)
+        {
+            transformer.bindNode(new QName(SOURCE_DOCUMENT_NAMESPACE), (Node) src, connection.createNodeType());
         }
         else if (src instanceof org.dom4j.Document)
         {
