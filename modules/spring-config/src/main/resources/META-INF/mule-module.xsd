@@ -164,7 +164,7 @@
                 <xsd:attribute name="vendor" type="xsd:string" default="MuleSoft">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Expected category of the module.
+                            Expected vendor of the module.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -175,7 +175,7 @@
     <xsd:simpleType name="categoryType">
         <xsd:annotation>
             <xsd:documentation>
-                Set of defined primitive types inputs for any operation or property.
+                Set of defined categories for a module.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
