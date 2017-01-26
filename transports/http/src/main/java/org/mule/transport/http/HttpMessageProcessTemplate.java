@@ -17,6 +17,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
 import org.mule.execution.EndPhaseTemplate;
@@ -192,13 +193,20 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     @Override
     public void afterFailureProcessingFlow(MuleException exception) throws MuleException
     {
+        // MULE-11535: unwrap errors thrown in the initialization phase so that the true cause can be used to generate status codes
+        Throwable error = exception;
+        if (error instanceof DefaultMuleException && error.getCause() instanceof CreateException)
+        {
+            error = error.getCause().getCause();
+        }
+
         if (!failureResponseSentToClient)
         {
-            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(), getMuleContext());
+            String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), error.getClass(), getMuleContext());
             int httpStatus = Integer.valueOf(temp);
             try
             {
-                sendFailureResponseToClient(httpStatus, exception.getMessage());
+                sendFailureResponseToClient(httpStatus, error.getMessage());
             }
             catch (Exception e)
             {

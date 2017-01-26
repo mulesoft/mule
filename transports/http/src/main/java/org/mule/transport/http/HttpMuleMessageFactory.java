@@ -11,7 +11,10 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMuleMessageFactory;
+import org.mule.transport.http.components.BadRequestException;
 import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.IOUtils;
 import org.mule.util.PropertiesUtils;
@@ -165,8 +168,16 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         httpHeaders.put(HttpConnector.HTTP_HEADERS, new HashMap<String, Object>(headers));
 
         String encoding = getEncoding(headers);
-        
-        queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
+
+        try
+        {
+            queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
+        }
+        catch (IllegalArgumentException e)
+        {
+            Message errorDescription = MessageFactory.createStaticMessage(e.getMessage());
+            throw new BadRequestException(errorDescription, e);
+        }
 
         //Make any URI params available ans inbound message headers
         addUriParamsAsHeaders(headers, uri);
