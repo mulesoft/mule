@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
+import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -63,12 +65,6 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   protected FlowConstructStatistics statistics;
 
   /**
-   * The initial states that the flow can be started in
-   */
-  public static final String INITIAL_STATE_STOPPED = "stopped";
-  public static final String INITIAL_STATE_STARTED = "started";
-
-  /**
    * Determines the initial state of this flow when the mule starts. Can be 'stopped' or 'started' (default)
    */
   protected String initialState = INITIAL_STATE_STARTED;
@@ -103,8 +99,8 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   public final void start() throws MuleException {
     // Check if Initial State is Stopped
     if (!isStopped() && initialState.equals(INITIAL_STATE_STOPPED)) {
-      lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<FlowConstruct>());
-      lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<FlowConstruct>());
+      lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<>());
+      lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<>());
 
       LOGGER.info("Flow " + name + " has not been started (initial state = 'stopped')");
       return;
