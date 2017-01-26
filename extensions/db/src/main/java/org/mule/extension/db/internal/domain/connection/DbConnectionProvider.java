@@ -18,6 +18,7 @@ import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
 import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
+import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.api.param.CustomDataType;
 import org.mule.extension.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.extension.db.internal.domain.type.ClobResolvedDataType;
@@ -104,8 +105,8 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   private DataSource dataSource;
 
-  public ConnectionException handleSQLConnectionException(Exception e) {
-    return new ConnectionCreationException("Could not obtain connection from data source", e);
+  public java.util.Optional<DbError> getDbErrorType(SQLException e) {
+    return empty();
   }
 
   @Override
@@ -258,5 +259,16 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
     return isXaConnection(jdbcConnection)
         ? java.util.Optional.of((XAConnection) ((MuleXaObject) jdbcConnection).getTargetObject())
         : empty();
+  }
+
+  private ConnectionException handleSQLConnectionException(Exception e) {
+    java.util.Optional<DbError> dbError = empty();
+    if (e instanceof SQLException) {
+      dbError = getDbErrorType((SQLException) e);
+    }
+
+    return dbError
+        .map(errorType -> new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e, errorType))
+        .orElse(new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e));
   }
 }

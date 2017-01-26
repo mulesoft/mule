@@ -6,6 +6,8 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_REACH;
 import static org.mule.extension.db.api.exception.connection.DbError.INVALID_CREDENTIALS;
 import static org.mule.extension.db.api.exception.connection.DbError.INVALID_DATABASE;
@@ -46,7 +48,7 @@ public class MySqlConnectionProvider extends DbConnectionProvider {
 
   @Override
   public Optional<DataSource> getDataSource() {
-    return Optional.empty();
+    return empty();
   }
 
   @Override
@@ -55,21 +57,15 @@ public class MySqlConnectionProvider extends DbConnectionProvider {
   }
 
   @Override
-  public ConnectionException handleSQLConnectionException(Exception e) {
-    DbError dbError = null;
-    if (e instanceof SQLException) {
-      String message = e.getMessage();
-      if (message.contains(ACCESS_DENIED)) {
-        dbError = INVALID_CREDENTIALS;
-      } else if (message.contains(UNKNOWN_DATABASE)) {
-        dbError = INVALID_DATABASE;
-      } else if (message.contains(COMMUNICATIONS_LINK_FAILURE)) {
-        dbError = CANNOT_REACH;
-      }
+  public Optional<DbError> getDbErrorType(SQLException e) {
+    String message = e.getMessage();
+    if (message.contains(ACCESS_DENIED)) {
+      return of(INVALID_CREDENTIALS);
+    } else if (message.contains(UNKNOWN_DATABASE)) {
+      return of(INVALID_DATABASE);
+    } else if (message.contains(COMMUNICATIONS_LINK_FAILURE)) {
+      return of(CANNOT_REACH);
     }
-
-    return dbError == null
-        ? new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e)
-        : new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e, dbError);
+    return empty();
   }
 }

@@ -8,6 +8,7 @@ package org.mule.extension.db.internal.domain.connection.derby;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_REACH;
 import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
 import static org.mule.extension.db.internal.domain.connection.derby.DerbyConnectionParameters.DERBY_DRIVER_CLASS;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
@@ -53,18 +54,12 @@ public class DerbyConnectionProvider extends DbConnectionProvider {
   }
 
   @Override
-  public ConnectionException handleSQLConnectionException(Exception e) {
-    DbError dbError = null;
-    if (e instanceof SQLException) {
-      if (e.getMessage().contains(FAILED_TO_START_DATABASE)) {
-        dbError = DbError.CANNOT_REACH;
-      } else if (e.getMessage().contains(NOT_FOUND)) {
-        dbError = DbError.CANNOT_REACH;
-      }
+  public Optional<DbError> getDbErrorType(SQLException e) {
+    if (e.getMessage().contains(FAILED_TO_START_DATABASE)) {
+      return Optional.of(CANNOT_REACH);
+    } else if (e.getMessage().contains(NOT_FOUND)) {
+      return Optional.of(CANNOT_REACH);
     }
-
-    return dbError == null
-        ? new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e)
-        : new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e, dbError);
+    return empty();
   }
 }
