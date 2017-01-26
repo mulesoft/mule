@@ -10,16 +10,16 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
-
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -89,8 +89,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
     asyncExecutor = newSingleThreadExecutor();
 
-    flow = new Flow("test", muleContext);
-    flow.setProcessingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix));
+    flow = builder("test", muleContext)
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix)).build();
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);

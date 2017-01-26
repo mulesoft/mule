@@ -10,15 +10,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 

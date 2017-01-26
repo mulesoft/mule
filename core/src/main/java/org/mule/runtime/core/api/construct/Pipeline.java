@@ -46,4 +46,8 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
    */
   Map<String, EventContext> getSerializationEventContextCache();
 
+  /**
+   * @return the factory used to create the {@link ProcessingStrategy} used on the pipeline.
+   */
+  ProcessingStrategyFactory getProcessingStrategyFactory();
 }

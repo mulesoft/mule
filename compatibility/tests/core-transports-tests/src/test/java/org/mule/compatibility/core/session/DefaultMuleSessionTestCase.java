@@ -14,21 +14,21 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.security.MuleCredentials;
-import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -145,7 +145,7 @@ public class DefaultMuleSessionTestCase extends AbstractMuleTestCase {
     // Create mock muleContext
     MuleContext muleContext = mockContextWithServices();
 
-    Flow flow = new Flow("flow", muleContext);
+    Flow flow = builder("flow", muleContext).build();
     DefaultMuleSession before = new DefaultMuleSession();
     before.setSecurityContext(createTestAuthentication());
     before.setProperty("foo", "bar");

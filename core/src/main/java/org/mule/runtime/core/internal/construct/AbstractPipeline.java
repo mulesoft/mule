@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.construct;
+package org.mule.runtime.core.internal.construct;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
@@ -51,7 +51,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;

@@ -7,10 +7,10 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.construct.Flow;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.

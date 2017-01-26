@@ -15,10 +15,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
@@ -54,7 +56,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws MuleException {
     when(mockMuleContext.getConfiguration().getDefaultProcessingStrategyFactory()).thenReturn(null);
-    this.flow = new Flow(FLOW_NAME, mockMuleContext);
+    this.flow = builder(FLOW_NAME, mockMuleContext).build();
   }
 
   @Test

@@ -71,7 +71,7 @@ import org.mule.runtime.core.api.context.notification.TransactionNotificationLis
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.factories.HostNameFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
-import org.mule.runtime.core.connector.MuleConnectorOperationLocator;
+import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.CustomNotification;
 import org.mule.runtime.core.context.notification.ExceptionNotification;

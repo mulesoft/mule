@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.construct;
+package org.mule.runtime.core.internal.construct;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -36,6 +35,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
@@ -58,16 +58,16 @@ import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
 
 @RunWith(Parameterized.class)
-public class FlowTestCase extends AbstractFlowConstructTestCase {
+public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   private static final String FLOW_NAME = "test-flow";
 
-  private Flow flow;
+  private DefaultFlowBuilder.DefaultFlow flow;
   private DynamicMessageProcessorContainer dynamicProcessorContainer;
   private SensingNullMessageProcessor sensingMessageProcessor;
   private BiFunction<Processor, Event, Event> triggerFunction;
 
-  public FlowTestCase(BiFunction<Processor, Event, Event> triggerFunction) {
+  public DefaultFlowTestCase(BiFunction<Processor, Event, Event> triggerFunction) {
     this.triggerFunction = triggerFunction;
   }
 
@@ -90,7 +90,7 @@ public class FlowTestCase extends AbstractFlowConstructTestCase {
 
     sensingMessageProcessor = getSensingNullMessageProcessor();
 
-    flow = new Flow(FLOW_NAME, muleContext);
+    flow = new DefaultFlowBuilder.DefaultFlow(FLOW_NAME, muleContext);
     flow.setMessageSource(directInboundMessageSource);
 
     dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);

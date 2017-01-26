@@ -9,8 +9,8 @@ package org.mule.test.integration.work;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 

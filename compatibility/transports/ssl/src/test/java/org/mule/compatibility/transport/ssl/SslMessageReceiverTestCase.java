@@ -7,13 +7,11 @@
 package org.mule.compatibility.transport.ssl;
 
 import static org.mockito.Mockito.mock;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
-import org.mule.compatibility.transport.ssl.SslMessageReceiver;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 
 public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
 

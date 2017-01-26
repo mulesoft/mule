@@ -77,15 +77,6 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -96,10 +87,10 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.StartupContext;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
@@ -158,6 +149,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {

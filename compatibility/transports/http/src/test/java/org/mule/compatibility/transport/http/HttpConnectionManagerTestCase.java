@@ -17,7 +17,7 @@ import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

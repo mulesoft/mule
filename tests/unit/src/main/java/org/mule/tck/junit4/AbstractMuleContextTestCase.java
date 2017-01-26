@@ -8,6 +8,7 @@ package org.mule.tck.junit4;
 
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
@@ -15,7 +16,6 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -361,8 +361,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final JavaComponent component = new DefaultJavaComponent(of);
     ((MuleContextAware) component).setMuleContext(muleContext);
 
-    final Flow flow = new Flow(name, muleContext);
-    flow.setMessageProcessors(Collections.singletonList((Processor) component));
+    Flow flow = builder(name, muleContext).messageProcessors(Collections.singletonList(component)).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
   }

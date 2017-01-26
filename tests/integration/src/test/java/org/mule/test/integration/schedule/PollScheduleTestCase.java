@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;

@@ -15,10 +15,10 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.test.AbstractIntegrationTestCase;
 

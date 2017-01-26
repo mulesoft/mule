@@ -14,7 +14,7 @@ import static junit.framework.Assert.assertTrue;
 
 import org.mule.compatibility.core.connector.EndpointConnectException;
 import org.mule.runtime.core.api.connector.Connectable;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

@@ -20,7 +20,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.message.StringAttributes;
 
 import java.util.Set;

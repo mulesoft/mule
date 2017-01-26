@@ -19,11 +19,11 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;

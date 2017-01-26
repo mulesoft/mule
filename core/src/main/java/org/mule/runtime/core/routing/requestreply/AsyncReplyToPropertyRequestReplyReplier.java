@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 
 public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 

@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 
 import java.nio.charset.Charset;
 

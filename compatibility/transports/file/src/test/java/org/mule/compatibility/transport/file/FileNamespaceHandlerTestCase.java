@@ -18,8 +18,8 @@ import org.mule.compatibility.transport.file.filters.FilenameRegexFilter;
 import org.mule.compatibility.transport.file.transformers.FileToByteArray;
 import org.mule.compatibility.transport.file.transformers.FileToString;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 

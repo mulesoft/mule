@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.connector;
+package org.mule.runtime.core.api.connector;
 
 import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.connector.Connectable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -16,7 +16,7 @@ import org.mule.compatibility.transport.tcp.TcpMessageReceiver;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;

@@ -13,8 +13,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 

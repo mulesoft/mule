@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.session;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
@@ -15,22 +16,20 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -192,8 +191,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
     Event event = Event.builder(context).message(message).flow(flow).build();
 
     SensingNullMessageProcessor flowListener = new SensingNullMessageProcessor();
-    Flow flow = new Flow("flow", muleContext);
-    flow.setMessageProcessors(Collections.<Processor>singletonList(flowListener));
+    Flow flow = builder("flow", muleContext).messageProcessors(singletonList(flowListener)).build();
     flow.initialise();
     flow.start();
 

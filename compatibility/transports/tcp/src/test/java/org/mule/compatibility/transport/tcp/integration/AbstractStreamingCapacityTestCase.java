@@ -15,8 +15,8 @@ import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

@@ -14,7 +14,6 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURC
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.message.CompatibilityMessage;
@@ -26,6 +25,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -36,8 +37,6 @@ import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
-import org.mule.runtime.core.connector.ConnectException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.FileUtils;
 

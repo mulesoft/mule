@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.api.metadata.DataType;
@@ -30,10 +29,9 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -59,7 +57,6 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     when(endpoint.getEndpointURI()).thenReturn(new MuleEndpointURI("test://test", muleContext));
     when(endpoint.getTransactionConfig()).thenReturn(new MuleTransactionConfig());
     when(endpoint.getExchangePattern()).thenReturn(ONE_WAY);
-    when(flow.getProcessingStrategyFactory()).thenReturn(new SynchronousProcessingStrategyFactory());
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);

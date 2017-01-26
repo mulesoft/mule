@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;

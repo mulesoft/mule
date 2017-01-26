@@ -20,9 +20,9 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.core.transport.AbstractConnectorTestCase;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;

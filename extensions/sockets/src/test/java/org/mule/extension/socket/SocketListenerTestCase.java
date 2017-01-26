@@ -6,7 +6,7 @@
  */
 package org.mule.extension.socket;
 
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 

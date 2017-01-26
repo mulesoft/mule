@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;

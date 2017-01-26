@@ -15,11 +15,11 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 

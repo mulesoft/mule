@@ -41,7 +41,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
-import org.mule.runtime.core.connector.MuleConnectorOperationLocator;
+import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;

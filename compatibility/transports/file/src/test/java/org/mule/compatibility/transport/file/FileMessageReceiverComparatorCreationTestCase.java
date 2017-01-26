@@ -11,10 +11,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.transport.file.FileMessageReceiver;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.size.SmallTest;
 

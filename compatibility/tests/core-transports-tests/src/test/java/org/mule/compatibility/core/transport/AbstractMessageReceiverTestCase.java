@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 

@@ -21,9 +21,9 @@ import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.compatibility.transport.vm.VMConnector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MessageExchangePattern;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 
 import java.util.List;

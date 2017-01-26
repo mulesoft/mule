@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.locator;
 
 import static java.lang.String.format;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.List;

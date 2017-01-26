@@ -18,16 +18,15 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;

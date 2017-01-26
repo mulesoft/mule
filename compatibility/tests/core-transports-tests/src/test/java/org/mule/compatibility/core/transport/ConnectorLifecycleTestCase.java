@@ -19,8 +19,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.tck.MuleTestUtils.APPLE_SERVICE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
@@ -29,11 +30,10 @@ import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -42,9 +42,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+import org.junit.Test;
 
 /**
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062) Also test lifecycle of a
@@ -326,9 +325,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Test
   public void testReceiversServiceLifecycle() throws Exception {
-    final Flow flow = new Flow(MuleTestUtils.APPLE_SERVICE, muleContext);
     InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
-    flow.setMessageSource(endpoint);
+    final Flow flow = builder(APPLE_SERVICE, muleContext).messageSource(endpoint).build();
     connector = (TestConnector) endpoint.getConnector();
 
     assertEquals(0, connector.receivers.size());

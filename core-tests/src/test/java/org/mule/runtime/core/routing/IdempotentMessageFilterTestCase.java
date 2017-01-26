@@ -14,9 +14,9 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

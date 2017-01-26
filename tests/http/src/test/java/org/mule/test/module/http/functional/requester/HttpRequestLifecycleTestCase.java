@@ -13,7 +13,7 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.api.construct.Flow;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void restartFlow() throws Exception {
     verifyRequest();
-    AbstractFlowConstruct flow = (AbstractFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("simpleRequest");
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("simpleRequest");
     flow.stop();
     flow.start();
     verifyRequest();

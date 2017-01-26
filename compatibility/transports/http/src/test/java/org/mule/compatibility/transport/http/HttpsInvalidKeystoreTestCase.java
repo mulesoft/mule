@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;

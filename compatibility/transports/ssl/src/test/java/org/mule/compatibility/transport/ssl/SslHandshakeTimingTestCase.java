@@ -12,11 +12,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;

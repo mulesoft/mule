@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.construct.processor;
+package org.mule.runtime.core.internal.construct.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.AbstractAnnotatedObject;

@@ -12,8 +12,8 @@ import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 
 import java.util.Random;

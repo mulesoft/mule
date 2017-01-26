@@ -10,13 +10,11 @@ import org.junit.After;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

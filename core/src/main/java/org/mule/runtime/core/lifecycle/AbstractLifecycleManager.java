@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.HashSet;

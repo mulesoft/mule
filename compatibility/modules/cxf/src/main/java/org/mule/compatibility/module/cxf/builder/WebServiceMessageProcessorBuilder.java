@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * Builds a CXF web service MessageProcessor using either the JAX-WS or simple frontends. It must be configured in the following
  * way:
  * <ul>
- * <li>If it is part of a {@link org.mule.runtime.core.construct.Flow}, then the serviceClass attribute must be supplied.</li>
+ * <li>If it is part of a {@link org.mule.runtime.core.api.construct.Flow}, then the serviceClass attribute must be supplied.</li>
  * <li>The builder will use the JAX-WS frontend by default.</li>
  */
 public class WebServiceMessageProcessorBuilder extends AbstractInboundMessageProcessorBuilder implements FlowConstructAware {

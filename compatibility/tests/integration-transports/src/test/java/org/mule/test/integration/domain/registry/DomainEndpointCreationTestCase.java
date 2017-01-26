@@ -14,9 +14,9 @@ import org.mule.compatibility.core.endpoint.AbstractEndpoint;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.ThreadingProfileConfigurationBuilder;
 
 import org.junit.Test;

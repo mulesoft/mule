@@ -15,10 +15,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
@@ -27,7 +27,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
@@ -88,7 +87,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
+    asyncMP.setFlowConstruct(builder("flowName", muleContext).build());
     asyncMP.initialise();
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
@@ -108,7 +107,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(30000);
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    asyncMP.setFlowConstruct(new Flow("flowName", muleContext));
+    asyncMP.setFlowConstruct(builder("flowName", muleContext).build());
     asyncMP.initialise();
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
