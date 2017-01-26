@@ -32,6 +32,14 @@ import java.util.List;
  */
 public interface Flow extends AnnotatedObject, Lifecycle, Pipeline, Processor {
 
+  String INITIAL_STATE_STOPPED = "stopped";
+  String INITIAL_STATE_STARTED = "started";
+
+  /**
+   * @return initial state of the flow, which can be {@value INITIAL_STATE_STARTED} or {@value INITIAL_STATE_STOPPED}
+   */
+  String getInitialState();
+
 
   /**
    * Creates a new flow builder
