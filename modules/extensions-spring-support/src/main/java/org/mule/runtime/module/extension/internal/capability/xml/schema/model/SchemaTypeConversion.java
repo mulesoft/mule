@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.acceptsExpressions;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_BOOLEAN;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_DATE_TIME;
@@ -88,7 +89,7 @@ public final class SchemaTypeConversion {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen()) {
+        if (isMap(objectType)) {
           qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
         } else {
           defaultVisit(objectType);
