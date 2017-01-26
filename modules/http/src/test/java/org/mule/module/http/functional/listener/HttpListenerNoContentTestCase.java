@@ -26,37 +26,44 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerNoContentTestCase extends FunctionalTestCase {
+public class HttpListenerNoContentTestCase extends FunctionalTestCase
+{
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
 
   @Override
-  protected String getConfigFile() {
+  protected String getConfigFile()
+  {
     return "http-listener-no-content-config.xml";
   }
 
   @Test
-  public void noBodyWhenEmpty() throws IOException {
+  public void noBodyWhenEmpty() throws IOException
+  {
     verifyResponseFrom("empty");
   }
 
   @Test
-  public void noBodyWhenString() throws IOException {
+  public void noBodyWhenString() throws IOException
+  {
     verifyResponseFrom("content");
   }
 
   @Test
-  public void noBodyWhenEmptyUsingProperty() throws IOException {
+  public void noBodyWhenEmptyUsingProperty() throws IOException
+  {
     verifyResponseFrom("emptyProperty");
   }
 
   @Test
-  public void noBodyWhenStringUsingProperty() throws IOException {
+  public void noBodyWhenStringUsingProperty() throws IOException
+  {
     verifyResponseFrom("contentProperty");
   }
 
-  private void verifyResponseFrom(String path) throws IOException {
+  private void verifyResponseFrom(String path) throws IOException
+  {
     final Response response = Request.Get(getUrl(path)).execute();
     HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getEntity(), is(nullValue()));
@@ -64,7 +71,8 @@ public class HttpListenerNoContentTestCase extends FunctionalTestCase {
     assertThat(httpResponse.getFirstHeader(TRANSFER_ENCODING), is(nullValue()));
   }
 
-  private String getUrl(String path) {
+  private String getUrl(String path)
+  {
     return String.format("http://localhost:%s/%s", port.getNumber(), path);
   }
 
