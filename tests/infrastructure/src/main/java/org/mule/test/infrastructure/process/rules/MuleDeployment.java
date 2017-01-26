@@ -85,6 +85,12 @@ public class MuleDeployment extends MuleInstallation {
   private List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
+  private Map<String, StringPropertySupplier> propertiesUsingLambdas = new HashMap<>();
+
+  public interface StringPropertySupplier {
+
+    public String getProperty();
+  }
 
   public static class Builder {
 
@@ -127,6 +133,18 @@ public class MuleDeployment extends MuleInstallation {
      */
     public Builder withProperty(String property, String value) {
       deployment.properties.put(property, value);
+      return this;
+    }
+
+    /**
+     * Specifies a system property to be passed in the command line when starting Mule that need to be resolved in the before() of the MuleDeployment rule.
+     *
+     * @param property
+     * @param propertySupplier
+     * @return
+     */
+    public Builder withPropertyUsingLambda(String property, StringPropertySupplier propertySupplier) {
+      deployment.propertiesUsingLambdas.put(property, propertySupplier);
       return this;
     }
 
@@ -265,11 +283,17 @@ public class MuleDeployment extends MuleInstallation {
       if (DEBUGGING_ENABLED) {
         setupDebugging();
       }
+      resolvePropertiesUsingLambdas();
       mule.start(toArray(properties));
       domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
       applications.forEach((application) -> checkAppIsDeployed(getName(application)));
       logger.info("Deployment successful");
     }
+  }
+
+  private void resolvePropertiesUsingLambdas() {
+    propertiesUsingLambdas
+        .forEach((propertyName, propertySupplierLambda) -> properties.put(propertyName, propertySupplierLambda.getProperty()));
   }
 
   private void setupDebugging() {
