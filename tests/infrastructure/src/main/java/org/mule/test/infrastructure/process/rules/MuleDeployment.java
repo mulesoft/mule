@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
@@ -85,12 +86,7 @@ public class MuleDeployment extends MuleInstallation {
   private List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
-  private Map<String, StringPropertySupplier> propertiesUsingLambdas = new HashMap<>();
-
-  public interface StringPropertySupplier {
-
-    public String getProperty();
-  }
+  private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
 
   public static class Builder {
 
@@ -143,7 +139,7 @@ public class MuleDeployment extends MuleInstallation {
      * @param propertySupplier
      * @return
      */
-    public Builder withPropertyUsingLambda(String property, StringPropertySupplier propertySupplier) {
+    public Builder withPropertyUsingLambda(String property, Supplier<String> propertySupplier) {
       deployment.propertiesUsingLambdas.put(property, propertySupplier);
       return this;
     }
@@ -293,7 +289,7 @@ public class MuleDeployment extends MuleInstallation {
 
   private void resolvePropertiesUsingLambdas() {
     propertiesUsingLambdas
-        .forEach((propertyName, propertySupplierLambda) -> properties.put(propertyName, propertySupplierLambda.getProperty()));
+        .forEach((propertyName, propertySupplierLambda) -> properties.put(propertyName, propertySupplierLambda.get()));
   }
 
   private void setupDebugging() {
