@@ -10,6 +10,7 @@ package org.mule.extension.http.internal.listener;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -162,6 +163,19 @@ public class HttpResponseFactory {
       httpEntity = byteArrayHttpEntity;
     }
 
+    Integer statusCode = listenerResponseBuilder.getStatusCode();
+    if (statusCode != null) {
+      responseBuilder.setStatusCode(statusCode);
+      if (statusCode == NO_CONTENT.getStatusCode()) {
+        httpEntity = new EmptyHttpEntity();
+        httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
+      }
+    }
+    String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(), statusCode);
+    if (reasonPhrase != null) {
+      responseBuilder.setReasonPhrase(reasonPhrase);
+    }
+
     Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
     for (String headerName : headerNames) {
       Collection<String> values = httpResponseHeaderBuilder.getHeader(headerName);
@@ -170,14 +184,6 @@ public class HttpResponseFactory {
       }
     }
 
-    Integer statusCode = listenerResponseBuilder.getStatusCode();
-    if (statusCode != null) {
-      responseBuilder.setStatusCode(statusCode);
-    }
-    String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(), statusCode);
-    if (reasonPhrase != null) {
-      responseBuilder.setReasonPhrase(reasonPhrase);
-    }
     responseBuilder.setEntity(httpEntity);
     return responseBuilder.build();
   }
