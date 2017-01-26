@@ -21,6 +21,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import org.mule.extension.db.api.StatementResult;
+import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
@@ -59,9 +60,8 @@ import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class},
-    sharedRuntimeLibs = {"org.apache.derby:derby"})
-public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase
+    implements DbArtifactClassLoaderRunnerConfig {
 
   @Parameterized.Parameter(0)
   public String dataSourceConfigResource;
