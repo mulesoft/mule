@@ -39,8 +39,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer;
-import org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder;
+import org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;
@@ -52,9 +52,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SmallTest
+@Ignore("MULE-11459")
 public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
   private ExtensionModel extensionModel;
