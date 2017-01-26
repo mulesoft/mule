@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
- * Extends the {@link ExpressionManager} supporting mutating operations and the propagation of more variables.
+ * Extends the {@link ExpressionEvaluator} supporting mutating operations and the propagation of more variables.
  * Only meant to distinguish the Mule 3 inherited behaviour from the current approach.
  *
  * @since 4.0

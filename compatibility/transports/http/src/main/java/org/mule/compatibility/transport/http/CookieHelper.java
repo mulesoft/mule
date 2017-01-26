@@ -270,7 +270,7 @@ public class CookieHelper {
    * @param cookiesObject this must be either a {@link Map Map&lt;String, String&gt;} or a {@link Cookie Cookie[]}. It can be
    *        null.
    * @param event this one is used only if the cookies are stored in a {@link Map} in order to resolve expressions with the
-   *        {@link ExpressionManager}.
+   *        {@link ExpressionEvaluator}.
    * @param destinationUri the host, port and path of this {@link URI} will be used as the data of the cookies that are added.
    * @param muleContext the Mule node.
    */

@@ -95,7 +95,7 @@ public class ExpressionArgument implements MuleContextAware {
     // engines use and because scripts when used for expressions are compiled in
     // runtime rather than at initialization the only way to ensure the correct
     // class-loader to used is to switch it out here. We may want to consider
-    // passing the class-loader to the ExpressionManager and only doing this for
+    // passing the class-loader to the ExpressionEvaluator and only doing this for
     // certain ExpressionEvaluators further in.
     Object result =
         withContextClassLoader(expressionEvaluationClassLoader,
