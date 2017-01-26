@@ -70,7 +70,7 @@
     <xsd:element name="parameter" type="parameterType">
         <xsd:annotation>
             <xsd:documentation>
-                An named element that will be consumed only in the scope of the body element by the list of message processors.
+                A parameter element defines an input value for the operation in which it is define. Such parameter must be defined with a meaningful name, a type which defines the kind of content the parameter must have and optionally a default value that will be used if the invocation to the operation does not defines a value for the parameter. The parameter can be accessed within the body definition of the operation using an expression such as #[mel: param.paramName]
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -104,7 +104,7 @@
     <xsd:element name="property" type="propertyType">
         <xsd:annotation>
             <xsd:documentation>
-                Parametrization of the module when being consumed (similarly to what an operation is).
+                A property element defines an input value for the operation in which it is define. Such property must be defined with a meaningful name, a type which defines the kind of content the property must have and optionally a default value that will be used if the invocation to the operation does not defines a value for the property. The property can be accessed within the body definition of the operation using an expression such as #[mel: property.paramName]
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
