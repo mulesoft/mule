@@ -19,9 +19,9 @@ import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthoriza
 import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_NOT_FOUND_STATUS;
 import static org.mule.extension.oauth2.internal.authorizationcode.AutoAuthorizationCodeTokenRequestHandler.TOKEN_URL_CALL_FAILED_STATUS;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;

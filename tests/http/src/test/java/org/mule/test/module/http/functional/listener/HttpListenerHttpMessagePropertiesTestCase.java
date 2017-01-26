@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
+import static org.mule.service.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_1;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.message.InternalMessage;

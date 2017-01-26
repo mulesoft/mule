@@ -10,7 +10,7 @@ package org.mule.test.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 
 import java.io.IOException;
 

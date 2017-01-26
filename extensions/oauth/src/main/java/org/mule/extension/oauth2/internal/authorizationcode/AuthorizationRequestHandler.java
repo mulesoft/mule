@@ -7,11 +7,11 @@
 package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static java.util.Collections.singletonMap;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
-import static org.mule.extension.http.api.HttpConstants.Methods.GET;
-import static org.mule.extension.http.api.HttpHeaders.Names.LOCATION;
+import static org.mule.service.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.service.http.api.HttpConstants.Methods.GET;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;

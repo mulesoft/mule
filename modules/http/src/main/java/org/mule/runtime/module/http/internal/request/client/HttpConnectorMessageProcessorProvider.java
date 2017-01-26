@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.request.client;
 
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.api.exception.MuleException;

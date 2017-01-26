@@ -6,9 +6,9 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import static org.mule.extension.http.api.HttpConstants.Methods.GET;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.service.http.api.HttpConstants.Methods.GET;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;

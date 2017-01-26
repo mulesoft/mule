@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;

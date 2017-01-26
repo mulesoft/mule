@@ -13,7 +13,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_LOCATIO
 import static org.mule.compatibility.transport.http.HttpConstants.SC_MOVED_TEMPORARILY;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_OK;
 import static org.mule.compatibility.transport.http.i18n.HttpMessages.fileNotFound;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
@@ -67,7 +67,7 @@ public class StaticResourceMessageProcessor extends AbstractAnnotatedObject impl
 
     String path = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY);
     String contextPath = event.getMessage()
-        .getInboundProperty(org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
+        .getInboundProperty(org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
     if (contextPath == null) {
       // If not found then try the transport property
       contextPath = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);

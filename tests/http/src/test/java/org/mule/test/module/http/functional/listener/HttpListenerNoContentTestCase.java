@@ -9,8 +9,9 @@ package org.mule.test.module.http.functional.listener;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.NO_CONTENT;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;

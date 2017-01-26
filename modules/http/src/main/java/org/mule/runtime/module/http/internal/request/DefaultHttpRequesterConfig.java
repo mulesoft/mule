@@ -7,8 +7,8 @@
 package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpClientSocketProperties;
@@ -26,7 +26,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;

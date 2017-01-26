@@ -8,9 +8,7 @@ package org.mule.extension.oauth2.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.extension.http.api.HttpConstants.Methods.POST;
-import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpSendBodyMode.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.NEVER;
 import static org.mule.extension.oauth2.api.exception.OAuthErrors.TOKEN_URL_FAIL;
@@ -19,6 +17,8 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRATION_TIME_
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_EXPRESSION;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;

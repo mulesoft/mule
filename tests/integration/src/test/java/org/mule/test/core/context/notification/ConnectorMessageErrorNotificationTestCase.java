@@ -13,7 +13,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;

@@ -32,13 +32,13 @@ public class HttpConstants {
   public static final int DEFAULT_HTTP_PORT = 80;
 
   // HTTP Methods
-  public static final String METHOD_OPTIONS = org.mule.runtime.module.http.api.HttpConstants.Methods.OPTIONS.name();
-  public static final String METHOD_GET = org.mule.runtime.module.http.api.HttpConstants.Methods.GET.name();
-  public static final String METHOD_HEAD = org.mule.runtime.module.http.api.HttpConstants.Methods.HEAD.name();
+  public static final String METHOD_OPTIONS = org.mule.service.http.api.HttpConstants.Methods.OPTIONS.name();
+  public static final String METHOD_GET = org.mule.service.http.api.HttpConstants.Methods.GET.name();
+  public static final String METHOD_HEAD = org.mule.service.http.api.HttpConstants.Methods.HEAD.name();
   public static final String METHOD_PATCH = "PATCH";
-  public static final String METHOD_POST = org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name();
-  public static final String METHOD_PUT = org.mule.runtime.module.http.api.HttpConstants.Methods.PUT.name();
-  public static final String METHOD_DELETE = org.mule.runtime.module.http.api.HttpConstants.Methods.DELETE.name();
+  public static final String METHOD_POST = org.mule.service.http.api.HttpConstants.Methods.POST.name();
+  public static final String METHOD_PUT = org.mule.service.http.api.HttpConstants.Methods.PUT.name();
+  public static final String METHOD_DELETE = org.mule.service.http.api.HttpConstants.Methods.DELETE.name();
   public static final String METHOD_TRACE = "TRACE";
   public static final String METHOD_CONNECT = "CONNECT";
 
@@ -64,10 +64,10 @@ public class HttpConstants {
   public static final String HEADER_ACCEPT_RANGES = "Accept-Ranges"; // [Response]
   public static final String HEADER_AGE = "Age"; // [Response]
   public static final String HEADER_ALLOW = "Allow"; // [Entity]
-  public static final String HEADER_AUTHORIZATION = org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION; // [Request]
+  public static final String HEADER_AUTHORIZATION = org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION; // [Request]
   public static final String HEADER_CACHE_CONTROL = "Cache-Control"; // [General]
   public static final String HEADER_CONNECTION = "Connection"; // [General]
-  public static final String HEADER_CONTENT_ENCODING = org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_ENCODING; // [Entity]
+  public static final String HEADER_CONTENT_ENCODING = org.mule.service.http.api.HttpHeaders.Names.CONTENT_ENCODING; // [Entity]
   public static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition"; // [Entity]
   public static final String HEADER_CONTENT_LANGUAGE = "Content-Language"; // [Entity]
   public static final String HEADER_CONTENT_LENGTH = "Content-Length"; // [Entity]
@@ -136,7 +136,7 @@ public class HttpConstants {
   public static final int SC_CONTINUE = 100;
   public static final int SC_SWITCHING_PROTOCOLS = 101;
   public static final int SC_PROCESSING = 102;
-  public static final int SC_OK = org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK.getStatusCode();
+  public static final int SC_OK = org.mule.service.http.api.HttpConstants.HttpStatus.OK.getStatusCode();
   public static final int SC_CREATED = 201;
   public static final int SC_ACCEPTED = 202;
   public static final int SC_NON_AUTHORITATIVE_INFORMATION = 203;
@@ -153,7 +153,7 @@ public class HttpConstants {
   public static final int SC_TEMPORARY_REDIRECT = 307;
   public static final int SC_BAD_REQUEST = 400;
   public static final int SC_UNAUTHORIZED =
-      org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED.getStatusCode();
+      org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED.getStatusCode();
   public static final int SC_PAYMENT_REQUIRED = 402;
   public static final int SC_FORBIDDEN = 403;
   public static final int SC_NOT_FOUND = 404;
@@ -176,7 +176,7 @@ public class HttpConstants {
   public static final int SC_LOCKED = 423;
   public static final int SC_FAILED_DEPENDENCY = 424;
   public static final int SC_INTERNAL_SERVER_ERROR =
-      org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode();
+      org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode();
   public static final int SC_NOT_IMPLEMENTED = 501;
   public static final int SC_BAD_GATEWAY = 502;
   public static final int SC_SERVICE_UNAVAILABLE = 503;

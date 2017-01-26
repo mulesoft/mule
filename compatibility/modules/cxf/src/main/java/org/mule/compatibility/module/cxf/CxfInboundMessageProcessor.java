@@ -8,21 +8,20 @@ package org.mule.compatibility.module.cxf;
 
 import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
-import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.extension.http.api.HttpHeaders.Names.HOST;
+import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.compatibility.module.cxf.support.DelegatingOutputStream;
 import org.mule.compatibility.module.cxf.transport.MuleUniversalDestination;
 import org.mule.extension.http.api.HttpAttributes;
-import org.mule.extension.http.api.HttpConstants.HttpStatus;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
@@ -39,6 +38,7 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.xml.stax.StaxSource;
+import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import java.io.ByteArrayInputStream;

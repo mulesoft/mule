@@ -10,7 +10,7 @@ import static org.apache.http.entity.ContentType.DEFAULT_TEXT;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import org.mule.test.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

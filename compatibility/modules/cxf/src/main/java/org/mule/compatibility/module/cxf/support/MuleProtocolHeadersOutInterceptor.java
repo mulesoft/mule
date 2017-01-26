@@ -9,9 +9,9 @@ package org.mule.compatibility.module.cxf.support;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.PROTOCOL_HEADERS;
-import static org.mule.extension.http.api.HttpConstants.Methods.POST;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
-import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.compatibility.module.cxf.CxfConstants;
 import org.mule.runtime.api.metadata.MediaType;

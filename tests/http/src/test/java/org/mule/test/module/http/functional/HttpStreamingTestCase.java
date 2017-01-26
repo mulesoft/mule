@@ -9,8 +9,8 @@ package org.mule.test.module.http.functional;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.extension.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
 
 import org.mule.extension.http.api.HttpResponseAttributes;

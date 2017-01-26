@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.module.http.api.HttpConstants.ALL_INTERFACES_IP;
+import static org.mule.service.http.api.HttpConstants.ALL_INTERFACES_IP;
 import org.mule.service.http.api.server.ServerAddress;
 
 public class DefaultServerAddress implements ServerAddress {

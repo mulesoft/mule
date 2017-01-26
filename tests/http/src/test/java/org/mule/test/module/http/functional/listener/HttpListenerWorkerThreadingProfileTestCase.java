@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_MAX_THREADS;
 
 import org.mule.functional.junit4.FunctionalTestCase;

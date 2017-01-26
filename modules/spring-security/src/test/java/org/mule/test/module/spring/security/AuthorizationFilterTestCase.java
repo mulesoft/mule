@@ -9,7 +9,7 @@ package org.mule.test.module.spring.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

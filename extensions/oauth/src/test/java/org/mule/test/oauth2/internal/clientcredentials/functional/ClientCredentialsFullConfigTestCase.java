@@ -17,9 +17,9 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;

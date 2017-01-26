@@ -7,8 +7,8 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapping;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;

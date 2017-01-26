@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.service.http.api.HttpHeaders;
 
 import java.io.IOException;
 

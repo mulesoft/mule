@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;

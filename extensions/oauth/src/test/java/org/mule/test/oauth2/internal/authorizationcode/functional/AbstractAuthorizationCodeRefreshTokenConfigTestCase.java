@@ -22,7 +22,7 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PA
 import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_REFRESH_TOKEN;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
