@@ -16,6 +16,7 @@ import org.mule.extensions.jms.api.exception.JmsPublishException;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.functional.junit4.rules.ExpectedError;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -58,6 +59,7 @@ public class JmsErrorTestCase extends JmsAbstractTestCase {
   }
 
   @Test
+  @Ignore
   public void timeout() throws Exception {
     expectedError.expectError(NAMESPACE, TIMEOUT.getType(), JmsConsumeException.class,
                               AN_ERROR_OCCURRED_WHILE_CONSUMING_A_MESSAGE);
