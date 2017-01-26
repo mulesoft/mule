@@ -6,19 +6,25 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
+import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_REACH;
+import static org.mule.extension.db.api.exception.connection.DbError.INVALID_CREDENTIALS;
+import static org.mule.extension.db.api.exception.connection.DbError.INVALID_DATABASE;
 import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
 import static org.mule.extension.db.internal.domain.connection.mysql.MySqlConnectionParameters.MYSQL_DRIVER_CLASS;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
+import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
-import java.util.Optional;
-
 import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.Optional;
 
 /**
  * Creates connections to a MySQL database.
@@ -31,6 +37,10 @@ import javax.sql.DataSource;
     fileName = DRIVER_FILE_NAME_PATTERN, requiredClassName = MYSQL_DRIVER_CLASS)
 public class MySqlConnectionProvider extends DbConnectionProvider {
 
+  private static final String ACCESS_DENIED = "Access denied";
+  private static final String UNKNOWN_DATABASE = "Unknown database";
+  private static final String COMMUNICATIONS_LINK_FAILURE = "Communications link failure";
+
   @ParameterGroup(name = CONNECTION)
   private MySqlConnectionParameters mySqlParameters;
 
@@ -42,5 +52,24 @@ public class MySqlConnectionProvider extends DbConnectionProvider {
   @Override
   public Optional<DataSourceConfig> getDataSourceConfig() {
     return Optional.ofNullable(mySqlParameters);
+  }
+
+  @Override
+  public ConnectionException handleSQLConnectionException(Exception e) {
+    DbError dbError = null;
+    if (e instanceof SQLException) {
+      String message = e.getMessage();
+      if (message.contains(ACCESS_DENIED)) {
+        dbError = INVALID_CREDENTIALS;
+      } else if (message.contains(UNKNOWN_DATABASE)) {
+        dbError = INVALID_DATABASE;
+      } else if (message.contains(COMMUNICATIONS_LINK_FAILURE)) {
+        dbError = CANNOT_REACH;
+      }
+    }
+
+    return dbError == null
+        ? new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e)
+        : new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e, dbError);
   }
 }

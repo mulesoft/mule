@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:config name="derbyConfigDatabaseNotFound">
+        <db:derby-connection database="target/db1" create="false"/>
+    </db:config>
+
+    <db:config name="derbyConfigDbFromJarNotFound">
+        <db:derby-connection database="(c:/derby/lib/jar2.jar)jarDB2" subsubProtocol="jar" create="false"/>
+    </db:config>
+
+    <db:config name="mySqlConfigInvalidHost">
+        <db:my-sql-connection host="0.0.0.0" port="8081"/>
+    </db:config>
+
+
+    <db:config name="mySqlConfigInvalidCredentials">
+        <db:my-sql-connection host="192.168.99.100" port="3306"/>
+    </db:config>
+
+
+    <db:config name="mySqlConfigInvalidDatabaseName">
+        <db:my-sql-connection host="192.168.99.100" port="3306" database="invalidDB" password="my-secret-pw"
+                              user="root"/>
+    </db:config>
+
+    <db:config name="mySqlConfigInvalidSocketTimeoutValue">
+        <db:my-sql-connection host="192.168.99.100" port="3306" password="my-secret-pw" user="root">
+            <db:connection-properties>
+                <db:connection-property key="connectTimeout" value="-1"/>
+                <db:connection-property key="socketTimeout" value="-1"/>
+            </db:connection-properties>
+        </db:my-sql-connection>
+    </db:config>
+
+    <db:config name="oracleConfigInvalidCredentials">
+        <db:oracle-connection host="192.168.99.100" port="49161" instance="xe" user="system"
+                              password="invalidPassword"/>
+    </db:config>
+
+    <db:config name="oracleConfigUnknownInstance">
+        <db:oracle-connection host="192.168.99.100" port="49161" instance="invalidInstance" user="system" password="oracle"/>
+    </db:config>
+
+    <db:config name="oracleConfigUnknownHost">
+        <db:oracle-connection host="invalidHost" port="49161" instance="xe" user="system" password="oracle"/>
+    </db:config>
+</mule>

@@ -63,6 +63,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   private static final Logger LOGGER = getLogger(DbConnectionProvider.class);
   public static final String DRIVER_FILE_NAME_PATTERN = "(.*)\\.jar";
+  protected static final String CONNECTION_ERROR_MESSAGE = "Could not obtain connection from data source";
 
   @ConfigName
   private String configName;
@@ -103,6 +104,10 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   private DataSource dataSource;
 
+  public ConnectionException handleSQLConnectionException(Exception e) {
+    return new ConnectionCreationException("Could not obtain connection from data source", e);
+  }
+
   @Override
   public final DbConnection connect() throws ConnectionException {
     try {
@@ -116,8 +121,10 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
       }
 
       return connection;
+    } catch (ConnectionException e) {
+      throw e;
     } catch (Exception e) {
-      throw new ConnectionCreationException(e);
+      throw handleSQLConnectionException(e);
     }
   }
 
