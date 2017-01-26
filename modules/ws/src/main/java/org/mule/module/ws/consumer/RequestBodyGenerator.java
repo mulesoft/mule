@@ -78,7 +78,7 @@ public class RequestBodyGenerator
         {
             DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
 
-            if (model.getFields().isEmpty())
+            if (model.getFields().isEmpty() && !model.isAnyFieldAllowed())
             {
                 logger.info("The selected operation does not require input parameters, the payload will be ignored");
                 QName element = part.getElementName();
