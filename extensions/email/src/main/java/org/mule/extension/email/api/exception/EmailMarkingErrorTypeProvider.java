@@ -6,11 +6,11 @@
  */
 package org.mule.extension.email.api.exception;
 
-import static org.mule.extension.email.api.exception.EmailErrors.*;
+import static org.mule.extension.email.api.exception.EmailError.ACCESSING_FOLDER;
+import static org.mule.extension.email.api.exception.EmailError.EMAIL_NOT_FOUND;
+import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 

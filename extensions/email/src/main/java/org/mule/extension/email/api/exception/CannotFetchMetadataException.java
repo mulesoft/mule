@@ -6,7 +6,7 @@
  */
 package org.mule.extension.email.api.exception;
 
-import static org.mule.extension.email.api.exception.EmailErrors.FETCHING_ATTRIBUTES;
+import static org.mule.extension.email.api.exception.EmailError.FETCHING_ATTRIBUTES;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.runtime.extension.api.exception.ModuleException;
 

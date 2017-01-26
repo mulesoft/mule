@@ -6,7 +6,7 @@
  */
 package org.mule.extension.email.api.exception;
 
-import static org.mule.extension.email.api.exception.EmailErrors.ACCESSING_FOLDER;
+import static org.mule.extension.email.api.exception.EmailError.ACCESSING_FOLDER;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
