@@ -21,8 +21,14 @@
 	<http:listener-config name="listenerConfigTSInResponseTSCheck"
 		host="localhost" port="${portTSInResponseTSCheck}" />
 
+	<http:listener-config name="listenerConfigTSInResponseNoTSCheck"
+		host="localhost" port="${portTSInResponseNoTSCheck}" />
+
 	<http:listener-config name="listenerConfigNoTSInResponseTSCheck"
 		host="localhost" port="${portNoTSInResponseTSCheck}" />
+
+	<http:listener-config name="listenerConfigNoTSInResponseNoTSCheck"
+		host="localhost" port="${portNoTSInResponseNoTSCheck}" />
 
 	<tls:context name="tlsContextSignature">
 		<tls:trust-store path="trustStore" password="mulepassword"
@@ -41,6 +47,44 @@
 		service="TestService" port="TestPort"
 		serviceAddress="http://localhost:${portServerTSInResponse}/services/Test"
 		name="TSCheckTSInResponse">
+		<ws:security>
+			<ws:wss-username-token username="admin"
+				password="textPassword" passwordType="TEXT" addCreated="true"
+				addNonce="true" />
+			<ws:wss-timestamp expires="60" />
+			<!-- I add the following actions because if I let the timestamp alone, 
+				no verification on incoming requests are performed -->
+			<ws:wss-sign tlsContext-ref="tlsContextSignature" />
+			<ws:wss-verify-signature tlsContext-ref="tlsContextSignature" />
+			<ws:wss-encrypt tlsContext-ref="tlsContextEncryption"
+				alias="s1as" />
+			<ws:wss-decrypt tlsContext-ref="tlsContextEncryption" />
+		</ws:security>
+	</ws:consumer-config>
+
+	<ws:consumer-config wsdlLocation="Test.wsdl"
+		service="TestService" port="TestPort"
+		serviceAddress="http://localhost:${portServerTSInResponse}/services/Test"
+		name="noTSCheckTSInResponse">
+		<ws:security>
+			<ws:wss-username-token username="admin"
+				password="textPassword" passwordType="TEXT" addCreated="true"
+				addNonce="true" />
+			<ws:wss-timestamp expires="60" />
+			<!-- I add the following actions because if I let the timestamp alone, 
+				no verification on incoming requests are performed -->
+			<ws:wss-sign tlsContext-ref="tlsContextSignature" />
+			<ws:wss-verify-signature tlsContext-ref="tlsContextSignature" />
+			<ws:wss-encrypt tlsContext-ref="tlsContextEncryption"
+				alias="s1as" />
+			<ws:wss-decrypt tlsContext-ref="tlsContextEncryption" />
+		</ws:security>
+	</ws:consumer-config>
+
+	<ws:consumer-config wsdlLocation="Test.wsdl"
+		service="TestService" port="TestPort"
+		serviceAddress="http://localhost:${portServerNoTSInResponse}/services/Test"
+		name="noTSCheckNoTSInResponse">
 		<ws:security>
 			<ws:wss-username-token username="admin"
 				password="textPassword" passwordType="TEXT" addCreated="true"
@@ -259,6 +303,13 @@
 		<ws:consumer config-ref="TSCheckTSInResponse" operation="echoWithHeaders" />
 	</flow>
 
+	<flow name="timestampInResponseNoTSCheck">
+		<http:listener path="in"
+			config-ref="listenerConfigTSInResponseNoTSCheck" />
+		<set-property propertyName="mustUnderstand" value="false" />
+		<ws:consumer config-ref="noTSCheckTSInResponse" operation="echoWithHeaders" />
+	</flow>
+
 	<flow name="noTimestampInResponseTSCheck">
 		<http:listener path="in"
 			config-ref="listenerConfigNoTSInResponseTSCheck" />
@@ -266,4 +317,11 @@
 		<ws:consumer config-ref="TSCheckNoTSInResponse" operation="echoWithHeaders" />
 	</flow>
 
+	<flow name="noTimestampInResponseNoTSCheck">
+		<http:listener path="in"
+			config-ref="listenerConfigNoTSInResponseNoTSCheck" />
+		<set-property propertyName="mustUnderstand" value="false" />
+		<ws:consumer config-ref="noTSCheckNoTSInResponse"
+			operation="echoWithHeaders" />
+	</flow>
 </mule>
