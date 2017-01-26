@@ -10,6 +10,8 @@ import org.mule.extension.validation.api.ObjectSource;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -45,13 +47,12 @@ public final class CustomValidatorOperation extends ValidationSupport {
         }
       });
 
-  public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") ObjectSource<Validator> source,
+  public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") ObjectSource source,
                               @Placement(order = 1) @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
                               @UseConfig ValidationExtension config)
       throws Exception {
-    ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
+    ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef(), config.getMuleContext());
     Validator validator = validatorSource.getObject();
-    config.getMuleContext().getRegistry().applyProcessors(validator);
     validateWith(validator, createContext(options, config));
   }
 
@@ -62,10 +63,13 @@ public final class CustomValidatorOperation extends ValidationSupport {
     }
   }
 
-  private class ValidatorSource extends ObjectSource<Validator> {
+  private class ValidatorSource extends ObjectSource {
 
-    public ValidatorSource(String type, Validator ref) {
+    private final MuleContext context;
+
+    public ValidatorSource(String type, Validator ref, MuleContext context) {
       super(type, ref);
+      this.context = context;
     }
 
     @Override
@@ -73,8 +77,10 @@ public final class CustomValidatorOperation extends ValidationSupport {
       return class2ValidatorCache.getUnchecked(this);
     }
 
-    private Validator createValidator() {
-      return super.doGetByClassName();
+    private synchronized Validator createValidator() throws MuleException {
+      Validator validator = super.doGetByClassName();
+      context.getRegistry().applyProcessors(validator);
+      return validator;
     }
 
     @Override

@@ -6,6 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,7 +40,7 @@ import java.lang.reflect.Constructor;
  * @since 3.7.0
  */
 @ExclusiveOptionals(isOneRequired = true)
-public class ObjectSource<T> {
+public class ObjectSource {
 
   @Parameter
   @Alias("class")
@@ -49,25 +50,27 @@ public class ObjectSource<T> {
   @Parameter
   @Optional
   @XmlHints(allowInlineDefinition = false)
-  private T ref;
+  private Validator ref;
 
   public ObjectSource() {}
 
-  public ObjectSource(String type, T ref) {
+  public ObjectSource(String type, Validator ref) {
     this.type = type;
     this.ref = ref;
   }
 
-  public final T getObject() {
+  public final Validator getObject() {
     return !isBlank(type) ? doGetByClassName() : ref;
   }
 
-  protected T doGetByClassName() {
-    Class<T> objectClass;
+  protected Validator doGetByClassName() {
+    Class<Validator> objectClass;
     try {
-      objectClass = (Class<T>) ClassUtils.loadClass(type, getClass());
+      objectClass = (Class<Validator>) ClassUtils.loadClass(type, getClass());
     } catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException("Could not find class " + type, e);
+      throw new IllegalArgumentException(format("Could not find class %s", type), e);
+    } catch (ClassCastException e) {
+      throw new IllegalArgumentException(format("Could %s is not a %s", type, Validator.class.getName()), e);
     }
 
     try {
@@ -77,7 +80,7 @@ public class ObjectSource<T> {
     }
   }
 
-  public T getRef() {
+  public Validator getRef() {
     return ref;
   }
 

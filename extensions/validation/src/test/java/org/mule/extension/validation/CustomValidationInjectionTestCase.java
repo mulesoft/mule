@@ -17,7 +17,6 @@ import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.CustomValidatorOperation;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,7 +41,7 @@ public class CustomValidationInjectionTestCase extends AbstractMuleTestCase {
   @Test
   public void injectionInCustomValidator() throws Exception {
     CustomValidatorOperation validator = new CustomValidatorOperation();
-    ObjectSource<Validator> objectSource = new ObjectSource<>(TestValidator.class.getName(), null);
+    ObjectSource objectSource = new ObjectSource(TestValidator.class.getName(), null);
     validator.customValidator(objectSource, null, config);
 
     verify(registryHelper, atLeastOnce()).applyProcessors(any(TestValidator.class));
