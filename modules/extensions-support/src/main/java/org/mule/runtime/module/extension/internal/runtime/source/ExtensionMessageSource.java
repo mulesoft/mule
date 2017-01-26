@@ -152,7 +152,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void notifyExceptionAndShutDown(Throwable exception) {
-    LOGGER.error(format("Message source '%s' on flow '%s' threw exception. Shutting down it forever...", sourceAdapter.getName(),
+    LOGGER.error(format("Message source on flow '%s' threw exception. Shutting down it forever...",
                         flowConstruct.getName()),
                  exception);
     shutdown();
