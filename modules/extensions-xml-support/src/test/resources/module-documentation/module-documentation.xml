@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-documentation"
+        namespace="http://www.mulesoft.org/schema/mule/module-documentation"
+        doc:description="Documentation for the connector"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <property name="aPropertyWithDoc" type="string" doc:description="Documentation for the property"/>
+
+    <operation name="operation-with-doc" doc:description="Documentation for the operation">
+        <parameters>
+            <parameter name="paramWithDoc" type="string" doc:description="Documentation for the parameter" />
+        </parameters>
+        <body>
+            <mule:set-payload value="hardcoded value"/>
+        </body>
+        <output type="string" doc:description="Documentation for the output"/>
+    </operation>
+</module>

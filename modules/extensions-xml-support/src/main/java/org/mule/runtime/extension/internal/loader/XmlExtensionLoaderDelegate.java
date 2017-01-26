@@ -77,6 +77,9 @@ final class XmlExtensionLoaderDelegate {
   private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
       .put("void", typeLoader.load(Void.class))
       .build();
+  private static final String CATEGORY = "category";
+  private static final String VENDOR = "vendor";
+  private static final String DOC_DESCRIPTION = "doc:description";
 
   private static ImmutableMap.Builder<String, MetadataType> getCommonTypesBuilder() {
     return ImmutableMap.<String, MetadataType>builder()
@@ -196,13 +199,15 @@ final class XmlExtensionLoaderDelegate {
     String name = moduleModel.getParameters().get(MODULE_NAME);
     String namespace = moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE);
 
-    String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 add 'from version' to smart extensions
+    String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
+    final String category = moduleModel.getParameters().get(CATEGORY);
+    final String vendor = moduleModel.getParameters().get(VENDOR);
     declarer.named(name)
-        .describedAs("Some description")
-        .fromVendor("MuleSoft") // TODO(fernandezlautaro): MULE-11010 add 'vendor' to smart extensions
+        .describedAs(getDescription(moduleModel))
+        .fromVendor(vendor)
+        .withMinMuleVersion(new MuleVersion("4.0.0")) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from ExtensionModel
         .onVersion(version)
-        .withMinMuleVersion(new MuleVersion("4.0.0")) //this one should be taken from the pom.xml
-        .withCategory(Category.COMMUNITY) // TODO(fernandezlautaro): MULE-11010 add 'category' to smart extensions
+        .withCategory(Category.valueOf(category.toUpperCase()))
         .withXmlDsl(XmlDslModel.builder()
             .setSchemaVersion(version)
             .setNamespace(name)
@@ -219,6 +224,10 @@ final class XmlExtensionLoaderDelegate {
     }
   }
 
+  private String getDescription(ComponentModel componentModel) {
+    return componentModel.getParameters().getOrDefault(DOC_DESCRIPTION, "");
+  }
+
   private List<ComponentModel> extractGlobalElementsFrom(ComponentModel moduleModel) {
     return moduleModel.getInnerComponents().stream()
         .filter(child -> !child.getIdentifier().equals(OPERATION_PROPERTY_IDENTIFIER)
@@ -227,9 +236,7 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private Optional<ConfigurationDeclarer> loadPropertiesFrom(ExtensionDeclarer declarer, ComponentModel moduleModel) {
-
     List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
-
     List<ComponentModel> properties = moduleModel.getInnerComponents().stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_PROPERTY_IDENTIFIER))
         .collect(Collectors.toList());
@@ -251,7 +258,6 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel) {
-
     String operationName = operationModel.getNameAttribute();
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentModel bodyComponentModel = operationModel.getInnerComponents()
@@ -261,7 +267,7 @@ final class XmlExtensionLoaderDelegate {
                                                                operationName)));
 
     operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(bodyComponentModel));
-
+    operationDeclarer.describedAs(getDescription(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer, operationModel);
   }
@@ -289,7 +295,8 @@ final class XmlExtensionLoaderDelegate {
         parameterDefaultValue == null ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
             : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
                 .defaultingTo(parameterDefaultValue);
-    parameterDeclarer.ofType(parameterType);
+    parameterDeclarer.describedAs(getDescription(param))
+        .ofType(parameterType);
   }
 
   private void extractOutputType(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
@@ -301,7 +308,8 @@ final class XmlExtensionLoaderDelegate {
     String receivedOutputType = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
     MetadataType metadataType = extractType(defaultOutputTypes, receivedOutputType);
 
-    operationDeclarer.withOutput().ofType(metadataType);
+    operationDeclarer.withOutput().describedAs(getDescription(outputComponentModel))
+        .ofType(metadataType);
     operationDeclarer.withOutputAttributes().ofType(typeLoader.load(Void.class));
   }
 

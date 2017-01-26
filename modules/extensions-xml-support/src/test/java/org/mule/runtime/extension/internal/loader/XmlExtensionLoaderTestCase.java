@@ -9,6 +9,7 @@ package org.mule.runtime.extension.internal.loader;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
@@ -148,6 +149,45 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
     Optional<OperationComponentModelModelProperty> modelProperty =
         operation.getModelProperty(OperationComponentModelModelProperty.class);
+    assertThat(modelProperty.isPresent(), is(true));
+    assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
+  }
+
+  @Test
+  public void testModuleDocumentation() throws IOException {
+    String modulePath = "module-documentation/module-documentation.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-documentation"));
+    assertThat(extensionModel.getDescription(), is("Documentation for the connector"));
+    assertThat(extensionModel.getConfigurationModels().size(), is(1));
+    ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
+    assertThat(configurationModel.getName(), is(CONFIG_NAME));
+    assertThat(configurationModel.getAllParameterModels().size(), is(1));
+    assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("aPropertyWithDoc"));
+    assertThat(configurationModel.getAllParameterModels().get(0).getDescription(), is("Documentation for the property"));
+
+    Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
+        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+    assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
+    assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(0));
+
+    assertThat(configurationModel.getOperationModels().size(), is(1));
+
+    Optional<OperationModel> operationModel = configurationModel.getOperationModel("operation-with-doc");
+    assertThat(operationModel.isPresent(), is(true));
+    assertThat(operationModel.get().getDescription(), is("Documentation for the operation"));
+
+    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("paramWithDoc"));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getDescription(), is("Documentation for the parameter"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getDescription(), is(TARGET_PARAMETER_DESCRIPTION));
+
+    assertThat(operationModel.get().getOutput().getDescription(), is("Documentation for the output"));
+
+    Optional<OperationComponentModelModelProperty> modelProperty =
+        operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
     assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
   }
