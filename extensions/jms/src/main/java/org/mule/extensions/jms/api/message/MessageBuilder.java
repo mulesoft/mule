@@ -19,6 +19,7 @@ import org.mule.extensions.jms.api.config.JmsProducerConfig;
 import org.mule.extensions.jms.api.destination.JmsDestination;
 import org.mule.extensions.jms.api.exception.DestinationNotFoundException;
 import org.mule.extensions.jms.internal.support.JmsSupport;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -202,6 +203,9 @@ public class MessageBuilder {
     try {
       // sanitize key as JMS Property Name
       key = encodeKey(key);
+      if (value instanceof TypedValue) {
+        value = ((TypedValue) value).getValue();
+      }
       msg.setObjectProperty(key, value);
     } catch (JMSException e) {
       // Various JMS servers have slightly different rules to what
