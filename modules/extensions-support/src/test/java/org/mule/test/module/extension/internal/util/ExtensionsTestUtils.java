@@ -34,7 +34,6 @@ import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.TypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
@@ -128,9 +127,8 @@ public final class ExtensionsTestUtils {
     return arrayTypeBuilder.build();
   }
 
-  public static DictionaryType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> keyTypeBuilder,
-                                            TypeBuilder<?> valueTypeBuilder) {
-    return TYPE_BUILDER.dictionaryType().id(clazz.getName()).ofKey(keyTypeBuilder).ofValue(valueTypeBuilder).build();
+  public static ObjectType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> valueTypeBuilder) {
+    return TYPE_BUILDER.objectType().id(clazz.getName()).openWith(valueTypeBuilder).build();
   }
 
   public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz) {

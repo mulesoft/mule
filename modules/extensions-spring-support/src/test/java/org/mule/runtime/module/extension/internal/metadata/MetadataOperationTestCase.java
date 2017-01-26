@@ -40,8 +40,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DateType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -242,10 +240,9 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
     final ComponentModel typedModel = metadataDescriptor.getModel();
     MetadataType type = typedModel.getOutputAttributes().getType();
-    assertThat(type, is(instanceOf(DictionaryType.class)));
-    DictionaryType dictionary = (DictionaryType) type;
-    assertThat(dictionary.getKeyType(), is(instanceOf(DateType.class)));
-    assertThat(dictionary.getValueType(), is(instanceOf(StringType.class)));
+    assertThat(type, is(instanceOf(ObjectType.class)));
+    ObjectType dictionary = (ObjectType) type;
+    assertThat(dictionary.getOpenRestriction().get(), is(instanceOf(StringType.class)));
   }
 
   @Test

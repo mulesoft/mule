@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.validator.ParameterModelValidator;
+import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -127,7 +128,8 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidParameterDictionaryDueToReservedName() {
     when(invalidParameterModel.getType())
-        .thenReturn(dictionaryOf(Map.class, objectTypeBuilder(String.class), objectTypeBuilder(InvalidPojo.class)));
+        .thenReturn(dictionaryOf(Map.class, objectTypeBuilder(InvalidPojo.class)));
+    when(invalidParameterModel.getModelProperty(InfrastructureParameterModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getName()).thenReturn("pojos");
     mockParameters(operationModel, invalidParameterModel);
     validate(extensionModel, validator);
