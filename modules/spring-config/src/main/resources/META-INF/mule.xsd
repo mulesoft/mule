@@ -6046,6 +6046,20 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="byteUnitType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Byte units enumeration
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="BYTE"/>
+            <xsd:enumeration value="KB"/>
+            <xsd:enumeration value="MB"/>
+            <xsd:enumeration value="GB"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <!-- i found this a bit confusing, so here is some background...
          this type is typically called from something like
            <xsd:element name="properties" type="mapType/>
