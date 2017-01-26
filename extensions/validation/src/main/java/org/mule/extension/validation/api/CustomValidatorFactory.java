@@ -8,6 +8,7 @@ package org.mule.extension.validation.api;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,27 +21,29 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.lang.reflect.Constructor;
+import java.util.Objects;
 
 /**
  * A factory object for providing instances by either referencing their classname (through the {@link #type} attribute, or a
  * {@link MuleRegistry} reference (through the {@link #ref} one.
  * <p>
  * When the {@link #type} attribute is used to reference a type, then a new instance is returned each time that
- * {@link #getObject(MuleContext)} is invoked. That type is also expected to have a public default {@link Constructor}.
+ * {@link CustomValidatorFactory#getObject()} is invoked. That type is also expected to have a public default {@link Constructor}.
  * <p>
  * When a {@link #ref} is provided, then that value is searched by using the {@link MuleRegistry#get(String)}. Notice however that
- * the reference will be re fetched each time that {@link #getObject(MuleContext)} is invoked
+ * the reference will be re fetched each time that {@link CustomValidatorFactory#getObject()} is invoked
  * <p>
  * The {@link #type} and {@link #ref} attributes are mutually exclusive. A {@link IllegalArgumentException} is thrown if both are
- * set by the time {@link #getObject(MuleContext)} is invoked. The same exception is also thrown if none of them are.
+ * set by the time {@link CustomValidatorFactory#getObject()} is invoked. The same exception is also thrown if none of them are.
  * <p>
  * Instances of this class are to be considered thread-safe and reusable.
  *
- * @param <T> the type of the object to be returned
- * @since 3.7.0
+ * @since 4.0
  */
 @ExclusiveOptionals(isOneRequired = true)
-public class ObjectSource {
+public final class CustomValidatorFactory {
+
+  private MuleContext muleContext;
 
   @Parameter
   @Alias("class")
@@ -52,19 +55,21 @@ public class ObjectSource {
   @XmlHints(allowInlineDefinition = false)
   private Validator ref;
 
-  public ObjectSource() {}
+  public CustomValidatorFactory() {}
 
-  public ObjectSource(String type, Validator ref) {
+  public CustomValidatorFactory(String type, Validator ref) {
     this.type = type;
     this.ref = ref;
   }
 
   public final Validator getObject() {
-    return !isBlank(type) ? doGetByClassName() : ref;
+    return !isBlank(type) ? doGetByClassName(muleContext) : ref;
   }
 
-  protected Validator doGetByClassName() {
+  protected Validator doGetByClassName(MuleContext muleContext) {
+    checkArgument(muleContext != null, "Mule Context is required for loading a Validator class");
     Class<Validator> objectClass;
+
     try {
       objectClass = (Class<Validator>) ClassUtils.loadClass(type, getClass());
     } catch (ClassNotFoundException e) {
@@ -74,17 +79,37 @@ public class ObjectSource {
     }
 
     try {
-      return objectClass.newInstance();
+      Validator validator = objectClass.newInstance();
+      muleContext.getRegistry().applyProcessors(validator);
+      return validator;
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of " + type), e);
     }
+  }
+
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 
   public Validator getRef() {
     return ref;
   }
 
-  public final String getType() {
+  public String getType() {
     return type;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof CustomValidatorFactory) {
+      CustomValidatorFactory that = (CustomValidatorFactory) other;
+      return Objects.equals(type, that.type) && Objects.equals(ref, that.ref);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, ref);
   }
 }

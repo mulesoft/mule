@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.extension.validation.api.ObjectSource;
+import org.mule.extension.validation.api.CustomValidatorFactory;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
@@ -30,10 +30,10 @@ public class CustomValidationInjectionTestCase extends AbstractMuleTestCase {
 
   private final MuleRegistryHelper registryHelper = mock(MuleRegistryHelper.class);
   private final ValidationExtension config = mock(ValidationExtension.class);
+  private final MuleContext muleContext = mock(MuleContext.class);
 
   @Before
   public void initializeMocks() throws Exception {
-    MuleContext muleContext = mock(MuleContext.class);
     when(config.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getRegistry()).thenReturn(registryHelper);
   }
@@ -41,9 +41,8 @@ public class CustomValidationInjectionTestCase extends AbstractMuleTestCase {
   @Test
   public void injectionInCustomValidator() throws Exception {
     CustomValidatorOperation validator = new CustomValidatorOperation();
-    ObjectSource objectSource = new ObjectSource(TestValidator.class.getName(), null);
+    CustomValidatorFactory objectSource = new CustomValidatorFactory(TestValidator.class.getName(), null);
     validator.customValidator(objectSource, null, config);
-
     verify(registryHelper, atLeastOnce()).applyProcessors(any(TestValidator.class));
   }
 

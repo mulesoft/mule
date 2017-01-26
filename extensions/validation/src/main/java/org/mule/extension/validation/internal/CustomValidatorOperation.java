@@ -6,12 +6,10 @@
  */
 package org.mule.extension.validation.internal;
 
-import org.mule.extension.validation.api.ObjectSource;
+import org.mule.extension.validation.api.CustomValidatorFactory;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -23,7 +21,7 @@ import com.google.common.cache.LoadingCache;
 
 /**
  * Defines a stateful operation of {@link ValidationExtension} which is capable of executing custom validators provided by a third
- * party. The {@link Validator} can be provided via a {@link ObjectSource} which means that the user could have specified either a
+ * party. The {@link Validator} can be provided via a {@link CustomValidatorFactory} which means that the user could have specified either a
  * classname or a named reference to it.
  * <p/>
  * If the user provided a classname, then the {@link Class} that it represents is expected to have a default public constructor
@@ -38,21 +36,21 @@ import com.google.common.cache.LoadingCache;
  */
 public final class CustomValidatorOperation extends ValidationSupport {
 
-  private final LoadingCache<ValidatorSource, Validator> class2ValidatorCache =
-      CacheBuilder.newBuilder().build(new CacheLoader<ValidatorSource, Validator>() {
+  private final LoadingCache<CustomValidatorFactory, Validator> validatorCache =
+      CacheBuilder.newBuilder().build(new CacheLoader<CustomValidatorFactory, Validator>() {
 
         @Override
-        public Validator load(ValidatorSource validatorSource) throws Exception {
-          return validatorSource.createValidator();
+        public Validator load(CustomValidatorFactory validatorSource) throws Exception {
+          return validatorSource.getObject();
         }
       });
 
-  public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") ObjectSource source,
+  public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") CustomValidatorFactory source,
                               @Placement(order = 1) @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
                               @UseConfig ValidationExtension config)
       throws Exception {
-    ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef(), config.getMuleContext());
-    Validator validator = validatorSource.getObject();
+    source.setMuleContext(config.getMuleContext());
+    Validator validator = validatorCache.getUnchecked(source);
     validateWith(validator, createContext(options, config));
   }
 
@@ -60,41 +58,6 @@ public final class CustomValidatorOperation extends ValidationSupport {
   protected void logSuccessfulValidation(Validator validator) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Successfully executed custom validator of type {}", validator.getClass().getName());
-    }
-  }
-
-  private class ValidatorSource extends ObjectSource {
-
-    private final MuleContext context;
-
-    public ValidatorSource(String type, Validator ref, MuleContext context) {
-      super(type, ref);
-      this.context = context;
-    }
-
-    @Override
-    protected Validator doGetByClassName() {
-      return class2ValidatorCache.getUnchecked(this);
-    }
-
-    private synchronized Validator createValidator() throws MuleException {
-      Validator validator = super.doGetByClassName();
-      context.getRegistry().applyProcessors(validator);
-      return validator;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (obj instanceof ValidatorSource) {
-        return getType().equals(((ValidatorSource) obj).getType());
-      }
-
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return getType().hashCode();
     }
   }
 }
