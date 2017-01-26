@@ -12,9 +12,9 @@ import static org.junit.Assert.assertFalse;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.meta.NameableObject;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 
 import java.util.Iterator;
 import java.util.List;

@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.interceptor;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.AbstractComponent;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -189,9 +189,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
 
   protected Flow createUninitializedFlow() throws Exception {
     TestComponent component = new TestComponent();
-    flow = new Flow("name", muleContext);
-    flow.setMessageProcessors(new ArrayList<Processor>());
-    flow.getMessageProcessors().add(component);
+    flow = builder("name", muleContext).messageProcessors(singletonList(component)).build();
     return flow;
   }
 

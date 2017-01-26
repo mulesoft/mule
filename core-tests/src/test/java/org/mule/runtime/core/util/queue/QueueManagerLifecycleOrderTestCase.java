@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.security.MuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -93,7 +93,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private class RecordingFlow extends Flow {
+  private class RecordingFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public RecordingFlow(String name, MuleContext muleContext) {
       super(name, muleContext);

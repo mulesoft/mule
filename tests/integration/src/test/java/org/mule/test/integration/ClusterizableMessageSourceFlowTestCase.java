@@ -8,14 +8,14 @@ package org.mule.test.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.connector.PollingController;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.connector.PollingController;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -45,9 +45,9 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     ((DefaultMuleContext) muleContext).setPollingController(pollingController);
     muleContext.start();
 
-    Flow test1 = (Flow) muleContext.getRegistry().get("test1");
+    Flow test1 = muleContext.getRegistry().get("test1");
     ClusterizableMessageSourceWrapper messageSource = (ClusterizableMessageSourceWrapper) test1.getMessageSource();
-    assertTrue(test1.isStarted());
+    assertTrue(test1.getLifecycleState().isStarted());
     assertTrue(messageSource.isStarted());
   }
 

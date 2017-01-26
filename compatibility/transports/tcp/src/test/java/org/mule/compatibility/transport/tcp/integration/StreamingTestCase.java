@@ -15,7 +15,7 @@ import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.HashMap;

@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
@@ -16,10 +17,10 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class AbstractBenchmark {
   }
 
   public Flow createFlow(MuleContext muleContext) {
-    return new Flow(FLOW_NAME, muleContext);
+    return builder(FLOW_NAME, muleContext).build();
   }
 
   public Event createEvent(Flow flow) {

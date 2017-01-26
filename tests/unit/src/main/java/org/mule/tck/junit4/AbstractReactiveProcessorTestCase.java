@@ -8,21 +8,18 @@ package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.tck.MuleTestUtils.processWithMonoAndBlockOnEventContextCompletion;
 import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
+import static org.mule.tck.MuleTestUtils.processWithMonoAndBlockOnEventContextCompletion;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.FLUX;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.MONO;
 import static reactor.core.Exceptions.unwrap;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Collection;
@@ -35,7 +32,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or
- * {@link org.mule.runtime.core.construct.Flow} that implements both {@link Processor#process(Event)} and
+ * {@link Flow} that implements both {@link Processor#process(Event)} and
  * {@link Processor#apply(Publisher)} needs paramatized tests so that both approaches are tested with the same test method. Test
  * cases that extend this abstract class should use (@link {@link #process(Processor, Event)} to invoke {@link Processor}'s as
  * part of the test, rather than invoking them directly.

@@ -8,10 +8,10 @@ package org.mule.runtime.core.api.rx;
 
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.Exceptions.unwrap;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.function.BiConsumer;
@@ -247,7 +247,7 @@ public class Exceptions {
    * This exception should only be thrown as part of reactive stream processing and needs to be explicitly handled using for
    * example {@link reactor.core.publisher.Flux#onErrorResumeWith(Predicate, Function)} depending on the behaviuor required in the
    * specific context. For example, in a {@link org.mule.runtime.core.routing.ScatterGatherRouter} a dropped message means one
-   * less item in the aggregated collection of messages, while a dropped message in a {@link org.mule.runtime.core.construct.Flow}
+   * less item in the aggregated collection of messages, while a dropped message in a {@link Flow}
    * means the source should recieve an empty response.
    */
   public static EventDroppedException newEventDroppedException(Event event) {

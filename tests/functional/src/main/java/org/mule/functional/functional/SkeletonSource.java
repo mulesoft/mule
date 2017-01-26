@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 
 /**
- * Test source that provides access to the {@link Processor} set by the owner {@link org.mule.runtime.core.construct.Flow}.
+ * Test source that provides access to the {@link Processor} set by the owner {@link org.mule.runtime.core.api.construct.Flow}.
  *
  * @since 4.0
  */

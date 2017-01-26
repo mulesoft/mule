@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;

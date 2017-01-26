@@ -8,10 +8,10 @@ package org.mule.test.xml.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.module.xml.filters.IsXmlFilter;

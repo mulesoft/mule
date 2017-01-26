@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.connector;
+package org.mule.runtime.core.api.connector;
 
 /**
  * This determines whether polling is turned on or off

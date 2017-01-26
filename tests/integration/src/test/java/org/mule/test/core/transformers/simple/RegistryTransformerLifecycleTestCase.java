@@ -6,20 +6,19 @@
  */
 package org.mule.test.core.transformers.simple;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -68,11 +67,11 @@ public class RegistryTransformerLifecycleTestCase extends AbstractIntegrationTes
 
   @Test
   public void testLifecycleInFlowTransientRegistry() throws Exception {
-    Flow flow = new Flow("flow", muleContext);
     TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
     transformer.setProperty("foo");
-    flow.setMessageProcessors(Collections.<Processor>singletonList(transformer));
+    Flow flow = builder("flow", muleContext).messageProcessors(singletonList(transformer)).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
+
     muleContext.dispose();
     assertLifecycle(transformer);
   }

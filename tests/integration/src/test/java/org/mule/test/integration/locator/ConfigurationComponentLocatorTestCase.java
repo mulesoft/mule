@@ -8,10 +8,10 @@ package org.mule.test.integration.locator;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.test.AbstractIntegrationTestCase;

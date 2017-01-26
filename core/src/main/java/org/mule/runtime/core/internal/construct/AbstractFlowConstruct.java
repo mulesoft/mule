@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.construct;
+package org.mule.runtime.core.internal.construct;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -56,9 +56,9 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowConstruct.class);
 
+  private final FlowConstructLifecycleManager lifecycleManager;
   protected String name;
   protected MessagingExceptionHandler exceptionListener;
-  protected final FlowConstructLifecycleManager lifecycleManager;
   protected final MuleContext muleContext;
   protected FlowConstructStatistics statistics;
 

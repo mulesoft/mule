@@ -13,8 +13,8 @@ import static org.mule.test.config.dsl.LifecycleAction.GET_OBJECT;
 import static org.mule.test.config.dsl.LifecycleAction.INITIALISE;
 import static org.mule.test.config.dsl.LifecycleAction.START;
 import static org.mule.test.config.dsl.LifecycleAction.STOP;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.test.config.dsl.LifecycleSensingMessageProcessor;
 import org.mule.test.config.dsl.LifecycleSensingObjectFactory;
 

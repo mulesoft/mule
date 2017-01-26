@@ -9,20 +9,20 @@ package org.mule.tck;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.function.Function;
 
@@ -57,7 +57,7 @@ public final class MuleTestUtils {
   }
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
-    final Flow flow = new Flow(APPLE_FLOW, context);
+    final Flow flow = builder(APPLE_FLOW, context).build();
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
     }

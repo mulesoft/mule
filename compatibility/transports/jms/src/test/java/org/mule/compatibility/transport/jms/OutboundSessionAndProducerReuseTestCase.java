@@ -26,12 +26,11 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.probe.JUnitProbe;
@@ -100,7 +99,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     EndpointBuilder epBuilder = new EndpointURIEndpointBuilder("jms://out", muleContext);
     epBuilder.setConnector(connector);
     outboundEndpoint = epBuilder.buildOutboundEndpoint();
-    outboundEndpoint.setFlowConstruct(new Flow("flow for jms://out", muleContext));
+    outboundEndpoint.setFlowConstruct(builder("flow for jms://out", muleContext).build());
   }
 
   @Override

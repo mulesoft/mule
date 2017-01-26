@@ -10,16 +10,14 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
-import org.mule.compatibility.transport.http.HttpMessageReceiver;
 import org.mule.compatibility.transport.http.transformers.MuleMessageToHttpResponse;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.util.CollectionUtils;
 

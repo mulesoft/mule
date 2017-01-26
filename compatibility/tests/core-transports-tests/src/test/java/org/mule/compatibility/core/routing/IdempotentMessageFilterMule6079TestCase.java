@@ -14,12 +14,11 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -29,7 +28,6 @@ import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextEndpointTestCase {
 

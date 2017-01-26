@@ -20,7 +20,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

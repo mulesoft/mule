@@ -32,7 +32,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
@@ -40,6 +39,7 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -156,7 +156,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     verify(notificationManager, times(4)).fireNotification(any(PipelineMessageNotification.class));
   }
 
-  private class TestPipeline extends Flow {
+  private class TestPipeline extends DefaultFlow {
 
     CountDownLatch latch = new CountDownLatch(2);
 

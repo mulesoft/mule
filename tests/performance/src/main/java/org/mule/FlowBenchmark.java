@@ -8,15 +8,16 @@ package org.mule;
 
 import static java.lang.Class.forName;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.TriggerableMessageSource;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -46,10 +47,8 @@ public class FlowBenchmark extends AbstractBenchmark {
     muleContext.start();
 
     source = new TriggerableMessageSource();
-    flow = createFlow(muleContext);
-    flow.setMessageProcessors(singletonList(event -> event));
-    flow.setMessageSource(source);
-    flow.setProcessingStrategyFactory((ProcessingStrategyFactory) forName(processingStrategyFactory).newInstance());
+    flow = builder(FLOW_NAME, muleContext).messageProcessors(singletonList(event -> event)).messageSource(source)
+        .processingStrategyFactory((ProcessingStrategyFactory) forName(processingStrategyFactory).newInstance()).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
   }
 

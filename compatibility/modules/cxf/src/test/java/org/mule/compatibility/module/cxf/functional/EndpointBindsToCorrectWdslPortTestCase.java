@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.compatibility.module.cxf.CxfInboundMessageProcessor;
 import org.mule.compatibility.module.cxf.config.FlowConfiguringMessageProcessor;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.cxf.endpoint.Server;

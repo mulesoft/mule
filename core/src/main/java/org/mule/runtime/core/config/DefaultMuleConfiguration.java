@@ -7,7 +7,6 @@
 package org.mule.runtime.core.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,10 +19,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.NetworkUtils;
-import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
@@ -156,7 +153,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   private ObjectSerializer defaultObjectSerializer;
 
   /**
-   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link Flow}s which
+   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link org.mule.runtime.core.api.construct.Flow}s which
    * doesn't specify otherwise
    *
    * @since 3.7.0

@@ -17,8 +17,8 @@ import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;

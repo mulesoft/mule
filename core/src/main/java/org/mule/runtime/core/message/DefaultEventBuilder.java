@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;

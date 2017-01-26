@@ -6,30 +6,27 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.transport.file.FileMuleMessageFactory;
-import org.mule.compatibility.transport.file.ReceiverFileInputStream;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
@@ -188,7 +185,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
   }
 
   protected Latch configureService(File inFile, boolean streaming, boolean filePayload) throws Exception {
-    Flow flow = new Flow("moveDeleteBridgeService", muleContext);
     String url = fileToUrl(inFile.getParentFile()) + "?connector=moveDeleteConnector";
     Transformer transformer = null;
     if (streaming) {
@@ -211,7 +207,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
       endpointBuilder.addMessageProcessor(new NoActionTransformer());
     }
     InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(endpointBuilder);
-    flow.setMessageSource(endpoint);
 
     final Latch latch = new Latch();
     FunctionalTestComponent testComponent = new FunctionalTestComponent();
@@ -225,9 +220,11 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
     final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(testComponent));
     component.setMuleContext(muleContext);
-    flow.setMessageProcessors(new ArrayList<Processor>());
-    flow.getMessageProcessors().add(component);
+
+    Flow flow = builder("moveDeleteBridgeService", muleContext).messageSource(endpoint)
+        .messageProcessors(singletonList(component)).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
+
     return latch;
   }
 

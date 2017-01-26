@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.connector;
+package org.mule.runtime.core.internal.connector;
+
+import org.mule.runtime.core.api.connector.PollingController;
 
 /**
  * By default, polling is alwaus enabled.

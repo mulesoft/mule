@@ -8,9 +8,9 @@ package org.mule.compatibility.core.processor;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.createEventUsingInboundEndpoint;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
@@ -27,6 +27,7 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
@@ -37,7 +38,6 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
@@ -181,7 +181,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     endpointBuilder.setTransactionConfig(txConfig);
     customizeEndpointBuilder(endpointBuilder);
     final OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
-    outboundEndpoint.setFlowConstruct(new Flow("Flow for " + uri, muleContext));
+    outboundEndpoint.setFlowConstruct(builder("Flow for " + uri, muleContext).build());
     return outboundEndpoint;
   }
 
@@ -198,10 +198,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     props.put("prop1", "value1");
     props.put("port", 12345);
 
-    Flow flow = getTestFlow(muleContext);
-    if (exceptionListener != null) {
-      flow.setExceptionListener(exceptionListener);
-    }
+    Flow flow = builder(APPLE_FLOW, muleContext).messagingExceptionHandler(exceptionListener).build();
     final Event.Builder eventBuilder = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).flow(flow);
     final InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build();
     return createEventUsingInboundEndpoint(eventBuilder, message, getTestInboundEndpoint(REQUEST_RESPONSE));

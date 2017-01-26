@@ -10,11 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.api.construct.Flow;
 
 import org.junit.Test;
 
@@ -36,10 +35,10 @@ public class FlowStateEndpointTestCase extends CompatibilityFunctionalTestCase {
   }
 
   protected void doTestStarted(String flowName) throws Exception {
-    AbstractFlowConstruct f = (AbstractFlowConstruct) muleContext.getRegistry().lookupFlowConstruct(flowName + "Flow");
+    Flow f = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName + "Flow");
     // Flow initially started
-    assertTrue(f.isStarted());
-    assertFalse(f.isStopped());
+    assertTrue(f.getLifecycleState().isStarted());
+    assertFalse(f.getLifecycleState().isStopped());
 
     // The listeners should be registered and started.
     doListenerTests(flowName, 1, true);
@@ -47,18 +46,17 @@ public class FlowStateEndpointTestCase extends CompatibilityFunctionalTestCase {
 
   @Test
   public void testInitialStateStopped() throws Exception {
-    AbstractFlowConstruct f = (AbstractFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("stoppedFlow");
-    assertEquals("stopped", f.getInitialState());
+    Flow f = (Flow) muleContext.getRegistry().lookupFlowConstruct("stoppedFlow");
     // Flow initially stopped
-    assertFalse(f.isStarted());
-    assertTrue(f.isStopped());
+    assertFalse(f.getLifecycleState().isStarted());
+    assertTrue(f.getLifecycleState().isStopped());
 
     // The connector should be started, but with no listeners registered.
     doListenerTests("stopped", 0, true);
 
     f.start();
-    assertTrue(f.isStarted());
-    assertFalse(f.isStopped());
+    assertTrue(f.getLifecycleState().isStarted());
+    assertFalse(f.getLifecycleState().isStopped());
 
     // The listeners should now be registered and started.
     doListenerTests("stopped", 1, true);

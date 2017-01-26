@@ -6,28 +6,26 @@
  */
 package org.mule.test.core.context.notification;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.component.Component;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.simple.EchoComponent;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -58,10 +56,9 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
   protected void doSetUp() throws Exception {
     setDisposeContextPerClass(true);
 
-    flow = new Flow("testFlow", muleContext);
     componentListener = new ComponentListener();
     component = new DefaultJavaComponent(new SingletonObjectFactory(EchoComponent.class));
-    flow.setMessageProcessors(Collections.<Processor>singletonList(component));
+    flow = builder("testFlow", muleContext).messageProcessors(singletonList(component)).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
 
     if (!muleContext.isStarted()) {

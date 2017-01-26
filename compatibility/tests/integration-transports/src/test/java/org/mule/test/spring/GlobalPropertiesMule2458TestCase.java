@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 
 import org.junit.Test;
 

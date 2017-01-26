@@ -16,19 +16,18 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 import static org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig.DEFAULT_CONNECTION_IDLE_TIMEOUT;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
-import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.runtime.module.http.internal.listener.DefaultServerAddress;
+import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

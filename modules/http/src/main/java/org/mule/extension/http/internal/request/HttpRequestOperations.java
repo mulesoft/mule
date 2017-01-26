@@ -10,6 +10,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -24,8 +25,9 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -106,7 +108,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
               .build();
 
       // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
-      final Flow flowConstruct = new Flow("httpRequestOperation", muleContext);
+      final Flow flowConstruct = builder("httpRequestOperation", muleContext).build();
       requester.doRequest(client, resolvedBuilder, true, muleContext, flowConstruct, callback);
     } catch (Exception e) {
       callback.error(e);

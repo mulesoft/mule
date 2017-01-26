@@ -12,7 +12,7 @@ import org.mule.compatibility.core.connector.EndpointConnectException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.util.StringUtils;
 
 public class HttpsMessageReceiver extends HttpMessageReceiver {

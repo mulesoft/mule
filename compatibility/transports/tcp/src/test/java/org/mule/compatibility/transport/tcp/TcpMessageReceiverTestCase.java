@@ -7,13 +7,11 @@
 package org.mule.compatibility.transport.tcp;
 
 import static org.mockito.Mockito.mock;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.AbstractMessageReceiverTestCase;
-import org.mule.compatibility.transport.tcp.TcpMessageReceiver;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 
 public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase {
 

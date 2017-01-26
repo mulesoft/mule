@@ -9,9 +9,9 @@ package org.mule.test.routing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Before;

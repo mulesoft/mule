@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 

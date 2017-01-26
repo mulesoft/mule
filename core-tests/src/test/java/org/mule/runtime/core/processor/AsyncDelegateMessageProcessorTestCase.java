@@ -20,14 +20,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -158,7 +158,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
         new AsyncDelegateMessageProcessor(MessageProcessors.newChain(listener), new LegacyAsynchronousProcessingStrategyFactory(),
                                           "thread");
     mp.setMuleContext(muleContext);
-    final Flow flowConstruct = new Flow("flow", muleContext);
+    final Flow flowConstruct = builder("flow", muleContext).build();
     flowConstruct.initialise();
     mp.setFlowConstruct(flowConstruct);
     mp.initialise();

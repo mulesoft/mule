@@ -10,7 +10,7 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.AbstractTransportMessageHandler;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.connector.Connectable;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.connector.ConnectException;
 
 import java.util.concurrent.Executor;
 

@@ -10,9 +10,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.DelegateTransactionFactory;
 import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.test.AbstractIntegrationTestCase;

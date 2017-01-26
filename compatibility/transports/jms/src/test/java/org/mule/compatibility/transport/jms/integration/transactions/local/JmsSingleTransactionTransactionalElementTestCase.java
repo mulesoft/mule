@@ -17,8 +17,8 @@ import org.mule.compatibility.transport.jms.integration.AbstractJmsFunctionalTes
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 
 import javax.jms.JMSException;

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Ignore;

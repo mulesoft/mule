@@ -12,12 +12,13 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -37,7 +38,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   @Mock
   private MuleConfiguration configuration;
 
-  private AbstractPipeline flow;
+  private Flow flow;
 
   @Before
   public void before() throws RegistrationException {
@@ -85,6 +86,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   }
 
   private void createFlow() {
-    flow = new Flow("test", muleContext);
+    flow = builder("test", muleContext).build();
   }
 }

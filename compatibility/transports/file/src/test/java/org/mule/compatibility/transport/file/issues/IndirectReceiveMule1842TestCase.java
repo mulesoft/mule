@@ -10,12 +10,12 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.file.AbstractFileFunctionalTestCase;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
-import org.mule.runtime.core.construct.Flow;
 
 import java.io.File;
 

@@ -103,7 +103,6 @@ import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.component.simple.LogComponent;
 import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
@@ -121,6 +120,7 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
@@ -422,17 +422,18 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withConstructorParameterDefinition(fromChildConfiguration(Filter.class).build())
             .withConstructorParameterDefinition(fromSimpleParameter("throwOnUnaccepted").withDefaultValue(false).build())
             .withConstructorParameterDefinition(fromSimpleReferenceParameter("onUnaccepted").build()).asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(Flow.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(NAME).build())
-        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
-        .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
-                                       fromChildConfiguration(MessagingExceptionHandler.class).build())
-        .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
-                                       fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
-        .build());
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(DefaultFlowBuilder.DefaultFlow.class))
+            .withConstructorParameterDefinition(fromSimpleParameter(NAME).build())
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+            .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
+            .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
+            .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+            .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
+                                           fromChildConfiguration(MessagingExceptionHandler.class).build())
+            .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
+                                           fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
+            .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SCATTER_GATHER)
         .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
         .withSetterParameterDefinition("parallel", fromSimpleParameter("parallel").build())

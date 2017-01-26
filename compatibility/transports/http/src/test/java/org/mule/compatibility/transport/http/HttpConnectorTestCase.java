@@ -22,7 +22,6 @@ import static org.mule.compatibility.transport.http.HttpConnector.DISABLE_STALE_
 import static org.mule.compatibility.transport.http.HttpConnector.SINGLE_DISPATCHER_PER_ENDPOINT_SYSTEM_PROPERTY;
 import static org.mule.compatibility.transport.tcp.TcpConnector.SEND_TCP_NO_DELAY_SYSTEM_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
@@ -34,7 +33,7 @@ import org.mule.compatibility.core.endpoint.DefaultOutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractConnectorTestCase;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.net.InetSocketAddress;

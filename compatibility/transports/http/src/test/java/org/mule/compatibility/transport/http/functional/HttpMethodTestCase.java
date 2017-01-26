@@ -12,7 +12,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.PatchMethod;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;

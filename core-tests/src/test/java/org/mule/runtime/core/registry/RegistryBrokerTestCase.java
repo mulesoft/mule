@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.registry.RegistryBroker;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Kiwi;
@@ -65,7 +65,7 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
     assertEquals("flow2-stop flow-stop ", tracker);
   }
 
-  class LifecycleTrackerFlow extends Flow {
+  class LifecycleTrackerFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public LifecycleTrackerFlow(String name, MuleContext muleContext) {
       super(name, muleContext);
