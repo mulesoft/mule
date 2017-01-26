@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.module.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
@@ -186,6 +187,23 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
         }
 
+        Integer resolvedStatusCode = resolveStatusCode(event);
+        if (resolvedStatusCode != null)
+        {
+            httpResponseBuilder.setStatusCode(resolvedStatusCode);
+            if (resolvedStatusCode == NO_CONTENT.getStatusCode())
+            {
+                //See GRIZZLY-1885. This could be avoided when that is available
+                httpEntity = new EmptyHttpEntity();
+                httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
+            }
+        }
+        String resolvedReasonPhrase = resolveReasonPhrase(event);
+        if (resolvedReasonPhrase != null)
+        {
+            httpResponseBuilder.setReasonPhrase(resolvedReasonPhrase);
+        }
+
         Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
         for (String headerName : headerNames)
         {
@@ -196,16 +214,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
         }
 
-        Integer resolvedStatusCode = resolveStatusCode(event);
-        if (resolvedStatusCode != null)
-        {
-            httpResponseBuilder.setStatusCode(resolvedStatusCode);
-        }
-        String resolvedReasonPhrase = resolveReasonPhrase(event);
-        if (resolvedReasonPhrase != null)
-        {
-            httpResponseBuilder.setReasonPhrase(resolvedReasonPhrase);
-        }
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();
     }

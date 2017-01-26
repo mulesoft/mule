@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}" />
+
+    <flow name="testFlow1">
+        <http:listener path="empty" allowedMethods="GET" config-ref="listenerConfig">
+            <http:response-builder statusCode="204"/>
+        </http:listener>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerNoContentTestCase$StreamingMessageProcessor"/>
+    </flow>
+
+    <flow name="testFlow2">
+        <http:listener path="content" allowedMethods="GET" config-ref="listenerConfig">
+            <http:response-builder statusCode="204"/>
+        </http:listener>
+        <set-payload value="WAT"/>
+    </flow>
+
+    <flow name="testFlow3">
+        <http:listener path="emptyProperty" allowedMethods="GET" config-ref="listenerConfig"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerNoContentTestCase$StreamingMessageProcessor"/>
+        <set-property propertyName="http.status" value="204"/>
+    </flow>
+
+    <flow name="testFlow4">
+        <http:listener path="contentProperty" allowedMethods="GET" config-ref="listenerConfig"/>
+        <set-payload value="WAT"/>
+        <set-property propertyName="http.status" value="204"/>
+    </flow>
+
+</mule>
