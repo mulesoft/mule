@@ -19,6 +19,7 @@ import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
@@ -30,9 +31,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
+import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
@@ -244,6 +247,7 @@ public class ApplicationModel {
           .add(new ComponentIdentifier.Builder().withNamespace(DATA_WEAVE).withName("reader-property").build())
           .build();
 
+  private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private List<ComponentModel> springComponentModels = new LinkedList<>();
   private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
@@ -254,7 +258,7 @@ public class ApplicationModel {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig      the mule artifact configuration content.
+   * @param artifactConfig the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @throws Exception when the application configuration has semantic errors.
    */
@@ -267,10 +271,10 @@ public class ApplicationModel {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig                      the mule artifact configuration content.
-   * @param artifactDeclaration                 an {@link ArtifactDeclaration}
+   * @param artifactConfig the mule artifact configuration content.
+   * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *                                            this model to their definitions
+   *        this model to their definitions
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
@@ -278,13 +282,31 @@ public class ApplicationModel {
                           Optional<ExtensionManager> extensionManager,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
       throws Exception {
+
+    this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     configurePropertyPlaceholderResolver(artifactConfig);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactConfigurationToComponentModel(extensionManager, artifactDeclaration);
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
-
     expandModules(extensionManager);
+  }
+
+  /**
+   * Resolves the types of each component model when possible.
+   */
+  public void resolveComponentTypes() {
+    checkState(componentBuildingDefinitionRegistry.isPresent(),
+               "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
+    executeOnEveryComponentTree(componentModel -> {
+      Optional<ComponentBuildingDefinition> buildingDefinition =
+          componentBuildingDefinitionRegistry.get().getBuildingDefinition(componentModel.getIdentifier());
+      buildingDefinition.ifPresent(definition -> {
+        ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
+        definition.getTypeDefinition().visit(typeDefinitionVisitor);
+        componentModel.setType(typeDefinitionVisitor.getType());
+      });
+    });
   }
 
   /**
@@ -717,7 +739,7 @@ public class ApplicationModel {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  //TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
+  // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
   public Optional<ComponentConfiguration> findNamedElement(String name) {
     Optional<ComponentConfiguration> requestedElement = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {
@@ -733,9 +755,9 @@ public class ApplicationModel {
   }
 
   /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModuleModel}
-   * as it's responsibility of this object to properly initialize and expand every global element/operation into the
-   * concrete set of message processors
+   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModuleModel} as
+   * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
+   * message processors
    *
    * @param extensionManager extensions that will be used to check if the element has to be expanded.
    */
