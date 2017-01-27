@@ -58,5 +58,12 @@ public class TestService
         return header;
     }
 
+    @WebResult(name = "text")
+    @WebMethod(action = "anyParams")
+    public String anyParams(@WebParam(name = "text") String s)
+    {
+        return s;
+    }
+
 
 }
