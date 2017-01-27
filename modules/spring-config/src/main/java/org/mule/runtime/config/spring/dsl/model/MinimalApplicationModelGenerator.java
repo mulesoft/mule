@@ -104,6 +104,7 @@ public class MinimalApplicationModelGenerator {
                             "Flow path is pointing to the message source of flow %s but it seems that the flow does not have a message source, component identifier of first element is %s",
                             flowModel.getNameAttribute(), sourceComponentModel.getIdentifier()));
           Iterator<ComponentModel> iterator = flowModel.getInnerComponents().iterator();
+          // Just keep the first element that it's the source.
           iterator.next();
           while (iterator.hasNext()) {
             iterator.next();
