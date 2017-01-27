@@ -8,7 +8,8 @@ package org.mule.runtime.core.expression;
 
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import org.mule.runtime.core.api.el.ExpressionManager;
+
+import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
@@ -64,7 +65,7 @@ public class ExpressionConfig {
     this.expression = expressionString;
   }
 
-  public void validate(ExpressionManager expressionManager) {
+  public void validate(ExpressionEvaluator expressionManager) {
     if (expression == null) {
       parse(unParsedExpression);
     }
@@ -73,7 +74,7 @@ public class ExpressionConfig {
     }
   }
 
-  public String getFullExpression(ExpressionManager expressionManager) {
+  public String getFullExpression(ExpressionEvaluator expressionManager) {
     if (fullExpression == null) {
       if (expression == null) {
         parse(unParsedExpression);
