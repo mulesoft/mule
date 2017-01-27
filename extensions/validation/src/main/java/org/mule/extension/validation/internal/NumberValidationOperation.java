@@ -37,20 +37,19 @@ public class NumberValidationOperation extends ValidationSupport {
    * @param maxValue If provided, check that the parsed value is less or equal than this value
    * @param numberType the type of number to test {@code value} against
    * @param options the {@link ValidationOptions}
-   * @param event the current {@link Event}
    */
   public void isNumber(String value, @Optional String locale, @Optional String pattern,
                        @Optional String minValue,
                        @Optional String maxValue, NumberType numberType,
                        @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
-                       Event event, @UseConfig ValidationExtension config)
+                       @UseConfig ValidationExtension config)
       throws Exception {
 
-    ValidationContext context = createContext(options, event, config);
+    ValidationContext context = createContext(options, config);
     Validator validator = new NumberValidator(value, parseLocale(locale), pattern, parseNumber(minValue, numberType),
                                               parseNumber(maxValue, numberType), numberType, context);
 
-    validateWith(validator, context, event);
+    validateWith(validator, context);
   }
 
   private Number parseNumber(String value, NumberType numberType) {

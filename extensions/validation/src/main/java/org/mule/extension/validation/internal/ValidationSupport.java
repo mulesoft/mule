@@ -7,24 +7,16 @@
 package org.mule.extension.validation.internal;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.extension.validation.api.ValidationErrorTypes.VALIDATION;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Locale;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.mule.runtime.extension.api.exception.ModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +30,13 @@ abstract class ValidationSupport {
   protected static final String ERROR_GROUP = "Error options";
   protected final static Logger LOGGER = LoggerFactory.getLogger(ValidationSupport.class);
 
-  @Inject
-  protected MuleContext muleContext;
-
-  protected void validateWith(Validator validator, ValidationContext validationContext, Event event) throws Exception {
+  protected void validateWith(Validator validator, ValidationContext validationContext) throws Exception {
     ValidationResult result = validator.validate();
     if (result.isError()) {
       result = evaluateCustomMessage(result, validationContext);
       throw new ValidationException(result);
     } else {
-      logSuccessfulValidation(validator, event);
+      logSuccessfulValidation(validator);
     }
   }
 
@@ -58,8 +47,8 @@ abstract class ValidationSupport {
         : error(customMessage);
   }
 
-  protected ValidationContext createContext(ValidationOptions options, Event muleEvent, ValidationExtension config) {
-    return new ValidationContext(options, muleEvent, config);
+  protected ValidationContext createContext(ValidationOptions options, ValidationExtension config) {
+    return new ValidationContext(options, config);
   }
 
   protected Locale parseLocale(String locale) {
@@ -67,7 +56,7 @@ abstract class ValidationSupport {
     return new Locale(locale);
   }
 
-  protected void logSuccessfulValidation(Validator validator, Event event) {
+  protected void logSuccessfulValidation(Validator validator) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
     }
