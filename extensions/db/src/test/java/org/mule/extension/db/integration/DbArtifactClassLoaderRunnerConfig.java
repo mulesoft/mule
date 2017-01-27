@@ -19,6 +19,6 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  */
 @ArtifactClassLoaderRunnerConfig(
     exportPluginClasses = {DbConnectionProvider.class, ConnectionCreationException.class},
-    sharedRuntimeLibs = {"org.apache.derby:derby", "mysql:mysql-connector-java"})
+    sharedRuntimeLibs = {"org.apache.derby:derby"})
 public interface DbArtifactClassLoaderRunnerConfig {
 }
