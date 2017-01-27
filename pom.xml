@@ -209,8 +209,9 @@
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
-        <reflectionsVersion>0.9.9</reflectionsVersion>
+        <powermockVersion>1.6.6</powermockVersion>
         <quartzVersion>2.2.1</quartzVersion>
+        <reflectionsVersion>0.9.9</reflectionsVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saajVersion>1.3</saajVersion>
@@ -679,6 +680,16 @@
                         <artifactId>hamcrest-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermockVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermockVersion}</version>
             </dependency>
             <dependency>
                 <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
