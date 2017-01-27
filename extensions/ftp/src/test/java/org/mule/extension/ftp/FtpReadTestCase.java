@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.BINARY_FILE_NAME;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;

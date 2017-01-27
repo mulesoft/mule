@@ -9,8 +9,8 @@ package org.mule.extension.file;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
@@ -88,13 +88,13 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readUnexisting() throws Exception {
-    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class, "doesn't exists");
     readPath("files/not-there.txt");
   }
 
   @Test
   public void readWithLockAndWithoutEnoughPermissions() throws Exception {
-    expectedError.expectError(NAMESPACE, ACCESS_DENIED.getType(), FileAccessDeniedException.class,
+    expectedError.expectError(NAMESPACE, ACCESS_DENIED, FileAccessDeniedException.class,
                               "access was denied by the operating system");
     File forbiddenFile = temporaryFolder.newFile("forbiddenFile");
     forbiddenFile.createNewFile();
@@ -104,7 +104,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readDirectory() throws Exception {
-    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "since it's a directory");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class, "since it's a directory");
     readPath("files");
   }
 

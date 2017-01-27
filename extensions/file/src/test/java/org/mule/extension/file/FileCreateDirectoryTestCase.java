@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file;
 
-import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
 
   @Test
   public void createExistingDirectory() throws Exception {
-    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
     final String directory = "washerefirst";
     temporaryFolder.newFolder(directory);
 

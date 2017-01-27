@@ -15,9 +15,11 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
-import org.mule.extension.file.common.api.exceptions.FileErrors;
+import org.mule.extension.file.common.api.exceptions.FileError;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.FileUtils;
@@ -65,28 +67,28 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
   @Test
   public void createNewOnExistingFile() throws Exception {
-    expectedError.expectError(NAMESPACE, FileErrors.FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class,
                               "Use a different write mode or point to a path which doesn't exists");
     doWriteOnExistingFile(CREATE_NEW);
   }
 
   @Test
   public void appendOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedError.expectError(NAMESPACE, FileErrors.ILLEGAL_PATH.getType(), IllegalPathException.class,
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
                               "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
   }
 
   @Test
   public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedError.expectError(NAMESPACE, FileErrors.ILLEGAL_PATH.getType(), IllegalPathException.class,
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
                               "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
   }
 
   @Test
   public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedError.expectError(NAMESPACE, FileErrors.ILLEGAL_PATH.getType(), IllegalPathException.class,
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
                               "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
   }

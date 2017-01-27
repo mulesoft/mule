@@ -48,7 +48,7 @@ import javax.inject.Inject;
 
 
 /**
- * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManagerAdapter}
+ * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManager}
  * in the {@link MuleContext} to search for the extension that wants to execute the operation from.
  * <p>
  * The concrete execution of the operation is handled by an {@link OperationMessageProcessor} instance.

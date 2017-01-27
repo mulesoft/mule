@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
  */
 public final class IllegalPathException extends ModuleException {
 
-  private static final FileErrors ERROR = FileErrors.ILLEGAL_PATH;
+  private static final FileError ERROR = FileError.ILLEGAL_PATH;
 
   /**
    * Creates a new instance with the specified detail {@code message}

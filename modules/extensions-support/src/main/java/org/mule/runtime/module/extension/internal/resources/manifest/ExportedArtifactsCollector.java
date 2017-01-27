@@ -23,9 +23,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 
 import com.google.common.collect.ImmutableSet;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -110,6 +112,8 @@ final public class ExportedArtifactsCollector {
   }
 
   private void collectDefault() {
+    //    exportErrorTypeDefinitionEnum(extensionModel);
+
     new ExtensionWalker() {
 
       @Override
@@ -129,6 +133,15 @@ final public class ExportedArtifactsCollector {
       }
 
     }.walk(extensionModel);
+  }
+
+  private void exportErrorTypeDefinitionEnum(ExtensionModel extensionModel) {
+    extensionModel.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(modelProperty -> {
+      ErrorTypes annotation = modelProperty.getType().getAnnotation(ErrorTypes.class);
+      if (annotation != null) {
+        exportedClasses.add(annotation.value());
+      }
+    });
   }
 
   private void collectReturnTypes(ComponentModel model) {

@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.write;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 
@@ -51,14 +51,14 @@ public class FileCopyTestCase extends FileConnectorTestCase {
 
   @Test
   public void nullTarget() throws Exception {
-    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
                               "target path cannot be null nor blank");
     doExecute(null, false, false);
   }
 
   @Test
   public void copyToItselfWithoutOverwrite() throws Exception {
-    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
     doExecute(getFlowName(), sourcePath, sourcePath, false, false);
   }
 
@@ -80,7 +80,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
 
   @Test
   public void toNonExistingFolderWithoutCreateParent() throws Exception {
-    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "destination path doesn't exists");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class, "destination path doesn't exists");
     String target = temporaryFolder.newFile().getAbsolutePath() + "a/b/c";
     doExecute(target, false, false);
   }
@@ -107,7 +107,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
 
   @Test
   public void withoutOverwrite() throws Exception {
-    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
     File existingFile = temporaryFolder.newFile();
     write(existingFile, EXISTING_CONTENT);
 
@@ -153,7 +153,7 @@ public class FileCopyTestCase extends FileConnectorTestCase {
 
   @Test
   public void directoryWithoutOverwrite() throws Exception {
-    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class, "already exists");
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
     sourcePath = buildSourceDirectory().getAbsolutePath();
 
     File targetDirectory = temporaryFolder.newFolder("target");

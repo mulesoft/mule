@@ -9,7 +9,12 @@ package org.mule.extension.file.internal;
 import static java.lang.String.format;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.notExists;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_DOESNT_EXIST;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_IS_NOT_DIRECTORY;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extension.file.api.exception.FileConnectionException;
 import org.mule.extension.file.common.api.FileSystemProvider;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
@@ -77,14 +82,15 @@ public final class LocalFileConnectionProvider extends FileSystemProvider<LocalF
 
   @Override
   public ConnectionValidationResult validate(LocalFileSystem fileSystem) {
-    return ConnectionValidationResult.success();
+    return success();
   }
 
   private void validateWorkingDir() throws ConnectionException {
     if (workingDir == null) {
       workingDir = System.getProperty("user.home");
       if (workingDir == null) {
-        throw new ConnectionException("Could not obtain user's home directory. Please provide a explicit value for the workingDir parameter");
+        throw new FileConnectionException("Could not obtain user's home directory. Please provide a explicit value for the workingDir parameter",
+                                          ILLEGAL_PATH);
       }
 
       LOGGER.warn("File connector '{}' does not specify the workingDir property. Defaulting to '{}'", getConfigName(),
@@ -93,11 +99,13 @@ public final class LocalFileConnectionProvider extends FileSystemProvider<LocalF
 
     Path workingDirPath = Paths.get(workingDir);
     if (notExists(workingDirPath)) {
-      throw new ConnectionException(format("Provided workingDir '%s' does not exists", workingDirPath.toAbsolutePath()));
+      throw new FileConnectionException(format("Provided workingDir '%s' does not exists", workingDirPath.toAbsolutePath()),
+                                        FILE_DOESNT_EXIST);
     }
 
     if (!isDirectory(workingDirPath)) {
-      throw new ConnectionException(format("Provided workingDir '%s' is not a directory", workingDirPath.toAbsolutePath()));
+      throw new FileConnectionException(format("Provided workingDir '%s' is not a directory", workingDirPath.toAbsolutePath()),
+                                        FILE_IS_NOT_DIRECTORY);
     }
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.common.api.exceptions;
 
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_CONTENT;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_CONTENT;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
