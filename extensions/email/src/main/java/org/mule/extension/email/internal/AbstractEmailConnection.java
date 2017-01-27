@@ -163,6 +163,7 @@ public abstract class AbstractEmailConnection {
       SSLContext sslContext = tlsContextFactory.createSslContext();
       properties.put(protocol.getSocketFactoryProperty(), sslContext.getSocketFactory());
     } catch (KeyManagementException | NoSuchAlgorithmException e) {
+      // TODO - MULE-11543: Add SSL as an ErrorType provided by Mule
       throw new EmailConnectionException("Failed when creating SSL context.", e, SSL_ERROR);
     }
 

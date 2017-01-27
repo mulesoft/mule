@@ -195,10 +195,7 @@ public class MailboxConnection extends AbstractEmailConnection {
     if (e.getCause() instanceof SocketTimeoutException) {
       throw new EmailConnectionException(format, e, CONNECTION_TIMEOUT);
     }
-    if (e.getCause() instanceof ConnectException) {
-      throw new EmailConnectionException(format, e, UNKNOWN_HOST);
-    }
-    if (e.getCause() instanceof UnknownHostException) {
+    if (e.getCause() instanceof ConnectException || e.getCause() instanceof UnknownHostException) {
       throw new EmailConnectionException(format, e, UNKNOWN_HOST);
     }
     throw new EmailConnectionException(format, e);
