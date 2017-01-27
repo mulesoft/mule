@@ -66,6 +66,9 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
    * processors that come after it.
    */
   private boolean alreadyAddedChild(Processor messageProcessor) {
+    if (messageProcessor == null) {
+      return false;
+    }
     for (MessageProcessorPathElement child : children) {
       if (messageProcessor != null && messageProcessor.equals(child.getMessageProcessor())) {
         return true;
