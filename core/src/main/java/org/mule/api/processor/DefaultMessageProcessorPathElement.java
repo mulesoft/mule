@@ -76,6 +76,10 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
      */
     private boolean alreadyAddedChild(MessageProcessor messageProcessor)
     {
+        if (messageProcessor == null)
+        {
+            return false;
+        }
         for (MessageProcessorPathElement child : children)
         {
             if (messageProcessor.equals(child.getMessageProcessor()))
