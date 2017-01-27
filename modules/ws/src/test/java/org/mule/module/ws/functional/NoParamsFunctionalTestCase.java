@@ -8,6 +8,7 @@ package org.mule.module.ws.functional;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
@@ -50,6 +51,20 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
 
         event = flow.process(event);
 
+        assertXMLEqual(expectedResponse, event.getMessage().getPayloadAsString());
+    }
+
+    @Test
+    public void payloadIsHonoredOperationAnyParams() throws Exception
+    {
+        Flow flow = (Flow) getFlowConstruct("anyParams");
+        MuleEvent event = getTestEvent("<ns:anyParams xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
+                                       "<text>TEST</text></ns:anyParams>");
+
+        event = flow.process(event);
+
+        String expectedResponse = "<ns:anyParamsResponse xmlns:ns=\"http://consumer.ws.module.mule.org/\">" +
+                                  "<text>TEST</text></ns:anyParamsResponse>";
         assertXMLEqual(expectedResponse, event.getMessage().getPayloadAsString());
     }
 
