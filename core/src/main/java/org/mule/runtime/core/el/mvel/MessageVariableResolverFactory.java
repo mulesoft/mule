@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.runtime.core.el.context.ModuleOperationVariableMapContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -32,8 +31,6 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String MESSAGE_PAYLOAD = MESSAGE + "." + PAYLOAD;
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
-  public static final String PARAM_VARS = "param";
-  public static final String PROPERTY_VARS = "property";
 
   protected Event event;
   protected Event.Builder eventBuilder;
@@ -64,8 +61,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public boolean isTarget(String name) {
     return MESSAGE.equals(name) || PAYLOAD.equals(name) || ATTRIBUTES.equals(name) || FLOW_VARS.equals(name)
         || EXCEPTION.equals(name) || ERROR.equals(name) || SESSION_VARS.equals(name)
-        || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)
-        || PARAM_VARS.equals(name) || PROPERTY_VARS.equals(name); //TODO until MULE-10291 & MULE-10353 are done, we will use flowVars to store the parameter.value and property.value
+        || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name);
   }
 
   @Override
@@ -104,11 +100,6 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
       } else if (MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)) {
         return new MuleImmutableVariableResolver<>(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
                                                    event.getMessage(), null);
-      } else if (PARAM_VARS.equals(name) || PROPERTY_VARS.equals(name)) { //TODO until MULE-10291 & MULE-10353 are done, we will use flowVars to store the parameter.value and property.value
-        return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS,
-                                                                      new ModuleOperationVariableMapContext(event, eventBuilder,
-                                                                                                            name),
-                                                                      null);
       }
     }
     return super.getNextFactoryVariableResolver(name);
