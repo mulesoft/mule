@@ -10,6 +10,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
@@ -84,6 +85,26 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     ApplicationModel minimalModel = generator.getMinimalModelByPath("deadLetterQueueFlow/0");
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(false));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+  }
+
+  @Test
+  public void flowWithSourcePathToMp() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/0");
+    assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
+               is(parseComponentIdentifier("mule:set-payload")));
+  }
+
+  @Test
+  public void flowWithSourcePathToSource() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/source");
+    assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
+               is(parseComponentIdentifier("mule:poll")));
   }
 
   private MinimalApplicationModelGenerator createGeneratorForConfig(String configFileName) throws Exception {
