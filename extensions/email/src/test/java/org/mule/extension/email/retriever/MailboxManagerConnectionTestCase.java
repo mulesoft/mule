@@ -124,14 +124,14 @@ public class MailboxManagerConnectionTestCase {
 
   @Test
   public void usernameMissingPassword() throws MessagingException, EmailConnectionException {
-    expectedException.expect(EmailException.class);
+    expectedException.expect(EmailConnectionException.class);
     expectedException.expectMessage(is(PASSWORD_NO_USERNAME_ERROR));
     new MailboxConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   @Test
   public void passwordMissingUsername() throws MessagingException, EmailConnectionException {
-    expectedException.expect(EmailException.class);
+    expectedException.expect(EmailConnectionException.class);
     expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
     new MailboxConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
   }

@@ -7,8 +7,9 @@
 package org.mule.extension.email.internal;
 
 import static org.apache.commons.lang.StringUtils.join;
+import static org.mule.extension.email.api.exception.EmailError.INVALID_CREDENTIALS;
+import static org.mule.extension.email.api.exception.EmailError.SSL_ERROR;
 import org.mule.extension.email.api.exception.EmailConnectionException;
-import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
@@ -114,8 +115,7 @@ public abstract class AbstractEmailConnection {
   private Properties buildBasicSessionProperties(String host, String port,
                                                  long connectionTimeout,
                                                  long readTimeout,
-                                                 long writeTimeout)
-      throws EmailConnectionException {
+                                                 long writeTimeout) {
     Properties props = new Properties();
     props.setProperty(protocol.getPortProperty(), port);
     props.setProperty(protocol.getHostProperty(), host);
@@ -163,7 +163,8 @@ public abstract class AbstractEmailConnection {
       SSLContext sslContext = tlsContextFactory.createSslContext();
       properties.put(protocol.getSocketFactoryProperty(), sslContext.getSocketFactory());
     } catch (KeyManagementException | NoSuchAlgorithmException e) {
-      throw new EmailConnectionException("Failed when creating SSL context.");
+      // TODO - MULE-11543: Add SSL as an ErrorType provided by Mule
+      throw new EmailConnectionException("Failed when creating SSL context.", e, SSL_ERROR);
     }
 
     return properties;
@@ -195,12 +196,12 @@ public abstract class AbstractEmailConnection {
    * @param username the specified username.
    * @param password the specified password.
    */
-  private boolean shouldAuthenticate(String username, String password) {
+  private boolean shouldAuthenticate(String username, String password) throws EmailConnectionException {
     if (username == null && password != null) {
-      throw new EmailException(PASSWORD_NO_USERNAME_ERROR);
+      throw new EmailConnectionException(PASSWORD_NO_USERNAME_ERROR, INVALID_CREDENTIALS);
     }
     if (username != null && password == null) {
-      throw new EmailException(USERNAME_NO_PASSWORD_ERROR);
+      throw new EmailConnectionException(USERNAME_NO_PASSWORD_ERROR, INVALID_CREDENTIALS);
     }
     return username != null;
   }

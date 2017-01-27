@@ -7,6 +7,10 @@
 package org.mule.extension.email.internal.mailbox;
 
 import static java.lang.String.format;
+import static org.mule.extension.email.api.exception.EmailError.CONNECTION_TIMEOUT;
+import static org.mule.extension.email.api.exception.EmailError.DISCONNECTED;
+import static org.mule.extension.email.api.exception.EmailError.INVALID_CREDENTIALS;
+import static org.mule.extension.email.api.exception.EmailError.UNKNOWN_HOST;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.email.api.exception.EmailAccessingFolderException;
@@ -15,15 +19,17 @@ import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.EmailProtocol;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Store;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.Map;
 
 /**
  * A connection with a mail server for retrieving and managing emails from an specific folder in a mailbox.
@@ -33,8 +39,9 @@ import org.slf4j.LoggerFactory;
 public class MailboxConnection extends AbstractEmailConnection {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MailboxConnection.class);
+  private static final String PORT_OUT_OF_RANGE = "port out of range";
 
-  private final Store store;
+  private Store store;
   private Folder folder;
 
   /**
@@ -56,6 +63,8 @@ public class MailboxConnection extends AbstractEmailConnection {
                            TlsContextFactory tlsContextFactory)
       throws EmailConnectionException {
     super(protocol, username, password, host, port, connectionTimeout, readTimeout, writeTimeout, properties, tlsContextFactory);
+    String format = format("Error while acquiring connection with the %s store", protocol);
+
     try {
       this.store = session.getStore(protocol.getName());
 
@@ -64,8 +73,14 @@ public class MailboxConnection extends AbstractEmailConnection {
       } else {
         this.store.connect();
       }
+    } catch (AuthenticationFailedException e) {
+      throw new EmailConnectionException(format, e, INVALID_CREDENTIALS);
     } catch (MessagingException e) {
-      throw new EmailConnectionException(format("Error while acquiring connection with the %s store", protocol), e);
+      handleEmailMessagingException(format, e);
+    } catch (IllegalArgumentException e) {
+      handleIllegalArgumentException(format, e);
+    } catch (Exception e) {
+      throw new EmailConnectionException(format, e);
     }
   }
 
@@ -156,8 +171,7 @@ public class MailboxConnection extends AbstractEmailConnection {
   @Override
   public ConnectionValidationResult validate() {
     String errorMessage = "Store is not connected";
-    // TODO - MULE-11433 : Useful error never informed by connectivity testing
-    return store.isConnected() ? success() : failure(errorMessage, new EmailConnectionException(errorMessage));
+    return store.isConnected() ? success() : failure(errorMessage, new EmailConnectionException(errorMessage, DISCONNECTED));
   }
 
   /**
@@ -168,5 +182,22 @@ public class MailboxConnection extends AbstractEmailConnection {
    */
   private boolean isCurrentFolder(String mailBoxFolder) {
     return folder.getName().equalsIgnoreCase(mailBoxFolder);
+  }
+
+  private void handleIllegalArgumentException(String format, IllegalArgumentException e) throws EmailConnectionException {
+    if (e.getMessage().contains(PORT_OUT_OF_RANGE)) {
+      throw new EmailConnectionException(format, e, UNKNOWN_HOST);
+    }
+    throw new EmailConnectionException(format, e);
+  }
+
+  private void handleEmailMessagingException(String format, MessagingException e) throws EmailConnectionException {
+    if (e.getCause() instanceof SocketTimeoutException) {
+      throw new EmailConnectionException(format, e, CONNECTION_TIMEOUT);
+    }
+    if (e.getCause() instanceof ConnectException || e.getCause() instanceof UnknownHostException) {
+      throw new EmailConnectionException(format, e, UNKNOWN_HOST);
+    }
+    throw new EmailConnectionException(format, e);
   }
 }

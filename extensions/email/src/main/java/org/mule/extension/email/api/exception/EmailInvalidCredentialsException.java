@@ -6,19 +6,11 @@
  */
 package org.mule.extension.email.api.exception;
 
-import static org.mule.extension.email.api.exception.EmailError.EMAIL_NOT_FOUND;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
-/**
- * 
- * {@link ModuleException} for the cases in which a given email couldn't be found in a mailbox folder.
- * 
- * @since 4.0
- */
-public class EmailNotFoundException extends ModuleException {
+public class EmailInvalidCredentialsException extends ModuleException {
 
-  public EmailNotFoundException(String message) {
-    super(message, EMAIL_NOT_FOUND);
+  public <T extends Enum<T>> EmailInvalidCredentialsException(Exception e) {
+    super(e, EmailError.INVALID_CREDENTIALS);
   }
-
 }

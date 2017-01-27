@@ -6,7 +6,7 @@
  */
 package org.mule.extension.email.api.exception;
 
-import static org.mule.extension.email.api.exception.EmailErrors.ATTACHMENT;
+import static org.mule.extension.email.api.exception.EmailError.ATTACHMENT;
 import org.mule.extension.email.api.EmailBuilder;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
