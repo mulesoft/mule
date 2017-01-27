@@ -7,17 +7,16 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.xml.util.XMLUtils;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
@@ -32,9 +31,10 @@ public class CxfBasicTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   public static final MediaType APP_SOAP_XML = MediaType.create("application", "soap+xml");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
-
   private String echoWsdl;
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -58,24 +58,27 @@ public class CxfBasicTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Test
   public void testEchoService() throws Exception {
-    MuleClient client = muleContext.getClient();
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
-                                         InternalMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
-                                         HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertTrue(getPayloadAsString(result).contains("Hello!"));
-    String ct = result.getPayload().getDataType().getMediaType().toRfcString();
-    assertEquals("text/xml; charset=UTF-8", ct);
+
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo").setMethod(POST.name())
+            .setEntity(new InputStreamHttpEntity(xml)).addHeader("content-type", APP_SOAP_XML.toRfcString()).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("Hello!"));
+    assertEquals("text/xml; charset=UTF-8", response.getHeaderValue("content-type"));
   }
 
   @Test
   public void testEchoWsdl() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
-                                         InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertNotNull(result.getPayload().getValue());
-    XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl")
+        .setMethod(POST.name()).build();
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    XMLUnit.compareXML(echoWsdl, payload);
   }
 }

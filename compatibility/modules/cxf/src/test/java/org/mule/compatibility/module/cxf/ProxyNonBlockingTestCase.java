@@ -8,12 +8,14 @@ package org.mule.compatibility.module.cxf;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -23,9 +25,6 @@ import org.junit.Test;
 
 @Ignore("MULE-10618")
 public class ProxyNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestCase {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   private static final String ECHO_SOAP_REQUEST = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
       + "<soap:Body><test xmlns=\"http://foo\"> foo </test></soap:Body>" + "</soap:Envelope>";
@@ -40,6 +39,9 @@ public class ProxyNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestCa
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -72,13 +74,16 @@ public class ProxyNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestCa
     getSensingInstance("sensingRequestResponseProcessorGreeter").assertRequestResponseThreadsDifferent();
   }
 
-  private void doTest(String path, String request, String expectedResponse) throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result =
-        client.send("http://localhost:" + dynamicPort.getNumber() + path, InternalMessage.of(request), HTTP_REQUEST_OPTIONS)
-            .getRight();
-    String resString = getPayloadAsString(result);
-    assertThat(resString, containsString(expectedResponse));
+  private void doTest(String path, String requestPayload, String expectedResponse) throws Exception {
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + path)
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertThat(payload, containsString(expectedResponse));
   }
 
   private SensingNullRequestResponseMessageProcessor getSensingInstance(String instanceBeanName) {

@@ -6,22 +6,26 @@
  */
 package org.mule.compatibility.module.cxf;
 
+import static java.lang.String.format;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class ProxyValidationComparisonTestCase extends AbstractCxfOverHttpExtensionTestCase {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   // this request contains no spaces to check the handling of tags following the body
   private static final String ONE_LINER_REQUEST = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -30,6 +34,9 @@ public class ProxyValidationComparisonTestCase extends AbstractCxfOverHttpExtens
 
   @Rule
   public final DynamicPort httpPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -47,16 +54,21 @@ public class ProxyValidationComparisonTestCase extends AbstractCxfOverHttpExtens
   }
 
   private void testResponsesWithPayload(String payload) throws Exception {
-    InternalMessage responseWithValidation = getResponseFor(payload + "Validation");
-    InternalMessage responseWithNoValidation = getResponseFor(payload + "NoValidation");
+    HttpResponse responseWithValidation = getResponseFor(payload + "Validation");
+    HttpResponse responseWithNoValidation = getResponseFor(payload + "NoValidation");
 
-    assertXMLEqual(getPayloadAsString(responseWithValidation), getPayloadAsString(responseWithNoValidation));
+    String responsePayloadWithValidation =
+        IOUtils.toString(((InputStreamHttpEntity) responseWithValidation.getEntity()).getInputStream());
+    String responsePayloadWithoutValidation =
+        IOUtils.toString(((InputStreamHttpEntity) responseWithNoValidation.getEntity()).getInputStream());
+    assertXMLEqual(responsePayloadWithValidation, responsePayloadWithoutValidation);
   }
 
-  private InternalMessage getResponseFor(String path) throws MuleException {
-    return muleContext.getClient().send(String.format("http://localhost:%s/services/%s", httpPort.getNumber(), path),
-                                        InternalMessage.of(ONE_LINER_REQUEST), HTTP_REQUEST_OPTIONS)
-        .getRight();
+  private HttpResponse getResponseFor(String path) throws MuleException, IOException, TimeoutException {
+    HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%s/services/%s", httpPort.getNumber(), path))
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(ONE_LINER_REQUEST.getBytes())).build();
+
+    return httpClient.send(request, RECEIVE_TIMEOUT, false, null);
   }
 
 }

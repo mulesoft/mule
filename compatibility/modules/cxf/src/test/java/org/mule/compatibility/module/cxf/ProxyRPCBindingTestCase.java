@@ -8,12 +8,14 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.custommonkey.xmlunit.XMLUnit;
@@ -29,10 +31,10 @@ public class ProxyRPCBindingTestCase extends AbstractCxfOverHttpExtensionTestCas
   @Rule
   public final DynamicPort httpPortService = new DynamicPort("port2");
 
-  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
-
   private String getAllRequest;
   private String getAllResponse;
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -49,18 +51,30 @@ public class ProxyRPCBindingTestCase extends AbstractCxfOverHttpExtensionTestCas
 
   @Test
   public void proxyRPCBodyPayload() throws Exception {
-    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body",
-                                                            InternalMessage.of(getAllRequest), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/body")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity(getAllRequest.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(XMLUnit.compareXML(getAllResponse, payload).identical());
   }
 
   @Test
   public void proxyRPCBodyEnvelope() throws Exception {
-    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope",
-                                                            InternalMessage.of(getAllRequest), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/envelope")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity(getAllRequest.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(XMLUnit.compareXML(getAllResponse, payload).identical());
   }
 
 }

@@ -7,12 +7,14 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -20,9 +22,6 @@ import org.junit.Test;
 
 // TODO MULE-11035 - Migrate extension tests that depend on multiple threads to use MuleArtifactFunctionalTestCase.
 public class ProxySoapVersionTestCase extends AbstractCxfOverHttpExtensionTestCase {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   String doGoogleSearch =
       "<urn:doGoogleSearch xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:urn=\"urn:GoogleSearch\">";
@@ -38,6 +37,9 @@ public class ProxySoapVersionTestCase extends AbstractCxfOverHttpExtensionTestCa
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
+
   @Override
   protected String getConfigFile() {
     return "proxy-soap-version-conf-flow-httpn.xml";
@@ -45,11 +47,15 @@ public class ProxySoapVersionTestCase extends AbstractCxfOverHttpExtensionTestCa
 
   @Test
   public void testProxyWithCommentInRequest() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy-soap-version",
-                                         InternalMessage.of(msgWithComment), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    String resString = getPayloadAsString(result);
-    assertTrue(resString.contains(doGoogleSearch));
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxy-soap-version")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity(msgWithComment.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertTrue(payload.contains(doGoogleSearch));
+
   }
 }

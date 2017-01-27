@@ -75,7 +75,13 @@ public class MuleServiceManager implements ServiceManager {
   private void startServices() throws MuleException {
     for (Service service : registeredServices) {
       if (service instanceof Startable) {
-        ((Startable) service).start();
+        ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+          Thread.currentThread().setContextClassLoader(service.getClass().getClassLoader());
+          ((Startable) service).start();
+        } finally {
+          Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+        }
       }
     }
   }

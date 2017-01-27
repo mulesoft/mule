@@ -6,21 +6,22 @@
  */
 package org.mule.compatibility.module.cxf;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class CxfComponentExceptionStrategyTestCase extends AbstractCxfOverHttpExtensionTestCase {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   private static final String REQUEST_PAYLOAD =
       "<soap:Envelope \n" + "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
@@ -41,6 +42,9 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractCxfOverHttpEx
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -87,12 +91,12 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractCxfOverHttpEx
   }
 
   private void doTest(String path, String soapMethod, String faultTemplate, String faultMessage) throws Exception {
-    InternalMessage response =
-        muleContext.getClient().send(String.format("http://localhost:%d/services/%s", dynamicPort.getNumber(), path),
-                                     InternalMessage.of(getRequestPayload(soapMethod)), HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertFault(faultTemplate, getPayloadAsString(response), faultMessage);
+    HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%d/services/%s", dynamicPort.getNumber(), path))
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(getRequestPayload(soapMethod).getBytes())).build();
 
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertFault(faultTemplate, payload, faultMessage);
   }
 
   private String getRequestPayload(String method) {
@@ -100,6 +104,6 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractCxfOverHttpEx
   }
 
   private void assertFault(String faultTemplate, String soapResponse, String faultMessage) {
-    assertEquals(String.format(faultTemplate, faultMessage), soapResponse);
+    assertEquals(format(faultTemplate, faultMessage), soapResponse);
   }
 }

@@ -8,11 +8,13 @@
 package org.mule.compatibility.module.cxf;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.StringReader;
@@ -28,14 +30,13 @@ import org.xml.sax.InputSource;
 
 public class ProxyWSDLRewriteAddressTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
+  private static final String SINGLE_PORT = "StockQuoteSoap";
+  private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
 
   @Rule
   public final DynamicPort httpPort = new DynamicPort("port1");
-
-  private static final String SINGLE_PORT = "StockQuoteSoap";
-  private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -45,10 +46,9 @@ public class ProxyWSDLRewriteAddressTestCase extends AbstractCxfOverHttpExtensio
   @Test
   public void testProxyWSDLRewriteSinglePort() throws Exception {
     String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/single";
-    InternalMessage response =
-        muleContext.getClient()
-            .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
-            .getRight();
+    HttpRequest request = HttpRequest.builder().setUri(proxyAddress + "?wsdl").setMethod(POST.name()).build();
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
     for (Element port : getPorts(getWsdl(response))) {
       String location = getLocation(port);
       String portName = port.getAttribute("name");
@@ -64,17 +64,17 @@ public class ProxyWSDLRewriteAddressTestCase extends AbstractCxfOverHttpExtensio
   @Test
   public void testProxyWSDLRewriteAllPorts() throws Exception {
     String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/all";
-    InternalMessage response =
-        muleContext.getClient()
-            .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
-            .getRight();
+    HttpRequest request = HttpRequest.builder().setUri(proxyAddress + "?wsdl").setMethod(POST.name()).build();
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
     for (Element port : getPorts(getWsdl(response))) {
       assertEquals(proxyAddress, getLocation(port));
     }
   }
 
-  private Document getWsdl(InternalMessage response) throws Exception {
-    return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
+  private Document getWsdl(HttpResponse response) throws Exception {
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    return XMLUnit.buildTestDocument(new InputSource(new StringReader(payload)));
   }
 
   private List<Element> getPorts(Document wsdl) {

@@ -10,14 +10,16 @@ package org.mule.compatibility.module.cxf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.StringReader;
@@ -42,7 +44,8 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends AbstractCxfOverHttp
   @Rule
   public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   private MuleContext mockServerContext;
 
@@ -83,10 +86,11 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends AbstractCxfOverHttp
   @Test
   public void testProxyWSDLRewriteAllSchemaLocations() throws Exception {
     String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
-    InternalMessage response =
-        muleContext.getClient()
-            .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
-            .getRight();
+    HttpRequest request =
+        HttpRequest.builder().setUri(proxyAddress + "?wsdl")
+            .setMethod(POST.name()).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     Set<String> expectedParametersValues = new HashSet<>();
     expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));
@@ -105,8 +109,9 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends AbstractCxfOverHttp
     assertTrue(expectedParametersValues.isEmpty());
   }
 
-  private Document getWsdl(InternalMessage response) throws Exception {
-    return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
+  private Document getWsdl(HttpResponse response) throws Exception {
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    return XMLUnit.buildTestDocument(new InputSource(new StringReader(payload)));
   }
 
   private List<Element> getSchemaImports(Document wsdl) {

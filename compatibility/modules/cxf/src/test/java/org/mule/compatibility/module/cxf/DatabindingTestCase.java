@@ -8,11 +8,13 @@ package org.mule.compatibility.module.cxf;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertNotNull;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -20,11 +22,13 @@ import org.junit.Test;
 
 public class DatabindingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
   private static final String DATABINDING_CONF_HTTPN_XML = "databinding-conf-httpn.xml";
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -62,10 +66,13 @@ public class DatabindingTestCase extends AbstractCxfOverHttpExtensionTestCase {
   }
 
   private void doTest(String service) throws Exception {
-    InternalMessage result =
-        muleContext.getClient().send(format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service),
-                                     InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(result.getPayload().getValue());
+
+    HttpRequest request =
+        HttpRequest.builder().setUri(format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service))
+            .setMethod(POST.name()).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertNotNull(payload);
   }
 }

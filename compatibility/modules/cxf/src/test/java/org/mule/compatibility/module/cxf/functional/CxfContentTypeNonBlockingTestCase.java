@@ -8,12 +8,13 @@ package org.mule.compatibility.module.cxf.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -31,6 +32,9 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
+
   @Override
   protected String getConfigFile() {
     return "cxf-echo-service-conf-httpn-nb.xml";
@@ -39,26 +43,28 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   @Test
   @Ignore("MULE-10618")
   public void testCxfService() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    String contentType = received.getPayload().getDataType().getMediaType().toRfcString();
-    assertNotNull(contentType);
+    HttpRequest httpRequest =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/hello")
+            .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes()))
+            .setMethod(POST.name()).build();
+
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    String contentType = httpResponse.getHeaderValue("content-type");
     assertTrue(contentType.contains("charset"));
   }
 
   @Test
   @Ignore("MULE-10618")
   public void testCxfClient() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("hello").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClient", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    String contentType = received.getInboundProperty("contentType");
-    assertNotNull(contentType);
+    HttpRequest httpRequest =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/helloClient")
+            .setEntity(new ByteArrayHttpEntity("hello".getBytes()))
+            .setMethod(POST.name()).build();
+
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    String contentType = httpResponse.getHeaderValue("content-type");
     assertTrue(contentType.contains("charset"));
     getSensingInstance("sensingRequestResponseProcessor").assertRequestResponseThreadsDifferent();
   }
@@ -66,12 +72,14 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   @Test
   @Ignore("MULE-10618")
   public void testCxfClientProxy() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("hello").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    String contentType = received.getInboundProperty("contentType");
+    HttpRequest httpRequest =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy")
+            .setEntity(new ByteArrayHttpEntity("hello".getBytes()))
+            .setMethod(POST.name()).build();
+
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    String contentType = httpResponse.getHeaderValue("content-type");
     assertNotNull(contentType);
     assertTrue(contentType.contains("charset"));
     getSensingInstance("sensingRequestResponseProcessorProxy").assertRequestResponseThreadsDifferent();

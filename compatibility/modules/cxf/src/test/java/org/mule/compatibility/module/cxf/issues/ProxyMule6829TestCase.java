@@ -10,22 +10,27 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.xml.namespace.QName;
 
@@ -35,11 +40,11 @@ import org.junit.Test;
 
 public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase {
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
-
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   private Latch latch;
   private TestCxfEventCallback testCxfEventCallback;
@@ -88,11 +93,11 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
             + "</soapenv:Envelope>";
 
     String soapOperation = "EchoOperation1";
-    InternalMessage response = executeSoap11Call(msgEchoOperation1, soapOperation);
+    HttpResponse httpResponse = executeSoap11Call(msgEchoOperation1, soapOperation);
     assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
-    String payload = getPayloadAsString(response);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
     assertTrue(payload.contains("<new:parameter1"));
     assertTrue(payload.contains("hello world"));
   }
@@ -108,11 +113,11 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
             + "</soapenv:Envelope>";
 
     String soapOperation = "EchoOperation2";
-    InternalMessage response = executeSoap11Call(msgEchoOperation2, soapOperation);
+    HttpResponse httpResponse = executeSoap11Call(msgEchoOperation2, soapOperation);
     assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
-    String payload = getPayloadAsString(response);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
     assertTrue(payload.contains("<new:parameter2"));
     assertTrue(payload.contains("hello world"));
   }
@@ -128,11 +133,11 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
             + "</soap:Envelope>";
 
     String soapOperation = "EchoOperation1";
-    InternalMessage response = executeSoap12Call(msgEchoOperation1, soapOperation);
+    HttpResponse httpResponse = executeSoap12Call(msgEchoOperation1, soapOperation);
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
-    String payload = getPayloadAsString(response);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
     assertTrue(payload.contains("<new:parameter1"));
     assertTrue(payload.contains("hello world"));
   }
@@ -148,29 +153,33 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
             + "</soap:Envelope>";
 
     String soapOperation = "EchoOperation2";
-    InternalMessage response = executeSoap12Call(msgEchoOperation2, soapOperation);
+    HttpResponse httpResponse = executeSoap12Call(msgEchoOperation2, soapOperation);
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
-    String payload = getPayloadAsString(response);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
     assertTrue(payload.contains("<new:parameter2"));
     assertTrue(payload.contains("hello world"));
   }
 
-  private InternalMessage executeSoap11Call(String msgString, String soapAction) throws MuleException {
-    InternalMessage msg = InternalMessage.builder().payload(msgString).addOutboundProperty("soapAction", soapAction).build();
+  private HttpResponse executeSoap11Call(String msgString, String soapAction)
+      throws MuleException, IOException, TimeoutException {
+    ParameterMap headersMap = new ParameterMap();
+    headersMap.put("soapAction", soapAction);
+    HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/EchoService11")
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
 
-    return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg,
-                                        HTTP_REQUEST_OPTIONS)
-        .getRight();
+    return httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
   }
 
-  private InternalMessage executeSoap12Call(String msgString, String soapAction) throws MuleException {
+  private HttpResponse executeSoap12Call(String msgString, String soapAction)
+      throws MuleException, IOException, TimeoutException {
     String contentType = APP_SOAP_XML.withCharset(UTF_8).toRfcString() + ";action=\"" + soapAction + "\"";
-    InternalMessage msg = InternalMessage.builder().payload(msgString).mediaType(MediaType.parse(contentType)).build();
+    ParameterMap headersMap = new ParameterMap();
+    headersMap.put("content-type", contentType);
+    HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/EchoService12")
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
 
-    return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg,
-                                        HTTP_REQUEST_OPTIONS)
-        .getRight();
+    return httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
   }
 }

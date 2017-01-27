@@ -7,21 +7,20 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class SoapRequestNoMethodParamTestCase extends AbstractCxfOverHttpExtensionTestCase {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   private static final String request =
       "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body><receive xmlns=\"http://www.muleumo.org\"><src xmlns=\"http://www.muleumo.org\">Test String</src></receive></soap:Body></soap:Envelope>";
@@ -31,6 +30,9 @@ public class SoapRequestNoMethodParamTestCase extends AbstractCxfOverHttpExtensi
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
+
   @Override
   protected String getConfigFile() {
     return "soap-request-conf-flow-httpn.xml";
@@ -38,12 +40,14 @@ public class SoapRequestNoMethodParamTestCase extends AbstractCxfOverHttpExtensi
 
   @Test
   public void testCXFSoapRequest() throws Exception {
-    InternalMessage msg = muleContext.getClient().send("http://localhost:" + port1.getValue() + "/services/TestComponent",
-                                                       InternalMessage.of(request), HTTP_REQUEST_OPTIONS)
-        .getRight();
+    HttpRequest httpRequest =
+        HttpRequest.builder().setUri("http://localhost:" + port1.getValue() + "/services/TestComponent")
+            .setEntity(new ByteArrayHttpEntity(request.getBytes()))
+            .setMethod(POST.name()).build();
 
-    assertNotNull(msg);
-    assertNotNull(msg.getPayload().getValue());
-    assertEquals(response, getPayloadAsString(msg));
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
+    assertEquals(response, payload);
   }
 }

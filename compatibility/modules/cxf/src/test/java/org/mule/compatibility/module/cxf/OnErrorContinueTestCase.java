@@ -13,14 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -28,8 +25,12 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.service.http.api.HttpConstants;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.nio.charset.Charset;
@@ -61,11 +62,11 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
           "</soap:Body>\n" +
           "</soap:Envelope>";
 
-  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
-      .method(POST.name()).disableStatusCodeValidation().build();
-
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Override
   protected String getConfigFile() {
@@ -74,41 +75,44 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
 
   @Test
   public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestFaultPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException",
-                                           request, HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertNotNull(response);
-    assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-    assertTrue(getPayloadAsString(response).contains("Anonymous"));
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    assertEquals(OK.getStatusCode(), response.getStatusCode());
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertTrue(payload.contains("Anonymous"));
   }
 
   @Test
   public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestFaultPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request,
-                    HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(response);
-    assertEquals(String.valueOf(HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR.getStatusCode()),
-                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
+    HttpRequest request = HttpRequest.builder()
+        .setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown")
+        .setMethod(POST.name())
+        .setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertTrue(payload.contains("<faultstring>"));
   }
 
   @Test
   public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException",
-                    request, HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(response);
-    assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-    assertTrue(getPayloadAsString(response).contains("APPEND"));
+    HttpRequest request = HttpRequest.builder()
+        .setUri("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException")
+        .setMethod(POST.name())
+        .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    assertEquals(OK.getStatusCode(), response.getStatusCode());
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertTrue(payload.contains("APPEND"));
   }
 
   @Test
@@ -137,14 +141,16 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
 
   @Test
   public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy",
-                    InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
-            .getRight();
-    String resString = getPayloadAsString(result);
-    assertEquals(String.valueOf(OK.getStatusCode()), result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
-    assertTrue(resString.contains("Anonymous"));
+    HttpRequest request = HttpRequest.builder()
+        .setUri("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy")
+        .setMethod(POST.name())
+        .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    assertEquals(OK.getStatusCode(), response.getStatusCode());
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertTrue(payload.contains("Anonymous"));
   }
 
   public static class ProxyCustomProcessor implements Processor {

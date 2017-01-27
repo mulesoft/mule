@@ -7,16 +7,16 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.compatibility.module.cxf.wssec.ClientPasswordCallback;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.custommonkey.xmlunit.XMLUnit;
@@ -26,11 +26,11 @@ import org.junit.Test;
 
 public class UsernameTokenProxyWithoutMustUnderstandTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
-
   @Rule
   public final DynamicPort httpPortProxy = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   private String request;
   private String response;
@@ -52,14 +52,15 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends AbstractCxf
 
   @Test
   public void testProxyServiceWithoutMustUnderstand() throws Exception {
-    InternalMessage replyMessage = sendRequest("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope", request);
-    assertNotNull(replyMessage);
-    String payload = getPayloadAsString(replyMessage);
+    HttpRequest httpRequest =
+        HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope")
+            .setEntity(new ByteArrayHttpEntity(request.getBytes()))
+            .setMethod(POST.name()).build();
+
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
     assertFalse(payload.contains("Fault"));
     assertTrue(XMLUnit.compareXML(response, payload).identical());
-  }
-
-  protected InternalMessage sendRequest(String url, String payload) throws MuleException {
-    return muleContext.getClient().send(url, InternalMessage.of(payload), HTTP_REQUEST_OPTIONS).getRight();
   }
 }

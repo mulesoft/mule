@@ -10,13 +10,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_IGNORE_METHOD_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -24,25 +21,24 @@ import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTestCase
     implements FunctionalTestNotificationListener {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   private static final String REQUEST_PAYLOAD = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
       + "<soap:Body>\n" + "<ns1:onReceive xmlns:ns1=\"http://functional.functional.mule.org/\">\n"
@@ -54,6 +50,8 @@ public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTes
 
   private List<Message> notificationMsgList = new ArrayList<>();
   private Latch latch = new Latch();
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient();
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -79,20 +77,17 @@ public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTes
 
     String myProperty = "myProperty";
 
-    Map<String, Serializable> props = new HashMap<>();
-    props.put(MULE_USER_PROPERTY, "alan");
-    props.put(MULE_METHOD_PROPERTY, "onReceive");
-    props.put(myProperty, myProperty);
+    ParameterMap headersMap = new ParameterMap();
+    headersMap.put(MULE_USER_PROPERTY, "alan");
+    headersMap.put(MULE_METHOD_PROPERTY, "onReceive");
+    headersMap.put(myProperty, myProperty);
 
-    InternalMessage reply = muleContext.getClient()
-        .send(String.format(endpointAddress),
-              InternalMessage.builder().payload(REQUEST_PAYLOAD).outboundProperties(props).build(),
-              HTTP_REQUEST_OPTIONS)
-        .getRight();
+    HttpRequest request = HttpRequest.builder().setUri(endpointAddress).setMethod(POST.name()).setHeaders(headersMap)
+        .setEntity(new ByteArrayHttpEntity(REQUEST_PAYLOAD.getBytes())).build();
 
-    assertNotNull(reply);
-    assertNotNull(reply.getPayload().getValue());
-    assertEquals(SOAP_RESPONSE, getPayloadAsString(reply));
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertEquals(SOAP_RESPONSE, payload);
 
     latch.await(3000, SECONDS);
 
