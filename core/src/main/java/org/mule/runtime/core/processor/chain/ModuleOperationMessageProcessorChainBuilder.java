@@ -7,8 +7,6 @@
 package org.mule.runtime.core.processor.chain;
 
 import static org.mule.runtime.core.api.message.InternalMessage.builder;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PARAM_VARS;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PROPERTY_VARS;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -19,12 +17,11 @@ import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.NotificationUtils;
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-
-import org.reactivestreams.Publisher;
+import java.util.stream.Collectors;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -45,11 +42,14 @@ import org.reactivestreams.Publisher;
  *      <module-operation-parameter-entry value="howdy" key="value1"/>
  *      <module-operation-parameter-entry value="#[mel:flowVars.person]" key="value2"/>
  *    </module-operation-parameters>
- *    <set-payload value="#[mel:param.value1 + param.value2]"/>
+ *    <set-payload value="#[param.value1 ++ param.value2]"/>
  * </module-operation-chain>
  * </pre>
  */
 public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
+
+  private static final String PARAM_VARS = "param";
+  private static final String PROPERTY_VARS = "property";
 
   private Map<String, String> properties;
   private Map<String, String> parameters;
@@ -140,16 +140,22 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     private Event createEventWithParameters(Event event) {
       Event.Builder builder = Event.builder(event.getContext());
       builder.message(builder().nullPayload().build());
-      properties.forEach(addEvaluatedParam(event, builder, PROPERTY_VARS));
-      parameters.forEach(addEvaluatedParam(event, builder, PARAM_VARS));
+      //TODO until MULE-10291 & MULE-10353 are done, we will use flowVars to store the parameter.value and property.value
+      builder.addVariable(PARAM_VARS, evaluateParameters(event, parameters));
+      builder.addVariable(PROPERTY_VARS, evaluateParameters(event, properties));
       return builder.build();
     }
 
-    private BiConsumer<String, String> addEvaluatedParam(Event event, Event.Builder builder, String prefix) {
-      return (name, value) -> builder.addVariable(prefix + "." + name, expressionManager.isExpression(value)
-          ? expressionManager.evaluate(value, event, flowConstruct)
-          : value);
+    private Map<String, Object> evaluateParameters(Event event, Map<String, String> unevaluatedMap) {
+      return unevaluatedMap.entrySet().stream()
+          .collect(Collectors.toMap(Map.Entry::getKey,
+                                    entry -> getEvaluatedValue(event, entry.getValue())));
+    }
 
+    private Object getEvaluatedValue(Event event, String value) {
+      return expressionManager.isExpression(value)
+          ? expressionManager.evaluate(value, event, flowConstruct)
+          : value;
     }
   }
 }

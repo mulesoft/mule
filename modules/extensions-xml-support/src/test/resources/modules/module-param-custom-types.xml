@@ -13,7 +13,7 @@
             <parameter name="value" type="Person"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[mel:param.value]"/>
+            <mule:set-payload value="#[param.value]"/>
         </body>
         <output type="Cat"/>
     </operation>
