@@ -6,6 +6,7 @@
  */
 package org.mule.extension.db.internal;
 
+import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.api.param.BulkQueryDefinition;
 import org.mule.extension.db.api.param.JdbcType;
@@ -45,7 +46,8 @@ import java.util.List;
 @ConnectionProviders({DataSourceReferenceConnectionProvider.class, GenericConnectionProvider.class, DerbyConnectionProvider.class,
     MySqlConnectionProvider.class, OracleDbConnectionProvider.class})
 @Xml(namespace = "db")
-@Export(classes = {QueryDefinition.class, StoredProcedureCall.class, BulkQueryDefinition.class})
+@Export(
+    classes = {QueryDefinition.class, StoredProcedureCall.class, BulkQueryDefinition.class, ConnectionCreationException.class})
 @ErrorTypes(DbError.class)
 public class DbConnector implements Initialisable {
 

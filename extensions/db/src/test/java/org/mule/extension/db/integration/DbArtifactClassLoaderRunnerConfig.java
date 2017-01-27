@@ -6,8 +6,6 @@
  */
 package org.mule.extension.db.integration;
 
-import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
-import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
@@ -18,7 +16,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  * @since 4.0
  */
 @ArtifactClassLoaderRunnerConfig(
-    exportPluginClasses = {DbConnectionProvider.class, ConnectionCreationException.class},
+    exportPluginClasses = {DbConnectionProvider.class},
     sharedRuntimeLibs = {"org.apache.derby:derby"})
 public interface DbArtifactClassLoaderRunnerConfig {
 }
