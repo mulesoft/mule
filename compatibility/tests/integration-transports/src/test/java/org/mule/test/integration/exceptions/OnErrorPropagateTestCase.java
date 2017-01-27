@@ -13,7 +13,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.exceptions.FunctionalTestException;

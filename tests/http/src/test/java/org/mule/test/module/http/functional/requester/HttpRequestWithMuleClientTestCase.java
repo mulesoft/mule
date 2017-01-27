@@ -12,21 +12,21 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.NEVER;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.service.http.api.HttpConstants;
-import org.mule.service.http.api.HttpHeaders;
+import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfigBuilder;
+import org.mule.service.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 

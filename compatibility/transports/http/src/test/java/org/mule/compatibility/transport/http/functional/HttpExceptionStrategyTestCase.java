@@ -14,7 +14,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_FORBIDDEN;
-import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;

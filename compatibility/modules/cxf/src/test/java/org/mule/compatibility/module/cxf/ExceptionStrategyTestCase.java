@@ -14,7 +14,7 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;

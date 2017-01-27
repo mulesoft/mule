@@ -20,7 +20,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.compatibility.module.cxf.testmodels.AsyncService;
 import org.mule.compatibility.module.cxf.testmodels.AsyncServiceWithSoapAction;

@@ -19,11 +19,11 @@ import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.ntlm.NTLMScheme;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.BooleanUtils;
@@ -87,9 +87,9 @@ public class HttpConnector extends TcpConnector {
    * MuleEvent property to pass back the status for the response
    */
   public static final String HTTP_STATUS_PROPERTY =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
   public static final String HTTP_VERSION_PROPERTY =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
 
   /**
    * @deprecated Instead users can now add properties to the outgoing request using the OUTBOUND property scope on the message.
@@ -107,31 +107,31 @@ public class HttpConnector extends TcpConnector {
    * unescaped
    */
   public static final String HTTP_QUERY_PARAMS =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
 
   public static final String HTTP_QUERY_STRING =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_QUERY_STRING;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_STRING;
 
   public static final String HTTP_METHOD_PROPERTY =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 
   /**
    * The path and query portions of the URL being accessed.
    */
   public static final String HTTP_REQUEST_PROPERTY =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PROPERTY;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PROPERTY;
 
   /**
    * The path portion of the URL being accessed. No query string is included.
    */
   public static final String HTTP_REQUEST_PATH_PROPERTY =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 
   /**
    * The context path of the endpoint being accessed. This is the path that the HTTP endpoint is listening on.
    */
   public static final String HTTP_CONTEXT_PATH_PROPERTY =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_CONTEXT_PATH_PROPERTY;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_CONTEXT_PATH_PROPERTY;
 
   /**
    * The context URI of the endpoint being accessed. This is the address that the HTTP endpoint is listening on. It includes:
@@ -158,7 +158,7 @@ public class HttpConnector extends TcpConnector {
   public static final String HTTP_POST_BODY_PARAM_PROPERTY = HTTP_PREFIX + "post.body.param";
 
   public static final String HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK =
-      org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
+      org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
   public static final String HTTP_ENCODE_PARAMVALUE = HTTP_PREFIX + "encode.paramvalue";
 
   public static final Set<String> HTTP_INBOUND_PROPERTIES;

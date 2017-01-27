@@ -12,7 +12,7 @@ import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.lifecycle.InitialisationException;

@@ -16,8 +16,8 @@ import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
-import static org.mule.service.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.compatibility.module.cxf.support.DelegatingOutputStream;
 import org.mule.compatibility.module.cxf.transport.MuleUniversalDestination;

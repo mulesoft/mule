@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request;
 
 
 import org.mule.runtime.core.api.Event;
-import org.mule.service.http.api.HttpConstants;
+import org.mule.runtime.module.http.api.HttpConstants;
 
 public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
 
