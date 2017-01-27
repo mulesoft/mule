@@ -45,8 +45,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     MuleEvent finalEvent;
                     if (successEvent instanceof VoidMuleEvent)
                     {
-                        //continue processing with the original event
-                        finalEvent = event;
+                        finalEvent = successEvent;
                     }
                     else
                     {
