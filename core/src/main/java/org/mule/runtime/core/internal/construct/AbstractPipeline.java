@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
@@ -51,7 +52,6 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -63,9 +63,6 @@ import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +71,10 @@ import java.util.function.Function;
 
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -212,6 +213,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return processingStrategy.isSynchronous();
   }
 
+  @Override
   public ProcessingStrategyFactory getProcessingStrategyFactory() {
     return processingStrategyFactory;
   }

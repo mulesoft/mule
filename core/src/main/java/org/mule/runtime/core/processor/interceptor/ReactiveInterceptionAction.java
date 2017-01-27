@@ -7,33 +7,43 @@
 
 package org.mule.runtime.core.processor.interceptor;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.interception.InterceptionAction;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.interception.InterceptionEvent;
+import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
- * TODO
+ * Implementation of {@link InterceptionAction} that does the needed hooks with {@code Reactor} into the pipeline.
+ * 
+ * @since 4.0
  */
-public class ReactiveInterceptionAction implements InterceptionAction {
+class ReactiveInterceptionAction implements InterceptionAction {
 
-  private CompletableFuture<Event> future;
-  private Event event;
+  private DefaultInterceptionEvent interceptionEvent;
   private ReactiveProcessor next;
 
-  public ReactiveInterceptionAction(Event event, ReactiveProcessor next) {
-    this.event = event;
+  public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent, ReactiveProcessor next) {
+    this.interceptionEvent = interceptionEvent;
     this.next = next;
   }
 
   @Override
-  public void proceed() {
-    this.future = just(event).transform(next).toFuture();
+  public CompletableFuture<InterceptionEvent> proceed() {
+    return just(interceptionEvent.resolve())
+        .transform(next)
+        .map(event -> new DefaultInterceptionEvent(event))
+        .cast(InterceptionEvent.class)
+        .toFuture();
   }
 
-  public CompletableFuture<Event> getFuture() {
-    return future;
+  @Override
+  public CompletableFuture<InterceptionEvent> skip() {
+    interceptionEvent.resolve();
+    return completedFuture(interceptionEvent);
   }
 }

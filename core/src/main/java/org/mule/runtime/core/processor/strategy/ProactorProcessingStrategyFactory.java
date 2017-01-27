@@ -18,7 +18,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.function.Consumer;
@@ -90,20 +90,21 @@ public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStr
       super.stop();
     }
 
-    //@Override
-    public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
-                                                                    Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-      if (messageProcessor.getProcessingType() == BLOCKING) {
-        return proactor(processorFunction, blockingScheduler);
-      } else if (messageProcessor.getProcessingType() == CPU_INTENSIVE) {
-        return proactor(processorFunction, cpuIntensiveScheduler);
-      } else {
-        return publisher -> from(publisher).transform(processorFunction);
-      }
+    @Override
+    public Function<ReactiveProcessor, ReactiveProcessor> onProcessor() {
+      return processor -> {
+        if (processor.getProcessingType() == BLOCKING) {
+          return proactor(processor, blockingScheduler);
+        } else if (processor.getProcessingType() == CPU_INTENSIVE) {
+          return proactor(processor, cpuIntensiveScheduler);
+        } else {
+          return publisher -> from(publisher).transform(processor);
+        }
+      };
     }
 
-    private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
-                                                                  Scheduler scheduler) {
+    private ReactiveProcessor proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
+                                       Scheduler scheduler) {
       return publisher -> from(publisher)
           .publishOn(fromExecutorService(getExecutorService(scheduler)))
           .transform(processorFunction)

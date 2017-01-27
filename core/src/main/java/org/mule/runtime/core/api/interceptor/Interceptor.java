@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.interceptor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.interception.InterceptableMessageProcessor;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 /**
@@ -16,7 +15,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
  * commonally known as the interceptor pattern and it allows for pre and processing of invocations on the object being
  * intercepted.
  */
-public interface Interceptor extends InterceptingMessageProcessor, InterceptableMessageProcessor {
+public interface Interceptor extends InterceptingMessageProcessor {
 
   /**
    * Invoked when the component should be called. The implementation can call next.process(event) to call the component or the
@@ -26,6 +25,7 @@ public interface Interceptor extends InterceptingMessageProcessor, Interceptable
    * @return A result message that may have been altered by this invocation
    * @throws MuleException if the invocation fails
    */
+  @Override
   Event process(Event event) throws MuleException;
 
 }

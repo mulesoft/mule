@@ -8,10 +8,11 @@
 package org.mule.runtime.core.processor.interceptor;
 
 import static java.lang.String.valueOf;
-import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -40,13 +42,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO
+ * Hooks the {@link InterceptionHandler}s for a {@link Processor} into the {@code Reactor} pipeline.
+ * 
+ * @since 4.0
  */
 public class ReactiveInterceptorAdapter implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>,
     FlowConstructAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
-  public static final String AROUND_METHOD_NAME = "around";
+  private static final String AROUND_METHOD_NAME = "around";
 
   private InterceptionHandler interceptionHandler;
   private FlowConstruct flowConstruct;
@@ -62,7 +66,6 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
   @Override
   public ReactiveProcessor apply(Processor component, ReactiveProcessor next) {
-    //TODO move this logic to validate before building the interception chain for processing
     if (!isInterceptable(component)) {
       return next;
     }
@@ -71,59 +74,64 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     ComponentLocation componentLocation =
         ((AnnotatedObject) component).getLocation(((MessageProcessorPathResolver) flowConstruct).getProcessorPath(component));
     Map<String, String> dslParameters = (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
-    LOGGER.warn("Applying interceptor: {} for componentLocation: {}", interceptionHandler, componentLocation.getPath());
+    LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptionHandler, componentLocation.getPath());
 
     if (interceptionHandler.intercept(componentIdentifier, componentLocation)) {
-      try {
-        //if (interceptionHandler.getClass().getMethod(AROUND_METHOD_NAME, Map.class, InterceptionEvent.class, InterceptionAction.class).isDefault()) {
-        if (!interceptionHandler.getClass()
-            .getMethod(AROUND_METHOD_NAME, Map.class, InterceptionEvent.class, InterceptionAction.class).getDeclaringClass()
-            .equals(interceptionHandler.getClass())) {
-          return publisher -> from(publisher)
-              .map(doBefore(component, dslParameters))
-              .transform(next)
-              .map(doAfter());
-        } else {
-          return publisher -> from(publisher)
-              .map(doBefore(component, dslParameters))
-              .flatMap(event -> fromFuture(doAround(event, component, dslParameters, next)))
-              .map(doAfter());
-        }
-        //TODO change this!
-      } catch (NoSuchMethodException e) {
-        throw new MuleRuntimeException(e);
+      if (implementsAround()) {
+        return publisher -> from(publisher)
+            .map(doBefore(component, dslParameters))
+            .flatMap(event -> fromFuture(doAround(event, component, dslParameters, next))
+                .mapError(CompletionException.class, completionException -> completionException.getCause()))
+            .doOnError(error -> {
+              interceptionHandler.after(null);
+            })
+            .map(doAfter());
+      } else {
+        return publisher -> from(publisher)
+            .map(doBefore(component, dslParameters))
+            .transform(next)
+            .doOnError(error -> {
+              // TODO should pass the exception to after to check the thrown exception
+              interceptionHandler.after(null);
+            })
+            .map(doAfter());
       }
+    } else {
+      return next;
     }
 
-    return next;
   }
 
-  private CompletableFuture<Event> doAround(Event event, Processor component, Map<String, String> dslParameters,
-                                            ReactiveProcessor next) {
-    DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-    final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(event, next);
-    interceptionHandler.around(resolveParameters(event, component, dslParameters), interceptionEvent,
-                               reactiveInterceptionAction);
-    //TODO Optional
-    final CompletableFuture<Event> future = reactiveInterceptionAction.getFuture();
-    if (future != null) {
-      return future;
+  private boolean implementsAround() {
+    try {
+      return !interceptionHandler.getClass()
+          .getMethod(AROUND_METHOD_NAME, Map.class, InterceptionEvent.class, InterceptionAction.class).isDefault();
+    } catch (NoSuchMethodException | SecurityException e) {
+      throw new MuleRuntimeException(e);
     }
-    return completedFuture(interceptionEvent.resolve());
-  }
-
-  private Function<Event, Event> doAfter() {
-    return event -> {
-      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-      interceptionHandler.after(interceptionEvent);
-      return interceptionEvent.resolve();
-    };
   }
 
   private Function<Event, Event> doBefore(Processor component, Map<String, String> dslParameters) {
     return event -> {
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
       interceptionHandler.before(resolveParameters(event, component, dslParameters), interceptionEvent);
+      return interceptionEvent.resolve();
+    };
+  }
+
+  private CompletableFuture<Event> doAround(Event event, Processor component, Map<String, String> dslParameters,
+                                            ReactiveProcessor next) {
+    DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
+    final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
+    return interceptionHandler.around(resolveParameters(event, component, dslParameters), interceptionEvent,
+                                      reactiveInterceptionAction)
+        .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
+  }
+
+  private Function<Event, Event> doAfter() {
+    return event -> {
+      DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
+      interceptionHandler.after(interceptionEvent);
       return interceptionEvent.resolve();
     };
   }
@@ -145,8 +153,9 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       try {
         return ((ProcessorParameterResolver) processor).resolve(event);
       } catch (MuleException e) {
-        //TODO Improve error message!
-        throw new MuleRuntimeException(e);
+        throw new MuleRuntimeException(createStaticMessage("Exception while resolving parameters %s of processor %s",
+                                                           parameters.toString(), processor.toString()),
+                                       e);
       }
     }
 

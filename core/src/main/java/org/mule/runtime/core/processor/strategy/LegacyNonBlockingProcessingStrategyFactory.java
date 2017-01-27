@@ -15,17 +15,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Allows Mule to use non-blocking execution model where possible and free up threads when performing IO operations.
@@ -56,14 +53,15 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
       this.schedulerStopper = schedulerStopper;
     }
 
-    //@Override
-    public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
-                                                                    Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-      if (processor instanceof NonBlockingMessageProcessor) {
-        return publisher -> from(publisher).transform(processorFunction).publishOn(fromExecutorService(scheduler));
-      } else {
-        return publisher -> from(publisher).transform(processorFunction);
-      }
+    @Override
+    public Function<ReactiveProcessor, ReactiveProcessor> onProcessor() {
+      return processor -> {
+        if (processor instanceof NonBlockingMessageProcessor) {
+          return publisher -> from(publisher).transform(processor).publishOn(fromExecutorService(scheduler));
+        } else {
+          return publisher -> from(publisher).transform(processor);
+        }
+      };
     }
 
     @Override
