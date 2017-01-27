@@ -7,7 +7,7 @@
 package org.mule.extension.oauth2.internal.clientcredentials;
 
 import static java.lang.String.format;
-import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;

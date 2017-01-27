@@ -15,13 +15,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.lang.String.format;
 import static org.apache.http.client.fluent.Request.Get;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.runtime.module.http.internal.HttpParser.encodeQueryString;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;

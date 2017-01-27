@@ -7,8 +7,8 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.HttpParser;

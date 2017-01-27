@@ -8,8 +8,8 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
+import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.service.http.api.HttpHeaders.Values.KEEP_ALIVE;
 
 import java.io.IOException;
 

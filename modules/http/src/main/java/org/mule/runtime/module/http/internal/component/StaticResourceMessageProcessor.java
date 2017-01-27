@@ -8,13 +8,14 @@ package org.mule.runtime.module.http.internal.component;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.LOCATION;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;

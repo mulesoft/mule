@@ -16,11 +16,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.extension.http.api.HttpConstants.Methods.POST;
-import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.compatibility.module.cxf.testmodels.AsyncService;
 import org.mule.compatibility.module.cxf.testmodels.AsyncServiceWithSoapAction;

@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.COOKIE;
+import static org.mule.service.http.api.HttpHeaders.Names.COOKIE;
 
 import com.google.common.collect.Sets;
 

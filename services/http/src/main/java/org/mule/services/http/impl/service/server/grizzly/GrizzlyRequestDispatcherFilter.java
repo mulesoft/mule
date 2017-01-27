@@ -8,10 +8,10 @@ package org.mule.services.http.impl.service.server.grizzly;
 
 import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpHeaders.Names.EXPECT;
+import static org.mule.service.http.api.HttpHeaders.Values.CONTINUE;
 import static org.mule.runtime.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.DefaultClientConnection;

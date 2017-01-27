@@ -7,10 +7,10 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
-import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
+import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.Event;

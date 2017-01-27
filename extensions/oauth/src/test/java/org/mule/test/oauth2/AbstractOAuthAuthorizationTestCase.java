@@ -27,12 +27,12 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAM
 import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.service.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.cxf;
 
-import static org.mule.extension.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 

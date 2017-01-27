@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 
 /**
  * Groups parameters related to a requester connection

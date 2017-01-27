@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.request.client;
 
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
 
 import org.mule.runtime.api.tls.TlsContextFactory;

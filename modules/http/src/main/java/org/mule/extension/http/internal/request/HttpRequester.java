@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;

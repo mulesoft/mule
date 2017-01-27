@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 
 public class NoMethodRequestHandler extends ErrorRequestHandler {
 

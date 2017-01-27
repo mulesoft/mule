@@ -29,11 +29,11 @@ import static org.mule.functional.junit4.matchers.PartAttributesMatchers.hasName
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.runtime.api.message.Message.builder;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -45,8 +45,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.service.http.api.HttpHeaders;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.Part;
 import org.mule.tck.junit4.rule.DynamicPort;

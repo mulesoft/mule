@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
 
 import org.mule.compatibility.module.cxf.testmodels.AsyncService;
 import org.mule.extension.http.api.HttpResponseAttributes;

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;

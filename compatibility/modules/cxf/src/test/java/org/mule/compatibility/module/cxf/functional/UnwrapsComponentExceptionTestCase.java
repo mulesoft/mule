@@ -7,8 +7,8 @@
 package org.mule.compatibility.module.cxf.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.compatibility.module.cxf.example.HelloWorld;

@@ -19,11 +19,11 @@ import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.ntlm.NTLMScheme;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.BooleanUtils;
@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 
 public class HttpConnector extends TcpConnector {
 
-  public static final String HTTP = org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP.getScheme();
+  public static final String HTTP = org.mule.service.http.api.HttpConstants.Protocols.HTTP.getScheme();
   public static final String HTTP_PREFIX = "http.";
   public static final String DISABLE_STALE_CONNECTION_CHECK_SYSTEM_PROPERTY =
       MuleProperties.SYSTEM_PROPERTY_PREFIX + "transport." + HTTP_PREFIX + "disableHttpClientStaleConnectionCheck";
@@ -200,7 +200,7 @@ public class HttpConnector extends TcpConnector {
 
   private String proxyHostname = null;
 
-  private int proxyPort = org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP.getDefaultPort();
+  private int proxyPort = org.mule.service.http.api.HttpConstants.Protocols.HTTP.getDefaultPort();
 
   private String proxyUsername = null;
 

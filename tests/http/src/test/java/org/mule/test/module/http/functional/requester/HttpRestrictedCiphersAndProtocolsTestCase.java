@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;

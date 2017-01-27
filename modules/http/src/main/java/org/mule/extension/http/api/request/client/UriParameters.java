@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.request.client;
 
-import org.mule.runtime.module.http.api.HttpConstants.Protocols;
+import org.mule.service.http.api.HttpConstants.Protocols;
 
 /**
  * Represents the default URI parameters an {@HttpClient} will receive in {@HttpRequest}s.

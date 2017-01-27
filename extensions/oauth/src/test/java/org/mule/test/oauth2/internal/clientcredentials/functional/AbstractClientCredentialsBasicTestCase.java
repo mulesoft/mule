@@ -12,10 +12,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;

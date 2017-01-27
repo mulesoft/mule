@@ -10,9 +10,9 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.DELETE;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.GET;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.Methods.DELETE;
+import static org.mule.service.http.api.HttpConstants.Methods.GET;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;

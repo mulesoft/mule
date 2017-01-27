@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.client.proxy.NtlmProxyConfigBuilder;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;

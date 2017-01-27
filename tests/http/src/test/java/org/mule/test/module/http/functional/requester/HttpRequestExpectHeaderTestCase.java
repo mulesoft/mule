@@ -8,7 +8,7 @@ package org.mule.test.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;

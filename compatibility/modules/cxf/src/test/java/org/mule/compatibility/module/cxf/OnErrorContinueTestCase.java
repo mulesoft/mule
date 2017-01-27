@@ -13,12 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.extension.http.api.HttpConstants.Methods.POST;
-import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.extension.http.api.HttpConstants;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -30,6 +29,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.nio.charset.Charset;

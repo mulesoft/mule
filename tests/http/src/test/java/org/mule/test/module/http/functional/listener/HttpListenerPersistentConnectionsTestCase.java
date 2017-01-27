@@ -8,8 +8,9 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.KEEP_ALIVE;
+import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.service.http.api.HttpHeaders.Values.KEEP_ALIVE;
+
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

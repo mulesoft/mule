@@ -11,7 +11,8 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

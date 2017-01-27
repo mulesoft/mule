@@ -7,7 +7,7 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.exception.MuleException;

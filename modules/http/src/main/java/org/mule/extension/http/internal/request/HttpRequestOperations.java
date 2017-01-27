@@ -36,8 +36,8 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.service.http.api.HttpConstants;
 
 import javax.inject.Inject;
 

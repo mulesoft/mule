@@ -10,8 +10,8 @@ package org.mule.compatibility.module.cxf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
