@@ -6,7 +6,6 @@
  */
 package org.mule.module.json.transformers;
 
-import org.apache.commons.collections.Predicate;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
@@ -17,15 +16,16 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ObjectToString;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.mule.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * A {@link org.mule.api.registry.TransformerResolver} implementation used to discover whether the current transform
@@ -72,7 +72,7 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
         {
             ObjectMapper mapper = getMapperResolver().resolve(ObjectMapper.class, source, result, muleContext);
 
-            if(mapper==null)
+            if (mapper == null)
             {
                 return null;
             }
@@ -117,11 +117,20 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
                     {
                         return false;
                     }
+                    if (object instanceof AbstractJsonTransformer)
+                    {
+                        // An empty transformer is created for each corresponding XML entry in the flows
+                        AbstractJsonTransformer jsonTransformer = (AbstractJsonTransformer) object;
+                        if (jsonTransformer.getMapper() == null)
+                        {
+                            return false;
+                        }
+                    }
                     return true;
                 }
             });
 
-            if (ts.size() == 1)
+            if (ts.size() > 0)
             {
                 t = ts.iterator().next();
             }
