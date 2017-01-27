@@ -135,6 +135,7 @@ public interface ExpressionManager extends ExpressionEvaluator {
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException or during transformation or during transformation
    */
+  @Override
   TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context) throws ExpressionRuntimeException;
 
   /**
@@ -185,6 +186,7 @@ public interface ExpressionManager extends ExpressionEvaluator {
    * @param expression is this string an expression string
    * @return true if the string contains an expression
    */
+  @Override
   boolean isExpression(String expression);
 
   /**
@@ -194,6 +196,7 @@ public interface ExpressionManager extends ExpressionEvaluator {
    * @param expression
    * @return true if the expression is valid.
    */
+  @Override
   boolean isValid(String expression);
 
   /**
