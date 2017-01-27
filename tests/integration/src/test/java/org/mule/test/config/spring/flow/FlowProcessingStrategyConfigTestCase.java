@@ -13,10 +13,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
 
   @Test
   public void testSynchronous() throws Exception {
-    assertThat(getFlowProcessingStrategyFactory("synchronousFlow"), instanceOf(SynchronousProcessingStrategyFactory.class));
+    assertThat(getFlowProcessingStrategyFactory("synchronousFlow"), instanceOf(LegacySynchronousProcessingStrategyFactory.class));
   }
 
   @Test
@@ -73,7 +74,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     return flow.getProcessingStrategyFactory();
   }
 
-  public static class CustomProcessingStrategyFactory implements ProcessingStrategy, ProcessingStrategyFactory {
+  public static class CustomProcessingStrategyFactory extends AbstractProcessingStrategy implements ProcessingStrategyFactory {
 
     String foo;
 

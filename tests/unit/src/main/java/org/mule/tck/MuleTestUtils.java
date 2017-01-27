@@ -11,9 +11,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -22,12 +23,10 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
-import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -118,39 +117,11 @@ public final class MuleTestUtils {
   public static Event processWithMonoAndBlock(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
       throws MuleException {
     try {
-      return processMonoInternal(event, processor).block();
+      return just(event).transform(processor).otherwise(EventDroppedException.class, mde -> empty())
+          .blockMillis(RECEIVE_TIMEOUT);
     } catch (Throwable exception) {
       throw rxExceptionToMuleException(exception);
     }
-  }
-
-  public static void processWithMono(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
-      throws MuleException {
-    try {
-      processMonoInternal(event, processor);
-    } catch (Throwable exception) {
-      throw rxExceptionToMuleException(exception);
-    }
-  }
-
-  public static Event processWithMonoAndBlockOnEventContextCompletion(Event event,
-                                                                      Function<Publisher<Event>, Publisher<Event>> processor)
-      throws MuleException {
-    processMonoInternal(event, processor);
-    try {
-      return from(event.getContext()).block();
-    } catch (Throwable exception) {
-      throw rxExceptionToMuleException(exception);
-    }
-  }
-
-  private static Mono<Event> processMonoInternal(Event event, Function<Publisher<Event>, Publisher<Event>> processor) {
-    return just(event)
-        .transform(processor)
-        .otherwise(EventDroppedException.class, mde -> empty())
-        .doOnSuccess(response -> event.getContext().success(response))
-        .doOnError(MessagingException.class, me -> me.getEvent().getContext().error(me))
-        .subscribe();
   }
 
 }

@@ -10,10 +10,14 @@ package org.mule.runtime.core.internal.construct;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -29,6 +33,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -36,6 +41,7 @@ import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
 import java.util.List;
@@ -174,42 +180,61 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     public Event process(final Event event) throws MuleException {
       if (useBlockingCodePath()) {
-        // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
-        final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
-        try {
-          ExecutionTemplate<Event> executionTemplate =
-              createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
-          Event result = executionTemplate.execute(() -> pipeline.process(newEvent));
-          return createReturnEventForParentFlowConstruct(result, event);
-        } catch (MessagingException e) {
-          e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
-          throw e;
-        } catch (Exception e) {
-          resetRequestContextEvent(event);
-          throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"), e);
-        }
+        return processBlockingSynchronous(event);
       } else {
         try {
-          return just(event).transform(this).block();
+          return just(event).transform(this).otherwise(EventDroppedException.class, ede -> empty()).block();
         } catch (Exception e) {
           throw rxExceptionToMuleException(e);
         }
       }
     }
 
+    /*
+     * Process flow using blocking {@link Processor#process(Event)} methods synchronously without apply any processing strategy.
+     * Note that individual processors internally may still you asynchronous non-blocking behaviour to achieved required
+     * functionality.
+     */
+    private Event processBlockingSynchronous(Event event) throws MessagingException, DefaultMuleException {
+      // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
+      final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+      try {
+        ExecutionTemplate<Event> executionTemplate =
+            createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
+        Event result = executionTemplate.execute(() -> pipeline.process(newEvent));
+        return createReturnEventForParentFlowConstruct(result, event);
+      } catch (MessagingException e) {
+        e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
+        throw e;
+      } catch (Exception e) {
+        resetRequestContextEvent(event);
+        throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"), e);
+      }
+    }
+
     @Override
     public Publisher<Event> apply(Publisher<Event> publisher) {
-      return from(publisher).flatMap(event -> {
-        Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
-        just(request).transform(processFlowFunction()).subscribe();
-        return Mono.from(request.getContext())
-            .map(r -> createReturnEventForParentFlowConstruct(r, event))
-            .otherwise(MessagingException.class, me -> {
-              me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
-              return error(me);
-            });
-      });
+      return from(publisher)
+          .doOnNext(assertStrarted())
+          .flatMap(event -> {
+            if (processingStrategyFactory instanceof LegacySynchronousProcessingStrategyFactory) {
+              return just(event).handle(nullSafeMap(checkedFunction(request -> processBlockingSynchronous(request))));
+            } else {
+              Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+              sink.accept(request);
+              return Mono.from(request.getContext())
+                  .map(r -> createReturnEventForParentFlowConstruct(r, event))
+                  .mapError(MessagingException.class, me -> {
+                    me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
+                    return me;
+                  })
+                  .otherwiseIfEmpty(fromCallable(() -> {
+                    throw newEventDroppedException(event);
+                  }));
+            }
+          });
     }
+
 
     private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
@@ -246,7 +271,6 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
       super.configurePreProcessors(builder);
-      builder.chain(new ProcessIfPipelineStartedMessageProcessor());
       builder.chain(new ProcessingTimeInterceptor());
       builder.chain(new FlowConstructStatisticsMessageProcessor());
     }

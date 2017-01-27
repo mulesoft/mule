@@ -9,17 +9,21 @@ package org.mule.runtime.core.processor.strategy;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class AbstractSchedulingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.WorkQueueProcessor;
 
-  public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
+public abstract class AbstractSchedulingProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
   private Consumer<Scheduler> schedulerStopper;
   private MuleContext muleContext;
@@ -27,6 +31,13 @@ public abstract class AbstractSchedulingProcessingStrategy implements Processing
   public AbstractSchedulingProcessingStrategy(Consumer<Scheduler> schedulerStopper, MuleContext muleContext) {
     this.schedulerStopper = schedulerStopper;
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+    WorkQueueProcessor<Event> processor = WorkQueueProcessor.share(false);
+    return new ReactorSink(processor.connectSink(), flowConstruct, processor.transform(function).retry().subscribe(),
+                           createOnEventConsumer());
   }
 
   protected Consumer<Scheduler> getSchedulerStopper() {

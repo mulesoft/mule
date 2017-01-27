@@ -9,6 +9,7 @@ package org.mule.runtime.core;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -203,7 +204,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // Publisher is not conserved after serialization due to null FlowConstruct so attempting to obtain result via before event
     // fails with timeout.
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
+    expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
     from(before.getContext()).blockMillis(BLOCK_TIMEOUT);
   }
 

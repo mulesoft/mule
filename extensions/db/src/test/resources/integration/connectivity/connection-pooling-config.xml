@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <flow name="queryAndJoin">
+    <flow name="queryAndJoin" processingStrategy="synchronous">
         <block transactionalAction="ALWAYS_BEGIN">
             <db:delete config-ref="pooledJdbcConfig">
                 <db:sql>delete from PLANET</db:sql>

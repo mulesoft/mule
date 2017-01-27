@@ -9,8 +9,10 @@ package org.mule.runtime.core.api.processor.strategy;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Sink;
 
 import java.util.function.Function;
 
@@ -20,6 +22,16 @@ import org.reactivestreams.Publisher;
  * Determines how a list of message processors should processed.
  */
 public interface ProcessingStrategy {
+
+  /**
+   * Creates instances of {@link Sink} to be used for emitting {@link Event}'s to be processed. Each {@link Sink} should be use
+   * independent streams that implement the {@link Pipeline}.
+   *
+   * @param flowConstruct pipeline instance.
+   * @param function function representing the
+   * @return new sink instance
+   */
+  Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function);
 
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.

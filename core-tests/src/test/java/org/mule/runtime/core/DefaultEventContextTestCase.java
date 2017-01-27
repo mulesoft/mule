@@ -9,6 +9,7 @@ package org.mule.runtime.core;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -23,8 +24,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
-
-  private static String TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE = "Timeout on blocking read";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -70,7 +69,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertThat(from(childEventContext).block(), equalTo(event));
 
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
+    expectedException.expectMessage(startsWith(REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE));
     from(eventContext).blockMillis(BLOCK_TIMEOUT);
   }
 
@@ -84,7 +83,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertThat(from(childEventContext).block(), is(nullValue()));
 
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
+    expectedException.expectMessage(startsWith(REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE));
     from(eventContext).blockMillis(BLOCK_TIMEOUT);
   }
 
@@ -109,7 +108,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     childEventContext.error(exception);
 
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(equalTo(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
+    expectedException.expectMessage(startsWith(REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE));
     from(eventContext).blockMillis(BLOCK_TIMEOUT);
   }
 

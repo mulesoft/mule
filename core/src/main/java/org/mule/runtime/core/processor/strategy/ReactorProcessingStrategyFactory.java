@@ -45,8 +45,7 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop"), DEFAULT_QUEUE_SIZE),
+    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
                                          scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                      MILLISECONDS),
                                          muleContext);
@@ -81,17 +80,8 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
-          .doOnNext(assertCanProcess())
           .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
           .transform(pipelineFunction);
-    }
-
-    protected Consumer<Event> assertCanProcess() {
-      return event -> {
-        if (isTransactionActive()) {
-          throw propagate(new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
-        }
-      };
     }
 
   }

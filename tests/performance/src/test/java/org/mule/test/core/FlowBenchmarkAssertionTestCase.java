@@ -8,6 +8,7 @@ package org.mule.test.core;
 
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.FlowBenchmark;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
@@ -24,7 +25,7 @@ public class FlowBenchmarkAssertionTestCase extends AbstractBenchmarkAssertionTe
     runAndAssertBenchmark(FlowBenchmark.class, "processSource", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
                                        new String[] {DefaultFlowProcessingStrategyFactory.class.getCanonicalName()}),
-                          50, MICROSECONDS, 16000);
+                          50, MICROSECONDS, 6000);
   }
 
   @Test
@@ -32,7 +33,7 @@ public class FlowBenchmarkAssertionTestCase extends AbstractBenchmarkAssertionTe
     runAndAssertBenchmark(FlowBenchmark.class, "processSource", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
                                        new String[] {SynchronousProcessingStrategyFactory.class.getCanonicalName()}),
-                          5, MICROSECONDS, 5800);
+                          7, MICROSECONDS, 5500);
   }
 
   @Test
@@ -40,7 +41,7 @@ public class FlowBenchmarkAssertionTestCase extends AbstractBenchmarkAssertionTe
     runAndAssertBenchmark(FlowBenchmark.class, "processFlow", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
                                        new String[] {DefaultFlowProcessingStrategyFactory.class.getCanonicalName()}),
-                          50, MICROSECONDS, 19000);
+                          50, MICROSECONDS, 8500);
   }
 
   @Test
@@ -48,7 +49,40 @@ public class FlowBenchmarkAssertionTestCase extends AbstractBenchmarkAssertionTe
     runAndAssertBenchmark(FlowBenchmark.class, "processFlow", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
                                        new String[] {SynchronousProcessingStrategyFactory.class.getCanonicalName()}),
-                          6, MICROSECONDS, 8000);
+                          8, MICROSECONDS, 8000);
+  }
+
+  @Test
+  public void processStreamOf1000FlowDefault() {
+    runAndAssertBenchmark(FlowBenchmark.class, "processFlowStream", 1,
+                          singletonMap(PROCESSING_STRATEGY_PARAM,
+                                       new String[] {DefaultFlowProcessingStrategyFactory.class.getCanonicalName()}),
+                          9, MILLISECONDS, 7800000);
+  }
+
+
+  @Test
+  public void processStreamOf1000FlowSynchronous() {
+    runAndAssertBenchmark(FlowBenchmark.class, "processFlowStream", 1,
+                          singletonMap(PROCESSING_STRATEGY_PARAM,
+                                       new String[] {SynchronousProcessingStrategyFactory.class.getCanonicalName()}),
+                          9, MILLISECONDS, 7800000);
+  }
+
+  @Test
+  public void processStreamOf1000SourceDefault() {
+    runAndAssertBenchmark(FlowBenchmark.class, "processSourceStream", 1,
+                          singletonMap(PROCESSING_STRATEGY_PARAM,
+                                       new String[] {DefaultFlowProcessingStrategyFactory.class.getCanonicalName()}),
+                          8, MILLISECONDS, 5500000);
+  }
+
+  @Test
+  public void processStreamOf1000SourceSynchronous() {
+    runAndAssertBenchmark(FlowBenchmark.class, "processSourceStream", 1,
+                          singletonMap(PROCESSING_STRATEGY_PARAM,
+                                       new String[] {SynchronousProcessingStrategyFactory.class.getCanonicalName()}),
+                          7, MILLISECONDS, 5500000);
   }
 
 }

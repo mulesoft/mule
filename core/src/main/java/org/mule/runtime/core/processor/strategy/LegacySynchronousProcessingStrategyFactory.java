@@ -6,26 +6,31 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
+import static reactor.core.Exceptions.propagate;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.function.Consumer;
 
 /**
  * This processing strategy processes all message processors in the calling thread.
  */
-public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
+@Deprecated
+public class LegacySynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static ProcessingStrategy SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
+  static ProcessingStrategy LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE = new AbstractLegacyProcessingStrategy() {
 
     @Override
     public boolean isSynchronous() {
       return true;
     }
 
-    @Override
     protected Consumer<Event> createOnEventConsumer() {
       return event -> {
       };
@@ -34,7 +39,7 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+    return LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 
 }
