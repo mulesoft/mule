@@ -8,6 +8,7 @@ package org.mule.module.ws.consumer;
 
 import org.mule.common.metadata.DefaultXmlMetaDataModel;
 import org.mule.common.metadata.MetaDataGenerationException;
+import org.mule.common.metadata.property.AllowsAnyMetaDataModelProperty;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -78,7 +79,7 @@ public class RequestBodyGenerator
         {
             DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
 
-            if (model.getFields().isEmpty())
+            if (model.getFields().isEmpty() && model.getProperty(AllowsAnyMetaDataModelProperty.class) == null)
             {
                 logger.info("The selected operation does not require input parameters, the payload will be ignored");
                 QName element = part.getElementName();

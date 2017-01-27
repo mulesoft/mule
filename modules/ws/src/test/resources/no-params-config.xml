@@ -25,6 +25,10 @@
         <ws:consumer operation="noParamsWithHeader" />
     </flow>
 
+    <flow name="anyParams">
+        <ws:consumer operation="anyParams" />
+    </flow>
+
     <flow name="server">
         <inbound-endpoint address="http://localhost:${port}/services/Test" exchange-pattern="request-response">
             <cxf:jaxws-service serviceClass="org.mule.module.ws.consumer.TestService"/>
