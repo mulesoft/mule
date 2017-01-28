@@ -9,6 +9,7 @@ package org.mule.compatibility.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.IOUtils;
@@ -62,14 +63,14 @@ public class CxfBasicTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo").setMethod(POST.name())
-            .setEntity(new InputStreamHttpEntity(xml)).addHeader("content-type", APP_SOAP_XML.toRfcString()).build();
+            .setEntity(new InputStreamHttpEntity(xml)).addHeader(CONTENT_TYPE, APP_SOAP_XML.toRfcString()).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
 
     assertTrue(payload.contains("Hello!"));
-    assertEquals("text/xml; charset=UTF-8", response.getHeaderValue("content-type"));
+    assertEquals("text/xml; charset=UTF-8", response.getHeaderValueIgnoreCase(CONTENT_TYPE));
   }
 
   @Test

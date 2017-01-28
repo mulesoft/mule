@@ -7,14 +7,10 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -66,14 +62,14 @@ public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
 
     ParameterMap headersMap = new ParameterMap();
-    headersMap.put("content-type", APP_SOAP_XML.toRfcString());
+    headersMap.put(CONTENT_TYPE, APP_SOAP_XML.toRfcString());
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo")
         .setMethod(POST.name()).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
     assertTrue(payload.contains("Hello!"));
-    assertEquals("text/xml; charset=UTF-8", response.getHeaderValue("content-type"));
+    assertEquals("text/xml; charset=UTF-8", response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
   }
 

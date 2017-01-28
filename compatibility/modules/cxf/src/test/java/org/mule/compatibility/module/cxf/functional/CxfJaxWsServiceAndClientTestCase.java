@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.core.util.IOUtils;
@@ -67,7 +68,7 @@ public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensi
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    assertThat(httpResponse.getHeaderValue("content-type"),
+    assertThat(httpResponse.getHeaderValueIgnoreCase(CONTENT_TYPE),
                allOf(startsWith("multipart/related; charset=UTF-8; boundary=\"uuid:"),
                      endsWith("\"; start=\"<root.message@cxf.apache.org>\"; type=\"application/xop+xml\"; start-info=\"text/xml\"")));
 

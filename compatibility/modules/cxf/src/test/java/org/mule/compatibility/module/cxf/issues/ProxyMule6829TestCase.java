@@ -10,6 +10,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
@@ -176,7 +177,7 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
       throws MuleException, IOException, TimeoutException {
     String contentType = APP_SOAP_XML.withCharset(UTF_8).toRfcString() + ";action=\"" + soapAction + "\"";
     ParameterMap headersMap = new ParameterMap();
-    headersMap.put("content-type", contentType);
+    headersMap.put(CONTENT_TYPE, contentType);
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/EchoService12")
         .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
 

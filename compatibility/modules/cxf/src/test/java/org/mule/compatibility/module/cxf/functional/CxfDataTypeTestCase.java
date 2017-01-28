@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.api.metadata.MediaType;
@@ -79,7 +80,7 @@ public class CxfDataTypeTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testCxfSimpleService() throws Exception {
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
     ParameterMap headersMap = new ParameterMap();
-    headersMap.put("content-type", APP_SOAP_XML.toRfcString());
+    headersMap.put(CONTENT_TYPE, APP_SOAP_XML.toRfcString());
 
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo")
         .setMethod(POST.name()).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();

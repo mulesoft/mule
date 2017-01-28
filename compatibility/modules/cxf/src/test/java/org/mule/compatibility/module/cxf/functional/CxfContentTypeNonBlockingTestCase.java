@@ -9,6 +9,7 @@ package org.mule.compatibility.module.cxf.functional;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -50,7 +51,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    String contentType = httpResponse.getHeaderValue("content-type");
+    String contentType = httpResponse.getHeaderValueIgnoreCase(CONTENT_TYPE);
     assertTrue(contentType.contains("charset"));
   }
 
@@ -64,7 +65,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    String contentType = httpResponse.getHeaderValue("content-type");
+    String contentType = httpResponse.getHeaderValueIgnoreCase(CONTENT_TYPE);
     assertTrue(contentType.contains("charset"));
     getSensingInstance("sensingRequestResponseProcessor").assertRequestResponseThreadsDifferent();
   }
@@ -79,7 +80,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    String contentType = httpResponse.getHeaderValue("content-type");
+    String contentType = httpResponse.getHeaderValueIgnoreCase(CONTENT_TYPE);
     assertNotNull(contentType);
     assertTrue(contentType.contains("charset"));
     getSensingInstance("sensingRequestResponseProcessorProxy").assertRequestResponseThreadsDifferent();

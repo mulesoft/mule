@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import org.mule.runtime.core.api.client.MuleClient;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -50,7 +50,7 @@ public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestC
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
-    assertEquals("text/xml; charset=UTF-8", response.getHeaderValue("content-type"));
+    assertEquals("text/xml; charset=UTF-8", response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
 
     Document document = DocumentHelper.parseText(payload);
