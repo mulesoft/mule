@@ -11,6 +11,7 @@ package org.mule.compatibility.module.cxf;
 import static org.custommonkey.xmlunit.XMLUnit.compareXML;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_ENCODING;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.core.util.IOUtils;

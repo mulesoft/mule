@@ -17,7 +17,6 @@ import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPER
 import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
 import org.mule.compatibility.module.cxf.testmodels.AsyncService;
 import org.mule.compatibility.module.cxf.testmodels.AsyncServiceWithSoapAction;
 import org.mule.functional.functional.FunctionalTestComponent;
@@ -32,7 +31,9 @@ import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Rule;
 import org.junit.Test;
