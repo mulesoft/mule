@@ -8,16 +8,18 @@
 package org.mule.extension.http.internal;
 
 import static java.lang.String.format;
+import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.error.ResourceNotFoundException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.module.http.internal.component.ResourceNotFoundException;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,7 +56,7 @@ public class StaticResourceLoader {
   @Optional(defaultValue = "#[attributes]")
   private HttpRequestAttributes attributes;
 
-  public InternalMessage load() throws ResourceNotFoundException {
+  public Result load() throws ResourceNotFoundException {
     // TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
     String path = attributes.getRequestPath();
     String contextPath = attributes.getListenerPath();
@@ -73,7 +75,7 @@ public class StaticResourceLoader {
     }
 
     File file = new File(resourceBasePath + path);
-    InternalMessage result;
+    Result result;
 
     if (file.isDirectory()) {
       if (!path.endsWith("/")) {
@@ -97,13 +99,17 @@ public class StaticResourceLoader {
         mimeType = DEFAULT_MIME_TYPE;
       }
 
-      result = InternalMessage.builder().payload(buffer).mediaType(MediaType.parse(mimeType)).build();
+      result = Result.builder().output(buffer).mediaType(MediaType.parse(mimeType)).build();
       return result;
     } catch (IOException e) {
-      throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBasePath + path)),
-                                          e);
+      throw new ResourceNotFoundException(e, NOT_FOUND, getExceptionMessage(path));
     } finally {
       IOUtils.closeQuietly(in);
     }
   }
+
+  private I18nMessage getExceptionMessage(String path) {
+    return createStaticMessage(format("The file: %s was not found.", resourceBasePath + path));
+  }
+
 }

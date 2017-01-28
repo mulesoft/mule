@@ -52,6 +52,16 @@ public class HttpListenerConfig implements Initialisable {
   @Placement(tab = ADVANCED_TAB)
   private Boolean parseRequest;
 
+  /**
+   * Ideal for proxy scenarios, this indicates whether errors produced by an HTTP request should be interpreted by the listener.
+   * If enabled, an error thrown by an HTTP request operation reaching a listener will be analysed for response data.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED_TAB)
+  private Boolean interpretRequestErrors;
+
 
   @Override
   public void initialise() throws InitialisationException {
@@ -64,6 +74,10 @@ public class HttpListenerConfig implements Initialisable {
   }
 
   public Boolean resolveParseRequest(Boolean listenerParseRequest) {
-    return listenerParseRequest != null ? listenerParseRequest : (parseRequest != null ? parseRequest : true);
+    return listenerParseRequest != null ? listenerParseRequest : parseRequest;
+  }
+
+  public Boolean resolveInterpretRequestErrors(Boolean listenerInterpretRequestErrors) {
+    return listenerInterpretRequestErrors != null ? listenerInterpretRequestErrors : interpretRequestErrors;
   }
 }

@@ -22,9 +22,11 @@ import java.util.LinkedList;
  */
 public class SimpleHttpServer {
 
+  public static final String DEFAULT_RESPONSE = "This is the response";
   private final int port;
   private HttpServer server;
   private LinkedList<HttpMessage> httpRequests = new LinkedList<>();
+  private int statusCode = 200;
 
   public HttpMessage getLastHttpRequest() {
     return httpRequests.getLast();
@@ -76,13 +78,16 @@ public class SimpleHttpServer {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
       httpRequests.addLast(new HttpMessage(exchange));
-      String response = "This is the response";
-      exchange.sendResponseHeaders(200, response.length());
+      String response = DEFAULT_RESPONSE;
+      exchange.sendResponseHeaders(statusCode, response.length());
       OutputStream os = exchange.getResponseBody();
       os.write(response.getBytes());
       os.close();
     }
   }
 
+  public void setResponseStatusCode(int statusCode) {
+    this.statusCode = statusCode;
+  }
 
 }

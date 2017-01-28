@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port2}"/>
+    </httpn:request-config>
+
+    <flow name="customErrorType">
+        <httpn:listener config-ref="listenerConfig" path="/error"/>
+        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorProcessor"/>
+    </flow>
+
+    <flow name="customMessage">
+        <httpn:listener config-ref="listenerConfig" path="/errorMessage"/>
+        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorMessageProcessor"/>
+    </flow>
+
+    <flow name="customErrorResponseWhenError">
+        <httpn:listener config-ref="listenerConfig" path="/errorResponse">
+            <httpn:error-response statusCode="403" reasonPhrase="Forbidden">
+                <httpn:body>#['Cant see this']</httpn:body>
+                <httpn:headers>
+                    #[{"XX-Custom": "Xcustom"}]
+                </httpn:headers>
+            </httpn:error-response>
+        </httpn:listener>
+        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorProcessor"/>
+    </flow>
+
+    <flow name="customErrorResponseWhenErrorMessage">
+        <httpn:listener config-ref="listenerConfig" path="/errorResponseWithMessage">
+            <httpn:error-response statusCode="403" reasonPhrase="Forbidden">
+                <httpn:body>#['Cant see this']</httpn:body>
+                <httpn:headers>
+                    #[{"XX-Custom": "Xcustom"}]
+                </httpn:headers>
+            </httpn:error-response>
+        </httpn:listener>
+        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorMessageProcessor"/>
+    </flow>
+
+    <flow name="requestErrorNotInterpreted">
+        <httpn:listener config-ref="listenerConfig" path="/requestError"/>
+        <httpn:request path="/test" config-ref="requestConfig">
+            <httpn:response-validator>
+                <httpn:failure-status-code-validator values="201"/>
+            </httpn:response-validator>
+        </httpn:request>
+    </flow>
+
+    <flow name="requestErrorInterpreted">
+        <httpn:listener config-ref="listenerConfig" path="/requestErrorInterpreted" interpretRequestErrors="true"/>
+        <httpn:request path="/test" config-ref="requestConfig">
+            <httpn:response-validator>
+                <httpn:failure-status-code-validator values="201"/>
+            </httpn:response-validator>
+        </httpn:request>
+    </flow>
+
+</mule>

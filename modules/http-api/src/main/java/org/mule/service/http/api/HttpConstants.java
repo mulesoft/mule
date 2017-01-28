@@ -108,6 +108,8 @@ public abstract class HttpConstants {
 
     EXPECTATION_FAILED(417, "Expectation Failed"),
 
+    TOO_MANY_REQUESTS(429, "Too Many Requests"),
+
     INTERNAL_SERVER_ERROR(500, "Server Error"),
 
     NOT_IMPLEMENTED(501, "Not Implemented"),
@@ -136,11 +138,23 @@ public abstract class HttpConstants {
       return reasonPhrase;
     }
 
+    /**
+     * Returns the reason phrase corresponding to a given status code.
+     *
+     * @param statusCode the HTTP status code to search for
+     * @return the reason phrase for the given code or null if not found
+     */
     public static String getReasonPhraseForStatusCode(int statusCode) {
       final HttpStatus statusByCode = getStatusByCode(statusCode);
       return statusByCode == null ? null : statusByCode.getReasonPhrase();
     }
 
+    /**
+     * Returns an {@link HttpStatus} corresponding to a given status code.
+     *
+     * @param statusCode the HTTP status code to search for
+     * @return an {@link HttpStatus} representing {@code statusCode} or null if not found
+     */
     public static HttpStatus getStatusByCode(int statusCode) {
       for (HttpStatus httpStatus : HttpStatus.values()) {
         if (httpStatus.getStatusCode() == statusCode) {

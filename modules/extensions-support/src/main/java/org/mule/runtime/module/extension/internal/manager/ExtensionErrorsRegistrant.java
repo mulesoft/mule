@@ -7,12 +7,9 @@
 package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -70,9 +67,6 @@ class ExtensionErrorsRegistrant {
     ErrorModel connectivityErrorModel = newError(CONNECTIVITY_ERROR_IDENTIFIER, errorExtensionNamespace)
         .withParent(newError(CONNECTIVITY_ERROR_IDENTIFIER, MULE).build()).build();
 
-    ErrorModel unknownErrorModel = newError(UNKNOWN_ERROR_IDENTIFIER, errorExtensionNamespace)
-        .withParent(newError(ANY_IDENTIFIER, MULE).build()).build();
-
     ErrorModel retryExhaustedError = newError(RETRY_EXHAUSTED_ERROR_IDENTIFIER, errorExtensionNamespace)
         .withParent(newError(RETRY_EXHAUSTED_ERROR_IDENTIFIER, MULE).build()).build();
 
@@ -84,7 +78,6 @@ class ExtensionErrorsRegistrant {
       protected void onOperation(OperationModel model) {
         if (!errorTypes.isEmpty()) {
           ExceptionMapper.Builder builder = ExceptionMapper.builder();
-          builder.addExceptionMapping(Exception.class, getErrorType(unknownErrorModel));
           builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel));
           builder.addExceptionMapping(RetryPolicyExhaustedException.class, getErrorType(retryExhaustedError));
 

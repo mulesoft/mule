@@ -147,12 +147,16 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected void fireNotification(Exception ex) {
     if (enableNotifications) {
-      if (ex.getCause() != null && ex.getCause() instanceof SecurityException) {
-        fireNotification(new SecurityNotification((SecurityException) ex.getCause(), SECURITY_AUTHENTICATION_FAILED));
+      if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
+        fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
       } else {
         fireNotification(new ExceptionNotification(ex));
       }
     }
+  }
+
+  private Throwable getCause(Exception ex) {
+    return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
   }
 
   /**

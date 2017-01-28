@@ -13,7 +13,6 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -26,6 +25,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
@@ -194,11 +194,14 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
           (ComponentIdentifier) ((AnnotatedObject) annotatedObject).getAnnotation(ANNOTATION_NAME);
       errorMappings = (List<ErrorMapping>) ((AnnotatedObject) annotatedObject).getAnnotation(ANNOTATION_ERROR_MAPPINGS);
     }
-    if (componentIdentifier != null) {
+    if (causeException instanceof TypedException) {
+      errorType = ((TypedException) causeException).getErrorType();
+    } else if (componentIdentifier != null) {
       errorType = errorTypeLocator.lookupComponentErrorType(componentIdentifier, causeException);
     } else {
       errorType = errorTypeLocator.lookupErrorType(causeException);
     }
+
     if (errorMappings != null && !errorMappings.isEmpty()) {
       Optional<ErrorMapping> matchedErrorMapping = errorMappings.stream().filter(mapping -> mapping.match(errorType)).findFirst();
       if (matchedErrorMapping.isPresent()) {
@@ -235,7 +238,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
     //TODO: MULE-10970/MULE-10971 - Change signature to AnnotatedObject once every processor and source is one
     Throwable causeException = messagingException.getCause() != null ? messagingException.getCause() : messagingException;
     Optional<Error> error = messagingException.getEvent().getError();
-    if (!error.isPresent() || !error.get().getCause().equals(causeException)
+    if (!error.isPresent() || errorCauseMatchesException(causeException, error)
         || !messagingException.causedExactlyBy(error.get().getCause().getClass())) {
 
       Error newError = getErrorFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
@@ -247,16 +250,17 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
     }
   }
 
+  static boolean errorCauseMatchesException(Throwable causeException, Optional<Error> error) {
+    Throwable throwable = causeException instanceof TypedException ? causeException.getCause() : causeException;
+    return !error.get().getCause().equals(throwable);
+  }
+
   private static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,
                                                     ErrorTypeLocator errorTypeLocator) {
-    ErrorType errorType;
+    ErrorType errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
     if (causeException instanceof TypedException) {
-      errorType = ((TypedException) causeException).getErrorType();
       causeException = causeException.getCause();
-    } else {
-      errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
     }
-
     return ErrorBuilder.builder(causeException).errorType(errorType).build();
   }
 

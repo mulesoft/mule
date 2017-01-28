@@ -17,9 +17,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-/**
- *
- */
 public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Override

@@ -7,9 +7,12 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
+import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
+import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -22,11 +25,11 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.service.http.api.client.HttpRequestAuthentication;
@@ -35,6 +38,7 @@ import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 import java.io.InputStream;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,19 +80,18 @@ public class HttpRequester {
   }
 
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
-                        boolean checkRetry, MuleContext muleContext, FlowConstruct flowConstruct,
-                        CompletionCallback<Object, HttpResponseAttributes> callback)
-      throws MuleException {
+                        boolean checkRetry, MuleContext muleContext,
+                        CompletionCallback<Object, HttpResponseAttributes> callback) {
     HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication, muleContext);
 
     //TODO: MULE-10340 - Add notifications to HTTP request
     //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication),
-                createResponseHandler(muleContext, flowConstruct, requestBuilder, client, httpRequest, checkRetry,
+                createResponseHandler(muleContext, requestBuilder, client, httpRequest, checkRetry,
                                       callback));
   }
 
-  private ResponseHandler createResponseHandler(MuleContext muleContext, FlowConstruct flowConstruct,
+  private ResponseHandler createResponseHandler(MuleContext muleContext,
                                                 HttpRequesterRequestBuilder requestBuilder, HttpExtensionClient client,
                                                 HttpRequest httpRequest,
                                                 boolean checkRetry, CompletionCallback<Object, HttpResponseAttributes> callback) {
@@ -107,12 +110,12 @@ public class HttpRequester {
             //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
             if (resendRequest(result, checkRetry, authentication)) {
               consumePayload(result);
-              doRequest(client, requestBuilder, false, muleContext, flowConstruct, callback);
+              doRequest(client, requestBuilder, false, muleContext, callback);
             } else {
-              responseValidator.validate(result, muleContext);
+              responseValidator.validate(result);
               callback.success(result);
             }
-          } catch (MuleException e) {
+          } catch (Exception e) {
             callback.error(e);
           }
         });
@@ -122,7 +125,8 @@ public class HttpRequester {
       public void onFailure(Exception exception) {
         checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
         logger.error(getErrorMessage(httpRequest));
-        callback.error(exception);
+        HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
+        callback.error(new ModuleException(exception, error));
       }
 
     };

@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.temporary;
 
+import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
+import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -28,6 +30,7 @@ import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
 
 /**
@@ -48,7 +51,8 @@ import org.mule.service.http.api.client.proxy.ProxyConfig;
     subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
 @Import(type = TcpClientSocketProperties.class, from = "Sockets")
 @Import(type = TcpServerSocketProperties.class, from = "Sockets")
-@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/httpn", namespace = "httpn")
+@ErrorTypes(HttpError.class)
+@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/httpn", namespace = HTTP_NAMESPACE)
 //TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
 //because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
 @Export(classes = {HttpExtensionClient.class})

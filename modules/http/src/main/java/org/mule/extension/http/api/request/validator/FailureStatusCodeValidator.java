@@ -6,9 +6,8 @@
  */
 package org.mule.extension.http.api.request.validator;
 
-import static java.lang.String.format;
+import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 /**
@@ -20,11 +19,11 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
   @Override
-  public void validate(Result<Object, HttpResponseAttributes> result, MuleContext context) throws ResponseValidatorException {
+  public void validate(Result<Object, HttpResponseAttributes> result) throws ResponseValidatorException {
     int status = result.getAttributes().get().getStatusCode();
 
     if (belongs(status)) {
-      throw new ResponseValidatorException(format("Response code %d mapped as failure", status));
+      throw new ResponseValidatorException(getExceptionMessage(status), getErrorByCode(status), result);
     }
   }
 

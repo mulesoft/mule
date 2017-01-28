@@ -11,12 +11,11 @@ import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedB
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.service.http.api.HttpHeaders;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;

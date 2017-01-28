@@ -7,7 +7,6 @@
 package org.mule.extension.http.api.request.validator;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 /**
@@ -21,9 +20,8 @@ public interface ResponseValidator {
    * Validates whether an HTTP response result should be accepted or not, failing in that case.
    *
    * @param result the message to validate
-   * @param context the Mule Context for the current application.
    * @throws ResponseValidatorException if the message is not considered valid.
    */
-  void validate(Result<Object, HttpResponseAttributes> result, MuleContext context) throws ResponseValidatorException;
+  void validate(Result<Object, HttpResponseAttributes> result) throws ResponseValidatorException;
 
 }

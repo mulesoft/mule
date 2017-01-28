@@ -12,8 +12,8 @@ import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Authentication;
@@ -97,9 +97,9 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     }
     ParameterMap headers = new ParameterMap();
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    return Message.builder().nullPayload().attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(),
-                                                                                 UNAUTHORIZED.getReasonPhrase(),
-                                                                                 headers))
+    return Message.builder().nullPayload().attributes(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
+                                                                                         UNAUTHORIZED.getReasonPhrase(),
+                                                                                         headers))
         .build();
   }
 

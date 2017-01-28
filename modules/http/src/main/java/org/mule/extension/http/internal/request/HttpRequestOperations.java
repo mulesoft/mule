@@ -10,7 +10,6 @@ import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
-import static org.mule.runtime.core.api.construct.Flow.builder;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -25,9 +24,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -68,12 +66,13 @@ public class HttpRequestOperations implements Initialisable, Disposable {
    */
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpRequestMetadataResolver.class)
+  @Throws(RequestErrorTypeProvider.class)
   public void request(@Optional(defaultValue = "/") String path,
                       @Optional(defaultValue = "GET") String method,
                       @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
                       @ParameterGroup(
                           name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
-                      @ParameterGroup(name = REQUEST_SETTINGS, showInDsl = false) HttpRequesterRequestBuilder requestBuilder,
+                      @ParameterGroup(name = REQUEST_SETTINGS) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @UseConfig HttpRequesterConfig config,
@@ -107,9 +106,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
               .setTransformationService(muleContext.getTransformationService()).setScheduler(scheduler)
               .build();
 
-      // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved
-      final Flow flowConstruct = builder("httpRequestOperation", muleContext).build();
-      requester.doRequest(client, resolvedBuilder, true, muleContext, flowConstruct, callback);
+      requester.doRequest(client, resolvedBuilder, true, muleContext, callback);
     } catch (Exception e) {
       callback.error(e);
     }
