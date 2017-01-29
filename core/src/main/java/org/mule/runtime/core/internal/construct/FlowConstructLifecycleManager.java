@@ -6,18 +6,16 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.context.notification.FlowConstructNotification;
 import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
-import org.mule.runtime.core.service.Pausable;
-import org.mule.runtime.core.service.Resumable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,27 +36,6 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
   public FlowConstructLifecycleManager(FlowConstruct flowConstruct, MuleContext muleContext) {
     super(flowConstruct.getName(), flowConstruct);
     this.muleContext = muleContext;
-  }
-
-  @Override
-  protected void registerTransitions() {
-    super.registerTransitions();
-
-    // pause resume
-    addDirectTransition(Startable.PHASE_NAME, Pausable.PHASE_NAME);
-    // Note that 'Resume' state gets removed and the current state is set to 'start'. See {@link #notifyTransition}
-    addDirectTransition(Pausable.PHASE_NAME, Resumable.PHASE_NAME);
-    addDirectTransition(Pausable.PHASE_NAME, Stoppable.PHASE_NAME);
-  }
-
-  @Override
-  protected void notifyTransition(String currentPhase) {
-    if (currentPhase.equals(Resumable.PHASE_NAME)) {
-      // Revert back to start phase
-      completedPhases.remove(Resumable.PHASE_NAME);
-      completedPhases.remove(Pausable.PHASE_NAME);
-      setCurrentPhase(Startable.PHASE_NAME);
-    }
   }
 
   @Override
@@ -84,27 +61,6 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STARTED);
   }
 
-
-  public void firePausePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
-    checkPhase(Pausable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info("Pausing flow: " + getLifecycleObject().getName());
-    }
-
-    // TODO No pre notification
-    invokePhase(Pausable.PHASE_NAME, getLifecycleObject(), callback);
-    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_PAUSED);
-  }
-
-  public void fireResumePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
-    checkPhase(Resumable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info("Resuming flow: " + getLifecycleObject().getName());
-    }
-    // TODO No pre notification
-    invokePhase(Resumable.PHASE_NAME, getLifecycleObject(), callback);
-    fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_RESUMED);
-  }
 
   @Override
   public void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException {
