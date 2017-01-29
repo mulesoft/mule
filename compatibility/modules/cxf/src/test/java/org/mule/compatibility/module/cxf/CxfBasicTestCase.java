@@ -35,7 +35,7 @@ public class CxfBasicTestCase extends AbstractCxfOverHttpExtensionTestCase {
   private String echoWsdl;
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

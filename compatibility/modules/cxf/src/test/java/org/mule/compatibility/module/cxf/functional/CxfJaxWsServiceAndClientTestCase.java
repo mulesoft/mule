@@ -43,7 +43,7 @@ public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensi
   public DynamicPort port = new DynamicPort("port");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {

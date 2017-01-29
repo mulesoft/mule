@@ -8,15 +8,17 @@ package org.mule.test.integration.routing;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -26,6 +28,9 @@ public class WireTapCxfTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {
@@ -38,14 +43,13 @@ public class WireTapCxfTestCase extends CompatibilityFunctionalTestCase {
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
-    MuleClient client = muleContext.getClient();
-    InternalMessage response = client.send(url, InternalMessage.of(msg), newOptions().method(POST.name()).build()).getRight();
-    assertThat(response, not(nullValue()));
+    HttpRequest httpRequest =
+        HttpRequest.builder().setUri(url).setEntity(new ByteArrayHttpEntity(msg.getBytes())).setMethod(POST.name()).build();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    String responseString = getPayloadAsString(response);
+    String responseString = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
     assertThat(responseString, containsString("echoResponse"));
     assertThat(responseString, not(containsString("soap:Fault")));
-
-    assertThat(client.request("test://wireTapped", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
+    assertThat(muleContext.getClient().request("test://wireTapped", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
   }
 }

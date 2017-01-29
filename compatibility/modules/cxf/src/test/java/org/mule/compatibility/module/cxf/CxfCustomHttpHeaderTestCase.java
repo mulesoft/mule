@@ -52,7 +52,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTes
   private List<Message> notificationMsgList = new ArrayList<>();
   private Latch latch = new Latch();
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

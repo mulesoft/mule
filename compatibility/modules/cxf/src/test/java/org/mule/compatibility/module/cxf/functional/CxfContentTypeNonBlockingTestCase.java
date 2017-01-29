@@ -34,7 +34,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {

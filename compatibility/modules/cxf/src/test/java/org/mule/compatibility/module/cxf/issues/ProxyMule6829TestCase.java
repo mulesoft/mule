@@ -45,7 +45,7 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   private Latch latch;
   private TestCxfEventCallback testCxfEventCallback;

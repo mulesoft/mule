@@ -31,32 +31,16 @@ import org.junit.rules.ExternalResource;
  */
 public class TestHttpClient extends ExternalResource implements org.mule.service.http.api.client.HttpClient {
 
-  private final TlsContextFactory tlsContextFactory;
   private final HttpService httpService;
+  private TlsContextFactory tlsContextFactory;
   private org.mule.service.http.api.client.HttpClient httpClient;
 
-  public TestHttpClient() {
-    this(new HttpServiceImplementation(), null);
+  private TestHttpClient() {
+    this(new HttpServiceImplementation());
   }
 
-  /**
-   * Creates a client using a default configuration
-   *
-   * @param httpService service instance that will be used on the client. Non null
-   */
-  public TestHttpClient(HttpService httpService) {
-    this(httpService, null);
-  }
-
-  /**
-   * Creates a custom client
-   *
-   * @param httpService service instance that will be used on the client. Non null
-   * @param tlsContextFactory the tls context factory for creating the context to secure the connection
-   */
-  public TestHttpClient(HttpService httpService, TlsContextFactory tlsContextFactory) {
+  private TestHttpClient(HttpService httpService) {
     checkArgument(httpService != null, "httpService cannot be null");
-    this.tlsContextFactory = tlsContextFactory;
     this.httpService = httpService;
   }
 
@@ -99,5 +83,55 @@ public class TestHttpClient extends ExternalResource implements org.mule.service
   public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
                    ResponseHandler handler) {
     httpClient.send(request, responseTimeout, followRedirects, authentication, handler);
+  }
+
+  public static class Builder {
+
+    private final HttpService service;
+    private TlsContextFactory tlsContextFactory;
+
+    /**
+     * Creates a builder using a default {@link HttpService}
+     */
+    public Builder() {
+      this.service = null;
+    }
+
+    /**
+     * Creates a builder using a custom {@link HttpService}
+     *
+     * @param httpService httpService instance that will be used on the client. Non null
+     */
+    public Builder(HttpService httpService) {
+      this.service = httpService;
+    }
+
+    /**
+     * @param tlsContextFactory the tls context factory for creating the context to secure the connection
+     * @return same builder instance
+     */
+    public Builder tlsContextFactory(TlsContextFactory tlsContextFactory) {
+      this.tlsContextFactory = tlsContextFactory;
+
+      return this;
+    }
+
+    /**
+     * Builds the client
+     *
+     * @return a non null {@link TestHttpClient} with the provided configuration
+     */
+    public TestHttpClient build() {
+      TestHttpClient httpClient;
+      if (service == null) {
+        httpClient = new TestHttpClient();
+      } else {
+        httpClient = new TestHttpClient(service);
+      }
+
+      httpClient.tlsContextFactory = tlsContextFactory;
+
+      return httpClient;
+    }
   }
 }

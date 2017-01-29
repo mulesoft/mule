@@ -48,7 +48,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {

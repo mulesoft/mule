@@ -8,13 +8,12 @@ package org.mule.compatibility.module.cxf;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.services.http.TestHttpClient;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -28,7 +27,7 @@ public class DatabindingTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {

@@ -45,7 +45,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends AbstractCxfOverHttp
   public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   private MuleContext mockServerContext;
 

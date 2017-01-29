@@ -11,16 +11,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +28,9 @@ public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
   @Rule
   public DynamicPort httpPort = new DynamicPort("port");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+
   @Override
   protected String getConfigFile() {
     return "org/mule/test/usecases/sync/http-jms-bridge-flow.xml";
@@ -37,18 +38,17 @@ public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testBridge() throws Exception {
-    MuleClient client = muleContext.getClient();
     String payload = "payload";
 
-    Map<String, Serializable> headers = new HashMap<>();
+    ParameterMap headersMap = new ParameterMap();
     final String customHeader = "X-Custom-Header";
-    headers.put(customHeader, "value");
+    headersMap.put(customHeader, "value");
 
-    client.dispatch(format("http://localhost:%d/in", httpPort.getNumber()),
-                    InternalMessage.builder().payload(payload).outboundProperties(headers).build(),
-                    newOptions().method(POST.name()).build());
+    HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%d/in", httpPort.getNumber()))
+        .setEntity(new ByteArrayHttpEntity(payload.getBytes())).setHeaders(headersMap).setMethod(POST.name()).build();
+    httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
-    InternalMessage msg = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msg = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertThat(getPayloadAsString(msg), is(payload));
     assertThat(msg.getOutboundProperty(customHeader), is("value"));

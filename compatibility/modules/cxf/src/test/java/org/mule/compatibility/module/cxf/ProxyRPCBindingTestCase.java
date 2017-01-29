@@ -34,7 +34,7 @@ public class ProxyRPCBindingTestCase extends AbstractCxfOverHttpExtensionTestCas
   private String getAllRequest;
   private String getAllResponse;
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {

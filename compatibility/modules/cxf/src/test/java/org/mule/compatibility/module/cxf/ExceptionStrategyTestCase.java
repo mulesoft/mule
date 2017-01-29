@@ -56,7 +56,7 @@ public class ExceptionStrategyTestCase extends AbstractCxfOverHttpExtensionTestC
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {

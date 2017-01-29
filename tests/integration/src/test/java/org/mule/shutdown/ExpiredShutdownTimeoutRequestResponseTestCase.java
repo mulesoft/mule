@@ -7,14 +7,14 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Ignore;
@@ -26,6 +26,9 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
 
   @Rule
   public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "100");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {
@@ -48,7 +51,6 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
   }
 
   private void doShutDownTest(final String url) throws MuleException, InterruptedException {
-    final MuleClient client = muleContext.getClient();
     final boolean[] results = new boolean[] {false};
 
     Thread t = new Thread() {
@@ -56,12 +58,12 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
       @Override
       public void run() {
         try {
-          InternalMessage muleMessage = InternalMessage.builder().payload(TEST_MESSAGE).build();
-          Error error =
-              client.send(url, muleMessage,
-                          HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build())
-                  .getLeft();
-          results[0] = error.getCause() instanceof DispatchException;
+          HttpRequest request = HttpRequest.builder().setUri(url).setEntity(new ByteArrayHttpEntity(TEST_MESSAGE.getBytes()))
+              .setMethod(POST.name()).build();
+
+          HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+          results[0] = response.getStatusCode() != OK.getStatusCode();
         } catch (Exception e) {
           // Ignore
         }

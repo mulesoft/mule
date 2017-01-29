@@ -7,13 +7,17 @@
 package org.mule.test.integration.domain.http;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -31,6 +35,8 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase {
   public DynamicPort dynamicPort = new DynamicPort("port1");
   @Rule
   public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().tlsContextFactory(getTlsContextFactory()).build();
 
   @Override
   protected String getDomainConfig() {
@@ -46,25 +52,26 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase {
 
   @Test
   public void bothServicesBindCorrectly() throws Exception {
-    InternalMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient()
-        .send(format("%s://localhost:%d/service/helloWorld", endpointScheme.getValue(), dynamicPort.getNumber()),
-              InternalMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
-        .getRight();
-    assertThat(getPayloadAsString(helloWorldServiceResponse, getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), is("hello world"));
+    HttpRequest httpRequest = HttpRequest.builder()
+        .setUri(format("%s://localhost:%d/service/helloWorld", endpointScheme.getValue(), dynamicPort.getNumber())).build();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    InternalMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient()
-        .send(format("%s://localhost:%d/service/helloMule", endpointScheme.getValue(), dynamicPort.getNumber()),
-              InternalMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
-        .getRight();
-    assertThat(getPayloadAsString(helloMuleServiceResponse, getMuleContextForApp(HELLO_MULE_SERVICE_APP)), is("hello mule"));
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream(), UTF_8);
+    assertThat(payload, is("hello world"));
+
+    httpRequest = HttpRequest.builder()
+        .setUri(format("%s://localhost:%d/service/helloMule", endpointScheme.getValue(), dynamicPort.getNumber())).build();
+    httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream(), UTF_8);
+    assertThat(payload, is("hello mule"));
   }
 
   protected SystemProperty getEndpointSchemeSystemProperty() {
     return new SystemProperty("scheme", "http");
   }
 
-  protected HttpRequestOptionsBuilder getOptionsBuilder() {
-    return newOptions();
+  protected TlsContextFactory getTlsContextFactory() {
+    return null;
   }
-
 }

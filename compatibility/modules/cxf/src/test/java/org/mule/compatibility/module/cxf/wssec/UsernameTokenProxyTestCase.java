@@ -9,9 +9,8 @@ package org.mule.compatibility.module.cxf.wssec;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -34,7 +33,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase {
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String[] getConfigFiles() {

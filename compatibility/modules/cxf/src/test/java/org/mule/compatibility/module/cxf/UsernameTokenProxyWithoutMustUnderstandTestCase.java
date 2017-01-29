@@ -30,7 +30,7 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends AbstractCxf
   public final DynamicPort httpPortProxy = new DynamicPort("port1");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient();
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   private String request;
   private String response;

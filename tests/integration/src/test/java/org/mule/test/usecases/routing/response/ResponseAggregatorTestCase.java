@@ -8,20 +8,22 @@ package org.mule.test.usecases.routing.response;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -36,6 +38,9 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
   @Rule
   public DynamicPort port = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+
   @Override
   protected String getConfigFile() {
     return "org/mule/test/usecases/routing/response/response-router-flow.xml";
@@ -43,13 +48,13 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testSyncResponse() throws Exception {
-    MuleClient client = muleContext.getClient();
-    final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
-    InternalMessage message = client.send(format("http://localhost:%s", port.getNumber()),
-                                          InternalMessage.builder().payload("request").build(), httpRequestOptions)
-        .getRight();
-    assertNotNull(message);
-    assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
+    HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%s", port.getNumber()))
+        .setEntity(new ByteArrayHttpEntity("request".getBytes())).setMethod(POST.name()).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertThat(payload, is("Received: request"));
   }
 
   @Test
