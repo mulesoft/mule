@@ -22,9 +22,13 @@ import org.mule.extension.file.api.exception.FileConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 import java.io.IOException;
 
+@Features("File Connector")
+@Stories("Negative Connectivity Testing")
 public class FileNegativeConnectivityTestCase extends FileConnectorTestCase {
 
   private static final Matcher<Exception> CONNECTION_EXCEPTION_MATCHER =

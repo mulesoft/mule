@@ -120,21 +120,17 @@ public class SftpClient {
    *
    * @param user the authentication user
    */
-  public void login(String user) throws IOException {
-    try {
-      configureSession(user);
-      if (!StringUtils.isEmpty(password)) {
-        session.setPassword(password);
-      }
-
-      if (!StringUtils.isEmpty(identityFile)) {
-        setupIdentity();
-      }
-
-      connect();
-    } catch (Exception e) {
-      throw loginException(user, e);
+  public void login(String user) throws IOException, JSchException {
+    configureSession(user);
+    if (!StringUtils.isEmpty(password)) {
+      session.setPassword(password);
     }
+
+    if (!StringUtils.isEmpty(identityFile)) {
+      setupIdentity();
+    }
+
+    connect();
   }
 
   private void setupIdentity() throws JSchException {

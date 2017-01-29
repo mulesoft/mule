@@ -14,6 +14,7 @@ import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 import static org.mule.functional.util.sftp.SftpServer.PASSWORD;
 import static org.mule.functional.util.sftp.SftpServer.USERNAME;
+import com.jcraft.jsch.JSchException;
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -84,7 +85,7 @@ public class SftpTestHarness extends AbstractFtpTestHarness {
     }
   }
 
-  private SftpClient createDefaultSftpClient() throws IOException {
+  private SftpClient createDefaultSftpClient() throws IOException, JSchException {
     SftpClient sftpClient = new SftpClientFactory().createInstance("localhost", sftpPort.getNumber());
     sftpClient.setPassword(PASSWORD);
     sftpClient.login(USERNAME);
