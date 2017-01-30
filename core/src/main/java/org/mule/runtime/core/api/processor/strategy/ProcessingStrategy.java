@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.processor.strategy;
 
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -58,7 +59,6 @@ public interface ProcessingStrategy {
                                                                   MessagingExceptionHandler messagingExceptionHandler) {
     return publisher -> from(publisher).transform(pipelineFunction);
   }
-
 
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.

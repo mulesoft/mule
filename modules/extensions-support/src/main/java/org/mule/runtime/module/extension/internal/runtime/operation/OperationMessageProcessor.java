@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -18,6 +19,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -298,4 +300,25 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     return asProcessingType(operationModel.getExecutionType());
   }
 
+  @Override
+  public org.mule.runtime.api.component.ComponentIdentifier getIdentifier() {
+    // TODO MULE-11572 set this data instead of building this object each time
+    return new org.mule.runtime.api.component.ComponentIdentifier() {
+
+      @Override
+      public String getNamespace() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getNamespace();
+      }
+
+      @Override
+      public String getName() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
+      }
+
+      @Override
+      public ComponentType getComponentType() {
+        return OPERATION;
+      }
+    };
+  }
 }

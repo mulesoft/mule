@@ -165,6 +165,7 @@ public class MuleProperties {
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
+  public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY = "_muleDefaultTlsContextFactoryBuilder";
 

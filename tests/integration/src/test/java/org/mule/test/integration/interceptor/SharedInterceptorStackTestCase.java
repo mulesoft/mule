@@ -8,10 +8,10 @@ package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.interceptor.Interceptor;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.test.AbstractIntegrationTestCase;
 

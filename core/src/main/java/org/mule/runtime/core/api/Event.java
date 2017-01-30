@@ -312,7 +312,7 @@ public interface Event extends Serializable {
      * Add a variable.
      *
      * @param key the key of the variable to add.
-     * @param value the value of the variable to add.
+     * @param value the value of the variable to add. {@code null} values are supported.
      * @return the builder instance.
      */
     Builder addVariable(String key, Object value);
@@ -321,8 +321,8 @@ public interface Event extends Serializable {
      * Add a variable.
      *
      * @param key the key of the variable to add.
-     * @param value the value of the variable to add.
-     * @param mediaType the variable media this
+     * @param value the value of the variable to add. {@code null} values are supported.
+     * @param mediaType additional metadata about the {@code value} type.
      * @return the builder instance
      */
     Builder addVariable(String key, Object value, DataType mediaType);

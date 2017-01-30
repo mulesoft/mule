@@ -103,7 +103,7 @@ public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStr
     }
 
     private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
-                                                                  Scheduler scheduler) {
+                                       Scheduler scheduler) {
       return publisher -> from(publisher)
           .publishOn(fromExecutorService(getExecutorService(scheduler)))
           .transform(processorFunction)

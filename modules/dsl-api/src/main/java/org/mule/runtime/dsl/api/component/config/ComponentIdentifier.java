@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 public class ComponentIdentifier {
 
   public static QName ANNOTATION_NAME = new QName("config", "componentIdentifier");
+  public static QName ANNOTATION_PARAMETERS = new QName("config", "componentParameters");
 
   private String namespace;
   private String name;
@@ -45,6 +46,7 @@ public class ComponentIdentifier {
   }
 
   public static ComponentIdentifier parseComponentIdentifier(String componentIdentifier) {
+    // This is reading the alias of the namespace in a given xml, not the actual namespace
     checkArgument(!isEmpty(componentIdentifier), "identifier cannot be an empty string or null");
     String[] values = componentIdentifier.split(":");
     String namespace;
