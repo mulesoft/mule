@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -26,7 +27,6 @@ import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newB
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -248,7 +248,7 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (isMap(objectType) && !isInfrastructure(objectType)) {
+          if (isMap(objectType)) {
             if (!(parseAsContent(objectType))) {
               parseMapParameters(parameter, objectType, paramDsl);
             }
@@ -368,14 +368,16 @@ public abstract class ExtensionDefinitionParser {
       @Override
       public void visitObject(ObjectType objectType) {
         defaultVisit(objectType);
-        if (isMap(objectType)) {
+        Optional<DslElementSyntax> containedElement = valueDsl.getContainedElement(VALUE_ATTRIBUTE_NAME);
+        if (isMap(objectType) || !containedElement.isPresent()) {
           return;
         }
 
-        if ((valueDsl.supportsTopLevelDeclaration() || (valueDsl.supportsChildDeclaration() && !valueDsl.isWrapped())) &&
-            !parsingContext.isRegistered(valueDsl.getElementName(), valueDsl.getNamespace())) {
+        DslElementSyntax valueChild = containedElement.get();
+        if ((valueChild.supportsTopLevelDeclaration() || (valueChild.supportsChildDeclaration() && !valueChild.isWrapped())) &&
+            !parsingContext.isRegistered(valueChild.getElementName(), valueChild.getNamespace())) {
           try {
-            parsingContext.registerObjectType(valueDsl.getElementName(), valueDsl.getNamespace(), objectType);
+            parsingContext.registerObjectType(valueChild.getElementName(), valueChild.getNamespace(), objectType);
             new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                           parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
