@@ -157,7 +157,7 @@
         <component class="org.mule.test.integration.watermark.WatermarkPollingTestCase$FooComponent"/>
         <error-handler>
             <on-error-continue>
-                <logger level="ERROR" message="'FAILED'"/>
+                <logger level="ERROR" message="FAILED"/>
                 <set-variable variableName="test7" value="catchedException"/>
                 <logger level="ERROR" message="#[mel:test7]"/>
             </on-error-continue>

@@ -205,7 +205,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
           return result;
         }
       }, expression);
-    } else {
+    } else if (isExpression(expression)) {
       TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
       try {
         return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
@@ -214,6 +214,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                                                         STRING)),
                                              e);
       }
+    } else {
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
+      }
+      return expression;
     }
   }
 

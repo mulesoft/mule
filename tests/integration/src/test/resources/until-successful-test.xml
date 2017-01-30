@@ -41,7 +41,7 @@
     </flow>
 
     <flow name="target-mp">
-        <test:component appendString="'ERROR'" />
+        <test:component appendString="ERROR" />
     </flow>
 
     <flow name="target-flow">
