@@ -8,8 +8,10 @@ package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.email.ImapConnector;
+import org.mule.transport.email.MicrosoftExchangeImapConnector;
 
 /**
  * Registers a Bean Definition Parser for handling <code><imap:connector></code> elements.
@@ -23,5 +25,7 @@ public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
 
         MuleDefinitionParserConfiguration parser = registerConnectorDefinitionParser(ImapConnector.class);
         parser.addMapping("defaultProcessMessageAction", EmailNamespaceHandler.DEFAULT_PROCESS_MESSAGE_ACTION);
+
+        registerBeanDefinitionParser("msexchange-connector", new MuleOrphanDefinitionParser(MicrosoftExchangeImapConnector.class, true));
     }
 }
