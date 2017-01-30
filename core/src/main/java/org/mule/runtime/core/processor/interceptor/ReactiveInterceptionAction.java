@@ -10,13 +10,14 @@ package org.mule.runtime.core.processor.interceptor;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static reactor.core.publisher.Mono.just;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 
 /**

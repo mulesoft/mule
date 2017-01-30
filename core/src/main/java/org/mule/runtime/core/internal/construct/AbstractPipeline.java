@@ -16,9 +16,8 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import static reactor.core.Exceptions.*;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -57,11 +56,19 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.*;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyDefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,9 +78,6 @@ import java.util.function.Function;
 
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 import reactor.core.publisher.Mono;
 

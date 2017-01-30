@@ -14,13 +14,6 @@ import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNO
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -36,6 +29,14 @@ import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

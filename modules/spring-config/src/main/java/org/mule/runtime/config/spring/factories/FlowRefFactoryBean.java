@@ -17,7 +17,6 @@ import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
-import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;

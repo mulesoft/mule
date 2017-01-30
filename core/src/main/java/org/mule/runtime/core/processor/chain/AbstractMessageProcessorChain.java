@@ -20,13 +20,6 @@ import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -49,6 +42,14 @@ import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 

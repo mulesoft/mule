@@ -8,14 +8,15 @@ package org.mule.runtime.core.api.processor.strategy;
 
 import static reactor.core.publisher.Flux.from;
 
-import java.util.function.Function;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Sink;
+
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 
 /**

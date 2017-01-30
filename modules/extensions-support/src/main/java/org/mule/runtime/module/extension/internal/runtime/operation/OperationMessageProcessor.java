@@ -30,9 +30,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 
-import java.util.Map;
-import java.util.Optional;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -67,6 +64,10 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+
+import java.util.Map;
+import java.util.Optional;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 

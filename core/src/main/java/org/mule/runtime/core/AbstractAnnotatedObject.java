@@ -15,12 +15,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.R
 import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -29,6 +23,12 @@ import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.source.MessageSource;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 /**
  * Base implementation for {@link AnnotatedObject}
