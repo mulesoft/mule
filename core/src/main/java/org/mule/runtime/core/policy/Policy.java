@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.core.policy;
 
-import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.util.UUID.getUUID;
-import org.mule.runtime.api.metadata.TypedValue;
-
-import java.util.Map;
-
 /**
  * This class represents a policy injection.
  * <p>
@@ -39,16 +33,6 @@ public class Policy {
    */
   public String getPolicyId() {
     return id;
-  }
-
-  /**
-   * Retrieves the set of parameters values to execute the policy. This parameters are expected to be part accessible from the
-   * expression language.
-   * 
-   * @return parameters to be used to execute the policy.
-   */
-  public Map<String, TypedValue> getParameters() {
-    return emptyMap();
   }
 
   /**
