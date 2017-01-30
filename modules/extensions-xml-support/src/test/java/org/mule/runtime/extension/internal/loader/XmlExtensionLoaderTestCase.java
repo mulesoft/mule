@@ -163,9 +163,13 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getAllParameterModels().size(), is(1));
+    assertThat(configurationModel.getAllParameterModels().size(), is(2));
     assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("aPropertyWithDoc"));
     assertThat(configurationModel.getAllParameterModels().get(0).getDescription(), is("Documentation for the property"));
+    assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("aHiddenPropertyWithDoc"));
+    assertThat(configurationModel.getAllParameterModels().get(1).getDescription(), is("Documentation for the hidden property"));
+    assertThat(configurationModel.getAllParameterModels().get(1).getLayoutModel().isPresent(), is(true));
+    assertThat(configurationModel.getAllParameterModels().get(1).getLayoutModel().get().isPassword(), is(true));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
@@ -178,11 +182,16 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(operationModel.isPresent(), is(true));
     assertThat(operationModel.get().getDescription(), is("Documentation for the operation"));
 
-    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(3));
     assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("paramWithDoc"));
     assertThat(operationModel.get().getAllParameterModels().get(0).getDescription(), is("Documentation for the parameter"));
-    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operationModel.get().getAllParameterModels().get(1).getDescription(), is(TARGET_PARAMETER_DESCRIPTION));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is("hiddenParamWithDoc"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getDescription(),
+               is("Documentation for the hidden parameter"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getLayoutModel().isPresent(), is(true));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getLayoutModel().get().isPassword(), is(true));
+    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().get(2).getDescription(), is(TARGET_PARAMETER_DESCRIPTION));
 
     assertThat(operationModel.get().getOutput().getDescription(), is("Documentation for the output"));
 

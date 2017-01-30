@@ -7,6 +7,7 @@
 package org.mule.runtime.extension.internal.loader;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
@@ -14,6 +15,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
 import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -29,6 +31,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModelReader;
@@ -212,7 +215,7 @@ final class XmlExtensionLoaderDelegate {
             .setSchemaVersion(version)
             .setNamespace(name)
             .setNamespaceUri(namespace)
-            .setSchemaLocation(namespace.concat("current" + SEPARATOR).concat(name).concat(XSD_SUFFIX))
+            .setSchemaLocation(namespace.concat(SEPARATOR).concat("current").concat(SEPARATOR).concat(name).concat(XSD_SUFFIX))
             .setXsdFileName(name.concat(XSD_SUFFIX))
             .build());
     declarer.withModelProperty(new XmlExtensionModelProperty());
@@ -289,6 +292,8 @@ final class XmlExtensionLoaderDelegate {
     String parameterName = parameters.get(PARAMETER_NAME);
     String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
+    LayoutModel layoutModel = parseBoolean(parameters.get("password")) ? builder().asPassword().build()
+        : builder().build();
     MetadataType parameterType = extractType(defaultInputTypes, receivedInputType);
 
     ParameterDeclarer parameterDeclarer =
@@ -296,6 +301,7 @@ final class XmlExtensionLoaderDelegate {
             : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
                 .defaultingTo(parameterDefaultValue);
     parameterDeclarer.describedAs(getDescription(param))
+        .withLayout(layoutModel)
         .ofType(parameterType);
   }
 
