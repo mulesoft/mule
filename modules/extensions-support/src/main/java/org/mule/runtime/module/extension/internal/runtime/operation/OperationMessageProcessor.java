@@ -164,7 +164,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       })));
     }
 
-    return from(publisher).concatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
+    return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration = getConfiguration(event);
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
       ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);

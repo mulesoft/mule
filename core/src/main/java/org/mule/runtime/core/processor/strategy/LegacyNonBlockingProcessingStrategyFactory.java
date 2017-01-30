@@ -44,7 +44,8 @@ public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchrono
   }
 
   @Deprecated
-  public static class LegacyNonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+  public static class LegacyNonBlockingProcessingStrategy extends AbstractLegacyProcessingStrategy
+      implements Startable, Stoppable {
 
     private Supplier<Scheduler> schedulerSupplier;
     private Consumer<Scheduler> schedulerStopper;

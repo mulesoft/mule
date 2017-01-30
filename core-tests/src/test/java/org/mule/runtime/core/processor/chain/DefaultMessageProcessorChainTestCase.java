@@ -30,8 +30,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
-import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.FLUX;
-import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.MONO;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
@@ -64,7 +63,9 @@ import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFac
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyDefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
@@ -110,25 +111,22 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     return Arrays.asList(new Object[][] {
         {new SynchronousProcessingStrategyFactory(), BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
+        {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorProcessingStrategyFactory(), BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
+        {new LegacySynchronousProcessingStrategyFactory(), BLOCKING},
         {new LegacyDefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new LegacyNonBlockingProcessingStrategyFactory(), BLOCKING},
         {new LegacyAsynchronousProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousProcessingStrategyFactory(), MONO},
-        {new DefaultFlowProcessingStrategyFactory(), MONO},
-        {new ProactorProcessingStrategyFactory(), MONO},
-        {new WorkQueueProcessingStrategyFactory(), MONO},
-        {new LegacyDefaultFlowProcessingStrategyFactory(), MONO},
-        {new LegacyNonBlockingProcessingStrategyFactory(), MONO},
-        {new LegacyAsynchronousProcessingStrategyFactory(), MONO},
-        {new SynchronousProcessingStrategyFactory(), FLUX},
-        {new DefaultFlowProcessingStrategyFactory(), FLUX},
-        {new ProactorProcessingStrategyFactory(), FLUX},
-        {new WorkQueueProcessingStrategyFactory(), FLUX},
-        {new LegacyDefaultFlowProcessingStrategyFactory(), FLUX},
-        {new LegacyNonBlockingProcessingStrategyFactory(), FLUX},
-        {new LegacyAsynchronousProcessingStrategyFactory(), FLUX}});
+        {new SynchronousProcessingStrategyFactory(), NON_BLOCKING},
+        {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
+        {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
+        {new ProactorProcessingStrategyFactory(), NON_BLOCKING},
+        {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
+        {new LegacySynchronousProcessingStrategyFactory(), NON_BLOCKING},
+        {new LegacyDefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
+        {new LegacyNonBlockingProcessingStrategyFactory(), NON_BLOCKING},
+        {new LegacyAsynchronousProcessingStrategyFactory(), NON_BLOCKING}});
   }
 
   private Flow flow;
@@ -772,7 +770,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       return super.process(messageProcessor, event);
     } finally {
       final SchedulerService schedulerService = muleContext.getSchedulerService();
-      if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && (mode == MONO || mode == FLUX)) {
+      if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && mode == NON_BLOCKING) {
         new PollingProber().check(new JUnitLambdaProbe(() -> {
           verify(schedulerService.getSchedulers().get(0), atLeast(nonBlockingProcessorsExecuted.get()))
               .submit(any(Runnable.class));

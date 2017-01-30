@@ -20,11 +20,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -43,6 +45,7 @@ import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFac
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.test.core.lifecycle.LifecycleTrackerProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -236,8 +239,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .start();
     flow.setMessageSource(mockMessageSource);
 
-    Processor mockMessageProcessor =
-        mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    Processor mockMessageProcessor = spy(new LifecycleTrackerProcessor());
     flow.getMessageProcessors().add(mockMessageProcessor);
 
     flow.initialise();

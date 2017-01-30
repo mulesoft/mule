@@ -9,15 +9,11 @@ package org.mule.tck.junit4;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
-import static org.mule.tck.MuleTestUtils.processWithMonoAndBlockOnEventContextCompletion;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
-import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.FLUX;
-import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.MONO;
-import static reactor.core.Exceptions.unwrap;
-import static reactor.core.publisher.Mono.just;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
@@ -27,7 +23,6 @@ import java.util.Collection;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -50,7 +45,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return asList(new Object[][] {{BLOCKING}, {MONO}, {FLUX}});
+    return asList(new Object[][] {{BLOCKING}, {NON_BLOCKING}});
   }
 
   @Override
@@ -72,15 +67,18 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
       switch (mode) {
         case BLOCKING:
           return processor.process(event);
-        case MONO:
+        case NON_BLOCKING:
           return processWithMonoAndBlock(event, processor);
-        case FLUX:
-          return processWithMonoAndBlockOnEventContextCompletion(event, processor);
         default:
           return null;
       }
-    } catch (MessagingException msgException) {
-      throw messagingExceptionToException(msgException);
+    } catch (Exception exception) {
+      // Do not unwrap MessagingException thrown by use of apply() with Flow for compatibility with flow.process()
+      if (!(processor instanceof Flow) && exception instanceof MessagingException) {
+        throw messagingExceptionToException((MessagingException) exception);
+      } else {
+        throw exception;
+      }
     }
   }
 
@@ -88,25 +86,6 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     // unwrap MessagingException to ensure same exception is thrown by blocking and non-blocking processing
     return (msgException.getCause() instanceof Exception) ? (Exception) msgException.getCause()
         : new RuntimeException(msgException.getCause());
-  }
-
-  /*
-   * Do not unwrap MessagingException thrown by use of apply() for compatability with flow.process()
-   */
-  protected Event processFlow(Flow flow, Event event) throws Exception {
-    switch (mode) {
-      case BLOCKING:
-        return flow.process(event);
-      default:
-        try {
-          return just(event)
-              .transform(flow)
-              .subscribe()
-              .blockMillis(RECEIVE_TIMEOUT);
-        } catch (Throwable exception) {
-          throw (Exception) unwrap(exception);
-        }
-    }
   }
 
   public enum Mode {
@@ -117,11 +96,6 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     /**
      * Test using new reactive API by creating a {@link Mono} and blocking and waiting for completion (value, empty or error)
      */
-    MONO,
-    /**
-     * Test using new reactive API by creating a {@link Flux}, emitting the event and then blocking for completion of the
-     * {@link EventContext}
-     */
-    FLUX
+    NON_BLOCKING,
   }
 }

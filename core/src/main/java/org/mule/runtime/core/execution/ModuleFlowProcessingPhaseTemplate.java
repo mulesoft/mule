@@ -15,7 +15,6 @@ import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 

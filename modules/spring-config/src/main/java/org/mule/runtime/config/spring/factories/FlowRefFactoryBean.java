@@ -170,7 +170,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher).concatMap(event -> {
+          return from(publisher).flatMap(event -> {
             try {
               return just(event).transform(resolveReferencedProcessor(event));
             } catch (MuleException e) {

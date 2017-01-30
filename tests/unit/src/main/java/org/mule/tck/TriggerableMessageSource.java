@@ -31,6 +31,10 @@ public class TriggerableMessageSource implements NonBlockingMessageSource {
     this.listener = listener;
   }
 
+  public Processor getListener() {
+    return this.listener;
+  }
+
   @Override
   public String toString() {
     return ObjectUtils.toString(this);

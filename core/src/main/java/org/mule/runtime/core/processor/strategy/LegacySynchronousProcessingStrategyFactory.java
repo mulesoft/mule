@@ -16,9 +16,10 @@ import java.util.function.Consumer;
 /**
  * This processing strategy processes all message processors in the calling thread.
  */
-public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
+@Deprecated
+public class LegacySynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static ProcessingStrategy SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
+  static ProcessingStrategy LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE = new AbstractLegacyProcessingStrategy() {
 
     @Override
     public boolean isSynchronous() {
@@ -37,7 +38,7 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+    return LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 
 }

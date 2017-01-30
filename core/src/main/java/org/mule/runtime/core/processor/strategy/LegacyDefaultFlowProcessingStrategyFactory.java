@@ -65,5 +65,12 @@ public class LegacyDefaultFlowProcessingStrategyFactory extends LegacyAsynchrono
     protected boolean canProcessAsync(Event event) {
       return !isTransactionActive();
     }
+
+    @Override
+    protected Consumer<Event> createOnEventConsumer() {
+      // Do nothing given event should still be processed when transaction is active
+      return event -> {
+      };
+    }
   }
 }

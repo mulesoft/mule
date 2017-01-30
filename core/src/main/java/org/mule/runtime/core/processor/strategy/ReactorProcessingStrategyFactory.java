@@ -7,16 +7,11 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -45,8 +40,7 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(config().withMaxConcurrentTasks(1).withName(schedulersNamePrefix + ".event-loop"), DEFAULT_QUEUE_SIZE),
+    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
                                          scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                      MILLISECONDS),
                                          muleContext);
@@ -81,17 +75,8 @@ public class ReactorProcessingStrategyFactory implements ProcessingStrategyFacto
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
-          .doOnNext(assertCanProcess())
           .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
           .transform(pipelineFunction);
-    }
-
-    protected Consumer<Event> assertCanProcess() {
-      return event -> {
-        if (isTransactionActive()) {
-          throw propagate(new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE)));
-        }
-      };
     }
 
   }
