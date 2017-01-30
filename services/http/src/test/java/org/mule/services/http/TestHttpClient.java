@@ -23,7 +23,7 @@ import java.util.concurrent.TimeoutException;
 import org.junit.rules.ExternalResource;
 
 /**
- * Defines a {@link org.mule.service.http.api.client.HttpClient} using a defualt implementation of {@link HttpService}
+ * Defines a {@link org.mule.service.http.api.client.HttpClient} using a default implementation of {@link HttpService}
  *
  * <p/>
  * This rule is intended to simplify the usage of the {@link org.mule.service.http.api.client.HttpClient} as it

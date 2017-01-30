@@ -7,6 +7,7 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
@@ -17,6 +18,7 @@ import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -50,7 +52,7 @@ public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestC
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
-    assertEquals("text/xml; charset=UTF-8", response.getHeaderValueIgnoreCase(CONTENT_TYPE));
+    assertEquals(XML.withCharset(StandardCharsets.UTF_8), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
 
     Document document = DocumentHelper.parseText(payload);

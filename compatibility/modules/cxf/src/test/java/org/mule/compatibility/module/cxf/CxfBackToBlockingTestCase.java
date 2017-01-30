@@ -9,6 +9,7 @@ package org.mule.compatibility.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
@@ -22,6 +23,7 @@ import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
@@ -69,7 +71,7 @@ public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
     assertTrue(payload.contains("Hello!"));
-    assertEquals("text/xml; charset=UTF-8", response.getHeaderValueIgnoreCase(CONTENT_TYPE));
+    assertEquals(XML.withCharset(StandardCharsets.UTF_8), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
   }
 
