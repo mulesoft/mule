@@ -71,7 +71,7 @@ public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
     assertTrue(payload.contains("Hello!"));
-    assertEquals(XML.withCharset(StandardCharsets.UTF_8), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
+    assertEquals(XML.withCharset(StandardCharsets.UTF_8).toRfcString(), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
   }
 
