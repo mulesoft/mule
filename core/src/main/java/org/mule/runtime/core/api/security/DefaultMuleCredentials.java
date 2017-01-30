@@ -4,49 +4,50 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.security;
+package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.security.Credentials;
-import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ArrayUtils;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.security.Credentials;
 
 import java.io.Serializable;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
- * <code>MuleCredentials</code> can be used to read and set Mule user information that can be stored in a message header.
+ *
+ * Default implementation of {@link Credentials}.
+ * {@code DefaultMuleCredentials} can be used to read and set Mule user information that can be stored in a message header.
+ *
+ * @since 4.0
  */
+public class DefaultMuleCredentials implements Credentials, Serializable {
 
-public class MuleCredentials implements Credentials, Serializable {
-
-  public static final String TOKEN_DELIM = "::";
+  private static final String TOKEN_DELIM = "::";
 
   private final String username;
   private final char[] password;
   private Object roles;
 
-  public MuleCredentials(String username, char[] password) {
+  public DefaultMuleCredentials(String username, char[] password) {
     this.username = username;
     this.password = ArrayUtils.clone(password);
   }
 
-  public MuleCredentials(String username, char[] password, Object roles) {
+  public DefaultMuleCredentials(String username, char[] password, Object roles) {
     this.username = username;
     this.password = ArrayUtils.clone(password);
     this.roles = roles;
   }
 
-  public MuleCredentials(String header, SecurityManager sm) throws EncryptionStrategyNotFoundException, CryptoFailureException {
+  public DefaultMuleCredentials(String header, SecurityManager sm)
+      throws EncryptionStrategyNotFoundException, CryptoFailureException {
 
     int i = header.indexOf(' ');
     if (i == -1) {
-      throw new IllegalArgumentException(CoreMessages.headerMalformedValueIs(MuleProperties.MULE_USER_PROPERTY, header)
-          .toString());
+      throw new IllegalArgumentException(
+                                         createStaticMessage("Header field 'MULE_USER' is malformed. Value is '%s'", header)
+                                             .toString());
     }
 
     String scheme = header.substring(0, i);
@@ -81,14 +82,26 @@ public class MuleCredentials implements Credentials, Serializable {
     return buf.toString();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public String getUsername() {
     return username;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public char[] getPassword() {
     return ArrayUtils.clone(password);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Object getRoles() {
     return roles;
   }

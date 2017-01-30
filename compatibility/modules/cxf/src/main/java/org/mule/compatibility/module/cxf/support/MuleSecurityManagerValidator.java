@@ -8,12 +8,14 @@ package org.mule.compatibility.module.cxf.support;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.runtime.core.api.security.SecurityManager;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
@@ -29,7 +31,7 @@ public class MuleSecurityManagerValidator implements Validator {
 
   private static Logger logger = LoggerFactory.getLogger(MuleSecurityManagerValidator.class);
 
-  private org.mule.runtime.core.api.security.SecurityManager securityManager;
+  private SecurityManager securityManager;
 
   @Override
   public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
@@ -38,9 +40,11 @@ public class MuleSecurityManagerValidator implements Validator {
     }
 
     DefaultMuleAuthentication auth = new DefaultMuleAuthentication(
-                                                                   new MuleCredentials(credential.getUsernametoken().getName(),
-                                                                                       credential.getUsernametoken().getPassword()
-                                                                                           .toCharArray()));
+                                                                   new DefaultMuleCredentials(credential.getUsernametoken()
+                                                                       .getName(),
+                                                                                              credential.getUsernametoken()
+                                                                                                  .getPassword()
+                                                                                                  .toCharArray()));
 
     try {
       Authentication authentication = securityManager.authenticate(auth);
@@ -53,7 +57,7 @@ public class MuleSecurityManagerValidator implements Validator {
         logger.warn("Could not create security context after having successfully authenticated.", e);
       }
       getCurrentEvent().getSession().setSecurityContext(secContext);
-    } catch (org.mule.runtime.core.api.security.SecurityException e) {
+    } catch (SecurityException e) {
       throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null, e);
     } catch (SecurityProviderNotFoundException e) {
       throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null, e);
@@ -62,7 +66,7 @@ public class MuleSecurityManagerValidator implements Validator {
     return credential;
   }
 
-  public void setSecurityManager(org.mule.runtime.core.api.security.SecurityManager securityManager) {
+  public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
 

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.module.spring.security.PreAuthenticatedAuthenticationProvider;
 import org.mule.runtime.module.spring.security.SpringProviderAdapter;
 import org.mule.runtime.module.spring.security.UserAndPasswordAuthenticationProvider;
@@ -27,7 +27,7 @@ public abstract class AuthenticationNamespaceHandlerTestCase extends UsesHttpExt
 
   @Test
   public void testSecurityManagerConfigured() {
-    MuleSecurityManager securityManager = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
+    DefaultMuleSecurityManager securityManager = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
     assertNotNull(securityManager);
 
     Collection<SecurityProvider> providers = securityManager.getProviders();

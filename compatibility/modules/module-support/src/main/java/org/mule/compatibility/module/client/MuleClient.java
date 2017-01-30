@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-import static org.mule.runtime.core.security.MuleCredentials.createHeader;
+import static org.mule.runtime.core.api.security.DefaultMuleCredentials.createHeader;
 
 import org.mule.compatibility.core.api.FutureMessageResult;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -45,7 +45,7 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.Serializable;
@@ -97,7 +97,7 @@ public class MuleClient implements Disposable {
   private MuleContext muleContext;
   private MuleClientFlowConstruct flowConstruct;
 
-  private MuleCredentials user;
+  private DefaultMuleCredentials user;
 
   private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 
@@ -147,7 +147,7 @@ public class MuleClient implements Disposable {
    */
   public MuleClient(String user, String password) throws MuleException {
     init(/* startManager */true);
-    this.user = new MuleCredentials(user, password.toCharArray());
+    this.user = new DefaultMuleCredentials(user, password.toCharArray());
   }
 
   /**
@@ -183,7 +183,7 @@ public class MuleClient implements Disposable {
   public MuleClient(String configResources, ConfigurationBuilder builder, String user, String password)
       throws ConfigurationException, InitialisationException {
     this(configResources, builder);
-    this.user = new MuleCredentials(user, password.toCharArray());
+    this.user = new DefaultMuleCredentials(user, password.toCharArray());
   }
 
   /**

@@ -14,12 +14,12 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.util.StringUtils;
@@ -58,7 +58,7 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
     // This filter may only allow authentication on a subset of registered
     // security providers
     if (securityProviders != null) {
-      SecurityManager localManager = new MuleSecurityManager();
+      SecurityManager localManager = new DefaultMuleSecurityManager();
       String[] securityProviders = StringUtils.splitAndTrim(this.securityProviders, ",");
       for (String sp : securityProviders) {
         SecurityProvider provider = securityManager.getProvider(sp);

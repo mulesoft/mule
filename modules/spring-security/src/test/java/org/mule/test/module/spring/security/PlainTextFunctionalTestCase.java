@@ -16,7 +16,7 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;
@@ -68,7 +68,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
   }
 
   private InternalMessage createRequestMessage(String user, String password) {
-    String header = MuleCredentials.createHeader(user, password.toCharArray());
+    String header = DefaultMuleCredentials.createHeader(user, password.toCharArray());
     return InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_USER_PROPERTY, header).build();
   }
 

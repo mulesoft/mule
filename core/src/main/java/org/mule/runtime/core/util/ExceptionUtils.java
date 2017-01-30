@@ -20,7 +20,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorMapping;

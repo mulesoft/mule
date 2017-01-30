@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.spring.security;
 
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 
 import java.util.Map;
 
@@ -30,8 +30,8 @@ public class SpringAuthenticationAdapter implements Authentication {
   }
 
   @Override
-  public void setAuthenticated(boolean b) {
-    delegate.setAuthenticated(b);
+  public void setAuthenticated(boolean authenticated) {
+    delegate.setAuthenticated(authenticated);
   }
 
   @Override

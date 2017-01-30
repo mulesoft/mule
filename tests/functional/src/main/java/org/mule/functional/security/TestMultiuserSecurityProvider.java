@@ -7,8 +7,8 @@
 package org.mule.functional.security;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.Authentication;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.SecurityException;
 
 import java.util.HashMap;
 import java.util.Map;

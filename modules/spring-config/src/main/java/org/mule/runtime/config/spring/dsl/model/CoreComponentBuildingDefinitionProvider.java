@@ -79,7 +79,7 @@ import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;

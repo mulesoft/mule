@@ -19,7 +19,7 @@ public class UserAndPasswordAuthenticationProvider implements SpringAuthenticati
   /**
    * {@inheritDoc}
    */
-  public Authentication getAuthentication(org.mule.runtime.core.api.security.Authentication authentication) {
+  public Authentication getAuthentication(org.mule.runtime.api.security.Authentication authentication) {
     return new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials());
   }
 }

@@ -7,11 +7,11 @@
 package org.mule.runtime.core.security;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityContextFactory;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 
 public abstract class AbstractSecurityProvider implements SecurityProvider {
 

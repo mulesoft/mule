@@ -445,6 +445,29 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SetSecureCageType" substitutionGroup="mule:abstract-operator" name="set-secure-cage"></xs:element>
+    <xs:complexType name="SetSecureCageType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="providers">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="provider">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionList" use="optional" name="providers"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="user"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="pass"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:simpleType name="org.mule.test.petstore.extension.PetEnumType">
         <xs:union>
             <xs:simpleType>

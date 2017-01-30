@@ -18,18 +18,18 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityException;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
-import org.mule.runtime.core.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
 import org.mule.service.http.api.domain.ParameterMap;
 
@@ -82,8 +82,8 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   }
 
 
-  protected Authentication createAuthentication(String username, String password, Event event) {
-    return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
+  protected Authentication createAuthentication(String username, String password) {
+    return new DefaultMuleAuthentication(new DefaultMuleCredentials(username, password.toCharArray()));
   }
 
   protected Event setUnauthenticated(Event event) {
@@ -108,7 +108,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
    * session
    *
    * @param event the current message recieved
-   * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
+   * @throws SecurityException if authentication fails
    */
   @Override
   public Event authenticate(Event event)
@@ -139,7 +139,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       }
 
       Authentication authResult;
-      Authentication authentication = createAuthentication(username, password, event);
+      Authentication authentication = createAuthentication(username, password);
 
       try {
         authResult = getSecurityManager().authenticate(authentication);

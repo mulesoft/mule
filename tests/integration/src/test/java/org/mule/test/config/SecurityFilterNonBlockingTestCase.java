@@ -10,8 +10,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.test.AbstractIntegrationTestCase;
 

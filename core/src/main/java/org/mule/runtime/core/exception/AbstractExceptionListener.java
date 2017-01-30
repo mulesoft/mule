@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
