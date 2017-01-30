@@ -9,8 +9,6 @@ package org.mule.runtime.core.api.security;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleException;
 
-import java.lang.*;
-
 /**
  * {@code EncryptionStrategyNotFoundException} thrown by the {@link java.lang.SecurityManager} when an encryption
  * scheme is set in a property or header that has not been registered with the manager.

@@ -42,7 +42,7 @@ public class DefaultMuleSecurityManager implements SecurityManager {
   /**
    * logger used by this class
    */
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleSecurityManager.class);
+  protected static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleSecurityManager.class);
 
   private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
   private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();
@@ -71,8 +71,8 @@ public class DefaultMuleSecurityManager implements SecurityManager {
       SecurityProvider provider = iter.next();
 
       if (provider.supports(toTest)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Authentication attempt using " + provider.getClass().getName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Authentication attempt using " + provider.getClass().getName());
         }
 
         Authentication result = null;
