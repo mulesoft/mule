@@ -225,7 +225,9 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         protected void defaultVisit(MetadataType metadataType) {
-          parseAttributeParameter(parameter);
+          if (!parseAsContent(metadataType)) {
+            parseAttributeParameter(parameter);
+          }
         }
 
         @Override
