@@ -6,25 +6,23 @@
  */
 package org.mule.compatibility.module.cxf;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.nio.charset.Charset;
@@ -49,9 +47,8 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public DynamicPort dynamicPort = new DynamicPort("port1");
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
-  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {
@@ -60,54 +57,53 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
 
   @Test
   public void testFaultInCxfService() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestFaultPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(response);
-    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault")
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("<faultstring>"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   @Test
   public void testFaultInCxfSimpleService() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testSimpleServiceWithFault", request, HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(response);
-    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testSimpleServiceWithFault")
+            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("<faultstring>"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   @Test
   public void testExceptionThrownInTransformer() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerException", request, HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(response);
-    assertTrue(getPayloadAsString(response).contains("<faultstring>"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testTransformerException")
+            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("<faultstring>"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   @Test
   public void testUnwrapException() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapException", request, HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(response);
-    assertTrue(getPayloadAsString(response).contains("Illegal argument!!"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapException")
+            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("Illegal argument!!"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   @Test
@@ -124,38 +120,41 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
 
   @Test
   public void testServerClientProxyWithFault() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault",
-                                         InternalMessage.of(requestFaultPayload), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    String resString = getPayloadAsString(result);
-    assertThat(resString, containsString("<faultstring>Cxf Exception Message</faultstring>"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault")
+            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("<faultstring>Cxf Exception Message</faultstring>"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   @Test
   public void testServerClientProxyWithTransformerException() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException",
-                                         InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    String resString = getPayloadAsString(result);
-    assertTrue(resString.contains("TransformerException"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException")
+            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("TransformerException"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   @Test
   public void testServerClientJaxwsWithUnwrapFault() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault",
-                                         InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    String resString = getPayloadAsString(result);
-    assertThat(resString, containsString("Illegal argument!!"));
-    assertEquals(String.valueOf(INTERNAL_SERVER_ERROR.getStatusCode()),
-                 result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault")
+            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+
+    assertTrue(payload.contains("Illegal argument!!"));
+    assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
   }
 
   public static class CxfTransformerThrowsExceptions extends AbstractTransformer {

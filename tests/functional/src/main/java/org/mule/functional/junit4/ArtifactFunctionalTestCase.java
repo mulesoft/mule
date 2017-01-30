@@ -14,10 +14,8 @@ import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
-
-import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
-import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -25,6 +23,8 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.MuleServiceManager;
@@ -95,7 +95,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;
   private static ClassLoader containerClassLoader;
-
   private static MuleServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
 
@@ -146,6 +145,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
       throw new IllegalStateException("Service class loaders were already set, it cannot be set again");
     }
     serviceClassLoaders = artifactClassLoaders;
+    createServiceManager();
   }
 
   @ContainerClassLoaderAware
@@ -169,19 +169,33 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return builder;
   }
 
-  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
-    if (serviceRepository == null) {
-      serviceRepository =
-          new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(serviceClassLoaders),
-                                                              new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
-      try {
-        serviceRepository.start();
-      } catch (MuleException e) {
-        throw new IllegalStateException("Couldn't start service manager", e);
-      }
-    }
+  /**
+   * Returns an instance of a given service if available
+   *
+   * @param serviceClass class of service to look for. Non null.
+   * @param <T> service class
+   * @return an instance of the provided service type if it was declared as a dependency on the test, null otherwise.
+   */
+  protected <T extends Service> T getService(Class<T> serviceClass) {
+    Optional<Service> service =
+        serviceRepository.getServices().stream().filter(s -> serviceClass.isAssignableFrom(s.getClass())).findFirst();
 
+    return service.isPresent() ? (T) service.get() : null;
+  }
+
+  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
     builder.addServiceConfigurator(new TestServicesMuleContextConfigurator(serviceRepository));
+  }
+
+  private static void createServiceManager() {
+    serviceRepository =
+        new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(serviceClassLoaders),
+                                                            new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+    try {
+      serviceRepository.start();
+    } catch (MuleException e) {
+      throw new IllegalStateException("Couldn't start service manager", e);
+    }
   }
 
   /**

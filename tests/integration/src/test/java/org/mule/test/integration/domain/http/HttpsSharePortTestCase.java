@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.domain.http;
 
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -47,7 +47,7 @@ public class HttpsSharePortTestCase extends HttpSharePortTestCase {
   }
 
   @Override
-  protected HttpRequestOptionsBuilder getOptionsBuilder() {
-    return super.getOptionsBuilder().tlsContextFactory(tlsContextFactory);
+  protected TlsContextFactory getTlsContextFactory() {
+    return tlsContextFactory;
   }
 }

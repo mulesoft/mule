@@ -7,12 +7,16 @@
 package org.mule.compatibility.module.cxf.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.compatibility.module.cxf.example.HelloWorld;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.jws.WebService;
@@ -31,6 +35,9 @@ public class UnwrapsComponentExceptionTestCase extends AbstractCxfOverHttpExtens
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
+
   @Override
   protected String getConfigFile() {
     return "unwraps-component-exception-config-httpn.xml";
@@ -38,14 +45,13 @@ public class UnwrapsComponentExceptionTestCase extends AbstractCxfOverHttpExtens
 
   @Test
   public void testReceivesComponentExceptionMessage() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
+    HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/hello")
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
-    InternalMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
-                                                            newOptions().method(POST.name()).disableStatusCodeValidation()
-                                                                .build())
-        .getRight();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    assertTrue("Component exception was not managed", getPayloadAsString(received).contains(ERROR_MESSAGE));
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
+    assertTrue("Component exception was not managed", payload.contains(ERROR_MESSAGE));
   }
 
   @WebService(endpointInterface = "org.mule.compatibility.module.cxf.example.HelloWorld", serviceName = "HelloWorld")

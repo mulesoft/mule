@@ -297,7 +297,9 @@
     </flow>
 
     <flow name="routeBasedOnSoapAction">
-        <httpn:listener path="/services/routeBasedOnSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedOnSoapAction" config-ref="listenerConfig" allowedMethods="POST" >
+            <httpn:response statusCode="#[mel:message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"
                            wsdlLocation="echo-11.wsdl" >
             <cxf:features>

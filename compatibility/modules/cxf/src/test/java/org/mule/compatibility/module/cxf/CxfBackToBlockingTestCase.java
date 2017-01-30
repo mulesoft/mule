@@ -7,21 +7,23 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.xml.util.XMLUtils;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
@@ -33,12 +35,12 @@ import org.junit.Test;
 @Ignore("MULE-10618")
 public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
-
   private String echoWsdl;
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {
@@ -59,26 +61,29 @@ public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
 
   @Test
   public void backToBlocking() throws Exception {
-    MuleClient client = muleContext.getClient();
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
-                                         InternalMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
-                                         HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertTrue(getPayloadAsString(result).contains("Hello!"));
-    String ct = result.getPayload().getDataType().getMediaType().toRfcString();
-    assertEquals("text/xml; charset=UTF-8", ct);
+
+    ParameterMap headersMap = new ParameterMap();
+    headersMap.put(CONTENT_TYPE, APP_SOAP_XML.toRfcString());
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo")
+        .setMethod(POST.name()).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    assertTrue(payload.contains("Hello!"));
+    assertEquals(XML.withCharset(StandardCharsets.UTF_8), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
   }
 
   @Test
   public void backToBlockingWsdl() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
-                                         InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertNotNull(result.getPayload().getValue());
-    XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl")
+        .setMethod(POST.name()).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
+    XMLUnit.compareXML(echoWsdl, payload);
     muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
   }
 

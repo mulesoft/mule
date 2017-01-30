@@ -11,24 +11,23 @@ package org.mule.compatibility.module.cxf;
 import static org.custommonkey.xmlunit.XMLUnit.compareXML;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_ENCODING;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_ENCODING;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -38,8 +37,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class GZIPEncodingTestCase extends AbstractCxfOverHttpExtensionTestCase {
-
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
   private static final String GZIP = "gzip";
 
@@ -51,6 +48,8 @@ public class GZIPEncodingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private String getAllRequest;
   private String getAllResponse;
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   @Before
@@ -67,27 +66,36 @@ public class GZIPEncodingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Test
   public void proxyWithGZIPResponse() throws Exception {
-    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy",
-                                                            InternalMessage.of(getAllRequest), HTTP_REQUEST_OPTIONS)
-        .getRight();
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/proxy")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity(getAllRequest.getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
     validateResponse(response);
   }
 
   @Test
   public void proxyWithGZIPRequestAndResponse() throws Exception {
-    Map<String, Serializable> properties = new HashMap<>();
-    properties.put(CONTENT_ENCODING, "gzip,deflate");
-    InternalMessage response = muleContext.getClient()
-        .send("http://localhost:" + httpPortProxy.getNumber() + "/proxy",
-              InternalMessage.builder().payload(gzip(getAllRequest)).outboundProperties(properties).build(), HTTP_REQUEST_OPTIONS)
-        .getRight();
+    ParameterMap headersMap = new ParameterMap();
+    headersMap.put(CONTENT_ENCODING, "gzip,deflate");
+
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/proxy")
+            .setMethod(POST.name())
+            .setHeaders(headersMap)
+            .setEntity(new ByteArrayHttpEntity(gzip(getAllRequest))).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
     validateResponse(response);
   }
 
-  private void validateResponse(InternalMessage response) throws Exception {
-    String unzipped = unzip(new ByteArrayInputStream(getPayloadAsBytes(response)));
+  private void validateResponse(HttpResponse response) throws Exception {
+    String unzipped = unzip(((InputStreamHttpEntity) response.getEntity()).getInputStream());
     assertThat(unzipped, compareXML(getAllResponse, unzipped).identical(), is(true));
-    assertThat(response.getInboundProperty(CONTENT_ENCODING), is(GZIP));
+    assertThat(response.getHeaderValue("content-encoding"), is(GZIP));
   }
 
   private String unzip(InputStream input) throws IOException {

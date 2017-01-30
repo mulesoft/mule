@@ -12,14 +12,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -27,7 +24,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.util.CharSetUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.service.http.api.HttpService;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.CountDownLatch;
@@ -45,7 +43,6 @@ import org.junit.Test;
 public class OnErrorPropagateTestCase extends CompatibilityFunctionalTestCase {
 
   public static final int TIMEOUT = 5000;
-  public static final String JSON_REQUEST = "{\"userId\":\"15\"}";
   public static final int MAX_REDELIVERY = 4;
   public static final int EXPECTED_DELIVERED_TIMES = MAX_REDELIVERY + 1;
   public static final int SHORT_MAX_REDELIVERY = 2;
@@ -57,6 +54,8 @@ public class OnErrorPropagateTestCase extends CompatibilityFunctionalTestCase {
   public DynamicPort dynamicPort1 = new DynamicPort("port1");
   @Rule
   public DynamicPort dynamicPort2 = new DynamicPort("port2");
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   public OnErrorPropagateTestCase() {
     System.setProperty("maxRedelivery", String.valueOf(MAX_REDELIVERY));
@@ -160,42 +159,12 @@ public class OnErrorPropagateTestCase extends CompatibilityFunctionalTestCase {
   }
 
   @Test
-  public void testHttpAlwaysRollbackUsingMuleClient() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage response =
-        client.send(format("http://localhost:%s", dynamicPort1.getNumber()), InternalMessage.of(JSON_REQUEST),
-                    newOptions().disableStatusCodeValidation().responseTimeout(TIMEOUT).build())
-            .getRight();
-    assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(500));
-  }
-
-  @Test
   public void testHttpAlwaysRollbackUsingHttpClient() throws Exception {
     HttpClient httpClient = new HttpClient();
     GetMethod getMethod = new GetMethod(format("http://localhost:%s", dynamicPort1.getNumber()));
     int status = httpClient.executeMethod(getMethod);
-    assertThat(status, is(500));
+    assertThat(status, is(INTERNAL_SERVER_ERROR.getStatusCode()));
     getMethod.releaseConnection();
-  }
-
-  @Ignore("See MULE-9197")
-  @Test
-  public void testHttpRedeliveryExhaustedRollbackUsingMuleClient() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage response = null;
-    final HttpRequestOptions httpRequestOptions =
-        newOptions().method(POST.name()).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
-    for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
-      response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), InternalMessage.of(MESSAGE),
-                             httpRequestOptions)
-          .getRight();
-      assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(500));
-    }
-    response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), InternalMessage.of(MESSAGE),
-                           httpRequestOptions)
-        .getRight();
-    assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
-    assertThat(getPayloadAsString(response), is(MESSAGE_EXPECTED));
   }
 
   @Ignore("See MULE-9197")

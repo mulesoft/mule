@@ -7,15 +7,18 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
-
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -29,8 +32,8 @@ public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestC
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(POST.name()).disableStatusCodeValidation().build();
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getConfigFile() {
@@ -39,24 +42,20 @@ public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestC
 
   @Test
   public void testSoapDocumentError() throws Exception {
-    MuleClient client = muleContext.getClient();
-
     String soapRequest =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
             + "<soap:Body>" + "<ssss xmlns=\"http://www.muleumo.org\">"
             + "<request xmlns=\"http://www.muleumo.org\">Bad Request</request>" + "</ssss>" + "</soap:Body>" + "</soap:Envelope>";
 
-    InternalMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent",
-                                        InternalMessage.of(soapRequest), HTTP_REQUEST_OPTIONS)
-        .getRight();
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent")
+        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(soapRequest.getBytes())).build();
 
-    assertNotNull(reply);
-    assertNotNull(reply.getPayload().getValue());
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
-    String ct = reply.getPayload().getDataType().getMediaType().toRfcString();
-    assertEquals("text/xml; charset=UTF-8", ct);
+    assertEquals(XML.withCharset(StandardCharsets.UTF_8), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
 
-    Document document = DocumentHelper.parseText(getPayloadAsString(reply));
+    Document document = DocumentHelper.parseText(payload);
     List<?> fault = document.selectNodes("//soap:Envelope/soap:Body/soap:Fault/faultcode");
 
     assertEquals(1, fault.size());

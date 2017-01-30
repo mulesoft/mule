@@ -7,18 +7,18 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
 
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
 
@@ -34,6 +34,9 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
+
   @Override
   protected String getConfigFile() {
     return "holder-conf-httpn-nb.xml";
@@ -42,13 +45,14 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   @Ignore("MULE-10618")
   public void testClientEchoHolder() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("TEST").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClient", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    assertNotNull(received);
-    Object[] payload = deserializeResponse(received);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echoClient")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    Object[] payload = deserializeResponse(response);
     assertEquals("one-response", payload[0]);
     assertEquals(null, payload[1]);
     assertEquals("one-holder1", ((Holder) payload[2]).value);
@@ -59,13 +63,14 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   @Ignore("MULE-10618")
   public void testClientProxyEchoHolder() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("TEST").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClientProxy", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    assertNotNull(received);
-    Object[] payload = deserializeResponse(received);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echoClientProxy")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    Object[] payload = deserializeResponse(response);
     assertEquals("one-response", payload[0]);
     assertEquals("one-holder1", ((Holder) payload[1]).value);
     assertEquals("one-holder2", ((Holder) payload[2]).value);
@@ -75,13 +80,14 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   @Ignore("MULE-10618")
   public void testClientEcho2Holder() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("TEST").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2Client", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    assertNotNull(received);
-    Object[] payload = deserializeResponse(received);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo2Client")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    Object[] payload = deserializeResponse(response);
     assertEquals("one-response", payload[0]);
     assertEquals(null, payload[1]);
     assertEquals("two-holder", ((Holder) payload[2]).value);
@@ -91,13 +97,14 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   @Ignore("MULE-10618")
   public void testClientProxyEcho2Holder() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("TEST").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2ClientProxy", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    assertNotNull(received);
-    Object[] payload = deserializeResponse(received);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo2ClientProxy")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    Object[] payload = deserializeResponse(response);
     assertEquals("one-response", payload[0]);
     assertEquals("two-holder", ((Holder) payload[1]).value);
     getSensingInstance("sensingRequestResponseProcessorEchoProxy2").assertRequestResponseThreadsSame();
@@ -106,13 +113,15 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   @Ignore("MULE-10618")
   public void testClientEcho3Holder() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("TEST").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3Client", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    assertNotNull(received);
-    Object[] payload = deserializeResponse(received);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo3Client")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    Object[] payload = deserializeResponse(response);
+
     assertEquals(null, payload[0]);
     assertEquals("one", ((Holder) payload[1]).value);
     getSensingInstance("sensingRequestResponseProcessorEcho3").assertRequestResponseThreadsDifferent();
@@ -121,13 +130,14 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   @Ignore("MULE-10618")
   public void testClientProxyEcho3Holder() throws Exception {
-    InternalMessage request = InternalMessage.builder().payload("TEST").build();
-    MuleClient client = muleContext.getClient();
-    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3ClientProxy", request,
-                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
-    assertNotNull(received);
-    Object[] payload = deserializeResponse(received);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo3ClientProxy")
+            .setMethod(POST.name())
+            .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    Object[] payload = deserializeResponse(response);
     assertEquals(null, payload[0]);
     assertEquals("one", ((Holder) payload[1]).value);
     getSensingInstance("sensingRequestResponseProcessorEchoProxy3").assertRequestResponseThreadsSame();
@@ -137,8 +147,8 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
     return ((SensingNullRequestResponseMessageProcessor) muleContext.getRegistry().lookupObject(instanceBeanName));
   }
 
-  private static <T> T deserializeResponse(InternalMessage received) throws Exception {
-    ObjectInputStream objectInputStream = new ObjectInputStream((InputStream) received.getPayload().getValue());
+  private static <T> T deserializeResponse(HttpResponse received) throws Exception {
+    ObjectInputStream objectInputStream = new ObjectInputStream(((InputStreamHttpEntity) received.getEntity()).getInputStream());
     Object objectPayload = objectInputStream.readObject();
     return (T) objectPayload;
   }
