@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableMap;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -26,26 +27,29 @@ public class PolicyParametrization {
   private final PolicyPointcut pointcut;
   private final Map<String, String> parameters;
   private final int order;
+  private final File config;
 
   /**
    * Creates a new parametrization
-   * 
-   * @param id parametrization identifier. Non empty.
+   *  @param id parametrization identifier. Non empty.
    * @param pointcut used to determine if the policy must be applied on a given request. Non null
    * @param order indicates how this policy must be ordered related to other applied policies. A policy with a given order
-   *        has to be applied before polices with smaller order and after policies with bigger order. Must be positive
+  *        has to be applied before polices with smaller order and after policies with bigger order. Must be positive
    * @param parameters parameters for the policy template on which the parametrization is based on. Non null.
+   * @param config Mule XML configuration file for creating the policy. Non null.
    */
-  public PolicyParametrization(String id, PolicyPointcut pointcut, int order, Map<String, String> parameters) {
+  public PolicyParametrization(String id, PolicyPointcut pointcut, int order, Map<String, String> parameters, File config) {
     checkArgument(!isEmpty(id), "id cannot be null");
     checkArgument(pointcut != null, "pointcut cannot be null");
     checkArgument(parameters != null, "parameters cannot be null");
     checkArgument(order > 0, "order must be positive");
+    checkArgument(config != null, "config file cannot be null");
 
     this.id = id;
     this.pointcut = pointcut;
     this.parameters = unmodifiableMap(parameters);
     this.order = order;
+    this.config = config;
   }
 
   /**
@@ -74,5 +78,12 @@ public class PolicyParametrization {
    */
   public Map<String, String> getParameters() {
     return parameters;
+  }
+
+  /**
+   * @return configuration file used to generate the policy
+   */
+  public File getConfig() {
+    return config;
   }
 }

@@ -65,7 +65,7 @@ public class DefaultPolicyTemplate implements PolicyTemplate {
 
   @Override
   public File[] getResourceFiles() {
-    return descriptor.getConfigResourceFiles();
+    return new File[0];
   }
 
   @Override

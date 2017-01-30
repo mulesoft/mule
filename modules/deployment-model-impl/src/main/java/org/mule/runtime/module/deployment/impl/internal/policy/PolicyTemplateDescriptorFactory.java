@@ -15,7 +15,6 @@ import static java.util.Collections.emptySet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
-import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleTmpDir;
@@ -81,7 +80,6 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
     final PolicyTemplateDescriptor descriptor = new PolicyTemplateDescriptor(mulePolicyModel.getName());
     descriptor.setRootFolder(artifactFolder);
-    descriptor.setConfigResourceFiles(new File[] {new File(artifactFolder, DEFAULT_POLICY_CONFIGURATION_RESOURCE)});
 
     if (mulePolicyModel.getClassLoaderModelLoaderDescriptor().isPresent()) {
       MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = mulePolicyModel.getClassLoaderModelLoaderDescriptor().get();
