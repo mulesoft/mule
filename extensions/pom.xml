@@ -200,26 +200,26 @@
                 </property>
             </activation>
             <build>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.mule.extensions</groupId>
-                            <artifactId>mule-extensions-documentation-maven-plugin</artifactId>
-                            <version>${extension.documentation.maven.plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <phase>verify</phase>
-                                    <goals>
-                                        <goal>generate</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                            <configuration>
-                                <!-- Picks up the packaged extension file -->
-                                <outputDir>${project.build.directory}/docs</outputDir>
-                                <jar>${project.build.directory}/${project.artifactId}-${project.version}-mule-plugin.jar</jar>
-                            </configuration>
-                        </plugin>
-                    </plugins>
+                <plugins>
+                    <plugin>
+                        <groupId>org.mule.extensions</groupId>
+                        <artifactId>mule-extensions-documentation-maven-plugin</artifactId>
+                        <version>${extension.documentation.maven.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- Picks up the packaged extension file -->
+                            <outputDir>${project.build.directory}/docs</outputDir>
+                            <jar>${project.build.directory}/${project.artifactId}-${project.version}-mule-plugin.jar</jar>
+                        </configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
     </profiles>
