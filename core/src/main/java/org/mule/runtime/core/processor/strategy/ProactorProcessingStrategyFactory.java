@@ -19,7 +19,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.function.Consumer;
@@ -103,7 +102,7 @@ public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStr
       }
     }
 
-    private ReactiveProcessor proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
+    private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
                                        Scheduler scheduler) {
       return publisher -> from(publisher)
           .publishOn(fromExecutorService(getExecutorService(scheduler)))
