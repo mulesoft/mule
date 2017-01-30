@@ -8,16 +8,27 @@
 package org.mule.runtime.core;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.INTERCEPTING;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.PROCESSOR;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.api.routing.OutboundRouter;
+import org.mule.runtime.core.api.routing.SelectiveRouter;
+import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * Base implementation for {@link AnnotatedObject}
@@ -55,6 +66,21 @@ public abstract class AbstractAnnotatedObject implements AnnotatedObject {
       public String getName() {
         return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
       }
+
+      @Override
+      public ComponentType getComponentType() {
+        // TODO improve this implementation
+        if (AbstractAnnotatedObject.this instanceof MessageSource) {
+          return SOURCE;
+        } else if (AbstractAnnotatedObject.this instanceof OutboundRouter
+            || AbstractAnnotatedObject.this instanceof SelectiveRouter || AbstractAnnotatedObject.this instanceof MessageRouter) {
+          return ROUTER;
+        } else if (AbstractAnnotatedObject.this instanceof InterceptingMessageProcessor) {
+          return INTERCEPTING;
+        } else {
+          return PROCESSOR;
+        }
+      }
     };
   }
 
@@ -71,13 +97,13 @@ public abstract class AbstractAnnotatedObject implements AnnotatedObject {
         }
 
         @Override
-        public String getFileName() {
-          return (String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName"));
+        public Optional<String> getFileName() {
+          return of((String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName")));
         }
 
         @Override
-        public int getLineInFile() {
-          return (int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine"));
+        public Optional<Integer> getLineInFile() {
+          return of((int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine")));
         }
       };
     }

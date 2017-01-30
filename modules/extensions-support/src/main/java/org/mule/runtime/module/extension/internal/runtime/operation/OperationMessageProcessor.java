@@ -8,6 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.INTERCEPTING;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.PROCESSOR;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -18,6 +23,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -27,6 +33,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -40,11 +48,17 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.interception.ProcessorParameterResolver;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.routing.OutboundRouter;
+import org.mule.runtime.core.api.routing.SelectiveRouter;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
@@ -302,4 +316,24 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     return asProcessingType(operationModel.getExecutionType());
   }
 
+  @Override
+  public org.mule.runtime.api.component.ComponentIdentifier getIdentifier() {
+    return new org.mule.runtime.api.component.ComponentIdentifier() {
+
+      @Override
+      public String getNamespace() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getNamespace();
+      }
+
+      @Override
+      public String getName() {
+        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
+      }
+
+      @Override
+      public ComponentType getComponentType() {
+        return OPERATION;
+      }
+    };
+  }
 }

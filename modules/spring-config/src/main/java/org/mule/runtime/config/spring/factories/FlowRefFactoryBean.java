@@ -7,6 +7,8 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import static reactor.core.publisher.Flux.error;
@@ -15,6 +17,7 @@ import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
+import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -39,6 +42,7 @@ import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -92,6 +96,11 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         public String getName() {
           return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
         }
+
+        @Override
+        public ComponentType getComponentType() {
+          return ROUTER;
+        }
       };
     }
 
@@ -108,13 +117,13 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
           }
 
           @Override
-          public String getFileName() {
-            return (String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName"));
+          public Optional<String> getFileName() {
+            return of((String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName")));
           }
 
           @Override
-          public int getLineInFile() {
-            return (int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine"));
+          public Optional<Integer> getLineInFile() {
+            return of((int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine")));
           }
         };
       }

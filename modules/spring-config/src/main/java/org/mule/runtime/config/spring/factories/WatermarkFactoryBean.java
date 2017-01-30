@@ -7,10 +7,12 @@
 
 package org.mule.runtime.config.spring.factories;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
+import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -24,6 +26,7 @@ import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -134,6 +137,11 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
       public String getName() {
         return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
       }
+
+      @Override
+      public ComponentType getComponentType() {
+        return null;
+      }
     };
   }
 
@@ -150,13 +158,13 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
         }
 
         @Override
-        public String getFileName() {
-          return (String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName"));
+        public Optional<String> getFileName() {
+          return of((String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName")));
         }
 
         @Override
-        public int getLineInFile() {
-          return (int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine"));
+        public Optional<Integer> getLineInFile() {
+          return of((int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine")));
         }
       };
     }

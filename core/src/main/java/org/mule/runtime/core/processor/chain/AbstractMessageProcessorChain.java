@@ -21,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.InterceptionHandler;
+import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.AbstractAnnotatedObject;
@@ -121,11 +121,15 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    List<InterceptionHandler> interceptionHandlerChain =
-        muleContext.getMessageProcessorInterceptorManager().retrieveInterceptionHandlerChain();
+    if (flowConstruct instanceof Pipeline) {
+      interceptors.add(0, (processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor().apply(next));
+    }
+
+    List<ProcessorInterceptor> interceptionHandlerChain =
+        muleContext.getProcessorInterceptorManager().getInterceptors();
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted =
         new ArrayList<>(interceptors.size() + interceptionHandlerChain.size());
-    //TODO Review how interceptors are registered!
+    // TODO MULE-11521 Review how interceptors are registered!
     interceptionHandlerChain.stream()
         .forEach(interceptionHandler -> {
           ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptionHandler);
@@ -267,10 +271,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     this.flowConstruct = flowConstruct;
     this.messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
     setFlowConstructIfNeeded(getMessageProcessorsForLifecycle(), flowConstruct);
-
-    if (flowConstruct instanceof Pipeline) {
-      interceptors.add(0, (processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor().apply(next));
-    }
   }
 
   @Override

@@ -8,6 +8,8 @@
 package org.mule.runtime.core.processor.interceptor;
 
 import static java.lang.String.valueOf;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
 import static reactor.core.publisher.Mono.from;
@@ -19,7 +21,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.api.interception.InterceptionHandler;
+import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,9 +32,11 @@ import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.api.interception.ProcessorParameterResolver;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
@@ -42,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Hooks the {@link InterceptionHandler}s for a {@link Processor} into the {@code Reactor} pipeline.
+ * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
  * 
  * @since 4.0
  */
@@ -52,10 +56,10 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
   private static final String AROUND_METHOD_NAME = "around";
 
-  private InterceptionHandler interceptionHandler;
+  private ProcessorInterceptor interceptionHandler;
   private FlowConstruct flowConstruct;
 
-  public ReactiveInterceptorAdapter(InterceptionHandler interceptionHandler) {
+  public ReactiveInterceptorAdapter(ProcessorInterceptor interceptionHandler) {
     this.interceptionHandler = interceptionHandler;
   }
 
@@ -82,17 +86,16 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
             .map(doBefore(component, dslParameters))
             .flatMap(event -> fromFuture(doAround(event, component, dslParameters, next))
                 .mapError(CompletionException.class, completionException -> completionException.getCause()))
-            .doOnError(error -> {
-              interceptionHandler.after(null);
+            .doOnError(MessagingException.class, error -> {
+              interceptionHandler.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
             })
             .map(doAfter());
       } else {
         return publisher -> from(publisher)
             .map(doBefore(component, dslParameters))
             .transform(next)
-            .doOnError(error -> {
-              // TODO should pass the exception to after to check the thrown exception
-              interceptionHandler.after(null);
+            .doOnError(MessagingException.class, error -> {
+              interceptionHandler.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
             })
             .map(doAfter());
       }
@@ -131,7 +134,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   private Function<Event, Event> doAfter() {
     return event -> {
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-      interceptionHandler.after(interceptionEvent);
+      interceptionHandler.after(interceptionEvent, empty());
       return interceptionEvent.resolve();
     };
   }

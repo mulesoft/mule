@@ -82,12 +82,6 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
     return this;
   }
 
-  @Override
-  public DefaultInterceptionEvent error(Error error) {
-    interceptedOutput = interceptedOutput.error(error);
-    return this;
-  }
-
   /**
    * Updates the state of this object, overriding the {@link #interceptedInput} with the result of
    * {@link #interceptedOutput#build()} and resetting {@link #interceptedOutput}.
