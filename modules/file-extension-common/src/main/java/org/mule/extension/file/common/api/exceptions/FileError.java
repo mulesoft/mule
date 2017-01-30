@@ -26,7 +26,7 @@ public enum FileError implements ErrorTypeDefinition<FileError> {
 
   ILLEGAL_CONTENT,
 
-  CONCURRENCY,
+  FILE_LOCK,
 
   FILE_ALREADY_EXISTS,
 

@@ -22,7 +22,7 @@ public final class FileLockedException extends ModuleException {
    * @param message the detail message
    */
   public FileLockedException(String message) {
-    super(message, CONCURRENCY);
+    super(message, FILE_LOCK);
   }
 }
 
