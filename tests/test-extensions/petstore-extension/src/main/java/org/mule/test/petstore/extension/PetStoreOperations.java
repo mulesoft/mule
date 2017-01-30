@@ -69,7 +69,7 @@ public class PetStoreOperations {
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
 
     authHandler.setAuthentication(providers,
-                                  authHandler.createDefaultAuthentication(authHandler.createCredentials()
+                                  authHandler.createAuthentication(authHandler.createCredentialsBuilder()
                                       .withUsername(user)
                                       .withPassword(pass.toCharArray())
                                       .build()));

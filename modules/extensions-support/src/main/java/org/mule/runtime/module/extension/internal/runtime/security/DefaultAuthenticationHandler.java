@@ -87,7 +87,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
    * {@inheritDoc}
    */
   @Override
-  public Authentication createDefaultAuthentication(Credentials credentials) {
+  public Authentication createAuthentication(Credentials credentials) {
     return new DefaultMuleAuthentication(credentials);
   }
 
@@ -95,7 +95,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
    * {@inheritDoc}
    */
   @Override
-  public CredentialsBuilder createCredentials() {
+  public CredentialsBuilder createCredentialsBuilder() {
     return new DefaultCredentialsBuilder();
   }
 

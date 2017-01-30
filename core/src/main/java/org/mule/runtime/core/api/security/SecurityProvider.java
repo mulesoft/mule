@@ -16,7 +16,7 @@ import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
  * {@code SecurityProvider} is a target security provider that actually does the work of authenticating credentials and
  * populating the Authentication object.
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface SecurityProvider extends Initialisable, NameableObject {
 

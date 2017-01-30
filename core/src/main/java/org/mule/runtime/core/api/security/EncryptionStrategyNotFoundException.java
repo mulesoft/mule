@@ -15,7 +15,7 @@ import java.lang.*;
  * {@code EncryptionStrategyNotFoundException} thrown by the {@link java.lang.SecurityManager} when an encryption
  * scheme is set in a property or header that has not been registered with the manager.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class EncryptionStrategyNotFoundException extends MuleException {
 

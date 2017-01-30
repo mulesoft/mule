@@ -15,7 +15,7 @@ import org.mule.runtime.api.security.SecurityException;
  * {@code UnsupportedAuthenticationSchemeException} is thrown when a authentication scheme is being used on the message that
  * the Security filter does not understand.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class UnsupportedAuthenticationSchemeException extends SecurityException implements ErrorMessageAwareException {
 

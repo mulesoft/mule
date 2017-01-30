@@ -17,7 +17,7 @@ import java.util.Collection;
 /**
  * {@code SecurityManager} is responsible for managing one or more {@link SecurityProvider}s.
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface SecurityManager extends Initialisable {
 

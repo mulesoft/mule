@@ -13,7 +13,7 @@ import org.mule.runtime.api.security.SecurityException;
 /**
  * {@code UnauthorisedException} is thrown if authentication fails.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class UnauthorisedException extends SecurityException {
 

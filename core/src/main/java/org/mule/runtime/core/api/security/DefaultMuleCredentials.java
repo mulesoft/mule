@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
  * Default implementation of {@link Credentials}.
  * {@code DefaultMuleCredentials} can be used to read and set Mule user information that can be stored in a message header.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class DefaultMuleCredentials implements Credentials, Serializable {
 

@@ -16,7 +16,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
  * Implementors of {@link EncryptionStrategy} should provide a toString method that exposes *only* information
  * that maybe useful for debugging <b>not</b> passwords, secret keys, etc.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class CryptoFailureException extends MuleException {
 

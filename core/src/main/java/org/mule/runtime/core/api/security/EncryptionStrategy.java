@@ -17,7 +17,7 @@ import java.io.InputStream;
  * for example for Password Based Encryption (PBE) a password, salt, iteration count and algorithm
  * may be set on the strategy.
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface EncryptionStrategy extends Initialisable, NamedObject {
 

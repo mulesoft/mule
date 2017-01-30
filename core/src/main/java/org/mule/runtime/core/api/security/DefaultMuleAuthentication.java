@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Default implementation of {@link Authentication}
  *
- * @since 1.0
+ * @since 4.0
  */
 public class DefaultMuleAuthentication implements Authentication {
 
