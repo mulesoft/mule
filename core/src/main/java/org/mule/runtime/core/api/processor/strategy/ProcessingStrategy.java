@@ -28,7 +28,7 @@ public interface ProcessingStrategy {
    * independent streams that implement the {@link Pipeline}.
    *
    * @param flowConstruct pipeline instance.
-   * @param pipelineFunction function representing the
+   * @param pipelineFunction function representing the pipeline.
    * @return new sink instance
    */
   Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> pipelineFunction);

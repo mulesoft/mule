@@ -19,9 +19,9 @@ import java.util.function.Consumer;
  * All Sinks must support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
  * handle this, i.e.
  * <ol>
- * <li>i) By continuing in the caller thread.</li>
- * <li>ii) Serializing all events to a single thread.</li>
- * <li>iii) Using a ring-buffer to de-multiplex requests and then handle them with 1..n subscribers.</li>
+ * <li>By continuing in the caller thread.</li>
+ * <li>Serializing all events to a single thread.</li>
+ * <li>Using a ring-buffer to de-multiplex requests and then handle them with 1..n subscribers.</li>
  * </ol>
  *
  * @since 4.0
