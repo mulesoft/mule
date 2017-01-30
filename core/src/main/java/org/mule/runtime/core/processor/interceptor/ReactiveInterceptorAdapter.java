@@ -125,7 +125,7 @@ public class ReactiveInterceptorAdapter
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
-                                      reactiveInterceptionAction)
+                              reactiveInterceptionAction)
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }
 
