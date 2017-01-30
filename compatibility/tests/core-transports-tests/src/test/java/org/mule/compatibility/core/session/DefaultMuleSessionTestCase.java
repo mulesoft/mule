@@ -21,14 +21,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.DefaultSecurityContextFactory;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -166,8 +166,8 @@ public class DefaultMuleSessionTestCase extends AbstractMuleTestCase {
                  after.getSecurityContext().getAuthentication().getProperties().get("key1"));
     assertEquals(before.getSecurityContext().getAuthentication().getCredentials(),
                  after.getSecurityContext().getAuthentication().getCredentials());
-    // assertEquals(before.getSecurityContext().getAuthentication().getEvent().getId(),
-    // after.getSecurityContext().getAuthentication().getEvent().getId());
+    // assertEquals(before.getAuthentication().getAuthentication().getEvent().getId(),
+    // after.getAuthentication().getAuthentication().getEvent().getId());
 
     after.setProperty("new", "value");
     assertNull(before.getProperty("new"));
@@ -192,7 +192,7 @@ public class DefaultMuleSessionTestCase extends AbstractMuleTestCase {
   }
 
   private SecurityContext createTestAuthentication() {
-    Authentication auth = new DefaultMuleAuthentication(new MuleCredentials("dan", new char[] {'d', 'f'}));
+    Authentication auth = new DefaultMuleAuthentication(new DefaultMuleCredentials("dan", new char[] {'d', 'f'}));
     auth.setProperties(Collections.<String, Object>singletonMap("key1", "value1"));
     SecurityContext securityContext = new DefaultSecurityContextFactory().create(auth);
     return securityContext;

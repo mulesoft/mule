@@ -9,7 +9,7 @@ package org.mule.extension.ws.api.exception;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 
 import org.apache.cxf.interceptor.Fault;
 

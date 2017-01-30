@@ -8,14 +8,14 @@ package org.mule.runtime.module.spring.security;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.NotPermittedException;
-import org.mule.runtime.core.api.security.SecurityException;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractSecurityFilter;
 import org.mule.runtime.module.spring.security.i18n.SpringSecurityMessages;

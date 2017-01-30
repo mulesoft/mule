@@ -20,7 +20,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;

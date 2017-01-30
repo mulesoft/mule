@@ -6,13 +6,18 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -57,6 +62,17 @@ public class PetStoreOperations {
 
   public PetCage getCage(@UseConfig PetStoreConnector config) {
     return config.getCage();
+  }
+
+  public void setSecureCage(@Optional @NullSafe List<String> providers, String user, String pass,
+                            AuthenticationHandler authHandler)
+      throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
+
+    authHandler.setAuthentication(providers,
+                                  authHandler.createDefaultAuthentication(authHandler.createCredentials()
+                                      .withUsername(user)
+                                      .withPassword(pass.toCharArray())
+                                      .build()));
   }
 
   public void makePhoneCall(PhoneNumber phoneNumber) {}

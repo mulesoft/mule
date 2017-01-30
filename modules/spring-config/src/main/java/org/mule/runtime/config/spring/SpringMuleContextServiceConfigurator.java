@@ -92,7 +92,7 @@ import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.policy.DefaultPolicyManager;
 import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
-import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -198,7 +198,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class))
       .put("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class))
       .put("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition())
-      .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(MuleSecurityManager.class))
+      .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
       .put(OBJECT_CONVERTER_RESOLVER, getBeanDefinition(DynamicDataTypeConversionResolver.class))

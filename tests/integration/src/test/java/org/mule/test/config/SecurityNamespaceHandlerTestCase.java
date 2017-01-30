@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.security.MockEncryptionStrategy;
 import org.mule.functional.security.TestSingleUserSecurityProvider;
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;

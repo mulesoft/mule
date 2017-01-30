@@ -23,14 +23,14 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.security.Authentication;
-import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.message.SessionHandler;
-import org.mule.runtime.core.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.DefaultSecurityContextFactory;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -148,7 +148,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
   public void testSecurityContext() throws Exception {
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
-    Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
+    Credentials credentials = new DefaultMuleCredentials("joe", "secret".toCharArray());
     SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
     testEvent().getSession().setSecurityContext(sc);
 

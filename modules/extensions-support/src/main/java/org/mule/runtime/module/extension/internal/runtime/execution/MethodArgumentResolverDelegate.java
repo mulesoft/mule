@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -39,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgume
 import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 
@@ -67,6 +69,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
   private static final ArgumentResolver<CompletionCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
       new CompletionCallbackArgumentResolver();
+  private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
+      new SecurityContextHandlerArgumentResolver();
 
 
   private final Method method;
@@ -128,6 +132,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (MediaType.class.equals(parameterType)) {
         argumentResolver = MEDIA_TYPE_ARGUMENT_RESOLVER;
+      } else if (AuthenticationHandler.class.equals(parameterType)) {
+        argumentResolver = SECURITY_CONTEXT_HANDLER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

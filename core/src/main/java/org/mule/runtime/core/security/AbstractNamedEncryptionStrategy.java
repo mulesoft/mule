@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 
 import java.io.ByteArrayInputStream;

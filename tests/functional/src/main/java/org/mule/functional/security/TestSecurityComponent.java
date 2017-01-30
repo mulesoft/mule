@@ -9,7 +9,7 @@ package org.mule.functional.security;
 
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 
 import org.slf4j.Logger;

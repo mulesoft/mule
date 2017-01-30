@@ -7,7 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityException;
 
 /**
  * <code>SecurityNotification</code> is fired when a request for authorisation failed.

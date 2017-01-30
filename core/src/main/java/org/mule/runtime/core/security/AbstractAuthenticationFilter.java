@@ -12,9 +12,9 @@ import org.mule.runtime.core.api.security.AuthenticationFilter;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.SecurityException;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound or outbound authentication for messages.

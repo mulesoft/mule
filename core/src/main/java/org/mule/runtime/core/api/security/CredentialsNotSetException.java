@@ -28,6 +28,6 @@ public class CredentialsNotSetException extends UnauthorisedException {
   }
 
   public CredentialsNotSetException(Event event, SecurityContext context, SecurityFilter filter) {
-    super(event, context, filter);
+    super(context, filter.getClass().getName(), event.getContext().getOriginatingConnectorName());
   }
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityContextFactory;
 

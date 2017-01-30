@@ -11,7 +11,7 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class MuleSecurityManagerConfigurator implements ObjectFactory<SecurityMa
     securityManagers.add(muleContext.getSecurityManager());
     SecurityManager factorySecurityManager = muleContext.getSecurityManager();
     if (!name.equals(OBJECT_SECURITY_MANAGER)) {
-      factorySecurityManager = new MuleSecurityManager();
+      factorySecurityManager = new DefaultMuleSecurityManager();
       securityManagers.add(factorySecurityManager);
     }
     providers.stream().forEach(provider -> {

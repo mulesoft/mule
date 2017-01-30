@@ -8,10 +8,11 @@ package org.mule.compatibility.module.cxf.security;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.SecurityManager;
 
-public class WebServiceSecurityException extends org.mule.runtime.core.api.security.SecurityException {
+public class WebServiceSecurityException extends SecurityException {
 
   public WebServiceSecurityException(Event event, Throwable cause,
                                      SecurityManager securityManager) {

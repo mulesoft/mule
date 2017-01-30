@@ -18,7 +18,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
-import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -115,7 +115,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
     @Override
     protected void doConfigure(MuleContext muleContext) throws Exception {
       muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, rtqm);
-      muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+      muleContext.getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
 
     }
   }

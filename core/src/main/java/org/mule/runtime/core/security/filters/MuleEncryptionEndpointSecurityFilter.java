@@ -7,23 +7,23 @@
 package org.mule.runtime.core.security.filters;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.Authentication;
-import org.mule.runtime.core.api.security.Credentials;
+import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.core.api.security.CredentialsNotSetException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityException;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
-import org.mule.runtime.core.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.security.MuleHeaderCredentialsAccessor;
 
 /**
@@ -45,11 +45,11 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
       throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(), this);
     }
 
-    Credentials user = new MuleCredentials(userHeader, getSecurityManager());
+    Credentials user = new DefaultMuleCredentials(userHeader, getSecurityManager());
 
     Authentication authentication;
     try {
-      authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user, event));
+      authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user));
     } catch (Exception e) {
       // Authentication failed
       if (logger.isDebugEnabled()) {

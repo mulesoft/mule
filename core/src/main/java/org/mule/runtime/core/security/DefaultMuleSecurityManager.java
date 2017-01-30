@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.ArrayList;
@@ -33,20 +33,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>MuleSecurityManager</code> is a default implementation security manager for a Mule instance.
+ * {@code DefaultMuleSecurityManager} is a default implementation of a {@link SecurityManager} for a Mule instance.
+ *
+ * @since 4.0
  */
-
-public class MuleSecurityManager implements SecurityManager {
+public class DefaultMuleSecurityManager implements SecurityManager {
 
   /**
    * logger used by this class
    */
-  protected static final Logger logger = LoggerFactory.getLogger(MuleSecurityManager.class);
+  protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleSecurityManager.class);
 
   private Map<String, SecurityProvider> providers = new ConcurrentHashMap<String, SecurityProvider>();
   private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<String, EncryptionStrategy>();
 
-  public MuleSecurityManager() {
+  public DefaultMuleSecurityManager() {
     super();
   }
 
@@ -58,6 +59,9 @@ public class MuleSecurityManager implements SecurityManager {
     LifecycleTransitionResult.initialiseAll(all.iterator());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Authentication authenticate(Authentication authentication) throws SecurityException, SecurityProviderNotFoundException {
     Iterator<SecurityProvider> iter = providers.values().iterator();
@@ -89,6 +93,9 @@ public class MuleSecurityManager implements SecurityManager {
     throw new SecurityProviderNotFoundException(toTest.getName());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addProvider(SecurityProvider provider) {
     if (getProvider(provider.getName()) != null) {
@@ -97,6 +104,9 @@ public class MuleSecurityManager implements SecurityManager {
     providers.put(provider.getName(), provider);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SecurityProvider getProvider(String name) {
     if (name == null) {
@@ -105,17 +115,26 @@ public class MuleSecurityManager implements SecurityManager {
     return providers.get(name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SecurityProvider removeProvider(String name) {
     return providers.remove(name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Collection<SecurityProvider> getProviders() {
     ArrayList<SecurityProvider> providersList = new ArrayList<SecurityProvider>(providers.values());
     return Collections.unmodifiableCollection(providersList);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void setProviders(Collection<SecurityProvider> providers) {
     for (SecurityProvider provider : providers) {
@@ -123,6 +142,9 @@ public class MuleSecurityManager implements SecurityManager {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SecurityContext createSecurityContext(Authentication authentication) throws UnknownAuthenticationTypeException {
     Iterator<SecurityProvider> iter = providers.values().iterator();
@@ -137,27 +159,42 @@ public class MuleSecurityManager implements SecurityManager {
     throw new UnknownAuthenticationTypeException(authentication);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public EncryptionStrategy getEncryptionStrategy(String name) {
     return cryptoStrategies.get(name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addEncryptionStrategy(EncryptionStrategy strategy) {
     cryptoStrategies.put(strategy.getName(), strategy);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public EncryptionStrategy removeEncryptionStrategy(String name) {
     return cryptoStrategies.remove(name);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Collection<EncryptionStrategy> getEncryptionStrategies() {
     List<EncryptionStrategy> allStrategies = new ArrayList<EncryptionStrategy>(cryptoStrategies.values());
     return Collections.unmodifiableCollection(allStrategies);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void setEncryptionStrategies(Collection<EncryptionStrategy> strategies) {
     for (EncryptionStrategy strategy : strategies) {
