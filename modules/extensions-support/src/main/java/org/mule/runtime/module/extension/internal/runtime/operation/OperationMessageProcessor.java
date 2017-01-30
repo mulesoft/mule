@@ -302,6 +302,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   @Override
   public org.mule.runtime.api.component.ComponentIdentifier getIdentifier() {
+    // TODO MULE-11572 set this data instead of building this object each time
     return new org.mule.runtime.api.component.ComponentIdentifier() {
 
       @Override

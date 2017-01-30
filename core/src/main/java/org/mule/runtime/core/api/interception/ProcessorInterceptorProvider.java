@@ -12,7 +12,7 @@ import org.mule.runtime.api.interception.ProcessorInterceptor;
 import java.util.List;
 
 // TODO MULE-11521 Define if this will remain here
-public interface ProcessorInterceptorManager {
+public interface ProcessorInterceptorProvider {
 
   void addInterceptor(ProcessorInterceptor interceptor);
 

@@ -16,10 +16,8 @@ import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNO
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
-import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -57,6 +55,7 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
 
   @Override
   public ComponentIdentifier getIdentifier() {
+    // TODO MULE-11572 set this data instead of building this object each time
     return new ComponentIdentifier() {
 
       @Override

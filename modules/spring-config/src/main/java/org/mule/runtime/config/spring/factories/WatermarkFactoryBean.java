@@ -8,11 +8,11 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.util.Optional.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
-import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -126,6 +126,7 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
 
   @Override
   public ComponentIdentifier getIdentifier() {
+    // TODO MULE-11572 set this data instead of building this object each time
     return new ComponentIdentifier() {
 
       @Override
@@ -140,7 +141,7 @@ public class WatermarkFactoryBean extends AbstractFactoryBean<Watermark> impleme
 
       @Override
       public ComponentType getComponentType() {
-        return null;
+        return SOURCE;
       }
     };
   }

@@ -11,13 +11,13 @@ import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.runtime.api.interception.ProcessorInterceptor;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //TODO MULE-11521 Define if this will remain here
-public class DefaultProcessorInterceptorManager implements ProcessorInterceptorManager {
+public class DefaultProcessorInterceptorManager implements ProcessorInterceptorProvider {
 
   private List<ProcessorInterceptor> interceptors = new ArrayList<>();
 

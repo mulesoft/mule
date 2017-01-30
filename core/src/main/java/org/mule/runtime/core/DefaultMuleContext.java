@@ -50,7 +50,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
@@ -241,7 +241,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
-  private ProcessorInterceptorManager processorInterceptorManager;
+  private ProcessorInterceptorProvider processorInterceptorManager;
 
   static {
     // Ensure reactor operatorError hook is always registered.
@@ -1072,11 +1072,11 @@ public class DefaultMuleContext implements MuleContext {
    * {@inheritDoc}
    */
   @Override
-  public ProcessorInterceptorManager getProcessorInterceptorManager() {
+  public ProcessorInterceptorProvider getProcessorInterceptorManager() {
     return processorInterceptorManager;
   }
 
-  public void setProcessorInterceptorManager(ProcessorInterceptorManager processorInterceptorManager) {
+  public void setProcessorInterceptorManager(ProcessorInterceptorProvider processorInterceptorManager) {
     this.processorInterceptorManager = processorInterceptorManager;
   }
 

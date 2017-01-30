@@ -53,11 +53,11 @@ public class ReactiveInterceptorAdapter
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
   private static final String AROUND_METHOD_NAME = "around";
 
-  private ProcessorInterceptor interceptionHandler;
+  private ProcessorInterceptor interceptor;
   private FlowConstruct flowConstruct;
 
-  public ReactiveInterceptorAdapter(ProcessorInterceptor interceptionHandler) {
-    this.interceptionHandler = interceptionHandler;
+  public ReactiveInterceptorAdapter(ProcessorInterceptor interceptor) {
+    this.interceptor = interceptor;
   }
 
   @Override
@@ -76,16 +76,16 @@ public class ReactiveInterceptorAdapter
     ComponentLocation componentLocation =
         ((AnnotatedObject) component).getLocation(((MessageProcessorPathResolver) flowConstruct).getProcessorPath(component));
     Map<String, String> dslParameters = (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
-    LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptionHandler, componentLocation.getPath());
+    LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptor, componentLocation.getPath());
 
-    if (interceptionHandler.intercept(componentIdentifier, componentLocation)) {
+    if (interceptor.intercept(componentIdentifier, componentLocation)) {
       if (implementsAround()) {
         return publisher -> from(publisher)
             .map(doBefore(component, dslParameters))
             .flatMap(event -> fromFuture(doAround(event, component, dslParameters, next))
                 .mapError(CompletionException.class, completionException -> completionException.getCause()))
             .doOnError(MessagingException.class, error -> {
-              interceptionHandler.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
+              interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
             })
             .map(doAfter());
       } else {
@@ -93,7 +93,7 @@ public class ReactiveInterceptorAdapter
             .map(doBefore(component, dslParameters))
             .transform(next)
             .doOnError(MessagingException.class, error -> {
-              interceptionHandler.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
+              interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
             })
             .map(doAfter());
       }
@@ -105,7 +105,7 @@ public class ReactiveInterceptorAdapter
 
   private boolean implementsAround() {
     try {
-      return !interceptionHandler.getClass()
+      return !interceptor.getClass()
           .getMethod(AROUND_METHOD_NAME, Map.class, InterceptionEvent.class, InterceptionAction.class).isDefault();
     } catch (NoSuchMethodException | SecurityException e) {
       throw new MuleRuntimeException(e);
@@ -115,7 +115,7 @@ public class ReactiveInterceptorAdapter
   private Function<Event, Event> doBefore(Processor component, Map<String, String> dslParameters) {
     return event -> {
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-      interceptionHandler.before(resolveParameters(event, component, dslParameters), interceptionEvent);
+      interceptor.before(resolveParameters(event, component, dslParameters), interceptionEvent);
       return interceptionEvent.resolve();
     };
   }
@@ -124,7 +124,7 @@ public class ReactiveInterceptorAdapter
                                             Function<Publisher<Event>, Publisher<Event>> next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
-    return interceptionHandler.around(resolveParameters(event, component, dslParameters), interceptionEvent,
+    return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
                                       reactiveInterceptionAction)
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }
@@ -132,7 +132,7 @@ public class ReactiveInterceptorAdapter
   private Function<Event, Event> doAfter() {
     return event -> {
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-      interceptionHandler.after(interceptionEvent, empty());
+      interceptor.after(interceptionEvent, empty());
       return interceptionEvent.resolve();
     };
   }

@@ -83,6 +83,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
     @Override
     public ComponentIdentifier getIdentifier() {
+      // TODO MULE-11572 set this data instead of building this object each time
       return new ComponentIdentifier() {
 
         @Override
