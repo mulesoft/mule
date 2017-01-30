@@ -51,7 +51,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   }
 
   /**
-   * Implementation of {@link Sink} using Reactor's {@link BlockingSink} to accepts/submit events.
+   * Implementation of {@link Sink} using Reactor's {@link BlockingSink} to accept events.
    */
   static final class ReactorSink implements Sink, Disposable {
 
@@ -75,13 +75,11 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
         case BACKPRESSURED:
           // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
           blockingSink.accept(event);
-          //event.getContext().error(new RejectedExecutionException("Flow `" + flowConstruct.getName()
-          //    + "` rejected execution of event due to back-pressure"));
         case FAILED:
           event.getContext().error(blockingSink.getError());
         case CANCELLED:
-          event.getContext().error(new RejectedExecutionException("Flow `" + flowConstruct.getName()
-              + "` rejected execution of event as it is stopped"));
+          event.getContext().error(new RejectedExecutionException("Flow '" + flowConstruct.getName()
+              + "' rejected execution of event as it is stopped"));
       }
     }
 

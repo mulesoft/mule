@@ -43,7 +43,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
@@ -55,15 +54,10 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.*;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.util.NotificationUtils;
@@ -260,7 +254,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
           return from(publisher)
-              .doOnNext(assertStrarted())
+              .doOnNext(assertStarted())
               .doOnNext(event -> sink.accept(event))
               .flatMap(event -> Mono.from(event.getContext()));
         }
@@ -407,7 +401,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return flowMap.resolvePath(processor);
   }
 
-  public Consumer<Event> assertStrarted() {
+  public Consumer<Event> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
         throw propagate(new MessagingException(event,
@@ -441,9 +435,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   /**
    * Determines is blocking synchronous code path should be used. This is used in the following cases:
    * <ol>
-   * <li>i) If a transaction is active and a processing strategy supporting transactions is configured. (synchronous or default
+   * <li>If a transaction is active and a processing strategy supporting transactions is configured. (synchronous or default
    * strategies)</li>
-   * <li>i) If {@link LegacySynchronousProcessingStrategyFactory} is configured as the processing strategy.</li>
+   * <li>If {@link LegacySynchronousProcessingStrategyFactory} is configured as the processing strategy.</li>
    * </ol>
    * 
    * @return true if blocking synchronous code path should be used, false otherwise.
@@ -451,7 +445,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected boolean useBlockingCodePath() {
     return (isTransactionActive() &&
         (processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory
-            || processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory
+            || processingStrategyFactory instanceof LegacyDefaultFlowProcessingStrategyFactory
             || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory))
         || processingStrategyFactory instanceof LegacySynchronousProcessingStrategyFactory;
   }

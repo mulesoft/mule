@@ -15,18 +15,22 @@ import java.util.function.Consumer;
 /**
  * Used to dispatch {@link Event}'s asynchronously for processing. The result of asynchronous processing can be obtained by
  * subscribing to the {@link Event}'s {@link EventContext}.
- * 
- * All Sinks should support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
- * handle this, i.e. i) by continuing in the callee thread, ii) serializing all events to a single thread or iii) use a
- * ring-buffer to de-multiplex requests and then handle them with 1..n subscribers.
+ * <p/>
+ * All Sinks must support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
+ * handle this, i.e.
+ * <ol>
+ * <li>i) By continuing in the caller thread.</li>
+ * <li>ii) Serializing all events to a single thread.</li>
+ * <li>iii) Using a ring-buffer to de-multiplex requests and then handle them with 1..n subscribers.</li>
+ * </ol>
  *
  * @since 4.0
  */
 public interface Sink extends Consumer<Event> {
 
   /**
-   * Submit the given {@link Event} for processing without a timeout. If the {@link Event} can't not be processed immediately due
-   * to back-pressure then this method will block until in can be processed.
+   * Submit the given {@link Event} for processing without a timeout. If the {@link Event} cannot be processed immediately due to
+   * back-pressure then this method will block until in can be processed.
    *
    * @param event the {@link Event} to dispatch for processing
    */

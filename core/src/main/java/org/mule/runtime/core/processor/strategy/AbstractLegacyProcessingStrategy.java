@@ -19,7 +19,7 @@ import org.reactivestreams.Publisher;
 
 /**
  * Interface to be implemented by legacy processing strategy implementations. This interface provides a default implementation of
- * {@link #createSink(FlowConstruct, Function)} that ensures events are processed are not de-multiplexed onto a single
+ * {@link #createSink(FlowConstruct, Function)} that ensures processed events are not de-multiplexed into a single
  * {@link org.mule.runtime.core.api.construct.Flow} stream but are rather executed independently.
  */
 public abstract class AbstractLegacyProcessingStrategy extends AbstractProcessingStrategy {

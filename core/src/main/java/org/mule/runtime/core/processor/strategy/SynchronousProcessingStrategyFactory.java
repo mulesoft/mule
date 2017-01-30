@@ -25,6 +25,9 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
       return true;
     }
 
+    /*
+     * This processing strategy supports transactions so we override default check that fails on transactions.
+     */
     @Override
     protected Consumer<Event> createOnEventConsumer() {
       return event -> {

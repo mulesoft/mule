@@ -24,14 +24,14 @@ import org.reactivestreams.Publisher;
 public interface ProcessingStrategy {
 
   /**
-   * Creates instances of {@link Sink} to be used for emitting {@link Event}'s to be processed. Each {@link Sink} should be use
+   * Creates instances of {@link Sink} to be used for emitting {@link Event}'s to be processed. Each {@link Sink} should be used
    * independent streams that implement the {@link Pipeline}.
    *
    * @param flowConstruct pipeline instance.
-   * @param function function representing the
+   * @param pipelineFunction function representing the
    * @return new sink instance
    */
-  Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function);
+  Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> pipelineFunction);
 
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.

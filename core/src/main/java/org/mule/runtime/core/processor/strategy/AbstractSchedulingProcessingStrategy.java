@@ -23,6 +23,8 @@ import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.WorkQueueProcessor;
 
+import static reactor.core.publisher.WorkQueueProcessor.share;
+
 public abstract class AbstractSchedulingProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
   private Consumer<Scheduler> schedulerStopper;
@@ -35,7 +37,7 @@ public abstract class AbstractSchedulingProcessingStrategy extends AbstractProce
 
   @Override
   public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-    WorkQueueProcessor<Event> processor = WorkQueueProcessor.share(false);
+    WorkQueueProcessor<Event> processor = share(false);
     return new ReactorSink(processor.connectSink(), flowConstruct, processor.transform(function).retry().subscribe(),
                            createOnEventConsumer());
   }

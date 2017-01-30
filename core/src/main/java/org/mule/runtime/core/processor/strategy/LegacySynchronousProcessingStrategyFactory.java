@@ -26,6 +26,10 @@ public class LegacySynchronousProcessingStrategyFactory implements ProcessingStr
       return true;
     }
 
+    /*
+     * This processing strategy supports transactions so we override default check that fails on transactions.
+     */
+    @Override
     protected Consumer<Event> createOnEventConsumer() {
       return event -> {
       };

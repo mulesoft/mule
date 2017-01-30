@@ -215,7 +215,7 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     public Publisher<Event> apply(Publisher<Event> publisher) {
       return from(publisher)
-          .doOnNext(assertStrarted())
+          .doOnNext(assertStarted())
           .flatMap(event -> {
             if (processingStrategyFactory instanceof LegacySynchronousProcessingStrategyFactory) {
               return just(event).handle(nullSafeMap(checkedFunction(request -> processBlockingSynchronous(request))));
