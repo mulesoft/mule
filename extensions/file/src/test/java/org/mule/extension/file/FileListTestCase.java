@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ACCESS_DENIED;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
@@ -56,7 +56,7 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void listWithoutReadPermission() throws Exception {
-    expectedError.expectError(NAMESPACE, ACCESS_DENIED.getType(), FileAccessDeniedException.class,
+    expectedError.expectError(NAMESPACE, ACCESS_DENIED, FileAccessDeniedException.class,
                               "access was denied by the operating system");
 
     temporaryFolder.newFolder("forbiddenDirectory").setReadable(false);
@@ -78,13 +78,13 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void notDirectory() throws Exception {
-    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "Only directories can be listed");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class, "Only directories can be listed");
     doList(String.format(TEST_FILE_PATTERN, 0), false);
   }
 
   @Test
   public void notExistingPath() throws Exception {
-    expectedError.expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class, "doesn't exists");
     doList(String.format("whatever", 0), false);
   }
 

@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
  */
 public final class FileAlreadyExistsException extends ModuleException {
 
-  private static final FileErrors ERROR = FileErrors.FILE_ALREADY_EXISTS;
+  private static final FileError ERROR = FileError.FILE_ALREADY_EXISTS;
 
   /**
    * Creates a new instance with the specified detail {@code message}

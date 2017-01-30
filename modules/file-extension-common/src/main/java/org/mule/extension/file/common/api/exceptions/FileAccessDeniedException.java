@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
  */
 public final class FileAccessDeniedException extends ModuleException {
 
-  private static final FileErrors ERROR = FileErrors.ACCESS_DENIED;
+  private static final FileError ERROR = FileError.ACCESS_DENIED;
 
   /**
    * Creates a new instance with the specified detail {@code message}

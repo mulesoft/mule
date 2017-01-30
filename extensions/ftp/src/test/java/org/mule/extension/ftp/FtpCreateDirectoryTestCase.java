@@ -8,7 +8,7 @@ package org.mule.extension.ftp;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 

@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileErrors.ILLEGAL_PATH;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+
+    <ftp:config name="sftpConfigInvalidCredentials">
+        <ftp:sftp-connection username="invalidUser" password="invalidPassword" host="localhost" port="${SFTP_PORT}" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="sftpConfigConnectionTimeout">
+        <ftp:sftp-connection username="muletest1" password="muletest1" host="google.com" port="${SFTP_PORT}" workingDir="${workingDir}" connectionTimeout="1" connectionTimeoutUnit="MILLISECONDS"/>
+    </ftp:config>
+
+    <ftp:config name="sftpConfigConnectionRefused">
+        <ftp:sftp-connection username="muletest1" password="muletest1" host="localhost" port="8888" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="sftpConfigMissingCredentials">
+        <ftp:sftp-connection host="localhost" port="${SFTP_PORT}" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="sftpConfigUnknownHost">
+        <ftp:sftp-connection username="anonymous" password="password"  host="dsadsadas" port="${SFTP_PORT}" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="sftpConfigFirstConnection">
+        <ftp:sftp-connection username="limitedUsed" password="limitedUsed"  host="localhost" port="${SFTP_PORT}" workingDir="${workingDir}" />
+    </ftp:config>
+
+    <ftp:config name="sftpConfigServiceUnavailable">
+        <ftp:sftp-connection username="limitedUsed" password="limitedUsed"  host="localhost" port="${SFTP_PORT}" workingDir="${workingDir}" />
+    </ftp:config>
+
+</mule>

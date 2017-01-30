@@ -15,6 +15,7 @@ import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
 import com.google.common.base.Joiner;
@@ -64,11 +65,17 @@ public class ExpectedError implements TestRule {
   /**
    * Helper method to configure all the matchers that can be used with this rule at the same time.
    */
-  public void expectError(String namespace, String errorTypeDefinition, Class<?> cause,
-                          String message) {
+  public void expectError(String namespace, String errorTypeDefinition, Class<?> cause, String message) {
     expectErrorType(namespace, errorTypeDefinition)
         .expectCause(instanceOf(cause))
         .expectMessage(containsString(message));
+  }
+
+  /**
+   * Helper method to configure all the matchers that can be used with this rule at the same time.
+   */
+  public void expectError(String namespace, ErrorTypeDefinition errorTypeDefinition, Class<?> cause, String message) {
+    expectError(namespace, errorTypeDefinition.getType(), cause, message);
   }
 
   public ExpectedError expectMessage(Matcher<String> matcher) {

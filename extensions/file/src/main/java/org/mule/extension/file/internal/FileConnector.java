@@ -12,10 +12,11 @@ import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFilePredicateBuilder;
+import org.mule.extension.file.api.exception.FileConnectionException;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.BaseFileSystemOperations;
-import org.mule.extension.file.common.api.exceptions.FileErrors;
+import org.mule.extension.file.common.api.exceptions.FileError;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -37,9 +38,9 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 @SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @ConnectionProviders(LocalFileConnectionProvider.class)
 @Sources(DirectoryListener.class)
-@ErrorTypes(FileErrors.class)
+@ErrorTypes(FileError.class)
 @Export(classes = {LocalFileAttributes.class, FileEventType.class, ListenerFileAttributes.class, EventedFileAttributes.class,
-    DeletedFileAttributes.class})
+    DeletedFileAttributes.class, FileConnectionException.class})
 public class FileConnector extends FileConnectorConfig {
 
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.common.api.exceptions;
 
-import static org.mule.extension.file.common.api.exceptions.FileErrors.*;
+import static org.mule.extension.file.common.api.exceptions.FileError.*;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
@@ -22,7 +22,7 @@ public final class FileLockedException extends ModuleException {
    * @param message the detail message
    */
   public FileLockedException(String message) {
-    super(message, CONCURRENCY);
+    super(message, FILE_LOCK);
   }
 }
 

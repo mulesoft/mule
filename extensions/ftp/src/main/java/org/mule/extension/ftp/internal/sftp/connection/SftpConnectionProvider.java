@@ -6,7 +6,11 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
+import static java.lang.String.format;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import com.jcraft.jsch.JSchException;
+import org.mule.extension.file.common.api.exceptions.FileError;
+import org.mule.extension.ftp.api.FTPConnectionException;
 import org.mule.extension.ftp.api.sftp.SftpAuthenticationMethod;
 import org.mule.extension.ftp.internal.AbstractFtpConnectionProvider;
 import org.mule.extension.ftp.internal.FtpConnector;
@@ -20,6 +24,8 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import com.google.common.base.Joiner;
 
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.Set;
 
 /**
@@ -31,6 +37,10 @@ import java.util.Set;
 @Alias("sftp")
 @DisplayName("SFTP Connection")
 public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFileSystem> {
+
+  private static final String AUTH_FAIL_MESSAGE = "Auth fail";
+  private static final String SSH_DISCONNECTION_MESSAGE = "SSH_MSG_DISCONNECT";
+  private static final String TIMEOUT = "timeout";
 
   @ParameterGroup(name = CONNECTION)
   private SftpConnectionSettings connectionSettings = new SftpConnectionSettings();
@@ -65,13 +75,14 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
     client.setKnownHostsFile(knownHostsFile);
     try {
       client.login(connectionSettings.getUsername());
+    } catch (JSchException e) {
+      handleJSchException(e);
     } catch (Exception e) {
       throw new ConnectionException(e);
     }
 
     return new SftpFileSystem(client, getWorkingDir(), muleContext);
   }
-
 
   void setPort(int port) {
     connectionSettings.setPort(port);
@@ -107,5 +118,34 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
 
   void setClientFactory(SftpClientFactory clientFactory) {
     this.clientFactory = clientFactory;
+  }
+
+  /**
+   * Handles a {@link JSchException}, introspects their cause or message to return a {@link ConnectionException}
+   * indicating with a {@link FileError} the kind of failure.
+   * @param e The exception to handle
+   * @throws ConnectionException Indicating the kind of failure
+   */
+  private void handleJSchException(JSchException e) throws ConnectionException {
+    String message = e.getMessage();
+    if (message.equals(AUTH_FAIL_MESSAGE)) {
+      throw new FTPConnectionException(format("Error during login to %s@%s", connectionSettings.getUsername(),
+                                              connectionSettings.getHost()),
+                                       e, FileError.INVALID_CREDENTIALS);
+    }
+    if (e.getMessage().startsWith(TIMEOUT)) {
+      throw new FTPConnectionException(e, FileError.CONNECTION_TIMEOUT);
+    }
+    if (e.getMessage().startsWith(SSH_DISCONNECTION_MESSAGE)) {
+      throw new FTPConnectionException("An error occurred connecting to the SFTP server: " + e.getMessage(), e,
+                                       FileError.DISCONNECTED);
+    }
+    if (e.getCause() instanceof ConnectException) {
+      throw new FTPConnectionException(e, FileError.CANNOT_REACH);
+    }
+    if (e.getCause() instanceof UnknownHostException) {
+      throw new FTPConnectionException(e, FileError.UNKNOWN_HOST);
+    }
+    throw new ConnectionException(e);
   }
 }
