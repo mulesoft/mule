@@ -6,26 +6,21 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.Exceptions.propagate;
-import org.mule.runtime.core.api.DefaultMuleException;
+import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Sink;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
-import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Interface to be implemented by legacy processing strategy implementations. This interface provides a default implementation of
  * {@link #createSink(FlowConstruct, Function)} that ensures events are processed are not de-multiplexed onto a single
- * {@link org.mule.runtime.core.construct.Flow} stream but are rather executed independenatly stream.
+ * {@link org.mule.runtime.core.api.construct.Flow} stream but are rather executed independently.
  */
 public abstract class AbstractLegacyProcessingStrategy extends AbstractProcessingStrategy {
 
@@ -38,14 +33,9 @@ public abstract class AbstractLegacyProcessingStrategy extends AbstractProcessin
       @Override
       public void accept(Event event) {
         onEventConsumer.accept(event);
-        Mono.just(event).transform(function).subscribe();
+        just(event).transform(function).subscribe();
       }
 
-      @Override
-      public void submit(Event event, Duration duration) {
-        onEventConsumer.accept(event);
-        accept(event);
-      }
     };
   }
 

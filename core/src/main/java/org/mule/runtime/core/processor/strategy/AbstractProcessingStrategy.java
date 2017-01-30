@@ -9,7 +9,7 @@ package org.mule.runtime.core.processor.strategy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.Exceptions.propagate;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -18,13 +18,11 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 
-import java.time.Duration;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
 import reactor.core.publisher.BlockingSink;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.FluxProcessor;
@@ -73,18 +71,17 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public void accept(Event event) {
       onEventConsumer.accept(event);
-      blockingSink.accept(event);
-    }
-
-    @Override
-    public void submit(Event event, Duration duration) {
-      onEventConsumer.accept(event);
-      if (blockingSink.submit(event) < 0) {
-        MessagingException rejectedException =
-            new MessagingException(event, new RejectedExecutionException("Flow rejected execution of event after "
-                + duration.toMillis() + "ms"));
-        flowConstruct.getExceptionListener().handleException(rejectedException, event);
-        event.getContext().error(rejectedException);
+      switch (blockingSink.emit(event)) {
+        case BACKPRESSURED:
+          // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
+          blockingSink.accept(event);
+          //event.getContext().error(new RejectedExecutionException("Flow `" + flowConstruct.getName()
+          //    + "` rejected execution of event due to back-pressure"));
+        case FAILED:
+          event.getContext().error(blockingSink.getError());
+        case CANCELLED:
+          event.getContext().error(new RejectedExecutionException("Flow `" + flowConstruct.getName()
+              + "` rejected execution of event as it is stopped"));
       }
     }
 

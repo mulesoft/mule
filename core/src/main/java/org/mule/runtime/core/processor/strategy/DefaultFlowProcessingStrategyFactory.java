@@ -8,39 +8,29 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 
-import static org.mule.runtime.core.transaction.TransactionCoordination.*;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 
-import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.NOPLogger;
 
 /**
  * Creates default processing strategy with same behaviuor as {@link ProactorProcessingStrategyFactory} apart from the fact it
@@ -97,15 +87,6 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
       public DelegateSink(Sink syncSink, Sink proactorSink) {
         this.syncSink = syncSink;
         this.proactorSink = proactorSink;
-      }
-
-      @Override
-      public void submit(Event event, Duration duration) {
-        if (isTransactionActive()) {
-          syncSink.submit(event, duration);
-        } else {
-          proactorSink.submit(event, duration);
-        }
       }
 
       @Override

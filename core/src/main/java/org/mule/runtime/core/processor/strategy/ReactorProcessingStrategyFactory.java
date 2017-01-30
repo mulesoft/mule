@@ -7,16 +7,11 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;

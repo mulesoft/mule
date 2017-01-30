@@ -24,7 +24,6 @@ import java.util.function.Consumer;
  */
 public interface Sink extends Consumer<Event> {
 
-
   /**
    * Submit the given {@link Event} for processing without a timeout. If the {@link Event} can't not be processed immediately due
    * to back-pressure then this method will block until in can be processed.
@@ -33,14 +32,5 @@ public interface Sink extends Consumer<Event> {
    */
   @Override
   void accept(Event event);
-
-  /**
-   * Submit the given {@link Event} for processing with a timeout. If the {@link Event} could not be processed, due to for example
-   * back-pressure, when the timeout is reached then the {@link EventContext} will be completed with an error of type 'OVERLOAD'.
-   *
-   * @param event the {@link Event} to dispatch for processing
-   * @param duration timeout after which the {@link EventContext} will be completed with an error.
-   */
-  void submit(Event event, Duration duration);
 
 }

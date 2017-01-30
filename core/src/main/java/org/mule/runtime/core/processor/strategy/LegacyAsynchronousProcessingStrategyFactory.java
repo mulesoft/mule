@@ -7,14 +7,11 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.empty;
@@ -24,7 +21,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
