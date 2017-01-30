@@ -52,7 +52,7 @@ public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestC
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
-    assertEquals(XML.withCharset(StandardCharsets.UTF_8), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
+    assertEquals(XML.withCharset(StandardCharsets.UTF_8).toRfcString(), response.getHeaderValueIgnoreCase(CONTENT_TYPE));
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
 
     Document document = DocumentHelper.parseText(payload);
