@@ -69,7 +69,7 @@ public abstract class AbstractAnnotatedObject implements AnnotatedObject {
 
       @Override
       public ComponentType getComponentType() {
-        // TODO improve this implementation
+        // TODO MULE-11568 improve this implementation
         if (AbstractAnnotatedObject.this instanceof MessageSource) {
           return SOURCE;
         } else if (AbstractAnnotatedObject.this instanceof OutboundRouter

@@ -10,14 +10,19 @@ package org.mule.runtime.core.processor.interceptor;
 import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
@@ -29,28 +34,19 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.api.interception.ProcessorParameterResolver;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.exception.MessagingException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
- * 
+ *
  * @since 4.0
  */
-public class ReactiveInterceptorAdapter implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>,
+public class ReactiveInterceptorAdapter
+    implements BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>,
     FlowConstructAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
@@ -69,7 +65,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   @Override
-  public ReactiveProcessor apply(Processor component, ReactiveProcessor next) {
+  public Function<Publisher<Event>, Publisher<Event>> apply(Processor component,
+                                                            Function<Publisher<Event>, Publisher<Event>> next) {
     if (!isInterceptable(component)) {
       return next;
     }
@@ -123,7 +120,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private CompletableFuture<Event> doAround(Event event, Processor component, Map<String, String> dslParameters,
-                                            ReactiveProcessor next) {
+                                            Function<Publisher<Event>, Publisher<Event>> next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
     return interceptionHandler.around(resolveParameters(event, component, dslParameters), interceptionEvent,
@@ -152,15 +149,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private Map<String, Object> resolveParameters(Event event, Processor processor, Map<String, String> parameters) {
-    if (processor instanceof ProcessorParameterResolver) {
-      try {
-        return ((ProcessorParameterResolver) processor).resolve(event);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(createStaticMessage("Exception while resolving parameters %s of processor %s",
-                                                           parameters.toString(), processor.toString()),
-                                       e);
-      }
-    }
+    // TODO MULE-11567 properly get SDK operation parameters
+    // TODO MULE-11527 avoid doing unnecesary evaluations
 
     Map<String, Object> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {

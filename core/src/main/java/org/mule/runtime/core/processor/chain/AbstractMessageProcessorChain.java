@@ -20,6 +20,13 @@ import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,7 +42,6 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
@@ -43,14 +49,6 @@ import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -69,7 +67,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
-  private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
+  private List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptors =
+      new ArrayList<>();
 
   public AbstractMessageProcessorChain(List<Processor> processors) {
     this(null, processors);
@@ -122,12 +121,12 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     if (flowConstruct instanceof Pipeline) {
-      interceptors.add(0, (processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor().apply(next));
+      interceptors.add(0, (processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(processor, next));
     }
 
     List<ProcessorInterceptor> interceptionHandlerChain =
         muleContext.getProcessorInterceptorManager().getInterceptors();
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted =
+    List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptorsToBeExecuted =
         new ArrayList<>(interceptors.size() + interceptionHandlerChain.size());
     // TODO MULE-11521 Review how interceptors are registered!
     interceptionHandlerChain.stream()
@@ -140,8 +139,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
     Flux<Event> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
-      ReactiveProcessor processorFunction = processor;
-      for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
+      Function<Publisher<Event>, Publisher<Event>> processorFunction = processor;
+      for (BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>> interceptor : interceptorsToBeExecuted) {
         processorFunction = interceptor.apply(processor, processorFunction);
       }
       stream = stream.transform(processorFunction);

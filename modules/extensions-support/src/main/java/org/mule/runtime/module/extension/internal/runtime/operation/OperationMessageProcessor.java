@@ -8,11 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.INTERCEPTING;
 import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.OPERATION;
-import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.PROCESSOR;
-import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.ROUTER;
-import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -34,7 +30,9 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.component.ComponentIdentifier.ComponentType;
+import java.util.Map;
+import java.util.Optional;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -48,17 +46,10 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.interception.ProcessorParameterResolver;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.OutboundRouter;
-import org.mule.runtime.core.api.routing.SelectiveRouter;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
@@ -76,12 +67,9 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-
-import java.util.Map;
-import java.util.Optional;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -108,7 +96,7 @@ import reactor.core.publisher.Mono;
  * @since 3.7.0
  */
 public class OperationMessageProcessor extends ExtensionComponent<OperationModel>
-    implements Processor, EntityMetadataProvider, ProcessorParameterResolver, Lifecycle {
+    implements Processor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = getLogger(OperationMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
@@ -156,16 +144,11 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public Map<String, Object> resolve(Event event) throws MuleException {
-    return resolverSet.resolve(event).asMap();
-  }
-
-  @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     if (operationModel.isBlocking()) {
       return from(publisher).map(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
         Optional<ConfigurationInstance> configuration = getConfiguration(event);
-        Map<String, Object> operationParameters = resolve(event);
+        Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
 
         OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent) -> {
           ExecutionContextAdapter operationContext = createExecutionContext(configuration, parameters, operationEvent);
@@ -184,7 +167,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration = getConfiguration(event);
-      Map<String, Object> operationParameters = resolve(event);
+      Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
       ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
 
       // TODO: MULE-11184 - it shouldn't be necessary to create the MessagingException here.

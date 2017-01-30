@@ -14,17 +14,17 @@ import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.reactivestreams.Publisher;
 
 /**
@@ -91,16 +91,15 @@ public class ProactorProcessingStrategyFactory extends MultiReactorProcessingStr
     }
 
     @Override
-    public Function<ReactiveProcessor, ReactiveProcessor> onProcessor() {
-      return processor -> {
-        if (processor.getProcessingType() == BLOCKING) {
-          return proactor(processor, blockingScheduler);
-        } else if (processor.getProcessingType() == CPU_INTENSIVE) {
-          return proactor(processor, cpuIntensiveScheduler);
-        } else {
-          return publisher -> from(publisher).transform(processor);
-        }
-      };
+    public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
+                                                                    Function<Publisher<Event>, Publisher<Event>> processorFunction) {
+      if (messageProcessor.getProcessingType() == BLOCKING) {
+        return proactor(processorFunction, blockingScheduler);
+      } else if (messageProcessor.getProcessingType() == CPU_INTENSIVE) {
+        return proactor(processorFunction, cpuIntensiveScheduler);
+      } else {
+        return publisher -> from(publisher).transform(processorFunction);
+      }
     }
 
     private ReactiveProcessor proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
