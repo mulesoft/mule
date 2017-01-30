@@ -138,10 +138,17 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   public void parseCompatibility() throws MuleException {
     assertThat(expressionManager.parse("this is #[mel:payload]", testEvent(), mock(FlowConstruct.class)),
                is(String.format("this is %s", TEST_PAYLOAD)));
-    assertThat(expressionManager.parse("'this is ' ++ payload", testEvent(), mock(FlowConstruct.class)),
+    assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), mock(FlowConstruct.class)),
                is(String.format("this is %s", TEST_PAYLOAD)));
     expectedException.expect(RuntimeException.class);
     expressionManager.parse("this is #[payload]", testEvent(), mock(FlowConstruct.class));
+  }
+
+  @Test
+  @Description("Verifies that parsing works for plain String scenarios.")
+  public void parse() throws MuleException {
+    String expression = "this is a test";
+    assertThat(expressionManager.parse(expression, testEvent(), mock(FlowConstruct.class)), is(expression));
   }
 
   @Test

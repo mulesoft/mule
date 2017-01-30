@@ -159,7 +159,7 @@
 
     <flow name="components">
         <echo-component/>
-        <test:component appendString="'test'"/>
+        <test:component appendString="test"/>
     </flow>
 
     <flow name="wiretap">

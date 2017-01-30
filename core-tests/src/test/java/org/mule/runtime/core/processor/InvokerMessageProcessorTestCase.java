@@ -128,7 +128,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
   public void testMethodWithPrimitiveArgTypes() throws MuleException, Exception {
     invoker.setMethodName("testDuplicateNameMethod");
     invoker.setArgumentTypes(new Class<?>[] {String.class, Integer.class});
-    invoker.setArguments(asList("'some String'", 42));
+    invoker.setArguments(asList("some String", 42));
     invoker.initialise();
     assertEquals("some String42(string and int)",
                  invoker.process(testEvent()).getMessageAsString(muleContext));
