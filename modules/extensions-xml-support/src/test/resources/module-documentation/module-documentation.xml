@@ -12,10 +12,12 @@
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <property name="aPropertyWithDoc" type="string" doc:description="Documentation for the property"/>
+    <property name="aHiddenPropertyWithDoc" type="string" password="true" doc:description="Documentation for the hidden property"/>
 
     <operation name="operation-with-doc" doc:description="Documentation for the operation">
         <parameters>
             <parameter name="paramWithDoc" type="string" doc:description="Documentation for the parameter" />
+            <parameter name="hiddenParamWithDoc" type="string" password="true" doc:description="Documentation for the hidden parameter" />
         </parameters>
         <body>
             <mule:set-payload value="hardcoded value"/>
