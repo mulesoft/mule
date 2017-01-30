@@ -71,16 +71,8 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public void accept(Event event) {
       onEventConsumer.accept(event);
-      switch (blockingSink.emit(event)) {
-        case BACKPRESSURED:
-          // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
-          blockingSink.accept(event);
-        case FAILED:
-          event.getContext().error(blockingSink.getError());
-        case CANCELLED:
-          event.getContext().error(new RejectedExecutionException("Flow '" + flowConstruct.getName()
-              + "' rejected execution of event as it is stopped"));
-      }
+      // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
+      blockingSink.accept(event);
     }
 
     @Override
