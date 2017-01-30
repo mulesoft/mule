@@ -7,7 +7,8 @@
 package org.mule.module.ws.functional;
 
 import static org.mule.api.config.MuleProperties.MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE;
-
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.FALSE;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
@@ -26,16 +27,16 @@ public class WssCheckTimestampInResponseTestCase extends AbstractWssCheckTimesta
     {
         return Arrays.asList(new Object[][] {
                                              // TS in response and TS check action requested
-                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, Boolean.TRUE.toString()),
+                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, TRUE.toString()),
                                               EXPECTED_RESPONSE, dynamicPortTSInResponseTSCheck, ECHO_REQUEST_WITH_HEADERS},
                                              // No TS in response and TS check action requested
-                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, Boolean.TRUE.toString()),
+                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, TRUE.toString()),
                                               EXPECTED_ERROR_NO_TIMESTAMP_RESPONSE, dynamicPortNoTSInResponseTSCheck, ECHO_REQUEST_WITH_HEADERS},
                                              // TS in response and no TS check action requested
-                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, Boolean.FALSE.toString()),
+                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, FALSE.toString()),
                                               EXPECTED_ERROR_NO_TIMESTAMP_RESPONSE, dynamicPortTSInResponseNoTSCheck, ECHO_REQUEST_WITH_HEADERS},
                                              // No TS in response and No TS check action requested
-                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, Boolean.FALSE.toString()),
+                                             {new SystemProperty(MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE, FALSE.toString()),
                                               EXPECTED_RESPONSE, dynamicPortNoTSInResponseNoTSCheck, ECHO_REQUEST_WITH_HEADERS}
         });
     }
