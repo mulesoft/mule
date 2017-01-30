@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.model.resolvers;
+package org.mule.runtime.core.api.model.resolvers;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -20,8 +20,8 @@ import java.util.Set;
 
 /**
  * A base class that allows implementing resolvers to define what parameters it is expecting. Currently there are two
- * implementations of this {@link org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver}, that allows methods with
- * no arguments to be invoked and {@link org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver} that allows for methods
+ * implementations of this {@link org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver}, that allows methods with
+ * no arguments to be invoked and {@link org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver} that allows for methods
  * that accept an array type to be invoked.
  * <p/>
  * Users can set explicit method names on this resolver to control which methods are allowed to be called. Also a set of 'ignored'

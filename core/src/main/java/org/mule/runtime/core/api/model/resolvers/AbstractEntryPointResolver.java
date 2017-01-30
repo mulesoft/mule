@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.model.resolvers;
+package org.mule.runtime.core.api.model.resolvers;
 
 import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.api.MuleEventContext;

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.message.SessionHandler;
-import org.mule.runtime.core.model.streaming.CallbackOutputStream;
+import org.mule.runtime.core.api.model.streaming.CallbackOutputStream;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 
 import java.io.OutputStream;

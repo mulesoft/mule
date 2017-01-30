@@ -16,7 +16,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

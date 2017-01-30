@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;

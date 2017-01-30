@@ -18,8 +18,8 @@ import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
 
 import java.util.Collection;
 

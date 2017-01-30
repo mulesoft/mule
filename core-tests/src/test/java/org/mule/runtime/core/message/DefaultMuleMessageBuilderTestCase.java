@@ -26,7 +26,7 @@ import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;

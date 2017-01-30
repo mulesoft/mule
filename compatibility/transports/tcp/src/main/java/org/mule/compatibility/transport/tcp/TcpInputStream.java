@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.tcp;
 
-import org.mule.runtime.core.model.streaming.DelegatingInputStream;
+import org.mule.runtime.core.api.model.streaming.DelegatingInputStream;
 
 import java.io.InputStream;
 

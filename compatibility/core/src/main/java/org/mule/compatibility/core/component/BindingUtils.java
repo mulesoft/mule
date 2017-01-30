@@ -11,8 +11,8 @@ import org.mule.compatibility.core.api.component.JavaWithBindingsComponent;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.model.resolvers.NoSatisfiableMethodsException;
-import org.mule.runtime.core.model.resolvers.TooManySatisfiableMethodsException;
+import org.mule.runtime.core.api.model.resolvers.NoSatisfiableMethodsException;
+import org.mule.runtime.core.api.model.resolvers.TooManySatisfiableMethodsException;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.lang.reflect.Method;

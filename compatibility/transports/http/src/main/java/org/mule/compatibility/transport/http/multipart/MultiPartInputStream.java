@@ -21,7 +21,7 @@ package org.mule.compatibility.transport.http.multipart;
 // ========================================================================
 
 
-import org.mule.runtime.core.model.streaming.DeleteOnCloseFileInputStream;
+import org.mule.runtime.core.api.model.streaming.DeleteOnCloseFileInputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
