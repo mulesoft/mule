@@ -175,7 +175,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         }
         catch (IllegalArgumentException e)
         {
-            Message errorDescription = MessageFactory.createStaticMessage(e.getMessage());
+            Message errorDescription = MessageFactory.createStaticMessage("Invalid URL parameter encoding\n%s", e.getMessage());
             throw new BadRequestException(errorDescription, e);
         }
 

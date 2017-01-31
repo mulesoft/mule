@@ -195,7 +195,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     {
         // MULE-11535: unwrap errors thrown in the initialization phase so that the true cause can be used to generate status codes
         Throwable error = exception;
-        if (error instanceof DefaultMuleException && error.getCause() instanceof CreateException)
+        if (error instanceof DefaultMuleException
+            && error.getCause() instanceof CreateException
+            && error.getCause().getCause() != null)
         {
             error = error.getCause().getCause();
         }
