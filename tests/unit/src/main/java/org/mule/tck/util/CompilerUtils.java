@@ -7,6 +7,24 @@
 
 package org.mule.tck.util;
 
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.tck.ZipUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.util.*;
+
 import static java.io.File.pathSeparator;
 import static java.util.stream.Collectors.toList;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
@@ -14,27 +32,6 @@ import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.tck.ZipUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-
-import org.apache.commons.io.filefilter.NameFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tools to compile Java files into classes, jars and Mule extensions.
@@ -208,7 +205,12 @@ public class CompilerUtils {
     }
 
     private String getRelativePath(File targetFolder, File file) {
-      return file.getAbsolutePath().substring(targetFolder.getAbsolutePath().length() + 1);
+      final StringJoiner pathJoiner = new StringJoiner("/");
+      final Path relativePath = targetFolder.toPath().relativize(file.toPath());
+      for (Path path : relativePath) {
+        pathJoiner.add(path.toString());
+      }
+      return pathJoiner.toString();
     }
 
   }
