@@ -402,6 +402,22 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetFishFromRiverStreamType" substitutionGroup="mule:abstract-operator" name="get-fish-from-river-stream"></xs:element>
+    <xs:complexType name="GetFishFromRiverStreamType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="river"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="pollutedStream"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetForbiddenPetsType" substitutionGroup="mule:abstract-operator" name="get-forbidden-pets"></xs:element>
     <xs:complexType name="GetForbiddenPetsType">
         <xs:complexContent>
