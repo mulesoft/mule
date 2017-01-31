@@ -12,6 +12,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURAT
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -23,12 +24,10 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
-import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
+import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
@@ -38,6 +37,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -56,13 +56,13 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
@@ -155,7 +155,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @OnSuccess
   public void onSuccess(
                         @Optional @Placement(
-                            tab = RESPONSE_SETTINGS) @NullSafe HttpListenerSuccessResponseBuilder response,
+                            tab = RESPONSE_SETTINGS) @NullSafe HttpListenerResponseBuilder response,
                         SourceCallbackContext callbackContext)
       throws Exception {
 
@@ -167,14 +167,14 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @OnError
   public void onError(
                       @Optional @Placement(
-                          tab = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerErrorResponseBuilder errorResponse,
+                          tab = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
     if (errorResponse.getBody() == null) {
-      errorResponse.setBody(error.getCause().getMessage());
+      errorResponse.setBody(new TypedValue<>(error.getCause().getMessage(), STRING));
     }
 
     HttpResponseContext context = callbackContext.getVariable("responseContext");
@@ -326,7 +326,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     // return muleEvent;
   }
 
-  protected HttpResponse buildResponse(HttpListenerSuccessResponseBuilder listenerResponseBuilder, boolean supportStreaming)
+  protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportStreaming)
       throws Exception {
     HttpResponseBuilder responseBuilder = HttpResponse.builder();
 
@@ -334,7 +334,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   }
 
   protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
-                                         HttpListenerSuccessResponseBuilder listenerResponseBuilder,
+                                         HttpListenerResponseBuilder listenerResponseBuilder,
                                          boolean supportsStreaming)
       throws Exception {
     return responseFactory.create(responseBuilder, listenerResponseBuilder, supportsStreaming);

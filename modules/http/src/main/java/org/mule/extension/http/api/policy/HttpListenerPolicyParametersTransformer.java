@@ -8,10 +8,9 @@ package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -43,10 +42,11 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     ParameterMap headers = new ParameterMap(responseBuilder.getHeaders());
     Message.Builder messageBuilder;
     Message.PayloadBuilder builder = Message.builder();
-    if (responseBuilder.getBody() == null) {
+    TypedValue<Object> body = responseBuilder.getBody();
+    if (body.getValue() == null) {
       messageBuilder = builder.nullPayload();
     } else {
-      messageBuilder = builder.payload(responseBuilder.getBody());
+      messageBuilder = builder.payload(body.getValue()).mediaType(body.getDataType().getMediaType());
     }
     int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
     return messageBuilder
@@ -62,12 +62,12 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Map<String, Object> fromMessageToSuccessResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), "response", message);
+    return messageToResponseParameters(new HttpListenerResponseBuilder(), "response", message);
   }
 
   @Override
   public Map<String, Object> fromMessageToErrorResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), "errorResponse", message);
+    return messageToResponseParameters(new HttpListenerResponseBuilder(), "errorResponse", message);
   }
 
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,
@@ -76,14 +76,14 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
         ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder);
     if (message.getAttributes() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes();
-      httpListenerResponseBuilder.setBody(message.getPayload().getValue());
+      httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else if (message.getAttributes() instanceof HttpPolicyResponseAttributes) {
       HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes();
-      httpListenerResponseBuilder.setBody(message.getPayload().getValue());
+      httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());

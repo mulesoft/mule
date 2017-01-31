@@ -8,19 +8,19 @@ package org.mule.extension.oauth2.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpSendBodyMode.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.NEVER;
 import static org.mule.extension.oauth2.api.exception.OAuthErrors.TOKEN_URL_FAIL;
 import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_EXPRESSION;
 import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRATION_TIME_EXPRESSION;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_EXPRESSION;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.HttpRequestFactory;
@@ -31,6 +31,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -153,7 +154,7 @@ public abstract class AbstractTokenRequestHandler implements Initialisable, Star
       throws MuleException, TokenUrlResponseException {
     try {
       final HttpRequesterRequestBuilder requestBuilder = new HttpRequesterRequestBuilder();
-      requestBuilder.setBody(tokenRequestFormToSend);
+      requestBuilder.setBody(new TypedValue<>(tokenRequestFormToSend, fromObject(tokenRequestFormToSend)));
 
       if (authorization != null) {
         requestBuilder.setHeaders(singletonMap(AUTHORIZATION, authorization));

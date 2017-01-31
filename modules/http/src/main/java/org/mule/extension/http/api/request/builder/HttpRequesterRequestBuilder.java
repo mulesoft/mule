@@ -7,15 +7,11 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.of;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.extension.http.api.HttpMessageBuilder;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,26 +40,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Content
   @DisplayName("Query Parameters")
   private Map<String, String> queryParams = new HashMap<>();
-
-  /**
-   * The mediaType of the body to respond
-   */
-  //TODO: MULE-10877 this should be replaced by having body as a TypedValue
-  @Parameter
-  @Optional(defaultValue = "#[mel:message.dataType.mediaType]")
-  private ParameterResolver<MediaType> mediaType = new ParameterResolver<MediaType>() {
-
-    @Override
-    public MediaType resolve() {
-      return ANY;
-    }
-
-    @Override
-    public java.util.Optional<String> getExpression() {
-      return of("#['*/*']");
-    }
-  };
-
 
   // For now, only handle single params
   public String replaceUriParams(String path) {
@@ -95,8 +71,4 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     this.uriParams = uriParams;
   }
 
-  @Override
-  public MediaType getMediaType() {
-    return mediaType.resolve();
-  }
 }

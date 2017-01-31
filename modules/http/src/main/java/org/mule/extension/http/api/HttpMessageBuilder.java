@@ -6,10 +6,10 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public abstract class HttpMessageBuilder {
    */
   @Parameter
   @Content(primary = true)
-  private Object body;
+  private TypedValue<Object> body;
 
 
   /**
@@ -37,13 +37,11 @@ public abstract class HttpMessageBuilder {
   @Content
   protected Map<String, String> headers = new HashMap<>();
 
-  public Object getBody() {
+  public TypedValue<Object> getBody() {
     return body;
   }
 
-  public abstract MediaType getMediaType();
-
-  public void setBody(Object body) {
+  public void setBody(TypedValue<Object> body) {
     this.body = body;
   }
 
