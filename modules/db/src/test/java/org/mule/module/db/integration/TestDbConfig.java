@@ -20,7 +20,7 @@ public class TestDbConfig
 
     private static boolean USE_DERBY = true;
     private static boolean USE_MYSQL = false;
-    private static boolean USE_ORACLE = true;
+    private static boolean USE_ORACLE = false;
 
 
     public static List<Object[]> getResources()

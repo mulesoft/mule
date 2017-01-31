@@ -11,7 +11,6 @@ import static org.mule.module.db.integration.TestRecordUtil.assertMessageContain
 import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
@@ -44,8 +43,7 @@ public class OracleSelectWithTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void selectWith() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://with", TEST_MESSAGE, null);
+        MuleMessage response = runFlow("with").getMessage();
 
         assertMessageContains(response, getAllPlanetRecords());
     }
