@@ -9,8 +9,12 @@
     <httpn:request-config name="requestConfig">
         <httpn:request-connection host="localhost" port="${httpPort}" maxConnections="1"/>
     </httpn:request-config>
-    <flow name="limitedConnections" processingStrategy="synchronous">
+
+    <!-- TODO MULE-11351 Rework ring-buffer based processing strategy implementations for stream approach -->
+    <flow name="limitedConnections" processingStrategy="legacy-sync">
         <httpn:request config-ref="requestConfig" path="testPath"/>
     </flow>
+
+    <custom-processing-strategy name="legacy-sync" class="org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory"/>
 
 </mule>

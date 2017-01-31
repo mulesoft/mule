@@ -22,7 +22,8 @@
         <petstore:get-client config-ref="${configName}"/>
     </flow>
 
-    <flow name="getClientOnLatch" processingStrategy="legacy-sync">
+    <!-- TODO MULE-11351 Rework ring-buffer based processing strategy implementations for stream approach -->
+     <flow name="getClientOnLatch" processingStrategy="legacy-sync">
         <petstore:get-client-on-latch config-ref="${configName}"/>
     </flow>
 
