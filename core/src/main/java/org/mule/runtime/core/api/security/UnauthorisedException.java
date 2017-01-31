@@ -38,7 +38,7 @@ public class UnauthorisedException extends SecurityException {
     I18nMessage m;
     if (context == null) {
       m = createStaticMessage("Registered authentication is set to %s but there was no security context on the session",
-                              filter.getClass().getName());
+                              filter);
     } else {
       m = createStaticMessage("Authentication failed for principal %s", context.getAuthentication().getPrincipal());
     }
