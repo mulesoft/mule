@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-repeated-operations"
+        namespace="http://www.mulesoft.org/schema/mule/module-repeated-operations"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <operation name="repeated-operation">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="repeated-operation">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>
