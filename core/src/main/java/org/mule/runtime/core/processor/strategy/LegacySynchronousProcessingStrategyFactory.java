@@ -18,8 +18,8 @@ public class LegacySynchronousProcessingStrategyFactory implements ProcessingStr
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return (flowConstruct, pipelineFunction) -> {
-      throw new IllegalStateException("Sink cannot be created for " + LegacySynchronousProcessingStrategyFactory.class.getName());
+    return (flowConstruct, pipelineFunction) -> event -> {
+      throw new IllegalStateException("Sink is not supported for " + LegacySynchronousProcessingStrategyFactory.class.getName());
     };
   }
 }
