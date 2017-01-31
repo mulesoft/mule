@@ -21,11 +21,16 @@ import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMule
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
@@ -34,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -44,29 +50,33 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
  */
 public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactory<PolicyTemplateDescriptor> {
 
-  public static final String PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID = "PROPERTIES";
-  protected static final String FILE_SYSTEM_MODEL_LOADER_ID = "FILE_SYSTEM";
   protected static final String MISSING_POLICY_DESCRIPTOR_ERROR = "Policy must contain a " + MULE_POLICY_JSON + " file";
 
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+  private final DescriptorLoaderRepository descriptorLoaderRepository;
 
   /**
    * Creates a default factory
    */
   @SuppressWarnings({"unused"})
   public PolicyTemplateDescriptorFactory() {
-    this(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()));
+    this(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()));
   }
 
   /**
    * Creates a new factory
    *
    * @param artifactPluginDescriptorLoader loads the artifact descriptor for plugins used on the policy template. Non null
+   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
    */
-  public PolicyTemplateDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
+  public PolicyTemplateDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
+                                         DescriptorLoaderRepository descriptorLoaderRepository) {
     checkArgument(artifactPluginDescriptorLoader != null, "artifactPluginDescriptorLoader cannot be null");
+    checkArgument(descriptorLoaderRepository != null, "descriptorLoaderRepository cannot be null");
 
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+    this.descriptorLoaderRepository = descriptorLoaderRepository;
   }
 
   @Override
@@ -83,31 +93,41 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
     if (mulePolicyModel.getClassLoaderModelLoaderDescriptor().isPresent()) {
       MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = mulePolicyModel.getClassLoaderModelLoaderDescriptor().get();
-      if (!muleArtifactLoaderDescriptor.getId().equals(FILE_SYSTEM_MODEL_LOADER_ID)) {
-        throw new ArtifactDescriptorCreateException("Unknown model loader: " + muleArtifactLoaderDescriptor.getId());
+      Optional<ClassLoaderModelLoader> classLoaderModelLoader =
+          descriptorLoaderRepository.get(muleArtifactLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
+      if (!classLoaderModelLoader.isPresent()) {
+        throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(muleArtifactLoaderDescriptor));
       }
 
-      FileSystemPolicyClassLoaderModelLoader classLoaderModelLoader = new FileSystemPolicyClassLoaderModelLoader();
-      ClassLoaderModel classLoaderModel =
-          classLoaderModelLoader.loadClassLoaderModel(artifactFolder);
+      ClassLoaderModel classLoaderModel = classLoaderModelLoader.get()
+          .load(artifactFolder, mulePolicyModel.getClassLoaderModelLoaderDescriptor().get().getAttributes());
       descriptor.setClassLoaderModel(classLoaderModel);
     }
 
-    MuleArtifactLoaderDescriptor bundleDescriptorLoader = mulePolicyModel.getBundleDescriptorLoader();
-    if (!bundleDescriptorLoader.getId().equals(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID)) {
-      throw new ArtifactDescriptorCreateException("Unknown bundle descriptor loader: " + bundleDescriptorLoader.getId());
+    Optional<BundleDescriptorLoader> bundleDescriptorLoader =
+        descriptorLoaderRepository.get(mulePolicyModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
+    if (!bundleDescriptorLoader.isPresent()) {
+      throw new ArtifactDescriptorCreateException(invalidBundleDescriptorLoaderIdError(mulePolicyModel
+          .getBundleDescriptorLoader()));
     }
+    descriptor.setBundleDescriptor(bundleDescriptorLoader.get()
+        .load(artifactFolder, mulePolicyModel.getBundleDescriptorLoader().getAttributes()));
     descriptor.setPlugins(parseArtifactPluginDescriptors(artifactFolder, descriptor));
-
-    PropertiesBundleDescriptorLoader propertiesBundleDescriptorLoader = new PropertiesBundleDescriptorLoader();
-    descriptor.setBundleDescriptor(propertiesBundleDescriptorLoader.loadBundleDescriptor(bundleDescriptorLoader.getAttributes()));
 
     return descriptor;
   }
 
+  protected static String invalidBundleDescriptorLoaderIdError(MuleArtifactLoaderDescriptor bundleDescriptorLoader) {
+    return "Unknown bundle descriptor loader: " + bundleDescriptorLoader.getId();
+  }
+
+  protected static String invalidClassLoaderModelIdError(MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
+    return "Unknown model loader: " + muleArtifactLoaderDescriptor.getId();
+  }
+
   private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(File artifactFolder, PolicyTemplateDescriptor descriptor) {
     final File pluginsDir = new File(artifactFolder, PLUGINS_FOLDER);
-    //TODO(pablo.kraan): MULE-11383 all artifacts must be .jar files
+    // TODO(pablo.kraan): MULE-11383 all artifacts must be .jar files
     String[] pluginZips = pluginsDir.list(new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE));
     if (pluginZips == null) {
       return emptySet();

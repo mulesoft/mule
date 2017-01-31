@@ -9,31 +9,41 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
  * Creates a {@link ClassLoaderModel} from a policy's folder
  */
-public class FileSystemPolicyClassLoaderModelLoader {
+public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelLoader {
 
+  public static final String FILE_SYSTEM_POLICY_MODEL_LOADER_ID = "FILE_SYSTEM_POLICY_MODEL_LOADER";
   protected static final String LIB_DIR = "lib";
   public static final String CLASSES_DIR = "classes";
   private static final String JAR_FILE = ".jar";
 
+
+  @Override
+  public String getId() {
+    return FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
+  }
 
   /**
    * Given a policy template's location it will build a {@link ClassLoaderModel} taking in account jars located inside the {@value LIB_DIR}
    * folder and resources located inside the {@value CLASSES_DIR} folder.
    *
    * @param artifactFolder {@link File} where the current plugin to work with.
-   * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
+   * @param attributes collection of attributes describing the loader. Non null.
+   * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs
    */
-  public ClassLoaderModel loadClassLoaderModel(File artifactFolder) {
+  @Override
+  public ClassLoaderModel load(File artifactFolder, Map<String, Object> attributes) {
 
     final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
 

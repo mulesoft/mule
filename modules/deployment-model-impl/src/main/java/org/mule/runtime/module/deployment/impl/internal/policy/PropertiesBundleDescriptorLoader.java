@@ -9,13 +9,17 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 
+import java.io.File;
 import java.util.Map;
 
 /**
  * Loads a {@link BundleDescriptor} using properties defined in the stored descriptor loader.
  */
-public class PropertiesBundleDescriptorLoader {
+public class PropertiesBundleDescriptorLoader implements BundleDescriptorLoader {
+
+  public static final String PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID = "PROPERTIES";
 
   public static final String VERSION = "version";
   public static final String GROUP_ID = "groupId";
@@ -23,14 +27,22 @@ public class PropertiesBundleDescriptorLoader {
   public static final String CLASSIFIER = "classifier";
   public static final String TYPE = "type";
 
+  @Override
+  public String getId() {
+    return PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+  }
+
   /**
    * Loads a bundle descriptor from the provided properties
    *
+   *
+   * @param artifactFolder {@link File} where the current artifact to work with. Non null
    * @param attributes attributes defined in the loader.
    * @return a locator of the coordinates of the current artifact
    * @throws ArtifactDescriptorCreateException if any bundle descriptor required property is missing on the given attributes.
    */
-  public BundleDescriptor loadBundleDescriptor(Map<String, Object> attributes) {
+  @Override
+  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes) {
     String version = (String) attributes.get(VERSION);
     String groupId = (String) attributes.get(GROUP_ID);
     String artifactId = (String) attributes.get(ARTIFACT_ID);
