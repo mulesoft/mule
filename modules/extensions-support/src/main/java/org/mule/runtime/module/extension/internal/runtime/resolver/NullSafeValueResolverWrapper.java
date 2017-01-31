@@ -16,8 +16,11 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -106,8 +109,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
 
           Optional<String> defaultValue = getDefaultValue(objectField);
           if (defaultValue.isPresent()) {
-            resolver = new TypeSafeExpressionValueResolver(defaultValue.get(), field.getType(), muleContext);
-
+            resolver = getFieldDefaultValueValueResolver(objectField, muleContext);
           } else if (isParameterGroup(objectField)) {
             DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(objectField.getValue()));
             resolverSet.add(field.getName(), new ObjectBuilderValueResolver<>(groupBuilder));

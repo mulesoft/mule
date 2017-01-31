@@ -123,6 +123,7 @@ import java.util.function.Supplier;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
@@ -843,13 +844,11 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private boolean isParameterResolver(Set<ModelProperty> modelProperties, MetadataType expectedType) {
-    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty)
-        || expectedType.getAnnotation(ParameterResolverTypeAnnotation.class).isPresent();
+    return IntrospectionUtils.isParameterResolver(modelProperties) || IntrospectionUtils.isParameterResolver(expectedType);
   }
 
   private boolean isTypedValue(Set<ModelProperty> modelProperties, MetadataType expectedType) {
-    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TypedValueTypeModelProperty)
-        || expectedType.getAnnotation(TypedValueTypeAnnotation.class).isPresent();
+    return IntrospectionUtils.isTypedValue(modelProperties) || IntrospectionUtils.isTypedValue(expectedType);
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {

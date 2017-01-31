@@ -20,6 +20,8 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -28,6 +30,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.vegan.extension.VeganProductInformation;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -49,9 +52,11 @@ public abstract class AbstractTypedValueTestCase extends ExtensionFunctionalTest
   void assertTypedValue(TypedValue typedValue, Object payloadValue, MediaType mediaType, Charset charset) {
     assertThat(typedValue, is(instanceOf(TypedValue.class)));
     Object value = typedValue.getValue();
-    assertThat(value, is(instanceOf(payloadValue.getClass())));
     assertThat(value, is(payloadValue));
-    assertThat(typedValue.getDataType(), is(like(payloadValue.getClass(), mediaType, charset)));
+    if (value != null) {
+      assertThat(value, is(instanceOf(payloadValue.getClass())));
+      assertThat(typedValue.getDataType(), is(like(payloadValue.getClass(), mediaType, charset)));
+    }
   }
 
 
@@ -115,6 +120,18 @@ public abstract class AbstractTypedValueTestCase extends ExtensionFunctionalTest
 
     public TypedValueExtension typedValueOnConfig(@UseConfig TypedValueExtension extension) {
       return extension;
+    }
+
+    public VeganProductInformation typedValueOperationPojoWithContent(@Optional VeganProductInformation param) {
+      return param;
+    }
+
+    public VeganProductInformation typedValueOperationPojoWithNullsafeAndContent(@NullSafe @Optional VeganProductInformation param) {
+      return param;
+    }
+
+    public TypedValue<String> typedValueOperationWithStringContent(@Content TypedValue<String> stringDescription) {
+      return stringDescription;
     }
   }
 
