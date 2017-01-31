@@ -102,7 +102,7 @@ public class HttpRequestFactory {
     builder.setHeaders(toParameterMap(requestBuilder.getHeaders()));
     builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
 
-    MediaType mediaType = requestBuilder.getMediaType();
+    MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
     if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
       if (!MediaType.ANY.matches(mediaType)) {
         builder.addHeader(CONTENT_TYPE, mediaType.toRfcString());
@@ -125,7 +125,7 @@ public class HttpRequestFactory {
 
     }
 
-    builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody(), mediaType));
+    builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody().getValue(), mediaType));
 
     if (authentication != null) {
       authentication.authenticate(builder);

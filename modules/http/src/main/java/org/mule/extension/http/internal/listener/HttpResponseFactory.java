@@ -23,6 +23,7 @@ import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -104,8 +105,9 @@ public class HttpResponseFactory {
       }
     });
 
-    if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(listenerResponseBuilder.getMediaType())) {
-      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, listenerResponseBuilder.getMediaType().toString());
+    TypedValue<Object> body = listenerResponseBuilder.getBody();
+    if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(body.getDataType().getMediaType())) {
+      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toString());
     }
 
     final String configuredContentType = httpResponseHeaderBuilder.getContentType();
@@ -113,7 +115,7 @@ public class HttpResponseFactory {
     final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
 
     HttpEntity httpEntity;
-    final Object payload = listenerResponseBuilder.getBody();
+    final Object payload = body.getValue();
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
@@ -124,7 +126,7 @@ public class HttpResponseFactory {
       } else if (!configuredContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
         warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
       }
-      httpEntity = createUrlEncodedEntity(listenerResponseBuilder.getMediaType(), (Map) payload);
+      httpEntity = createUrlEncodedEntity(body.getDataType().getMediaType(), (Map) payload);
       if (responseStreaming == HttpStreamingType.ALWAYS && supportsTransferEncoding) {
         setupChunkedEncoding(httpResponseHeaderBuilder);
       } else {

@@ -8,10 +8,10 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
+import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
@@ -27,13 +27,13 @@ public class HttpListenerResponseSender {
     this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService);
   }
 
-  public void sendResponse(HttpResponseContext context, HttpListenerSuccessResponseBuilder response) throws Exception {
+  public void sendResponse(HttpResponseContext context, HttpListenerResponseBuilder response) throws Exception {
     HttpResponse httpResponse = buildResponse(response, context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback));
   }
 
-  protected HttpResponse buildResponse(HttpListenerSuccessResponseBuilder listenerResponseBuilder, boolean supportStreaming)
+  protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportStreaming)
       throws Exception {
     HttpResponseBuilder responseBuilder = HttpResponse.builder();
 
@@ -41,7 +41,7 @@ public class HttpListenerResponseSender {
   }
 
   protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
-                                         HttpListenerSuccessResponseBuilder listenerResponseBuilder,
+                                         HttpListenerResponseBuilder listenerResponseBuilder,
                                          boolean supportsStreaming)
       throws Exception {
     return responseFactory.create(responseBuilder, listenerResponseBuilder, supportsStreaming);

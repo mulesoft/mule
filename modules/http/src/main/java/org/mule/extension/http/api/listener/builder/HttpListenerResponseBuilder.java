@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  *
  * @since 4.0
  */
-public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
+public class HttpListenerResponseBuilder extends HttpMessageBuilder {
 
   /**
    * HTTP status code the response should have.

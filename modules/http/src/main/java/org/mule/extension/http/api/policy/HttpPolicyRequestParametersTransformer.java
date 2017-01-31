@@ -11,6 +11,7 @@ import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.pars
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -35,10 +36,12 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
   public Message fromParametersToMessage(Map<String, Object> parameters) {
     HttpRequesterRequestBuilder requestBuilder = (HttpRequesterRequestBuilder) parameters.get("requestBuilder");
     String path = (String) parameters.get("path");
-    return Message.builder().payload(requestBuilder.getBody())
+    TypedValue<Object> body = requestBuilder.getBody();
+    return Message.builder().payload(body.getValue())
         .attributes(new HttpPolicyRequestAttributes(new ParameterMap(requestBuilder.getHeaders()),
                                                     new ParameterMap(requestBuilder.getQueryParams()),
                                                     new ParameterMap(requestBuilder.getQueryParams()), path))
+        .mediaType(body.getDataType().getMediaType())
         .build();
   }
 
@@ -50,7 +53,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
       httpRequesterRequestBuilder.setHeaders(requestAttributes.getHeaders());
       httpRequesterRequestBuilder.setQueryParams(requestAttributes.getQueryParams());
       httpRequesterRequestBuilder.setUriParams(requestAttributes.getUriParams());
-      httpRequesterRequestBuilder.setBody(message.getPayload().getValue());
+      httpRequesterRequestBuilder.setBody(message.getPayload());
       return ImmutableMap.<String, Object>builder().put("requestBuilder", httpRequesterRequestBuilder).build();
     } else {
       return emptyMap();
