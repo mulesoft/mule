@@ -14,8 +14,10 @@
     </petstore:config>
 
     <flow name="getFish">
-        <petstore:get-fish-from-river-stream pollutedStream="#[mel: new ByteArrayInputStream('herring'.getBytes());]">
-            <petstore:river>#[mel: new ByteArrayInputStream("goldfish".getBytes());]</petstore:river>
+        <set-payload value="goldfish"/>
+        <string-to-byte-array-transformer/>
+        <petstore:get-fish-from-river-stream pollutedStream="#[mel:flowVars.herring]">
+            <petstore:river>#[payload]</petstore:river>
         </petstore:get-fish-from-river-stream>
     </flow>
 

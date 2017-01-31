@@ -11,6 +11,8 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import java.io.ByteArrayInputStream;
+
 import org.junit.Test;
 
 public class PetStoreInputeStreamContentTestCase extends ExtensionFunctionalTestCase {
@@ -27,7 +29,10 @@ public class PetStoreInputeStreamContentTestCase extends ExtensionFunctionalTest
 
   @Test
   public void parseInputStreamContentParameter() throws Exception {
-    String fish = (String) flowRunner("getFish").run().getMessage().getPayload().getValue();
+    String fish = (String) flowRunner("getFish")
+        .withVariable("herring", new ByteArrayInputStream("herring".getBytes()))
+        .run().getMessage().getPayload().getValue();
+
     assertThat(fish, is("goldfish herring"));
   }
 }
