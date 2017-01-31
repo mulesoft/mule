@@ -79,30 +79,33 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     if (isInstance(expectedClass, value)) {
       return (T) value;
     }
-    return value != null ? (T) transform(typedValue, expectedDataType, event) : null;
+    return (T) transform(typedValue, expectedDataType, event);
   }
 
   public Object transform(TypedValue value, DataType expectedDataType, Event event)
       throws MessagingException, MessageTransformerException, TransformerException {
     Transformer transformer;
-    try {
-      transformer = muleContext.getRegistry().lookupTransformer(value.getDataType(), expectedDataType);
-    } catch (TransformerException e) {
-      throw new MessagingException(createStaticMessage(String.format(
-                                                                     "Expression '%s' was expected to return a value of type '%s' but a '%s' was found instead "
-                                                                         + "and no suitable transformer could be located",
-                                                                     evaluator.getRawValue(), expectedClass.getName(),
-                                                                     value.getValue().getClass().getName())),
-                                   event, e);
-    }
+    if (value.getValue() != null) {
+      try {
+        transformer = muleContext.getRegistry().lookupTransformer(value.getDataType(), expectedDataType);
+      } catch (TransformerException e) {
+        throw new MessagingException(createStaticMessage(String.format(
+                                                                       "Expression '%s' was expected to return a value of type '%s' but a '%s' was found instead "
+                                                                           + "and no suitable transformer could be located",
+                                                                       evaluator.getRawValue(), expectedClass.getName(),
+                                                                       value.getValue().getClass().getName())),
+                                     event, e);
+      }
 
-    T result;
-    if (transformer instanceof MessageTransformer) {
-      result = (T) ((MessageTransformer) transformer).transform(value.getValue(), event);
-    } else {
-      result = (T) transformer.transform(value.getValue());
+      T result;
+      if (transformer instanceof MessageTransformer) {
+        result = (T) ((MessageTransformer) transformer).transform(value.getValue(), event);
+      } else {
+        result = (T) transformer.transform(value.getValue());
+      }
+      return result;
     }
-    return result;
+    return value.getValue();
   }
 
   void initEvaluator() {

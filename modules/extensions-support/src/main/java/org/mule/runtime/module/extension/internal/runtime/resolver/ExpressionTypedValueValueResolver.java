@@ -42,8 +42,7 @@ public class ExpressionTypedValueValueResolver<T> extends TypeSafeExpressionValu
     } else {
       DataType expectedDataType =
           DataType.builder().type(expectedClass).mediaType(typedValue.getDataType().getMediaType()).build();
-      T result = typedValue.getValue() != null ? (T) transform(typedValue, expectedDataType, event) : null;
-      return new TypedValue<>(result, expectedDataType);
+      return new TypedValue<>((T) transform(typedValue, expectedDataType, event), expectedDataType);
     }
   }
 }
