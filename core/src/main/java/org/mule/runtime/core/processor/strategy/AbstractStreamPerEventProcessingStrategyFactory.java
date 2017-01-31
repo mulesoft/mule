@@ -36,9 +36,7 @@ abstract class AbstractStreamPerEventProcessingStrategyFactory extends AbstractP
         onEventConsumer.accept(event);
         just(event).transform(function).subscribe();
       }
-
     };
   }
-
 
 }
