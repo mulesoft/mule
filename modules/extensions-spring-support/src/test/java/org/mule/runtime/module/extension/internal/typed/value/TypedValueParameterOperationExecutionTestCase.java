@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.typed.value;
 
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import org.junit.After;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.MediaType;
@@ -14,6 +16,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
+import org.mule.test.vegan.extension.VeganProductInformation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,5 +126,57 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     Event event = flowRunner("typedValueForStringInsidePojo").run();
     DifferedKnockableDoor value = (DifferedKnockableDoor) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getAddress(), "string", MediaType.APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueForContentWithExplicitValue() throws Exception {
+    Event event = flowRunner("typedValueForContentWithExplicitValue").run();
+    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
+    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueForContentWithDefaultValue() throws Exception {
+    Event event = flowRunner("typedValueForContentWithDefaultValue").run();
+    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
+    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueForContentOnNullSafePojoWithDefaultValue() throws Exception {
+    Event event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValue").run();
+    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
+    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo() throws Exception {
+    Event event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo").run();
+    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
+    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueOnContentOnNullSafeWithExplicitValues() throws Exception {
+    Event event = flowRunner("typedValueOnContentOnNullSafeWithExplicitValues").run();
+    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
+    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+    assertTypedValue(value.getBrandName(), "string", APPLICATION_JSON, UTF8);
+    assertTypedValue(value.getWeight(), 5, ANY, null);
+  }
+
+  @Test
+  public void typedValueOperationWithExplicitStringContent() throws Exception {
+    runAndAssertTypedValue("typedValueOperationWithExplicitStringContent", "string", APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueOperationWithDefaultStringContent() throws Exception {
+    runAndAssertTypedValue("typedValueOperationWithDefaultStringContent", "string", APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void typedValueOperationWithExplicitNullContent() throws Exception {
+    runAndAssertTypedValue("typedValueOperationWithExplicitNullContent", null, APPLICATION_JSON, UTF8);
   }
 }

@@ -18,12 +18,16 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldByNameOrAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
-
+import com.google.common.base.Joiner;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ModelProperty;
@@ -41,14 +45,10 @@ import org.mule.runtime.extension.api.declaration.type.annotation.DefaultEncodin
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-
-import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -110,7 +110,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         resolver = getDefaultValueResolver(p.getModelProperty(DefaultEncodingModelProperty.class).isPresent(), () -> {
           Object defaultValue = p.getDefaultValue();
           if (defaultValue instanceof String) {
-            return new TypeSafeExpressionValueResolver((String) defaultValue, getType(p.getType()), muleContext);
+            return getExpressionBasedValueResolver((String) defaultValue, p, muleContext);
           } else if (defaultValue != null) {
             return new StaticValueResolver<>(defaultValue);
           }
@@ -191,8 +191,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       } else if (!isParameterGroup) {
         valueResolver = getDefaultValueResolver(field.getAnnotation(DefaultEncodingAnnotation.class).isPresent(),
                                                 () -> getDefaultValue(field).isPresent()
-                                                    ? new TypeSafeExpressionValueResolver<>(getDefaultValue(field).get(),
-                                                                                            objectField.getType(), muleContext)
+                                                    ? getFieldDefaultValueValueResolver(field, muleContext)
                                                     : null);
       }
 
@@ -298,14 +297,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {
     return CollectionValueResolver.of(collection.getClass(),
                                       collection.stream().map(p -> toValueResolver(p)).collect(new ImmutableListCollector<>()));
-  }
-
-  private boolean isTypedValue(Set<ModelProperty> modelProperties) {
-    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TypedValueTypeModelProperty);
-  }
-
-  private boolean isParameterResolver(Set<ModelProperty> modelProperties) {
-    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ParameterResolverTypeModelProperty);
   }
 
   /**

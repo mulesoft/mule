@@ -113,11 +113,12 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
       @Override
       public void visitString(StringType stringType) {
         if (fieldDsl.get().supportsChildDeclaration()) {
-          addParameter(fieldName, fromChildConfiguration(String.class).withWrapperIdentifier(fieldName));
+          String elementName = fieldDsl.get().getElementName();
+          addParameter(fieldName, fromChildConfiguration(String.class).withWrapperIdentifier(elementName));
           addDefinition(baseDefinitionBuilder.copy()
-              .withIdentifier(fieldName)
+              .withIdentifier(elementName)
               .withTypeDefinition(fromType(String.class))
-              .withTypeConverter(value -> resolverOf(fieldName, stringType, value, defaultValue,
+              .withTypeConverter(value -> resolverOf(elementName, stringType, value, defaultValue,
                                                      expressionSupport, false,
                                                      emptySet(), acceptsReferences))
               .build());
