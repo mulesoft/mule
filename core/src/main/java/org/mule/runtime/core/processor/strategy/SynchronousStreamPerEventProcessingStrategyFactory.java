@@ -6,56 +6,35 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
- *  Processing strategy that processes all message processors in the caller thread.
+ * Processing strategy that processes all message processors in the caller thread.
  */
 public class SynchronousStreamPerEventProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  static ProcessingStrategy SYNCHRONOUS_STREAM_PER_EVENT_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
-
-    @Override
-    public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-      return new Sink() {
-
-        Consumer<Event> onEventConsumer = createOnEventConsumer();
+  static ProcessingStrategy SYNCHRONOUS_STREAM_PER_EVENT_PROCESSING_STRATEGY_INSTANCE =
+      new AbstractStreamPerEventProcessingStrategyFactory() {
 
         @Override
-        public void accept(Event event) {
-          onEventConsumer.accept(event);
-          just(event).transform(function).subscribe();
+        public boolean isSynchronous() {
+          return true;
         }
 
+        /*
+         * This processing strategy supports transactions so we override default check that fails on transactions.
+         */
+        @Override
+        protected Consumer<Event> createOnEventConsumer() {
+          return event -> {
+          };
+        }
       };
-    }
-
-    @Override
-    public boolean isSynchronous() {
-      return true;
-    }
-
-    /*
-     * This processing strategy supports transactions so we override default check that fails on transactions.
-     */
-    @Override
-    protected Consumer<Event> createOnEventConsumer() {
-      return event -> {
-      };
-    }
-  };
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {

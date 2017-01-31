@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.SynchronousStreamPerEventProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
@@ -38,7 +38,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
   @Test
   public void testSynchronous() throws Exception {
     assertThat(getFlowProcessingStrategyFactory("synchronousFlow"),
-               instanceOf(SynchronousStreamPerEventProcessingStrategyFactory.class));
+               instanceOf(SynchronousProcessingStrategyFactory.class));
   }
 
   @Test

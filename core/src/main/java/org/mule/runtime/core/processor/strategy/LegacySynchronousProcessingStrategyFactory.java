@@ -6,10 +6,20 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+
 /**
- * Legacy version of {@link SynchronousStreamPerEventProcessingStrategyFactory} that uses blocking code path as in 3.x.
+ * Processing strategy used to force legacy 3.x synchronous behaviour that uses a blocking code path.
  */
 @Deprecated
-public class LegacySynchronousProcessingStrategyFactory extends SynchronousStreamPerEventProcessingStrategyFactory {
+public class LegacySynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
+  @Override
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return (flowConstruct, pipelineFunction) -> {
+      throw new IllegalStateException("Sink cannot be created for " + LegacySynchronousProcessingStrategyFactory.class.getName());
+    };
+  }
 }
