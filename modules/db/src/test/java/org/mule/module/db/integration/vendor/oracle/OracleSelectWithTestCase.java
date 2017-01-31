@@ -7,22 +7,16 @@
 
 package org.mule.module.db.integration.vendor.oracle;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mule.module.db.integration.DbTestUtil.selectData;
-import static org.mule.module.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.module.db.integration.TestRecordUtil.assertMessageContains;
+import static org.mule.module.db.integration.TestRecordUtil.getAllPlanetRecords;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.TestDbConfig;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
-import org.mule.module.db.integration.model.Field;
-import org.mule.module.db.integration.model.Record;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -53,19 +47,6 @@ public class OracleSelectWithTestCase extends AbstractDbIntegrationTestCase
         LocalMuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://with", TEST_MESSAGE, null);
 
-        assertMergeResult(response);
-    }
-
-    private void assertMergeResult(MuleMessage response) throws SQLException
-    {
-        assertThat((Integer) response.getPayload(), equalTo(3));
-
-        List<Map<String, String>> result = selectData("select * from PLANET order by ID", getDefaultDataSource());
-        assertRecords(result, createRecord(2), createRecord(3), createRecord(4));
-    }
-
-    private Record createRecord(int pos)
-    {
-        return new Record(new Field("NAME", "merged"), new Field("POSITION", pos));
+        assertMessageContains(response, getAllPlanetRecords());
     }
 }

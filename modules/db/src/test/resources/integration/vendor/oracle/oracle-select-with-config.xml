@@ -8,14 +8,14 @@
     <flow name="with">
         <inbound-endpoint address="vm://with" exchange-pattern="request-response"/>
 
-        <db:update config-ref="dbConfig">
+        <db:select config-ref="dbConfig">
             <db:parameterized-query>
                 WITH my_planets AS (
                     SELECT * FROM PLANET
                 )
-                SELECT p.name
-                FROM my_planets p
+                SELECT *
+                FROM my_planets
             </db:parameterized-query>
-        </db:update>
+        </db:select>
     </flow>
 </mule>
