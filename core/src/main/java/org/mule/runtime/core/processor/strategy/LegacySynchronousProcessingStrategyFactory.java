@@ -6,39 +6,10 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-
-import java.util.function.Consumer;
-
 /**
- * This processing strategy processes all message processors in the calling thread.
+ * Legacy version of {@link CallerThreadProcessingStrategyFactory} that uses blocking code path as in 3.x.
  */
 @Deprecated
-public class LegacySynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
-
-  static ProcessingStrategy LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE = new AbstractLegacyProcessingStrategy() {
-
-    @Override
-    public boolean isSynchronous() {
-      return true;
-    }
-
-    /*
-     * This processing strategy supports transactions so we override default check that fails on transactions.
-     */
-    @Override
-    protected Consumer<Event> createOnEventConsumer() {
-      return event -> {
-      };
-    }
-  };
-
-  @Override
-  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
-  }
+public class LegacySynchronousProcessingStrategyFactory extends CallerThreadProcessingStrategyFactory {
 
 }

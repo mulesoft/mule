@@ -20,11 +20,8 @@ import org.mule.runtime.core.management.stats.ProcessingTime;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.OffsetTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.reactivestreams.Subscriber;
-
 import reactor.core.publisher.MonoProcessor;
 
 /**
