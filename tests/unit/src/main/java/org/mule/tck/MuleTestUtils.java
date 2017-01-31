@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 
 import java.util.function.Function;
 
@@ -57,9 +58,9 @@ public final class MuleTestUtils {
   }
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
-    // Use simple processing strategy given flow used in test event is not used for processing.
+    // Use synchronous processing strategy given flow used in test event is not used for processing.
     final Flow flow =
-        builder(APPLE_FLOW, context).processingStrategyFactory(new LegacySynchronousProcessingStrategyFactory()).build();
+        builder(APPLE_FLOW, context).processingStrategyFactory(new SynchronousProcessingStrategyFactory()).build();
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
     }

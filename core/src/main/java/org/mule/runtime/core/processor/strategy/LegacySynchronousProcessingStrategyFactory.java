@@ -7,9 +7,9 @@
 package org.mule.runtime.core.processor.strategy;
 
 /**
- * Legacy version of {@link CallerThreadProcessingStrategyFactory} that uses blocking code path as in 3.x.
+ * Legacy version of {@link SynchronousStreamPerEventProcessingStrategyFactory} that uses blocking code path as in 3.x.
  */
 @Deprecated
-public class LegacySynchronousProcessingStrategyFactory extends CallerThreadProcessingStrategyFactory {
+public class LegacySynchronousProcessingStrategyFactory extends SynchronousStreamPerEventProcessingStrategyFactory {
 
 }

@@ -16,7 +16,7 @@ import static org.mule.runtime.core.util.ProcessingStrategyUtils.DEFAULT_PROCESS
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.SYNC_PROCESSING_STRATEGY;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.CallerThreadProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -36,7 +36,7 @@ public class ConfigurationProcessingStrategyParserTestCase extends AbstractInteg
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
         {DEFAULT_PROCESSING_STRATEGY, DefaultFlowProcessingStrategyFactory.class},
-        {SYNC_PROCESSING_STRATEGY, CallerThreadProcessingStrategyFactory.class},
+        {SYNC_PROCESSING_STRATEGY, SynchronousProcessingStrategyFactory.class},
         {ASYNC_PROCESSING_STRATEGY, LegacyAsynchronousProcessingStrategyFactory.class},
     });
   }

@@ -8,13 +8,15 @@ package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.function.Consumer;
 
 /**
- * This processing strategy processes all message processors in the calling thread.
+ * This processing strategy processes all {@link Processor}'s in the caller thread serializing each event using a shared sevent
+ * tream.
  */
 public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 

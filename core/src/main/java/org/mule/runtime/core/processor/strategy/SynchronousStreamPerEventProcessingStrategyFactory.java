@@ -23,9 +23,9 @@ import org.reactivestreams.Publisher;
 /**
  *  Processing strategy that processes all message processors in the caller thread.
  */
-public class CallerThreadProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class SynchronousStreamPerEventProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  static ProcessingStrategy CALLER_THREAD_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
+  static ProcessingStrategy SYNCHRONOUS_STREAM_PER_EVENT_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
@@ -59,7 +59,7 @@ public class CallerThreadProcessingStrategyFactory implements ProcessingStrategy
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return CALLER_THREAD_PROCESSING_STRATEGY_INSTANCE;
+    return SYNCHRONOUS_STREAM_PER_EVENT_PROCESSING_STRATEGY_INSTANCE;
   }
 
 }

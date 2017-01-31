@@ -22,8 +22,10 @@
         <petstore:get-client config-ref="${configName}"/>
     </flow>
 
-    <flow name="getClientOnLatch" processingStrategy="synchronous">
+    <flow name="getClientOnLatch" processingStrategy="legacy-sync">
         <petstore:get-client-on-latch config-ref="${configName}"/>
     </flow>
+
+    <custom-processing-strategy name="legacy-sync" class="org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory"/>
 
 </mule>
