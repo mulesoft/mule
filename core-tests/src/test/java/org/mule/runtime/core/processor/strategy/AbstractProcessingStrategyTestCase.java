@@ -103,6 +103,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @After
   public void after() {
+    flow.dispose();
     cpuLight.shutdownNow();
     blocking.shutdownNow();
     cpuIntensive.shutdownNow();
@@ -142,7 +143,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       assertThat(latchedProcessor.getSecondCalledLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
     }
 
-    flow.dispose();
   }
 
   @Test
