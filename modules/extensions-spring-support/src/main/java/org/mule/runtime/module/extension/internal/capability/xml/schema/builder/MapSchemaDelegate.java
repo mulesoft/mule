@@ -32,6 +32,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an open {@link ObjectType}
@@ -98,12 +99,14 @@ final class MapSchemaDelegate {
        */
       @Override
       public void visitObject(ObjectType objectType) {
-        if (isMap(objectType)) {
+        Optional<DslElementSyntax> containedElement = entryValueDsl.getContainedElement(VALUE_ATTRIBUTE_NAME);
+        if (isMap(objectType) || !containedElement.isPresent()) {
           defaultVisit(objectType);
           return;
         }
 
-        final boolean shouldGenerateChildElement = entryValueDsl.supportsChildDeclaration();
+        final boolean shouldGenerateChildElement =
+            containedElement.get().supportsChildDeclaration() || containedElement.get().isWrapped();
 
         entryComplexType.getAttributeOrAttributeGroup()
             .add(builder.createAttribute(VALUE_ATTRIBUTE_NAME, valueType, !shouldGenerateChildElement, SUPPORTED));
@@ -112,7 +115,6 @@ final class MapSchemaDelegate {
           DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType)
               .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] cannot be represented as a child element in Map entries",
                                                                      getId(objectType))));
-
           if (typeDsl.isWrapped()) {
             ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(typeDsl, objectType, ZERO, UNBOUNDED);
             entryComplexType.setChoice(choice);
