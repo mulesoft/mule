@@ -18,7 +18,6 @@ import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPl
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
@@ -124,20 +123,6 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
     }
 
     properties.setProperty(PLUGIN_DEPENDENCIES, plugins);
-
-    return this;
-  }
-
-  /**
-   * Sets the configuration file used for the policy.
-   *
-   * @param configFile policy configuration from a external file or test resource. Non empty.
-   * @return the same builder instance
-   */
-  public PolicyFileBuilder definedBy(String configFile) {
-    checkImmutable();
-    checkArgument(!StringUtils.isEmpty(configFile), "Config file cannot be empty");
-    this.resources.add(new ZipResource(configFile, DEFAULT_POLICY_CONFIGURATION_RESOURCE));
 
     return this;
   }

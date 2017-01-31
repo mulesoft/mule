@@ -19,7 +19,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.createPolicyRegistrationError;
-
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
@@ -37,6 +36,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFac
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.File;
 import java.util.List;
 
 import org.junit.Before;
@@ -60,9 +60,9 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   private final Application application = mock(Application.class);
   private final PolicyPointcut pointcut = mock(PolicyPointcut.class);
   private final PolicyParametrization parametrization1 =
-      new PolicyParametrization(POLICY_ID1, pointcut, ORDER_POLICY1, emptyMap());
+      new PolicyParametrization(POLICY_ID1, pointcut, ORDER_POLICY1, emptyMap(), mock(File.class));
   private final PolicyParametrization parametrization2 =
-      new PolicyParametrization(POLICY_ID2, pointcut, ORDER_POLICY2, emptyMap());
+      new PolicyParametrization(POLICY_ID2, pointcut, ORDER_POLICY2, emptyMap(), mock(File.class));
   private final PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_NAME);
   private final PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
   private PolicyTemplate policyTemplate = mock(PolicyTemplate.class);

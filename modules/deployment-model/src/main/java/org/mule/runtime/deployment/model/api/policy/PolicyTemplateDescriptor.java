@@ -10,7 +10,6 @@ package org.mule.runtime.deployment.model.api.policy;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +24,6 @@ public class PolicyTemplateDescriptor extends ArtifactDescriptor {
   public static final String META_INF = "META-INF";
   public static final String MULE_POLICY_JSON = "mule-policy.json";
 
-  private File[] configResourceFiles;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
 
   /**
@@ -35,14 +33,6 @@ public class PolicyTemplateDescriptor extends ArtifactDescriptor {
    */
   public PolicyTemplateDescriptor(String name) {
     super(name);
-  }
-
-  public File[] getConfigResourceFiles() {
-    return configResourceFiles;
-  }
-
-  public void setConfigResourceFiles(File[] configResourceFiles) {
-    this.configResourceFiles = configResourceFiles;
   }
 
   public Set<ArtifactPluginDescriptor> getPlugins() {

@@ -12,7 +12,6 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -32,8 +31,6 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRep
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.service.ServiceRepository;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +79,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
         newBuilder().setArtifactType(APP)
             .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
             .setArtifactName(parametrization.getId())
-            .setConfigurationFiles(getResourcePaths(template.getDescriptor().getConfigResourceFiles()))
+            .setConfigurationFiles(new String[] {parametrization.getConfig().getAbsolutePath()})
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
@@ -102,15 +99,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     } catch (MuleException e) {
       throw new InitialisationException(createStaticMessage("Cannot create artifact context for the policy instance"), e, this);
     }
-  }
-
-  private String[] getResourcePaths(File[] configResourceFiles) {
-    List<String> paths = new ArrayList<>();
-    for (File configResourceFile : configResourceFiles) {
-      paths.add(configResourceFile.getAbsolutePath());
-    }
-
-    return paths.toArray(new String[0]);
   }
 
   private void initPolicyInstance() throws InitialisationException {
