@@ -40,8 +40,8 @@ public class FlowBenchmark extends AbstractBenchmark {
 
   @Param({
       "org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory",
+      "org.mule.runtime.core.processor.strategy.SynchronousStreamProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.SynchronousStreamPerEventProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.MultiReactorProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory"

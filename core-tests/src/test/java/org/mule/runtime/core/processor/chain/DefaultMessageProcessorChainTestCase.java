@@ -60,7 +60,7 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.SynchronousStreamPerEventProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyDefaultFlowProcessingStrategyFactory;
@@ -68,7 +68,7 @@ import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrat
 import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousStreamProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
@@ -111,24 +111,24 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-        {new SynchronousProcessingStrategyFactory(), BLOCKING},
+        {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorProcessingStrategyFactory(), BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
+        {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
         {new SynchronousProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousStreamPerEventProcessingStrategyFactory(), BLOCKING},
         {new LegacySynchronousProcessingStrategyFactory(), BLOCKING},
         {new LegacyDefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new LegacyNonBlockingProcessingStrategyFactory(), BLOCKING},
         {new LegacyAsynchronousProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousProcessingStrategyFactory(), NON_BLOCKING},
+        {new SynchronousStreamProcessingStrategyFactory(), NON_BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new SynchronousProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousStreamPerEventProcessingStrategyFactory(), NON_BLOCKING},
+        {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
+        {new SynchronousProcessingStrategyFactory(), NON_BLOCKING},
         {new LegacySynchronousProcessingStrategyFactory(), NON_BLOCKING},
         {new LegacyDefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
         {new LegacyNonBlockingProcessingStrategyFactory(), NON_BLOCKING},
