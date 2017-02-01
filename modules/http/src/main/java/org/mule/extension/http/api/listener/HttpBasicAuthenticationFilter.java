@@ -14,106 +14,60 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.security.Authentication;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.security.AbstractAuthenticationFilter;
-import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
 import org.mule.service.http.api.domain.ParameterMap;
+
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Filter for basic authentication over an HTTP request
+ * Filter for basic authentication over an HTTP request.
+ *
+ * @since 4.0
  */
-public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter {
+public class HttpBasicAuthenticationFilter {
 
   protected static final Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
 
+  /**
+   * Authentication realm.
+   */
+  @Parameter
   private String realm;
 
-  private boolean realmRequired = true;
-  private HttpRequestAttributes attributes;
-
   /**
-   * Creates a filter based on the HTTP listener error response builder status code and headers configuration.
+   * The delegate-security-provider to use for authenticating. Use this in case you have multiple security managers defined in
+   * your configuration.
    */
-  public HttpBasicAuthenticationFilter() {
-    super();
-  }
+  @Parameter
+  @Optional
+  @NullSafe
+  private List<String> securityProviders;
 
-  @Override
-  protected void doInitialise() throws InitialisationException {
-    if (realm == null) {
-      if (isRealmRequired()) {
-        throw new InitialisationException(createStaticMessage("The realm must be set on this security filter"), this);
-      } else {
-        logger.warn("There is no security realm set, using default: null");
-      }
-    }
-  }
-
-  public String getRealm() {
-    return realm;
-  }
-
-  public void setRealm(String realm) {
-    this.realm = realm;
-  }
-
-  public boolean isRealmRequired() {
-    return realmRequired;
-  }
-
-  public void setRealmRequired(boolean realmRequired) {
-    this.realmRequired = realmRequired;
-  }
-
-  public void setAttributes(HttpRequestAttributes attributes) {
-    this.attributes = attributes;
-  }
-
-
-  protected Authentication createAuthentication(String username, String password) {
-    return new DefaultMuleAuthentication(new DefaultMuleCredentials(username, password.toCharArray()));
-  }
-
-  private Message createUnauthenticatedMessage() {
-    String realmHeader = "Basic realm=";
-    if (realm != null) {
-      realmHeader += "\"" + realm + "\"";
-    }
-    ParameterMap headers = new ParameterMap();
-    headers.put(WWW_AUTHENTICATE, realmHeader);
-    return Message.builder().nullPayload().attributes(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
-                                                                                         UNAUTHORIZED.getReasonPhrase(),
-                                                                                         headers))
-        .build();
-  }
+  @Parameter
+  @Optional(defaultValue = "#[attributes]")
+  HttpRequestAttributes attributes;
 
   /**
-   * Authenticates the current message if authenticate is set to true. This method will always populate the secure context in the
-   * {@link Event} session
+   * Authenticates an HTTP message based on the provided {@link HttpRequestAttributes}.
    *
-   * @param event the current message received
    * @throws SecurityException if authentication fails
    */
-  @Override
-  public Event authenticate(Event event)
-      throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-      SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
+  public void authenticate(AuthenticationHandler authenticationHandler)
+      throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     String header = attributes.getHeaders().get(AUTHORIZATION.toLowerCase());
 
     if (logger.isDebugEnabled()) {
@@ -133,11 +87,13 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
         password = token.substring(delim + 1);
       }
 
-      Authentication authResult;
-      Authentication authentication = createAuthentication(username, password);
+      Credentials credentials = authenticationHandler.createCredentialsBuilder()
+          .withUsername(username)
+          .withPassword(password.toCharArray())
+          .build();
 
       try {
-        authResult = getSecurityManager().authenticate(authentication);
+        authenticationHandler.setAuthentication(securityProviders, authenticationHandler.createAuthentication(credentials));
       } catch (UnauthorisedException e) {
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
@@ -146,18 +102,28 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       }
 
       if (logger.isDebugEnabled()) {
-        logger.debug("Authentication success: " + authResult.toString());
+        logger.debug("Authentication success.");
       }
 
-      SecurityContext context = getSecurityManager().createSecurityContext(authResult);
-      context.setAuthentication(authResult);
-      event.getSession().setSecurityContext(context);
-      return event;
     } else if (header == null) {
-      throw new BasicUnauthorisedException(null, this, "HTTP listener", createUnauthenticatedMessage());
+      throw new BasicUnauthorisedException(null, "HTTP basic authentication", "HTTP listener", createUnauthenticatedMessage());
     } else {
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), createUnauthenticatedMessage());
     }
   }
+
+  private Message createUnauthenticatedMessage() {
+    String realmHeader = "Basic realm=";
+    if (realm != null) {
+      realmHeader += "\"" + realm + "\"";
+    }
+    ParameterMap headers = new ParameterMap();
+    headers.put(WWW_AUTHENTICATE, realmHeader);
+    return Message.builder().nullPayload().attributes(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
+                                                                                         UNAUTHORIZED.getReasonPhrase(),
+                                                                                         headers))
+        .build();
+  }
+
 }

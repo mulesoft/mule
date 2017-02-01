@@ -67,23 +67,32 @@
 
     <flow name="flow">
         <httpn:listener config-ref="listenerConfig1" path="*"/>
-        <httpn:basic-security-filter
-                realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider1" />
+        <httpn:basic-security-filter realm="mule-realm" >
+            <httpn:security-providers>
+                <httpn:security-provider value="daoAuthenticationSecurityProvider1"/>
+            </httpn:security-providers>
+        </httpn:basic-security-filter>
         <echo-component />
     </flow>
 
     <flow name="flow2">
         <httpn:listener config-ref="listenerConfig2" path="*"/>
-        <httpn:basic-security-filter
-                realm="mule-realm" securityProviders="daoAuthenticationSecurityProvider2" />
+        <httpn:basic-security-filter realm="mule-realm" >
+            <httpn:security-providers>
+                <httpn:security-provider value="daoAuthenticationSecurityProvider2"/>
+            </httpn:security-providers>
+        </httpn:basic-security-filter>
         <echo-component />
     </flow>
 
     <flow name="flow3">
         <httpn:listener config-ref="listenerConfig3" path="*"/>
-        <httpn:basic-security-filter
-            realm="mule-realm"
-            securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1" />
+        <httpn:basic-security-filter realm="mule-realm">
+            <httpn:security-providers>
+                <httpn:security-provider value="daoAuthenticationSecurityProvider2"/>
+                <httpn:security-provider value="daoAuthenticationSecurityProvider1"/>
+            </httpn:security-providers>
+        </httpn:basic-security-filter>
         <echo-component />
     </flow>
 

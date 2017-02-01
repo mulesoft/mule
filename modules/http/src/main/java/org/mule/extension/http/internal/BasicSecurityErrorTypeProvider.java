@@ -7,17 +7,17 @@
 package org.mule.extension.http.internal;
 
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
-import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.core.api.Event;
+import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
 /**
- * Errors that can be thrown in the {@link HttpOperations#basicSecurityFilter(String, String, HttpRequestAttributes, Event)}
+ * Errors that can be thrown in the {@link HttpOperations#basicSecurityFilter(HttpBasicAuthenticationFilter, AuthenticationHandler)}
  * operation.
  *
  * @since 4.0

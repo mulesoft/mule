@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.http.config;
 
 import org.mule.compatibility.config.spring.handlers.AbstractMuleTransportsNamespaceHandler;
 import org.mule.compatibility.core.endpoint.URIBuilder;
+import org.mule.compatibility.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.compatibility.transport.http.CacheControlHeader;
 import org.mule.compatibility.transport.http.CookieWrapper;
 import org.mule.compatibility.transport.http.HttpConnector;
@@ -19,7 +20,6 @@ import org.mule.compatibility.transport.http.builder.HttpHeaderDefinitionParser;
 import org.mule.compatibility.transport.http.builder.HttpResponseDefinitionParser;
 import org.mule.compatibility.transport.http.components.RestServiceWrapper;
 import org.mule.compatibility.transport.http.components.StaticResourceMessageProcessor;
-import org.mule.compatibility.transport.http.filters.HttpBasicAuthenticationFilter;
 import org.mule.compatibility.transport.http.filters.HttpRequestWildcardFilter;
 import org.mule.compatibility.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.compatibility.transport.http.transformers.HttpRequestBodyToParamMap;
