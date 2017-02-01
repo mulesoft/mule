@@ -111,7 +111,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-        {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorProcessingStrategyFactory(), BLOCKING},
@@ -122,7 +121,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new LegacyDefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new LegacyNonBlockingProcessingStrategyFactory(), BLOCKING},
         {new LegacyAsynchronousProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousStreamProcessingStrategyFactory(), NON_BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorProcessingStrategyFactory(), NON_BLOCKING},

@@ -11,10 +11,8 @@
     </httpn:request-config>
 
     <!-- TODO MULE-11351 Rework ring-buffer based processing strategy implementations for stream approach -->
-    <flow name="limitedConnections" processingStrategy="legacy-sync">
+    <flow name="limitedConnections" processingStrategy="synchronous">
         <httpn:request config-ref="requestConfig" path="testPath"/>
     </flow>
-
-    <custom-processing-strategy name="legacy-sync" class="org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory"/>
 
 </mule>
