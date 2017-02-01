@@ -14,6 +14,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.message.InternalMessage.of;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 
 import org.mule.functional.functional.SkeletonSource;
@@ -131,7 +132,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
     try {
       ((SkeletonSource) messageSource).getListener()
-          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).build());
+          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null))
+              .build());
     } finally {
       WaitingProcessor.latch.countDown();
     }
