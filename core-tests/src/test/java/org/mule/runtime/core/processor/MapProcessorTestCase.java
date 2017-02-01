@@ -16,14 +16,19 @@ import static org.mule.runtime.core.api.message.InternalMessage.of;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,7 +39,7 @@ import reactor.core.Exceptions;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class MapProcessorTestCase extends AbstractMuleTestCase {
+public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Mock
   private EventContext eventContext;
