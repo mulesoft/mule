@@ -22,7 +22,8 @@ public class ConfigurationOverrides {
 
   /**
    * Ideal for proxy scenarios, this indicates whether errors produced by an HTTP request should be interpreted by the listener.
-   * If enabled, an error thrown by an HTTP request operation reaching a listener will be analysed for response data.
+   * If enabled, an error thrown by an HTTP request operation reaching a listener will be analysed for response data, so if a
+   * request operation throws a FORBIDDEN error, for example, then the listener will generate a 403 error response.
    */
   @Parameter
   @Optional

@@ -2,9 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <httpn:listener-config name="listenerConfig">
         <httpn:listener-connection host="localhost" port="${port}"/>
@@ -16,12 +18,12 @@
 
     <flow name="customErrorType">
         <httpn:listener config-ref="listenerConfig" path="/error"/>
-        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorProcessor"/>
+        <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorException"/>
     </flow>
 
     <flow name="customMessage">
         <httpn:listener config-ref="listenerConfig" path="/errorMessage"/>
-        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorMessageProcessor"/>
+        <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorMessageException"/>
     </flow>
 
     <flow name="customErrorResponseWhenError">
@@ -33,7 +35,7 @@
                 </httpn:headers>
             </httpn:error-response>
         </httpn:listener>
-        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorProcessor"/>
+        <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorException"/>
     </flow>
 
     <flow name="customErrorResponseWhenErrorMessage">
@@ -45,7 +47,7 @@
                 </httpn:headers>
             </httpn:error-response>
         </httpn:listener>
-        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase$ErrorMessageProcessor"/>
+        <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorMessageException"/>
     </flow>
 
     <flow name="requestErrorNotInterpreted">

@@ -34,12 +34,9 @@ import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhr
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
@@ -241,24 +238,23 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
     return String.format("http://localhost:%s/%s", port.getValue(), path);
   }
 
-  protected static class ErrorProcessor implements Processor {
+  public static class ErrorException extends TypedException {
 
-    @Override
-    public Event process(Event event) throws MuleException {
-      throw new TypedException(new IOException(OOPS), errorToThrow);
+    public ErrorException() {
+      super(new IOException(OOPS), errorToThrow);
     }
+
   }
 
-  protected static class ErrorMessageProcessor implements Processor {
+  public static class ErrorMessageException extends TypedException {
 
-    @Override
-    public Event process(Event event) throws MuleException {
-      throw new TypedException(new WrapperErrorMessageAwareException(Message.builder()
+    public ErrorMessageException() {
+      super(new WrapperErrorMessageAwareException(Message.builder()
           .payload(ERROR)
           .attributes(attributesToSend)
-          .build(), new IOException(OOPS)),
-                               errorToThrow);
+          .build(), new IOException(OOPS)), errorToThrow);
     }
+
   }
 
 }
