@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
 
@@ -82,6 +83,7 @@ public class IMAPNegativeConnectivityTestCase extends EmailConnectorTestCase {
     connectivityUtils.assertFailedConnection("configCannotReach", exceptionMatcher, is(errorType(UNKNOWN_HOST)));
   }
 
+  @Ignore
   @Test
   public void configSocketTimeout() {
     Matcher<Exception> exceptionMatcher =
