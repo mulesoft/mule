@@ -89,6 +89,13 @@ public class SimpleQueryTemplateParserTestCase extends AbstractMuleTestCase {
     doKeywordParsingTest("merge", QueryType.MERGE);
   }
 
+  @Test
+  public void detectsWith() throws Exception {
+    doKeywordParsingTest("WITH", QueryType.SELECT);
+    doKeywordParsingTest("With", QueryType.SELECT);
+    doKeywordParsingTest("with", QueryType.SELECT);
+  }
+
   private void doKeywordParsingTest(String keyword, QueryType expectedQueryType) {
     doSqlParsingTest(expectedQueryType, keyword + " some unused SQL");
     doSqlParsingTest(expectedQueryType, keyword + "\nsome\nunused\nSQL");
