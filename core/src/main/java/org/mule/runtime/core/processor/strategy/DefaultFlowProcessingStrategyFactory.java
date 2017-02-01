@@ -79,7 +79,7 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
       return scheduler -> isTransactionActive();
     }
 
-    private static class DelegateSink implements Sink, Disposable {
+    private final static class DelegateSink implements Sink, Disposable {
 
       private final Sink syncSink;
       private final Sink proactorSink;

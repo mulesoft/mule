@@ -8,13 +8,14 @@ package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.function.Consumer;
 
 /**
- * Processing strategy that processes all message processors in the caller thread. Unlike other, asynchronous, processing
+ * Processing strategy that processes all {@link Processor}'s in the caller thread. Unlike other, asynchronous, processing
  * strategies this processing strategy does not used a shared stream, given this would require serializing all requests and
  * limiting the effectiveness of multi-threaded sources and operations. Use {@link SynchronousStreamProcessingStrategyFactory} in
  * order to obtain stream semantics while doing all processing in the caller thread.

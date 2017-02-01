@@ -26,7 +26,7 @@ import org.reactivestreams.Publisher;
 abstract class AbstractStreamPerEventProcessingStrategyFactory extends AbstractProcessingStrategy {
 
   @Override
-  public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+  public final Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
     return new Sink() {
 
       Consumer<Event> onEventConsumer = createOnEventConsumer();

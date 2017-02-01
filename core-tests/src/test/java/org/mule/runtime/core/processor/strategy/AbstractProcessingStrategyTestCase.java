@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -94,7 +95,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     cpuLight = new TestScheduler(3, CPU_LIGHT);
     blocking = new TestScheduler(3, IO);
     cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
-    asyncExecutor = newCachedThreadPool();
+    asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flow = builder("test", muleContext)
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix)).build();
