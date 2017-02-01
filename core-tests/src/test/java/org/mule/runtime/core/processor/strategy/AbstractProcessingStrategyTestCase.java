@@ -9,6 +9,7 @@ package org.mule.runtime.core.processor.strategy;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
@@ -93,7 +94,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     cpuLight = new TestScheduler(3, CPU_LIGHT);
     blocking = new TestScheduler(3, IO);
     cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
-    asyncExecutor = newSingleThreadExecutor();
+    asyncExecutor = newCachedThreadPool();
 
     flow = builder("test", muleContext)
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix)).build();

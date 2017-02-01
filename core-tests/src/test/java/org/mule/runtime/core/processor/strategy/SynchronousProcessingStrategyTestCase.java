@@ -45,8 +45,8 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleCpuLightConcurrent() throws Exception {
-    internalSingleCpuLightConcurrent(true);
-    assertSynchronous(1);
+    super.internalSingleCpuLightConcurrent(false);
+    assertSynchronous(2);
   }
 
   @Override
