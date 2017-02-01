@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
@@ -100,6 +101,7 @@ public class MacroExpansionModuleModel {
         ComponentIdentifier identifier = operationRefModel.getIdentifier();
         String identifierName = identifier.getName();
         if (identifierName.equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)) {
+          //config elements will be worked later on, that's why we are skipping this element
           continue;
         }
         ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
@@ -111,12 +113,22 @@ public class MacroExpansionModuleModel {
           if (configurationModel.isPresent()) {
             hasOperationModels = configurationModel.get();
           }
-          //config elements will be worked later on, that's why we are skipping this element
-          OperationModel operationModel = hasOperationModels.getOperationModel(identifierName)
-              .orElseThrow(() -> new IllegalArgumentException(format("The operation '%s' is missing in the module '%s'",
-                                                                     identifierName, extensionModel.getName())));
-          ComponentModel replacementModel = createOperationInstance(operationRefModel, extensionModel, operationModel);
-          componentModelsToReplaceByIndex.put(i, replacementModel);
+
+          Optional<OperationModel> operationModel = hasOperationModels.getOperationModel(identifierName);
+          if (operationModel.isPresent()) {
+            ComponentModel replacementModel = createOperationInstance(operationRefModel, extensionModel, operationModel.get());
+            componentModelsToReplaceByIndex.put(i, replacementModel);
+          } else {
+            //as the #executeOnEveryMuleComponentTree goes from bottom to top, before throwing an exception we need to check if
+            // the current operationRefModel's parent is an operation of the current ExtensionModel, meaning that the role of the
+            // parameter is either CONTENT or PRIMARY_CONTENT
+            final ComponentIdentifier parentIdentifier = operationRefModel.getParent().getIdentifier();
+            final String parentIdentifierName = parentIdentifier.getName();
+            if (!hasOperationModels.getOperationModel(parentIdentifierName).isPresent()) {
+              throw new IllegalArgumentException(format("The operation '%s' is missing in the module '%s'", identifierName,
+                                                        extensionModel.getName()));
+            }
+          }
         }
       }
       for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
@@ -247,8 +259,9 @@ public class MacroExpansionModuleModel {
               && componentModel.getIdentifier().getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
               && configParameter.equals(componentModel.getParameters().get(NAME_ATTRIBUTE)))
           .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException(String
-              .format("There's no <%s:config> named [%s] in the current mule app", extensionModel.getName(), configParameter)));
+          .orElseThrow(() -> new IllegalArgumentException(
+                                                          format("There's no <%s:config> named [%s] in the current mule app",
+                                                                 extensionModel.getName(), configParameter)));
       valuesMap
           .putAll(extractParameters(configRefComponentModel,
                                     extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get()
@@ -257,17 +270,43 @@ public class MacroExpansionModuleModel {
     return valuesMap;
   }
 
+  /**
+   * Iterates over the collection of {@link ParameterModel}s making a clear distinction between {@link ParameterRole#BEHAVIOUR}
+   * and {@link ParameterRole#CONTENT} or {@link ParameterRole#PRIMARY_CONTENT} roles, where the former maps to simple attributes
+   * while the latter are child elements.
+   * <p/>
+   * If the value of the parameter is missing, then it will try to pick up a default value (also from the {@link ParameterModel#getDefaultValue()})
+   *
+   * @param componentModel to look for the values
+   * @param parameters collection of parameters to look for in the parametrized {@link ComponentModel}
+   * @return a {@link Map} with the values to be macro expanded in the final mule application
+   */
   private Map<String, String> extractParameters(ComponentModel componentModel, List<ParameterModel> parameters) {
     Map<String, String> valuesMap = new HashMap<>();
     for (ParameterModel parameterExtension : parameters) {
       String paramName = parameterExtension.getName();
       String value = null;
-      if (componentModel.getParameters().containsKey(paramName)) {
-        value = componentModel.getParameters().get(paramName);
-      } else if (parameterExtension.getDefaultValue() != null) {
-        value = (String) parameterExtension.getDefaultValue();
+
+      switch (parameterExtension.getRole()) {
+        case BEHAVIOUR:
+          if (componentModel.getParameters().containsKey(paramName)) {
+            value = componentModel.getParameters().get(paramName);
+          }
+          break;
+        case CONTENT:
+        case PRIMARY_CONTENT:
+          final Optional<ComponentModel> childComponentModel = componentModel.getInnerComponents().stream()
+              .filter(cm -> paramName.equals(cm.getIdentifier().getName()))
+              .findFirst();
+          if (childComponentModel.isPresent()) {
+            value = childComponentModel.get().getTextContent();
+          }
+          break;
       }
 
+      if (value == null && (parameterExtension.getDefaultValue() != null)) {
+        value = (String) parameterExtension.getDefaultValue();
+      }
       if (value != null) {
         valuesMap.put(paramName, value);
       }

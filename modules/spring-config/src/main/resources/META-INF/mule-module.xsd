@@ -82,6 +82,7 @@
                 <xsd:attribute name="defaultValue" use="optional"/>
                 <xsd:attribute name="type" type="xsd:string"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
+                <xsd:attribute name="role" type="roleParameterType" default="BEHAVIOUR"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -185,6 +186,19 @@
             <xsd:enumeration value="SELECT"/>
             <xsd:enumeration value="PREMIUM"/>
             <xsd:enumeration value="CERTIFIED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="roleParameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Set of defined roles for a given parameter. BEHAVIOUR will render attributes, CONTENT implies support for DataWeave in place and PRIMARY works similarly to CONTENT although it also implies it will map to the payload
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="BEHAVIOUR"/>
+            <xsd:enumeration value="CONTENT"/>
+            <xsd:enumeration value="PRIMARY"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

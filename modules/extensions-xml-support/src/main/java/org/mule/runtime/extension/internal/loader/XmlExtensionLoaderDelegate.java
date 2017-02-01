@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModelReader;
@@ -80,9 +81,17 @@ final class XmlExtensionLoaderDelegate {
   private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
       .put("void", typeLoader.load(Void.class))
       .build();
+  private static final Map<String, ParameterRole> parameterRoleTypes = ImmutableMap.<String, ParameterRole>builder()
+      .put("BEHAVIOUR", ParameterRole.BEHAVIOUR)
+      .put("CONTENT", ParameterRole.CONTENT)
+      .put("PRIMARY", ParameterRole.PRIMARY_CONTENT)
+      .build();
+
   private static final String CATEGORY = "category";
   private static final String VENDOR = "vendor";
   private static final String DOC_DESCRIPTION = "doc:description";
+  private static final String PASSWORD = "password";
+  private static final String ROLE = "role";
 
   private static ImmutableMap.Builder<String, MetadataType> getCommonTypesBuilder() {
     return ImmutableMap.<String, MetadataType>builder()
@@ -248,7 +257,7 @@ final class XmlExtensionLoaderDelegate {
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
 
-      properties.stream().forEach(param -> extractParameter(configurationDeclarer, param));
+      properties.stream().forEach(param -> extractProperty(configurationDeclarer, param));
       return of(configurationDeclarer);
     }
     return empty();
@@ -283,16 +292,24 @@ final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().getInnerComponents()
           .stream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
-          .forEach(param -> extractParameter(operationDeclarer, param));
+          .forEach(param -> extractParameter(operationDeclarer, param, getRole(param)));
     }
   }
 
-  private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param) {
+  private ParameterRole getRole(ComponentModel param) {
+    return parameterRoleTypes.get(param.getParameters().get(ROLE));
+  }
+
+  private void extractProperty(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param) {
+    extractParameter(parameterizedDeclarer, param, ParameterRole.BEHAVIOUR);
+  }
+
+  private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
     Map<String, String> parameters = param.getParameters();
     String parameterName = parameters.get(PARAMETER_NAME);
     String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
-    LayoutModel layoutModel = parseBoolean(parameters.get("password")) ? builder().asPassword().build()
+    LayoutModel layoutModel = parseBoolean(parameters.get(PASSWORD)) ? builder().asPassword().build()
         : builder().build();
     MetadataType parameterType = extractType(defaultInputTypes, receivedInputType);
 
@@ -302,6 +319,7 @@ final class XmlExtensionLoaderDelegate {
                 .defaultingTo(parameterDefaultValue);
     parameterDeclarer.describedAs(getDescription(param))
         .withLayout(layoutModel)
+        .withRole(role)
         .ofType(parameterType);
   }
 
