@@ -37,6 +37,7 @@ import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPP
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -50,8 +51,8 @@ import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -187,8 +188,8 @@ public class BeanDefinitionFactory {
               annotations = (Map<QName, Object>) propertyValue.getValue();
             }
             annotations.put(ANNOTATION_NAME, componentModel.getIdentifier());
-            annotations.put(ANNOTATION_PARAMETERS, componentModel.getParameters());
-            //add any error mappings if present
+            annotations.put(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getParameters()));
+            // add any error mappings if present
             List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
                 .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
             if (!errorMappingComponents.isEmpty()) {
