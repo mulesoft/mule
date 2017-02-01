@@ -21,7 +21,6 @@
         <generateDocs>false</generateDocs>
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.metadata.version>1.0.0-SNAPSHOT</mule.metadata.version>
-        <extension.documentation.maven.plugin.version>1.0.0-SNAPSHOT</extension.documentation.maven.plugin.version>
     </properties>
 
     <modules>
@@ -203,21 +202,16 @@
                 <plugins>
                     <plugin>
                         <groupId>org.mule.extensions</groupId>
-                        <artifactId>mule-extensions-documentation-maven-plugin</artifactId>
-                        <version>${extension.documentation.maven.plugin.version}</version>
+                        <artifactId>mule-extensions-maven-plugin</artifactId>
+                        <version>${mule.extensions.maven.plugin.version}</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
                                 <goals>
-                                    <goal>generate</goal>
+                                    <goal>documentation</goal>
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <!-- Picks up the packaged extension file -->
-                            <outputDir>${project.build.directory}/docs</outputDir>
-                            <jar>${project.build.directory}/${project.artifactId}-${project.version}-mule-plugin.jar</jar>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
