@@ -36,6 +36,7 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 
 import java.io.File;
@@ -46,7 +47,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -213,25 +213,31 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     descriptor.setRootFolder(pluginFolder);
 
     mulePluginModel.getClassLoaderModelLoaderDescriptor().ifPresent(classLoaderModelLoaderDescriptor -> {
-      Optional<ClassLoaderModelLoader> classLoaderModelLoader =
-          descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
-      if (!classLoaderModelLoader.isPresent()) {
+      ClassLoaderModelLoader classLoaderModelLoader;
+      try {
+        classLoaderModelLoader =
+            descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
+      } catch (LoaderNotFoundException e) {
         throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(pluginFolder,
                                                                                    classLoaderModelLoaderDescriptor));
       }
+
       final ClassLoaderModel classLoaderModel =
-          classLoaderModelLoader.get().load(pluginFolder, classLoaderModelLoaderDescriptor.getAttributes());
+          classLoaderModelLoader.load(pluginFolder, classLoaderModelLoaderDescriptor.getAttributes());
       descriptor.setClassLoaderModel(classLoaderModel);
     });
 
-    Optional<BundleDescriptorLoader> bundleDescriptorLoader =
-        descriptorLoaderRepository.get(mulePluginModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
-    if (!bundleDescriptorLoader.isPresent()) {
+    BundleDescriptorLoader bundleDescriptorLoader;
+    try {
+      bundleDescriptorLoader =
+          descriptorLoaderRepository.get(mulePluginModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
+    } catch (LoaderNotFoundException e) {
       throw new ArtifactDescriptorCreateException(invalidBundleDescriptorLoaderIdError(pluginFolder, mulePluginModel
           .getBundleDescriptorLoader()));
     }
-    descriptor.setBundleDescriptor(bundleDescriptorLoader.get()
-        .load(pluginFolder, mulePluginModel.getBundleDescriptorLoader().getAttributes()));
+
+    descriptor.setBundleDescriptor(bundleDescriptorLoader.load(pluginFolder,
+                                                               mulePluginModel.getBundleDescriptorLoader().getAttributes()));
 
     mulePluginModel.getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
       final LoaderDescriber loaderDescriber = new LoaderDescriber(extensionModelDescriptor.getId());

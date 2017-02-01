@@ -30,6 +30,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
@@ -39,7 +40,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -93,25 +93,29 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
     if (mulePolicyModel.getClassLoaderModelLoaderDescriptor().isPresent()) {
       MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor = mulePolicyModel.getClassLoaderModelLoaderDescriptor().get();
-      Optional<ClassLoaderModelLoader> classLoaderModelLoader =
-          descriptorLoaderRepository.get(muleArtifactLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
-      if (!classLoaderModelLoader.isPresent()) {
+      ClassLoaderModelLoader classLoaderModelLoader;
+      try {
+        classLoaderModelLoader =
+            descriptorLoaderRepository.get(muleArtifactLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
+      } catch (LoaderNotFoundException e) {
         throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(muleArtifactLoaderDescriptor));
       }
 
-      ClassLoaderModel classLoaderModel = classLoaderModelLoader.get()
+      ClassLoaderModel classLoaderModel = classLoaderModelLoader
           .load(artifactFolder, mulePolicyModel.getClassLoaderModelLoaderDescriptor().get().getAttributes());
       descriptor.setClassLoaderModel(classLoaderModel);
     }
 
-    Optional<BundleDescriptorLoader> bundleDescriptorLoader =
-        descriptorLoaderRepository.get(mulePolicyModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
-    if (!bundleDescriptorLoader.isPresent()) {
+    BundleDescriptorLoader bundleDescriptorLoader;
+    try {
+      bundleDescriptorLoader =
+          descriptorLoaderRepository.get(mulePolicyModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
+    } catch (LoaderNotFoundException e) {
       throw new ArtifactDescriptorCreateException(invalidBundleDescriptorLoaderIdError(mulePolicyModel
           .getBundleDescriptorLoader()));
     }
-    descriptor.setBundleDescriptor(bundleDescriptorLoader.get()
-        .load(artifactFolder, mulePolicyModel.getBundleDescriptorLoader().getAttributes()));
+    descriptor.setBundleDescriptor(bundleDescriptorLoader.load(artifactFolder,
+                                                               mulePolicyModel.getBundleDescriptorLoader().getAttributes()));
     descriptor.setPlugins(parseArtifactPluginDescriptors(artifactFolder, descriptor));
 
     return descriptor;

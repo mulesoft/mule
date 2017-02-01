@@ -8,13 +8,14 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Collections.singleton;
-import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
@@ -22,22 +23,32 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
-import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractMuleTestCase {
 
-  public static final String LOADER_ID = "loader";
+  private static final String LOADER_ID = "loader";
+
   private final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
   private final ServiceRegistryDescriptorLoaderRepository repository =
       new ServiceRegistryDescriptorLoaderRepository(serviceRegistry);
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Test
   public void initializesClassLoaderModelLoadersOnce() throws Exception {
-    repository.get("any", ClassLoaderModelLoader.class);
-    repository.get("any", ClassLoaderModelLoader.class);
+    ClassLoaderModelLoader expectedClassLoaderModelLoader = mock(ClassLoaderModelLoader.class);
+    when(expectedClassLoaderModelLoader.getId()).thenReturn(LOADER_ID);
+    Collection<ClassLoaderModelLoader> classLoaderModelLoaders = singleton(expectedClassLoaderModelLoader);
+    when(serviceRegistry.lookupProviders(ClassLoaderModelLoader.class, getClass().getClassLoader()))
+        .thenReturn(classLoaderModelLoaders);
+
+    repository.get(LOADER_ID, ClassLoaderModelLoader.class);
+    repository.get(LOADER_ID, ClassLoaderModelLoader.class);
 
     verify(serviceRegistry).lookupProviders(ClassLoaderModelLoader.class, getClass().getClassLoader());
     verify(serviceRegistry).lookupProviders(BundleDescriptorLoader.class, getClass().getClassLoader());
@@ -47,8 +58,10 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
 
   @Test
   public void doesNotFindInvalidLoaderId() throws Exception {
-    Optional<ClassLoaderModelLoader> invalid = repository.get("invalid", ClassLoaderModelLoader.class);
-    assertThat(invalid, is(empty()));
+    expectedException.expect(LoaderNotFoundException.class);
+    expectedException.expectMessage(noRegisteredLoaderError("invalid", ClassLoaderModelLoader.class));
+
+    repository.get("invalid", ClassLoaderModelLoader.class);
   }
 
   @Test
@@ -58,9 +71,9 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
     Collection<ClassLoaderModelLoader> classLoaderModelLoaders = singleton(expectedClassLoaderModelLoader);
     when(serviceRegistry.lookupProviders(ClassLoaderModelLoader.class, getClass().getClassLoader()))
         .thenReturn(classLoaderModelLoaders);
-    Optional<ClassLoaderModelLoader> classLoaderModelLoader = repository.get(LOADER_ID, ClassLoaderModelLoader.class);
+    ClassLoaderModelLoader classLoaderModelLoader = repository.get(LOADER_ID, ClassLoaderModelLoader.class);
 
-    assertThat(classLoaderModelLoader.get(), is(expectedClassLoaderModelLoader));
+    assertThat(classLoaderModelLoader, is(expectedClassLoaderModelLoader));
   }
 
   @Test
@@ -70,8 +83,10 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
     Collection<ClassLoaderModelLoader> classLoaderModelLoaders = singleton(classLoaderModelLoader);
     when(serviceRegistry.lookupProviders(ClassLoaderModelLoader.class, getClass().getClassLoader()))
         .thenReturn(classLoaderModelLoaders);
-    Optional<BundleDescriptorLoader> bundleDescriptorLoader = repository.get(LOADER_ID, BundleDescriptorLoader.class);
 
-    assertThat(bundleDescriptorLoader, is(empty()));
+    expectedException.expect(LoaderNotFoundException.class);
+    expectedException.expectMessage(noRegisteredLoaderError(LOADER_ID, BundleDescriptorLoader.class));
+
+    repository.get(LOADER_ID, BundleDescriptorLoader.class);
   }
 }

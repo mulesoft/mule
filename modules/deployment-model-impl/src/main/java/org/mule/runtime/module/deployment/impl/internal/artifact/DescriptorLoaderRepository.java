@@ -22,8 +22,8 @@ public interface DescriptorLoaderRepository {
    * @param id identifies the loader to obtain. Non empty.
    * @param loaderClass class of {@link DescriptorLoader} to search for. No null.
    * @param <T> type of descriptor loader to return
-   * @returns an {@link Optional} loader of the given class and ID. It will be empty if there is no loader of that class
-   *          registered with that ID.
+   * @returns a non null {@link Optional} loader of the given class and ID
+   * @throws LoaderNotFoundException if there is no registered loader of type {@link T} with the provided ID.
    */
-  <T extends DescriptorLoader> Optional<T> get(String id, Class<T> loaderClass);
+  <T extends DescriptorLoader> T get(String id, Class<T> loaderClass) throws LoaderNotFoundException;
 }

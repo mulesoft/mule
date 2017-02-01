@@ -9,8 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.createTempFile;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,6 +46,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader;
@@ -94,14 +93,14 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, ClassLoaderModelLoader.class))
-        .thenReturn(of(new FileSystemPolicyClassLoaderModelLoader()));
+        .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, ClassLoaderModelLoader.class))
-        .thenReturn(empty());
+        .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, BundleDescriptorLoader.class))
-        .thenReturn(of(new PropertiesBundleDescriptorLoader()));
+        .thenReturn(new PropertiesBundleDescriptorLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, BundleDescriptorLoader.class))
-        .thenReturn(empty());
+        .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
   }
 
   @Test

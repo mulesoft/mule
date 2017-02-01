@@ -10,8 +10,6 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -42,6 +40,7 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateExcep
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
@@ -96,14 +95,14 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
 
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, ClassLoaderModelLoader.class))
-        .thenReturn(of(new FileSystemPolicyClassLoaderModelLoader()));
+        .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, ClassLoaderModelLoader.class))
-        .thenReturn(empty());
+        .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, BundleDescriptorLoader.class))
-        .thenReturn(of(new PropertiesBundleDescriptorLoader()));
+        .thenReturn(new PropertiesBundleDescriptorLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, BundleDescriptorLoader.class))
-        .thenReturn(empty());
+        .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
   }
 
   @Test

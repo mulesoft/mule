@@ -8,7 +8,6 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
@@ -18,7 +17,6 @@ import org.mule.runtime.module.artifact.descriptor.DescriptorLoader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Provides a {@link DescriptorLoaderRepository} that uses a {@link ServiceRegistry} to detect available implementations of
@@ -42,7 +40,7 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
   }
 
   @Override
-  public <T extends DescriptorLoader> Optional<T> get(String id, Class<T> loaderClass) {
+  public <T extends DescriptorLoader> T get(String id, Class<T> loaderClass) throws LoaderNotFoundException {
     if (descriptorLoaders == null) {
       initializeDescriptorLoaders();
     }
@@ -53,7 +51,15 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
       descriptorLoader = registeredDescriptorLoaders.get(id);
     }
 
-    return ofNullable((T) descriptorLoader);
+    if (descriptorLoader == null) {
+      throw new LoaderNotFoundException(noRegisteredLoaderError(id, loaderClass));
+    }
+
+    return (T) descriptorLoader;
+  }
+
+  protected static <T extends DescriptorLoader> String noRegisteredLoaderError(String id, Class<T> loaderClass) {
+    return format("There is no loader with ID='%s' and type '$s'", id, loaderClass.getName());
   }
 
   private void initializeDescriptorLoaders() {
