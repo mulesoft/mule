@@ -13,12 +13,15 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Response;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,20 +35,20 @@ public class HttpListenerUriEncodingErrorTestCase extends FunctionalTestCase
     public void failsWithAppropriateError() throws Exception
     {
         String address = getUri() + "?blah=badcode%2";
-        MuleMessage response = muleContext.getClient().send(address, getTestMuleMessage(), newOptions().disableStatusCodeValidation().build());
+        Response response = sendGetRequest(address);
 
-        assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(BAD_REQUEST.getStatusCode()));
-        assertThat(response.getPayloadAsString(), containsString("URLDecoder"));
+        assertThat(response.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
+        assertThat(response.getResponseBody(), containsString("URLDecoder"));
     }
 
     @Test
     public void worksWhenValidUri() throws Exception
     {
         String address = getUri() + "?blah=a%20space";
-        MuleMessage response = muleContext.getClient().send(address, getTestMuleMessage());
+        Response response = sendGetRequest(address);
 
-        assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));
-        assertThat(response.getPayloadAsString(), equalTo("response"));
+        assertThat(response.getStatusCode(), is(OK.getStatusCode()));
+        assertThat(response.getResponseBody(), equalTo("response"));
     }
 
     @Override
@@ -57,5 +60,17 @@ public class HttpListenerUriEncodingErrorTestCase extends FunctionalTestCase
     private String getUri()
     {
         return format("http://localhost:%d/", dynamicPort.getNumber());
+    }
+
+    private Response sendGetRequest(String address) throws Exception
+    {
+        AsyncHttpClientConfig.Builder configBuilder = new AsyncHttpClientConfig.Builder();
+        AsyncHttpClientConfig config = configBuilder.build();
+
+        try (AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config))
+        {
+            ListenableFuture<Response> future = asyncHttpClient.prepareGet(address).execute();
+            return future.get();
+        }
     }
 }
