@@ -132,7 +132,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
     try {
       ((SkeletonSource) messageSource).getListener()
-          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null)).build());
+          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null))
+              .build());
     } finally {
       WaitingProcessor.latch.countDown();
     }
