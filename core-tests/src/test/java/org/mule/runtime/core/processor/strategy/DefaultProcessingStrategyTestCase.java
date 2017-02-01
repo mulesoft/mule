@@ -9,6 +9,9 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -30,10 +33,8 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive,
-                                             scheduler -> {
-                                             },
-                                             muleContext);
+    return new DefaultFlowProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive, scheduler -> {
+    }, Integer.MAX_VALUE, () -> blocking, DEFAULT_BUFFER_SIZE, DEFAULT_SUBSCRIBER_COUNT, DEFAULT_WAIT_STRATEGY, muleContext);
   }
 
   @Override

@@ -16,10 +16,14 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 @Deprecated
 public class LegacySynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
+  public static ProcessingStrategy LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE =
+      (flowConstruct, pipelineFunction) -> event -> {
+        throw new IllegalStateException("Sink is not supported for "
+            + LegacySynchronousProcessingStrategyFactory.class.getName());
+      };
+
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return (flowConstruct, pipelineFunction) -> event -> {
-      throw new IllegalStateException("Sink is not supported for " + LegacySynchronousProcessingStrategyFactory.class.getName());
-    };
+    return LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 }

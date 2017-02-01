@@ -120,7 +120,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
     assertSynchronous(1);
   }
 
-  private void assertSynchronous(int concurrency) {
+  protected void assertSynchronous(int concurrency) {
     assertThat(threads.size(), equalTo(concurrency));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
