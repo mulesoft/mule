@@ -8,6 +8,8 @@ package org.mule.module.http.internal.listener;
 
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
@@ -29,6 +31,7 @@ import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
@@ -149,11 +152,16 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
             private void sendErrorResponse(final HttpStatus status, String message, HttpResponseReadyCallback responseCallback)
             {
-                responseCallback.responseReady(new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
-                                                       .setStatusCode(status.getStatusCode())
-                                                       .setReasonPhrase(status.getReasonPhrase())
-                                                       .setEntity(new ByteArrayHttpEntity(message.getBytes()))
-                                                       .build(), new ResponseStatusCallback()
+
+                byte[] responseData = message.getBytes();
+                HttpResponse response = new org.mule.module.http.internal.domain.response.HttpResponseBuilder()
+                    .setStatusCode(status.getStatusCode())
+                    .setReasonPhrase(status.getReasonPhrase())
+                    .setEntity(new ByteArrayHttpEntity(responseData))
+                    .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
+                    .build();
+
+                responseCallback.responseReady(response, new ResponseStatusCallback()
                 {
                     @Override
                     public void responseSendFailure(Throwable exception)
