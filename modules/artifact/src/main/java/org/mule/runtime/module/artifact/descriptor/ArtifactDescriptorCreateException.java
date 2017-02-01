@@ -25,4 +25,11 @@ public class ArtifactDescriptorCreateException extends RuntimeException {
   public ArtifactDescriptorCreateException(String s, Throwable throwable) {
     super(s, throwable);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public ArtifactDescriptorCreateException(Throwable cause) {
+    super(cause);
+  }
 }

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.io.File.createTempFile;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,23 +17,39 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
+import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.invalidBundleDescriptorLoaderIdError;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.invalidClassLoaderModelIdError;
+import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
+import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
+import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -40,24 +57,50 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 
 public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
-  public static final String PLUGIN_NAME = "testPlugin";
+  private static final String PLUGIN_NAME = "testPlugin";
+  private static final String INVALID_LOADER_ID = "INVALID";
+  private static final String MIN_MULE_VERSION = "4.0.0";
 
   @Rule
   public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
-  private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory();
+  private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
+  private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory(descriptorLoaderRepository);
 
   @Before
   public void setUp() throws Exception {
     when(classLoaderFilterFactory.create(null, null))
         .thenReturn(NULL_CLASSLOADER_FILTER);
+
+    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, ClassLoaderModelLoader.class))
+        .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, ClassLoaderModelLoader.class))
+        .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
+
+    when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, BundleDescriptorLoader.class))
+        .thenReturn(new PropertiesBundleDescriptorLoader());
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, BundleDescriptorLoader.class))
+        .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
   }
 
   @Test
@@ -178,6 +221,43 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     descriptorFactory.create(pluginFolder);
   }
 
+  @Test
+  public void detectsInvalidClassLoaderModelLoaderId() throws Exception {
+    MulePluginModel.MulePluginModelBuilder pluginModelBuilder = new MulePluginModel.MulePluginModelBuilder().setName(PLUGIN_NAME)
+        .setMinMuleVersion(MIN_MULE_VERSION)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
+    pluginModelBuilder.withClassLoaderModelDescriber().setId(INVALID_LOADER_ID);
+
+    ArtifactPluginFileBuilder pluginFileBuilder =
+        new ArtifactPluginFileBuilder(PLUGIN_NAME).describedBy(pluginModelBuilder.build());
+    File tempFolder = createTempFolder();
+    unzip(pluginFileBuilder.getArtifactFile(), tempFolder);
+
+    expectedException.expect(ArtifactDescriptorCreateException.class);
+    expectedException
+        .expectMessage(invalidClassLoaderModelIdError(tempFolder, pluginModelBuilder.getClassLoaderModelDescriptorLoader()));
+
+    descriptorFactory.create(tempFolder);
+  }
+
+  @Test
+  public void detectsInvalidBundleDescriptorModelLoaderId() throws Exception {
+    MulePluginModel.MulePluginModelBuilder pluginModelBuilder = new MulePluginModel.MulePluginModelBuilder().setName(PLUGIN_NAME)
+        .setMinMuleVersion(MIN_MULE_VERSION).withBundleDescriptorLoader(createBundleDescriptorLoader(INVALID_LOADER_ID));
+    pluginModelBuilder.withClassLoaderModelDescriber().setId(FILE_SYSTEM_POLICY_MODEL_LOADER_ID);
+
+    ArtifactPluginFileBuilder pluginFileBuilder =
+        new ArtifactPluginFileBuilder(PLUGIN_NAME).describedBy(pluginModelBuilder.build());
+    File tempFolder = createTempFolder();
+    unzip(pluginFileBuilder.getArtifactFile(), tempFolder);
+
+    expectedException.expect(ArtifactDescriptorCreateException.class);
+    expectedException
+        .expectMessage(invalidBundleDescriptorLoaderIdError(tempFolder, pluginModelBuilder.getBundleDescriptorLoader()));
+
+    descriptorFactory.create(tempFolder);
+  }
+
   private File createPluginFolder() {
     final File pluginFolder = new File(pluginsFolder.getRoot(), PLUGIN_NAME);
     assertThat(pluginFolder.mkdir(), is(true));
@@ -188,6 +268,23 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     final File jar1 = new File(pluginLibFolder, child);
     FileUtils.write(jar1, "foo");
     return jar1;
+  }
+
+  private File createTempFolder() throws IOException {
+    File tempFolder = createTempFile("tempPolicy", null);
+    Assert.assertThat(tempFolder.delete(), Matchers.is(true));
+    Assert.assertThat(tempFolder.mkdir(), Matchers.is(true));
+    return tempFolder;
+  }
+
+  private MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String bundleDescriptorLoaderId) {
+    Map<String, Object> attributes = new HashMap();
+    attributes.put(VERSION, "1.0");
+    attributes.put(GROUP_ID, "org.mule.test");
+    attributes.put(ARTIFACT_ID, PLUGIN_NAME);
+    attributes.put(CLASSIFIER, "mule-plugin");
+    attributes.put(TYPE, "jar");
+    return new MuleArtifactLoaderDescriptor(bundleDescriptorLoaderId, attributes);
   }
 
   private static class PluginDescriptorChecker {

@@ -45,7 +45,7 @@ public class FileSystemPolicyClassLoaderModelLoaderTestCase extends AbstractMule
     File file2 = new File(libFolder, "test2.jar");
     stringToFile(file2.getAbsolutePath(), "foo");
 
-    ClassLoaderModel classLoaderModel = classLoaderModelLoader.loadClassLoaderModel(policyFolder);
+    ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(policyFolder, null);
 
     assertThat(classLoaderModel.getUrls().length, equalTo(3));
     assertThat(classLoaderModel.getUrls()[0], equalTo(classesFolder.toURI().toURL()));
