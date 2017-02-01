@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class PropertiesBundleDescriptorLoader implements BundleDescriptorLoader 
    * @throws ArtifactDescriptorCreateException if any bundle descriptor required property is missing on the given attributes.
    */
   @Override
-  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes) {
+  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
     String version = (String) attributes.get(VERSION);
     String groupId = (String) attributes.get(GROUP_ID);
     String artifactId = (String) attributes.get(ARTIFACT_ID);
@@ -52,7 +53,7 @@ public class PropertiesBundleDescriptorLoader implements BundleDescriptorLoader 
       return new BundleDescriptor.Builder().setVersion(version).setGroupId(groupId).setArtifactId(artifactId)
           .setClassifier(classifier).setType(type).build();
     } catch (IllegalArgumentException e) {
-      throw new ArtifactDescriptorCreateException("Bundle descriptor attributes are not complete", e);
+      throw new InvalidDescriptorLoaderException("Bundle descriptor attributes are not complete", e);
     }
   }
 }

@@ -7,9 +7,9 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -43,7 +43,7 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs
    */
   @Override
-  public ClassLoaderModel load(File artifactFolder, Map<String, Object> attributes) {
+  public ClassLoaderModel load(File artifactFolder, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
 
     final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
 
@@ -52,7 +52,8 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
     return classLoaderModelBuilder.build();
   }
 
-  private void loadUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder, File artifactFolder) {
+  private void loadUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder, File artifactFolder)
+      throws InvalidDescriptorLoaderException {
     try {
       classLoaderModelBuilder.containing(new File(artifactFolder, CLASSES_DIR).toURI().toURL());
       final File libDir = new File(artifactFolder, LIB_DIR);
@@ -63,7 +64,7 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
         }
       }
     } catch (MalformedURLException e) {
-      throw new ArtifactDescriptorCreateException("Failed to create plugin descriptor " + artifactFolder);
+      throw new InvalidDescriptorLoaderException("Failed to create plugin descriptor " + artifactFolder);
     }
   }
 }

@@ -15,6 +15,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
    * there's an issue while reading that file
    */
   @Override
-  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes) {
+  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
     Model model = getPomModel(artifactFolder);
 
     return new BundleDescriptor.Builder()

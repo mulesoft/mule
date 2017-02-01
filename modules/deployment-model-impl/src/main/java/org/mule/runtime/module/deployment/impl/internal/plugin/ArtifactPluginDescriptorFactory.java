@@ -35,6 +35,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -213,20 +214,21 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     descriptor.setRootFolder(pluginFolder);
 
     mulePluginModel.getClassLoaderModelLoaderDescriptor().ifPresent(classLoaderModelLoaderDescriptor -> {
-      ClassLoaderModelLoader classLoaderModelLoader;
-      try {
-        classLoaderModelLoader =
-            descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
-      } catch (LoaderNotFoundException e) {
-        throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(pluginFolder,
-                                                                                   classLoaderModelLoaderDescriptor));
-      }
-
-      final ClassLoaderModel classLoaderModel =
-          classLoaderModelLoader.load(pluginFolder, classLoaderModelLoaderDescriptor.getAttributes());
-      descriptor.setClassLoaderModel(classLoaderModel);
+      descriptor.setClassLoaderModel(getClassLoaderModel(pluginFolder, classLoaderModelLoaderDescriptor));
     });
 
+    descriptor.setBundleDescriptor(getBundleDescriptor(pluginFolder, mulePluginModel));
+
+    mulePluginModel.getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
+      final LoaderDescriber loaderDescriber = new LoaderDescriber(extensionModelDescriptor.getId());
+      loaderDescriber.addAttributes(extensionModelDescriptor.getAttributes());
+      descriptor.setExtensionModelDescriptorProperty(loaderDescriber);
+    });
+
+    return descriptor;
+  }
+
+  private BundleDescriptor getBundleDescriptor(File pluginFolder, MulePluginModel mulePluginModel) {
     BundleDescriptorLoader bundleDescriptorLoader;
     try {
       bundleDescriptorLoader =
@@ -236,16 +238,30 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
           .getBundleDescriptorLoader()));
     }
 
-    descriptor.setBundleDescriptor(bundleDescriptorLoader.load(pluginFolder,
-                                                               mulePluginModel.getBundleDescriptorLoader().getAttributes()));
+    try {
+      return bundleDescriptorLoader.load(pluginFolder, mulePluginModel.getBundleDescriptorLoader().getAttributes());
+    } catch (InvalidDescriptorLoaderException e) {
+      throw new ArtifactDescriptorCreateException(e);
+    }
+  }
 
-    mulePluginModel.getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
-      final LoaderDescriber loaderDescriber = new LoaderDescriber(extensionModelDescriptor.getId());
-      loaderDescriber.addAttributes(extensionModelDescriptor.getAttributes());
-      descriptor.setExtensionModelDescriptorProperty(loaderDescriber);
-    });
+  private ClassLoaderModel getClassLoaderModel(File pluginFolder, MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor) {
+    ClassLoaderModelLoader classLoaderModelLoader;
+    try {
+      classLoaderModelLoader =
+          descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
+    } catch (LoaderNotFoundException e) {
+      throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(pluginFolder,
+                                                                                 classLoaderModelLoaderDescriptor));
+    }
 
-    return descriptor;
+    final ClassLoaderModel classLoaderModel;
+    try {
+      classLoaderModel = classLoaderModelLoader.load(pluginFolder, classLoaderModelLoaderDescriptor.getAttributes());
+    } catch (InvalidDescriptorLoaderException e) {
+      throw new ArtifactDescriptorCreateException(e);
+    }
+    return classLoaderModel;
   }
 
   protected static String invalidBundleDescriptorLoaderIdError(File pluginFolder,

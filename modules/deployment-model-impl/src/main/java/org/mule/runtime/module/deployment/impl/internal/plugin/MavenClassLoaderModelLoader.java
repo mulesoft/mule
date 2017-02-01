@@ -35,6 +35,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -115,8 +116,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
    * @see BundlePluginDependenciesResolver#getArtifactsWithDependencies(List, Set)
    */
   @Override
-  public ClassLoaderModel load(File artifactFolder,
-                               Map<String, Object> attributes) {
+  public ClassLoaderModel load(File artifactFolder, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
     final Model model = getPomModel(artifactFolder);
     final ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
     classLoaderModelBuilder
@@ -173,7 +173,8 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
         && MULE_PLUGIN_CLASSIFIER.equals(dependency.getArtifact().getClassifier());
   }
 
-  private PreorderNodeListGenerator assemblyDependenciesFromPom(File pluginFolder, Model model) {
+  private PreorderNodeListGenerator assemblyDependenciesFromPom(File pluginFolder, Model model)
+      throws InvalidDescriptorLoaderException {
 
     Artifact defaultArtifact = new DefaultArtifact(model.getGroupId(), model.getArtifactId(),
                                                    null,
@@ -201,13 +202,13 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
     } catch (DependencyResolutionException e) {
       DependencyNode node = e.getResult().getRoot();
       logUnresolvedArtifacts(node, e);
-      throw new ArtifactDescriptorCreateException(format("There was an issue solving the dependencies for the plugin [%s]",
-                                                         pluginFolder.getAbsolutePath()),
-                                                  e);
+      throw new InvalidDescriptorLoaderException(format("There was an issue solving the dependencies for the plugin [%s]",
+                                                        pluginFolder.getAbsolutePath()),
+                                                 e);
     } catch (DependencyCollectionException e) {
-      throw new ArtifactDescriptorCreateException(format("There was an issue resolving the dependency tree for the plugin [%s]",
-                                                         pluginFolder.getAbsolutePath()),
-                                                  e);
+      throw new InvalidDescriptorLoaderException(format("There was an issue resolving the dependency tree for the plugin [%s]",
+                                                        pluginFolder.getAbsolutePath()),
+                                                 e);
     } catch (ArtifactDescriptorException e) {
       throw new ArtifactDescriptorCreateException(format("There was an issue resolving the artifact descriptor for the plugin [%s]",
                                                          pluginFolder.getAbsolutePath()),
