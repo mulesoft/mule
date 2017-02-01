@@ -173,7 +173,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
-    if (errorResponse.getBody() == null) {
+    if (errorResponse.getBody() == null || errorResponse.getBody().getValue() == null) {
       errorResponse.setBody(new TypedValue<>(error.getCause().getMessage(), STRING));
     }
 
