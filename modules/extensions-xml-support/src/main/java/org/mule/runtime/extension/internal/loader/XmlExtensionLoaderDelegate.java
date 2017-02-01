@@ -9,6 +9,7 @@ package org.mule.runtime.extension.internal.loader;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -16,6 +17,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
 import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -101,6 +103,14 @@ final class XmlExtensionLoaderDelegate {
         .put("date", typeLoader.load(Date.class))
         .put("integer", typeLoader.load(Integer.class))
         .put("time", typeLoader.load(LocalTime.class));
+  }
+
+  private static ParameterRole getRole(final String role) {
+    if (!parameterRoleTypes.containsKey(role)) {
+      throw new IllegalArgumentException(format("The parametrized role [%s] doesn't match any of the expected types [%s]", role,
+                                                join(", ", parameterRoleTypes.keySet())));
+    }
+    return parameterRoleTypes.get(role);
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
@@ -292,16 +302,15 @@ final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().getInnerComponents()
           .stream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
-          .forEach(param -> extractParameter(operationDeclarer, param, getRole(param)));
+          .forEach(param -> {
+            final String role = param.getParameters().get(ROLE);
+            extractParameter(operationDeclarer, param, getRole(role));
+          });
     }
   }
 
-  private ParameterRole getRole(ComponentModel param) {
-    return parameterRoleTypes.get(param.getParameters().get(ROLE));
-  }
-
   private void extractProperty(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param) {
-    extractParameter(parameterizedDeclarer, param, ParameterRole.BEHAVIOUR);
+    extractParameter(parameterizedDeclarer, param, BEHAVIOUR);
   }
 
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
@@ -348,7 +357,7 @@ final class XmlExtensionLoaderDelegate {
       String errorMessage = format(
                                    "should not have reach here. Type obtained [%s] when supported default types are [%s].",
                                    receivedType,
-                                   String.join(", ", types.keySet()));
+                                   join(", ", types.keySet()));
       if (typesCatalog.isPresent()) {
         errorMessage +=
             format(" Custom types [%s] doesn't have support for the specified [%s] type", getCustomTypeFilename(), receivedType);
