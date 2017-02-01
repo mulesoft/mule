@@ -6,79 +6,35 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 
 /**
- * Creates {@link ReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages to
- * single-threaded event-loop.
+ * Creates {@link RingBufferProcessingStrategy} instance that implements the reactor pattern by de-multiplexes incoming messages
+ * onto a single event-loop using a ring-buffer.
  *
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0
  */
-public class ReactorProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessingStrategyFactory {
 
-  private static int DEFAULT_QUEUE_SIZE = 256;
+  @Override
+  public void setSubscriberCount(int subscriberCount) {
+    throw new UnsupportedOperationException("ReactorProcessingStrategy does not support more than 1 subscriber event-loop");
+  }
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    // TODO MULE-11132 Use cpuLight scheduler with single-thread affinity.
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
-                                         scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                     MILLISECONDS),
-                                         muleContext);
-  }
+    return new RingBufferProcessingStrategy(() -> muleContext.getSchedulerService()
+        .customScheduler(SchedulerConfig.config().withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
+            .withMaxConcurrentTasks(getSubscriberCount() + 1)),
 
-  static class ReactorProcessingStrategy extends AbstractSchedulingProcessingStrategy {
-
-    private Supplier<Scheduler> cpuLightSchedulerSupplier;
-    protected Scheduler cpuLightScheduler;
-
-    public ReactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                     Consumer<Scheduler> schedulerStopper,
-                                     MuleContext muleContext) {
-      super(schedulerStopper, muleContext);
-      this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
-    }
-
-    @Override
-    public void start() throws MuleException {
-      this.cpuLightScheduler = cpuLightSchedulerSupplier.get();
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (cpuLightScheduler != null) {
-        getSchedulerStopper().accept(cpuLightScheduler);
-      }
-    }
-
-    @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
-                                                                   MessagingExceptionHandler messagingExceptionHandler) {
-      return publisher -> from(publisher)
-          .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
-          .transform(pipelineFunction);
-    }
-
+                                            getBufferSize(),
+                                            1,
+                                            getWaitStrategy(),
+                                            muleContext);
   }
 
 }

@@ -7,23 +7,27 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dispatches incoming messages to a work queue
@@ -34,29 +38,64 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProcessingStrategyFactory {
 
-  private int maxThreads;
+  private static int DEFAULT_MAX_CONCURRENCY = 16;
+  private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
+
+  /**
+   * Configures the maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks
+   * using the IO pool, but will also limit the number of CPU_LIGHT threads in used concurrently.
+   *
+   * @param maxConcurrency
+   */
+  public void setMaxConcurrency(int maxConcurrency) {
+    if (maxConcurrency > 1) {
+      throw new IllegalArgumentException("maxConcurrency must be at least 1");
+    }
+    this.maxConcurrency = maxConcurrency;
+  }
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(config().withMaxConcurrentTasks(maxThreads)
-            .withName(schedulersNamePrefix)),
+        .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                           maxConcurrency,
                                            scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                        MILLISECONDS),
+                                           () -> muleContext.getSchedulerService().customScheduler(config()
+                                               .withName(schedulersNamePrefix + "." + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
+                                               .withMaxConcurrentTasks(getSubscriberCount() + 1)),
+                                           getBufferSize(),
+                                           getSubscriberCount(),
+                                           getWaitStrategy(),
                                            muleContext);
   }
 
-  static class WorkQueueProcessingStrategy extends AbstractSchedulingProcessingStrategy {
+  /**
+   * Configure the maximum concurrency for message processing in the flow.
+   *
+   * @param concurrency
+   */
+  public void setConcurrency(int concurrency) {
+    this.maxConcurrency = concurrency;
+  }
 
-    private Supplier<Scheduler> schedulerSupplier;
-    private Scheduler scheduler;
+  static class WorkQueueProcessingStrategy extends RingBufferProcessingStrategy implements Startable, Stoppable {
 
-    public WorkQueueProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
-                                       MuleContext muleContext) {
-      super(schedulerStopper, muleContext);
-      this.schedulerSupplier = schedulerSupplier;
+    private Supplier<Scheduler> ioSchedulerSupplier;
+    private Consumer<Scheduler> schedulerStopper;
+    private int concurrency;
+    private Scheduler ioScheduler;
+
+    public WorkQueueProcessingStrategy(Supplier<Scheduler> ioSchedulerSupplier, int concurrency,
+                                       Consumer<Scheduler> schedulerStopper,
+                                       Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                       int bufferSize, int subscriberCount, String waitStrategy, MuleContext muleContext) {
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, muleContext);
+      this.ioSchedulerSupplier = ioSchedulerSupplier;
+      this.schedulerStopper = schedulerStopper;
+      this.concurrency = concurrency;
     }
 
     @Override
@@ -64,21 +103,23 @@ public class WorkQueueProcessingStrategyFactory implements ProcessingStrategyFac
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
-          .publishOn(fromExecutorService(scheduler))
-          .transform(pipelineFunction);
+          .flatMap(event -> just(event).transform(pipelineFunction).subscribeOn(Schedulers.fromExecutorService(ioScheduler)),
+                   concurrency);
     }
 
     @Override
     public void start() throws MuleException {
-      this.scheduler = schedulerSupplier.get();
+      this.ioScheduler = ioSchedulerSupplier.get();
     }
 
     @Override
     public void stop() throws MuleException {
-      if (scheduler != null) {
-        getSchedulerStopper().accept(scheduler);
+      if (ioScheduler != null) {
+        schedulerStopper.accept(ioScheduler);
       }
     }
 
   }
+
+
 }

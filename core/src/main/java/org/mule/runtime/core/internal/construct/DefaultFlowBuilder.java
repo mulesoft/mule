@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory.LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.fromCallable;
@@ -218,7 +219,7 @@ public class DefaultFlowBuilder implements Builder {
       return from(publisher)
           .doOnNext(assertStarted())
           .flatMap(event -> {
-            if (processingStrategyFactory instanceof LegacySynchronousProcessingStrategyFactory) {
+            if (processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE) {
               return just(event).handle(nullSafeMap(checkedFunction(request -> processBlockingSynchronous(request))));
             } else {
               Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());

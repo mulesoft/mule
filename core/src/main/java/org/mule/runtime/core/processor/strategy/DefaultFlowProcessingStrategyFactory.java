@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
-
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
@@ -49,15 +48,31 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
                                                      .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                          MILLISECONDS),
+                                             getMaxConcurrency(),
+                                             () -> muleContext.getSchedulerService()
+                                                 .customScheduler(config()
+                                                     .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
+                                                     .withMaxConcurrentTasks(getSubscriberCount() + 1)),
+                                             getBufferSize(),
+                                             1,
+                                             getWaitStrategy(),
                                              muleContext);
   }
 
   static class DefaultFlowProcessingStrategy extends ProactorProcessingStrategy {
 
-    public DefaultFlowProcessingStrategy(Supplier<Scheduler> eventLoop, Supplier<Scheduler> io, Supplier<Scheduler> cpu,
-                                         Consumer<Scheduler> schedulerStopper,
-                                         MuleContext muleContext) {
-      super(eventLoop, io, cpu, schedulerStopper, muleContext);
+    protected DefaultFlowProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                            Supplier<Scheduler> blockingSchedulerSupplier,
+                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                            Consumer<Scheduler> schedulerStopper,
+                                            int maxConcurrency,
+                                            Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                            int bufferSize,
+                                            int subscriberCount,
+                                            String waitStrategy,
+                                            MuleContext muleContext) {
+      super(cpuLightSchedulerSupplier, blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, schedulerStopper,
+            maxConcurrency, ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, muleContext);
     }
 
     @Override
