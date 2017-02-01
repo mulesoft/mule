@@ -9,6 +9,7 @@ package org.mule.runtime.extension.internal.loader;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -16,6 +17,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
 import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -32,6 +34,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModelReader;
@@ -80,9 +83,17 @@ final class XmlExtensionLoaderDelegate {
   private static final Map<String, MetadataType> defaultOutputTypes = getCommonTypesBuilder()
       .put("void", typeLoader.load(Void.class))
       .build();
+  private static final Map<String, ParameterRole> parameterRoleTypes = ImmutableMap.<String, ParameterRole>builder()
+      .put("BEHAVIOUR", ParameterRole.BEHAVIOUR)
+      .put("CONTENT", ParameterRole.CONTENT)
+      .put("PRIMARY", ParameterRole.PRIMARY_CONTENT)
+      .build();
+
   private static final String CATEGORY = "category";
   private static final String VENDOR = "vendor";
   private static final String DOC_DESCRIPTION = "doc:description";
+  private static final String PASSWORD = "password";
+  private static final String ROLE = "role";
 
   private static ImmutableMap.Builder<String, MetadataType> getCommonTypesBuilder() {
     return ImmutableMap.<String, MetadataType>builder()
@@ -92,6 +103,14 @@ final class XmlExtensionLoaderDelegate {
         .put("date", typeLoader.load(Date.class))
         .put("integer", typeLoader.load(Integer.class))
         .put("time", typeLoader.load(LocalTime.class));
+  }
+
+  private static ParameterRole getRole(final String role) {
+    if (!parameterRoleTypes.containsKey(role)) {
+      throw new IllegalArgumentException(format("The parametrized role [%s] doesn't match any of the expected types [%s]", role,
+                                                join(", ", parameterRoleTypes.keySet())));
+    }
+    return parameterRoleTypes.get(role);
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
@@ -248,7 +267,7 @@ final class XmlExtensionLoaderDelegate {
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
 
-      properties.stream().forEach(param -> extractParameter(configurationDeclarer, param));
+      properties.stream().forEach(param -> extractProperty(configurationDeclarer, param));
       return of(configurationDeclarer);
     }
     return empty();
@@ -283,16 +302,23 @@ final class XmlExtensionLoaderDelegate {
       optionalParametersComponentModel.get().getInnerComponents()
           .stream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
-          .forEach(param -> extractParameter(operationDeclarer, param));
+          .forEach(param -> {
+            final String role = param.getParameters().get(ROLE);
+            extractParameter(operationDeclarer, param, getRole(role));
+          });
     }
   }
 
-  private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param) {
+  private void extractProperty(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param) {
+    extractParameter(parameterizedDeclarer, param, BEHAVIOUR);
+  }
+
+  private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
     Map<String, String> parameters = param.getParameters();
     String parameterName = parameters.get(PARAMETER_NAME);
     String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
-    LayoutModel layoutModel = parseBoolean(parameters.get("password")) ? builder().asPassword().build()
+    LayoutModel layoutModel = parseBoolean(parameters.get(PASSWORD)) ? builder().asPassword().build()
         : builder().build();
     MetadataType parameterType = extractType(defaultInputTypes, receivedInputType);
 
@@ -302,6 +328,7 @@ final class XmlExtensionLoaderDelegate {
                 .defaultingTo(parameterDefaultValue);
     parameterDeclarer.describedAs(getDescription(param))
         .withLayout(layoutModel)
+        .withRole(role)
         .ofType(parameterType);
   }
 
@@ -330,7 +357,7 @@ final class XmlExtensionLoaderDelegate {
       String errorMessage = format(
                                    "should not have reach here. Type obtained [%s] when supported default types are [%s].",
                                    receivedType,
-                                   String.join(", ", types.keySet()));
+                                   join(", ", types.keySet()));
       if (typesCatalog.isPresent()) {
         errorMessage +=
             format(" Custom types [%s] doesn't have support for the specified [%s] type", getCustomTypeFilename(), receivedType);

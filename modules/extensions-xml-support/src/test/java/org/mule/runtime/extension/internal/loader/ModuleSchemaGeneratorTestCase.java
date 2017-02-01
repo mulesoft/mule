@@ -65,6 +65,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
       {
         add("module-param-default-types");
         add("module-param-custom-types");
+        add("module-param-role");
         add("module-param-types");
         add("module-properties-default-types");
         add("module-properties-types");

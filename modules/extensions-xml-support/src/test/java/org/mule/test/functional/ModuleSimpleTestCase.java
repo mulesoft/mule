@@ -8,10 +8,9 @@ package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import org.mule.runtime.core.api.Event;
-
 import org.hamcrest.core.Is;
 import org.junit.Test;
+import org.mule.runtime.core.api.Event;
 
 public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 

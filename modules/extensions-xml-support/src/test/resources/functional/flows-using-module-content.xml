@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-content="http://www.mulesoft.org/schema/mule/module-content"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core     http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/module-content http://www.mulesoft.org/schema/mule/module-content/module-content.xsd">
+
+    <flow name="testSetPayloadUsingContent">
+        <module-content:set-payload-using-content-parameter>
+            <module-content:content>#[{ "smart" : "connector" }]</module-content:content>
+        </module-content:set-payload-using-content-parameter>
+    </flow>
+
+    <flow name="testSetPayloadUsingContentAndSimpleParameter">
+        <module-content:set-payload-using-content-and-simple-parameter parameter1="value from attribute">
+            <module-content:content>#[{ "smart" : "connector" }]</module-content:content>
+        </module-content:set-payload-using-content-and-simple-parameter>
+    </flow>
+
+    <flow name="testSetPayloadUsingPrimary">
+        <module-content:set-payload-using-primary-parameter>
+            <module-content:primary>#[{ "smart2" : "connector2" }]</module-content:primary>
+        </module-content:set-payload-using-primary-parameter>
+    </flow>
+
+    <flow name="testSetPayloadUsingContentAndPrimaryAndSimpleParameter">
+        <module-content:set-payload-using-content-and-primary-and-simple-parameter parameter1="value from attribute">
+            <module-content:content>#[{ "smart" : "connector" }]</module-content:content>
+            <module-content:primary>#[{ "smart2" : "connector2" }]</module-content:primary>
+        </module-content:set-payload-using-content-and-primary-and-simple-parameter>
+    </flow>
+</mule>
