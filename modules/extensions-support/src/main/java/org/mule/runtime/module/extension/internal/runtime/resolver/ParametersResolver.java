@@ -79,8 +79,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return new ParametersResolver(muleContext, parameters);
   }
 
-  public static ParametersResolver fromParameterizedModelDefaultValues(ParameterizedModel parameterizedModel,
-                                                                       MuleContext muleContext) {
+  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel,
+                                                     MuleContext muleContext) {
     Map<String, Object> parameterValues = new HashMap<>();
     for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
       parameterValues.put(model.getName(), model.getDefaultValue());

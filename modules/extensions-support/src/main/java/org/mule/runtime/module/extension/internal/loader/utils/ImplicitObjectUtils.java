@@ -42,7 +42,7 @@ public final class ImplicitObjectUtils {
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     ResolverSet resolverSet = new ResolverSet();
     ParametersResolver parametersResolver =
-        ParametersResolver.fromParameterizedModelDefaultValues(parameterizedModel, muleContext);
+        ParametersResolver.fromDefaultValues(parameterizedModel, muleContext);
 
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       Object defaultValue = parameterModel.getDefaultValue();
