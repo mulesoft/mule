@@ -55,7 +55,7 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
     final ExtensionType sourceType = createExecutableType(name, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
     initialiseSequence(sourceType);
     ExplicitGroup sequence = sourceType.getSequence();
-    builder.addInfrastructureParameters(sourceModel, sequence);
+    builder.addInfrastructureParameters(sourceType, sourceModel, sequence);
 
     List<ParameterGroupModel> inlineGroupedParameters = getInlineGroups(sourceModel);
     sourceModel.getErrorCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));

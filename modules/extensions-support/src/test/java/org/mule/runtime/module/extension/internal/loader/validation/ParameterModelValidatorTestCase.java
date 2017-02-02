@@ -79,12 +79,14 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
 
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getModelProperty(QNameModelProperty.class)).thenReturn(Optional.empty());
+    when(validParameterModel.getModelProperty(InfrastructureParameterModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(validParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(validParameterModel.getLayoutModel()).thenReturn(Optional.empty());
 
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getModelProperty(QNameModelProperty.class)).thenReturn(Optional.empty());
+    when(invalidParameterModel.getModelProperty(InfrastructureParameterModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(invalidParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());

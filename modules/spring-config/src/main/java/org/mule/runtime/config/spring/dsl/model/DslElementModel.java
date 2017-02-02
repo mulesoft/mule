@@ -7,13 +7,15 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.LinkedHashSet;
@@ -36,17 +38,19 @@ import java.util.function.Function;
 public class DslElementModel<T> {
 
   private final T model;
+  private final String value;
   private final DslElementSyntax dsl;
   private final Set<DslElementModel> containedElements;
   private final ComponentConfiguration configuration;
   private final ComponentIdentifier identifier;
 
   private DslElementModel(T model, DslElementSyntax dsl, Set<DslElementModel> containedElements,
-                          ComponentConfiguration configuration) {
+                          ComponentConfiguration configuration, String value) {
     this.dsl = dsl;
     this.model = model;
     this.containedElements = containedElements;
     this.configuration = configuration;
+    this.value = value;
     this.identifier = createIdentifier();
   }
 
@@ -85,6 +89,14 @@ public class DslElementModel<T> {
    */
   public Optional<ComponentConfiguration> getConfiguration() {
     return Optional.ofNullable(configuration);
+  }
+
+  /**
+   * @return the {@code value} assigned to this element in its current configuration.
+   * This represents either the value of an attribute or that of a text child element.
+   */
+  public Optional<String> getValue() {
+    return Optional.ofNullable(value);
   }
 
   /**
@@ -154,6 +166,7 @@ public class DslElementModel<T> {
   public static final class Builder<M> {
 
     private M model;
+    private String value;
     private DslElementSyntax dsl;
     private ComponentConfiguration configuration;
     private Set<DslElementModel> contained = new LinkedHashSet<>();
@@ -180,8 +193,28 @@ public class DslElementModel<T> {
       return this;
     }
 
+    public Builder<M> withValue(String value) {
+      this.value = value;
+      return this;
+    }
+
     public DslElementModel<M> build() {
-      return new DslElementModel<>(model, dsl, contained, configuration);
+      if (configuration != null) {
+        Optional<String> configurationValue = configuration.getValue();
+        if (configurationValue.isPresent() && !isBlank(configurationValue.get())) {
+          if (value == null) {
+            value = configurationValue.get();
+          } else {
+            checkState(value.equals(configurationValue.get()),
+                       "The same element cannot have two different values associated.");
+          }
+        } else {
+          checkState(value == null,
+                     "The same element cannot have two different values associated.");
+        }
+      }
+
+      return new DslElementModel<>(model, dsl, contained, configuration, value);
     }
 
   }

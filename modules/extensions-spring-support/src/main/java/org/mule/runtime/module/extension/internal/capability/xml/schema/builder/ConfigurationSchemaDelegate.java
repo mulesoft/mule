@@ -76,7 +76,7 @@ final class ConfigurationSchemaDelegate {
         }
       });
 
-      builder.addInfrastructureParameters(configurationModel, sequence);
+      builder.addInfrastructureParameters(config, configurationModel, sequence);
       configurationModel.getParameterGroupModels().forEach(group -> {
         if (!group.isShowInDsl()) {
           List<TopLevelElement> parameters = builder.registerParameters(config, group.getParameterModels());

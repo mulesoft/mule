@@ -6,13 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static org.mule.runtime.api.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
+import org.mule.runtime.extension.internal.property.QNameModelProperty;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
+import java.util.Optional;
+
+import javax.xml.namespace.QName;
 
 /**
  * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the {@link String} name
@@ -25,6 +33,21 @@ public final class InfrastructureTypeMapping {
   private static Map<Class<?>, String> mapping = ImmutableMap.<Class<?>, String>builder()
       .put(TlsContextFactory.class, TLS_PARAMETER_NAME).build();
 
+  private static Map<String, QNameModelProperty> qNames = ImmutableMap.<String, QNameModelProperty>builder()
+      .put(TLS_PARAMETER_NAME, new QNameModelProperty(new QName(MULE_TLS_NAMESPACE,
+                                                                TLS_CONTEXT_ELEMENT_IDENTIFIER,
+                                                                TLS_PREFIX)))
+      .build();
+
+  private static Map<String, ParameterDslConfiguration> dlsConfig = ImmutableMap.<String, ParameterDslConfiguration>builder()
+      .put(TLS_PARAMETER_NAME,
+           ParameterDslConfiguration.builder()
+               .allowsInlineDefinition(true)
+               .allowTopLevelDefinition(true)
+               .allowsReferences(true)
+               .build())
+      .build();
+
   private static Map<String, String> nameMap = mapping.entrySet().stream()
       .collect(new ImmutableMapCollector<>(e -> e.getKey().getName(), Map.Entry::getValue));
 
@@ -34,6 +57,14 @@ public final class InfrastructureTypeMapping {
 
   public static Map<String, String> getNameMap() {
     return nameMap;
+  }
+
+  public static Optional<QNameModelProperty> getQName(String name) {
+    return Optional.of(qNames.get(name));
+  }
+
+  public static Optional<ParameterDslConfiguration> getDslConfiguration(String name) {
+    return Optional.of(dlsConfig.get(name));
   }
 
   private InfrastructureTypeMapping() {}

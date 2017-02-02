@@ -54,7 +54,7 @@ final class ConnectionProviderSchemaDelegate {
     sequence.setMinOccurs(ZERO);
     sequence.setMaxOccurs(MAX_ONE);
 
-    builder.addInfrastructureParameters(providerModel, sequence);
+    builder.addInfrastructureParameters(providerType, providerModel, sequence);
     providerModel.getParameterGroupModels().forEach(group -> {
       if (!group.isShowInDsl()) {
         builder.addParameterToSequence(builder.registerParameters(providerType, group.getParameterModels()), sequence);
