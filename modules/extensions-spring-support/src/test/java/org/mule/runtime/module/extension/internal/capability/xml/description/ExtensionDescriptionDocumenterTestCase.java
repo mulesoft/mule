@@ -87,12 +87,16 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   private void assertDescriptions(ExtensionModel declaration) {
     assertDescription(declaration, "Test Extension Description");
     List<ConfigurationModel> configurations = declaration.getConfigurationModels();
-    assertThat(configurations, hasSize(1));
-    ConfigurationModel onlyConfig = configurations.get(0);
-    assertDescription(onlyConfig, "This is some documentation.");
-    assertDescription(onlyConfig.getConnectionProviders().get(0), "Provider Documentation");
+    assertThat(configurations, hasSize(2));
+    ConfigurationModel first = configurations.get(1);
+    assertDescription(first, "This is some Config documentation.");
+    assertDescription(first.getConnectionProviders().get(0), "Provider Documentation");
 
-    List<ParameterModel> params = onlyConfig.getAllParameterModels();
+    ConfigurationModel second = configurations.get(0);
+    assertDescription(second, "This is some Another Config documentation.");
+    assertDescription(second.getConnectionProviders().get(0), "Provider Documentation");
+
+    List<ParameterModel> params = first.getAllParameterModels();
     assertDescription(params.get(0), "Config parameter");
     assertDescription(params.get(1), "Config Parameter with an Optional value");
     assertDescription(params.get(2), "Group parameter 1");
@@ -108,7 +112,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     assertDescription(greetFriend.getAllParameterModels().get(0), "This is one of my friends");
     assertDescription(greetFriend.getAllParameterModels().get(1), "Some other friend");
 
-    List<OperationModel> connectedOperations = onlyConfig.getOperationModels();
+    List<OperationModel> connectedOperations = first.getOperationModels();
     OperationModel connectedOpe = connectedOperations.get(0);
     assertDescription(connectedOpe, "Test Operation with blank parameter description");
     assertDescription(connectedOpe.getAllParameterModels().get(0), "");
