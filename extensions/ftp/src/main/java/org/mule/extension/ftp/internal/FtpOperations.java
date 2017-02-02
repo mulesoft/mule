@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ftp.internal;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
@@ -31,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -68,7 +70,7 @@ public final class FtpOperations extends BaseFileSystemOperations {
   @Throws(FileListErrorTypeProvider.class)
   public List<Result<InputStream, FtpFileAttributes>> list(@UseConfig FileConnectorConfig config,
                                                            @Connection FtpFileSystem fileSystem,
-                                                           @Optional String directoryPath,
+                                                           String directoryPath,
                                                            @Optional(defaultValue = "false") boolean recursive,
                                                            MediaType mediaType,
                                                            @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
@@ -105,7 +107,8 @@ public final class FtpOperations extends BaseFileSystemOperations {
                                                      @Connection FtpFileSystem fileSystem,
                                                      @DisplayName("File Path") String path,
                                                      MediaType mediaType,
-                                                     @Optional(defaultValue = "false") boolean lock) {
+                                                     @Optional(defaultValue = "false") @Placement(
+                                                         tab = ADVANCED_TAB) boolean lock) {
     Result result = doRead(config, fileSystem, path, mediaType, lock);
     return (Result<InputStream, FtpFileAttributes>) result;
   }

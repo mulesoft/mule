@@ -8,6 +8,8 @@ package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.file.common.api.exceptions.IllegalContentException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
@@ -15,11 +17,11 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
@@ -90,7 +92,8 @@ public abstract class BaseFileSystemOperations {
                                                        @Connection FileSystem fileSystem,
                                                        @DisplayName("File Path") String path,
                                                        MediaType mediaType,
-                                                       @Optional(defaultValue = "false") boolean lock) {
+                                                       @Optional(defaultValue = "false") @Placement(
+                                                           tab = ADVANCED_TAB) boolean lock) {
     fileSystem.changeToBaseDir();
     return fileSystem.read(config, path, mediaType, lock);
   }
@@ -142,8 +145,8 @@ public abstract class BaseFileSystemOperations {
       throw new IllegalContentException("Cannot write a null content");
     }
 
+    validatePath(path, "path");
     fileSystem.changeToBaseDir();
-    path = resolvePath(path, event, "path");
 
     if (encoding == null) {
       encoding = config.getDefaultWriteEncoding();
@@ -186,15 +189,9 @@ public abstract class BaseFileSystemOperations {
   protected void doCopy(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
                         String targetPath, boolean createParentDirectories, boolean overwrite, Event event) {
     fileSystem.changeToBaseDir();
-    validateTargetPath(targetPath);
-    sourcePath = resolvePath(sourcePath, event, "sourcePath");
+    validatePath(targetPath, "target path");
+    validatePath(sourcePath, "source path");
     fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event);
-  }
-
-  private void validateTargetPath(String targetPath) {
-    if (StringUtils.isBlank(targetPath)) {
-      throw new IllegalPathException("target path cannot be null nor blank");
-    }
   }
 
   /**
@@ -225,14 +222,13 @@ public abstract class BaseFileSystemOperations {
    * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   protected void doMove(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
                         String targetPath, boolean createParentDirectories, boolean overwrite, Event event) {
     fileSystem.changeToBaseDir();
-    validateTargetPath(targetPath);
-    sourcePath = resolvePath(sourcePath, event, "sourcePath");
+    validatePath(targetPath, "target path");
+    validatePath(sourcePath, "source path");
     fileSystem.move(config, sourcePath, targetPath, overwrite, createParentDirectories);
   }
 
@@ -246,12 +242,10 @@ public abstract class BaseFileSystemOperations {
    *
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be deleted
-   * @param event      The current {@link Event}
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
   protected void doDelete(FileSystem fileSystem, @Optional String path, Event event) {
     fileSystem.changeToBaseDir();
-    path = resolvePath(path, event, "path");
     fileSystem.delete(path);
   }
 
@@ -270,7 +264,6 @@ public abstract class BaseFileSystemOperations {
    * @param path       the path to the file to be renamed
    * @param to         the file's new name
    * @param overwrite  whether or not overwrite the file if the target destination already exists.
-   * @param event      The current {@link Event}
    */
   protected void doRename(@Connection FileSystem fileSystem, @Optional String path,
                           @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
@@ -281,7 +274,6 @@ public abstract class BaseFileSystemOperations {
     }
 
     fileSystem.changeToBaseDir();
-    path = resolvePath(path, event, "path");
     fileSystem.rename(path, to, overwrite);
   }
 
@@ -291,24 +283,17 @@ public abstract class BaseFileSystemOperations {
    * @param fileSystem    a reference to the host {@link FileSystem}
    * @param directoryPath the new directory's name
    */
+
   protected void doCreateDirectory(@Connection FileSystem fileSystem, String directoryPath) {
+    validatePath(directoryPath, "directory path");
     fileSystem.changeToBaseDir();
     fileSystem.createDirectory(directoryPath);
   }
 
-  private String resolvePath(String path, Event event, String attributeName) {
-    if (!StringUtils.isBlank(path)) {
-      return path;
+  private void validatePath(String path, String pathName) {
+    if (isBlank(path)) {
+      throw new IllegalPathException(format("%s cannot be null nor blank", pathName));
     }
-
-    Message message = event.getMessage();
-    if (message.getAttributes() instanceof FileAttributes) {
-      return ((FileAttributes) message.getAttributes()).getPath();
-    }
-
-    throw new IllegalPathException(
-                                   format("A %s was not specified and a default one could not be obtained from the current message attributes",
-                                          attributeName));
   }
 
   private Predicate<FileAttributes> getPredicate(FilePredicateBuilder builder) {

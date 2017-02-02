@@ -19,7 +19,6 @@ import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,15 +104,6 @@ public class FileListTestCase extends FileConnectorTestCase {
     FileAttributes file = (FileAttributes) messages.get(0).getAttributes();
     assertThat(file.isDirectory(), is(true));
     assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
-  }
-
-  @Test
-  public void listWithoutPath() throws Exception {
-    List<Message> messages = (List<Message>) flowRunner("listWithoutPath").run().getMessage().getPayload().getValue();
-
-    assertThat(messages, hasSize(6));
-    FileAttributes attributes = (FileAttributes) messages.get(0).getAttributes();
-    assertThat(new File(attributes.getPath()).getParent(), is(equalTo(temporaryFolder.getRoot().getAbsolutePath())));
   }
 
   private boolean assertListedFiles(List<Message> messages) throws Exception {

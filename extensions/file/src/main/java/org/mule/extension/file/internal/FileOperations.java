@@ -6,6 +6,7 @@
  */
 package org.mule.extension.file.internal;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -30,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -67,7 +69,7 @@ public final class FileOperations extends BaseFileSystemOperations {
   @Throws(FileListErrorTypeProvider.class)
   public List<Result<InputStream, LocalFileAttributes>> list(@UseConfig FileConnectorConfig config,
                                                              @Connection LocalFileSystem fileSystem,
-                                                             @Optional String directoryPath,
+                                                             String directoryPath,
                                                              @Optional(defaultValue = "false") boolean recursive,
                                                              MediaType mediaType,
                                                              @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
@@ -104,7 +106,8 @@ public final class FileOperations extends BaseFileSystemOperations {
                                                        @Connection FileSystem fileSystem,
                                                        @DisplayName("File Path") String path,
                                                        MediaType mediaType,
-                                                       @Optional(defaultValue = "false") boolean lock) {
+                                                       @Optional(defaultValue = "false") @Placement(
+                                                           tab = ADVANCED_TAB) boolean lock) {
     Result result = doRead(config, fileSystem, path, mediaType, lock);
     return (Result<InputStream, LocalFileAttributes>) result;
   }
@@ -154,9 +157,10 @@ public final class FileOperations extends BaseFileSystemOperations {
   @Throws(FileWriteErrorTypeProvider.class)
   public void write(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
                     @Content @Summary("Content to be written into the file") Object content,
-                    @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
+                    @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") @Placement(
+                        tab = ADVANCED_TAB) String encoding,
                     @Optional(defaultValue = "true") boolean createParentDirectories,
-                    @Optional(defaultValue = "false") boolean lock, @Optional(
+                    @Optional(defaultValue = "false") @Placement(tab = ADVANCED_TAB) boolean lock, @Optional(
                         defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
                     Event event) {
     super.doWrite(config, fileSystem, path, content, encoding, createParentDirectories, lock, mode, event);
@@ -195,7 +199,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Copies a file in another directory")
   @Throws(FileCopyErrorTypeProvider.class)
-  public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
+  public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
                    @Optional(defaultValue = "false") boolean overwrite, Event event) {
     super.doCopy(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, event);
@@ -234,7 +238,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Moves a file to another directory")
   @Throws(FileCopyErrorTypeProvider.class)
-  public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
+  public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
                    @Optional(defaultValue = "false") boolean overwrite, Event event) {
     super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, event);
@@ -256,7 +260,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Deletes a file")
   @Throws(FileDeleteErrorTypeProvider.class)
-  public void delete(@Connection FileSystem fileSystem, @Optional String path, Event event) {
+  public void delete(@Connection FileSystem fileSystem, String path, Event event) {
     super.doDelete(fileSystem, path, event);
   }
 
@@ -279,7 +283,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Renames a file")
   @Throws(FileRenameErrorTypeProvider.class)
-  public void rename(@Connection FileSystem fileSystem, @Optional String path,
+  public void rename(@Connection FileSystem fileSystem, String path,
                      @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
     super.doRename(fileSystem, path, to, overwrite, event);
   }

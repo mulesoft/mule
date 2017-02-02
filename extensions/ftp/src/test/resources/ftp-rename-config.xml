@@ -12,12 +12,12 @@
     </spring:beans>
 
     <flow name="rename">
-        <ftp:rename path="#[mel:path]" to="#[mel:to]" overwrite="#[mel:overwrite]"/>
+        <ftp:rename path="#[path]" to="#[to]" overwrite="#[overwrite]"/>
     </flow>
 
     <flow name="readAndRename">
-        <ftp:read path="#[mel:path]" />
-        <ftp:rename to="#[mel:to]"/>
+        <ftp:read path="#[path]" />
+        <ftp:rename path="#[path]" to="#[to]"/>
     </flow>
 
 </mule>

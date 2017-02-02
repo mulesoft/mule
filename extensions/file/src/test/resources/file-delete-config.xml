@@ -10,11 +10,11 @@
     </file:config>
 
     <flow name="delete">
-        <file:delete path="#[mel:delete]" />
+        <file:delete path="#[delete]" />
     </flow>
 
     <flow name="readAndDelete">
-        <file:read path="#[mel:delete]" />
-        <file:delete />
+        <file:read path="#[delete]" />
+        <file:delete path="#[delete]"/>
     </flow>
 </mule>
