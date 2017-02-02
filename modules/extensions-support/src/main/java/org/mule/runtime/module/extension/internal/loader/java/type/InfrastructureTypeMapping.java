@@ -30,29 +30,30 @@ import javax.xml.namespace.QName;
  */
 public final class InfrastructureTypeMapping {
 
-  private static Map<Class<?>, String> mapping = ImmutableMap.<Class<?>, String>builder()
+  private static Map<Class<?>, String> MAPPING = ImmutableMap.<Class<?>, String>builder()
       .put(TlsContextFactory.class, TLS_PARAMETER_NAME).build();
 
-  private static Map<String, QNameModelProperty> qNames = ImmutableMap.<String, QNameModelProperty>builder()
+  private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
       .put(TLS_PARAMETER_NAME, new QNameModelProperty(new QName(MULE_TLS_NAMESPACE,
                                                                 TLS_CONTEXT_ELEMENT_IDENTIFIER,
                                                                 TLS_PREFIX)))
       .build();
 
-  private static Map<String, ParameterDslConfiguration> dlsConfig = ImmutableMap.<String, ParameterDslConfiguration>builder()
-      .put(TLS_PARAMETER_NAME,
-           ParameterDslConfiguration.builder()
-               .allowsInlineDefinition(true)
-               .allowTopLevelDefinition(true)
-               .allowsReferences(true)
-               .build())
-      .build();
+  private static Map<String, ParameterDslConfiguration> DSL_CONFIGURATIONS =
+      ImmutableMap.<String, ParameterDslConfiguration>builder()
+          .put(TLS_PARAMETER_NAME,
+               ParameterDslConfiguration.builder()
+                   .allowsInlineDefinition(true)
+                   .allowTopLevelDefinition(true)
+                   .allowsReferences(true)
+                   .build())
+          .build();
 
-  private static Map<String, String> nameMap = mapping.entrySet().stream()
+  private static Map<String, String> nameMap = MAPPING.entrySet().stream()
       .collect(new ImmutableMapCollector<>(e -> e.getKey().getName(), Map.Entry::getValue));
 
   public static Map<Class<?>, String> getMap() {
-    return mapping;
+    return MAPPING;
   }
 
   public static Map<String, String> getNameMap() {
@@ -60,11 +61,11 @@ public final class InfrastructureTypeMapping {
   }
 
   public static Optional<QNameModelProperty> getQName(String name) {
-    return Optional.of(qNames.get(name));
+    return Optional.of(QNAMES.get(name));
   }
 
   public static Optional<ParameterDslConfiguration> getDslConfiguration(String name) {
-    return Optional.of(dlsConfig.get(name));
+    return Optional.of(DSL_CONFIGURATIONS.get(name));
   }
 
   private InfrastructureTypeMapping() {}
