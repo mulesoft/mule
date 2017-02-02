@@ -7,10 +7,12 @@
 package org.mule.compatibility.transport.http;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.mule.compatibility.transport.http.i18n.HttpMessages.incorrectlyEncodedUrl;
 
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
+import org.mule.compatibility.transport.http.components.BadRequestException;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
@@ -135,8 +137,11 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory {
 
     Charset encoding = getEncoding(messageBuilder, headers);
 
-    queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
-
+    try {
+      queryParameters.put(HttpConnector.HTTP_QUERY_PARAMS, processQueryParams(uri, encoding));
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(incorrectlyEncodedUrl(), e);
+    }
     // Make any URI params available ans inbound message headers
     addUriParamsAsHeaders(headers, uri);
 

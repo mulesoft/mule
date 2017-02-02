@@ -97,4 +97,7 @@ public class HttpMessages extends I18nMessageFactory {
     return factory.createMessage(BUNDLE_PATH, 26, url);
   }
 
+  public static I18nMessage incorrectlyEncodedUrl() {
+    return factory.createMessage(BUNDLE_PATH, 27);
+  }
 }

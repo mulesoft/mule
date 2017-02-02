@@ -30,7 +30,8 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
-import static org.mule.runtime.core.api.Event.*;
+import static org.mule.runtime.core.api.Event.Builder;
+import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
@@ -40,9 +41,10 @@ import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
@@ -182,11 +184,18 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
   @Override
   public void afterFailureProcessingFlow(MuleException exception) throws MuleException {
+    // MULE-11535: unwrap errors thrown in the initialization phase so that the true cause can be used to generate status codes
+    Throwable error = exception;
+    if (error instanceof DefaultMuleException
+        && error.getCause() instanceof CreateException
+        && error.getCause().getCause() != null) {
+      error = error.getCause().getCause();
+    }
     if (!failureResponseSentToClient) {
-      String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), exception.getClass(), getMuleContext());
+      String temp = ExceptionHelper.getErrorMapping(getConnector().getProtocol(), error.getClass(), getMuleContext());
       int httpStatus = Integer.valueOf(temp);
       try {
-        sendFailureResponseToClient(httpStatus, exception.getMessage());
+        sendFailureResponseToClient(httpStatus, error.getMessage());
       } catch (Exception e) {
         final String errorMessage = "Exception sending http response after error";
         logger.warn(errorMessage + ": " + e.getMessage());
