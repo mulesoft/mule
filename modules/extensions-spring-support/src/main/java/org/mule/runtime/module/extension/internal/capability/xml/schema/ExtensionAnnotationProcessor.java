@@ -93,7 +93,7 @@ public final class ExtensionAnnotationProcessor {
       return emptyList();
     }
     return Stream.of(valueClasses)
-        .map(sourceClass -> (TypeElement) getElementForClass(annotationValues, sourceClass))
+        .map(c -> (TypeElement) getElementForClass(annotationValues, c))
         .collect(new ImmutableListCollector<>());
   }
 
@@ -112,10 +112,17 @@ public final class ExtensionAnnotationProcessor {
       return emptyMap();
     }
     ImmutableMap.Builder<String, VariableElement> builder = ImmutableMap.builder();
-    TypeElement superClass = (TypeElement) ((Symbol.ClassSymbol) element).getSuperclass().asElement();
+    TypeElement superClass = getSuperclassElement(element);
     builder.putAll(getFieldsAnnotatedWith(superClass, annotation));
     builder.putAll(collectAnnotatedElements(fieldsIn(element.getEnclosedElements()), annotation));
     return builder.build();
+  }
+
+  public TypeElement getSuperclassElement(Element element) {
+    if (element instanceof Symbol.ClassSymbol) {
+      return (TypeElement) ((Symbol.ClassSymbol) element).getSuperclass().asElement();
+    }
+    return null;
   }
 
   private <T extends Element> Map<String, T> collectAnnotatedElements(Iterable<T> elements, Class<? extends Annotation> clazz) {
@@ -127,7 +134,6 @@ public final class ExtensionAnnotationProcessor {
     });
     return fields.build();
   }
-
 
   public MethodDocumentation getMethodDocumentation(ProcessingEnvironment processingEnv, Element element) {
     final StringBuilder parsedComment = new StringBuilder();

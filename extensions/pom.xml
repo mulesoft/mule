@@ -18,6 +18,7 @@
     <description>Mule extensions that augment the core Mule functionality through the Mule Extension API</description>
 
     <properties>
+        <generateDocs>false</generateDocs>
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.metadata.version>1.0.0-SNAPSHOT</mule.metadata.version>
     </properties>
@@ -142,7 +143,9 @@
                         <configuration>
                             <outputDirectory>target/classes/META-INF</outputDirectory>
                             <processors>
-                                <processor>org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor</processor>
+                                <processor>
+                                    org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor
+                                </processor>
                             </processors>
                             <options>
                                 <extension.version>${project.version}</extension.version>
@@ -186,5 +189,32 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>generate-documentation</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>generateDocs</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.mule.extensions</groupId>
+                        <artifactId>mule-extensions-maven-plugin</artifactId>
+                        <version>${mule.extensions.maven.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>documentation</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
