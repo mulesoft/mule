@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.RESPONSE_VALIDATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
@@ -304,10 +305,12 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
       private void sendErrorResponse(final HttpStatus status, String message,
                                      HttpResponseReadyCallback responseCallback) {
+        byte[] responseData = message.getBytes();
         responseCallback.responseReady(HttpResponse.builder()
             .setStatusCode(status.getStatusCode())
             .setReasonPhrase(status.getReasonPhrase())
-            .setEntity(new ByteArrayHttpEntity(message.getBytes()))
+            .setEntity(new ByteArrayHttpEntity(responseData))
+            .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
             .build(), new ResponseStatusCallback() {
 
               @Override
