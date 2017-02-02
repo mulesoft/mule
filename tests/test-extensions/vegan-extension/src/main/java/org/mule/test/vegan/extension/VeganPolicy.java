@@ -19,11 +19,19 @@ public class VeganPolicy {
   @ParameterGroup(name = "Ingredients")
   private VeganIngredients ingredients;
 
+  @Parameter
+  @Optional(defaultValue = "500")
+  private Integer maxCalories;
+
   public Boolean getMeetAllowed() {
     return meetAllowed;
   }
 
   public VeganIngredients getIngredients() {
     return ingredients;
+  }
+
+  public Integer getMaxCalories() {
+    return maxCalories;
   }
 }
