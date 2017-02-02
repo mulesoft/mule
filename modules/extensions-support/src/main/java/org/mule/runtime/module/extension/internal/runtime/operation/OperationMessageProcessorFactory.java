@@ -46,7 +46,8 @@ public class OperationMessageProcessorFactory {
       throws Exception {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       try {
-        ResolverSet resolverSet = new ParametersResolver(muleContext, parameters).getParametersAsResolverSet(operationModel);
+        ResolverSet resolverSet =
+            ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel);
         OperationMessageProcessor processor;
         ExtensionManager extensionManager = muleContext.getExtensionManager();
         if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {

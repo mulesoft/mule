@@ -18,9 +18,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Utilities for creating object with implicit values based on a {@link ParameterizedModel}
@@ -40,15 +38,11 @@ public final class ImplicitObjectUtils {
    * @param muleContext        the Mule node.
    * @return a {@link ResolverSet}
    */
+  // TODO - MULE-11610 : Implicit resolvers doesn't use the same resolving mechanism that for a defined element
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     ResolverSet resolverSet = new ResolverSet();
-
-    Map<String, Object> parameterValues = new HashMap<>();
-    for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
-      parameterValues.put(model.getName(), model.getDefaultValue());
-    }
-
-    ParametersResolver parametersResolver = new ParametersResolver(muleContext, parameterValues);
+    ParametersResolver parametersResolver =
+        ParametersResolver.fromParameterizedModelDefaultValues(parameterizedModel, muleContext);
 
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       Object defaultValue = parameterModel.getDefaultValue();
