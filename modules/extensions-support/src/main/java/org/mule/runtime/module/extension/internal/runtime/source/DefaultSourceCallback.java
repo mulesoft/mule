@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessage;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessageCollection;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
@@ -22,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 
 /**
@@ -46,13 +49,14 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
 
     private DefaultSourceCallback<T, A> product = new DefaultSourceCallback();
 
-    public Builder<T, A> setListener(Processor listener) {
-      product.listener = listener;
+    public Builder<T, A> setSourceModel(SourceModel sourceModel) {
+      product.sourceModel = sourceModel;
+      product.returnsListOfMessages = returnsListOfMessages(sourceModel);
       return this;
     }
 
-    public Builder<T, A> setConfigName(String configName) {
-      product.configName = configName;
+    public Builder<T, A> setListener(Processor listener) {
+      product.listener = listener;
       return this;
     }
 
@@ -88,6 +92,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       checkArgument(product.messageProcessingManager, "messageProcessingManager");
       checkArgument(product.processContextSupplier, "processContextSupplier");
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
+      checkArgument(product.sourceModel, "sourceModel");
 
       return product;
     }
@@ -95,6 +100,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     private void checkArgument(Object value, String name) {
       Preconditions.checkArgument(value != null, name + " was not set");
     }
+
   }
 
   /**
@@ -104,13 +110,14 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     return new Builder();
   }
 
+  private SourceModel sourceModel;
   private Processor listener;
-  private String configName;
   private FlowConstruct flowConstruct;
   private ExceptionCallback exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;
   private SourceCompletionHandlerFactory completionHandlerFactory;
+  private boolean returnsListOfMessages = false;
 
   private DefaultSourceCallback() {}
 
@@ -127,17 +134,28 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
    */
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
-    Event event = Event.builder(create(flowConstruct, configName))
-        .message((InternalMessage) toMessage(result))
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
-        .build();
+    MessageProcessContext messageProcessContext = processContextSupplier.get();
+    final T resultValue = result.getOutput();
+
+    Message message;
+
+    if (resultValue instanceof Collection && returnsListOfMessages) {
+      message = toMessage(Result.<Collection<Message>, Attributes>builder()
+          .output(toMessageCollection((Collection<Result>) resultValue, result.getMediaType().orElse(ANY)))
+          .attributes(NULL_ATTRIBUTES)
+          .mediaType(result.getMediaType().orElse(ANY))
+          .build());
+    } else {
+      message = toMessage(result);
+    }
 
     messageProcessingManager.processMessage(
-                                            new ExtensionFlowProcessingTemplate(event,
-                                                                                listener,
-                                                                                completionHandlerFactory
-                                                                                    .createCompletionHandler(context)),
-                                            processContextSupplier.get());
+                                            new ModuleFlowProcessingTemplate(message,
+                                                                             listener,
+                                                                             completionHandlerFactory
+                                                                                 .createCompletionHandler(context),
+                                                                             messageProcessContext),
+                                            messageProcessContext);
   }
 
   /**

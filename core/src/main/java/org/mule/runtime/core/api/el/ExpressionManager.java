@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.el;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.el.ValidationResult;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as XML, Java,
  * scripting and annotations.
  */
-public interface ExpressionManager {
+public interface ExpressionManager extends ExpressionEvaluator {
 
   String DEFAULT_EXPRESSION_PREFIX = "#[";
   String DEFAULT_EXPRESSION_POSTFIX = "]";
@@ -61,6 +61,7 @@ public interface ExpressionManager {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
+  @Override
   TypedValue evaluate(String expression, BindingContext context) throws ExpressionRuntimeException;
 
   /**
@@ -134,13 +135,16 @@ public interface ExpressionManager {
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException or during transformation or during transformation
    */
+  @Override
   TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context) throws ExpressionRuntimeException;
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected result and an {@link MuleEvent}.
+   * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
+   * result and an {@link Event}.
    *
    * @param expression the EL expression
-   * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value type.
+   * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
+   *        type.
    * @param context an expression binding context to consider
    * @param event the current event to consider
    * @return the result of the expression plus its type
@@ -182,6 +186,7 @@ public interface ExpressionManager {
    * @param expression is this string an expression string
    * @return true if the string contains an expression
    */
+  @Override
   boolean isExpression(String expression);
 
   /**
@@ -191,6 +196,7 @@ public interface ExpressionManager {
    * @param expression
    * @return true if the expression is valid.
    */
+  @Override
   boolean isValid(String expression);
 
   /**
@@ -199,5 +205,6 @@ public interface ExpressionManager {
    * @param expression the expression to validate
    * @return a {@link ValidationResult} indicating whether the validation was successful or not.
    */
+  @Override
   ValidationResult validate(String expression);
 }

@@ -48,7 +48,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
     assertEquals(1, ((DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener()).getMessageProcessors().size());
 
-    flowRunner("testService1").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testService1").withPayload(TEST_PAYLOAD).dispatch();
 
     assertExceptionMessage(muleContext.getClient().request("test://out1", RECEIVE_TIMEOUT).getRight().get());
     // request one more time to ensure that only one exception message was sent
@@ -71,7 +71,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
     MuleClient client = muleContext.getClient();
 
-    flowRunner("testService2").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testService2").withPayload(TEST_PAYLOAD).dispatch();
 
     InternalMessage out2 = client.request("test://out2", RECEIVE_TIMEOUT).getRight().get();
     InternalMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT).getRight().get();
@@ -84,7 +84,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
   public void testDefaultExceptionStrategyNonEndpoint() throws Exception {
     MuleClient mc = muleContext.getClient();
 
-    flowRunner("testService3").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testService3").withPayload(TEST_PAYLOAD).dispatch();
 
     InternalMessage out4 = mc.request("test://out4", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("ERROR!", getPayloadAsString(out4));
@@ -97,7 +97,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     map.put("key2", "value2");
 
     MuleClient client = muleContext.getClient();
-    flowRunner("testService6").withPayload(map).asynchronously().run();
+    flowRunner("testService6").withPayload(map).dispatch();
 
     InternalMessage message = client.request("test://out6", RECEIVE_TIMEOUT).getRight().get();
 
@@ -114,7 +114,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     final FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct("testService5");
 
     MuleClient client = muleContext.getClient();
-    flowRunner("testService5").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("testService5").withPayload(TEST_PAYLOAD).dispatch();
 
     assertExceptionMessage(client.request("test://out5", RECEIVE_TIMEOUT).getRight().get());
 

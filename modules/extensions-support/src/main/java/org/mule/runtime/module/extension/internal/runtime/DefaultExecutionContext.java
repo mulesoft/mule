@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRANSACTIONAL_ACTION_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isTransactional;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
 import java.util.HashMap;
@@ -44,8 +43,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> parameters;
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
-  private final Event event;
   private final MuleContext muleContext;
+  private Event event;
   private Optional<TransactionConfig> transactionConfig = null;
   private Supplier<Optional<TransactionConfig>> transactionConfigSupplier;
 
@@ -59,7 +58,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,
-                                 ResolverSetResult parameters,
+                                 Map<String, Object> parameters,
                                  M componentModel,
                                  Event event,
                                  MuleContext muleContext) {
@@ -68,13 +67,12 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.configuration = configuration;
     this.event = event;
     this.componentModel = componentModel;
-    this.parameters = new HashMap<>(parameters.asMap());
+    this.parameters = parameters;
     this.muleContext = muleContext;
     transactionConfigSupplier = () -> {
       synchronized (this) {
         if (transactionConfig == null) {
-          transactionConfig = isTransactional(componentModel) ? Optional.of(buildTransactionConfig()) : empty();
-
+          transactionConfig = componentModel.isTransactional() ? of(buildTransactionConfig()) : empty();
           transactionConfigSupplier = () -> transactionConfig;
         }
         return transactionConfig;

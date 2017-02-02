@@ -11,11 +11,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.config.spring.factories.WatermarkFactoryBean.MULE_WATERMARK_PARTITION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.util.store.ObjectStorePartition;
 import org.mule.tck.probe.PollingProber;

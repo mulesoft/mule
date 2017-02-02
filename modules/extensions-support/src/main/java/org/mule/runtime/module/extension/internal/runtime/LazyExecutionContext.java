@@ -30,7 +30,7 @@ import java.util.Optional;
  * @param <M> the generic type of of the model which represents the component beign executed
  * @since 4.0
  */
-public class LazyExecutionContext<M extends ComponentModel> implements ExecutionContext<M> {
+public class LazyExecutionContext<M extends ComponentModel> implements EventedExecutionContext<M> {
 
   private final Map<String, ValueResolver> valueResolvers;
   private final M componentModel;
@@ -94,6 +94,11 @@ public class LazyExecutionContext<M extends ComponentModel> implements Execution
   @Override
   public Optional<ConfigurationInstance> getConfiguration() {
     return empty();
+  }
+
+  @Override
+  public Event getEvent() {
+    return event;
   }
 
   /**

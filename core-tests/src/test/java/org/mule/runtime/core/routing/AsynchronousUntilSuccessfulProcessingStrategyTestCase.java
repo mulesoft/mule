@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -24,17 +23,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -46,12 +48,15 @@ import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,8 +91,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   private FailCallback failRoute = () -> {
   };
   private CountDownLatch routeCountDownLatch;
-  @Mock
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockContextWithServices();
   @Mock
   private TransformationService transformationService;
 
@@ -99,8 +103,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final InternalMessage mockMessage = InternalMessage.builder().payload("").build();
     event = Event.builder(DefaultEventContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
-    when(mockUntilSuccessfulConfiguration.getThreadingProfile().createPool(anyString())).thenReturn(mockPool);
-    when(mockUntilSuccessfulConfiguration.createScheduledRetriesPool(anyString())).thenReturn(mockScheduledPool);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
     objectStore.clear();
     configureMockPoolToInvokeRunnableInNewThread();
@@ -118,6 +120,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
                                                                                                                   .toString()
                                                                                                                   .getBytes())
                                                                                                           .build());
+  }
+
+  @After
+  public void after() {
+    final List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
+    for (Scheduler scheduler : new ArrayList<>(createdSchedulers)) {
+      scheduler.shutdown();
+    }
   }
 
   @Test(expected = InitialisationException.class)
@@ -150,7 +160,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object item) {
         return item instanceof MessagingException
             && ((MessagingException) item).getCause() instanceof RetryPolicyExhaustedException
-            && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getCauseException().getMessage());
+            && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getRootCause().getMessage());
       }
     }), any(Event.class));
     verify(mockDLQ, never()).process(any(Event.class));
@@ -171,8 +181,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object item) {
         return item instanceof MessagingException
-            && ((MessagingException) item).getCauseException() instanceof RetryPolicyExhaustedException
-            && ((MessagingException) item).getCauseException().getMessage()
+            && ((MessagingException) item).getRootCause() instanceof RetryPolicyExhaustedException
+            && ((MessagingException) item).getRootCause().getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
     }), any(Event.class));
@@ -194,8 +204,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object item) {
         return item instanceof MessagingException
-            && ((MessagingException) item).getCauseException() instanceof RetryPolicyExhaustedException
-            && (((MessagingException) item).getCauseException()).getMessage()
+            && ((MessagingException) item).getRootCause() instanceof RetryPolicyExhaustedException
+            && (((MessagingException) item).getRootCause()).getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
     }), any(Event.class));
@@ -291,19 +301,18 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   @Test
   public void successfulExecutionWithAckExpression() throws Exception {
     String ackExpression = "some-expression";
-    String expressionEvalutaionResult = "new payload";
+    String expressionEvaluationResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    TypedValue mockTypedValue = mock(TypedValue.class);
-    when(mockTypedValue.getValue()).thenReturn(expressionEvalutaionResult);
+    TypedValue<String> typedValue = new TypedValue<>(expressionEvaluationResult, STRING);
     when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, event))
-        .thenReturn(mockTypedValue);
+        .thenReturn(typedValue);
     final Event result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(any(Event.class));
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1))
         .evaluate(eq(ackExpression), any(Event.class));
 
-    assertThat(result.getMessage().getPayload().getValue(), is(expressionEvalutaionResult));
+    assertThat(result.getMessage().getPayload().getValue(), is(expressionEvaluationResult));
     verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));
   }
 

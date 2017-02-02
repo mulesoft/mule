@@ -10,14 +10,13 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
@@ -52,7 +51,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
   public void testCollectionAggregator() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    flowRunner("SplitterFlow").withPayload(PAYLOAD).asynchronously().run();
+    flowRunner("SplitterFlow").withPayload(PAYLOAD).run();
     InternalMessage msg = client.request("test://collectionCreated", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertTrue(msg.getPayload().getValue() instanceof List);
@@ -72,7 +71,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testCustomAggregator() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("SplitterFlow2").withPayload(PAYLOAD).asynchronously().run();
+    flowRunner("SplitterFlow2").withPayload(PAYLOAD).run();
     InternalMessage msg = client.request("test://collectionCreated2", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertNotNull(msg.getPayload().getValue());
@@ -123,7 +122,7 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
       }
 
       return Event.builder(executionContext).message(InternalMessage.builder().payload(eventList).build())
-          .exchangePattern(ONE_WAY).flow(fc).build();
+          .flow(fc).build();
     }
   }
 }

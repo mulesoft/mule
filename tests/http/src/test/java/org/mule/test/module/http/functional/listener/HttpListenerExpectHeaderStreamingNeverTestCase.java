@@ -10,11 +10,12 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.EXPECT;
+import static org.mule.service.http.api.HttpHeaders.Names.HOST;
+import static org.mule.service.http.api.HttpHeaders.Values.CONTINUE;
+
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

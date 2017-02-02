@@ -18,10 +18,10 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -52,7 +52,7 @@ public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleConte
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
     final Builder builder = Event.builder(testEvent());
-    dataTypePropagator.propagate(testEvent(), builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType),
+    dataTypePropagator.propagate(testEvent(), builder, new TypedValue<>(TEST_MESSAGE, expectedDataType),
                                  compiledExpression);
     final Event event = builder.build();
 

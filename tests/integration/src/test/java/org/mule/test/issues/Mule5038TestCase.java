@@ -7,11 +7,11 @@
 package org.mule.test.issues;
 
 import static org.junit.Assert.assertNotSame;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.MessageFilter;
 
 import org.junit.Test;

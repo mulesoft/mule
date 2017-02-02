@@ -59,7 +59,6 @@ public class PluginUrlClassification {
 
   public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses, List<String> pluginDependencies) {
     this(name, urls, exportClasses, pluginDependencies, Collections.<String>emptySet(), Collections.<String>emptySet());
-
   }
 
   public List<URL> getUrls() {

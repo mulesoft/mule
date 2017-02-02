@@ -7,7 +7,8 @@
 package org.mule.extension.file.common.api;
 
 import static org.apache.commons.io.IOUtils.write;
-import org.mule.runtime.api.message.MuleEvent;
+
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -23,17 +24,17 @@ import java.io.OutputStreamWriter;
 public class FileWriterVisitor implements FileContentVisitor {
 
   private final OutputStream outputStream;
-  private final MuleEvent event;
+  private final Event event;
   private final String encoding;
 
   /**
    * Creates a new instance
    *
    * @param outputStream the stream to write into
-   * @param event a {@link MuleEvent} to be used to power the {@link #visit(OutputHandler)} case
+   * @param event a {@link Event} to be used to power the {@link #visit(OutputHandler)} case
    * @param encoding the encoding to use when writing a content of type {@link String}
    */
-  public FileWriterVisitor(OutputStream outputStream, MuleEvent event, String encoding) {
+  public FileWriterVisitor(OutputStream outputStream, Event event, String encoding) {
     this.outputStream = outputStream;
     this.event = event;
     this.encoding = encoding;
@@ -59,7 +60,7 @@ public class FileWriterVisitor implements FileContentVisitor {
 
   @Override
   public void visit(OutputHandler handler) throws Exception {
-    handler.write((org.mule.runtime.core.api.Event) event, outputStream);
+    handler.write(event, outputStream);
   }
 
   @Override

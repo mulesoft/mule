@@ -7,15 +7,14 @@
 package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 import java.util.List;
 
@@ -36,17 +35,13 @@ public class PetStoreConnector {
 
   @Parameter
   @Optional
-  private ThreadingProfile threadingProfile;
-
-  @Parameter
-  @Optional
   private PetCage cage;
 
   @Parameter
   @Optional
   private List<PetCage> cages;
 
-  @ParameterGroup
+  @ParameterGroup(name = "Cashier")
   private ExclusiveCashier cashier;
 
   public List<String> getPets() {
@@ -55,10 +50,6 @@ public class PetStoreConnector {
 
   public TlsContextFactory getTlsContext() {
     return tls;
-  }
-
-  public ThreadingProfile getThreadingProfile() {
-    return threadingProfile;
   }
 
   public PetCage getCage() {

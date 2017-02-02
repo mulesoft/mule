@@ -44,19 +44,19 @@ public class EmailBody {
   private String contentType;
 
   /**
-   * The character encoding of the body. If not specified, it defaults to the default charset in the mule configuration
+   * The character encoding of the body. If not specified, it defaults to the default encoding in the mule configuration
    */
   @Parameter
   @Optional
   @Placement(order = 3)
-  private String charset;
+  private String encoding;
 
   public EmailBody() {}
 
-  public EmailBody(String content, MediaType contentType, String charset) {
+  public EmailBody(String content, MediaType contentType, String encoding) {
     this.content = content;
     this.contentType = contentType.toString();
-    this.charset = charset;
+    this.encoding = encoding;
   }
 
   /**
@@ -74,9 +74,9 @@ public class EmailBody {
   }
 
   /**
-   * @return the charset of the body.
+   * @return the encoding of the body.
    */
-  public String getCharset() {
-    return charset;
+  public String getEncoding() {
+    return encoding;
   }
 }

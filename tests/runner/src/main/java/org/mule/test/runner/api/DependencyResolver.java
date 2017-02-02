@@ -7,12 +7,12 @@
 
 package org.mule.test.runner.api;
 
+import static com.google.common.base.Joiner.on;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.aether.RepositorySystem;
@@ -50,19 +50,21 @@ public class DependencyResolver {
 
   private RepositorySystem system;
   private RepositorySystemSession session;
+  private List<RemoteRepository> remoteRepositories;
 
   /**
    * Creates an instance of the resolver.
-   *
-   * @param system {@link RepositorySystem} where {@link Dependency}s will be resolved.
+   *  @param system {@link RepositorySystem} where {@link Dependency}s will be resolved.
    * @param session {@link RepositorySystemSession} used to resolve and {@link Dependency}s.
+   * @param remoteRepositories {@link RemoteRepository} to be used for resolving dependencies.
    */
-  public DependencyResolver(RepositorySystem system, RepositorySystemSession session) {
+  public DependencyResolver(RepositorySystem system, RepositorySystemSession session, List<RemoteRepository> remoteRepositories) {
     checkNotNull(system, "system cannot be null");
     checkNotNull(session, "session cannot be null");
 
     this.system = system;
     this.session = session;
+    this.remoteRepositories = remoteRepositories;
   }
 
   /**
@@ -76,7 +78,7 @@ public class DependencyResolver {
     checkNotNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
-        new ArtifactDescriptorRequest(artifact, Collections.<RemoteRepository>emptyList(), null);
+        new ArtifactDescriptorRequest(artifact, remoteRepositories, null);
     return system.readArtifactDescriptor(session, request);
   }
 
@@ -90,7 +92,7 @@ public class DependencyResolver {
   public ArtifactResult resolveArtifact(Artifact artifact) throws ArtifactResolutionException {
     checkNotNull(artifact, "artifact cannot be null");
 
-    final ArtifactRequest request = new ArtifactRequest(artifact, Collections.<RemoteRepository>emptyList(), null);
+    final ArtifactRequest request = new ArtifactRequest(artifact, remoteRepositories, null);
     return system.resolveArtifact(session, request);
   }
 
@@ -133,11 +135,12 @@ public class DependencyResolver {
     collectRequest.setRoot(root);
     collectRequest.setDependencies(directDependencies);
     collectRequest.setManagedDependencies(managedDependencies);
-    collectRequest.setRepositories(Collections.<RemoteRepository>emptyList());
+    collectRequest.setRepositories(remoteRepositories);
 
     DependencyNode node;
     try {
       node = system.collectDependencies(session, collectRequest).getRoot();
+      logDependencyGraph(node, collectRequest);
       DependencyRequest dependencyRequest = new DependencyRequest();
       dependencyRequest.setRoot(node);
       dependencyRequest.setCollectRequest(collectRequest);
@@ -155,6 +158,20 @@ public class DependencyResolver {
 
     List<File> files = getFiles(node);
     return files;
+  }
+
+  private void logDependencyGraph(DependencyNode node, Object request) {
+    if (logger.isTraceEnabled()) {
+      PathRecordingDependencyVisitor visitor = new PathRecordingDependencyVisitor(null, false);
+      node.accept(visitor);
+
+      logger.trace("******* Dependency Graph calculated for {} with request: '{}' *******", request.getClass().getSimpleName(),
+                   request);
+      visitor.getPaths().stream().forEach(
+                                          pathList -> logger.trace(on(" -> ")
+                                              .join(pathList.stream().filter(path -> path != null).collect(toList()))));
+      logger.trace("******* End of dependency Graph *******");
+    }
   }
 
   /**

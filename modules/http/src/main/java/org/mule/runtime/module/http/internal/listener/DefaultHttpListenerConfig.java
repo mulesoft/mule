@@ -7,33 +7,34 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.config.MutableThreadingProfile;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -63,9 +64,8 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   private HttpListenerConnectionManager connectionManager;
   private TlsContextFactory tlsContext;
   private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
-  private ThreadingProfile workerThreadingProfile;
   private boolean started = false;
-  private Server server;
+  private HttpServer server;
   private Scheduler workManager;
   private boolean initialised;
 
@@ -76,10 +76,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
 
   DefaultHttpListenerConfig(HttpListenerConnectionManager connectionManager) {
     this.connectionManager = connectionManager;
-  }
-
-  public void setWorkerThreadingProfile(ThreadingProfile workerThreadingProfile) {
-    this.workerThreadingProfile = workerThreadingProfile;
   }
 
   public void setName(String name) {
@@ -125,10 +121,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
       return;
     }
     basePath = HttpParser.sanitizePathWithStartSlash(this.basePath);
-    if (workerThreadingProfile == null) {
-      workerThreadingProfile = new MutableThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
-      workerThreadingProfile.setMaxThreadsActive(DEFAULT_MAX_THREADS);
-    }
 
     if (port == null) {
       port = protocol.getDefaultPort();
@@ -179,7 +171,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
    * Creates the server address object with the IP and port that this config should bind to.
    */
   private ServerAddress createServerAddress() throws UnknownHostException {
-    return new ServerAddress(NetworkUtils.getLocalHostIp(host), port);
+    return new DefaultServerAddress(NetworkUtils.getLocalHostIp(host), port);
   }
 
   @Override

@@ -315,6 +315,8 @@ public abstract class AbstractTestDatabase {
 
   public abstract void createStoredProcedureUpdateTestType1(DataSource dataSource) throws SQLException;
 
+  public abstract void createStoredProcedureParameterizedUpdatePlanetDescription(DataSource dataSource) throws SQLException;
+
   public abstract void createStoredProcedureParameterizedUpdateTestType1(DataSource dataSource) throws SQLException;
 
   public abstract void createStoredProcedureCountRecords(DataSource dataSource) throws SQLException;
@@ -341,6 +343,14 @@ public abstract class AbstractTestDatabase {
     throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
   }
 
+  public void createStoredProcedureUpdateZipCodes(DataSource dataSource) throws SQLException {
+    throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+  }
+
+  public void createStoredProcedureUpdateContactDetails(DataSource dataSource) throws SQLException {
+    throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
+  }
+
   public void createStoredProcedureGetContactDetails(DataSource dataSource) throws SQLException {
     throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
   }
@@ -359,6 +369,10 @@ public abstract class AbstractTestDatabase {
 
   public MetadataType getNameFieldMetaDataType() {
     return typeBuilder.stringType().build();
+  }
+
+  public Object getDescriptionFieldMetaDataType() {
+    return typeBuilder.objectType().build();
   }
 
   public Class getIdFieldJavaClass() {

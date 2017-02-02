@@ -14,7 +14,7 @@ import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionExcepti
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,26 +22,27 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionEnricherManager;
+import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
@@ -57,7 +58,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ExtensionMessageSource extends ExtensionComponent implements MessageSource, ExceptionCallback {
+public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource, ExceptionCallback {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -70,7 +71,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
-  private final ExceptionEnricherManager exceptionEnricherManager;
+  private final ExceptionHandlerManager exceptionEnricherManager;
   private Processor messageProcessor;
 
   private SourceAdapter sourceAdapter;
@@ -79,13 +80,12 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   public ExtensionMessageSource(ExtensionModel extensionModel, SourceModel sourceModel, SourceAdapterFactory sourceAdapterFactory,
                                 ConfigurationProvider configurationProvider, RetryPolicyTemplate retryPolicyTemplate,
-                                ExtensionManagerAdapter managerAdapter) {
+                                ExtensionManager managerAdapter) {
     super(extensionModel, sourceModel, configurationProvider, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
-    this.exceptionEnricherManager = new ExceptionEnricherManager(extensionModel, sourceModel);
-
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
   }
 
   private synchronized void createSource() throws Exception {
@@ -97,11 +97,15 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     }
   }
 
-  private void startSource() {
+  private void startSource() throws MuleException {
     try {
       retryPolicyTemplate.execute(new SourceRetryCallback(), retryScheduler);
     } catch (Throwable e) {
-      throw new MuleRuntimeException(e);
+      if (e instanceof MuleException) {
+        throw (MuleException) e;
+      } else {
+        throw new MuleRuntimeException(e);
+      }
     }
   }
 
@@ -119,8 +123,8 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
 
   private SourceCallbackFactory createSourceCallbackFactory() {
     return completionHandlerFactory -> DefaultSourceCallback.builder()
-        .setConfigName(getConfigName())
         .setExceptionCallback(this)
+        .setSourceModel(sourceModel)
         .setFlowConstruct(flowConstruct)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
@@ -148,7 +152,7 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
   }
 
   private void notifyExceptionAndShutDown(Throwable exception) {
-    LOGGER.error(format("Message source '%s' on flow '%s' threw exception. Shutting down it forever...", sourceAdapter.getName(),
+    LOGGER.error(format("Message source on flow '%s' threw exception. Shutting down it forever...",
                         flowConstruct.getName()),
                  exception);
     shutdown();
@@ -249,6 +253,17 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
       public ClassLoader getExecutionClassLoader() {
         return muleContext.getExecutionClassLoader();
       }
+
+      @Override
+      public ComponentIdentifier getSourceIdentifier() {
+        return new ComponentIdentifier.Builder().withNamespace(getExtensionModel().getName().toLowerCase())
+            .withName(sourceModel.getName()).build();
+      }
+
+      @Override
+      public ErrorTypeLocator getErrorTypeLocator() {
+        return muleContext.getErrorTypeLocator();
+      }
     };
   }
 
@@ -288,7 +303,6 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
     messageProcessor = listener;
   }
 
-
   /**
    * Validates if the current source is valid for the set configuration. In case that the validation fails, the method will throw
    * a {@link IllegalSourceException}
@@ -315,11 +329,6 @@ public class ExtensionMessageSource extends ExtensionComponent implements Messag
         throw new ValueResolvingException(e.getMessage(), e);
       }
     };
-  }
-
-  private String getConfigName() {
-    ConfigurationProvider configurationProvider = getConfigurationProvider();
-    return configurationProvider != null ? configurationProvider.getName() : null;
   }
 
   @Override

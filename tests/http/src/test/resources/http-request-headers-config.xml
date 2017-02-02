@@ -12,47 +12,37 @@
 
     <flow name="headerList">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['testName1' : 'testValue1', headerName : headerValue]]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['testName1' : 'testValue1', headerName : headerValue]]
+            </httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="headerMap">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder>
-                <httpn:headers>#[headers]</httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>#[mel:headers]</httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="headerOverride">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder>
-                <httpn:headers>#[headers]</httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>#[mel:headers]</httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="httpHeaders">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['http.scheme' : 'testValue1']]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['http.scheme' : 'testValue1']]
+            </httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="connectionHeader">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['Connection' : 'close']]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['Connection' : 'close']]
+            </httpn:headers>
         </httpn:request>
     </flow>
 
@@ -62,21 +52,17 @@
 
     <flow name="hostHeader">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['Host' : server.systemProperties['host']]]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['Host' : server.systemProperties['host']]]
+            </httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="transferEncodingHeader">
         <httpn:request config-ref="config" path="testPath" method="POST">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['Transfer-Encoding' : server.systemProperties['encoding']]]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['Transfer-Encoding' : server.systemProperties['encoding']]]
+            </httpn:headers>
         </httpn:request>
     </flow>
 

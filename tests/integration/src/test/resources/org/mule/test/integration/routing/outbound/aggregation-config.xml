@@ -15,7 +15,7 @@
 
     <flow name="AggregationFlow">
         <collection-aggregator timeout="2000" failOnTimeout="false"/>
-        <logger message="#[payload]" level="ERROR"/>
+        <logger message="#[mel:payload]" level="ERROR"/>
         <test:queue name="collectionCreated"/>
     </flow>
 
@@ -26,7 +26,7 @@
 
     <flow name="AggregationFlow2">
         <custom-aggregator class="org.mule.test.core.routing.outbound.AggregationTestCase$Aggregator" timeout="2000" failOnTimeout="false"/>
-        <logger message="#[payload]" level="ERROR"/>
+        <logger message="#[mel:payload]" level="ERROR"/>
         <test:queue name="collectionCreated2"/>
     </flow>
 

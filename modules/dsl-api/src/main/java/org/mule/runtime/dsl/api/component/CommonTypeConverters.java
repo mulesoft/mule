@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.dsl.api.component;
 
+import static java.lang.Enum.valueOf;
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
  * Set of common {@link TypeConverter}s to be reused in different {@link ComponentBuildingDefinitionProvider}s
@@ -26,6 +28,17 @@ public class CommonTypeConverters {
         // TODO MULE-10835 use MuleRuntimeException once it's moved to the API.
         throw new RuntimeException(e);
       }
+    };
+  }
+
+  /**
+   * @return a converter that transforms a String to an Enum.
+   */
+  public static TypeConverter<String, Enum> stringToEnumConverter(Class<? extends Enum> enumType) {
+    checkArgument(enumType != null, "enumType cannot be null");
+    return enumAsString -> {
+      checkArgument(enumAsString != null, "enumAsString cannot be null");
+      return valueOf(enumType, enumAsString);
     };
   }
 

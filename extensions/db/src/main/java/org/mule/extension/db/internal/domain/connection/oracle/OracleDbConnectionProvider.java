@@ -6,19 +6,32 @@
  */
 package org.mule.extension.db.internal.domain.connection.oracle;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_REACH;
+import static org.mule.extension.db.api.exception.connection.DbError.INVALID_CREDENTIALS;
+import static org.mule.extension.db.api.exception.connection.DbError.INVALID_DATABASE;
+import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
+import static org.mule.extension.db.internal.domain.connection.oracle.OracleConnectionParameters.DRIVER_CLASS_NAME;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
+import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
+import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
+import org.mule.extension.db.internal.domain.connection.JdbcConnectionFactory;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import javax.sql.DataSource;
-
-import static java.util.Optional.empty;
 
 /**
  * Creates connections to a Oracle database
@@ -27,10 +40,21 @@ import static java.util.Optional.empty;
  */
 @DisplayName("Oracle Connection")
 @Alias("oracle")
+@ExternalLib(name = "Oracle JDBC Driver", description = "A JDBC driver which supports connecting to an Oracle Database",
+    fileName = DRIVER_FILE_NAME_PATTERN, requiredClassName = DRIVER_CLASS_NAME)
 public class OracleDbConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup
+  private static final String INVALID_CREDENTIALS_ORACLE_CODE = "ORA-01017";
+  private static final String UNKNOWN_SID_ORACLE_CODE = "ORA-12505";
+  private static final String IO_ERROR = "IO Error: The Network Adapter could not establish the connection";
+
+  @ParameterGroup(name = CONNECTION)
   private OracleConnectionParameters oracleConnectionParameters;
+
+  @Override
+  protected JdbcConnectionFactory createJdbcConnectionFactory() {
+    return new OracleJdbcConnectionFactory();
+  }
 
   @Override
   protected DbConnection createDbConnection(Connection connection) throws Exception {
@@ -44,6 +68,19 @@ public class OracleDbConnectionProvider extends DbConnectionProvider {
 
   @Override
   public Optional<DataSourceConfig> getDataSourceConfig() {
-    return Optional.ofNullable(oracleConnectionParameters);
+    return ofNullable(oracleConnectionParameters);
+  }
+
+  @Override
+  public Optional<DbError> getDbErrorType(SQLException e) {
+    String message = e.getMessage();
+    if (message.contains(INVALID_CREDENTIALS_ORACLE_CODE)) {
+      return of(INVALID_CREDENTIALS);
+    } else if (message.contains(UNKNOWN_SID_ORACLE_CODE)) {
+      return of(INVALID_DATABASE);
+    } else if (message.contains(IO_ERROR)) {
+      return of(CANNOT_REACH);
+    }
+    return empty();
   }
 }

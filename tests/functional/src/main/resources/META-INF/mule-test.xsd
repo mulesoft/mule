@@ -223,6 +223,21 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="skeleton-source" type="skeletonSourceType" substitutionGroup="mule:abstract-message-source">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that provides access to the Processor set by the owner Flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="skeletonSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageSourceType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="shared-source" type="sharedSourceType" substitutionGroup="mule:abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
@@ -238,6 +253,35 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             A reference to the configuration element for this source.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="throw" type="throwType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that links to a shared-config.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="throwType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="exception" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A fully qualified classname of the exception object to throw. Must be a TypedException unless an error is provided as well.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="error" type="mule:errorIdentifierType" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The error to throw. If provided, the exception will be used as cause for a TypedException.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

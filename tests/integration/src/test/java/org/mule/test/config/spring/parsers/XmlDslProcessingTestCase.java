@@ -127,7 +127,7 @@ public class XmlDslProcessingTestCase extends FunctionalTestCase {
     List<String> firstCollection = simpleListTypeMap.get("1");
     assertThat(firstCollection, hasItems("value1", "value2"));
     List<String> secondCollection = simpleListTypeMap.get("2");
-    assertThat(secondCollection, hasItem("#['some expression']"));
+    assertThat(secondCollection, hasItem("#[mel:'some expression']"));
   }
 
   @Test

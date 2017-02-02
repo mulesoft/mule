@@ -9,8 +9,8 @@ package org.mule.test.module.http.functional.requester;
 import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
+import static org.mule.service.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 
 public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
 

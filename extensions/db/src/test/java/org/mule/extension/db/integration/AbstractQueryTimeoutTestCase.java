@@ -11,8 +11,9 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import org.mule.runtime.api.message.MuleEvent;
+
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Before;
@@ -32,7 +33,7 @@ public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegration
    */
   @Test
   public void timeoutsQuery() throws Exception {
-    MuleEvent responseEvent = flowRunner(QUERY_TIMEOUT_FLOW).withPayload(0).run();
+    Event responseEvent = flowRunner(QUERY_TIMEOUT_FLOW).withPayload(0).run();
 
     Message response = responseEvent.getMessage();
     assertThat(response.getPayload().getValue(), is(notNullValue()));

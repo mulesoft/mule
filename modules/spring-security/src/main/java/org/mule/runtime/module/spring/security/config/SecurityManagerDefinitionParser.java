@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.runtime.core.security.MuleSecurityManager;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -32,7 +32,7 @@ public class SecurityManagerDefinitionParser implements BeanDefinitionParser {
 
   public SecurityManagerDefinitionParser() {
     this.namedDefinitionParser = new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER);
-    this.orphanDefinitionParser = new OrphanDefinitionParser(MuleSecurityManager.class, true);
+    this.orphanDefinitionParser = new OrphanDefinitionParser(DefaultMuleSecurityManager.class, true);
     this.orphanDefinitionParser.addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
   }
 

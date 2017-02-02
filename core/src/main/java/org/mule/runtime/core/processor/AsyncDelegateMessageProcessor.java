@@ -7,24 +7,25 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -37,7 +38,6 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.util.NotificationUtils;
-import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,10 +45,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 
 /**
- * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of
+ * Processes {@link Event}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
  * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be executed in a
  * different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is present then an
  * exception is thrown.
@@ -86,7 +87,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     if (processingStrategyFactory == null) {
       throw new InitialisationException(objectIsNull("processingStrategy"), this);
     }
-    processingStrategy = processingStrategyFactory.create(muleContext);
+    processingStrategy = processingStrategyFactory.create(muleContext, getPrefix(muleContext) + name);
     super.initialise();
   }
 
@@ -126,16 +127,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             .map(event1 -> updateEventForAsync(event1))
             .transform(processingStrategy.onPipeline(flowConstruct, delegate, messagingExceptionHandler))
             .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
-            .doOnError(exception -> {
-              if (!(exception instanceof MessagingException))
-                logger.error("Unhandled exception in async processing " + exception);
-            })
+            .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                       exception -> logger.error("Unhandled exception in async processing.", exception))
             .subscribe());
   }
 
   private Event updateEventForAsync(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    Event newEvent = Event.builder(event).synchronous(false).exchangePattern(ONE_WAY).replyToHandler(null).build();
+    Event newEvent = Event.builder(event).replyToHandler(null).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(newEvent);
     return newEvent;

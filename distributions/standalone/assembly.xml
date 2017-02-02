@@ -1,6 +1,6 @@
 <!-- Assembly descriptor for the full Mule distribution. -->
 <assembly>
-    <id>full</id>
+    <id>standalone</id>
     <formats>
         <format>zip</format>
         <format>tar.gz</format>
@@ -123,13 +123,16 @@
                 <include>org.mule:mule-metadata-model-api</include>
                 <include>org.mule:mule-metadata-model-java</include>
                 <include>org.mule:mule-metadata-model-persistence</include>
+                <include>org.mule:mule-metadata-model-xml</include>
+                <include>org.mule:mule-metadata-model-json</include>
                 <!-- extensions API -->
                 <include>org.mule.extensions:mule-extensions-api</include>
                 <include>org.mule.extensions:mule-extensions-api-persistence</include>
-                <include>org.mule.extensions:mule-extensions-api-xml-dsl</include>
                 <include>org.mule.extensions:mule-extensions-api-dsql</include>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
+                <!--Services-->
+                <include>org.mule.modules:mule-service-http-api</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
@@ -140,16 +143,12 @@
                 <include>org.mule.modules:mule-module-service</include>
                 <include>org.mule.modules:mule-module-container</include>
                 <include>org.mule.modules:mule-module-builders</include>
-                <include>org.mule.modules:mule-module-cxf</include>
                 <include>org.mule.modules:mule-module-extensions-support</include>
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
+                <include>org.mule.modules:mule-module-extensions-xml-support</include>
                 <include>org.mule.modules:mule-module-http</include>
-                <include>org.mule.modules:mule-module-jaas</include>
                 <include>org.mule.modules:mule-module-jbossts</include>
-                <include>org.mule.modules:mule-module-json</include>
                 <include>org.mule.modules:mule-module-management</include>
-                <include>org.mule.modules:mule-module-oauth</include>
-                <include>org.mule.modules:mule-module-pgp</include>
                 <include>org.mule.modules:mule-module-repository</include>
                 <include>org.mule.modules:mule-module-scripting</include>
                 <include>org.mule.modules:mule-module-scripting-jruby</include>
@@ -164,12 +163,8 @@
                 <include>org.mule.transports:mule-transport-sockets</include>
 
                 <!-- Shared libs -->
-                <include>org.mule.common:mule-common</include>
                 <include>org.mule.mvel:mule-mvel2</include>
             </includes>
-            <excludes>
-                <exclude>*:zip:*</exclude>
-            </excludes>
         </dependencySet>
 
         <!-- Mule Services -->
@@ -179,6 +174,7 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.services:mule-service-scheduler</include>
+                <include>org.mule.services:mule-service-http</include>
             </includes>
         </dependencySet>
         
@@ -198,13 +194,15 @@
                 <exclude>org.mule:mule-metadata-model-api</exclude>
                 <exclude>org.mule:mule-metadata-model-java</exclude>
                 <exclude>org.mule:mule-metadata-model-persistence</exclude>
+                <exclude>org.mule:mule-metadata-model-xml</exclude>
+                <exclude>org.mule:mule-metadata-model-json</exclude>
                 <!--extensions API-->
                 <exclude>org.mule.extensions:mule-extensions-api</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-persistence</exclude>
-                <exclude>org.mule.extensions:mule-extensions-api-xml-dsl</exclude>
                 <exclude>org.mule.extensions:mule-extensions-api-dsql</exclude>
+                <!--Services-->
+                <exclude>org.mule.modules:mule-service-http-api</exclude>
                 <!-- lib/mule -->
-                <exclude>org.mule.common:mule-common</exclude>
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.extensions:mule-extensions-all</exclude>
@@ -212,16 +210,14 @@
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-artifact</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>
-                <exclude>org.mule.modules:mule-module-cxf</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-support</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
+                <exclude>org.mule.modules:mule-module-extensions-xml-support</exclude>
                 <exclude>org.mule.modules:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
                 <exclude>org.mule.modules:mule-module-email</exclude>
                 <exclude>org.mule.modules:mule-module-wsc</exclude>
-                <exclude>org.mule.modules:mule-module-jaas</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
-                <exclude>org.mule.modules:mule-module-json</exclude>
                 <exclude>org.mule.modules:mule-module-container</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-deployment</exclude>
@@ -231,7 +227,6 @@
                 <exclude>org.mule.modules:mule-module-service</exclude>
                 <exclude>org.mule.modules:mule-module-management</exclude>
                 <exclude>org.mule.modules:mule-module-oauth</exclude>
-                <exclude>org.mule.modules:mule-module-pgp</exclude>
                 <exclude>org.mule.modules:mule-module-reboot</exclude>
                 <exclude>org.mule.modules:mule-module-repository</exclude>
                 <exclude>org.mule.modules:mule-module-scripting</exclude>
@@ -247,20 +242,9 @@
                 <exclude>org.mule.transports:mule-transport-sockets</exclude>
 
                 <!-- lib/plugins (these artifacts are zip type) -->
+                <!--//TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips-->
                 <exclude>*:zip:*</exclude>
-
-                <!-- mule-tests-functional dependencies -->
-                <exclude>org.apache.ftpserver:ftpserver-core</exclude>
-                <exclude>org.apache.ftpserver:ftplet-api</exclude>
-                <exclude>org.apache.sshd:sshd-core</exclude>
-                <exclude>org.apache.mina:mina-core</exclude>
-
-                <!-- lib/user -->
-                <exclude>junit:junit</exclude>
-                <exclude>xmlunit:xmlunit</exclude>
-                <exclude>org.mule.tests:mule-tests-functional</exclude>
-                <exclude>org.mule.tests:mule-tests-runner</exclude>
-                <exclude>org.mule.tests:mule-tests-unit</exclude>
+                <exclude>*:mule-plugin:*</exclude>
 
                 <!-- lib/boot -->
                 <exclude>commons-cli:commons-cli</exclude>
@@ -286,20 +270,6 @@
                 <exclude>com.yourkit:yjp-controller-api-redist</exclude>
 
             </excludes>
-        </dependencySet>
-
-        <!-- Mule testing framework -->
-        <dependencySet>
-            <outputDirectory>lib/user</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <scope>test</scope>
-            <includes>
-                <include>junit:junit</include>
-                <include>xmlunit:xmlunit</include>
-                <include>org.mule.tests:mule-tests-functional</include>
-                <include>org.mule.tests:mule-tests-runner</include>
-                <include>org.mule.tests:mule-tests-unit</include>
-            </includes>
         </dependencySet>
 
         <!--

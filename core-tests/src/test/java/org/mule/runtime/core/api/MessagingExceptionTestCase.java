@@ -27,7 +27,6 @@ import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -100,14 +99,14 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getCauseExceptionWithoutCause() {
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent);
-    assertThat((MessagingException) exception.getCauseException(), is(exception));
+    assertThat((MessagingException) exception.getRootCause(), is(exception));
   }
 
   @Test
   public void getCauseExceptionWithMuleCause() {
     DefaultMuleException causeException = new DefaultMuleException("");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, causeException);
-    assertThat((DefaultMuleException) exception.getCauseException(), is(causeException));
+    assertThat((DefaultMuleException) exception.getRootCause(), is(causeException));
   }
 
   @Test
@@ -115,14 +114,14 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     DefaultMuleException causeCauseException = new DefaultMuleException("");
     DefaultMuleException causeException = new DefaultMuleException(causeCauseException);
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, causeException);
-    assertThat((DefaultMuleException) exception.getCauseException(), is(causeCauseException));
+    assertThat((DefaultMuleException) exception.getRootCause(), is(causeCauseException));
   }
 
   @Test
   public void getCauseExceptionWithNonMuleCause() {
     IOException causeException = new IOException("");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, causeException);
-    assertThat((IOException) exception.getCauseException(), is(causeException));
+    assertThat((IOException) exception.getRootCause(), is(causeException));
   }
 
   @Test
@@ -130,7 +129,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     ConnectException causeCauseException = new ConnectException();
     IOException causeException = new IOException(causeCauseException);
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, causeException);
-    assertThat((ConnectException) exception.getCauseException(), is(causeCauseException));
+    assertThat((ConnectException) exception.getRootCause(), is(causeCauseException));
   }
 
   @Test

@@ -13,9 +13,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
-import static org.mule.runtime.core.util.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
-
+import static org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
+import static org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
@@ -104,7 +103,7 @@ public class JaxbSecurityTestCase extends FunctionalTestCase {
 
       fail("Should've thrown exception");
     } catch (MessagingException e) {
-      assertThat(e.getCauseException(), instanceOf(SAXParseException.class));
+      assertThat(e.getRootCause(), instanceOf(SAXParseException.class));
     }
   }
 }

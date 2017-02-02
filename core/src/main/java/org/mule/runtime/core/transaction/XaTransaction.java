@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.transaction;
 
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.util.Preconditions;
@@ -208,7 +209,7 @@ public class XaTransaction extends AbstractTransaction {
    *        {@link org.mule.runtime.core.util.xa.XaResourceFactoryHolder} to be able to determine correctly if there's already a
    *        resource for that {@link javax.transaction.xa.XAResource} provider.
    * @param resource the resource object. It must be an {@link javax.transaction.xa.XAResource} or a
-   *        {@link org.mule.runtime.core.transaction.XaTransaction.MuleXaObject}
+   *        {@link MuleXaObject}
    * @throws TransactionException
    */
   public synchronized void bindResource(Object key, Object resource) throws TransactionException {
@@ -347,33 +348,6 @@ public class XaTransaction extends AbstractTransaction {
         }
       }
     }
-  }
-
-  public interface MuleXaObject {
-
-    void close() throws Exception;
-
-    void setReuseObject(boolean reuseObject);
-
-    boolean isReuseObject();
-
-    boolean enlist() throws TransactionException;
-
-    boolean delist() throws Exception;
-
-    /**
-     * Get XAConnection or XASession from wrapper / proxy
-     *
-     * @return return javax.sql.XAConnection for jdbc or javax.jms.XASession for jms
-     */
-    Object getTargetObject();
-
-    String SET_REUSE_OBJECT_METHOD_NAME = "setReuseObject";
-    String IS_REUSE_OBJECT_METHOD_NAME = "isReuseObject";
-    String DELIST_METHOD_NAME = "delist";
-    String ENLIST_METHOD_NAME = "enlist";
-    String GET_TARGET_OBJECT_METHOD_NAME = "getTargetObject";
-    String CLOSE_METHOD_NAME = "close";
   }
 
   @Override

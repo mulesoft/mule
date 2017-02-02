@@ -19,7 +19,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -203,7 +203,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void addProcessorPathElementsBeforeInit() throws MuleException {
     Foreach foreachMp = new Foreach();
     foreachMp.setMuleContext(muleContext);
-    foreachMp.setFlowConstruct(mock(Flow.class));
+    foreachMp.setFlowConstruct(mock(DefaultFlowBuilder.DefaultFlow.class));
     List<Processor> processors = getSimpleMessageProcessors();
     foreachMp.setMessageProcessors(processors);
 

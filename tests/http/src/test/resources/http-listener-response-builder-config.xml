@@ -14,118 +14,129 @@
 
     <flow name="emptyResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${emptyResponseBuilderPath}">
-            <httpn:response-builder />
+            <httpn:response />
+        </httpn:listener>
+        <echo-component/>
+    </flow>
+
+    <flow name="twoHeadersResponseBuilderFlow">
+        <httpn:listener config-ref="listenerConfig" path="${twoHeadersResponseBuilderPath}">
+            <httpn:response>
+                <httpn:headers>
+                    #[mel:['content-type' : 'text/x-javascript', 'Content-Type' : 'application/json']]
+                </httpn:headers>
+            </httpn:response>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="statusResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${statusResponseBuilderPath}">
-            <httpn:response-builder statusCode="201" reasonPhrase="everything works!"/>
+            <httpn:response statusCode="201" reasonPhrase="everything works!"/>
         </httpn:listener>
         <echo-component/>
-        <logger level="ERROR" message="#[payload]"/>
+        <logger level="ERROR" message="#[mel:payload]"/>
     </flow>
 
     <flow name="headerResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headerResponseBuilderPath}">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
-                    #[['User-Agent' : 'Mule 3.6.0', 'Date' : '2016-06-08T13:34:41.080-03:00']]
+                    #[mel:['User-Agent' : 'Mule 4.0.0', 'Date' : '2016-06-08T13:34:41.080-03:00']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="headersResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headersResponseBuilderPath}">
-            <httpn:response-builder>
-                <httpn:headers>#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]</httpn:headers>
-            </httpn:response-builder>
+            <httpn:response>
+                <httpn:headers>#[mel:['User-Agent': 'Mule 4.0.0','Date': server.dateTime.toString()]]</httpn:headers>
+            </httpn:response>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="headersOverrideResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${headersOverrideResponseBuilderPath}">
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
-                    #[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]
+                    #[mel:['User-Agent': 'Mule 4.0.0','Date': server.dateTime.toString()]]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="defaultReasonPhraseResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${defaultReasonPhraseResponseBuilderPath}">
-            <httpn:response-builder statusCode="200"/>
+            <httpn:response statusCode="200"/>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="noReasonPhraseUnknownStatusCodeResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${noReasonPhraseUnknownStatusCodeResponseBuilderPath}">
-            <httpn:response-builder statusCode="1001"/>
+            <httpn:response statusCode="1001"/>
         </httpn:listener>
         <echo-component/>
     </flow>
 
     <flow name="errorEmptyResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorEmptyResponseBuilderPath}">
-            <httpn:error-response-builder />
+            <httpn:error-response />
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="errorStatusResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorStatusResponseBuilderPath}">
-            <httpn:error-response-builder statusCode="201" reasonPhrase="everything works!"/>
+            <httpn:error-response statusCode="201" reasonPhrase="everything works!"/>
         </httpn:listener>
-        <logger level="ERROR" message="#[payload]"/>
+        <logger level="ERROR" message="#[mel:payload]"/>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="errorHeaderResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeaderResponseBuilderPath}">
-            <httpn:error-response-builder>
-                <httpn:headers>#[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]</httpn:headers>
-            </httpn:error-response-builder>
+            <httpn:error-response>
+                <httpn:headers>#[mel:['User-Agent': 'Mule 4.0.0','Date': server.dateTime.toString()]]</httpn:headers>
+            </httpn:error-response>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="errorHeadersResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeadersResponseBuilderPath}">
-            <httpn:error-response-builder>
+            <httpn:error-response>
                 <httpn:headers>
-                    #[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]
+                    #[mel:['User-Agent': 'Mule 4.0.0','Date': server.dateTime.toString()]]
                 </httpn:headers>
-            </httpn:error-response-builder>
+            </httpn:error-response>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="errorHeadersOverrideResponseBuilderFlow">
         <httpn:listener config-ref="listenerConfig" path="${errorHeadersOverrideResponseBuilderPath}">
-            <httpn:error-response-builder>
+            <httpn:error-response>
                 <httpn:headers>
-                    #[['User-Agent': 'Mule 3.6.0','Date': server.dateTime.toString()]]
+                    #[mel:['User-Agent': 'Mule 4.0.0','Date': server.dateTime.toString()]]
                 </httpn:headers>
-            </httpn:error-response-builder>
+            </httpn:error-response>
         </httpn:listener>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="responseBuilderAndErrorResponseBuilderNotTheSame">
         <httpn:listener config-ref="listenerConfig" path="${responseBuilderAndErrorResponseBuilderNotTheSamePath}">
-            <httpn:response-builder statusCode="202"/>
-            <httpn:error-response-builder statusCode="505"/>
+            <httpn:response statusCode="202"/>
+            <httpn:error-response statusCode="505"/>
         </httpn:listener>
         <message-filter throwOnUnaccepted="true">
             <expression-filter
-                    expression="#[message.getAttributes().getHeaders().get('fail') == null]"/>
+                    expression="#[mel:message.getAttributes().getHeaders().get('fail') == null]"/>
         </message-filter>
     </flow>
 

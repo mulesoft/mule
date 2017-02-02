@@ -8,6 +8,7 @@ package org.mule.service.scheduler.internal;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
@@ -27,30 +28,54 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
   private static final Logger logger = getLogger(RunnableFutureDecorator.class);
 
   private final RunnableFuture<V> task;
+  private final ClassLoader classLoader;
 
   private final DefaultScheduler scheduler;
+
+  private final String taskAsString;
 
   /**
    * Decorates the given {@code task}
    * 
    * @param task the task to be decorated
+   * @param classLoader the context {@link ClassLoader} on which the {@code task} should be executed
    * @param scheduler the owner {@link Executor} of this task
+   * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
+   * @param id a unique it for this task.
    */
-  RunnableFutureDecorator(RunnableFuture<V> task, DefaultScheduler scheduler) {
+  RunnableFutureDecorator(RunnableFuture<V> task, ClassLoader classLoader, DefaultScheduler scheduler, String taskAsString,
+                          Integer id) {
+    super(id);
     this.task = task;
+    this.classLoader = classLoader;
     this.scheduler = scheduler;
+    this.taskAsString = taskAsString;
   }
 
   @Override
   public void run() {
     long startTime = beforeRun();
+
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(classLoader);
+
     try {
       task.run();
+      task.get();
+    } catch (ExecutionException e) {
+      logger.error("Uncaught throwable in task " + toString(), e);
+    } catch (CancellationException e) {
+      logger.trace("Task " + toString() + " cancelled");
+    } catch (InterruptedException e) {
+      currentThread.interrupt();
     } finally {
       wrapUp();
       if (logger.isTraceEnabled()) {
         logger.trace("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
       }
+
+      currentThread.setContextClassLoader(currentClassLoader);
     }
   }
 
@@ -92,6 +117,6 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
 
   @Override
   public String toString() {
-    return "RunnableFutureDecorator[" + task.toString() + "]";
+    return taskAsString;
   }
 }

@@ -6,23 +6,26 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.apache.commons.net.ftp.FTPClient;
+import static java.lang.String.format;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.command.FileCommand;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.api.Event;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static java.lang.String.format;
+import org.apache.commons.net.ftp.FTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for {@link FileCommand} implementations that target a FTP/SFTP server
@@ -71,6 +74,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
   /**
    * {@inheritDoc}
    */
+  @Override
   protected boolean exists(Path path) {
     return getFile(path.toString()) != null;
   }
@@ -132,7 +136,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
 
     if (exists(target)) {
       if (!overwrite) {
-        throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
+        throw new FileAlreadyExistsException(format("'%s' cannot be renamed because '%s' already exists", source, target));
       }
 
       try {
@@ -166,7 +170,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
     FileAttributes targetFile = getFile(directoryPath);
 
     if (targetFile != null) {
-      throw new IllegalArgumentException(format("Directory '%s' already exists", path.toAbsolutePath()));
+      throw new FileAlreadyExistsException(format("Directory '%s' already exists", path.toAbsolutePath()));
     }
 
     mkdirs(path);
@@ -174,7 +178,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
 
   /**
    * Performs the base logic and delegates into
-   * {@link AbstractFtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean, MuleEvent)} to perform the actual
+   * {@link AbstractFtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean, Event)} to perform the actual
    * copying logic
    *
    * @param config the config that is parameterizing this operation
@@ -182,10 +186,10 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
    * @param target the path to the target destination
    * @param overwrite whether to overwrite existing target paths
    * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
-   * @param event the {@link MuleEvent} which triggered this operation
+   * @param event the {@link Event} which triggered this operation
    */
   protected final void copy(FileConnectorConfig config, String source, String target, boolean overwrite,
-                            boolean createParentDirectory, MuleEvent event, FtpCopyDelegate delegate) {
+                            boolean createParentDirectory, Event event, FtpCopyDelegate delegate) {
     FileAttributes sourceFile = getExistingFile(source);
     Path targetPath = resolvePath(target);
     FileAttributes targetFile = getFile(targetPath.toString());
@@ -210,7 +214,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
         mkdirs(targetPath);
         targetPath = targetPath.resolve(sourceFile.getName());
       } else {
-        throw new IllegalArgumentException(String
+        throw new IllegalPathException(String
             .format("Can't copy '%s' to '%s' because the destination path " + "doesn't exists", sourceFile.getPath(),
                     targetPath.toAbsolutePath()));
       }

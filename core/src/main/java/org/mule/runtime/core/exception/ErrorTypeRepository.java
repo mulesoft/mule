@@ -7,14 +7,22 @@
 package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ANY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CRITICAL;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Repository for the different {@link ErrorType}s in a mule artifact.
@@ -25,35 +33,94 @@ import java.util.Map;
  */
 public class ErrorTypeRepository {
 
+  /**
+   * Error type that represents all of them that can be handled.
+   */
   protected static final ErrorType ANY_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
 
+
+  /**
+   * Error type for which there's no clear reason for failure. Will be used when no specific match is found.
+   */
+  protected static final ErrorType UNKNOWN_ERROR_TYPE =
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)
+          .parentErrorType(ANY_ERROR_TYPE).build();
+
+  /**
+   * Error type for which there will be no handling since it represents an error so critical it should not be handled.
+   * If such an error occurs it will always be propagated. Same for it's children.
+   */
+  protected static final ErrorType CRITICAL_ERROR_TYPE =
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
+          .parentErrorType(null).build();
+
   private Map<ComponentIdentifier, ErrorType> errorTypes = new HashMap<>();
+  private Map<ComponentIdentifier, ErrorType> internalErrorTypes = new HashMap<>();
 
   public ErrorTypeRepository() {
-    this.errorTypes.put(new ComponentIdentifier.Builder()
-        .withNamespace(CORE_NAMESPACE_NAME)
-        .withName(ANY_IDENTIFIER)
-        .build(),
-                        ANY_ERROR_TYPE);
+    this.errorTypes.put(ANY, ANY_ERROR_TYPE);
+    this.internalErrorTypes.put(CRITICAL, CRITICAL_ERROR_TYPE);
+    this.internalErrorTypes.put(UNKNOWN, UNKNOWN_ERROR_TYPE);
   }
 
+  /**
+   * Adds and returns an {@link ErrorType} for a given identifier with the given parent that will be fully visible, meaning
+   * it will be available for use in on-error components.
+   *
+   * @param errorTypeIdentifier the {@link ComponentIdentifier} for the error
+   * @param parentErrorType the {@link ErrorType} that will act as parent
+   * @return the created {@link ErrorType}
+   */
   public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
+    return addErrorTypeTo(errorTypeIdentifier, parentErrorType, this.errorTypes);
+  }
+
+  /**
+   * Adds and returns an {@link ErrorType} for a given identifier with the given parent that will be only used internally, meaning
+   * it won't be available for use in on-error components.
+   *
+   * @param errorTypeIdentifier the {@link ComponentIdentifier} for the error
+   * @param parentErrorType the {@link ErrorType} that will act as parent
+   * @return the created {@link ErrorType}
+   */
+  public ErrorType addInternalErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
+    return addErrorTypeTo(errorTypeIdentifier, parentErrorType, this.internalErrorTypes);
+  }
+
+  private ErrorType addErrorTypeTo(ComponentIdentifier identifier, ErrorType parent, Map<ComponentIdentifier, ErrorType> map) {
     ErrorTypeBuilder errorTypeBuilder =
-        ErrorTypeBuilder.builder().namespace(errorTypeIdentifier.getNamespace())
-            .identifier(errorTypeIdentifier.getName())
-            .parentErrorType(parentErrorType);
+        ErrorTypeBuilder.builder().namespace(identifier.getNamespace())
+            .identifier(identifier.getName())
+            .parentErrorType(parent);
     ErrorType errorType = errorTypeBuilder.build();
-    if (this.errorTypes.put(errorTypeIdentifier, errorType) != null) {
-      throw new IllegalStateException(format("An error type with identifier %s already exists", errorTypeIdentifier));
+    if (map.put(identifier, errorType) != null) {
+      throw new IllegalStateException(format("An error type with identifier %s already exists", identifier));
     }
     return errorType;
   }
 
-  public ErrorType lookupErrorType(ComponentIdentifier errorTypeComponentIdentifier) {
-    ErrorType errorType = this.errorTypes.get(errorTypeComponentIdentifier);
-    if (errorType == null) {
-      throw new IllegalStateException(format("there's no error type for %s", errorTypeComponentIdentifier));
+  /**
+   * Looks up the specified error's type and returns it if found and available for general use (error handling).
+   *
+   * @param errorTypeComponentIdentifier the {@link ComponentIdentifier} for the error
+   * @return an {@link Optional} with the corresponding {@link ErrorType} or an empty one
+   */
+  public Optional<ErrorType> lookupErrorType(ComponentIdentifier errorTypeComponentIdentifier) {
+    return ofNullable(this.errorTypes.get(errorTypeComponentIdentifier));
+  }
+
+  /**
+   * Returns the specified error's type if present. Unlike {@link #lookupErrorType(ComponentIdentifier)}, this will return the
+   * {@link ErrorType} even if it's not available for general use (error handling).
+   *
+   * @param errorTypeIdentifier the {@link ComponentIdentifier} for the error
+   * @return an {@link Optional} with the corresponding {@link ErrorType} or an empty one
+   */
+  public Optional<ErrorType> getErrorType(ComponentIdentifier errorTypeIdentifier) {
+    Optional<ErrorType> errorType = lookupErrorType(errorTypeIdentifier);
+    if (!errorType.isPresent()) {
+      errorType = ofNullable(this.internalErrorTypes.get(errorTypeIdentifier));
     }
     return errorType;
   }
@@ -67,4 +134,12 @@ public class ErrorTypeRepository {
     return ANY_ERROR_TYPE;
   }
 
+  /**
+   * Gets the {@link ErrorType} instance for CRITICAL error type.
+   *
+   * @return the CRITICAL error type
+   */
+  public ErrorType getCriticalErrorType() {
+    return CRITICAL_ERROR_TYPE;
+  }
 }

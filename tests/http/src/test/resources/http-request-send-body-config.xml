@@ -6,9 +6,13 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <httpn:request-config name="config"  sendBodyMode="NEVER" >
+    <httpn:request-config name="config" sendBodyMode="NEVER" >
         <httpn:request-connection host="localhost" port="${httpPort}"/>
     </httpn:request-config>
+
+    <flow name="sendBodyConfig">
+        <httpn:request config-ref="config" path="requestPath" method="#[method]" />
+    </flow>
 
     <flow name="sendBodyAuto">
         <httpn:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="AUTO"/>

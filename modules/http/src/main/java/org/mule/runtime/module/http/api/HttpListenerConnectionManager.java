@@ -13,6 +13,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -20,15 +21,14 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.HttpServerManager;
-import org.mule.runtime.module.http.internal.listener.Server;
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
 import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.ServerAddress;
 
 import com.google.common.collect.Iterables;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 public class HttpListenerConnectionManager implements Initialisable, Disposable, MuleContextAware {
@@ -75,11 +75,12 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
     this.muleContext = muleContext;
   }
 
-  public Server createServer(ServerAddress serverAddress, Supplier<Executor> workManagerSource, boolean usePersistentConnections,
-                             int connectionIdleTimeout) {
+  public HttpServer createServer(ServerAddress serverAddress, Supplier<Scheduler> schedulerSupplier,
+                                 boolean usePersistentConnections,
+                                 int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {
-        return httpServerManager.createServerFor(serverAddress, workManagerSource, usePersistentConnections,
+        return httpServerManager.createServerFor(serverAddress, schedulerSupplier, usePersistentConnections,
                                                  connectionIdleTimeout);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
@@ -94,11 +95,12 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
     return httpServerManager.containsServerFor(serverAddress);
   }
 
-  public Server createSslServer(ServerAddress serverAddress, Supplier<Executor> workManagerSource, TlsContextFactory tlsContext,
-                                boolean usePersistentConnections, int connectionIdleTimeout) {
+  public HttpServer createSslServer(ServerAddress serverAddress, Supplier<Scheduler> schedulerSupplier,
+                                    TlsContextFactory tlsContext,
+                                    boolean usePersistentConnections, int connectionIdleTimeout) {
     if (!containsServerFor(serverAddress)) {
       try {
-        return httpServerManager.createSslServerFor(tlsContext, workManagerSource, serverAddress, usePersistentConnections,
+        return httpServerManager.createSslServerFor(tlsContext, schedulerSupplier, serverAddress, usePersistentConnections,
                                                     connectionIdleTimeout);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);

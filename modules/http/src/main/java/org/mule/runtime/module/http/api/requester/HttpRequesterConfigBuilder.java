@@ -14,10 +14,12 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.client.proxy.NtlmProxyConfigBuilder;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.runtime.core.util.ObjectNameHelper;
+import org.mule.service.http.api.client.proxy.ProxyConfigBuilder;
 
 /**
  * Builder for creating http request configs pragmatically.
@@ -59,9 +61,9 @@ public class HttpRequesterConfigBuilder {
   }
 
   /**
-   * To create instances of {@link org.mule.runtime.module.http.api.requester.proxy.ProxyConfig} use
-   * {@link org.mule.runtime.module.http.api.requester.proxy.NtlmProxyConfigBuilder} or
-   * {@link org.mule.runtime.module.http.api.requester.proxy.ProxyConfigBuilder}
+   * To create instances of {@link ProxyConfig} use
+   * {@link NtlmProxyConfigBuilder} or
+   * {@link ProxyConfigBuilder}
    *
    * @param proxyConfig proxy configuration for outgoing HTTP request
    * @return the builder

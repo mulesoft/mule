@@ -11,46 +11,46 @@ import static java.lang.String.format;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import static org.mule.extension.file.common.api.FileDisplayConstants.MATCHER;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
-import org.mule.extension.file.internal.command.DirectoryListenerCommand;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
+import org.mule.extension.file.internal.command.DirectoryListenerCommand;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import com.google.common.base.Supplier;
@@ -73,7 +73,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
@@ -186,12 +186,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   @Parameter
   @Optional
   @Alias("matchWith")
-  @Placement(group = MATCHER)
   @DisplayName(MATCH_WITH)
   private FilePredicateBuilder<FilePredicateBuilder, FileAttributes> predicateBuilder;
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private SchedulerService schedulerService;
 
   @Connection
   private FileSystem fileSystem;
@@ -200,12 +202,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private WatchService watcher;
   private Predicate<FileAttributes> matcher;
   private Set<FileEventType> enabledEventTypes = new HashSet<>();
-  private ExecutorService executorService;
+  private Scheduler listenerExecutor;
   private PrimaryNodeLifecycleNotificationListener clusterListener;
 
   private final Map<WatchKey, Path> keyPaths = new HashMap<>();
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private boolean started = false;
+
+  private Future<?> submittedListenerTask;
 
   @Override
   public void onStart(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) throws MuleException {
@@ -220,12 +224,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     createWatcherService();
 
     matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
-    executorService =
-        newSingleThreadExecutor(r -> new Thread(r,
-                                                format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
+
+    listenerExecutor = schedulerService.customScheduler(config().withMaxConcurrentTasks(1)
+        .withName(format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
+
+    submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
+
     started = true;
     stopRequested.set(false);
-    executorService.execute(() -> listen(sourceCallback));
   }
 
   private synchronized void initialiseClusterListener(SourceCallback<InputStream, ListenerFileAttributes> sourceCallback) {
@@ -344,30 +350,17 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
   @Override
   public void onStop() {
+    submittedListenerTask.cancel(false);
     stopRequested.set(true);
     started = false;
 
     closeWatcherService();
-    shutdownExecutor();
+    shutdownScheduler();
   }
 
-  private void shutdownExecutor() {
-    if (executorService == null) {
-      return;
-    }
-
-    executorService.shutdownNow();
-    try {
-      if (!executorService.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS)) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Could not properly terminate pending events for directory listener on flow " + flowConstruct.getName());
-        }
-      }
-    } catch (InterruptedException e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Got interrupted while trying to terminate pending events for directory listener on flow "
-            + flowConstruct.getName());
-      }
+  private void shutdownScheduler() {
+    if (listenerExecutor != null) {
+      listenerExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     }
   }
 

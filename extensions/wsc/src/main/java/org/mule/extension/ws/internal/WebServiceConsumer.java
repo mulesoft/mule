@@ -6,51 +6,49 @@
  */
 package org.mule.extension.ws.internal;
 
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.WscErrors;
+import org.mule.extension.ws.api.security.SecurityStrategy;
+import org.mule.extension.ws.api.security.WssDecryptSecurityStrategy;
+import org.mule.extension.ws.api.security.WssEncryptSecurityStrategy;
+import org.mule.extension.ws.api.security.WssSignSecurityStrategy;
+import org.mule.extension.ws.api.security.WssTimestampSecurityStrategy;
+import org.mule.extension.ws.api.security.WssUsernameTokenSecurityStrategy;
+import org.mule.extension.ws.api.security.WssVerifySignatureSecurityStrategy;
 import org.mule.extension.ws.internal.connection.WscConnectionProvider;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import javax.inject.Inject;
 
 /**
  * Web Service Consumer extension used to consume SOAP web services.
  *
  * @since 4.0
  */
-// TODO: Remove when MULE-10839 it's fixed
-@Export(classes = WscException.class)
+@ErrorTypes(WscErrors.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
-@Extension(name = "wsc")
-public class WebServiceConsumer implements Initialisable {
-
-  @Inject
-  private MuleContext muleContext;
+@SubTypeMapping(baseType = SecurityStrategy.class,
+    subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
+        WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
+@Extension(name = "Web Service Consumer")
+@Xml(namespace = "wsc")
+public class WebServiceConsumer {
 
   /**
    * Default character encoding to be used in all the messages. If not specified, the default charset in the mule configuration
    * will be used
    */
   @Parameter
-  @Optional
+  @DefaultEncoding
   private String encoding;
 
   public String getEncoding() {
     return encoding;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (encoding == null) {
-      encoding = muleContext.getConfiguration().getDefaultEncoding();
-    }
   }
 }

@@ -71,6 +71,16 @@ public final class EmailConnectorConstants {
   public static final String CONTENT_TYPE_HEADER = "Content-Type";
 
   /**
+   * Content transfer encoding header name.
+   */
+  public static final String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
+
+  /**
+   * Default value for the Content-Transfer-Encoding header.
+   */
+  public static final String DEFAULT_CONTENT_TRANSFER_ENCODING = "7BIT";
+
+  /**
    * Default page size to be fetched by the {@link PagingProviderEmailDelegate}
    */
   public static final String DEFAULT_PAGE_SIZE = "10";

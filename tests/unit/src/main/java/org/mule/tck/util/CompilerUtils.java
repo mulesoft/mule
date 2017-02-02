@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringJoiner;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -208,7 +210,11 @@ public class CompilerUtils {
     }
 
     private String getRelativePath(File targetFolder, File file) {
-      return file.getAbsolutePath().substring(targetFolder.getAbsolutePath().length() + 1);
+      final StringJoiner pathJoiner = new StringJoiner("/");
+      for (Path targetFolderPathElement : targetFolder.toPath().relativize(file.toPath())) {
+        pathJoiner.add(targetFolderPathElement.toString());
+      }
+      return pathJoiner.toString();
     }
 
   }

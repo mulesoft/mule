@@ -8,26 +8,32 @@
 package org.mule.test.runner.api;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerAdapterFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;
+import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.mule.runtime.core.api.config.ConfigurationBuilder} that creates an
- * {@link org.mule.runtime.extension.api.ExtensionManager}. It reads the extension manifest file using the extension class loader
+ * {@link org.mule.runtime.core.api.extension.ExtensionManager}. It reads the extension manifest file using the extension class loader
  * that loads the extension annotated class and register the extension to the manager.
  *
  * @since 4.0
@@ -36,7 +42,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
 
   private static Logger LOGGER = LoggerFactory.getLogger(IsolatedClassLoaderExtensionsManagerConfigurationBuilder.class);
 
-  private final ExtensionManagerAdapterFactory extensionManagerAdapterFactory;
+  private final ExtensionManagerFactory extensionManagerFactory;
   private final List<ArtifactClassLoader> pluginsClassLoaders;
 
   /**
@@ -49,15 +55,15 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    *        plugin or extension plugin).
    */
   public IsolatedClassLoaderExtensionsManagerConfigurationBuilder(final List<ArtifactClassLoader> pluginsClassLoaders) {
-    this.extensionManagerAdapterFactory = new DefaultExtensionManagerAdapterFactory();
+    this.extensionManagerFactory = new DefaultExtensionManagerFactory();
     this.pluginsClassLoaders = pluginsClassLoaders;
   }
 
   /**
    * Goes through the list of plugins {@link ArtifactClassLoader}s to check if they have an extension descriptor and if they do it
-   * will parse it and register the extension into the {@link org.mule.runtime.extension.api.ExtensionManager}
+   * will parse it and register the extension into the {@link org.mule.runtime.core.api.extension.ExtensionManager}
    * <p/>
-   * It has to use reflection to access these classes due to the current execution of this method would be with the applciation
+   * It has to use reflection to access these classes due to the current execution of this method would be with the application
    * {@link ArtifactClassLoader} and the list of plugin {@link ArtifactClassLoader} was instantiated with the Launcher
    * {@link ClassLoader} so casting won't work here.
    *
@@ -66,7 +72,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    */
   @Override
   protected void doConfigure(final MuleContext muleContext) throws Exception {
-    final ExtensionManagerAdapter extensionManager = createExtensionManager(muleContext);
+    final ExtensionManager extensionManager = createExtensionManager(muleContext);
 
     for (Object pluginClassLoader : pluginsClassLoaders) {
       String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
@@ -74,8 +80,13 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
       URL manifestUrl = getExtensionManifest(classLoader);
       if (manifestUrl != null) {
         LOGGER.debug("Discovered extension: {}", artifactName);
+
+        //TODO: Remove when MULE-11136
         ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-        extensionManager.registerExtension(extensionManifest, classLoader);
+        Map<String, Object> params = new HashMap<>();
+        params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
+        params.put(VERSION, extensionManifest.getVersion());
+        extensionManager.registerExtension(new JavaExtensionModelLoader().loadExtensionModel(classLoader, params));
       } else {
         LOGGER.debug(
                      "Discarding plugin artifact class loader with artifactName '{}' due to it doesn't have an extension descriptor",
@@ -101,17 +112,21 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   }
 
   /**
-   * Creates an {@link ExtensionManagerAdapter} to be used for registering the extensions.
+   * Creates an {@link ExtensionManager} to be used for registering the extensions.
    *
    * @param muleContext a {@link MuleContext} needed for creating the manager
-   * @return an {@link ExtensionManagerAdapter}
-   * @throws InitialisationException if an error occurrs while initializing the manager.
+   * @return an {@link ExtensionManager}
+   * @throws InitialisationException if an error occurs while initializing the manager.
    */
-  private ExtensionManagerAdapter createExtensionManager(final MuleContext muleContext) throws InitialisationException {
-    try {
-      return extensionManagerAdapterFactory.createExtensionManager(muleContext);
-    } catch (Exception e) {
-      throw new InitialisationException(e, muleContext);
+  private ExtensionManager createExtensionManager(final MuleContext muleContext) throws InitialisationException {
+    if (muleContext.getExtensionManager() != null) {
+      // TODO MULE-10982: implement a testing framework for XML based connectors, for now we workaround the current generation of the ExtensionManager if it was already created (see org.mule.test.operation.AbstractXmlExtensionMuleArtifactFunctionalTestCase)
+      return muleContext.getExtensionManager();
     }
+    ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
+
+    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+
+    return extensionManager;
   }
 }

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
-import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
@@ -158,7 +158,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   }
 
   private void assertStopped(final MuleLoggerContext context) {
-    final ValueHolder<Boolean> contextWasAccessibleDuringShutdown = new ValueHolder<>(true);
+    final Reference<Boolean> contextWasAccessibleDuringShutdown = new Reference<>(true);
     PollingProber pollingProber = new PollingProber(1000, 10);
     pollingProber.check(new JUnitProbe() {
 

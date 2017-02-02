@@ -9,16 +9,15 @@ package org.mule.runtime.module.http.internal.listener;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 import org.junit.Rule;
@@ -53,17 +52,19 @@ public class HttpListenerConnectionManagerTestCase extends AbstractMuleTestCase 
     final HttpListenerConnectionManager connectionManager = new HttpListenerConnectionManager();
     final MuleContext mockMuleContext = mockContextWithServices();
     connectionManager.setMuleContext(mockMuleContext);
-    Supplier<Executor> mockWorkManagerSource = mock(Supplier.class);
+    Supplier<Scheduler> mockSchedulerSource = mock(Supplier.class);
     when((Object) (mockMuleContext.getRegistry().lookupObject(TcpServerSocketProperties.class)))
         .thenReturn(mock(TcpServerSocketProperties.class));
 
     connectionManager.initialise();
-    connectionManager.createServer(new ServerAddress(firstIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+    connectionManager.createServer(new DefaultServerAddress(firstIp, PORT), mockSchedulerSource, false,
+                                   CONNECTION_IDLE_TIMEOUT);
     expectedException.expect(MuleRuntimeException.class);
     expectedException.expectMessage(String.format(HttpListenerConnectionManager.SERVER_ALREADY_EXISTS_FORMAT, PORT, secondIp));
 
     try {
-      connectionManager.createServer(new ServerAddress(secondIp, PORT), mockWorkManagerSource, false, CONNECTION_IDLE_TIMEOUT);
+      connectionManager.createServer(new DefaultServerAddress(secondIp, PORT), mockSchedulerSource, false,
+                                     CONNECTION_IDLE_TIMEOUT);
     } finally {
       connectionManager.dispose();
     }

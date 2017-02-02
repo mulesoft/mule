@@ -14,6 +14,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 
 import javax.xml.stream.XMLStreamException;
@@ -32,6 +33,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
     registerSourceType(DataType.fromType(Source.class));
     registerSourceType(DataType.INPUT_STREAM);
     registerSourceType(DataType.fromType(Document.class));
+    registerSourceType(DataType.fromType(ByteArrayOutputStream.class));
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.STRING);
 

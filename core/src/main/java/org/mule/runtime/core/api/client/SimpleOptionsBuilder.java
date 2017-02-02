@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.client;
 
-import org.mule.runtime.core.client.SimpleOptions;
+import org.mule.runtime.core.internal.client.SimpleOptions;
 
 /**
  * Most basic options builder that every connector must be able to use for configuration.

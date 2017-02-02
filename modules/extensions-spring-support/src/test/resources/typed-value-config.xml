@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+
+
+    <typed-value:config name="config"/>
+
+    <flow name="typedValueForString">
+        <set-payload value="This is a string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-parameter stringValue="#[payload]"/>
+    </flow>
+
+    <flow name="typedValueForStringFromByteArray">
+        <set-payload value="#[mel:'This is a string'.getBytes()]" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-parameter stringValue="#[payload]"/>
+    </flow>
+
+    <flow name="typedValueForStringWithDefaultValue">
+        <typed-value:typed-value-operation-string-parameter/>
+    </flow>
+
+    <flow name="typedValueForStringList">
+        <set-payload value="#[mel:['string','string']]" mimeType="application/java" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-list-parameter stringValues="#[payload]"/>
+    </flow>
+    <flow name="typedValueForStringListAsChild">
+        <typed-value:typed-value-operation-string-list-parameter>
+            <typed-value:string-values>
+                <typed-value:string-value value="string"/>
+                <typed-value:string-value value="string"/>
+            </typed-value:string-values>
+        </typed-value:typed-value-operation-string-list-parameter>
+    </flow>
+
+    <flow name="typedValueForStringMap">
+        <set-payload value="#[mel:['string':'string']]" mimeType="application/java" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-string-map-parameter stringMapValues="#[payload]"/>
+    </flow>
+
+    <flow name="typedValueForStringMapAsChild">
+        <typed-value:typed-value-operation-string-map-parameter>
+            <typed-value:string-map-values>
+                <typed-value:string-map-value key="string" value="string"/>
+            </typed-value:string-map-values>
+        </typed-value:typed-value-operation-string-map-parameter>
+    </flow>
+
+    <flow name="typedValueForDoorAsChild">
+        <typed-value:typed-value-operation-door-parameter>
+            <typed-value:door-value victim="Saul" address="123"/>
+        </typed-value:typed-value-operation-door-parameter>
+    </flow>
+
+    <flow name="typedValueForDoorListAsChild">
+        <typed-value:typed-value-operation-door-list-parameter>
+            <typed-value:door-values>
+                <typed-value:door victim="Saul" address="123"/>
+            </typed-value:door-values>
+        </typed-value:typed-value-operation-door-list-parameter>
+    </flow>
+
+    <flow name="typedValueForDoorMapAsChild">
+        <typed-value:typed-value-operation-door-map-parameter>
+            <typed-value:door-map-values>
+                <typed-value:door-map-value key="key">
+                    <typed-value:door victim="Saul" address="123"/>
+                </typed-value:door-map-value>
+            </typed-value:door-map-values>
+        </typed-value:typed-value-operation-door-map-parameter>
+    </flow>
+
+    <flow name="typedValueOperationStringMapListParameter">
+        <typed-value:typed-value-operation-string-map-list-parameter>
+            <typed-value:door-map-list-values>
+                <typed-value:door-map-list-value key="key">
+                    <typed-value:door-map-list-value-item value="string"/>
+                </typed-value:door-map-list-value>
+            </typed-value:door-map-list-values>
+        </typed-value:typed-value-operation-string-map-list-parameter>
+    </flow>
+
+    <flow name="typedValueForStringOnSourceOnSuccess" initialState="stopped">
+        <typed-value:source stringValue="#[payload]"/>
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+    </flow>
+
+    <flow name="typedValueForStringInsidePojo">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-for-string-inside-pojo>
+            <typed-value:differed-door address="#[payload]"/>
+        </typed-value:typed-value-for-string-inside-pojo>
+    </flow>
+
+    <flow name="typedValueForContentWithExplicitValue">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-pojo-with-content >
+            <typed-value:param >
+                <typed-value:description>
+                    #[payload]
+                </typed-value:description>
+            </typed-value:param>
+        </typed-value:typed-value-operation-pojo-with-content>
+    </flow>
+
+    <flow name="typedValueForContentWithDefaultValue">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-pojo-with-content >
+            <typed-value:param />
+        </typed-value:typed-value-operation-pojo-with-content>
+    </flow>
+
+    <flow name="typedValueForContentOnNullSafePojoWithDefaultValue">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
+            <typed-value:param />
+        </typed-value:typed-value-operation-pojo-with-nullsafe-and-content>
+    </flow>
+
+    <flow name="typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-pojo-with-nullsafe-and-content />
+    </flow>
+
+    <flow name="typedValueOnContentOnNullSafeWithExplicitValues">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
+            <typed-value:param weight="#[5]">
+                <typed-value:description>
+                    #[payload]
+                </typed-value:description>
+                <typed-value:brand-name>
+                    #[payload]
+                </typed-value:brand-name>
+            </typed-value:param>
+        </typed-value:typed-value-operation-pojo-with-nullsafe-and-content>
+    </flow>
+
+    <flow name="typedValueOperationWithExplicitStringContent">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-with-string-content>
+            <typed-value:string-description>
+                #[payload]
+            </typed-value:string-description>
+        </typed-value:typed-value-operation-with-string-content>
+    </flow>
+
+    <flow name="typedValueOperationWithDefaultStringContent">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-with-string-content/>
+    </flow>
+
+    <flow name="typedValueOperationWithExplicitNullContent">
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-operation-with-string-content>
+            <typed-value:string-description>
+                #[null]
+            </typed-value:string-description>
+        </typed-value:typed-value-operation-with-string-content>
+    </flow>
+</mule>

@@ -8,13 +8,18 @@ package org.mule.runtime.module.extension.internal.capability.xml;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-@Extension(name = "documentation")
+/**
+ * This is some documentation.
+ */
+@Extension(name = "documentation", description = "Test Extension Description")
 @Operations({TestDocumentedExtensionOperations.class})
+@ConnectionProviders(TestDocumentedProvider.class)
 @Xml(namespaceLocation = "namespaceLocation", namespace = "documentation")
 public class TestExtensionWithDocumentation {
 
@@ -31,6 +36,6 @@ public class TestExtensionWithDocumentation {
   @Optional
   private String configParameterWithComplexJavadoc;
 
-  @ParameterGroup
+  @ParameterGroup(name = "group")
   private TestDocumentedParameterGroup group;
 }

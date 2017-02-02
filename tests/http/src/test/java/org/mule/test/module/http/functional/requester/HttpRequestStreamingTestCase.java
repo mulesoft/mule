@@ -13,9 +13,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -41,6 +42,16 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
   @Override
   protected String getConfigFile() {
     return "http-request-streaming-config.xml";
+  }
+
+  @Test
+  public void defaultsToConfigStreamingModeWhenEmpty() throws Exception {
+    assertNoStreaming(runFlowWithPayload("streamingAutoConfigMode", new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+  }
+
+  @Test
+  public void overridesConfigStreamingModeWhenSet() throws Exception {
+    assertStreaming(runFlowWithPayload("streamingAlwaysConfigMode", new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
   }
 
   // AUTO

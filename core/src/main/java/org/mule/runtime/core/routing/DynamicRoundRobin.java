@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-
 
 /**
  * RoundRobin divides the messages it receives among its target routes in round-robin fashion. The set of routes is obtained
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * This includes messages received on all threads, so there is no guarantee that messages received from a splitter are sent to
  * consecutively numbered targets.
  */
-public class DynamicRoundRobin implements Processor, Initialisable, MuleContextAware {
+public class DynamicRoundRobin extends AbstractAnnotatedObject implements Processor, Initialisable, MuleContextAware {
 
   private RoundRobinRoutingStrategy routingStrategy;
   private MuleContext muleContext;

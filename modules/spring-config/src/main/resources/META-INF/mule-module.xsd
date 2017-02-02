@@ -38,18 +38,7 @@
                         </xsd:annotation>
                         <xsd:complexType>
                             <xsd:sequence>
-                                <xsd:element name="parameter" minOccurs="1" maxOccurs="unbounded">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            An named element that will be consumed only in the scope of the body element by the list of message processors.
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                    <xsd:complexType>
-                                        <xsd:attribute name="name"/>
-                                        <xsd:attribute name="defaultValue" use="optional"/>
-                                        <xsd:attribute name="type" type="inputType" use="required"/>
-                                    </xsd:complexType>
-                                </xsd:element>
+                                <xsd:element ref="parameter" minOccurs="1" maxOccurs="unbounded"/>
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
@@ -65,16 +54,7 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
-                    <xsd:element name="output" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Defines the output of the operation if exists, void otherwise.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                        <xsd:complexType>
-                            <xsd:attribute name="type" type="outputSimpleType" use="required"/>
-                        </xsd:complexType>
-                    </xsd:element>
+                    <xsd:element ref="output" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
@@ -83,6 +63,61 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="parameter" type="parameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A parameter element defines an input value for the operation in which it is define. Such parameter must be defined with a meaningful name, a type which defines the kind of content the parameter must have and optionally a default value that will be used if the invocation to the operation does not defines a value for the parameter. The parameter can be accessed within the body definition of the operation using an expression such as #[mel: param.paramName]
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="parameterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="name"/>
+                <xsd:attribute name="defaultValue" use="optional"/>
+                <xsd:attribute name="type" type="xsd:string"/>
+                <xsd:attribute name="password" type="xsd:boolean" default="false"/>
+                <xsd:attribute name="role" type="roleParameterType" default="BEHAVIOUR"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="output" type="outputType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines the output of the operation if exists, void otherwise.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="outputType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="property" type="propertyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A property element defines an input value for the operation in which it is define. Such property must be defined with a meaningful name, a type which defines the kind of content the property must have and optionally a default value that will be used if the invocation to the operation does not defines a value for the property. The property can be accessed within the body definition of the operation using an expression such as #[mel: property.paramName]
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="propertyType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="name" use="required"/>
+                <xsd:attribute name="defaultValue" use="optional"/>
+                <xsd:attribute name="type" type="xsd:string" use="required"/>
+                <xsd:attribute name="password" type="xsd:boolean" default="false"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -97,18 +132,7 @@
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence maxOccurs="unbounded" minOccurs="1">
                     <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                        <xsd:element name="property">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Parametrization of the module when being consumed (similarly to what an operation is).
-                                </xsd:documentation>
-                            </xsd:annotation>
-                            <xsd:complexType>
-                                <xsd:attribute name="name" use="required"/>
-                                <xsd:attribute name="defaultValue" use="optional"/>
-                                <xsd:attribute name="type" type="inputType" use="required"/>
-                            </xsd:complexType>
-                        </xsd:element>
+                        <xsd:element ref="property"/>
                         <xsd:element ref="operation" />
                         <xsd:group ref="mule:muleRootElements">
                             <xsd:annotation>
@@ -133,40 +157,48 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="category" type="categoryType" default="COMMUNITY">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Expected category of the module.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="vendor" type="xsd:string" default="MuleSoft">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Expected vendor of the module.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:simpleType name="inputType">
+    <xsd:simpleType name="categoryType">
         <xsd:annotation>
             <xsd:documentation>
-                Set of defined primitive types inputs for any operation or property.
+                Set of defined categories for a module.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="string"/>
-            <xsd:enumeration value="boolean"/>
-            <xsd:enumeration value="datetime"/>
-            <xsd:enumeration value="date"/>
-            <xsd:enumeration value="integer"/>
-            <xsd:enumeration value="time"/>
+            <xsd:enumeration value="COMMUNITY"/>
+            <xsd:enumeration value="SELECT"/>
+            <xsd:enumeration value="PREMIUM"/>
+            <xsd:enumeration value="CERTIFIED"/>
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType name="outputSimpleType">
+    <xsd:simpleType name="roleParameterType">
         <xsd:annotation>
             <xsd:documentation>
-                Set of defined primitive types output for any operation.
+                Set of defined roles for a given parameter. BEHAVIOUR will render attributes, CONTENT implies support for DataWeave in place and PRIMARY works similarly to CONTENT although it also implies it will map to the payload
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="string"/>
-            <xsd:enumeration value="boolean"/>
-            <xsd:enumeration value="datetime"/>
-            <xsd:enumeration value="date"/>
-            <xsd:enumeration value="integer"/>
-            <xsd:enumeration value="time"/>
-            <xsd:enumeration value="void"/>
+            <xsd:enumeration value="BEHAVIOUR"/>
+            <xsd:enumeration value="CONTENT"/>
+            <xsd:enumeration value="PRIMARY"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

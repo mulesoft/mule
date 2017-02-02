@@ -32,7 +32,7 @@
     </httpn:listener-config>
 
     <httpn:request-config name="clientGlobalConfig">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="globalTlsContext"/>
+        <httpn:request-connection protocol="HTTPS" host="localhost" tlsContext="globalTlsContext"/>
     </httpn:request-config>
 
     <flow name="testInsecureServer">

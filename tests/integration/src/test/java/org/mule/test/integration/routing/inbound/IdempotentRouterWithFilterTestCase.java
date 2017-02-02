@@ -31,7 +31,7 @@ public class IdempotentRouterWithFilterTestCase extends AbstractIntegrationTestC
   @Test
   @SuppressWarnings("null")
   public void testWithValidData() throws Exception {
-    flowRunner("IdempotentPlaceHolder").withPayload("Mule is the best!").asynchronously().run();
+    flowRunner("IdempotentPlaceHolder").withPayload("Mule is the best!").run();
     MuleClient myClient = muleContext.getClient();
     InternalMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().get();
 
@@ -47,7 +47,7 @@ public class IdempotentRouterWithFilterTestCase extends AbstractIntegrationTestC
    */
   @Test
   public void testWithInvalidData() throws Exception {
-    flowRunner("IdempotentPlaceHolder").withPayload(new Object()).asynchronously().run();
+    flowRunner("IdempotentPlaceHolder").withPayload(new Object()).run();
     MuleClient myClient = muleContext.getClient();
     assertThat(myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }

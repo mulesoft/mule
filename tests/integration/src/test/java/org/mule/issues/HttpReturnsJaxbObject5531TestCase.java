@@ -7,18 +7,18 @@
 package org.mule.issues;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.test.AbstractIntegrationTestCase;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -40,6 +40,9 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractIntegrationTestCa
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+
   @Override
   protected String getConfigFile() {
     return "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml";
@@ -47,12 +50,12 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractIntegrationTestCa
 
   @Test
   public void testGetWeather() throws Exception {
-    String testUrl = "http://localhost:" + port1.getNumber() + "/test";
-    MuleClient client = muleContext.getClient();
-    Object response = client.send(testUrl, InternalMessage.of("hello"), newOptions().method(POST.name()).build());
-    assertNotNull(response);
-    String stringResponse = (String) new ObjectToString().transform(response, UTF_8);
-    assertTrue(stringResponse.contains("<Success>true</Success>"));
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + port1.getNumber() + "/test").setMethod(POST.name()).build();
+
+    HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream(), UTF_8);
+    assertTrue(payload.contains("<Success>true</Success>"));
   }
 
   public static class WeatherReport implements Callable {

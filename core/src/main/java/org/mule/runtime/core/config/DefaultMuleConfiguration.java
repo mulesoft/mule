@@ -6,25 +6,24 @@
  */
 package org.mule.runtime.core.config;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.FatalException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.NetworkUtils;
-import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.IOException;
@@ -154,7 +153,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   private ObjectSerializer defaultObjectSerializer;
 
   /**
-   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link Flow}s which
+   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link org.mule.runtime.core.api.construct.Flow}s which
    * doesn't specify otherwise
    *
    * @since 3.7.0
@@ -204,7 +203,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
     if (containerMode) {
-      final String muleHome = System.getProperty("mule.home");
+      final String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
       // in container mode the id is the app name, have each app isolate its work dir
       if (!isStandalone()) {
         // fallback to current dir as a parent
@@ -237,15 +236,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (p != null) {
       systemModelType = p;
     }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
-    if (p != null) {
-      responseTimeout = NumberUtils.toInt(p);
-    }
-    p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
-    if (p != null) {
-      defaultTransactionTimeout = NumberUtils.toInt(p);
-    }
-
     p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
     if (p != null) {
       workingDirectory = p;
@@ -315,7 +305,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * </ul>
    */
   protected void validateXML() throws FatalException {
-    SAXParserFactory f = new XMLSecureFactories().createSaxParserFactory();
+    SAXParserFactory f = XMLSecureFactories.createDefault().getSAXParserFactory();
     if (f == null || f.getClass().getName().indexOf("crimson") != -1) {
       throw new FatalException(CoreMessages.valueIsInvalidFor(f.getClass().getName(), "javax.xml.parsers.SAXParserFactory"),
                                this);

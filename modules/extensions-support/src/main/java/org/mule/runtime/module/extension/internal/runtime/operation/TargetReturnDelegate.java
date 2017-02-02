@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
@@ -28,17 +29,19 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param target the name of the variable in which the output message will be set
-   * @param muleContext the current {@link MuleContext}
+   * @param componentModel the component which produces the return value
+   * @param target         the name of the variable in which the output message will be set
+   * @param muleContext    the current {@link MuleContext}
    */
-  TargetReturnDelegate(String target, MuleContext muleContext) {
-    super(muleContext);
+  TargetReturnDelegate(String target, ComponentModel componentModel, MuleContext muleContext) {
+    super(componentModel, muleContext);
     this.target = target;
   }
 
   @Override
-  public MuleEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return org.mule.runtime.core.api.Event.builder(operationContext.getEvent())
-        .addVariable(target, toMessage(value, operationContext)).build();
+  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+    return Event.builder(operationContext.getEvent())
+        .addVariable(target, toMessage(value, operationContext))
+        .build();
   }
 }

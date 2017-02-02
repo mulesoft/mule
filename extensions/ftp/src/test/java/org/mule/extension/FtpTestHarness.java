@@ -7,6 +7,7 @@
 package org.mule.extension;
 
 import org.mule.extension.ftp.api.FtpFileAttributes;
+import org.mule.functional.junit4.rules.ExpectedError;
 
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
@@ -41,7 +42,7 @@ public interface FtpTestHarness extends TestRule {
   /**
    * @return the {@link ExpectedException} rule used for the current test
    */
-  ExpectedException expectedException();
+  ExpectedError expectedError();
 
   /**
    * Creates a directory

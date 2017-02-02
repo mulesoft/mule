@@ -11,6 +11,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
@@ -37,8 +38,7 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType> {
   @Override
   protected boolean matchesSafely(DataType dataType) {
     boolean sameType = type == null ? dataType.getType() == null : type.equals(dataType.getType());
-    boolean sameEncoding = encoding == null ? !dataType.getMediaType().getCharset().isPresent()
-        : encoding.equals(dataType.getMediaType().getCharset().get());
+    boolean sameEncoding = dataType.getMediaType().getCharset().equals(Optional.ofNullable(encoding));
     boolean sameMimeType = mimeType == null ? dataType.getMediaType() == null : mimeType.matches(dataType.getMediaType());
 
     return sameType && sameEncoding && sameMimeType;

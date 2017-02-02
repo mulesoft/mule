@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.parameterDescriptor;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -17,12 +19,12 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.builder.InputMetadataDescriptorBuilder;
-import org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder;
-import org.mule.runtime.api.metadata.descriptor.builder.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -48,20 +50,25 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    */
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
-    InputMetadataDescriptorBuilder input = MetadataDescriptorBuilder.inputDescriptor();
-
+    InputMetadataDescriptor.InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
     List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
-    for (ParameterModel parameter : component.getParameterModels()) {
+    for (ParameterModel parameter : component.getAllParameterModels()) {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
-      input.withParameter(parameter.getName(), result);
+      input.withParameter(parameter.getName(), result.get());
       results.add(result);
     }
+    List<MetadataFailure> failures = results.stream().flatMap(e -> e.getFailures().stream()).collect(toList());
+    return failures.isEmpty() ? success(input.build()) : failure(input.build(), failures);
+  }
 
-    if (results.isEmpty()) {
-      return success(input.build());
-    }
-
-    return mergeResults(input.build(), results.toArray(new MetadataResult<?>[] {}));
+  /**
+   * Given a parameters name, returns the associated {@link NamedTypeResolver}.
+   * 
+   * @param parameterName name of the parameter
+   * @return {@link NamedTypeResolver} of the parameter
+   */
+  NamedTypeResolver getParameterResolver(String parameterName) {
+    return resolverFactory.getInputResolver(parameterName);
   }
 
   /**
@@ -78,18 +85,16 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
                                                                                      MetadataContext context, Object key) {
 
-    ParameterMetadataDescriptorBuilder descriptorBuilder = parameterDescriptor(parameter.getName());
+    ParameterMetadataDescriptorBuilder descriptorBuilder = ParameterMetadataDescriptor.builder(parameter.getName());
     if (!parameter.hasDynamicType()) {
       return success(descriptorBuilder.withType(parameter.getType()).build());
     }
 
     descriptorBuilder.dynamic(true);
-
     MetadataResult<MetadataType> inputMetadataResult = getParameterMetadata(parameter, context, key);
     MetadataType type = inputMetadataResult.get() == null ? parameter.getType() : inputMetadataResult.get();
     ParameterMetadataDescriptor descriptor = descriptorBuilder.withType(type).build();
-
-    return inputMetadataResult.isSuccess() ? success(descriptor) : failure(descriptor, inputMetadataResult);
+    return inputMetadataResult.isSuccess() ? success(descriptor) : failure(descriptor, inputMetadataResult.getFailures());
   }
 
   /**
@@ -101,9 +106,20 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * @return a {@link MetadataResult} with the {@link MetadataType} of the {@code parameter}.
    */
   private MetadataResult<MetadataType> getParameterMetadata(ParameterModel parameter, MetadataContext context, Object key) {
-    boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
-    return resolveMetadataType(allowsNullType, parameter.getType(),
-                               () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key),
-                               parameter.getName());
+    try {
+      boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
+      MetadataType metadata = resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key);
+      if (isMetadataResolvedCorrectly(metadata, allowsNullType)) {
+        return success(metadata);
+      }
+      MetadataFailure failure = newFailure()
+          .withMessage(format("Error resolving metadata for the [%s] input parameter", parameter.getName()))
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onParameter(parameter.getName());
+      return failure(parameter.getType(), failure);
+    } catch (Exception e) {
+      return failure(parameter.getType(), newFailure(e).onParameter(parameter.getName()));
+    }
   }
 }

@@ -9,9 +9,10 @@ package org.mule.test.integration.messaging.meps;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class InOnlyOutOnlyTestCase extends AbstractIntegrationTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    FlowRunner baseRunner = flowRunner("In-Only_Out-Only-Service").withPayload("some data").asynchronously();
+    FlowRunner baseRunner = flowRunner("In-Only_Out-Only-Service").withPayload("some data");
     baseRunner.run();
     baseRunner.reset();
     baseRunner.withInboundProperty("foo", "bar").run();

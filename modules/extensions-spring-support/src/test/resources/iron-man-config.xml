@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
+
+    <marvel:iron-man name="ironMan">
+        <marvel:missile-connection />
+    </marvel:iron-man>
+
+    <marvel:iron-man name="warMachine">
+        <marvel:odd-missile-connection>
+            <reconnect count="3" frequency="200"/>
+        </marvel:odd-missile-connection>
+    </marvel:iron-man>
+
+    <flow name="fireMissile">
+        <test:assert-intercepting responseSameTask="false" />
+        <marvel:fire-missile at="#[mel:payload]" config-ref="ironMan"/>
+    </flow>
+
+    <flow name="warMachineFireMissile">
+        <test:assert-intercepting responseSameTask="false" />
+        <marvel:fire-missile at="#[mel:payload]" config-ref="warMachine"/>
+    </flow>
+
+    <flow name="computeFlightPlan">
+        <test:assert-intercepting responseSameTask="false" />
+        <marvel:compute-flight-plan config-ref="ironMan" />
+    </flow>
+
+</mule>

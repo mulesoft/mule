@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 
 /**
  * Extension point for overriding MessageProcessorPolling functionality.
@@ -38,10 +39,11 @@ public abstract class MessageProcessorPollingInterceptor {
    *
    * @param sourceEvent The event that was returned by the polling processor
    * @param event The event that is about to be sent to the rest of the flow
+   * @param flow the flow that will be executed for the polled events
    *
    * @return The event that should be sent to the rest of the flow. Must not be null
    */
-  public Event prepareRouting(Event sourceEvent, Event event) throws MuleException {
+  public Event prepareRouting(Event sourceEvent, Event event, FlowConstruct flow) throws MuleException {
     return event;
   }
 

@@ -13,9 +13,10 @@ import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
-import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.util.NullDslResolvingContext;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -29,12 +30,11 @@ import java.util.Set;
  */
 abstract class AbstractXmlResourceFactory implements DslResourceFactory {
 
-
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
     Set<ImportedTypeModel> importedTypes = extensionModel.getImportedTypes();
     DslResolvingContext dslContext = importedTypes.isEmpty()
-        ? name -> Optional.empty()
+        ? new NullDslResolvingContext()
         : new ClasspathBasedDslContext(extensionModel.getModelProperty(ImplementingTypeModelProperty.class)
             .map(mp -> mp.getType().getClassLoader())
             .orElse(Thread.currentThread().getContextClassLoader()));

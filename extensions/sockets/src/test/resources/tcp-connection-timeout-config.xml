@@ -10,8 +10,8 @@
         <sockets:tcp-requester-connection host="10.255.255.255" port="${port}"
                                           connectionTimeout="100"
                                           sendTcpNoDelay="true">
-            <pooling-profile maxActive="1"/>
             <reconnect blocking="false" />
+            <pooling-profile maxActive="1"/>
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
@@ -21,7 +21,7 @@
     </flow>
 
     <sub-flow name="onIncomingConnection">
-        <expression-component>new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
+        <expression-component>mel:new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
         </expression-component>
     </sub-flow>
 </mule>

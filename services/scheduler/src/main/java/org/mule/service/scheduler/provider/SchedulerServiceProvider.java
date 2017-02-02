@@ -22,11 +22,12 @@ import java.util.List;
  */
 public class SchedulerServiceProvider implements ServiceProvider {
 
-  private final SchedulerService service = new DefaultSchedulerService();
+  private final ServiceDefinition serviceDefinition =
+      new ServiceDefinition(SchedulerService.class, new DefaultSchedulerService());
 
   @Override
   public List<ServiceDefinition> providedServices() {
-    return singletonList(new ServiceDefinition(SchedulerService.class, service));
+    return singletonList(serviceDefinition);
   }
 
 }

@@ -13,12 +13,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
-import org.mule.runtime.dsl.api.config.ComponentConfiguration;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
+import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -45,7 +44,7 @@ public class TemporaryArtifactConnectivityTestingServiceBuilderTestCase extends 
 
   @Test(expected = IllegalStateException.class)
   public void noExtensionConfigured() {
-    builder.setArtifactConfiguration(getArtifactConfiguration()).build();
+    builder.setArtifactDeclaration(getArtifactDeclaration()).build();
   }
 
   @Test(expected = IllegalStateException.class)
@@ -57,7 +56,7 @@ public class TemporaryArtifactConnectivityTestingServiceBuilderTestCase extends 
   public void buildArtifact() {
     when(mockServiceRegistry.lookupProviders(eq(ConnectivityTestingStrategy.class), any()))
         .thenReturn(asList(mock(ConnectivityTestingStrategy.class)));
-    addExtension().setArtifactConfiguration(getArtifactConfiguration());
+    addExtension().setArtifactDeclaration(getArtifactDeclaration());
 
     builder.build();
   }
@@ -67,9 +66,8 @@ public class TemporaryArtifactConnectivityTestingServiceBuilderTestCase extends 
     return builder;
   }
 
-  private ArtifactConfiguration getArtifactConfiguration() {
-    return new ArtifactConfiguration(asList(new ComponentConfiguration.Builder().setIdentifier("identifier")
-        .setNamespace("namespace").build()));
+  private ArtifactDeclaration getArtifactDeclaration() {
+    return new ArtifactDeclaration();
   }
 
 }

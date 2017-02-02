@@ -15,7 +15,7 @@
     <flow name="foo">
         <httpn:listener path="foo" config-ref="listenerConfig"/>
         <append-string-transformer message=" bar"/>
-        <set-property propertyName="foo" value="#[message.inboundProperties.foo]"/>
+        <set-property propertyName="foo" value="#[mel:message.inboundProperties.foo]"/>
         <echo-component/>
     </flow>
     

@@ -30,7 +30,7 @@ public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testSplitter() throws Exception {
     Apple apple = new Apple();
-    flowRunner("Distributor").withPayload(apple).asynchronously().run();
+    flowRunner("Distributor").withPayload(apple).run();
 
     List<Apple> results = new ArrayList<>(3);
 

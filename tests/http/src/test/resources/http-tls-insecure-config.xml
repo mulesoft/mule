@@ -101,23 +101,23 @@
 
     <flow name="testFlowGlobalContextInsecureClientValid">
         <httpn:listener config-ref="globalConfigInsecure" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextSecureClientValid">
         <httpn:listener config-ref="globalConfigSecure" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextSecureClientInvalid">
         <httpn:listener config-ref="globalConfigSecureInvalid" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextDefaultClientValid">
         <httpn:listener config-ref="globalConfigDefault" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextClientDefaultInvalid">
         <httpn:listener config-ref="globalConfigDefaultInvalid" path="/" allowedMethods="GET"/>
-        <expression-component>payload = 'ok'</expression-component>
+        <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
 
 </mule>

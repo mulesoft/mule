@@ -39,7 +39,11 @@ import java.sql.SQLDataException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Error Handler")
 public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Rule
@@ -227,6 +231,9 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
     public Event process(Event event) throws MuleException {
       Throwable exception = (Throwable) event.getVariable("exception").getValue();
       if (exception instanceof MuleException) {
+        if (exception instanceof MessagingException) {
+          exception = new MessagingException(event, exception);
+        }
         throw (MuleException) exception;
       } else if (exception instanceof RuntimeException) {
         throw (RuntimeException) exception;

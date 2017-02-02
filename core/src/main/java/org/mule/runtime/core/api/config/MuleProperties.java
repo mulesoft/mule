@@ -140,11 +140,6 @@ public class MuleProperties {
   public static final String OBJECT_MULE_OUTBOUND_ENDPOINT_EXECUTOR_FACTORY = "_muleOutboundEndpointExecutorFactory";
   public static final String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";
   public static final String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
-  public static final String OBJECT_DEFAULT_THREADING_PROFILE = "_defaultThreadingProfile";
-  public static final String OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "_defaultMessageDispatcherThreadingProfile";
-  public static final String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
-  public static final String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
-  public static final String OBJECT_DEFAULT_SERVICE_THREADING_PROFILE = "_defaultServiceThreadingProfile";
   public static final String OBJECT_DEFAULT_GLOBAL_EXCEPTION_STRATEGY = "_defaultGlobalExceptionStrategy";
   public static final String OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE = "_defaultRetryPolicyTemplate";
   public static final String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
@@ -167,6 +162,10 @@ public class MuleProperties {
   public static final String OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER = "_muleMessageProcessingFlowTraceManager";
   public static final String OBJECT_CONNECTIVITY_TESTING_SERVICE = "_muleConnectivityTestingService";
   public static final String OBJECT_CONFIGURATION_COMPONENT_LOCATOR = "_muleConfigurationComponentLocator";
+  public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
+  public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
+  public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
+  public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY = "_muleDefaultTlsContextFactoryBuilder";
 
@@ -198,4 +197,5 @@ public class MuleProperties {
   public static final String MULE_DEFAULT_PROCESSING_STRATEGY = SYSTEM_PROPERTY_PREFIX + "default.processing.strategy";
   public static final String MULE_FLOW_TRACE = SYSTEM_PROPERTY_PREFIX + "flowTrace";
   public static final String MULE_LOG_VERBOSE_CLASSLOADING = SYSTEM_PROPERTY_PREFIX + "classloading.verbose";
+  public static final String MULE_MEL_AS_DEFAULT = SYSTEM_PROPERTY_PREFIX + "test.mel.default";
 }

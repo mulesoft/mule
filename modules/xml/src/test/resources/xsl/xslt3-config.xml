@@ -20,7 +20,7 @@
 
     <flow name="nullParam">
         <mulexml:xslt-transformer xsl-file="xsl/param-xslt.xsl">
-            <mulexml:context-property key="vtn" value="#[null]"/>
+            <mulexml:context-property key="vtn" value="#[mel:null]"/>
         </mulexml:xslt-transformer>
     </flow>
 </mule>

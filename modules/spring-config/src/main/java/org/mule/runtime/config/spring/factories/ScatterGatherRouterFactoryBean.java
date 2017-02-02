@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -24,16 +23,17 @@ import org.springframework.beans.factory.FactoryBean;
 public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<ScatterGatherRouter>, MuleContextAware, FlowConstructAware {
 
+  private boolean parallel = true;
   private long timeout = 0;
   private List<Processor> messageProcessors;
   private AggregationStrategy aggregationStrategy;
-  private ThreadingProfile threadingProfile;
   private MuleContext muleContext;
   private FlowConstruct flowConstruct;
 
   @Override
   public ScatterGatherRouter getObject() throws Exception {
     ScatterGatherRouter sg = new ScatterGatherRouter();
+    sg.setParallel(parallel);
     sg.setTimeout(timeout);
     sg.setMuleContext(muleContext);
     sg.setFlowConstruct(flowConstruct);
@@ -44,10 +44,6 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
 
     if (this.aggregationStrategy != null) {
       sg.setAggregationStrategy(this.aggregationStrategy);
-    }
-
-    if (this.threadingProfile != null) {
-      sg.setThreadingProfile(this.threadingProfile);
     }
 
     sg.setAnnotations(getAnnotations());
@@ -68,20 +64,16 @@ public class ScatterGatherRouterFactoryBean extends AbstractAnnotatedObject
     this.messageProcessors = messageProcessors;
   }
 
+  public void setParallel(boolean parallel) {
+    this.parallel = parallel;
+  }
+
   public void setTimeout(long timeout) {
     this.timeout = timeout;
   }
 
   public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
     this.aggregationStrategy = aggregationStrategy;
-  }
-
-  public ThreadingProfile getThreadingProfile() {
-    return this.threadingProfile;
-  }
-
-  public void setThreadingProfile(ThreadingProfile threadingProfile) {
-    this.threadingProfile = threadingProfile;
   }
 
   @Override

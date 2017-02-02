@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-
-public class NullMessageProcessor implements Processor {
+public class NullMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   public Event process(Event event) throws MuleException {
     return event;

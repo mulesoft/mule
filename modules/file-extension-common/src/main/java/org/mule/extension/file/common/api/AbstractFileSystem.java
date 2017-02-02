@@ -8,11 +8,6 @@ package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
 
-import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -21,10 +16,16 @@ import org.mule.extension.file.common.api.command.MoveCommand;
 import org.mule.extension.file.common.api.command.ReadCommand;
 import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
 
@@ -93,25 +94,28 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
-                       Predicate<FileAttributes> matcher) {
-    return getListCommand().list(config, directoryPath, recursive, message, matcher);
+  public List<Result<InputStream, FileAttributes>> list(FileConnectorConfig config,
+                                                        String directoryPath,
+                                                        boolean recursive,
+                                                        MediaType mediaType,
+                                                        Predicate<FileAttributes> matcher) {
+    return getListCommand().list(config, directoryPath, recursive, mediaType, matcher);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
+  public Result<InputStream, FileAttributes> read(FileConnectorConfig config, String filePath, MediaType mediaType,
                                                   boolean lock) {
-    return getReadCommand().read(config, message, filePath, lock);
+    return getReadCommand().read(config, filePath, mediaType, lock);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, Event event,
                     boolean lock, boolean createParentDirectories, String encoding) {
     getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectories, encoding);
   }
@@ -121,7 +125,7 @@ public abstract class AbstractFileSystem implements FileSystem {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
-                   boolean createParentDirectories, MuleEvent event) {
+                   boolean createParentDirectories, Event event) {
     getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories, event);
   }
 
@@ -165,7 +169,7 @@ public abstract class AbstractFileSystem implements FileSystem {
   public final synchronized PathLock lock(Path path, Object... params) {
     PathLock lock = createLock(path, params);
     if (!lock.tryLock()) {
-      throw new IllegalStateException(format("Could not lock file '%s' because it's already owned by another process", path));
+      throw new FileLockedException(format("Could not lock file '%s' because it's already owned by another process", path));
     }
 
     return lock;
@@ -200,7 +204,7 @@ public abstract class AbstractFileSystem implements FileSystem {
   @Override
   public void verifyNotLocked(Path path) {
     if (isLocked(path)) {
-      throw new IllegalStateException(format("File '%s' is locked by another process", path));
+      throw new FileLockedException(format("File '%s' is locked by another process", path));
     }
   }
 

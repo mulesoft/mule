@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -22,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
@@ -49,8 +50,8 @@ import org.slf4j.LoggerFactory;
  * Polling {@link org.mule.runtime.core.api.source.MessageSource}.
  * </p>
  * <p>
- * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.core.api.schedule.Scheduler} at the
- * initialization phase. This {@link org.mule.runtime.core.api.schedule.Scheduler} can be stopped/started and executed by using
+ * The {@link PollingMessageSource} is responsible of creating a {@link org.mule.runtime.api.scheduler.schedule.Scheduler} at the
+ * initialization phase. This {@link org.mule.runtime.api.scheduler.schedule.Scheduler} can be stopped/started and executed by using
  * the {@link org.mule.runtime.core.api.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule
  * server.
  * </p>
@@ -178,23 +179,27 @@ public class PollingMessageSource
 
         @Override
         public Event process() throws Exception {
-          Event event = Event.builder(create(flowConstruct, getPollingUniqueName())).message(request)
-              .exchangePattern(ONE_WAY).flow(flowConstruct).build();
-          event = interceptor.prepareSourceEvent(event);
+          return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
+            Event event = Event.builder(create(flowConstruct, getPollingUniqueName())).message(request)
+                .flow(flowConstruct).build();
+            event = interceptor.prepareSourceEvent(event);
 
-          setCurrentEvent(event);
+            setCurrentEvent(event);
 
-          Event sourceEvent = sourceMessageProcessor.process(event);
-          if (isNewMessage(sourceEvent)) {
-            muleContext.getNotificationManager()
-                .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
-                                                                   flowConstruct, MESSAGE_RECEIVED));
-            event = interceptor.prepareRouting(sourceEvent, sourceEvent);
-            interceptor.postProcessRouting(listener.process(event));
-          } else {
-            logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());
-          }
-          return null;
+            Event sourceEvent = sourceMessageProcessor.process(event);
+            if (isNewMessage(sourceEvent)) {
+              muleContext.getNotificationManager()
+                  .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
+                                                                     flowConstruct, MESSAGE_RECEIVED));
+              event = interceptor.prepareRouting(sourceEvent, sourceEvent, flowConstruct);
+              interceptor.postProcessRouting(listener.process(event));
+            } else {
+              logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());
+            }
+            return null;
+          }, Exception.class, e -> {
+            throw e;
+          });
         }
       });
       if (muleEvent != null) {
@@ -219,39 +224,15 @@ public class PollingMessageSource
    */
   @Override
   public void initialise() throws InitialisationException {
-    if (sourceMessageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) sourceMessageProcessor).setMuleContext(muleContext);
-    }
-    if (sourceMessageProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) sourceMessageProcessor).setFlowConstruct(flowConstruct);
-    }
-    if (sourceMessageProcessor instanceof Initialisable) {
-      ((Initialisable) sourceMessageProcessor).initialise();
-    }
-    if (override instanceof MuleContextAware) {
-      ((MuleContextAware) override).setMuleContext(muleContext);
-    }
-    if (override instanceof FlowConstructAware) {
-      ((FlowConstructAware) override).setFlowConstruct(flowConstruct);
-    }
-    if (override instanceof Initialisable) {
-      ((Initialisable) override).initialise();
-    }
+    initialiseIfNeeded(sourceMessageProcessor, muleContext, flowConstruct);
+    initialiseIfNeeded(override, muleContext, flowConstruct);
     createScheduler();
   }
 
   @Override
   public void dispose() {
-    if (override instanceof Disposable) {
-      try {
-        ((Disposable) override).dispose();
-      } catch (Exception e) {
-        logger.warn(format("Could not dispose polling override of class %s. Message receiver will continue to dispose",
-                           override.getClass().getCanonicalName()),
-                    e);
-      }
-    }
-
+    disposeIfNeeded(sourceMessageProcessor, logger);
+    disposeIfNeeded(override, logger);
     disposeScheduler();
   }
 

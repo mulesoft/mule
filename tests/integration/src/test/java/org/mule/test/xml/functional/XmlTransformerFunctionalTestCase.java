@@ -33,7 +33,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
   }
 
   protected void sendXml() throws Exception {
-    flowRunner("xml to ...").withPayload(SIMPLE_XML).asynchronously().run();
+    flowRunner("xml to ...").withPayload(SIMPLE_XML).run();
   }
 
   protected void sendObject() throws Exception {
@@ -41,7 +41,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
   }
 
   protected void sendObject(String flowName) throws Exception {
-    flowRunner(flowName).withPayload(new Parent(new Child())).asynchronously().run();
+    flowRunner(flowName).withPayload(new Parent(new Child())).run();
   }
 
   @Test

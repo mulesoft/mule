@@ -6,34 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.metadata.java.api.JavaTypeLoader;
-import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.extension.api.dsql.DsqlQuery;
-import org.mule.runtime.extension.api.dsql.QueryTranslator;
-import org.mule.runtime.extension.api.model.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.model.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
-import org.mule.test.metadata.extension.LocationKey;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
+import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
@@ -44,6 +19,29 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.extension.api.dsql.DsqlQuery;
+import org.mule.runtime.extension.api.dsql.QueryTranslator;
+import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
+import org.mule.test.metadata.extension.LocationKey;
+
+import java.lang.reflect.Field;
+import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataKeyIdObjectResolverTestCase {
@@ -255,7 +253,7 @@ public class MetadataKeyIdObjectResolverTestCase {
   }
 
   public void setParameters(ParameterModel... parameterModels) {
-    when(componentModel.getParameterModels()).thenReturn(Arrays.asList(parameterModels));
+    when(componentModel.getAllParameterModels()).thenReturn(asList(parameterModels));
   }
 
   private void setMetadataKeyIdModelProperty(Class<?> type) {
@@ -265,11 +263,5 @@ public class MetadataKeyIdObjectResolverTestCase {
 
   private class NotInstantiableClass {
 
-  }
-
-  private List<ParameterModel> getMetadataKeyParts(ComponentModel component) {
-    return component.getParameterModels().stream()
-        .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-        .collect(toList());
   }
 }

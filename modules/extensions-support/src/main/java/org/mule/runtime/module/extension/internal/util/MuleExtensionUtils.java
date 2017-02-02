@@ -7,27 +7,35 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
-import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -50,28 +58,31 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
-import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
-import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ConnectionTypeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.NullSafeModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
-import org.mule.runtime.module.extension.internal.model.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageCollection;
+import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageList;
+import org.mule.runtime.module.extension.internal.runtime.message.ResultsToMessageSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import com.google.common.collect.ImmutableList;
@@ -79,9 +90,11 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -116,6 +129,34 @@ public class MuleExtensionUtils {
         .mediaType(mediaType)
         .attributes((Attributes) result.getAttributes().orElse(NULL_ATTRIBUTES))
         .build();
+  }
+
+  /**
+   * Transforms the given {@code results} into a similar collection of {@link Message}
+   * objects
+   *
+   * @param results a collection of {@link Result} items
+   * @param mediaType the {@link MediaType} of the generated {@link Message} instances
+   * @return a similar collection of {@link Message}
+   */
+  public static Collection<Message> toMessageCollection(Collection<Result> results, MediaType mediaType) {
+    if (results instanceof List) {
+      return new ResultsToMessageList((List<Result>) results, mediaType);
+    } else if (results instanceof Set) {
+      return new ResultsToMessageSet((Set<Result>) results, mediaType);
+    } else {
+      return new ResultsToMessageCollection(results, mediaType);
+    }
+  }
+
+  /**
+   * @param componentModel a {@link ComponentModel}
+   * @return Whether the {@code componentModel} returns a list of messages
+   */
+  public static boolean returnsListOfMessages(ComponentModel componentModel) {
+    MetadataType outputType = componentModel.getOutput().getType();
+    return outputType instanceof ArrayType &&
+        Message.class.getName().equals(getTypeId(((ArrayType) outputType).getType()).orElse(null));
   }
 
   /**
@@ -156,22 +197,6 @@ public class MuleExtensionUtils {
                                                                         ConfigurationModel configurationModel) {
     return ImmutableList.<ConnectionProviderModel>builder().addAll(configurationModel.getConnectionProviders())
         .addAll(extensionModel.getConnectionProviders()).build();
-  }
-
-  /**
-   * Sorts the given {@code list} in ascending alphabetic order, using {@link NamedObject#getName()} as the sorting criteria
-   *
-   * @param list a {@link List} with instances of {@link NamedObject}
-   * @param <T>  the generic type of the items in the {@code list}
-   * @return the sorted {@code list}
-   */
-  public static <T extends NamedObject> List<T> alphaSortDescribedList(List<T> list) {
-    if (isEmpty(list)) {
-      return list;
-    }
-
-    Collections.sort(list, new NamedObjectComparator());
-    return list;
   }
 
   /**
@@ -269,6 +294,10 @@ public class MuleExtensionUtils {
     return getDefaultValue(object.getAnnotation(Optional.class));
   }
 
+  public static Event getInitialiserEvent() {
+    return getInitialiserEvent(null);
+  }
+
   public static Event getInitialiserEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
       // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
@@ -276,6 +305,16 @@ public class MuleExtensionUtils {
       @Override
       public MuleContext getMuleContext() {
         return muleContext;
+      }
+
+      @Override
+      public String getServerId() {
+        return "InitialiserServer";
+      }
+
+      @Override
+      public String getUniqueIdString() {
+        return getUUID();
       }
 
       @Override
@@ -299,7 +338,7 @@ public class MuleExtensionUtils {
       }
     };
     return Event.builder(create(flowConstruct, "InitializerEvent")).message(InternalMessage.builder().nullPayload().build())
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
+        .flow(flowConstruct).build();
   }
 
   /**
@@ -315,15 +354,14 @@ public class MuleExtensionUtils {
 
   /**
    * If the {@code extensionModel} contains a {@link ClassLoaderModelProperty}, then it returns the {@link ClassLoader} associated
-   * to such property.
+   * to such property. Otherwise, it returns the current TCCL
    *
    * @param extensionModel a {@link ExtensionModel}
    * @return a {@link ClassLoader}
-   * @throws IllegalModelDefinitionException if no {@link ClassLoaderModelProperty} is set on the extension
    */
   public static ClassLoader getClassLoader(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
-        .orElseThrow(() -> noClassLoaderException(extensionModel.getName()));
+        .orElse(currentThread().getContextClassLoader());
   }
 
   /**
@@ -373,13 +411,6 @@ public class MuleExtensionUtils {
     }
 
     throw new IllegalArgumentException("Unsupported action: " + action.name());
-  }
-
-  public static boolean isTransactional(ComponentModel operationModel) {
-    return operationModel
-        .getModelProperty(ConnectivityModelProperty.class)
-        .map(ConnectivityModelProperty::supportsTransactions)
-        .orElse(false);
   }
 
   /**
@@ -512,11 +543,31 @@ public class MuleExtensionUtils {
     return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
   }
 
-  private static class NamedObjectComparator implements Comparator<NamedObject> {
+  /**
+   * @return the extension's error namespace for a given {@link ExtensionModel}
+   */
+  public static String getExtensionsErrorNamespace(ExtensionModel extensionModel) {
+    return getExtensionsErrorNamespace(extensionModel.getXmlDslModel());
+  }
 
-    @Override
-    public int compare(NamedObject o1, NamedObject o2) {
-      return o1.getName().compareTo(o2.getName());
-    }
+  /**
+   * @return the extension's error namespace for a given {@link ExtensionDeclaration}
+   */
+  public static String getExtensionsErrorNamespace(ExtensionDeclaration extensionDeclaration) {
+    return getExtensionsErrorNamespace(extensionDeclaration.getXmlDslModel());
+  }
+
+  private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
+    return dslModel.getNamespace().toUpperCase();
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz) {
+    return loadExtension(clazz, new HashMap<>());
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
+    params.put(TYPE_PROPERTY_NAME, clazz.getName());
+    params.put(VERSION, getProductVersion());
+    return new JavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), params);
   }
 }

@@ -7,11 +7,12 @@
 package org.mule.runtime.module.deployment.impl.internal.temporary;
 
 import static java.util.Collections.emptyList;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
 import java.util.List;
 
@@ -22,27 +23,25 @@ import java.util.List;
  */
 public class TemporaryArtifactClassLoaderBuilderFactory {
 
-  private ArtifactPluginRepository applicationPluginRepository;
+  private final ArtifactPluginRepository applicationPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
-  private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
-  private final DependenciesProvider dependenciesProvider;
+  private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory;
+  private final PluginDependenciesResolver pluginDependenciesResolver;
 
   /**
    * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
    * 
-   * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
-   * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
-   * @param dependenciesProvider resolver for missing dependencies
+   * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders from descriptors
+   * @param artifactClassLoaderFactory creates artifact class loaders from descriptors
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
-  public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
-                                                    ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                                    ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                                    DependenciesProvider dependenciesProvider) {
+  public TemporaryArtifactClassLoaderBuilderFactory(ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
+                                                    DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
+                                                    PluginDependenciesResolver pluginDependenciesResolver) {
     this.applicationPluginRepository = new EmptyArtifactPluginRepository();
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.artifactDescriptorFactory = artifactDescriptorFactory;
-    this.dependenciesProvider = dependenciesProvider;
+    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
+    this.pluginDependenciesResolver = pluginDependenciesResolver;
   }
 
   /**
@@ -52,7 +51,8 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    */
   public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
     return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory,
-                                                   artifactDescriptorFactory, dependenciesProvider);
+                                                   artifactClassLoaderFactory,
+                                                   pluginDependenciesResolver);
   }
 
   /**

@@ -7,9 +7,9 @@
 package org.mule.test.heisenberg.extension.exception;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricher;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 
-public class HeisenbergConnectionExceptionEnricher implements ExceptionEnricher {
+public class HeisenbergConnectionExceptionEnricher extends ExceptionHandler {
 
   public static final String ENRICHED_MESSAGE = "Enriched Connection Exception: ";
 

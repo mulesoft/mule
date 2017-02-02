@@ -6,6 +6,8 @@
  */
 package org.mule.test.core.notification;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -28,21 +30,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
 import org.databene.contiperf.junit.ContiPerfRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-11450: Migrate Contiperf tests to JMH")
 public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
 
-  private static final int K_NOTIFICATIONS = 1000;
+  private static final int K_NOTIFICATIONS = 100;
 
   private DefaultSchedulerService schedulerService;
   private ServerNotificationManager notificationManager;
 
-  private final PerfTestServerNotificationListener asyncListener = new PerfTestServerNotificationListener();
-  private final PerfTestServerBlockingNotificationListener syncListener = new PerfTestServerBlockingNotificationListener();
+  private final PerfTestIOServerNotificationListener asyncIOListener = new PerfTestIOServerNotificationListener();
+  private final PerfTestLightServerNotificationListener asyncLightListener = new PerfTestLightServerNotificationListener();
+  private final PerfTestServerSynchronousNotificationListener syncListener = new PerfTestServerSynchronousNotificationListener();
 
   public ServerNotificationManagerPerformanceTestCase() {
     setStartContext(true);
@@ -61,11 +66,13 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
     super.doSetUp();
 
     notificationManager = muleContext.getNotificationManager();
-    notificationManager.addInterfaceToType(PerfTestServerNotificationListener.class, PerfTestServerNotification.class);
-    notificationManager.addInterfaceToType(PerfTestServerBlockingNotificationListener.class,
-                                           PerfTestServerBlockingNotification.class);
+    notificationManager.addInterfaceToType(PerfTestIOServerNotificationListener.class, PerfTestIOServerNotification.class);
+    notificationManager.addInterfaceToType(PerfTestLightServerNotificationListener.class, PerfTestLightServerNotification.class);
+    notificationManager.addInterfaceToType(PerfTestServerSynchronousNotificationListener.class,
+                                           PerfTestServerSynchronousNotification.class);
     notificationManager.addListener(syncListener);
-    notificationManager.addListener(asyncListener);
+    notificationManager.addListener(asyncIOListener);
+    notificationManager.addListener(asyncLightListener);
   }
 
   @Override
@@ -82,7 +89,8 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
 
   @Override
   protected void doTearDown() throws Exception {
-    notificationManager.removeListener(asyncListener);
+    notificationManager.removeListener(asyncIOListener);
+    notificationManager.removeListener(asyncLightListener);
     notificationManager.removeListener(syncListener);
     super.doTearDown();
   }
@@ -94,45 +102,96 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
   }
 
   @Test
-  @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-  @Required(throughput = 600)
-  public void dispatchBlockingEvents() {
+  @PerfTest(duration = 50000, threads = 1, warmUp = 10000)
+  @Required(throughput = 30000)
+  public void dispatchSynchronousEvents() {
     syncListener.reset();
     for (int i = 0; i < K_NOTIFICATIONS; ++i) {
-      notificationManager.fireNotification(new PerfTestServerBlockingNotification());
+      notificationManager.fireNotification(new PerfTestServerSynchronousNotification());
     }
 
     assertThat(syncListener.getNotifications(), is(K_NOTIFICATIONS));
   }
 
   @Test
-  @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-  @Required(throughput = 350)
-  public void justDispatchAsyncEvents() {
-    asyncListener.reset();
+  @PerfTest(duration = 50000, threads = 1, warmUp = 10000)
+  @Required(throughput = 600)
+  public void justDispatchAsyncIOEvents() {
+    asyncIOListener.reset();
     for (int i = 0; i < K_NOTIFICATIONS; ++i) {
-      notificationManager.fireNotification(new PerfTestServerNotification());
+      notificationManager.fireNotification(new PerfTestIOServerNotification());
     }
   }
 
   @Test
-  @PerfTest(duration = 30000, threads = 1, warmUp = 10000)
-  @Required(throughput = 60)
-  public void dispatchAndNotifyAsyncEvents() {
-    asyncListener.reset();
+  @PerfTest(duration = 50000, threads = 1, warmUp = 10000)
+  @Required(throughput = 10000)
+  public void justDispatchAsyncLightEvents() {
+    asyncLightListener.reset();
     for (int i = 0; i < K_NOTIFICATIONS; ++i) {
-      notificationManager.fireNotification(new PerfTestServerNotification());
+      notificationManager.fireNotification(new PerfTestLightServerNotification());
     }
-
-    new PollingProber(1000, 10).check(new JUnitLambdaProbe(() -> asyncListener.getNotifications() >= K_NOTIFICATIONS));
   }
 
-  public static class PerfTestServerNotificationListener implements ServerNotificationListener<PerfTestServerNotification> {
+  @Test
+  @PerfTest(duration = 50000, threads = 1, warmUp = 10000)
+  @Required(throughput = 6)
+  public void dispatchAndNotifyIOAsyncEvents() {
+    asyncIOListener.reset();
+    for (int i = 0; i < K_NOTIFICATIONS; ++i) {
+      notificationManager.fireNotification(new PerfTestIOServerNotification());
+    }
+
+    new PollingProber(5000, 10).check(new JUnitLambdaProbe(() -> asyncIOListener.getNotifications() >= K_NOTIFICATIONS));
+  }
+
+  @Test
+  @PerfTest(duration = 50000, threads = 1, warmUp = 10000)
+  @Required(throughput = 80)
+  public void dispatchAndNotifyAsyncLightEvents() {
+    asyncLightListener.reset();
+    for (int i = 0; i < K_NOTIFICATIONS; ++i) {
+      notificationManager.fireNotification(new PerfTestLightServerNotification());
+    }
+
+    new PollingProber(5000, 10).check(new JUnitLambdaProbe(() -> asyncLightListener.getNotifications() >= K_NOTIFICATIONS));
+  }
+
+  public static class PerfTestLightServerNotificationListener
+      implements ServerNotificationListener<PerfTestLightServerNotification> {
 
     private final AtomicInteger notifications = new AtomicInteger();
 
     @Override
-    public void onNotification(PerfTestServerNotification notification) {
+    public void onNotification(PerfTestLightServerNotification notification) {
+      notifications.incrementAndGet();
+    }
+
+    public int getNotifications() {
+      return notifications.get();
+    }
+
+    public void reset() {
+      notifications.set(0);
+    }
+
+    @Override
+    public boolean isBlocking() {
+      return false;
+    }
+  }
+
+  public static class PerfTestIOServerNotificationListener implements ServerNotificationListener<PerfTestIOServerNotification> {
+
+    private final AtomicInteger notifications = new AtomicInteger();
+
+    @Override
+    public void onNotification(PerfTestIOServerNotification notification) {
+      try {
+        sleep(10);
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
       notifications.incrementAndGet();
     }
 
@@ -145,8 +204,8 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
     }
   }
 
-  public static class PerfTestServerBlockingNotificationListener
-      implements ServerNotificationListener<PerfTestServerBlockingNotification> {
+  public static class PerfTestServerSynchronousNotificationListener
+      implements ServerNotificationListener<PerfTestServerSynchronousNotification> {
 
     private final AtomicInteger notifications = new AtomicInteger();
 
@@ -156,7 +215,7 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
     }
 
     @Override
-    public void onNotification(PerfTestServerBlockingNotification notification) {
+    public void onNotification(PerfTestServerSynchronousNotification notification) {
       notifications.incrementAndGet();
     }
 
@@ -169,26 +228,38 @@ public class ServerNotificationManagerPerformanceTestCase extends AbstractMuleCo
     }
   }
 
-  public static class PerfTestServerNotification extends ServerNotification {
+  public static class PerfTestIOServerNotification extends ServerNotification {
 
     static {
-      registerAction("PerfTestServerNotification", CUSTOM_EVENT_ACTION_START_RANGE + 1);
+      registerAction("PerfTestIOServerNotification", CUSTOM_EVENT_ACTION_START_RANGE + 1);
     }
 
-    public PerfTestServerNotification() {
+    public PerfTestIOServerNotification() {
       super("", CUSTOM_EVENT_ACTION_START_RANGE + 1);
     }
 
   }
 
-  public static class PerfTestServerBlockingNotification extends ServerNotification implements SynchronousServerEvent {
+  public static class PerfTestLightServerNotification extends ServerNotification {
 
     static {
-      registerAction("PerfTestServerBlockingNotification", CUSTOM_EVENT_ACTION_START_RANGE + 2);
+      registerAction("PerfTestLightServerNotification", CUSTOM_EVENT_ACTION_START_RANGE + 2);
     }
 
-    public PerfTestServerBlockingNotification() {
+    public PerfTestLightServerNotification() {
       super("", CUSTOM_EVENT_ACTION_START_RANGE + 2);
+    }
+
+  }
+
+  public static class PerfTestServerSynchronousNotification extends ServerNotification implements SynchronousServerEvent {
+
+    static {
+      registerAction("PerfTestServerBlockingNotification", CUSTOM_EVENT_ACTION_START_RANGE + 3);
+    }
+
+    public PerfTestServerSynchronousNotification() {
+      super("", CUSTOM_EVENT_ACTION_START_RANGE + 3);
     }
 
   }

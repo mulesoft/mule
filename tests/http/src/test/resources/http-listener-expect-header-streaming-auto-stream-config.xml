@@ -12,7 +12,7 @@
 
     <flow name="defaultFlow">
         <httpn:listener config-ref="listenerConfig"  path="/" responseStreamingMode="AUTO"/>
-        <expression-transformer expression="new StringBufferInputStream(message.payloadAs(String))"/>
+        <expression-transformer expression="mel:new StringBufferInputStream(message.payloadAs(String))"/>
     </flow>
 
 </mule>

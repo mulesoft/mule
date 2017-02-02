@@ -9,11 +9,11 @@ package org.mule.runtime.module.xml.util;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
@@ -47,7 +47,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
@@ -225,7 +224,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   }
 
   private static org.w3c.dom.Document parseXML(InputSource source) throws Exception {
-    DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+    DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     return factory.newDocumentBuilder().parse(source);
   }
 
@@ -287,6 +286,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     } else if (obj instanceof byte[]) {
       // TODO Handle encoding/charset?
       return factory.createXMLStreamReader(new ByteArrayInputStream((byte[]) obj));
+    } else if (obj instanceof java.io.ByteArrayOutputStream) {
+      return factory.createXMLStreamReader(new ByteArrayInputStream(((java.io.ByteArrayOutputStream) obj).toByteArray()));
     } else if (obj instanceof OutputHandler) {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       try {
@@ -367,7 +368,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   }
 
   public static Node toDOMNode(Object src, Event event) throws Exception {
-    DocumentBuilderFactory builderFactory = new XMLSecureFactories().createDocumentBuilderFactory();
+    DocumentBuilderFactory builderFactory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     builderFactory.setNamespaceAware(true);
 
     return toDOMNode(src, event, builderFactory);
@@ -419,7 +420,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   private static String getOuterXml(XMLStreamReader xmlr) throws TransformerFactoryConfigurationError, TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     StringWriter stringWriter = new StringWriter();
-    transformer.transform(new StAXSource(xmlr), new StreamResult(stringWriter));
+    transformer.transform(new StaxSource(xmlr), new StreamResult(stringWriter));
     return stringWriter.toString();
   }
 

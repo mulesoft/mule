@@ -6,15 +6,24 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.api.MessageExchangePattern;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
+import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 
 public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
   @Override
   protected boolean shouldProcessEvent(Event event) {
     // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
-    return !event.getExchangePattern().hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
+    MessageExchangePattern mep = REQUEST_RESPONSE;
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyImmutableEndpoint) {
+      mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getMessageSource()).getExchangePattern();
+    }
+    return !mep.hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
   }
 
 }

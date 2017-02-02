@@ -6,6 +6,9 @@
  */
 package org.mule.tck.junit4;
 
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
@@ -13,17 +16,18 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
@@ -33,23 +37,22 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.service.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
@@ -72,6 +75,7 @@ import org.junit.rules.TemporaryFolder;
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
+  public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on blocking read";
 
   public TemporaryFolder workingDirectory = new TemporaryFolder();
 
@@ -108,6 +112,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * Default timeout for waiting for responses
    */
   public static final int RECEIVE_TIMEOUT = 5000;
+
+  /**
+   * Default timeout used when blocking on {@link org.reactivestreams.Publisher} completion.
+   */
+  public static final int BLOCK_TIMEOUT = 50;
 
   /**
    * Use this as a semaphore to the unit test to indicate when a callback has successfully been called.
@@ -246,15 +255,22 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   // This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    builders.add(new TestServicesConfigurationBuilder());
+    builders.add(new TestServicesConfigurationBuilder(mockHttpService()));
+  }
+
+  /**
+   * Defines if a mock should be used for the {@link HttpService}. If {@code false} an implementation will need to be provided.
+   *
+   * @return whether or not the {@link HttpService} should be mocked.
+   */
+  protected boolean mockHttpService() {
+    return true;
   }
 
   /**
    * Override this method to set properties of the MuleContextBuilder before it is used to create the MuleContext.
    */
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    contextBuilder.setWorkListener(new TestingWorkListener());
-  }
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 
   protected ConfigurationBuilder getBuilder() throws Exception {
     return new DefaultsConfigurationBuilder();
@@ -292,11 +308,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static void disposeContext() throws RegistrationException, MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
-        final SchedulerService serviceImpl = muleContext.getSchedulerService();
-        if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
-          stopIfNeeded(serviceImpl);
-        }
         muleContext.dispose();
+
+        verifyAndStopSchedulers();
 
         MuleConfiguration configuration = muleContext.getConfiguration();
 
@@ -312,6 +326,22 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       muleContext = null;
       clearLoggingConfig();
     }
+  }
+
+  protected static void verifyAndStopSchedulers() throws MuleException {
+    final SchedulerService serviceImpl = muleContext.getSchedulerService();
+    final List<Scheduler> schedulers = serviceImpl.getSchedulers();
+
+    try {
+      assertThat(schedulers, empty());
+    } finally {
+      schedulers.forEach(sched -> sched.shutdownNow());
+
+      if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
+        stopIfNeeded(serviceImpl);
+      }
+    }
+
   }
 
   /**
@@ -332,8 +362,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final JavaComponent component = new DefaultJavaComponent(of);
     ((MuleContextAware) component).setMuleContext(muleContext);
 
-    final Flow flow = new Flow(name, muleContext);
-    flow.setMessageProcessors(Collections.singletonList((Processor) component));
+    Flow flow = builder(name, muleContext).messageProcessors(Collections.singletonList(component)).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
   }
@@ -414,10 +443,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public SensingNullMessageProcessor getSensingNullMessageProcessor() {
     return new SensingNullMessageProcessor();
-  }
-
-  public TriggerableMessageSource getTriggerableMessageSource(Processor listener) {
-    return new TriggerableMessageSource(listener);
   }
 
   public TriggerableMessageSource getTriggerableMessageSource() {

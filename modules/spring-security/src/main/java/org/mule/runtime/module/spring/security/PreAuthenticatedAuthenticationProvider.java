@@ -20,7 +20,7 @@ public class PreAuthenticatedAuthenticationProvider implements SpringAuthenticat
   /**
    * {@inheritDoc}
    */
-  public Authentication getAuthentication(org.mule.runtime.core.api.security.Authentication authentication) {
+  public Authentication getAuthentication(org.mule.runtime.api.security.Authentication authentication) {
     return new PreAuthenticatedAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials());
   }
 }

@@ -11,7 +11,8 @@
 
     <configuration shutdownTimeout="${contextShutdownTimeout}" />
 
-    <flow name="staticComponentFlow">
+    <!-- TODO Use async strategy for now due to MULE-11097: Reactor does not handle RejectedExecutionException's -->
+    <flow name="staticComponentFlow" processingStrategy="asynchronous">
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <static-component>
@@ -21,7 +22,8 @@
         <test:queue name="response"/>
     </flow>
 
-    <flow name="scriptComponentFlow">
+    <!-- TODO Use async strategy for now due to MULE-11097: Reactor does not handle RejectedExecutionException's -->
+    <flow name="scriptComponentFlow" processingStrategy="asynchronous">
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <script:component>
@@ -31,11 +33,12 @@
         <test:queue name="response"/>
     </flow>
 
-    <flow name="expressionTransformerFlow">
+    <!-- TODO Use async strategy for now due to MULE-11097: Reactor does not handle RejectedExecutionException's -->
+    <flow name="expressionTransformerFlow" processingStrategy="asynchronous">
 
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <expression-transformer>
-            <return-argument expression="return &quot;expressionTransformerResponse&quot;;" />
+            <return-argument expression="mel:return &quot;expressionTransformerResponse&quot;;" />
         </expression-transformer>
 
         <test:queue name="response"/>

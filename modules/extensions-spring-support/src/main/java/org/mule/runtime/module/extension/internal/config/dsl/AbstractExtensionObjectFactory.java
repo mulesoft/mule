@@ -6,49 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static com.google.common.collect.ImmutableList.copyOf;
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getModelName;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
-import org.mule.runtime.api.meta.model.EnrichableModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.core.util.func.CompositePredicate;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.extension.api.util.NameUtils;
-import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectTypeParametersResolver;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
-import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create extension components.
@@ -58,105 +27,39 @@ import java.util.function.Predicate;
  * @param <T> the generic type of the instances to be built
  * @since 4.0
  */
-public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory<T> {
+public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotatedObjectFactory<T>
+    implements ObjectTypeParametersResolver {
 
   protected final MuleContext muleContext;
-  private Map<String, Object> parameters = new HashMap<>();
+  protected Map<String, Object> parameters = new HashMap<>();
+  protected ParametersResolver parametersResolver;
 
   public AbstractExtensionObjectFactory(MuleContext muleContext) {
     this.muleContext = muleContext;
+    this.parametersResolver = new ParametersResolver(muleContext, parameters);
   }
 
-  /**
-   * @return the components parameters as {@link Map} which key is the parameter name and the value is the actual thingy
-   */
-  protected Map<String, Object> getParameters() {
+  public Map<String, Object> getParameters() {
     return parameters;
   }
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = normalize(parameters);
+    this.parametersResolver = new ParametersResolver(muleContext, this.parameters);
   }
 
-  /**
-   * Constructs a {@link ResolverSet} from the output of {@link #getParameters()}, using {@link #toValueResolver(Object)} to
-   * process the values.
-   *
-   * @return a {@link ResolverSet}
-   * @throws {@link ConfigurationException} if the exclusiveness condition between parameters is not honored
-   */
-  protected ResolverSet getParametersAsResolverSet(ParameterizedModel model, Predicate<ParameterModel>... predicates)
-      throws ConfigurationException {
-
-    ResolverSet resolverSet = new ResolverSet();
-    Map<String, Object> parameters = getParameters();
-    model.getParameterModels().stream()
-        .filter(CompositePredicate.of(predicates))
-        .forEach(p -> {
-          String parameterName = getMemberName(p, p.getName());
-          ValueResolver<?> resolver = null;
-          if (parameters.containsKey(parameterName)) {
-            resolver = toValueResolver(parameters.get(parameterName));
-          } else {
-            Object defaultValue = p.getDefaultValue();
-            if (defaultValue instanceof String) {
-              resolver = new TypeSafeExpressionValueResolver((String) defaultValue, getType(p.getType()), muleContext);
-            } else if (defaultValue != null) {
-              resolver = new StaticValueResolver<>(defaultValue);
-            }
-          }
-
-          if (isNullSafe(p)) {
-            resolver = resolver != null ? resolver : new StaticValueResolver<>(null);
-            resolver = NullSafeValueResolverWrapper.of(p.getType(), resolver, p.getModelProperties(), muleContext);
-          }
-
-          if (resolver != null) {
-            resolverSet.add(parameterName, resolver);
-          }
-        });
-
-    if (model instanceof EnrichableModel) {
-      checkParameterGroupExclusivenessForModel((EnrichableModel) model, getParameters().keySet());
-    }
-
-    return resolverSet;
+  @Override
+  public void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
+    parametersResolver.resolveParameterGroups(objectType, builder);
   }
 
-  /**
-   * Wraps the {@code value} into a {@link ValueResolver} of the proper type. For example, {@link Collection} and {@link Map}
-   * instances are exposed as {@link CollectionValueResolver} and {@link MapValueResolver} respectively.
-   * <p>
-   * If {@code value} is already a {@link ValueResolver} then it's returned as is.
-   * <p>
-   * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
-   *
-   * @param value the value to expose
-   * @return a {@link ValueResolver}
-   */
-  protected ValueResolver<?> toValueResolver(Object value) {
-    ValueResolver<?> resolver;
-    if (value instanceof ValueResolver) {
-      resolver = (ValueResolver<?>) value;
-    } else if (value instanceof Collection) {
-      resolver = CollectionValueResolver
-          .of((Class<? extends Collection>) value.getClass(),
-              (List) ((Collection) value).stream().map(this::toValueResolver).collect(new ImmutableListCollector()));
-    } else if (value instanceof Map) {
-      Map<Object, Object> map = (Map<Object, Object>) value;
-      Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(map.size());
-      map.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
-                                                         (ValueResolver<Object>) toValueResolver(entryValue)));
-      resolver = MapValueResolver.of(map.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
-    } else {
-      resolver = new StaticValueResolver<>(value);
-    }
-    return resolver;
+  @Override
+  public void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
+    parametersResolver.resolveParameters(objectType, builder);
   }
 
   private Map<String, Object> normalize(Map<String, Object> parameters) {
     Map<String, Object> normalized = new HashMap<>();
-
     parameters.forEach((key, value) -> {
       String normalizedKey = key;
 
@@ -179,74 +82,5 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
 
   private String unwrapChildKey(String key) {
     return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
-  }
-
-  protected void checkParameterGroupExclusivenessForModel(EnrichableModel model, Set<String> resolverKeys)
-      throws ConfigurationException {
-    Optional<List<ParameterGroup>> exclusiveGroups =
-        model.getModelProperty(ParameterGroupModelProperty.class).map(mp -> mp.getExclusiveGroups());
-
-    if (exclusiveGroups.isPresent()) {
-      checkParameterGroupExclusiveness(model, exclusiveGroups.get(), resolverKeys);
-    }
-  }
-
-  /**
-   * Checks that the following conditions are honored:
-   * <ul>
-   * <li>Resolved fields from the parameter group belong to the same class</li>
-   * <li>If there is more than one field set, the parameter group declaring those fields must be a nester parameter group</li>
-   * <li>If set, the "one parameter should be present" condition must be honored</li>
-   * </ul>
-   *
-   * @param model
-   * @param exclusiveGroups
-   * @param resolverKeys
-   * @throws ConfigurationException if exclusiveness condition is not honored
-   */
-  private void checkParameterGroupExclusiveness(EnrichableModel model, List<ParameterGroup> exclusiveGroups,
-                                                Set<String> resolverKeys)
-      throws ConfigurationException {
-    for (ParameterGroup<?> group : exclusiveGroups) {
-      Multimap<Class<?>, Field> parametersFromGroup = ArrayListMultimap.create();
-      group.getOptionalParameters().stream()
-          .filter(f -> resolverKeys.contains(f.getName()))
-          .forEach(f -> parametersFromGroup.put(f.getDeclaringClass(), f));
-
-      group.getModelProperty(ParameterGroupModelProperty.class).ifPresent(mp -> mp.getGroups().stream()
-          .flatMap(g -> ((ParameterGroup<Field>) g).getOptionalParameters().stream())
-          .filter(f -> resolverKeys.contains((f).getName()))
-          .forEach(f -> parametersFromGroup.put(f.getDeclaringClass(), f)));
-
-      if (parametersFromGroup.keySet().size() > 1) {
-        throw buildExclusiveParametersException(model, parametersFromGroup);
-      }
-
-      for (Class<?> declaringParameterGroupClass : parametersFromGroup.keySet()) {
-        if (parametersFromGroup.get(declaringParameterGroupClass).size() > 1
-            && declaringParameterGroupClass.equals(group.getType())) {
-          throw buildExclusiveParametersException(model, parametersFromGroup);
-        }
-      }
-
-      if (group.isOneRequired() && parametersFromGroup.isEmpty()) {
-        throw new ConfigurationException((createStaticMessage(
-                                                              format("Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing",
-                                                                     group.getType().getName()))));
-      }
-    }
-  }
-
-  private ConfigurationException buildExclusiveParametersException(EnrichableModel model,
-                                                                   Multimap<Class<?>, Field> parametersFromGroup) {
-    return new ConfigurationException(
-                                      createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
-                                                                 getComponentModelTypeName(model), getModelName(model),
-                                                                 Joiner.on(", ")
-                                                                     .join(getOffendingParameterNames(parametersFromGroup)))));
-  }
-
-  private Set<String> getOffendingParameterNames(Multimap<Class<?>, Field> parametersFromGroup) {
-    return parametersFromGroup.values().stream().map(NameUtils::getAliasName).collect(toSet());
   }
 }

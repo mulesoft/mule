@@ -17,7 +17,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
-import org.mule.runtime.module.launcher.RepositoryServiceAware;
+import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

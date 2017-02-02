@@ -6,20 +6,13 @@
  */
 package org.mule.extension.email.internal.sender;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.GENERAL;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import javax.inject.Inject;
 
 /**
  * Configuration for operations that are performed through the SMTP (Simple Mail Transfer Protocol) protocol.
@@ -30,17 +23,13 @@ import javax.inject.Inject;
 @ConnectionProviders({SMTPProvider.class, SMTPSProvider.class})
 @Configuration(name = "smtp")
 @DisplayName("SMTP")
-public class SMTPConfiguration implements Initialisable {
-
-  @Inject
-  private MuleContext muleContext;
+public class SMTPConfiguration {
 
   /**
    * The "From" sender address. The person that is going to send the messages.
    */
   @Parameter
   @Optional
-  @Placement(group = GENERAL)
   private String from;
 
   /**
@@ -48,9 +37,8 @@ public class SMTPConfiguration implements Initialisable {
    * will be used
    */
   @Parameter
-  @Optional
-  @Placement(group = ADVANCED)
-  private String defaultCharset;
+  @DefaultEncoding
+  private String defaultEncoding;
 
   /**
    * @return the address of the person that is going to send the messages.
@@ -59,14 +47,7 @@ public class SMTPConfiguration implements Initialisable {
     return from;
   }
 
-  public String getDefaultCharset() {
-    return defaultCharset;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (defaultCharset == null) {
-      defaultCharset = muleContext.getConfiguration().getDefaultEncoding();
-    }
+  public String getDefaultEncoding() {
+    return defaultEncoding;
   }
 }

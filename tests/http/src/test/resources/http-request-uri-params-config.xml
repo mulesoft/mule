@@ -12,41 +12,33 @@
 
     <flow name="uriParamList">
         <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:request-builder>
-                <httpn:uri-params>
-                    #[['testParam1' : 'testValue1', paramName : paramValue]]
-                </httpn:uri-params>
-            </httpn:request-builder>
+            <httpn:uri-params>
+                #[mel:['testParam1' : 'testValue1', paramName : paramValue]]
+            </httpn:uri-params>
         </httpn:request>
     </flow>
 
     <flow name="uriParamMap">
         <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:request-builder>
-                <httpn:uri-params>
-                    #[params]
-                </httpn:uri-params>
-            </httpn:request-builder>
+            <httpn:uri-params>
+                #[mel:params]
+            </httpn:uri-params>
         </httpn:request>
     </flow>
 
     <flow name="uriParamOverride">
         <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:request-builder>
-                <httpn:uri-params>
-                    #[params]
-                </httpn:uri-params>
-            </httpn:request-builder>
+            <httpn:uri-params>
+                #[mel:params]
+            </httpn:uri-params>
         </httpn:request>
     </flow>
 
     <flow name="uriParamNull">
         <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:request-builder>
-                <httpn:uri-params>
-                    #[['testParam1' : 'testValue1' , 'testParam2' : payload]]
-                </httpn:uri-params>
-            </httpn:request-builder>
+            <httpn:uri-params>
+                #[mel:['testParam1' : 'testValue1' , 'testParam2' : payload]]
+            </httpn:uri-params>
         </httpn:request>
     </flow>
 

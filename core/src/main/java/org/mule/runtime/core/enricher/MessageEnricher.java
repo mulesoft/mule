@@ -10,8 +10,9 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -19,7 +20,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.NotificationUtils;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -71,14 +73,14 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
                          String targetExpressionArg,
                          ExtendedExpressionManager expressionManager) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
-      sourceExpressionArg = "#[payload:]";
+      sourceExpressionArg = "#[mel:payload:]";
     }
 
     TypedValue typedValue = expressionManager.evaluate(sourceExpressionArg, enrichmentEvent, flowConstruct);
 
     if (typedValue.getValue() instanceof InternalMessage) {
       InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
-      typedValue = new DefaultTypedValue(muleMessage.getPayload().getValue(), muleMessage.getPayload().getDataType());
+      typedValue = new TypedValue(muleMessage.getPayload().getValue(), muleMessage.getPayload().getDataType());
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
@@ -95,8 +97,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).flatMap(event -> Mono.just(event)
         .map(event1 -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
-        .transform(enrichmentProcessor).map(checkedFunction(response -> enrich(response, event)))
-        .otherwiseIfEmpty(Mono.just(event)));
+        .transform(enrichmentProcessor)
+        .map(checkedFunction(response -> enrich(response, event)))
+        .otherwise(EventDroppedException.class, mde -> Mono.just(event)));
   }
 
   protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {

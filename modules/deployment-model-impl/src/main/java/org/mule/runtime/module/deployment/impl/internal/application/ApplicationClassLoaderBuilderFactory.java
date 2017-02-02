@@ -8,13 +8,12 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 /**
  * Factory to create instances of {@code ApplicationClassLoaderBuilder}.
@@ -26,29 +25,26 @@ public class ApplicationClassLoaderBuilderFactory {
   private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory;
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
-  private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
-  private final DependenciesProvider dependenciesProvider;
+  private PluginDependenciesResolver pluginDependenciesResolver;
 
   /**
    * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
-   * 
+   *
    * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
    * @param artifactPluginRepository repository for artifact plugins provided by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders. Non null.
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
-   * @param dependenciesProvider resolver for missing dependencies
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public ApplicationClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory,
                                               ArtifactPluginRepository artifactPluginRepository,
                                               ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                              ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                              DependenciesProvider dependenciesProvider) {
+                                              PluginDependenciesResolver pluginDependenciesResolver) {
     checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
+    checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     this.applicationClassLoaderFactory = applicationClassLoaderFactory;
     this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.artifactDescriptorFactory = artifactDescriptorFactory;
-    this.dependenciesProvider = dependenciesProvider;
+    this.pluginDependenciesResolver = pluginDependenciesResolver;
   }
 
   /**
@@ -58,7 +54,7 @@ public class ApplicationClassLoaderBuilderFactory {
    */
   public ApplicationClassLoaderBuilder createArtifactClassLoaderBuilder() {
     return new ApplicationClassLoaderBuilder(applicationClassLoaderFactory, artifactPluginRepository,
-                                             artifactPluginClassLoaderFactory, artifactDescriptorFactory, dependenciesProvider);
+                                             artifactPluginClassLoaderFactory, pluginDependenciesResolver);
   }
 
 }

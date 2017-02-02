@@ -10,7 +10,10 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
@@ -20,6 +23,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.REGION_OWNER_CANNOT_BE_REMOVED_ERROR;
+import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createCannotRemoveClassLoaderError;
+import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -32,7 +38,9 @@ import java.util.List;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
@@ -53,7 +61,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private final TestArtifactClassLoader pluginClassLoader = new SubTestClassLoader();
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
   private final ArtifactDescriptor artifactDescriptor;
-
+  @Rule
+  public ExpectedException expectedException = none();
 
   public RegionClassLoaderTestCase() throws MalformedURLException {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
@@ -217,6 +226,86 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     verify(regionMember1).dispose();
     verify(regionMember2).dispose();
+  }
+
+  @Test
+  public void verifiesThatClassLoaderIsNotAddedTwice() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(createClassLoaderAlreadyInRegionError(appClassLoader.getArtifactId()));
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+  }
+
+  @Test
+  public void doesNotRemoveClassLoaderIfNotARegionMember() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+
+    assertThat(regionClassLoader.removeClassLoader(appClassLoader), is(false));
+  }
+
+  @Test
+  public void removesClassLoaderMember() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(pluginClassLoader, NULL_CLASSLOADER_FILTER);
+
+    assertThat(regionClassLoader.removeClassLoader(pluginClassLoader), is(true));
+    assertThat(regionClassLoader.getArtifactPluginClassLoaders(), is(empty()));
+  }
+
+  @Test
+  public void failsToRemoveRegionOwner() throws Exception {
+
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(REGION_OWNER_CANNOT_BE_REMOVED_ERROR);
+    regionClassLoader.removeClassLoader(appClassLoader);
+  }
+
+  @Test
+  public void failsToRemoveRegionMemberIfExportsPackages() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(pluginClassLoader, new DefaultArtifactClassLoaderFilter(singleton("org.foo"), emptySet()));
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId()));
+    regionClassLoader.removeClassLoader(pluginClassLoader);
+  }
+
+  @Test
+  public void failsToRemoveRegionMemberIfExportsResources() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(emptySet(), singleton("META-INF/pom.xml")));
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId()));
+    regionClassLoader.removeClassLoader(pluginClassLoader);
   }
 
   private List<ArtifactClassLoader> getClassLoaders(ArtifactClassLoader... expectedClassLoaders) {

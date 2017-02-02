@@ -15,7 +15,11 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.ErrorType;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("Error Types")
 public class DisjunctiveErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTestCase {
 
 

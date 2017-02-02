@@ -22,6 +22,7 @@
     <modules>
         <module>petstore-extension</module>
         <module>heisenberg-extension</module>
+        <module>marvel-extension</module>
         <module>metadata-extension</module>
         <module>transactional-extension</module>
         <module>vegan-extension</module>

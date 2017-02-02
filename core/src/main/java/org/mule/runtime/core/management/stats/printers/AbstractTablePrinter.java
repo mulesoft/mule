@@ -8,16 +8,13 @@ package org.mule.runtime.core.management.stats.printers;
 
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.management.stats.RouterStatistics;
-import org.mule.runtime.core.management.stats.ServiceStatistics;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,7 +79,6 @@ public class AbstractTablePrinter extends PrintWriter {
     if (stats == null) {
       return;
     }
-    ServiceStatistics serviceStats = (stats instanceof ServiceStatistics) ? (ServiceStatistics) stats : null;
 
     Arrays.fill(col, "-");
 
@@ -90,51 +86,20 @@ public class AbstractTablePrinter extends PrintWriter {
     col[j++] = stats.getName();
 
     // TODO RM* Handling custom stats objects
-    if (serviceStats != null) {
-      col[j++] = String.valueOf(serviceStats.getQueuedEvents());
-      col[j++] = String.valueOf(serviceStats.getMaxQueueSize());
-      col[j++] = String.valueOf(serviceStats.getAverageQueueSize());
-    } else {
-      j += 3;
-    }
-    col[j++] = String.valueOf(stats.getSyncEventsReceived());
-    col[j++] = String.valueOf(stats.getAsyncEventsReceived());
+    j += 4;
     col[j++] = String.valueOf(stats.getTotalEventsReceived());
-    if (serviceStats != null) {
-      col[j++] = String.valueOf(serviceStats.getSyncEventsSent());
-      col[j++] = String.valueOf(serviceStats.getAsyncEventsSent());
-      col[j++] = String.valueOf(serviceStats.getReplyToEventsSent());
-      col[j++] = String.valueOf(serviceStats.getTotalEventsSent());
-    } else {
-      j += 4;
-    }
+    j += 4;
 
-    if (serviceStats != null) {
-      col[j++] = String.valueOf(serviceStats.getExecutedEvents());
-    } else {
-      j++;
-    }
+    j++;
     col[j++] = String.valueOf(stats.getExecutionErrors());
     col[j++] = String.valueOf(stats.getFatalErrors());
-    if (serviceStats != null) {
-      col[j++] = String.valueOf(serviceStats.getMinExecutionTime());
-      col[j++] = String.valueOf(serviceStats.getMaxExecutionTime());
-      col[j++] = String.valueOf(serviceStats.getAverageExecutionTime());
-      col[j++] = String.valueOf(serviceStats.getTotalExecutionTime());
-    } else {
-      j += 4;
-    }
+    j += 4;
 
     col[j++] = String.valueOf(stats.getProcessedEvents());
     col[j++] = String.valueOf(stats.getMinProcessingTime());
     col[j++] = String.valueOf(stats.getMaxProcessingTime());
     col[j++] = String.valueOf(stats.getAverageProcessingTime());
     col[j++] = String.valueOf(stats.getTotalProcessingTime());
-
-    if (serviceStats != null) {
-      int i = getRouterInfo(serviceStats.getInboundRouterStat(), col, 26);
-      i = getRouterInfo(serviceStats.getOutboundRouterStat(), col, i);
-    }
 
     col[j++] = String.valueOf(stats.getSamplePeriod());
   }
@@ -192,10 +157,6 @@ public class AbstractTablePrinter extends PrintWriter {
   public void print(Object obj) {
     if (obj instanceof Collection) {
       print((Collection) obj);
-    } else if (obj instanceof ServiceStatistics) {
-      List<ServiceStatistics> l = new ArrayList<>();
-      l.add((ServiceStatistics) obj);
-      print(l);
     } else {
       super.print(obj);
     }

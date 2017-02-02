@@ -13,21 +13,15 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
+import org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
+import org.mule.tck.size.SmallTest;
 
 import com.google.common.io.ByteSource;
-import com.google.testing.compile.JavaFileObjects;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -42,7 +36,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 @SmallTest
-public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractMuleTestCase {
+public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractAnnotationProcessorTestCase {
 
   private static final String GROUP_PARAMETER_1 = "Group parameter 1";
   private static final String GROUP_PARAMETER_2 = "Group parameter 2";
@@ -115,30 +109,5 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
   private String xpath(String input, String expression) throws Exception {
     Node node = builderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(input)));
     return (String) xpath.evaluate(expression, node, XPathConstants.STRING);
-  }
-
-  private Iterable<JavaFileObject> testSourceFiles() throws Exception {
-    // this will be xxx/target/test-classes
-    File folder = new File(getClass().getClassLoader().getResource("").getPath().toString());
-
-    // up to levels
-    folder = folder.getParentFile().getParentFile();
-
-    folder = new File(folder, "src/test/java/" + getClass().getPackage().getName().replaceAll("\\.", "/"));
-
-    File[] files = folder.listFiles(new FilenameFilter() {
-
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.endsWith(".java");
-      }
-    });
-
-    List<JavaFileObject> javaFileObjects = new ArrayList<>(files.length);
-    for (File file : files) {
-      javaFileObjects.add(JavaFileObjects.forResource(file.toURI().toURL()));
-    }
-
-    return javaFileObjects;
   }
 }

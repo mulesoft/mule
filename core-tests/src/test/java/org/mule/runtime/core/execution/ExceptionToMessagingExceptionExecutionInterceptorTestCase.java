@@ -13,13 +13,12 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -64,9 +63,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     when(mockMessagingException.getEvent()).thenReturn(mockMuleEvent);
     when(mockMuleContext.getErrorTypeLocator()).thenReturn(mockErrorTypeLocator);
     when(mockMuleEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
-    when(mockMuleEvent.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
     when(mockMuleEvent.getError()).thenReturn(of(mockError));
-    when(mockErrorTypeLocator.lookupErrorType(any())).thenReturn(mockErrorType);
+    when(mockErrorTypeLocator.lookupErrorType((Exception) any())).thenReturn(mockErrorType);
 
     cut = new ExceptionToMessagingExceptionExecutionInterceptor();
     cut.setMuleContext(mockMuleContext);

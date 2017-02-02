@@ -9,7 +9,9 @@
     <httpn:request-config name="requestConfig">
         <httpn:request-connection host="localhost" port="${httpPort}" maxConnections="1"/>
     </httpn:request-config>
-    <flow name="limitedConnections">
+
+    <!-- TODO MULE-11351 Rework ring-buffer based processing strategy implementations for stream approach -->
+    <flow name="limitedConnections" processingStrategy="synchronous">
         <httpn:request config-ref="requestConfig" path="testPath"/>
     </flow>
 

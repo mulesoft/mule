@@ -6,21 +6,23 @@
  */
 package org.mule.extension.ftp;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.FtpTestHarness;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.util.IOUtils;
 
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import org.junit.Test;
@@ -48,83 +50,80 @@ public class FtpListTestCase extends FtpConnectorTestCase {
 
   @Test
   public void listNotRecursive() throws Exception {
-    TreeNode node = doList(".", false);
-    List<TreeNode> childs = node.getChilds();
+    List<Message> messages = doList(".", false);
 
-    assertThat(childs, hasSize(6));
-    assertThat(assertListedFiles(childs), is(true));
+    assertThat(messages, hasSize(6));
+    assertThat(assertListedFiles(messages), is(true));
   }
 
   @Test
   public void listRecursive() throws Exception {
-    TreeNode node = doList(".", true);
-    List<TreeNode> childs = node.getChilds();
+    List<Message> messages = doList(".", true);
 
-    assertThat(childs, hasSize(6));
-    assertThat(assertListedFiles(childs), is(true));
+    assertThat(messages, hasSize(8));
+    assertThat(assertListedFiles(messages), is(true));
 
-    List<TreeNode> subDirectories = childs.stream().filter(child -> child.getAttributes().isDirectory()).collect(toList());
+    List<Message> subDirectories = messages.stream()
+        .filter(message -> ((FileAttributes) message.getAttributes()).isDirectory())
+        .collect(toList());
 
     assertThat(subDirectories, hasSize(1));
-    TreeNode subDirectory = subDirectories.get(0);
-    assertThat(subDirectory.getChilds(), hasSize(2));
-    assertThat(assertListedFiles(subDirectory.getChilds()), is(false));
+    assertThat(assertListedFiles(subDirectories), is(true));
   }
 
   @Test
   public void notDirectory() throws Exception {
-    testHarness.expectedException().expectCause(is(instanceOf(IllegalArgumentException.class)));
-    doList(String.format(TEST_FILE_PATTERN, 0), false);
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "Only directories can be listed");
+    doList("list", format(TEST_FILE_PATTERN, 0), false);
   }
 
   @Test
   public void notExistingPath() throws Exception {
-    testHarness.expectedException().expectCause(is(instanceOf(IllegalArgumentException.class)));
-    doList(String.format("whatever", 0), false);
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
+    doList("list", format("whatever", 0), false);
   }
 
   @Test
   public void listWithEmbeddedMatcher() throws Exception {
-    TreeNode node = doList("listWithEmbeddedPredicate", ".", false);
-    List<TreeNode> childs = node.getChilds();
+    List<Message> messages = doList("listWithEmbeddedPredicate", ".", false);
 
-    assertThat(childs, hasSize(2));
-    assertThat(assertListedFiles(childs), is(false));
+    assertThat(messages, hasSize(2));
+    assertThat(assertListedFiles(messages), is(false));
   }
 
   @Test
   public void listWithGlobalMatcher() throws Exception {
-    TreeNode node = doList("listWithGlobalMatcher", ".", true);
-    List<TreeNode> childs = node.getChilds();
+    List<Message> messages = doList("listWithGlobalMatcher", ".", true);
 
-    assertThat(childs, hasSize(1));
+    assertThat(messages, hasSize(1));
 
-    FileAttributes file = childs.get(0).getAttributes();
+    FileAttributes file = (FileAttributes) messages.get(0).getAttributes();
     assertThat(file.isDirectory(), is(true));
     assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
   }
 
   @Test
   public void listWithoutPath() throws Exception {
-    TreeNode node = (TreeNode) flowRunner("listWithoutPath").run().getMessage().getPayload().getValue();
+    List<Message> messages = (List<Message>) flowRunner("listWithoutPath").run().getMessage().getPayload().getValue();
 
-    assertThat(node.getAttributes().getPath(),
-               is(equalTo(Paths.get(testHarness.getWorkingDirectory()).toAbsolutePath().toString())));
-    assertThat(node.getChilds(), hasSize(6));
+    assertThat(messages, hasSize(6));
+    FileAttributes attributes = (FileAttributes) messages.get(0).getAttributes();
+    assertThat(new File(attributes.getPath()).getParent(), is(equalTo(testHarness.getWorkingDirectory())));
   }
 
-  private boolean assertListedFiles(List<TreeNode> nodes) throws Exception {
+  private boolean assertListedFiles(List<Message> messages) throws Exception {
     boolean directoryWasFound = false;
 
-    for (TreeNode node : nodes) {
-      FileAttributes attributes = node.getAttributes();
+    for (Message message : messages) {
+      FileAttributes attributes = (FileAttributes) message.getAttributes();
       if (attributes.isDirectory()) {
         assertThat("two directories found", directoryWasFound, is(false));
         directoryWasFound = true;
         assertThat(attributes.getName(), equalTo(SUB_DIRECTORY_NAME));
       } else {
         assertThat(attributes.getName(), endsWith(".html"));
-        assertThat(IOUtils.toString(node.getContent()), equalTo(CONTENT));
+        assertThat(IOUtils.toString((InputStream) message.getPayload().getValue()), equalTo(CONTENT));
         assertThat(attributes.getSize(), is(new Long(CONTENT.length())));
       }
     }
@@ -132,23 +131,17 @@ public class FtpListTestCase extends FtpConnectorTestCase {
     return directoryWasFound;
   }
 
-  private TreeNode doList(String path, boolean recursive) throws Exception {
+  private List<Message> doList(String path, boolean recursive) throws Exception {
     return doList("list", path, recursive);
   }
 
-  private TreeNode doList(String flowName, String path, boolean recursive) throws Exception {
-    TreeNode node = (TreeNode) flowRunner(flowName).withVariable("path", path).withVariable("recursive", recursive).run()
-        .getMessage().getPayload().getValue();
+  private List<Message> doList(String flowName, String path, boolean recursive) throws Exception {
+    List<Message> messages =
+        (List<Message>) flowRunner(flowName).withVariable("path", path).withVariable("recursive", recursive).run()
+            .getMessage().getPayload().getValue();
 
-    assertThat(node, is(notNullValue()));
-    assertThat(node.getContent(), is(nullValue()));
-
-    FileAttributes attributes = node.getAttributes();
-    assertThat(attributes.isDirectory(), is(true));
-    assertThat(attributes.getPath(), equalTo(Paths.get(testHarness.getWorkingDirectory()).resolve(path).toString()));
-    assertThat(attributes.isDirectory(), is(true));
-
-    return node;
+    assertThat(messages, is(notNullValue()));
+    return messages;
   }
 
   private void createTestFiles() throws Exception {

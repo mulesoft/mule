@@ -9,12 +9,15 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
-import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.connector.ConnectException;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
@@ -23,6 +26,8 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
  * <code>ConnectException</code>.
  */
 public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionListener implements SystemExceptionHandler {
+
+  protected Scheduler retryScheduler;
 
   @Override
   public void handleException(Exception ex, RollbackSourceCallback rollbackMethod) {
@@ -47,7 +52,7 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     }
 
     if (ex instanceof ConnectException) {
-      ((ConnectException) ex).handleReconnection();
+      ((ConnectException) ex).handleReconnection(retryScheduler);
     }
   }
 
@@ -64,6 +69,19 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   public void handleException(Exception ex) {
     handleException(ex, null);
   }
+
+  @Override
+  protected void doInitialise(MuleContext context) throws InitialisationException {
+    retryScheduler = muleContext.getSchedulerService().ioScheduler();
+    super.doInitialise(context);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    if (retryScheduler != null) {
+      retryScheduler.shutdownNow();
+      retryScheduler = null;
+    }
+  }
 }
-
-

@@ -8,45 +8,33 @@ package org.mule.runtime.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
 
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequest;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.runtime.module.http.internal.multipart.HttpPart;
-import org.mule.runtime.module.http.internal.request.HttpAuthenticationType;
 import org.mule.runtime.module.http.internal.request.HttpClient;
 import org.mule.runtime.module.http.internal.request.HttpClientConfiguration;
 import org.mule.runtime.module.http.internal.request.NtlmProxyConfig;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.service.http.api.client.HttpAuthenticationType;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
+import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -61,6 +49,17 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient {
 
@@ -269,7 +268,7 @@ public class GrizzlyHttpClient implements HttpClient {
   }
 
   private HttpResponse createMuleResponse(Response response) throws IOException {
-    HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+    HttpResponseBuilder responseBuilder = HttpResponse.builder();
     responseBuilder.setStatusCode(response.getStatusCode());
     responseBuilder.setReasonPhrase(response.getStatusText());
     responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
@@ -293,10 +292,8 @@ public class GrizzlyHttpClient implements HttpClient {
 
       populateHeaders(request, builder);
 
-      DefaultHttpRequest defaultHttpRequest = (DefaultHttpRequest) request;
-
-      for (String queryParamName : defaultHttpRequest.getQueryParams().keySet()) {
-        for (String queryParamValue : defaultHttpRequest.getQueryParams().getAll(queryParamName)) {
+      for (String queryParamName : request.getQueryParams().keySet()) {
+        for (String queryParamValue : request.getQueryParams().getAll(queryParamName)) {
           builder.addQueryParam(queryParamName, queryParamValue);
         }
       }

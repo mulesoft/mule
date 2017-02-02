@@ -19,7 +19,6 @@
 
     <flow name="resequencer">
         <resequencer/>
-        <logger level="ERROR"/>
         <flow-ref name="sorted"/>
     </flow>
 

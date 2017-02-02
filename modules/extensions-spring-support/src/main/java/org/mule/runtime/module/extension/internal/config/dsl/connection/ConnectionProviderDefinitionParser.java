@@ -10,16 +10,15 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
@@ -33,13 +32,16 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 public final class ConnectionProviderDefinitionParser extends ExtensionDefinitionParser {
 
   private final ConnectionProviderModel providerModel;
+  private final ExtensionModel extensionModel;
   private final DslElementSyntax connectionDsl;
 
   public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
-                                            DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
+                                            ExtensionModel extensionModel, DslSyntaxResolver dslSyntaxResolver,
+                                            MuleContext muleContext,
                                             ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext, muleContext);
     this.providerModel = providerModel;
+    this.extensionModel = extensionModel;
     this.connectionDsl = dslSyntaxResolver.resolve(providerModel);
   }
 
@@ -50,10 +52,11 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withObjectFactoryType(ConnectionProviderObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(providerModel).build())
         .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
+        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("disableValidation", fromSimpleParameter("disableValidation").build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
         .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build());
 
-    parseParameters(providerModel.getParameterModels());
+    parseParameters(providerModel.getAllParameterModels());
   }
 }

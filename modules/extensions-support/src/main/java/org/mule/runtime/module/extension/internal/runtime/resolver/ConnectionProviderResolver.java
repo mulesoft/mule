@@ -17,23 +17,23 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
  *
  * @since 4.0
  */
-public class ConnectionProviderResolver implements ValueResolver<ConnectionProvider> {
+public class ConnectionProviderResolver<C> implements ValueResolver<ConnectionProvider<C>> {
 
-  private final ConnectionProviderObjectBuilder objectBuilder;
-  private final ObjectBuilderValueResolver<ConnectionProvider> valueResolver;
+  private final ConnectionProviderObjectBuilder<C> objectBuilder;
+  private final ObjectBuilderValueResolver<ConnectionProvider<C>> valueResolver;
 
   /**
    * Creates a new instance
    *
    * @param objectBuilder an object builder to instantiate the {@link ConnectionProvider}
    */
-  public ConnectionProviderResolver(ConnectionProviderObjectBuilder objectBuilder) {
+  public ConnectionProviderResolver(ConnectionProviderObjectBuilder<C> objectBuilder) {
     this.objectBuilder = objectBuilder;
     this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder);
   }
 
   @Override
-  public ConnectionProvider resolve(Event event) throws MuleException {
+  public ConnectionProvider<C> resolve(Event event) throws MuleException {
     return valueResolver.resolve(event);
   }
 

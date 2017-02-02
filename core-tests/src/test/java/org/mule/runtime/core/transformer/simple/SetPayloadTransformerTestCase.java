@@ -15,14 +15,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -34,7 +35,7 @@ import org.junit.Test;
 public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
   private static final String PLAIN_TEXT = "This is a plain text";
-  private static final String EXPRESSION = "#[testVariable]";
+  private static final String EXPRESSION = "#[mel:testVariable]";
 
   private SetPayloadTransformer setPayloadTransformer;
   private MuleContext mockMuleContext;
@@ -82,9 +83,8 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     setPayloadTransformer.setValue(EXPRESSION);
     when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadTransformer.initialise();
-    TypedValue mockTypedValue = mock(TypedValue.class);
-    when(mockTypedValue.getValue()).thenReturn(PLAIN_TEXT);
-    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(mockTypedValue);
+    TypedValue typedValue = new TypedValue<>(PLAIN_TEXT, STRING);
+    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent)).thenReturn(typedValue);
 
     Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertEquals(PLAIN_TEXT, response);

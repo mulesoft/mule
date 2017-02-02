@@ -6,8 +6,8 @@
  */
 package org.mule.extension.ws.internal.transport;
 
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_ATTACHMENTS_KEY;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_HEADERS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_ATTACHMENTS_KEY;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_HEADERS_KEY;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.extension.ws.internal.interceptor.MessageDispatcherInterceptor;
 
@@ -57,7 +57,7 @@ final class WscConduit extends AbstractConduit {
   }
 
   private void addMessageDispatcher(Message message) {
-    message.getInterceptorChain().add(new MessageDispatcherInterceptor(target.getAddress().getValue(), getMessageObserver()));
+    message.getInterceptorChain().add(new MessageDispatcherInterceptor(getMessageObserver()));
   }
 
   private void addAttachments(Message message) {

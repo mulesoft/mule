@@ -10,9 +10,14 @@ package org.mule.test.vegan.extension;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @MetadataScope(outputResolver = AppleTypesResolver.class,
     keysResolver = AppleTypesResolver.class)
@@ -21,5 +26,9 @@ public class EatAppleOperation {
   public Apple eatApple(@Connection Apple apple, @UseConfig AppleConfig config, @MetadataKeyId @Optional String key) {
     apple.bite();
     return apple;
+  }
+
+  public List<String> getAllApples(@MetadataKeyId @Optional String key, @Content Map<String, Apple> apples) {
+    return apples.keySet().stream().collect(Collectors.toList());
   }
 }

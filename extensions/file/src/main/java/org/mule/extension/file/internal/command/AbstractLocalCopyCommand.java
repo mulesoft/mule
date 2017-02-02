@@ -7,10 +7,12 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.extension.file.internal.LocalFileSystem;
+import org.mule.runtime.core.api.Event;
 
 import java.nio.file.CopyOption;
 import java.nio.file.FileAlreadyExistsException;
@@ -22,7 +24,7 @@ import java.nio.file.StandardCopyOption;
  * Base class for commands that generates copies of a local file, either by copying or moving them.
  * <p>
  * This class contains the logic to determine the actual target path in a way which provides bash semantics, as described in the
- * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, MuleEvent)} and
+ * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, Event)} and
  * {@link FileSystem#move(FileConnectorConfig, String, String, boolean, boolean)} methods.
  * <p>
  * This command also handles the concern of the target path already existing and whether or not overwrite it.
@@ -67,8 +69,8 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand {
         targetPath.toFile().mkdirs();
         targetPath = targetPath.resolve(source.getFileName());
       } else {
-        throw new IllegalArgumentException(format("Can't copy '%s' to '%s' because the destination path " + "doesn't exists",
-                                                  source.toAbsolutePath(), targetPath.toAbsolutePath()));
+        throw new IllegalPathException(format("Can't copy '%s' to '%s' because the destination path " + "doesn't exists",
+                                              source.toAbsolutePath(), targetPath.toAbsolutePath()));
       }
     }
 
@@ -79,9 +81,9 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand {
     try {
       doExecute(source, targetPath, overwrite, copyOption != null ? new CopyOption[] {copyOption} : new CopyOption[] {});
     } catch (FileAlreadyExistsException e) {
-      throw new IllegalArgumentException(format("Can't copy '%s' to '%s' because the destination path "
+      throw new org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException(format("Can't copy '%s' to '%s' because the destination path "
           + "already exists. Consider setting the 'overwrite' parameter to 'true'", source.toAbsolutePath(),
-                                                targetPath.toAbsolutePath()));
+                                                                                                targetPath.toAbsolutePath()));
     } catch (Exception e) {
       throw exception(format("Found exception %s file '%s' to '%s': %s", getAction(), source, targetPath, e.getMessage()), e);
     }

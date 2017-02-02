@@ -19,11 +19,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-cxf</artifactId>
+            <classifier>mule-plugin</classifier>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -43,12 +39,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http</artifactId>
+            <artifactId>mule-module-extensions-xml-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jaas</artifactId>
+            <artifactId>mule-module-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -58,22 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-json</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-management</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-oauth</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-pgp</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

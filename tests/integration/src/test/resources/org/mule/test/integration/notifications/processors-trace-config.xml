@@ -31,11 +31,11 @@
     </flow>
 
     <flow name="flowDynamic">
-        <flow-ref name="#['flow']"/>
+        <flow-ref name="#[mel:'flow']"/>
     </flow>
 
     <flow name="subFlowDynamic">
-        <flow-ref name="#['subFlow']"/>
+        <flow-ref name="#[mel:'subFlow']"/>
     </flow>
 
     <flow name="secondFlowStatic">
@@ -49,13 +49,13 @@
     </flow>
 
     <flow name="secondFlowDynamic">
-        <flow-ref name="#['flow']"/>
-        <flow-ref name="#['flow']"/>
+        <flow-ref name="#[mel:'flow']"/>
+        <flow-ref name="#[mel:'flow']"/>
     </flow>
 
     <flow name="secondSubFlowDynamic">
-        <flow-ref name="#['subFlow']"/>
-        <flow-ref name="#['subFlow']"/>
+        <flow-ref name="#[mel:'subFlow']"/>
+        <flow-ref name="#[mel:'subFlow']"/>
     </flow>
 
     <!-- Async -->
@@ -82,39 +82,39 @@
 
     <flow name="flowDynamicWithAsync">
         <async>
-            <flow-ref name="#['flowInAsync']"/>
+            <flow-ref name="#[mel:'flowInAsync']"/>
         </async>
     </flow>
 
     <flow name="subFlowDynamicWithAsync">
         <async>
-            <flow-ref name="#['subFlowInAsync']"/>
+            <flow-ref name="#[mel:'subFlowInAsync']"/>
         </async>
     </flow>
     
     <!-- Enricher -->
     
     <flow name="flowStaticWithEnricher">
-        <enricher source="#[payload]" target="#[flowVars.enriched]">
+        <enricher source="#[mel:payload]" target="#[mel:flowVars.enriched]">
             <flow-ref name="flow"/>
         </enricher>
     </flow>
 
     <flow name="subFlowStaticWithEnricher">
-        <enricher source="#[payload]" target="#[flowVars.enriched]">
+        <enricher source="#[mel:payload]" target="#[mel:flowVars.enriched]">
             <flow-ref name="subFlow"/>
         </enricher>
     </flow>
 
     <flow name="flowDynamicWithEnricher">
-        <enricher source="#[payload]" target="#[flowVars.enriched]">
-            <flow-ref name="#['flow']"/>
+        <enricher source="#[mel:payload]" target="#[mel:flowVars.enriched]">
+            <flow-ref name="#[mel:'flow']"/>
         </enricher>
     </flow>
 
     <flow name="subFlowDynamicWithEnricher">
-        <enricher source="#[payload]" target="#[flowVars.enriched]">
-            <flow-ref name="#['subFlow']"/>
+        <enricher source="#[mel:payload]" target="#[mel:flowVars.enriched]">
+            <flow-ref name="#[mel:'subFlow']"/>
         </enricher>
     </flow>
     
@@ -122,7 +122,7 @@
     
     <flow name="flowStaticWithChoice">
         <choice>
-            <when expression="#[true]">
+            <when expression="#[mel:true]">
                 <flow-ref name="flow"/>
             </when>
             <otherwise>
@@ -133,7 +133,7 @@
 
     <flow name="subFlowStaticWithChoice">
         <choice>
-            <when expression="#[true]">
+            <when expression="#[mel:true]">
                 <flow-ref name="subFlow"/>
             </when>
             <otherwise>
@@ -144,8 +144,8 @@
 
     <flow name="flowDynamicWithChoice">
         <choice>
-            <when expression="#[true]">
-                <flow-ref name="#['flow']"/>
+            <when expression="#[mel:true]">
+                <flow-ref name="#[mel:'flow']"/>
             </when>
             <otherwise>
                 <test:component throwException="true"/>
@@ -155,8 +155,8 @@
 
     <flow name="subFlowDynamicWithChoice">
         <choice>
-            <when expression="#[true]">
-                <flow-ref name="#['subFlow']"/>
+            <when expression="#[mel:true]">
+                <flow-ref name="#[mel:'subFlow']"/>
             </when>
             <otherwise>
                 <test:component throwException="true"/>
@@ -183,14 +183,14 @@
     <flow name="flowDynamicWithScatterGather">
         <scatter-gather>
             <test:component/>
-            <flow-ref name="#['flow']"/>
+            <flow-ref name="#[mel:'flow']"/>
         </scatter-gather>
     </flow>
 
     <flow name="subFlowDynamicWithScatterGather">
         <scatter-gather>
             <test:component/>
-            <flow-ref name="#['subFlow']"/>
+            <flow-ref name="#[mel:'subFlow']"/>
         </scatter-gather>
     </flow>
     
@@ -218,7 +218,7 @@
         <scatter-gather>
             <test:component/>
             <processor-chain>
-                <flow-ref name="#['flow']"/>
+                <flow-ref name="#[mel:'flow']"/>
             </processor-chain>
         </scatter-gather>
     </flow>
@@ -227,7 +227,7 @@
         <scatter-gather>
             <test:component/>
             <processor-chain>
-                <flow-ref name="#['subFlow']"/>
+                <flow-ref name="#[mel:'subFlow']"/>
             </processor-chain>
         </scatter-gather>
     </flow>

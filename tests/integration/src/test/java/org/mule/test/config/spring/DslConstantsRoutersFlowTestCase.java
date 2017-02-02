@@ -11,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
@@ -55,7 +55,7 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
     assertTrue(router instanceof IdempotentMessageFilter);
 
     IdempotentMessageFilter filter = (IdempotentMessageFilter) router;
-    assertEquals("#[message:id]-#[message:correlationId]", filter.getIdExpression());
+    assertEquals("#[mel:message:id]-#[mel:message:correlationId]", filter.getIdExpression());
     assertNotNull(filter.getStore());
     assertTrue(filter.getStore() instanceof TextFileObjectStore);
 

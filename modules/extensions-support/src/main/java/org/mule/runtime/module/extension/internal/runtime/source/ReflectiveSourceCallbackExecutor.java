@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,15 +21,15 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
- * Implementation of {@link SourceCallbackExecutor} which uses reflection to
- * execute the callback through a {@link Method}
+ * Implementation of {@link SourceCallbackExecutor} which uses reflection to execute the callback through a {@link Method}
  *
  * @since 4.0
  */
@@ -39,63 +38,63 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final SourceModel sourceModel;
-  private final ResolverSet parameters;
   private final MuleContext muleContext;
   private final ReflectiveMethodComponentExecutor<SourceModel> executor;
 
   /**
    * Creates a new instance
    *
-   * @param extensionModel        the {@link ExtensionModel} of the owning component
+   * @param extensionModel the {@link ExtensionModel} of the owning component
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the component requires a config
-   * @param sourceModel           the model of the {@code source}
-   * @param source                a {@link Source} instance
-   * @param method                the method to be executed
-   * @param parameters            a {@link ResolverSet} with the method's parameters
-   * @param muleContext           the current {@link MuleContext}
+   * @param sourceModel the model of the {@code source}
+   * @param source a {@link Source} instance
+   * @param method the method to be executed
+   * @param muleContext the current {@link MuleContext}
    */
   public ReflectiveSourceCallbackExecutor(ExtensionModel extensionModel,
                                           Optional<ConfigurationInstance> configurationInstance,
                                           SourceModel sourceModel,
                                           Object source,
                                           Method method,
-                                          ResolverSet parameters,
                                           MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
     this.configurationInstance = configurationInstance;
     this.sourceModel = sourceModel;
-    this.parameters = parameters;
     this.muleContext = muleContext;
-    executor = new ReflectiveMethodComponentExecutor<>(sourceModel, method, source);
+    executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel), method, source);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object execute(Event event, SourceCallbackContext context) throws Exception {
-    return executor.execute(createExecutionContext(event, context));
+  public Object execute(Event event, Map<String, Object> parameters, SourceCallbackContext context) throws Exception {
+    return executor.execute(createExecutionContext(event, parameters, context));
   }
 
-  private ExecutionContext<SourceModel> createExecutionContext(Event event, SourceCallbackContext callbackContext) {
-    if (event == null) {
-      event = getInitialiserEvent(muleContext);
-    }
-    final ResolverSetResult resolverSetResult;
-    try {
-      resolverSetResult = parameters.resolve(event);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Found exception trying to resolve parameters for source callback"), e);
-    }
+  private ExecutionContext<SourceModel> createExecutionContext(Event event, Map<String, Object> parameters,
+                                                               SourceCallbackContext callbackContext) {
     ExecutionContextAdapter<SourceModel> executionContext = new DefaultExecutionContext<>(extensionModel,
                                                                                           configurationInstance,
-                                                                                          resolverSetResult,
+                                                                                          parameters,
                                                                                           sourceModel,
                                                                                           event,
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);
     return executionContext;
+  }
+
+  private List<ParameterGroupModel> getAllGroups(SourceModel model) {
+    List<ParameterGroupModel> all = new LinkedList<>();
+    List<ParameterGroupModel> callbackParameters = new LinkedList<>();
+
+    all.addAll(model.getParameterGroupModels());
+    model.getSuccessCallback().ifPresent(callback -> callbackParameters.addAll(callback.getParameterGroupModels()));
+    model.getErrorCallback().ifPresent(callback -> callbackParameters.addAll(callback.getParameterGroupModels()));
+    all.addAll(callbackParameters.stream().distinct().collect(toList()));
+
+    return unmodifiableList(all);
   }
 }

@@ -12,7 +12,7 @@
 
     <httpn:response-builder name="globalResponseBuilder">
         <httpn:header headerName="User-Agent" value="Mule 3.6.0"/>
-        <httpn:header headerName="Date" value="#[server.dateTime]" />
+        <httpn:header headerName="Date" value="#[mel:server.dateTime]" />
     </httpn:response-builder>
 
     <httpn:response-builder name="globalCompositeResponseBuilder">

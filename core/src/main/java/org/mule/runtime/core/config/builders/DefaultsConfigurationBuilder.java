@@ -14,12 +14,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_TRANS
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
@@ -38,16 +34,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAUL
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
-import org.mule.runtime.core.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
-import org.mule.runtime.core.connector.MuleConnectorOperationLocator;
+import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
@@ -55,11 +49,11 @@ import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
-import org.mule.runtime.core.security.MuleSecurityManager;
-import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.security.DefaultMuleSecurityManager;
+import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
-import org.mule.runtime.core.util.lock.MuleLockFactory;
-import org.mule.runtime.core.util.lock.SingleServerLockProvider;
+import org.mule.runtime.core.internal.lock.MuleLockFactory;
+import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
@@ -75,11 +69,6 @@ import org.mule.runtime.core.util.store.MuleObjectStoreManager;
  * <li>{@link QueueManager}
  * <li>{@link SecurityManager}
  * <li>{@link ObjectStore}
- * <li>{@link ThreadingProfile} defaultThreadingProfile
- * <li>{@link ThreadingProfile} defaultMessageDispatcherThreadingProfile
- * <li>{@link ThreadingProfile} defaultMessageRequesterThreadingProfile
- * <li>{@link ThreadingProfile} defaultMessageReceiverThreadingProfile
- * <li>{@link ThreadingProfile} defaultComponentThreadingProfile
  * </ul>
  */
 public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
@@ -93,7 +82,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     configureQueueManager(muleContext);
 
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
-    registerObject(OBJECT_SECURITY_MANAGER, new MuleSecurityManager(), muleContext);
+    registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
 
     registerObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore(),
                    muleContext);
@@ -119,8 +108,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
 
     registerObject(OBJECT_PROCESSING_TIME_WATCHER, new DefaultProcessingTimeWatcher(), muleContext);
-
-    configureThreadingProfiles(muleContext);
 
     registerObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, new NoRetryPolicyTemplate(), muleContext);
     registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(muleContext), muleContext);
@@ -152,17 +139,5 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     QueueManager queueManager = new DelegateQueueManager();
     registerObject(OBJECT_QUEUE_MANAGER, queueManager, muleContext);
     registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
-  }
-
-  protected void configureThreadingProfiles(MuleContext muleContext) throws RegistrationException {
-    ThreadingProfile defaultThreadingProfile = new ChainedThreadingProfile();
-    registerObject(OBJECT_DEFAULT_THREADING_PROFILE, defaultThreadingProfile, muleContext);
-
-    registerObject(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
-                   muleContext);
-    registerObject(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
-                   muleContext);
-    registerObject(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE, new ChainedThreadingProfile(defaultThreadingProfile),
-                   muleContext);
   }
 }

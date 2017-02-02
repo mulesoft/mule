@@ -11,7 +11,7 @@
 
     <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
 
-    <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+    <heisenberg:door victim="#[mel:victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
     <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
         <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
@@ -29,18 +29,22 @@
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
         </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
         <heisenberg:ricin-packs>
             <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
-        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
-        </heisenberg:next-door>
-        <heisenberg:monthly-incomes>
-            <heisenberg:monthly-income value="12000"/>
-            <heisenberg:monthly-income value="500"/>
-        </heisenberg:monthly-incomes>
+        <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE" fullyBald="false"/>
     </heisenberg:config>
 
     <flow name="sayMyName">
@@ -62,9 +66,13 @@
     <flow name="getDefaultEnemy">
         <heisenberg:get-enemy/>
     </flow>
+    
+    <flow name="getAllEnemies">
+        <heisenberg:get-all-enemies />
+    </flow>
 
     <flow name="expressionEnemy">
-        <heisenberg:get-enemy index="#[flowVars['enemy']]"/>
+        <heisenberg:get-enemy index="#[mel:flowVars['enemy']]"/>
     </flow>
 
     <flow name="collectFromEvent">
@@ -75,17 +83,33 @@
         <heisenberg:get-payment-from-message/>
     </flow>
 
+    <flow name="getInlineInfo">
+        <heisenberg:get-inline-info>
+            <heisenberg:personal-barber beardTrimming="MUSTACHE" fullyBald="true"/>
+        </heisenberg:get-inline-info>
+    </flow>
+
+    <flow name="getInlinePersonalInfo">
+        <heisenberg:get-inline-personal-info>
+            <heisenberg:personal-info-argument myName="Pepe" age="26">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="explicitAddress"/>
+                </heisenberg:known-addresses>
+            </heisenberg:personal-info-argument>
+        </heisenberg:get-inline-personal-info>
+    </flow>
+
     <flow name="killFromPayload">
-        <heisenberg:kill goodbyeMessage="#[flowVars['goodbye']]"/>
+        <heisenberg:kill goodbyeMessage="#[mel:flowVars['goodbye']]"/>
     </flow>
 
     <flow name="customKillWithDefault">
-        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[mel:flowVars['goodbye']]"/>
     </flow>
 
     <flow name="customKillWithoutDefault">
-        <heisenberg:kill-with-custom-message goodbyeMessage="#[flowVars['goodbye']]"
-                                             victim="#[flowVars['victim']]"/>
+        <heisenberg:kill-with-custom-message goodbyeMessage="#[mel:flowVars['goodbye']]"
+                                             victim="#[mel:flowVars['victim']]"/>
     </flow>
 
     <flow name="killMany">
@@ -122,7 +146,11 @@
     </flow>
 
     <flow name="alias">
-        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52"/>
+        <heisenberg:alias greeting="Howdy!" myName="Walter White" age="52">
+            <heisenberg:known-addresses>
+                <heisenberg:known-address value="one address"/>
+            </heisenberg:known-addresses>
+        </heisenberg:alias>
     </flow>
 
     <flow name="knockStaticInlineDoor">
@@ -141,7 +169,7 @@
 
     <flow name="knockDynamicInlineDoor">
         <heisenberg:knock>
-            <heisenberg:knocked-door victim="#[victim]" address="308 Negra Arroyo Lane"/>
+            <heisenberg:knocked-door victim="#[mel:victim]" address="308 Negra Arroyo Lane"/>
         </heisenberg:knock>
     </flow>
 
@@ -149,13 +177,13 @@
         <heisenberg:knock-many>
             <heisenberg:doors>
                 <heisenberg:door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
-                <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane"/>
+                <heisenberg:door victim="#[mel:victim]" address="308 Negra Arroyo Lane"/>
             </heisenberg:doors>
         </heisenberg:knock-many>
     </flow>
 
     <flow name="knockManyByExpression">
-        <heisenberg:knock-many doors="#[doors]"/>
+        <heisenberg:knock-many doors="#[mel:doors]"/>
     </flow>
 
     <flow name="callSaul">
@@ -163,17 +191,17 @@
     </flow>
 
     <flow name="killWithWeapon">
-        <heisenberg:kill-with-weapon weapon="#[weapon]" type="MELEE_WEAPON">
+        <heisenberg:kill-with-weapon weapon="#[mel:weapon]" type="MELEE_WEAPON">
             <heisenberg:attributes-of-weapon brand="Pizza on the rooftop"/>
         </heisenberg:kill-with-weapon>
     </flow>
 
     <flow name="killWithMultipleWeapons">
-        <heisenberg:kill-with-multiples-weapons weaponList="#[weapons]"/>
+        <heisenberg:kill-with-multiples-weapons weapons="#[mel:weapons]"/>
     </flow>
 
     <flow name="killWithMultipleWildCardWeapons">
-        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[weapons]"/>
+        <heisenberg:kill-with-multiple-wild-card-weapons wildCardWeapons="#[mel:weapons]"/>
     </flow>
 
     <flow name="killWithRicinDefaultPayload">
@@ -182,14 +210,14 @@
 
     <flow name="killWithRicinAsChildElement">
         <heisenberg:kill-with-ricins>
-            <heisenberg:ricin-list>
+            <heisenberg:ricins>
                 <heisenberg:ricin microgramsPerKilo="20">
                     <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
                 </heisenberg:ricin>
                 <heisenberg:ricin microgramsPerKilo="22">
                     <heisenberg:destination address="pollos hermanos" victim="Gustavo Fring"/>
                 </heisenberg:ricin>
-            </heisenberg:ricin-list>
+            </heisenberg:ricins>
         </heisenberg:kill-with-ricins>
     </flow>
 
@@ -206,7 +234,7 @@
     </flow>
 
     <flow name="literalEcho">
-        <heisenberg:literal-echo literalExpression="#[money]"/>
+        <heisenberg:literal-echo literalExpression="#[mel:money]"/>
     </flow>
 
     <flow name="getMedicalHistory">
@@ -221,6 +249,10 @@
 
     <flow name="getGramsInStorage">
         <heisenberg:get-grams-in-storage/>
+    </flow>
+
+    <flow name="getBarberPreferences">
+        <heisenberg:get-barber-preferences config-ref="heisenberg"/>
     </flow>
 
     <flow name="investment">
@@ -247,7 +279,7 @@
                     <heisenberg:recursive-pojo/>
                 </heisenberg:childs>
                 <heisenberg:mapped-childs>
-                    <heisenberg:mapped-child key="someKey" value="#[new org.mule.test.heisenberg.extension.model.RecursivePojo()"/>
+                    <heisenberg:mapped-child key="someKey" value="#[mel:new org.mule.test.heisenberg.extension.model.RecursivePojo()"/>
                 </heisenberg:mapped-childs>
             </heisenberg:recursive-pojo>
         </heisenberg:approve>
@@ -261,48 +293,5 @@
                 </heisenberg:sale>
             </heisenberg:sales>
         </heisenberg:process-sale>
-    </flow>
-
-
-    <flow name="processWeaponAsStaticChildElement">
-        <heisenberg:process-weapon>
-            <heisenberg:weapon>
-                <heisenberg:ricin microgramsPerKilo="100">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-                </heisenberg:ricin>
-            </heisenberg:weapon>
-        </heisenberg:process-weapon>
-    </flow>
-
-    <flow name="processWeaponAsDynamicChildElement">
-        <set-payload value="#[100L]"/>
-        <heisenberg:process-weapon>
-            <heisenberg:weapon>
-                <heisenberg:ricin microgramsPerKilo="#[payload]">
-                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
-                </heisenberg:ricin>
-            </heisenberg:weapon>
-        </heisenberg:process-weapon>
-    </flow>
-
-    <flow name="processWeapon">
-        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
-        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
-        <heisenberg:process-weapon weapon="#[payload]"/>
-    </flow>
-
-    <flow name="processNullWeapon">
-        <heisenberg:process-weapon/>
-    </flow>
-
-    <flow name="processWeaponWithDefaultValue">
-        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
-        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
-        <heisenberg:process-weapon-with-default-value/>
-    </flow>
-
-    <flow name="processWrongWeapon">
-        <set-payload value="#[app.registry['door']]"/>
-        <heisenberg:process-weapon weapon="#[payload]"/>
     </flow>
 </mule>

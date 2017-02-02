@@ -6,10 +6,15 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertThat;
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -18,6 +23,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -30,6 +36,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
+  protected static final int DELTA_MILLIS = 30;
   protected static final int EXECUTOR_TIMEOUT_SECS = 1;
 
   protected static final Runnable EMPTY_RUNNABLE = () -> {
@@ -39,12 +46,14 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
   protected static final Consumer<ScheduledExecutorService> SUBMIT_RESULT_RUNNABLE = exec -> exec.submit(EMPTY_RUNNABLE, 0);
   protected static final Consumer<ScheduledExecutorService> EXECUTE_EMPTY_RUNNABLE = exec -> exec.execute(EMPTY_RUNNABLE);
 
+  protected static final Consumer<Scheduler> EMPTY_SHUTDOWN_CALLBACK = sched -> {
+  };
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
   protected ExecutorService sharedExecutor;
-  protected ScheduledExecutorService sharedScheduledExecutor;
+  protected ScheduledThreadPoolExecutor sharedScheduledExecutor;
   protected org.quartz.Scheduler sharedQuartzScheduler;
 
   @Before
@@ -52,7 +61,10 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
     sharedExecutor =
         new ThreadPoolExecutor(1, 1, 0, SECONDS, new ArrayBlockingQueue<>(1), new NamedThreadFactory(this.getClass().getName()));
 
-    sharedScheduledExecutor = newScheduledThreadPool(1, new NamedThreadFactory(this.getClass().getName() + "_sched"));
+    sharedScheduledExecutor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(this.getClass().getName() + "_sched"));
+    sharedScheduledExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+    sharedScheduledExecutor.setRemoveOnCancelPolicy(true);
+
     StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     schedulerFactory.initialize(defaultQuartzProperties());
     sharedQuartzScheduler = schedulerFactory.getScheduler();
@@ -70,14 +82,26 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
   }
 
   @After
-  public void after() throws SchedulerException {
+  public void after() throws SchedulerException, InterruptedException {
     sharedExecutor.shutdownNow();
     sharedScheduledExecutor.shutdownNow();
-    sharedQuartzScheduler.shutdown();
+    sharedQuartzScheduler.shutdown(true);
+
+    sharedExecutor.awaitTermination(5, SECONDS);
+    sharedScheduledExecutor.awaitTermination(5, SECONDS);
+  }
+
+  protected void assertTerminationIsNotDelayed(final ScheduledExecutorService executor) throws InterruptedException {
+    long startTime = nanoTime();
+    executor.shutdown();
+    executor.awaitTermination(1, SECONDS);
+
+    assertThat((double) NANOSECONDS.toMillis(nanoTime() - startTime), closeTo(0, DELTA_MILLIS));
   }
 
   protected ScheduledExecutorService createExecutor() {
-    return new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor, sharedQuartzScheduler);
+    return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
+                                sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {

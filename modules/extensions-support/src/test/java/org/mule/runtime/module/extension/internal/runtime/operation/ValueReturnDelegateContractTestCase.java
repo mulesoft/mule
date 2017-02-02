@@ -13,17 +13,18 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -46,6 +47,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   @Mock
   protected ExecutionContextAdapter operationContext;
 
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  protected ComponentModel componentModel;
+
   protected Event event;
 
   @Mock
@@ -63,7 +67,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   @Test
   public void returnsSingleValue() {
     byte[] value = new byte[] {};
-    org.mule.runtime.api.message.MuleEvent result = delegate.asReturnValue(value, operationContext);
+    Event result = delegate.asReturnValue(value, operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -76,8 +80,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Object payload = new Object();
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
-    org.mule.runtime.api.message.MuleEvent result =
-        delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
+    Event result = delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -90,8 +93,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception {
     Object payload = "hello world!";
 
-    org.mule.runtime.api.message.MuleEvent result =
-        delegate.asReturnValue(Result.builder().output(payload).build(), operationContext);
+    Event result = delegate.asReturnValue(Result.builder().output(payload).build(), operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -105,8 +107,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Object payload = "hello world!";
     Attributes newAttributes = mock(Attributes.class);
 
-    org.mule.runtime.api.message.MuleEvent result =
-        delegate.asReturnValue(Result.builder().output(payload).attributes(newAttributes).build(), operationContext);
+    Event result = delegate.asReturnValue(Result.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -117,5 +118,5 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   protected abstract ReturnDelegate createReturnDelegate();
 
-  protected abstract Message getOutputMessage(org.mule.runtime.api.message.MuleEvent result);
+  protected abstract Message getOutputMessage(Event result);
 }

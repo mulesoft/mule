@@ -9,22 +9,22 @@ package org.mule.runtime.module.http.internal.request;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.COOKIE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Names.COOKIE;
+import static org.mule.service.http.api.HttpHeaders.Names.HOST;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.PartAttributes;
@@ -33,13 +33,14 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.runtime.module.http.internal.domain.HttpEntity;
-import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
+import org.mule.service.http.api.domain.entity.HttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 import com.google.common.collect.Maps;
 
@@ -51,6 +52,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.activation.DataHandler;
 
@@ -82,7 +84,7 @@ public class MuleEventToHttpRequest {
 
   public HttpRequestBuilder create(Event event, String resolvedMethod, String resolvedUri) throws MessagingException {
     HttpRequesterRequestBuilder requestBuilder = requester.getRequestBuilder();
-    HttpRequestBuilder builder = new HttpRequestBuilder();
+    HttpRequestBuilder builder = HttpRequest.builder();
 
     builder.setUri(resolvedUri);
     builder.setMethod(resolvedMethod);
@@ -190,10 +192,10 @@ public class MuleEventToHttpRequest {
       }
 
     } else {
-      String contentType = requestBuilder.getHeaders().get(CONTENT_TYPE);
+      Optional<String> contentType = requestBuilder.getHeaderValue(CONTENT_TYPE);
 
-      if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
-          || contentType.startsWith(APPLICATION_JAVA)) {
+      if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
+          || contentType.get().startsWith(APPLICATION_JAVA)) {
         if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
           String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
@@ -230,16 +232,16 @@ public class MuleEventToHttpRequest {
 
 
   private boolean doStreaming(HttpRequestBuilder requestBuilder, Event event) throws MessagingException {
-    String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
-    String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
+    Optional<String> transferEncodingHeader = requestBuilder.getHeaderValue(TRANSFER_ENCODING);
+    Optional<String> contentLengthHeader = requestBuilder.getHeaderValue(CONTENT_LENGTH);
 
     HttpStreamingType requestStreamingMode = resolveStreamingType(event);
 
     Object payload = event.getMessage().getPayload().getValue();
 
     if (requestStreamingMode == HttpStreamingType.AUTO) {
-      if (contentLengthHeader != null) {
-        if (transferEncodingHeader != null) {
+      if (contentLengthHeader.isPresent()) {
+        if (transferEncodingHeader.isPresent()) {
           requestBuilder.removeHeader(TRANSFER_ENCODING);
 
           if (logger.isDebugEnabled()) {
@@ -249,7 +251,7 @@ public class MuleEventToHttpRequest {
         return false;
       }
 
-      if (transferEncodingHeader == null || !transferEncodingHeader.equalsIgnoreCase(CHUNKED)) {
+      if (!transferEncodingHeader.isPresent() || !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
         return payload instanceof InputStream;
       } else {
         return true;
@@ -263,7 +265,7 @@ public class MuleEventToHttpRequest {
         }
       }
 
-      if (transferEncodingHeader != null && !transferEncodingHeader.equalsIgnoreCase(CHUNKED)) {
+      if (transferEncodingHeader.isPresent() && !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
         requestBuilder.removeHeader(TRANSFER_ENCODING);
 
         if (logger.isDebugEnabled()) {

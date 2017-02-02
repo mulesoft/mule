@@ -7,7 +7,7 @@
 package org.mule.extension.ws.internal.interceptor;
 
 import static org.apache.cxf.phase.Phase.PRE_LOGICAL;
-import static org.mule.extension.ws.internal.ConsumeOperation.MULE_SOAP_ACTION;
+import static org.mule.extension.ws.internal.connection.WscClient.MULE_SOAP_ACTION;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;

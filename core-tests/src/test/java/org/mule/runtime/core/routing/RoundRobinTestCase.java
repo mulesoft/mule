@@ -12,13 +12,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -80,7 +79,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(singletonList(TEST_MESSAGE)).build();
 
-    roundRobin.process(eventBuilder().message(message).exchangePattern(REQUEST_RESPONSE).build());
+    roundRobin.process(eventBuilder().message(message).build());
 
     verify(route1).process(any(Event.class));
     verify(route2, never()).process(any(Event.class));
@@ -105,7 +104,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
       for (int i = 0; i < numMessages; i++) {
         InternalMessage msg = InternalMessage.builder().payload(TEST_MESSAGE + messageNumber.getAndIncrement()).build();
         Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(msg)
-            .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(session).build();
+            .flow(flowConstruct).session(session).build();
         try {
           target.process(event);
         } catch (MuleException e) {

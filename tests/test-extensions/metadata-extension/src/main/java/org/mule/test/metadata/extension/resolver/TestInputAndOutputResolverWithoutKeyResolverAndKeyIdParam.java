@@ -22,6 +22,11 @@ public class TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam
   private static final String KEY_SHOULD_BE_EMPTY = "Metadata resolvers without Key Resolver should get a NullMetadataKey as Key";
 
   @Override
+  public String getResolverName() {
+    return "TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam";
+  }
+
+  @Override
   public MetadataType getInputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
     checkArgument(isBlank(key), KEY_SHOULD_BE_EMPTY);
     return getMetadata(PERSON);

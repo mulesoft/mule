@@ -4,14 +4,12 @@
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-      xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
-       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <httpn:listener-config name="listenerConfig">
@@ -27,38 +25,32 @@
 
     <flow name="httpContinueProcessingActualMessage">
         <httpn:listener path="service" config-ref="listenerConfig"/>
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
         <error-handler>
             <on-error-continue>
                 <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
-                <json:object-to-json-transformer/>
             </on-error-continue>
         </error-handler>
     </flow>
 
     <flow name="httpsContinueProcessingActualMessage">
         <httpn:listener config-ref="listenerConfigHttps" path="httpsservice"/>
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
         <error-handler>
             <on-error-continue>
                 <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
-                <json:object-to-json-transformer/>
             </on-error-continue>
         </error-handler>
     </flow>
 
     <flow name="continueProcessingActualMessage">
-        <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
         <error-handler>
             <on-error-continue>
                 <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsErrorProcessor"/>
-                <json:object-to-json-transformer/>
             </on-error-continue>
         </error-handler>
     </flow>
@@ -122,13 +114,13 @@
 
     <flow name="onErrorTypeMatchSeveral">
         <choice>
-            <when expression="#[payload]">
+            <when expression="#[mel:payload]">
                 <append-string-transformer message=" apt1"/>
                 <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$FailingProcessor"/>
             </when>
             <otherwise>
                 <append-string-transformer message=" apt1"/>
-                <expression-transformer expression="#[payload.nope]"/>
+                <expression-transformer expression="#[mel:payload.nope]"/>
             </otherwise>
         </choice>
         <error-handler>

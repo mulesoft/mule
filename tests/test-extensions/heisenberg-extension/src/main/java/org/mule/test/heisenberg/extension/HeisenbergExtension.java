@@ -9,39 +9,41 @@ package org.mule.test.heisenberg.extension;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
-import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
@@ -50,7 +52,6 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -61,20 +62,30 @@ import javax.inject.Inject;
 @Extensible(alias = "heisenberg-empire")
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders(HeisenbergConnectionProvider.class)
-@Sources(HeisenbergSource.class)
+@Sources({HeisenbergSource.class, DEARadioSource.class})
 @Export(classes = {HeisenbergException.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
+@ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
+    fileName = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME, requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME)
+@ErrorTypes(HeisenbergErrors.class)
 public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public static final String HEISENBERG = "Heisenberg";
+  public static final String HEISENBERG_LIB_NAME = "Heisenberg.so";
+  public static final String HEISENBERG_LIB_DESCRIPTION = "Native Heisenberg support";
+  public static final String HEISENBERG_LIB_FILE_NAME = "heisenberg.so";
+  public static final String HEISENBERG_LIB_CLASS_NAME = "org.heisenberg.HeisenbergJNI";
+
   public static final String AGE = "50";
   public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
   public static final String RICIN_GROUP_NAME = "Dangerous-Ricin";
   public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
+  public static final String INLINE_BARBER_PREFERENCES = "Inline Barber Preferences";
   public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
   public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "weaponValueMap";
+  public static final String LAB_ADDRESS_EXAMPLE = "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104";
 
   private int initialise = 0;
   private int start = 0;
@@ -91,13 +102,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @ConfigName
   private String configName;
 
-  @Placement(group = PERSONAL_INFORMATION_GROUP_NAME)
-  @ParameterGroup
-  private ExtendedPersonalInfo personalInfo = new ExtendedPersonalInfo();
-
   @Parameter
   @Optional
-  private List<ExtendedPersonalInfo> familyInfo;
+  private List<PersonalInfo> familyInformations;
 
   @Parameter
   private List<String> enemies = new LinkedList<>();
@@ -116,20 +123,11 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Optional
   private Map<String, List<String>> deathsBySeasons;
 
-  @Parameter
-  @Optional
-  @Placement(order = 1, group = RICIN_GROUP_NAME)
-  private Map<String, Ricin> labeledRicin;
+  @ParameterGroup(name = RICIN_GROUP_NAME)
+  private RicinGroup ricinGroup;
 
-  @Parameter
-  @Optional
-  private KnockeableDoor nextDoor;
-
-  @Parameter
-  @Optional
-  @Placement(order = 2, group = RICIN_GROUP_NAME)
-  @Summary(RICIN_PACKS_SUMMARY)
-  private Set<Ricin> ricinPacks;
+  @ParameterGroup(name = PERSONAL_INFORMATION_GROUP_NAME)
+  private PersonalInfo personalInfo = new PersonalInfo();
 
   @Parameter
   private BigDecimal money;
@@ -148,11 +146,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   @Parameter
   @Optional
-  private List<?> wildCardList;
-
-  @Parameter
-  @Optional
-  private Map<? extends Weapon, ?> wildCardWeaponMap;
+  private List<?> wildCards;
 
   @Parameter
   @Optional
@@ -177,6 +171,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Parameter
   @Expression(REQUIRED)
   @Optional
+  @Example(LAB_ADDRESS_EXAMPLE)
   private String labAddress;
 
   @Parameter
@@ -188,6 +183,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Parameter
   @Optional
   private List<HealthStatus> healthProgressions;
+
+  @ParameterGroup(name = INLINE_BARBER_PREFERENCES, showInDsl = true)
+  private BarberPreferences barberPreferences;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -207,6 +205,10 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Override
   public void dispose() {
     dispose++;
+  }
+
+  public BarberPreferences getBarberPreferences() {
+    return barberPreferences;
   }
 
   public List<HealthStatus> getHealthProgression() {
@@ -241,12 +243,8 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
     return recipe;
   }
 
-  public Set<Ricin> getRicinPacks() {
-    return ricinPacks;
-  }
-
-  public KnockeableDoor getNextDoor() {
-    return nextDoor;
+  public RicinGroup getRicinGroup() {
+    return ricinGroup;
   }
 
   public Map<String, KnockeableDoor> getCandidateDoors() {
@@ -277,7 +275,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
     return endingHealth;
   }
 
-  public ExtendedPersonalInfo getPersonalInfo() {
+  public PersonalInfo getPersonalInfo() {
     return personalInfo;
   }
 
@@ -320,10 +318,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public Map<String, List<String>> getDeathsBySeasons() {
     return deathsBySeasons;
-  }
-
-  public Map<String, Ricin> getLabeledRicin() {
-    return labeledRicin;
   }
 
   public String getConfigName() {

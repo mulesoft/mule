@@ -7,10 +7,11 @@
 package org.mule.runtime.deployment.model.api.application;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.artifact.classloader.RegionOwnerArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 
-public interface Application extends DeployableArtifact<ApplicationDescriptor> {
+public interface Application extends DeployableArtifact<ApplicationDescriptor>, RegionOwnerArtifact {
 
   MuleContext getMuleContext();
 
@@ -24,4 +25,8 @@ public interface Application extends DeployableArtifact<ApplicationDescriptor> {
    */
   ApplicationStatus getStatus();
 
+  /**
+   * @return the policy manager for the application
+   */
+  ApplicationPolicyManager getPolicyManager();
 }

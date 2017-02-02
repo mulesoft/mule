@@ -7,9 +7,10 @@
 package org.mule.extension.socket.api.source;
 
 import static java.lang.String.format;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.extension.socket.api.SocketAttributes;
@@ -18,10 +19,11 @@ import org.mule.extension.socket.api.connection.ListenerConnection;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -36,7 +38,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.io.InputStream;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -56,7 +58,6 @@ import org.slf4j.LoggerFactory;
 public final class SocketListener extends Source<InputStream, SocketAttributes> implements FlowConstructAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SocketListener.class);
-  private ExecutorService executorService;
   private FlowConstruct flowConstruct;
 
   @Inject
@@ -73,24 +74,27 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
 
   private AtomicBoolean stopRequested = new AtomicBoolean(false);
   private Scheduler workManager;
+  private Scheduler listenerExecutor;
+
+  private Future<?> submittedListenerTask;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void onStart(SourceCallback<InputStream, SocketAttributes> sourceCallback) throws MuleException {
-    workManager = schedulerService.ioScheduler();
-
-    executorService =
-        newSingleThreadExecutor(r -> new Thread(r,
-                                                format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName())));
+    workManager = schedulerService
+        .ioScheduler(config().withName(format("%s%s.socket.worker", getPrefix(muleContext), flowConstruct.getName())));
 
     stopRequested.set(false);
-    executorService.execute(() -> listen(sourceCallback));
+
+    listenerExecutor = schedulerService.customScheduler(config().withMaxConcurrentTasks(1)
+        .withName(format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName())));
+    submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
   }
 
   @OnSuccess
-  public void onSuccess(@Optional(defaultValue = "#[payload]") @XmlHints(allowReferences = false) Object responseValue,
+  public void onSuccess(@Optional(defaultValue = "#[mel:payload]") @XmlHints(allowReferences = false) Object responseValue,
                         SourceCallbackContext context) {
     SocketWorker worker = context.getVariable(WORK);
     worker.onComplete(responseValue);
@@ -108,9 +112,10 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
    */
   @Override
   public void onStop() {
+    submittedListenerTask.cancel(false);
     stopRequested.set(true);
+    listenerExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
     workManager.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
-    shutdownExecutor();
   }
 
   /**
@@ -122,27 +127,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   }
 
   private boolean isRequestedToStop() {
-    return stopRequested.get() || Thread.currentThread().isInterrupted();
-  }
-
-  private void shutdownExecutor() {
-    if (executorService == null) {
-      return;
-    }
-
-    executorService.shutdownNow();
-    try {
-      if (!executorService.awaitTermination(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS)) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Could not properly terminate pending events for socket listener on flow " + flowConstruct.getName());
-        }
-      }
-    } catch (InterruptedException e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Got interrupted while trying to terminate pending events for socket listener on flow "
-            + flowConstruct.getName());
-      }
-    }
+    return stopRequested.get() || currentThread().isInterrupted();
   }
 
   private void listen(SourceCallback<InputStream, SocketAttributes> sourceCallback) {

@@ -7,9 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -20,17 +19,22 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
+import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
-import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
@@ -38,39 +42,42 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.just;
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutionType;
+import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.policy.OperationExecutionFunction;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Rule;
@@ -92,7 +99,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                         extensionManager);
+                                         extensionManager, mockPolicyManager);
   }
 
   @Test
@@ -123,7 +130,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Attributes attributes = mock(Attributes.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
+        .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -143,7 +150,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Attributes attributes = mock(Attributes.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
+        .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
 
     InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
@@ -159,7 +166,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).mediaType(mediaType).build());
+        .thenReturn(just(builder().output(payload).mediaType(mediaType).build()));
 
     event =
         Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
@@ -176,7 +183,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception {
     Object payload = "hello world!";
 
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(Result.builder().output(payload).build());
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(builder().output(payload).build()));
     event =
         Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
 
@@ -194,7 +201,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Attributes attributes = mock(Attributes.class);
 
     when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(Result.builder().output(payload).attributes(attributes).build());
+        .thenReturn(just(builder().output(payload).attributes(attributes).build()));
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -207,7 +214,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationReturnsPayloadValue() throws Exception {
     Object value = new Object();
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(value);
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(value));
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -220,7 +227,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor = setUpOperationMessageProcessor();
 
     Object value = new Object();
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(value);
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(value));
 
     InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
@@ -234,7 +241,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     expectedException.expect(IllegalOperationException.class);
     expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression"));
 
-    target = "#[someExpression]";
+    target = "#[mel:someExpression]";
     messageProcessor = createOperationMessageProcessor();
 
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
@@ -273,7 +280,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(void.class), false, emptySet()));
     messageProcessor = setUpOperationMessageProcessor();
 
-    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(null);
+    when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(empty());
     assertThat(messageProcessor.process(event), is(sameInstance(event)));
   }
 
@@ -297,40 +304,74 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
-  public void getExplicitOperationDynamicMetadata() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata(newKey("person", "Person").build());
+  public void executeWithPolicy() throws Exception {
+    ComponentIdentifier componentIdentifier =
+        new ComponentIdentifier.Builder().withNamespace(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
+    when(extensionModel.getName()).thenReturn(componentIdentifier.getNamespace());
+    when(operationModel.getName()).thenReturn(componentIdentifier.getName());
 
+    messageProcessor.process(event);
+
+    verify(mockPolicyManager).createOperationPolicy(eq(componentIdentifier), same(event), any(Map.class),
+                                                    any(OperationExecutionFunction.class));
+    verify(mockOperationPolicy).process(same(event));
+  }
+
+  @Test
+  public void getExplicitOperationDynamicMetadata() throws Exception {
+    mockMetadataResolution();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata =
+        messageProcessor.getMetadata(newKey("person", "Person").build());
+    verify(operationModel).getTypedModel(any(), any());
     assertThat(metadata.isSuccess(), is(true));
 
-    MetadataResult<OutputMetadataDescriptor> outputMetadataDescriptor = metadata.get().getOutputMetadata();
+    MetadataType payloadMetadata = metadata.get().getModel().getOutput().getType();
+    assertThat(payloadMetadata, is(TYPE_BUILDER.booleanType().build()));
 
-    MetadataResult<TypeMetadataDescriptor> payloadMetadata = outputMetadataDescriptor.get().getPayloadMetadata();
-    assertThat(payloadMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
+    MetadataType attributesMetadata = metadata.get().getModel().getOutputAttributes().getType();
+    assertThat(attributesMetadata, is(TYPE_BUILDER.booleanType().build()));
 
-    MetadataResult<TypeMetadataDescriptor> attributesMetadata = outputMetadataDescriptor.get().getAttributesMetadata();
-    assertThat(attributesMetadata.get().getType(), is(TYPE_BUILDER.booleanType().build()));
+    assertThat(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("content"))
+        .findFirst().get().getType(), is(TYPE_BUILDER.stringType().build()));
 
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("content").get().getType(),
-               is(TYPE_BUILDER.stringType().build()));
-    assertThat(metadata.get().getInputMetadata().get().getParameterMetadata("type").get().getType(), is(stringType));
+    assertThat(metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("type"))
+        .findFirst().get().getType(), is(stringType));
+  }
+
+  private void mockMetadataResolution() {
+    OperationModel typedModel = mock(OperationModel.class);
+    OutputModel resolvedOutputModel = mock(OutputModel.class);
+    when(resolvedOutputModel.getType()).thenReturn(TYPE_BUILDER.booleanType().build());
+    when(resolvedOutputModel.hasDynamicType()).thenReturn(true);
+    when(operationModel.getTypedModel(any(), any())).thenReturn(typedModel);
+    when(typedModel.getOutput()).thenReturn(resolvedOutputModel);
+    when(typedModel.getOutputAttributes()).thenReturn(resolvedOutputModel);
+    when(contentMock.getType()).thenReturn(TYPE_BUILDER.stringType().build());
+    when(typedModel.getAllParameterModels()).thenReturn(asList(keyParamMock, contentMock));
   }
 
   @Test
   public void getDSLOperationDynamicMetadata() throws Exception {
     final ObjectType objectType = BaseTypeBuilder
         .create(JAVA).objectType()
-        .with(new DescriptionAnnotation(empty(), "Some Description"))
+        .with(new DescriptionAnnotation("Some Description"))
         .build();
+    mockMetadataResolution();
+    when(operationModel.getTypedModel(any(), any()).getOutput().getType()).thenReturn(objectType);
+
     setUpValueResolvers();
     final OutputTypeResolver outputTypeResolver = mock(OutputTypeResolver.class);
     when(outputTypeResolver.getOutputType(any(), eq("person"))).thenReturn(objectType);
     when(metadataResolverFactory.getOutputResolver()).thenReturn(outputTypeResolver);
+    //verify(operationModel).getTypedModel(any(), any());
 
-    final MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata();
+    final MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = messageProcessor.getMetadata();
     assertThat(metadata.isSuccess(), is(true));
-    final MetadataResult<OutputMetadataDescriptor> outputMetadata = metadata.get().getOutputMetadata();
-    assertThat(outputMetadata.isSuccess(), is(true));
-    assertThat(outputMetadata.get().getPayloadMetadata().get().getType(), is(objectType));
+
+    MetadataType outputMetadata = metadata.get().getModel().getOutput().getType();
+    assertThat(outputMetadata, is(objectType));
 
     verify(resolverSet.getResolvers(), times(1));
   }
@@ -356,13 +397,24 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(metadataKeys, hasItem(metadataKeyWithId(STRING.name())));
   }
 
+  @Test
+  public void getProcessingType() {
+    assertProcessingType(CPU_INTENSIVE, ProcessingType.CPU_INTENSIVE);
+    assertProcessingType(CPU_LITE, ProcessingType.CPU_LITE);
+    assertProcessingType(BLOCKING, ProcessingType.BLOCKING);
+  }
+
+  private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {
+    when(operationModel.getExecutionType()).thenReturn(executionType);
+    assertThat(messageProcessor.getProcessingType(), is(expectedProcessingType));
+  }
+
+
   private Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
     return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
   }
 
   private void setUpValueResolvers() throws MuleException {
-    final Optional<ParameterGroupModelProperty> modelProperty = Optional.of(new ParameterGroupModelProperty(emptyList()));
-    when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(modelProperty);
     final Map<String, ValueResolver> valueResolvers = mock(Map.class);
     when(resolverSet.getResolvers()).thenReturn(valueResolvers);
     final ValueResolver valueResolver = mock(ValueResolver.class);

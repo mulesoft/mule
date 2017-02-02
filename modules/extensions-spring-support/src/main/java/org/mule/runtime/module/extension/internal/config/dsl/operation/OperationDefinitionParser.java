@@ -6,22 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TARGET_ATTRIBUTE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+
+import java.util.List;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor} instances through a
@@ -51,10 +56,18 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withObjectFactoryType(OperationMessageProcessorObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(operationModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
-        .withSetterParameterDefinition(TARGET_ATTRIBUTE, fromSimpleParameter(TARGET_ATTRIBUTE).build())
-        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+        .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
+        .withSetterParameterDefinition(TARGET_PARAMETER_NAME, fromSimpleParameter(TARGET_PARAMETER_NAME).build())
+        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
+                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build());
 
-    parseParameters(operationModel.getParameterModels());
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(operationModel);
+
+    parseParameters(getFlatParameters(inlineGroups, operationModel.getAllParameterModels()));
+
+    for (ParameterGroupModel group : inlineGroups) {
+      parseParameterGroup(group);
+    }
   }
 }

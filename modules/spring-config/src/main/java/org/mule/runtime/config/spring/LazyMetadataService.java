@@ -7,14 +7,17 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
 
@@ -53,18 +56,37 @@ public class LazyMetadataService implements MetadataService {
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId) {
-    return (MetadataResult<ComponentMetadataDescriptor>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getMetadata(componentId));
+  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId) {
+    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getOperationMetadata(componentId));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor> getMetadata(ComponentId componentId, MetadataKey key) {
-    return (MetadataResult<ComponentMetadataDescriptor>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getMetadata(componentId, key));
+  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId,
+                                                                                          MetadataKey key) {
+    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getOperationMetadata(componentId, key));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(ComponentId componentId) {
+    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getSourceMetadata(componentId));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(ComponentId componentId, MetadataKey key) {
+    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(componentId)
+        .orElseGet(() -> metadataService.getSourceMetadata(componentId, key));
   }
 
   /**
@@ -94,15 +116,15 @@ public class LazyMetadataService implements MetadataService {
   }
 
   private Optional<MetadataResult<?>> initializeComponent(ComponentId componentId) {
-    //TODO MULE-9496: REFACTOR WHEN FLOWPATH IS AVAILABLE
+    //TODO MULE-9496: REFACTOR WHEN FLOW PATH IS AVAILABLE
     final String componentIdentifier = componentId.getFlowName().isPresent()
         ? componentId.getFlowName().get() + "/" + componentId.getComponentPath() : componentId.getComponentPath();
     try {
       lazyMuleArtifactContext.initializeComponent(componentIdentifier);
     } catch (NoSuchComponentModelException e) {
-      return Optional.of(failure(e, FailureCode.COMPONENT_NOT_FOUND));
+      return Optional.of(failure(newFailure(e).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
     } catch (Exception e) {
-      return Optional.of(failure(e, FailureCode.UNKNOWN));
+      return Optional.of(failure(newFailure(e).onComponent()));
     }
     return empty();
   }

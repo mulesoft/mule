@@ -72,7 +72,9 @@ public class MessageChunkAggregator extends AbstractAggregator {
             builder.payload(baos.toByteArray());
           }
 
-          return Event.builder(firstEvent).message(builder.build()).session(getMergedSession(events.toArray())).build();
+          // Use last event, that hasn't been completed yet, for continued processing.
+          return Event.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
+              .session(getMergedSession(events.toArray())).build();
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         } finally {

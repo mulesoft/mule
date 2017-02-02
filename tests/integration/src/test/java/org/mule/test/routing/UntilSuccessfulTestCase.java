@@ -9,23 +9,24 @@ package org.mule.test.routing;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
+
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.store.AbstractPartitionedObjectStore;
+import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.probe.Probe;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -78,7 +79,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testDefaultConfiguration() throws Exception {
     final String payload = RandomStringUtils.randomAlphanumeric(20);
-    flowRunner("minimal-config").withPayload(payload).asynchronously().run();
+    flowRunner("minimal-config").withPayload(payload).run();
 
     final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
     assertThat(receivedPayloads, hasSize(1));
@@ -113,7 +114,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testRetryOnEndpoint() throws Exception {
     final String payload = RandomStringUtils.randomAlphanumeric(20);
-    flowRunner("retry-endpoint-config").withPayload(payload).asynchronously().run();
+    flowRunner("retry-endpoint-config").withPayload(payload).run();
 
     final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
     assertThat(receivedPayloads, hasSize(3));
@@ -147,45 +148,6 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
     assertThat(WaitMeasure.totalWait >= 1000, is(true));
   }
 
-  @Test
-  public void executeAsynchronouslyDoingRetries() throws Exception {
-    final String payload = RandomStringUtils.randomAlphanumeric(20);
-    final int expectedCounterExecutions = 4;
-    final int expectedCounterInExceptionStrategyExecutions = 1;
-    flowRunner("asynchronous-using-threading-profile").withPayload(payload).run();
-    new PollingProber(10000, 100).check(new Probe() {
-
-      private int executionOfCountInUntilSuccessful;
-      private int executionOfCountInExceptionStrategy;
-
-      @Override
-      public boolean isSatisfied() {
-        executionOfCountInUntilSuccessful = getNumberOfInvocationsFor("untilSuccessful2");
-        executionOfCountInExceptionStrategy = getNumberOfInvocationsFor("exceptionStrategy2");
-        return executionOfCountInUntilSuccessful == expectedCounterExecutions
-            && executionOfCountInExceptionStrategy == expectedCounterInExceptionStrategyExecutions;
-      }
-
-      @Override
-      public String describeFailure() {
-        return String.format(
-                             "Expecting %d executions of counter in until-successful and got %d \n "
-                                 + "Expecting %d execution of counter in exception strategy and got %d",
-                             expectedCounterExecutions, executionOfCountInUntilSuccessful,
-                             expectedCounterInExceptionStrategyExecutions, executionOfCountInExceptionStrategy);
-      }
-    });
-  }
-
-  @Test
-  public void executeAsynchronouslyDoingRetriesAfterRestart() throws Exception {
-    Flow flow = (Flow) getFlowConstruct("asynchronous-using-threading-profile");
-    flow.stop();
-    flow.start();
-    executeAsynchronouslyDoingRetries();
-
-  }
-
   private List<Object> ponderUntilMessageCountReceivedByTargetMessageProcessor(final int expectedCount)
       throws InterruptedException {
     return ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
@@ -193,12 +155,12 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   private List<Object> ponderUntilMessageCountReceived(final int expectedCount, final FunctionalTestComponent ftc)
       throws InterruptedException {
-    final List<Object> results = new ArrayList<Object>();
+    final List<Object> results = new ArrayList<>();
 
-    while (ftc.getReceivedMessagesCount() < expectedCount) {
-      Thread.yield();
-      Thread.sleep(100L);
-    }
+    new PollingProber(DEFAULT_TEST_TIMEOUT_SECS * 1000, 1000).check(new JUnitLambdaProbe(() -> {
+      assertThat(ftc.getReceivedMessagesCount(), greaterThanOrEqualTo(expectedCount));
+      return true;
+    }));
 
     for (int i = 0; i < ftc.getReceivedMessagesCount(); i++) {
       results.add(ftc.getReceivedMessage(1 + i));
@@ -207,10 +169,10 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
   }
 
   private void ponderUntilMessageCountReceivedByCustomMP(final int expectedCount) throws InterruptedException {
-    while (CustomMP.getCount() < expectedCount) {
-      Thread.yield();
-      Thread.sleep(100L);
-    }
+    new PollingProber(DEFAULT_TEST_TIMEOUT_SECS * 1000, 1000).check(new JUnitLambdaProbe(() -> {
+      assertThat(CustomMP.getCount(), greaterThanOrEqualTo(expectedCount));
+      return true;
+    }));
   }
 
   static class CustomMP implements Processor {

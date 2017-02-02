@@ -18,7 +18,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.PoolingProfile;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.pool.AbstractPoolingTestCase;

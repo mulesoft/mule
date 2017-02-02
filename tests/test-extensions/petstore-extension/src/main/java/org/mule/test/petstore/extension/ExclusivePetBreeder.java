@@ -6,16 +6,18 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 @ExclusiveOptionals(isOneRequired = true)
 public class ExclusivePetBreeder {
 
   @Optional
   @Parameter
-  private String mammals;
+  @Alias("mammals")
+  private String unaliasedNammals;
 
   @Optional
   @Parameter
@@ -25,7 +27,7 @@ public class ExclusivePetBreeder {
     return birds;
   }
 
-  public String getMammals() {
-    return mammals;
+  public String getunaliasedNammals() {
+    return unaliasedNammals;
   }
 }

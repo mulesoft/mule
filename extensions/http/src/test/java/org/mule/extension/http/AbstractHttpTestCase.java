@@ -7,9 +7,11 @@
 
 package org.mule.extension.http;
 
-import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 @ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets"},

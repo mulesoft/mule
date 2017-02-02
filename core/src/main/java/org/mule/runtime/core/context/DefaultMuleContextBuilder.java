@@ -8,14 +8,15 @@ package org.mule.runtime.core.context;
 
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
@@ -32,13 +33,10 @@ import org.mule.runtime.core.api.context.notification.TransactionNotificationLis
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
@@ -56,24 +54,21 @@ import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.RegistryDelegatingInjector;
-import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.SplashScreen;
-import org.mule.runtime.core.work.DefaultWorkListener;
-import org.mule.runtime.core.work.MuleWorkManager;
-
-import javax.resource.spi.work.WorkListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link MuleContextBuilder} that uses {@link DefaultMuleContext} as the default {@link MuleContext}
- * implementation and builds it with defaults values for {@link MuleConfiguration}, {@link LifecycleManager}, {@link WorkManager},
- * {@link WorkListener} and {@link ServerNotificationManager}.
+ * implementation and builds it with defaults values for {@link MuleConfiguration}, {@link LifecycleManager} and
+ * {@link ServerNotificationManager}.
  */
 public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
@@ -83,10 +78,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   protected MuleConfiguration config;
 
   protected MuleContextLifecycleManager lifecycleManager;
-
-  protected WorkManager workManager;
-
-  protected WorkListener workListener;
 
   protected ServerNotificationManager notificationManager;
 
@@ -108,8 +99,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     logger.debug("Building new DefaultMuleContext instance with MuleContextBuilder: " + this);
     DefaultMuleContext muleContext = createDefaultMuleContext();
     muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
-    muleContext.setWorkManager(injectMuleContextIfRequired(getWorkManager(), muleContext));
-    muleContext.setworkListener(getWorkListener());
     muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
 
@@ -129,6 +118,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     ErrorTypeRepository defaultErrorTypeRepository = createDefaultErrorTypeRepository();
     muleContext.setErrorTypeRepository(defaultErrorTypeRepository);
     muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(defaultErrorTypeRepository));
+
+    muleContext.setProcessorInterceptorManager(new DefaultProcessorInterceptorManager());
 
     return muleContext;
   }
@@ -160,16 +151,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   @Override
   public void setMuleConfiguration(MuleConfiguration config) {
     this.config = config;
-  }
-
-  @Override
-  public void setWorkManager(WorkManager workManager) {
-    this.workManager = workManager;
-  }
-
-  @Override
-  public void setWorkListener(WorkListener workListener) {
-    this.workListener = workListener;
   }
 
   @Override
@@ -229,22 +210,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     lifecycleManager = (MuleContextLifecycleManager) manager;
   }
 
-  protected WorkManager getWorkManager() {
-    if (workManager != null) {
-      return workManager;
-    } else {
-      return createWorkManager();
-    }
-  }
-
-  protected WorkListener getWorkListener() {
-    if (workListener != null) {
-      return workListener;
-    } else {
-      return createWorkListener();
-    }
-  }
-
   protected ServerNotificationManager getNotificationManager() {
     if (notificationManager != null) {
       return notificationManager;
@@ -293,27 +258,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     return new MuleContextLifecycleManager();
   }
 
-  protected MuleWorkManager createWorkManager() {
-    final MuleConfiguration config = getMuleConfiguration();
-    // still can be embedded, but in container mode, e.g. in a WAR
-    final String threadPrefix = config.isContainerMode() ? String.format("[%s].Mule", config.getId()) : "MuleServer";
-    ImmutableThreadingProfile threadingProfile = createMuleWorkManager();
-    return new MuleWorkManager(threadingProfile, threadPrefix, config.getShutdownTimeout());
-  }
-
-  protected ImmutableThreadingProfile createMuleWorkManager() {
-    return new ImmutableThreadingProfile(Integer.valueOf(System
-        .getProperty(MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE, String.valueOf(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE))),
-                                         ThreadingProfile.DEFAULT_MAX_THREADS_IDLE, ThreadingProfile.DEFAULT_MAX_BUFFER_SIZE,
-                                         ThreadingProfile.DEFAULT_MAX_THREAD_TTL, ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT,
-                                         ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION, ThreadingProfile.DEFAULT_DO_THREADING,
-                                         null, null);
-  }
-
-  protected DefaultWorkListener createWorkListener() {
-    return new DefaultWorkListener();
-  }
-
   protected ServerNotificationManager createNotificationManager() {
     return createDefaultNotificationManager();
   }
@@ -339,7 +283,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   @Override
   public String toString() {
     return ClassUtils.getClassName(getClass()) + "{muleConfiguration=" + config + ", lifecycleManager=" + lifecycleManager
-        + ", workManager=" + workManager + ", workListener=" + workListener + ", notificationManager=" + notificationManager
-        + "}";
+        + ", notificationManager=" + notificationManager + "}";
   }
 }

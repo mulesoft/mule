@@ -6,7 +6,7 @@
  */
 package org.mule.extension.socket.api.socket;
 
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 
 /**
  * Interface for common configuration required on sockets that will send requests.
@@ -18,7 +18,7 @@ import org.mule.extension.socket.api.ConnectionSettings;
 public interface RequesterSocketProperties {
 
   /**
-   * @return {@link ConnectionSettings} with the address parameters to where the requester socket should bind to.
+   * @return {@link SocketConnectionSettings} with the address parameters to where the requester socket should bind to.
    */
-  ConnectionSettings getLocalAddress();
+  SocketConnectionSettings getLocalAddress();
 }

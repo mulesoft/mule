@@ -7,8 +7,10 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
@@ -34,9 +36,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.aether.repository.LocalRepository;
 import org.junit.internal.builders.AnnotatedBuilder;
@@ -100,8 +104,10 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
 
-  private static String userHome = System.getProperty(USER_HOME);
+  private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
+  private static RunnerConfiguration runnerConfiguration;
+
   private static Exception errorCreatingClassLoaderTestRunner;
   private static boolean staticFieldsInjected = false;
 
@@ -121,15 +127,18 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     if (artifactClassLoaderHolder == null) {
       try {
-        artifactClassLoaderHolder = createClassLoaderTestRunner(clazz);
+        runnerConfiguration = readConfiguration(clazz);
+        artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
       } catch (Exception e) {
         errorCreatingClassLoaderTestRunner = e;
         throw e;
       }
+    } else {
+      checkConfiguration(clazz);
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
-
+    //    artifactClassLoaderHolder.loadClassWithApplicationClassLoader("org.mule.extension.db.internal.domain.connection.DbConnectionProvider");
     final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
         .loadClassWithApplicationClassLoader(RunnerDelegateTo.class.getName());
 
@@ -147,14 +156,26 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   }
 
+  private void checkConfiguration(Class<?> klass) {
+    RunnerConfiguration testRunnerConfiguration = readConfiguration(klass);
+    if (!runnerConfiguration.equals(testRunnerConfiguration)) {
+      throw new IllegalArgumentException("Invalid configuration defined for test: " + klass
+          + " . Is not supported to have multiple configurations of" +
+          " the runner because class loaders are created only once for all the tests in the module. Current configuration loaded was: "
+          + runnerConfiguration + " but configuration obtained from test class was: " + testRunnerConfiguration);
+    }
+  }
+
   /**
    * Creates the {@link ArtifactClassLoaderHolder} with the isolated class loaders.
    *
    * @param klass the test class being executed
+   * @param runnerConfiguration {@link RunnerConfiguration} based on annotated test class.
    * @return creates a {@link ArtifactClassLoaderHolder} that would be used to run the test. This way the test will be isolated
    *         and it will behave similar as an application running in a Mule standalone container.
    */
-  private static synchronized ArtifactClassLoaderHolder createClassLoaderTestRunner(Class<?> klass) {
+  private static synchronized ArtifactClassLoaderHolder createClassLoaderTestRunner(Class<?> klass,
+                                                                                    RunnerConfiguration runnerConfiguration) {
     final File targetTestClassesFolder = new File(klass.getProtectionDomain().getCodeSource().getLocation().getPath());
 
     ArtifactIsolatedClassLoaderBuilder builder = new ArtifactIsolatedClassLoaderBuilder();
@@ -162,15 +183,15 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     builder.setRootArtifactClassesFolder(rootArtifactClassesFolder);
     builder.setPluginResourcesFolder(targetTestClassesFolder.getParentFile());
 
-    builder.setProvidedExclusions(readAttribute("providedExclusions", klass));
-    builder.setProvidedInclusions(readAttribute("providedInclusions", klass));
-    builder.setTestExclusions(readAttribute("testExclusions", klass));
-    builder.setTestInclusions(readAttribute("testInclusions", klass));
+    builder.setProvidedExclusions(runnerConfiguration.getProvidedExclusions());
+    builder.setProvidedInclusions(runnerConfiguration.getProvidedInclusions());
+    builder.setTestExclusions(runnerConfiguration.getTestExclusions());
+    builder.setTestInclusions(runnerConfiguration.getTestInclusions());
 
-    builder.setExportPluginClasses(readAttribute("exportPluginClasses", klass));
+    builder.setExportPluginClasses(runnerConfiguration.getExportPluginClasses());
 
-    builder.setPluginCoordinates(readAttribute("plugins", klass));
-    builder.setSharedPluginLibCoordinates(readAttribute("sharedRuntimeLibs", klass));
+    builder.setPluginCoordinates(runnerConfiguration.getPlugins());
+    builder.setSharedPluginLibCoordinates(runnerConfiguration.getSharedRuntimeLibs());
     builder.setExtensionMetadataGeneration(true);
 
     Properties excludedProperties;
@@ -180,7 +201,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       throw new RuntimeException("Error while reading excluded properties", e);
     }
     List<String> excludedArtifactsList = getExcludedArtifacts(excludedProperties);
-
     builder.setExcludedArtifacts(excludedArtifactsList);
     builder.setExtraBootPackages(getExtraBootPackages(excludedProperties));
 
@@ -193,11 +213,12 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
     final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newLocalDependencyResolver(classPath,
-                                    workspaceLocationResolver,
-                                    getMavenLocalRepository());
+        .newOfflineDependencyResolver(classPath,
+                                      workspaceLocationResolver,
+                                      getMavenLocalRepository());
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
-                                                                 new ArtifactClassificationTypeResolver(dependencyResolver)));
+                                                                 new ArtifactClassificationTypeResolver(
+                                                                                                        dependencyResolver)));
 
     return builder.build();
   }
@@ -264,7 +285,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    * @return a {@link LocalRepository} that points to the local m2 repository folder
    */
   private static File getMavenLocalRepository() {
-    String localRepositoryProperty = System.getProperty("localRepository");
+    String localRepositoryProperty = getProperty("localRepository");
     if (localRepositoryProperty == null) {
       localRepositoryProperty = userHome + M2_REPO;
       LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);

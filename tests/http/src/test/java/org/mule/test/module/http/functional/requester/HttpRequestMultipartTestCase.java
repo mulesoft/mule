@@ -10,7 +10,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MultiPartPayloadMatchers.hasSize;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.MultiPartPayload;

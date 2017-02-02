@@ -8,7 +8,7 @@ package org.mule.extension.ws.internal.introspection;
 
 import static java.lang.String.format;
 import static org.mule.extension.ws.internal.util.TransformationUtils.nodeToString;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.extension.ws.internal.util.WscTransformationException;
 import org.mule.metadata.xml.SchemaCollector;
 
@@ -54,7 +54,7 @@ final class WsdlSchemasCollector {
           try {
             collector.addSchema(schemaUri, nodeToString(schema.getElement()));
           } catch (WscTransformationException e) {
-            throw new WscException(format("Cannot collect schema [%s], error while processing content", schemaUri), e);
+            throw new InvalidWsdlException(format("Cannot collect schema [%s], error while processing content", schemaUri), e);
           }
           getSchemaImportsUrls(schema).forEach(collector::addSchema);
         }

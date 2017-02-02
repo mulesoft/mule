@@ -12,12 +12,12 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
@@ -52,7 +52,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
     objectStore = new RaceConditionEnforcingObjectStore(cdl);
     idempotentMessageFilter = new IdempotentMessageFilter();
-    idempotentMessageFilter.setIdExpression("#[message.inboundProperties.id]");
+    idempotentMessageFilter.setIdExpression("#[mel:message.inboundProperties.id]");
     idempotentMessageFilter.setFlowConstruct(flow);
     idempotentMessageFilter.setThrowOnUnaccepted(false);
     idempotentMessageFilter.setStorePrefix("foo");

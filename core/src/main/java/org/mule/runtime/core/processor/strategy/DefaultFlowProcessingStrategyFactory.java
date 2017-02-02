@@ -7,59 +7,103 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
+import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 
 /**
- * This factory's processing strategy uses the 'asynchronous' strategy where possible, but if an event is synchronous it processes
- * it synchronously rather than failing.
+ * Creates default processing strategy with same behaviuor as {@link ProactorProcessingStrategyFactory} apart from the fact it
+ * will process syncronously without errror when a transaction is active.
  */
-public class DefaultFlowProcessingStrategyFactory extends LegacyAsynchronousProcessingStrategyFactory {
+public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
+        .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+                                             () -> muleContext.getSchedulerService()
+                                                 .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                             () -> muleContext.getSchedulerService()
+                                                 .cpuIntensiveScheduler(config()
+                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                              scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                          MILLISECONDS),
                                              muleContext);
   }
 
-  static class DefaultFlowProcessingStrategy extends LegacyAsynchronousProcessingStrategy {
+  static class DefaultFlowProcessingStrategy extends ProactorProcessingStrategy {
 
-    public DefaultFlowProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
+    public DefaultFlowProcessingStrategy(Supplier<Scheduler> eventLoop, Supplier<Scheduler> io, Supplier<Scheduler> cpu,
+                                         Consumer<Scheduler> schedulerStopper,
                                          MuleContext muleContext) {
-      super(schedulerSupplier, schedulerStopper, muleContext);
+      super(eventLoop, io, cpu, schedulerStopper, muleContext);
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      return publisher -> from(publisher).concatMap(request -> {
-        if (canProcessAsync(request)) {
-          return just(request).transform(super.onPipeline(flowConstruct, pipelineFunction));
-        } else {
-          return just(request).transform(SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.onPipeline(flowConstruct, pipelineFunction));
-        }
-      });
+    public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+      Sink proactorSink = super.createSink(flowConstruct, function);
+      Sink syncSink = SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, function);
+      return new DelegateSink(syncSink, proactorSink);
     }
 
-    protected boolean canProcessAsync(Event event) {
-      return !(event.isSynchronous() || isTransactionActive());
+    @Override
+    protected Consumer<Event> createOnEventConsumer() {
+      // Do nothing given event should still be processed when transaction is active
+      return event -> {
+      };
+    }
+
+    @Override
+    protected Predicate<Scheduler> scheduleOverridePredicate() {
+      return scheduler -> isTransactionActive();
+    }
+
+    private final static class DelegateSink implements Sink, Disposable {
+
+      private final Sink syncSink;
+      private final Sink proactorSink;
+
+      public DelegateSink(Sink syncSink, Sink proactorSink) {
+        this.syncSink = syncSink;
+        this.proactorSink = proactorSink;
+      }
+
+      @Override
+      public void accept(Event event) {
+        if (isTransactionActive()) {
+          syncSink.accept(event);
+        } else {
+          proactorSink.accept(event);
+        }
+      }
+
+      @Override
+      public void dispose() {
+        disposeIfNeeded(syncSink, NOP_LOGGER);
+        disposeIfNeeded(proactorSink, NOP_LOGGER);
+      }
     }
   }
+
 }

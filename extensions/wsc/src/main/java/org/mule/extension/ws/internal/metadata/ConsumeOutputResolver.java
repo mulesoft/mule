@@ -8,7 +8,7 @@ package org.mule.extension.ws.internal.metadata;
 
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getAttachmentFields;
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getOperationType;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.extension.ws.internal.introspection.OutputTypeIntrospecterDelegate;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -33,6 +33,11 @@ public class ConsumeOutputResolver extends BaseWscResolver implements OutputType
 
   public ConsumeOutputResolver() {
     this.bodyElementResolver = new BodyElementResolver(new OutputTypeIntrospecterDelegate());
+  }
+
+  @Override
+  public String getResolverName() {
+    return "ConsumeOutputResolver";
   }
 
   /**

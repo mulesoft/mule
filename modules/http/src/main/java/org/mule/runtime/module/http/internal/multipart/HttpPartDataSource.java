@@ -10,6 +10,7 @@ import static java.lang.Math.toIntExact;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.internal.HttpParser.parseMultipartContent;
+
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -21,7 +22,8 @@ import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
+import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

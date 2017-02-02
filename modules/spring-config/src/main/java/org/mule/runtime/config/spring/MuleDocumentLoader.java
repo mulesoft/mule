@@ -10,7 +10,7 @@ import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.META
 import org.mule.runtime.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.util.SystemUtils;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -91,7 +91,7 @@ final public class MuleDocumentLoader implements DocumentLoader {
   }
 
   protected XMLReader createSaxAnnotator(Document doc) throws ParserConfigurationException, SAXException {
-    SAXParserFactory saxParserFactory = new XMLSecureFactories().createSaxParserFactory();
+    SAXParserFactory saxParserFactory = XMLSecureFactories.createDefault().getSAXParserFactory();
     SAXParser saxParser = saxParserFactory.newSAXParser();
     XMLReader documentReader = saxParser.getXMLReader();
     documentReader.setContentHandler(new XmlMetadataAnnotator(doc, metadataFactory));

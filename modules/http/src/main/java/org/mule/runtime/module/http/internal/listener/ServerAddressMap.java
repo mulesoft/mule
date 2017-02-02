@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import org.mule.runtime.module.http.api.HttpConstants;
+import static org.mule.service.http.api.HttpConstants.ALL_INTERFACES_IP;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is a wrapper for a map whose keys are {@link org.mule.runtime.module.http.internal.listener.ServerAddress}s. It makes sure
+ * This is a wrapper for a map whose keys are {@link ServerAddress}s. It makes sure
  * that if an entry is not found we instead search for an entry with that same port but host 0.0.0.0.
  */
 public class ServerAddressMap<T> {
@@ -20,7 +21,7 @@ public class ServerAddressMap<T> {
   private Map<ServerAddress, T> internalMap;
 
   public ServerAddressMap() {
-    this(new HashMap<ServerAddress, T>());
+    this(new HashMap<>());
   }
 
   public ServerAddressMap(Map<ServerAddress, T> internalMap) {
@@ -35,8 +36,16 @@ public class ServerAddressMap<T> {
     T value = internalMap.get(key);
     if (value == null) {
       // if there's no entry for the specific address, we need to check if there's one for all interfaces address.
-      value = internalMap.get(new ServerAddress(HttpConstants.ALL_INTERFACES_IP, ((ServerAddress) key).getPort()));
+      value = internalMap.get(new DefaultServerAddress(ALL_INTERFACES_IP, ((ServerAddress) key).getPort()));
     }
     return value;
+  }
+
+  public boolean containsKey(Object key) {
+    return internalMap.containsKey(key);
+  }
+
+  public T remove(Object key) {
+    return internalMap.remove(key);
   }
 }

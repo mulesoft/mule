@@ -9,7 +9,11 @@ package org.mule.runtime.module.deployment.impl.internal.temporary;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.logging.log4j.core.util.FileUtils.getFileExtension;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,7 +24,6 @@ import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
@@ -32,6 +35,7 @@ import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -68,15 +72,26 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
   public TemporaryArtifactBuilder newBuilder() {
     return new TemporaryArtifactBuilder() {
 
+      private static final String JAR_EXTENSION = "jar";
+
       private Logger logger = LoggerFactory.getLogger(TemporaryArtifactBuilder.class);
 
       private File artifactRootFolder;
       private ArtifactContextBuilder artifactContextBuilder;
       private MuleDeployableArtifactClassLoader temporaryContextClassLoader;
-      private ArtifactConfiguration artifactConfiguration;
+      private ArtifactDeclaration artifactDeclaration;
       private List<File> artifactPluginFiles = new ArrayList<>();
+      private List<File> artifactLibraryFiles = new ArrayList<>();
       private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
       private List<Class<? extends ConnectivityTestingStrategy>> connectivityTestingStrategyTypes = new ArrayList<>();
+
+      @Override
+      public TemporaryArtifactBuilder addArtifactLibraryFile(File artifactLibraryFile) {
+        checkArgument(getFileExtension(artifactLibraryFile).equalsIgnoreCase(JAR_EXTENSION),
+                      "artifactLibraryFile has to be a jar file");
+        artifactLibraryFiles.add(artifactLibraryFile);
+        return this;
+      }
 
       @Override
       public TemporaryArtifactBuilder addArtifactPluginFile(File artifactPluginFile) {
@@ -110,7 +125,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
           File toolingTempFolder = new File(MuleContainerBootstrapUtils.getMuleTmpDir(), "tooling");
 
           artifactRootFolder = new File(toolingTempFolder, artifactId);
-          File tempPluginsFolder = new File(new File(artifactRootFolder, "plugins"), "lib");
+          File tempPluginsFolder = new File(artifactRootFolder, "plugins");
 
           artifactPluginDescriptors.addAll(this.artifactPluginFiles.stream().map(file -> {
             try {
@@ -120,10 +135,28 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
             }
           }).collect(toList()));
 
-          temporaryContextClassLoader = muleArtifactResourcesRegistry.getTemporaryArtifactClassLoaderBuilderFactory()
-              .createArtifactClassLoaderBuilder().setParentClassLoader(muleArtifactResourcesRegistry.getContainerClassLoader())
-              .addArtifactPluginDescriptors(this.artifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
-              .setArtifactId(artifactId).build();
+          final TemporaryArtifactClassLoaderBuilder temporaryArtifactClassLoaderBuilder =
+              muleArtifactResourcesRegistry.getTemporaryArtifactClassLoaderBuilderFactory()
+                  .createArtifactClassLoaderBuilder()
+                  .setParentClassLoader(muleArtifactResourcesRegistry.getContainerClassLoader())
+                  .addArtifactPluginDescriptors(this.artifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
+                  .setArtifactId(artifactId);
+
+          // Just add the "classes" folder in order to avoid issues when looking for log4j configuration
+          final File classes = new File(artifactRootFolder, "classes");
+          if (!classes.mkdir()) {
+            throw new MuleRuntimeException(createStaticMessage("Couldn't create classes folder for temporary application"));
+          }
+          temporaryArtifactClassLoaderBuilder.addUrl(classes.toURI().toURL());
+
+          artifactLibraryFiles.stream().forEach(file -> {
+            try {
+              temporaryArtifactClassLoaderBuilder.addUrl(file.toURI().toURL());
+            } catch (MalformedURLException e) {
+              throw new MuleRuntimeException(e);
+            }
+          });
+          temporaryContextClassLoader = temporaryArtifactClassLoaderBuilder.build();
 
           List<ArtifactPlugin> artifactPlugins = temporaryContextClassLoader.getArtifactPluginClassLoaders()
               .stream().map(artifactClassLoader -> new DefaultArtifactPlugin(artifactClassLoader.getArtifactId(),
@@ -138,7 +171,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
           artifactContextBuilder = ArtifactContextBuilder.newBuilder().setArtifactType(DOMAIN)
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(temporaryContextClassLoader)
               .setServiceRepository(muleArtifactResourcesRegistry.getServiceManager())
-              .setArtifactConfiguration(artifactConfiguration).setMuleContextListener(createMuleContextListener())
+              .setArtifactDeclaration(artifactDeclaration).setMuleContextListener(createMuleContextListener())
               .setClassLoaderRepository(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
 
           return new TemporaryArtifact() {
@@ -200,8 +233,8 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
        * {@inheritDoc}
        */
       @Override
-      public TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
-        this.artifactConfiguration = artifactConfiguration;
+      public TemporaryArtifactBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
+        this.artifactDeclaration = artifactDeclaration;
         return this;
       }
     };

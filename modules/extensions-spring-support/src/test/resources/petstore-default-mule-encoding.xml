@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+
+    <petstore:config name="config" cashierName="jim" pets="#[mel:[]]">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:cage>
+            <petstore:birds>
+                <petstore:bird key="mockingjay" value="15"/>
+                <petstore:bird key="mockingbird" value="10"/>
+            </petstore:birds>
+            <petstore:ammenities>
+                <petstore:ammenity value="spinning wheel"/>
+                <petstore:ammenity value="food can"/>
+            </petstore:ammenities>
+        </petstore:cage>
+    </petstore:config>
+
+    <flow name="fieldEncoding">
+        <petstore:get-cage config-ref="config"/>
+    </flow>
+
+    <flow name="topLevelEncoding">
+        <petstore:get-default-encoding usePhoneNumber="true">
+            <petstore:phone-number mobile="13123" home="1231" areaCodes="#[mel:[]]"/>
+        </petstore:get-default-encoding>
+    </flow>
+
+    <flow name="argumentEncoding">
+        <petstore:get-default-encoding usePhoneNumber="false"/>
+    </flow>
+
+    <flow name="overridedArgumentEncoding">
+        <petstore:get-default-encoding usePhoneNumber="false" encoding="#[mel:flowVars.customEncoding]"/>
+    </flow>
+</mule>

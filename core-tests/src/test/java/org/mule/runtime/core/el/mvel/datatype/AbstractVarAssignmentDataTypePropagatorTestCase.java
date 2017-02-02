@@ -20,6 +20,7 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
@@ -29,7 +30,6 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 import org.mule.runtime.core.el.mvel.MessageVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.StaticVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.VariableVariableResolverFactory;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -56,7 +56,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     final Builder builder = Event.builder(testEvent());
     CompiledExpression compiledExpression = compileMelExpression(expression, testEvent(), builder);
     Event event = builder.build();
-    dataTypePropagator.propagate(event, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
+    dataTypePropagator.propagate(event, builder, new TypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
     event = builder.build();
 
     assertThat(getVariableDataType(event), like(String.class, JSON, CUSTOM_ENCODING));
@@ -74,7 +74,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     event = builder.build();
 
     // Attempts to propagate a different dataType, which should be ignored
-    dataTypePropagator.propagate(event, builder, new DefaultTypedValue<>(propertyValue, DataType.STRING), compiledExpression);
+    dataTypePropagator.propagate(event, builder, new TypedValue<>(propertyValue, DataType.STRING), compiledExpression);
     event = builder.build();
 
     assertThat(getVariableDataType(event), like(Map.class, UNKNOWN, CUSTOM_ENCODING));

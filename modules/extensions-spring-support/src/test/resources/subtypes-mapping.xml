@@ -9,7 +9,7 @@
       http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd
       http://www.mulesoft.org/schema/mule/subtypes http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd">
 
-    <subtypes:config name="config" >
+    <subtypes:config name="config" twoPojos="#[mel:[]]" >
         <subtypes:connection>
             <subtypes:abstract-shape>
                 <subtypes:triangle-alias height="2" area="1"/>
@@ -30,7 +30,9 @@
         </subtypes:door-interface>
         <subtypes:explicit-square side="2" area="4"/>
         <subtypes:final-pojo someString="message"/>
-        <subtypes:ricin microgramsPerKilo="2"/>
+        <subtypes:ricin microgramsPerKilo="2">
+            <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
+        </subtypes:ricin>
         <subtypes:extensible-weapon>
             <heisenberg:ricin microgramsPerKilo="22">
                 <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
@@ -39,10 +41,13 @@
         <subtypes:triangle>
             <subtypes:triangle-alias height="4" area="2"/>
         </subtypes:triangle>
-        <subtypes:pojo-list-one>
+        <subtypes:pojo-with-extension>
+            <subtypes:extensible-pojo myString="A String" numbers="#[mel:[]]"/>
+        </subtypes:pojo-with-extension>
+        <subtypes:one-pojos>
             <subtypes:pojo-for-list id="inner"/>
-        </subtypes:pojo-list-one>
-        <subtypes:weapon-list>
+        </subtypes:one-pojos>
+        <subtypes:weapons>
             <subtypes:revolver bullets="6"/>
             <heisenberg:ricin microgramsPerKilo="10">
                 <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
@@ -51,7 +56,7 @@
                 <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
             </heisenberg:ricin>
             <subtypes:revolver bullets="0"/>
-        </subtypes:weapon-list>
+        </subtypes:weapons>
         <subtypes:weapon-maps>
             <subtypes:weapon-map key="ricinChild">
                 <heisenberg:ricin microgramsPerKilo="20">
@@ -61,7 +66,7 @@
             <subtypes:weapon-map key="revolverChild">
                 <subtypes:revolver bullets="1"/>
             </subtypes:weapon-map>
-            <subtypes:weapon-map key="revolverMEL" value="#[new org.mule.test.subtypes.extension.Revolver()]"/>
+            <subtypes:weapon-map key="revolverMEL" value="#[mel:new org.mule.test.subtypes.extension.Revolver()]"/>
         </subtypes:weapon-maps>
     </subtypes:config>
 
@@ -71,7 +76,10 @@
                        dateOfDeath="2011-09-07T00:00:00-05:00"
                        money="1000000"
                        finalHealth="DEAD"
-                       labAddress="#['Pollos Hermanos']">
+                       labAddress="#[mel:'Pollos Hermanos']"
+                       enemies="#[mel:[]]"
+                       monthlyIncomes="#[mel:[]]"
+                       knownAddresses="#[mel:[]]">
         <heisenberg:wild-card-weapons>
             <heisenberg:ricin microgramsPerKilo="10">
                 <heisenberg:destination victim="Krazy-8" address="Jesse's"/>
@@ -148,7 +156,7 @@
     </flow>
 
     <flow name="duplicatedOperationParameterAndTypeNames">
-        <subtypes:no-global-pojo noGlobalPojo="#[new org.mule.test.subtypes.extension.NoGlobalPojo()]"/>
+        <subtypes:no-global-pojo noGlobalPojo="#[mel:new org.mule.test.subtypes.extension.NoGlobalPojo()]"/>
     </flow>
 
     <flow name="pojoIsUsedInMapAndAlone">
@@ -158,10 +166,10 @@
             </subtypes:door>
             <subtypes:door-registries>
                 <subtypes:door-registry key="leftDoor">
-                    <subtypes:car-door handle="left"/>
+                    <subtypes:car-door handle="left" color="red"/>
                 </subtypes:door-registry>
                 <subtypes:door-registry key="rightDoor">
-                    <subtypes:car-door handle="right"/>
+                    <subtypes:car-door handle="right" color="red"/>
                 </subtypes:door-registry>
             </subtypes:door-registries>
         </subtypes:process-door>

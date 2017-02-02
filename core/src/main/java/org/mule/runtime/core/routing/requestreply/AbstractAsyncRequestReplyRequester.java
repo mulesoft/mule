@@ -8,19 +8,21 @@ package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.config.i18n.CoreMessages.responseTimedOutWaitingForId;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
@@ -252,7 +254,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     }
   }
 
-  class InternalAsyncReplyMessageProcessor implements Processor {
+  class InternalAsyncReplyMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
     @Override
     public Event process(Event event) throws MuleException {
@@ -343,5 +345,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
       return event;
     }
+  }
+
+  @Override
+  public ProcessingType getProcessingType() {
+    return BLOCKING;
   }
 }

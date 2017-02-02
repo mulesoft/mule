@@ -7,9 +7,22 @@
 
 
     <vegan:banana-config name="banana"/>
+    <vegan:healthy-food name="topLevelFood"/>
 
     <flow name="policy">
         <vegan:apply-policy/>
+    </flow>
+
+    <flow name="implementingType">
+        <vegan:get-production/>
+    </flow>
+
+    <flow name="inConfig">
+        <vegan:get-config />
+    </flow>
+
+    <flow name="topLevelNullSafe">
+        <vegan:get-healthy-food food="topLevelFood"/>
     </flow>
 
 </mule>

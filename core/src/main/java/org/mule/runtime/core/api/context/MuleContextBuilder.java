@@ -12,8 +12,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 
-import javax.resource.spi.work.WorkListener;
-
 /**
  * Builder that is used to build instances of {@link MuleContext}. Implementing classes are stateful and should provide public
  * chainable setters for configuring the builder instance and no public getters.
@@ -25,10 +23,6 @@ public interface MuleContextBuilder {
    * constructs the instance.
    */
   MuleContext buildMuleContext();
-
-  void setWorkManager(WorkManager workManager);
-
-  void setWorkListener(WorkListener workListener);
 
   void setNotificationManager(ServerNotificationManager notificationManager);
 

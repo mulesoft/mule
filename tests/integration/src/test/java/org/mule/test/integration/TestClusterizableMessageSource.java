@@ -6,16 +6,15 @@
  */
 package org.mule.test.integration;
 
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 
@@ -29,7 +28,7 @@ public class TestClusterizableMessageSource
   public void start() throws MuleException {
     InternalMessage muleMessage = InternalMessage.builder().payload("TEST").build();
     Event defaultMuleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(muleMessage).exchangePattern(ONE_WAY).flow(flowConstruct).build();
+        .message(muleMessage).flow(flowConstruct).build();
     listener.process(defaultMuleEvent);
   }
 

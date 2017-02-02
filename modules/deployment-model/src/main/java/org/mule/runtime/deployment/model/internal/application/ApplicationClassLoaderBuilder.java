@@ -11,17 +11,17 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
 import java.io.IOException;
 
@@ -32,6 +32,7 @@ import java.io.IOException;
  */
 public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<ApplicationClassLoaderBuilder> {
 
+  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private Domain domain;
 
   /**
@@ -39,19 +40,19 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * <p>
    * The {@code domainRepository} is used to locate the domain that this application belongs to and the
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
+   *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
    * @param artifactPluginRepository repository of plugins contained by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders.
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve
-   * @param dependenciesProvider resolver for missing dependencies.
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                        ArtifactPluginRepository artifactPluginRepository,
                                        ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                       ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                       DependenciesProvider dependenciesProvider) {
-    super(artifactClassLoaderFactory, artifactPluginRepository, artifactPluginClassLoaderFactory, artifactDescriptorFactory,
-          dependenciesProvider);
+                                       PluginDependenciesResolver pluginDependenciesResolver) {
+    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+
+    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }
 
   /**
@@ -65,6 +66,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
     checkState(domain != null, "Domain cannot be null");
 
     return (MuleDeployableArtifactClassLoader) super.build();
+  }
+
+  @Override
+  protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
   }
 
   @Override

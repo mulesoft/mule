@@ -8,9 +8,9 @@
 package org.mule.runtime.deployment.model.internal.plugin;
 
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
-import org.mule.runtime.deployment.model.api.artifact.InvalidDependencyVersionException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -20,15 +20,14 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderM
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
 
 /**
  * Resolves plugin dependencies considering the plugin name only.
@@ -56,6 +55,14 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   @Override
   public List<ArtifactPluginDescriptor> resolve(List<ArtifactPluginDescriptor> descriptors) {
 
+    List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
+
+    verifyPluginExportedPackages(resolvedPlugins);
+
+    return resolvedPlugins;
+  }
+
+  private List<ArtifactPluginDescriptor> resolvePluginsDependencies(List<ArtifactPluginDescriptor> descriptors) {
     Set<BundleDescriptor> knownPlugins =
         descriptors.stream().map(ArtifactPluginDescriptor::getBundleDescriptor).collect(Collectors.toSet());
     descriptors = getArtifactsWithDependencies(descriptors, knownPlugins);
@@ -93,6 +100,29 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     }
 
     return resolvedPlugins;
+  }
+
+  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
+    final Map<String, List<String>> exportedPackages = new HashMap<>();
+
+    boolean error = false;
+    for (ArtifactPluginDescriptor plugin : plugins) {
+      for (String packageName : plugin.getClassLoaderModel().getExportedPackages()) {
+        List<String> exportedOn = exportedPackages.get(packageName);
+
+        if (exportedOn == null) {
+          exportedOn = new LinkedList<>();
+          exportedPackages.put(packageName, exportedOn);
+        } else {
+          error = true;
+        }
+        exportedOn.add(plugin.getName());
+      }
+    }
+
+    if (error) {
+      throw new DuplicateExportedPackageException(exportedPackages);
+    }
   }
 
   /**
@@ -142,7 +172,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                                    List<ArtifactPluginDescriptor> resolvedPlugins) {
     Set<String> exportedPackages = new HashSet<>();
     for (BundleDependency pluginDependency : pluginDependencies) {
-      if (MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().get())) {
+      final Optional<String> classifier = pluginDependency.getDescriptor().getClassifier();
+      if (classifier.isPresent() && MULE_PLUGIN_CLASSIFIER.equals(classifier.get())) {
         ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(pluginDependency, resolvedPlugins);
         exportedPackages.addAll(dependencyDescriptor.getClassLoaderModel().getExportedPackages());
         exportedPackages
@@ -214,32 +245,6 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     return availableBundleDescriptor.getArtifactId().equals(expectedBundleDescriptor.getArtifactId()) &&
         availableBundleDescriptor.getGroupId().equals(expectedBundleDescriptor.getGroupId()) &&
         isCompatibleVersion(availableBundleDescriptor.getVersion(), expectedBundleDescriptor.getVersion());
-  }
-
-  private static boolean isCompatibleVersion(String availableVersion, String expectedVersion) {
-    if (availableVersion.equals(expectedVersion)) {
-      return true;
-    }
-
-    Version available = getBundleVersion(availableVersion);
-    Version expected = getBundleVersion(expectedVersion);
-
-    if (available.compareTo(expected) >= 0) {
-      String availableMajorVersion = availableVersion.substring(0, availableVersion.indexOf("."));
-      String expectedMajorVersion = expectedVersion.substring(0, expectedVersion.indexOf("."));
-
-      return availableMajorVersion.equals(expectedMajorVersion);
-    }
-
-    return false;
-  }
-
-  private static Version getBundleVersion(String version) {
-    try {
-      return new GenericVersionScheme().parseVersion(version);
-    } catch (InvalidVersionSpecificationException e) {
-      throw new InvalidDependencyVersionException("Unable to parse bundle version: " + version);
-    }
   }
 
   private boolean hasPluginDependenciesResolved(Set<BundleDependency> pluginDependencies,

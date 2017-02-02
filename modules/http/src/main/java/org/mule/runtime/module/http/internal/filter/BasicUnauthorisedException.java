@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.http.internal.filter;
 
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
-import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.security.SecurityFilter;
 
 public class BasicUnauthorisedException extends UnauthorisedException implements ErrorMessageAwareException {
 
@@ -29,8 +29,13 @@ public class BasicUnauthorisedException extends UnauthorisedException implements
   }
 
   public BasicUnauthorisedException(Event event, SecurityContext context, SecurityFilter filter) {
-    super(event, context, filter);
+    super(context, filter.getClass().getName(), event.getContext().getOriginatingConnectorName());
     this.errorMessage = event.getMessage();
+  }
+
+  public BasicUnauthorisedException(SecurityContext context, SecurityFilter filter, String connector, Message errorMessage) {
+    super(context, filter.getClass().getName(), connector);
+    this.errorMessage = errorMessage;
   }
 
   @Override

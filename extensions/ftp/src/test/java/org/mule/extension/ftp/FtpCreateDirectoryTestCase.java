@@ -6,15 +6,15 @@
  */
 package org.mule.extension.ftp;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 
 import java.nio.file.Paths;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
 
@@ -37,10 +37,10 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
 
   @Test
   public void createExistingDirectory() throws Exception {
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     final String directory = "washerefirst";
     testHarness.makeDir(directory);
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-    testHarness.expectedException().expectMessage(containsString(testHarness.getWorkingDirectory()));
     doCreateDirectory(directory);
   }
 

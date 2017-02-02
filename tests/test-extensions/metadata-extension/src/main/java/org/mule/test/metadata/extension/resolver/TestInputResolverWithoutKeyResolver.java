@@ -24,4 +24,9 @@ public class TestInputResolverWithoutKeyResolver implements InputTypeResolver<St
   public String getCategoryName() {
     return "MetadataExtensionResolver";
   }
+
+  @Override
+  public String getResolverName() {
+    return "TestInputResolverWithoutKeyResolver";
+  }
 }

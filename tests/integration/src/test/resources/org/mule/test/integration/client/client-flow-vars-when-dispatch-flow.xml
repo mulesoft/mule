@@ -34,8 +34,8 @@
         <set-variable variableName="team" value="Sales"/>
         <processor ref="myProcessor"/>
         <set-variable variableName="ammount" value="100"/>
-        <test:assert expression="#[flowVars['team'] == 'Sales']" />
-        <test:assert expression="#[flowVars['ammount'] == '100']" />
+        <test:assert expression="#[mel:flowVars['team'] == 'Sales']" />
+        <test:assert expression="#[mel:flowVars['ammount'] == '100']" />
     </flow>
 
     <flow name="flowVarsFlowUsingJavaComponent">
@@ -43,7 +43,7 @@
         <set-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingVariablesTestCase$JavaComponentDispatchFlowUsingNewMuleClient"/>
         <set-variable variableName="ammount" value="100"/>
-        <test:assert expression="#[flowVars['team'] == 'Sales']" />
-        <test:assert expression="#[flowVars['ammount'] == '100']" />
+        <test:assert expression="#[mel:flowVars['team'] == 'Sales']" />
+        <test:assert expression="#[mel:flowVars['ammount'] == '100']" />
     </flow>
 </mule>

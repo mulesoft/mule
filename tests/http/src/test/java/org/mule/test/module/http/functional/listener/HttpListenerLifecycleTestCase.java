@@ -8,7 +8,7 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;

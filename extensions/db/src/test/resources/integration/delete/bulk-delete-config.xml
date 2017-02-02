@@ -25,7 +25,7 @@
             <db:sql>select * from PLANET</db:sql>
         </db:select>
 
-        <db:bulk-update parameterValues="#[payload]">
+        <db:bulk-update>
             <db:sql>update PLANET set NAME='Mercury' where POSITION=:position</db:sql>
         </db:bulk-update>
     </flow>

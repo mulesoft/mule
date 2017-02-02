@@ -9,14 +9,16 @@ package org.mule.runtime.core.security;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.security.Authentication;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 
 /**
  * Performs authentication based on a username and password. The username and password are retrieved from the {@link Message}
@@ -25,8 +27,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
  */
 public class UsernamePasswordAuthenticationFilter extends AbstractAuthenticationFilter {
 
-  private String username = "#[message.inboundProperties.username]";
-  private String password = "#[message.inboundProperties.password]";
+  private String username = "#[mel:message.inboundProperties.username]";
+  private String password = "#[mel:message.inboundProperties.password]";
 
   public UsernamePasswordAuthenticationFilter() {
     super();
@@ -36,7 +38,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
    * Authenticates the current message.
    *
    * @param event the current message recieved
-   * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
+   * @throws SecurityException if authentication fails
    */
   @Override
   public Event authenticate(Event event)
@@ -79,7 +81,8 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
       throw new UnauthorisedException(CoreMessages.authNoCredentials());
     }
 
-    return new DefaultMuleAuthentication(new MuleCredentials(usernameEval.toString(), passwordEval.toString().toCharArray()));
+    return new DefaultMuleAuthentication(new DefaultMuleCredentials(usernameEval.toString(),
+                                                                    passwordEval.toString().toCharArray()));
   }
 
   public String getUsername() {

@@ -12,16 +12,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
@@ -47,8 +46,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
   public ExpectedException expectedException = ExpectedException.none();
 
 
-  public AsyncInterceptingMessageProcessorTestCase(boolean reactive) {
-    super(reactive);
+  public AsyncInterceptingMessageProcessorTestCase(Mode mode) {
+    super(mode);
     setStartContext(true);
   }
 
@@ -60,14 +59,14 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
 
   @Test
   public void testProcessOneWay() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(ONE_WAY).build();
+    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     assertAsync(messageProcessor, event);
   }
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(REQUEST_RESPONSE).build();
+    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     assertAsync(messageProcessor, event);
   }
@@ -75,12 +74,11 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
   @Test
   public void testException() throws Exception {
 
-    Flow flow = new Flow("flow", muleContext);
+    Flow flow = builder("flow", muleContext).build();
     initialiseObject(flow);
 
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.of(TEST_MESSAGE))
-        .exchangePattern(ONE_WAY)
         .build();
 
     messageProcessor.setListener(failingProcessor);

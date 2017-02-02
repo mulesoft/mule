@@ -12,7 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 /**
  * A {@link ObjectParsingDelegate} which only parses {@link ObjectType} which represent one specific java type.

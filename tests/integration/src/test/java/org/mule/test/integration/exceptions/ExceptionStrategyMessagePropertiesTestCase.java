@@ -46,7 +46,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrat
     public void run() {
       try {
         for (int i = 0; i < numMessages; ++i) {
-          flowRunner("inbound").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "bar").asynchronously().run();
+          flowRunner("inbound").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "bar").dispatch();
         }
       } catch (Exception e) {
         fail(e.getMessage());

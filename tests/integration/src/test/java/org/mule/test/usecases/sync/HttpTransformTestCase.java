@@ -6,18 +6,22 @@
  */
 package org.mule.test.usecases.sync;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -29,12 +33,14 @@ import org.junit.Test;
 
 public class HttpTransformTestCase extends AbstractIntegrationTestCase {
 
-  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
   @Rule
   public DynamicPort httpPort1 = new DynamicPort("port1");
 
   @Rule
   public DynamicPort httpPort2 = new DynamicPort("port2");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {
@@ -43,34 +49,31 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testTransform() throws Exception {
-    MuleClient client = muleContext.getClient();
-    InternalMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()),
-                                          InternalMessage.of("payload"), HTTP_REQUEST_OPTIONS)
-        .getRight();
-    assertNotNull(message);
-    GZipUncompressTransformer gu = new GZipUncompressTransformer();
-    gu.setMuleContext(muleContext);
-    gu.setReturnDataType(DataType.STRING);
-    assertNotNull(message.getPayload().getValue());
-    String result = (String) gu.transform(getPayloadAsBytes(message));
+    HttpRequest httpRequest = HttpRequest.builder().setUri(format("http://localhost:%d/RemoteService", httpPort1.getNumber()))
+        .setEntity(new ByteArrayHttpEntity("payload".getBytes())).setMethod(POST.name()).build();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    GZipUncompressTransformer transformer = new GZipUncompressTransformer();
+    transformer.setMuleContext(muleContext);
+    transformer.setReturnDataType(DataType.STRING);
+    byte[] byteArray = IOUtils.toByteArray(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
+    String result = (String) transformer.transform(byteArray);
     assertThat(result, is("<string>payload</string>"));
   }
 
   @Test
   public void testBinary() throws Exception {
-    MuleClient client = muleContext.getClient();
     ArrayList<Integer> payload = new ArrayList<>();
     payload.add(42);
-    InternalMessage message =
-        client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
-                    InternalMessage.of(muleContext.getObjectSerializer().getExternalProtocol().serialize(payload)),
-                    HTTP_REQUEST_OPTIONS)
-            .getRight();
-    assertNotNull(message);
-    ByteArrayToSerializable bas = new ByteArrayToSerializable();
-    bas.setMuleContext(muleContext);
-    assertNotNull(message.getPayload().getValue());
-    Object result = bas.transform(message.getPayload().getValue());
+    HttpRequest httpRequest = HttpRequest.builder().setUri(format("http://localhost:%d/RemoteService", httpPort2.getNumber()))
+        .setEntity(new ByteArrayHttpEntity(muleContext.getObjectSerializer().getExternalProtocol().serialize(payload)))
+        .setMethod(POST.name()).build();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+
+    ByteArrayToSerializable transformer = new ByteArrayToSerializable();
+    transformer.setMuleContext(muleContext);
+    byte[] byteArray = IOUtils.toByteArray(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
+    Object result = transformer.transform(byteArray);
     assertThat(result, is(payload));
   }
 

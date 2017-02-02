@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
@@ -83,13 +84,14 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   private AetherClassPathClassifier classifier;
 
   private Artifact rootArtifact;
+  private Artifact serviceArtifact;
   private Dependency fooCoreDep;
   private Dependency fooToolsArtifactDep;
   private Dependency fooTestsSupportDep;
   private Dependency guavaDep;
   private Dependency derbyDriverDep;
-  private Dependency fooServiceDep;
 
+  private Dependency fooServiceDep;
   private List<Dependency> directDependencies;
 
   @Before
@@ -101,7 +103,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     this.fooTestsSupportDep = new Dependency(new DefaultArtifact("org.foo.tests:foo-tests-support:1.0-SNAPSHOT"), TEST);
     this.derbyDriverDep = new Dependency(new DefaultArtifact("org.apache.derby:derby:10.11.1.1"), TEST);
     this.guavaDep = new Dependency(new DefaultArtifact("org.google:guava:18.0"), COMPILE);
-    this.fooServiceDep = new Dependency(new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0-SNAPSHOT"), PROVIDED);
+    serviceArtifact = new DefaultArtifact("org.foo:foo-service:jar:mule-service:1.0-SNAPSHOT");
+    this.fooServiceDep = new Dependency(serviceArtifact, PROVIDED);
 
     this.dependencyResolver = mock(DependencyResolver.class);
     this.context = mock(ClassPathClassifierContext.class);
@@ -130,7 +133,6 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     List<Dependency> managedDependencies = newArrayList(guavaDep);
     when(artifactDescriptorResult.getManagedDependencies()).thenReturn(managedDependencies);
     when(dependencyResolver.readArtifactDescriptor(any(Artifact.class))).thenReturn(artifactDescriptorResult);
-
 
     File rootArtifactFile = temporaryFolder.newFile();
     File fooCoreArtifactFile = temporaryFolder.newFile();
@@ -329,8 +331,29 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
         .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
             .thenReturn(rootArtifactResult);
 
+    File serviceArtifactFile = temporaryFolder.newFile();
+    ArtifactResult serviceArtifactResult = mock(ArtifactResult.class);
+    Artifact jarServiceArtifact = serviceArtifact.setFile(serviceArtifactFile);
+    when(serviceArtifactResult.getArtifact()).thenReturn(jarServiceArtifact);
+
+    when(dependencyResolver
+        .resolveArtifact(argThat(new ArtifactMatcher(serviceArtifact.getGroupId(), serviceArtifact.getArtifactId()))))
+            .thenReturn(serviceArtifactResult);
 
     ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
+
+    Dependency compileMuleCoreDep = fooCoreDep.setScope(COMPILE);
+    Dependency compileMuleArtifactDep = fooToolsArtifactDep.setScope(COMPILE);
+    File fooCoreArtifactFile = temporaryFolder.newFile();
+    File fooToolsArtifactFile = temporaryFolder.newFile();
+
+    when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
+                                                (List<Dependency>) and((argThat(hasItems(equalTo(compileMuleCoreDep),
+                                                                                         equalTo(compileMuleArtifactDep)))),
+                                                                       argThat(hasSize(2))),
+                                                argThat(equalTo(Collections.<Dependency>emptyList())),
+                                                argThat(instanceOf(DependencyFilter.class))))
+                                                    .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 
@@ -338,7 +361,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(classification.getApplicationUrls(), hasItem(rootArtifactFile.toURI().toURL()));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getPluginSharedLibUrls(), is(empty()));
-    assertThat(classification.getContainerUrls(), is(empty()));
+    assertThat(classification.getContainerUrls(), hasSize(2));
     assertThat(classification.getServiceUrlClassifications(), hasSize(1));
     assertThat(classification.getServiceUrlClassifications().get(0).getUrls(), hasItem(fooServiceArtifactFile.toURI().toURL()));
 
@@ -350,6 +373,12 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                              argThat(equalTo(Collections.<Dependency>emptyList())),
                              argThat(instanceOf(DependencyFilter.class)));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
+    verify(dependencyResolver, atLeastOnce()).resolveDependencies(argThat(nullValue(Dependency.class)),
+                                                                  (List<Dependency>) and((argThat(hasItems(equalTo(compileMuleCoreDep),
+                                                                                                           equalTo(compileMuleArtifactDep)))),
+                                                                                         argThat(hasSize(2))),
+                                                                  argThat(equalTo(Collections.<Dependency>emptyList())),
+                                                                  argThat(instanceOf(DependencyFilter.class)));
   }
 
   private ArtifactDescriptorResult noManagedDependencies() throws ArtifactDescriptorException {

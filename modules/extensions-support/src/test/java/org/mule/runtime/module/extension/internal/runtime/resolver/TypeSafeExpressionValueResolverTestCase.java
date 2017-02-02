@@ -42,13 +42,13 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
-    assertResolved(getResolver("#['Hello ' + payload]", String.class)
+    assertResolved(getResolver("#[mel:'Hello ' + payload]", String.class)
         .resolve(eventBuilder().message(InternalMessage.of("World!")).build()), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
-    assertResolved(getResolver("Hello #[payload]", String.class)
+    assertResolved(getResolver("Hello #[mel:payload]", String.class)
         .resolve(eventBuilder().message(InternalMessage.of("World!")).build()), HELLO_WORLD, times(1));
   }
 
@@ -60,13 +60,13 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   @Test
   public void expressionWithTransformation() throws Exception {
-    assertResolved(getResolver("#[true]", String.class)
+    assertResolved(getResolver("#[mel:true]", String.class)
         .resolve(eventBuilder().message(InternalMessage.of(HELLO_WORLD)).build()), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
-    assertResolved(getResolver("tru#['e']", String.class)
+    assertResolved(getResolver("tru#[mel:'e']", String.class)
         .resolve(eventBuilder().message(InternalMessage.of(HELLO_WORLD)).build()), "true", times(1));
   }
 
@@ -82,7 +82,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   @Test(expected = IllegalArgumentException.class)
   public void nullExpectedType() throws Exception {
-    getResolver("#[payload]", null);
+    getResolver("#[mel:payload]", null);
   }
 
 

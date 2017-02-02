@@ -7,17 +7,17 @@
 package org.mule.test.metadata.extension;
 
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Query;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
@@ -153,7 +153,8 @@ public class MetadataOperations {
   }
 
   public LocationKey simpleMultiLevelKeyResolver(@Connection MetadataConnection connection,
-                                                 @ParameterGroup @MetadataKeyId(TestMultiLevelKeyResolver.class) LocationKey locationKey,
+                                                 @ParameterGroup(
+                                                     name = "key") @MetadataKeyId(TestMultiLevelKeyResolver.class) LocationKey locationKey,
                                                  @Optional @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKey;
   }
@@ -184,6 +185,15 @@ public class MetadataOperations {
     return null;
   }
 
+  public List<Result<String, StringAttributes>> listOfMessages() {
+    return null;
+  }
+
+  @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
+  public List<Result> dynamicListOfMessages(@MetadataKeyId String type) {
+    return null;
+  }
+
   public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal) {
     return false;
   }
@@ -192,7 +202,7 @@ public class MetadataOperations {
                                                                @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) Map<String, Object> mapContent) {}
 
   public void contentParameterShouldNotGenerateListChildElement(
-                                                                @TypeResolver(TestInputResolverWithoutKeyResolver.class) List<String> listContent) {}
+                                                                @TypeResolver(TestInputResolverWithoutKeyResolver.class) List<String> contents) {}
 
   public void contentParameterShouldNotGeneratePojoChildElement(
                                                                 @TypeResolver(TestInputResolverWithoutKeyResolver.class) Bear animalContent) {}

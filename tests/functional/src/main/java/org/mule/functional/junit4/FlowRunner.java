@@ -6,18 +6,21 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
+
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import org.apache.commons.collections.Transformer;
@@ -27,14 +30,15 @@ import org.apache.commons.collections.Transformer;
  * 
  * This runner is <b>not</b> thread-safe.
  */
-public class FlowRunner extends FlowConstructRunner<FlowRunner> {
+public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Disposable {
 
   private String flowName;
 
   private ExecutionTemplate<Event> txExecutionTemplate = callback -> callback.process();
 
   private Transformer responseEventTransformer = input -> input;
-  private boolean nonBlocking = false;
+
+  private Scheduler scheduler;
 
   /**
    * Initializes this flow runner.
@@ -60,16 +64,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
     txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
 
-    return this;
-  }
-
-  /**
-   * Configures this runner's flow to be run non-blocking.
-   * 
-   * @return this {@link FlowRunner}
-   */
-  public FlowRunner nonBlocking() {
-    nonBlocking = true;
     return this;
   }
 
@@ -113,18 +107,67 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public Event runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    Event responseEvent = txExecutionTemplate.execute(() -> {
-      if (nonBlocking) {
-        return processAsStreamAndBlock(getOrBuildEvent(), flow);
-      } else {
-        return flow.process(getOrBuildEvent());
-      }
-    });
+    Event response = txExecutionTemplate.execute(getFlowRunCallback(flow));
+
     for (String flowNameToVerify : flowNamesToVerify) {
       FlowAssert.verify(flowNameToVerify);
     }
 
-    return (Event) responseEventTransformer.transform(responseEvent);
+    return (Event) responseEventTransformer.transform(response);
+  }
+
+  /**
+   * Dispatches to the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
+   * afterwards.
+   *
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   *
+   * Dispatch behaves differently to {@link FlowRunner#run()} in that it does not propagate any exceptions to the test case or
+   * return a result.
+   */
+  public void dispatch() throws Exception {
+    Flow flow = (Flow) getFlowConstruct();
+    try {
+      txExecutionTemplate.execute(getFlowDispatchCallback(flow));
+    } catch (Exception e) {
+      // Ignore
+    }
+    FlowAssert.verify(flowName);
+  }
+
+  /**
+   * Dispatches to the specified flow with the provided event and configuration in a new IO thread, and performs a
+   * {@link FlowAssert#verify(String))} afterwards.
+   *
+   * If this is called multiple times, the <b>same</b> event will be sent. To force the creation of a new event, use
+   * {@link #reset()}.
+   *
+   * Dispatch behaves differently to {@link FlowRunner#run()} in that it does not propagate any exceptions to the test case or
+   * return a result.
+   */
+  public void dispatchAsync() throws Exception {
+    Flow flow = (Flow) getFlowConstruct();
+    scheduler = muleContext.getSchedulerService().ioScheduler();
+    try {
+      scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
+    } catch (Exception e) {
+      // Ignore
+    }
+    FlowAssert.verify(flowName);
+  }
+
+  private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
+    return () -> {
+      return flow.process(getOrBuildEvent());
+    };
+  }
+
+  private ExecutionCallback<Event> getFlowDispatchCallback(final Flow flow) {
+    return () -> {
+      flow.process(getOrBuildEvent());
+      return null;
+    };
   }
 
   /**
@@ -147,5 +190,12 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
   @Override
   public String getFlowConstructName() {
     return flowName;
+  }
+
+  @Override
+  public void dispose() {
+    if (scheduler != null) {
+      scheduler.stop(0, SECONDS);
+    }
   }
 }

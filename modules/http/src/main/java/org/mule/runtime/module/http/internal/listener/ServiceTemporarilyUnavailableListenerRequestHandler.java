@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 
 /**
  * Request handle for request calls to paths with no listener configured.

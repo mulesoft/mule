@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection>
+            <httpn:authentication>
+                <oauth:authorization-code-grant-type
+                        clientId="${client.id}"
+                        clientSecret="${client.secret}"
+                        localCallbackUrl="${local.callback.url}"
+                        externalCallbackUrl="${local.callback.url}"
+                        localAuthorizationUrl="${local.authorization.url}"
+                        authorizationUrl="${authorization.url}"
+                        tokenUrl="${token.url}">
+                </oauth:authorization-code-grant-type>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${onCompleteUrlPort}"/>
+    </httpn:listener-config>
+
+    <flow name="someFlow">
+        <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
+        <test:assert expression="#[mel:message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
+    </flow>
+
+    <!-- TODO MULE-11405 remove this flow  -->
+    <flow name="testFlow">
+        <httpn:request host="localhost" port="${oauthServerHttpPort}" path="/resource" method="POST"
+                       config-ref="requestConfig"/>
+    </flow>
+</mule>

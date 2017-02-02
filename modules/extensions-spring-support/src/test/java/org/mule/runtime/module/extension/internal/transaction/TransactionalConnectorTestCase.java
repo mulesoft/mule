@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.transaction;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.test.transactional.TestTransactionalConnection;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.test.transactional.TestLocalTransactionalConnection;
 import org.mule.test.transactional.TransactionalExtension;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase {
@@ -39,10 +44,25 @@ public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase 
 
   @Test
   public void executeTransactionless() throws Exception {
-    TestTransactionalConnection connection = (TestTransactionalConnection) flowRunner("executeTransactionless").withPayload("")
-        .run().getMessage().getPayload().getValue();
+    TestLocalTransactionalConnection connection =
+        (TestLocalTransactionalConnection) flowRunner("executeTransactionless").withPayload("")
+            .run().getMessage().getPayload().getValue();
     assertThat(connection.isTransactionBegun(), is(false));
     assertThat(connection.isTransactionCommited(), is(false));
     assertThat(connection.isTransactionRolledback(), is(false));
+  }
+
+  @Test
+  public void localTxDoesntSupportMultipleResources() throws Exception {
+    MessagingException exception = flowRunner("localTxDoesntSupportMultipleResources").runExpectingException();
+    Error error = exception.getEvent().getError().get();
+    MatcherAssert.assertThat(error.getDescription(),
+                             is(containsString("the current transaction doesn't support it and could not being bound")));
+    MatcherAssert.assertThat(error.getCause(), is(instanceOf(TransactionException.class)));
+  }
+
+  @Test
+  public void localTxSupportsMultipleOperationsFromSameResource() throws Exception {
+    flowRunner("localTxSupportsMultipleOperationsFromSameResource").run();
   }
 }

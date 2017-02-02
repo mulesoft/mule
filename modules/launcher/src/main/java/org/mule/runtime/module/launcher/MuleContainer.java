@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
-import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -20,6 +20,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.temporary.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
@@ -82,7 +83,7 @@ public class MuleContainer {
   }
 
   private ServiceManager serviceManager;
-
+  private ExtensionModelLoaderManager extensionModelLoaderManager;
 
   /**
    * Application entry point.
@@ -99,6 +100,8 @@ public class MuleContainer {
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
 
+    this.extensionModelLoaderManager = artifactResourcesRegistry.getExtensionModelLoaderManager();
+
     this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
                                                        artifactResourcesRegistry.getApplicationFactory());
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
@@ -112,8 +115,10 @@ public class MuleContainer {
   }
 
   public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
-                       MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager) {
-    this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager);
+                       MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
+                       ExtensionModelLoaderManager extensionModelLoaderManager) {
+    this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
+         extensionModelLoaderManager);
   }
 
   /**
@@ -121,7 +126,7 @@ public class MuleContainer {
    */
   public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService,
                        ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
-                       ServiceManager serviceManager)
+                       ServiceManager serviceManager, ExtensionModelLoaderManager extensionModelLoaderManager)
       throws IllegalArgumentException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
     init(args);
@@ -130,6 +135,7 @@ public class MuleContainer {
     this.coreExtensionManager = coreExtensionManager;
     this.repositoryService = repositoryService;
     this.serviceManager = serviceManager;
+    this.extensionModelLoaderManager = extensionModelLoaderManager;
     this.toolingService = toolingService;
   }
 
@@ -183,6 +189,8 @@ public class MuleContainer {
       coreExtensionManager.start();
 
       serviceManager.start();
+
+      extensionModelLoaderManager.start();
 
       deploymentService.start();
     } catch (Throwable e) {
@@ -247,6 +255,10 @@ public class MuleContainer {
 
     if (serviceManager != null) {
       serviceManager.stop();
+    }
+
+    if (extensionModelLoaderManager != null) {
+      extensionModelLoaderManager.stop();
     }
 
     coreExtensionManager.dispose();

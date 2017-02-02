@@ -7,7 +7,7 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:request-config name="requestConfig" basePath="basePath">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
+        <httpn:request-connection host="localhost"/>
     </httpn:request-config>
 
     <httpn:request-config name="requestConfigHttp">

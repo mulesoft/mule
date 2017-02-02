@@ -19,20 +19,18 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.S
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.GENERATED_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CURRENT_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.extension.api.model.property.ExportModelProperty;
+import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
 import org.mule.runtime.module.extension.internal.config.ExtensionNamespaceHandler;
 import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Optional;
 import java.util.ServiceLoader;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -69,7 +67,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   private SpringHandlerBundleResourceFactory springHandlerFactory = new SpringHandlerBundleResourceFactory();
   private SpringSchemaBundleResourceFactory springSchemaBundleResourceFactory = new SpringSchemaBundleResourceFactory();
-  private SchemaResourceFactory schemaResourceFactory = new SchemaResourceFactory();
+  private SchemaXmlResourceFactory schemaXmlResourceFactory = new SchemaXmlResourceFactory();
 
   @Before
   public void before() {
@@ -84,10 +82,9 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
     when(extensionModel.getXmlDslModel()).thenReturn(xmlDslModel);
     mockSubTypes(extensionModel);
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
-    when(extensionModel.getModelProperty(ExportModelProperty.class)).thenReturn(Optional.empty());
 
     generator = new AnnotationProcessorResourceGenerator(asList(springHandlerFactory, springSchemaBundleResourceFactory,
-                                                                schemaResourceFactory),
+                                                                schemaXmlResourceFactory),
                                                          processingEnvironment);
 
     when(extensionModel.getName()).thenReturn(EXTENSION_NAME);
@@ -96,7 +93,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   @Override
   protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
-    return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaResourceFactory.class,
+    return new Class[] {SpringHandlerBundleResourceFactory.class, SchemaXmlResourceFactory.class,
         SpringSchemaBundleResourceFactory.class};
   }
 
@@ -116,7 +113,7 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
 
   @Test
   public void generateSchema() throws Exception {
-    GeneratedResource resource = schemaResourceFactory.generateResource(extensionModel).get();
+    GeneratedResource resource = schemaXmlResourceFactory.generateResource(extensionModel).get();
     assertThat(isBlank(new String(resource.getContent())), is(false));
   }
 

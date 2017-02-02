@@ -14,7 +14,7 @@ import java.sql.Struct;
 /**
  * Defines a structured data type for {@link Struct} mapped to a Java class.
  */
-public class MappedStructResolvedDbType<T> extends StructuredDbType {
+public class MappedStructResolvedDbType<T> extends AbstractStructuredDbType {
 
   private final Class<T> mappedClass;
 

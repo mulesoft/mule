@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -41,7 +41,7 @@ public interface Processor extends ReactiveProcessor {
    * <p>
    * The default implementation delegates to {@link #process(Event)} and will:
    * <ol>
-   * <li>propagte any exception thrown</li>
+   * <li>propagate any exception thrown</li>
    * <li>drop events if invocation of {@link #process(Event)} returns null.</li>
    * </ol>
    *
@@ -53,14 +53,4 @@ public interface Processor extends ReactiveProcessor {
     return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
-  /**
-   * Given existing processor may be doing anything we need to be conservative and use the {@link ProcessingType#BLOCKING} type.
-   * Implementations can of course easily override this and should do so.
-   * 
-   * @return default {@link ProcessingType#BLOCKING} processing type.
-   */
-  @Override
-  default ReactiveProcessor.ProcessingType getProccesingType() {
-    return ProcessingType.BLOCKING;
-  }
 }

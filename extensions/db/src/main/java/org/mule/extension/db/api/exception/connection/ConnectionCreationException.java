@@ -8,6 +8,7 @@
 package org.mule.extension.db.api.exception.connection;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
  * Thrown to indicate an error creating a connection
@@ -18,11 +19,15 @@ public class ConnectionCreationException extends ConnectionException {
     super(message);
   }
 
+  public ConnectionCreationException(Throwable throwable) {
+    super(throwable);
+  }
+
   public ConnectionCreationException(String message, Throwable throwable) {
     super(message, throwable);
   }
 
-  public ConnectionCreationException(Throwable throwable) {
-    super(throwable);
+  public ConnectionCreationException(String message, Throwable throwable, DbError dbError) {
+    super(message, new ModuleException(throwable, dbError));
   }
 }

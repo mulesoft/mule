@@ -12,12 +12,12 @@
     </spring:beans>
 
     <flow name="rename">
-        <file:rename path="#[path]" to="#[to]" overwrite="#[overwrite]"/>
+        <file:rename path="#[mel:path]" to="#[mel:to]" overwrite="#[mel:overwrite]"/>
     </flow>
 
     <flow name="readAndRename">
-        <file:read path="#[path]" />
-        <file:rename to="#[to]"/>
+        <file:read path="#[mel:path]" />
+        <file:rename to="#[mel:to]"/>
     </flow>
 
 </mule>

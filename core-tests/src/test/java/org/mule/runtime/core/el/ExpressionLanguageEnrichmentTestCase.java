@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
 import org.mule.runtime.core.api.Event;
@@ -90,7 +89,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichFlowVariable() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).build();
+    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("flowVars['foo']", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getVariable("foo").getValue(), is("bar"));
@@ -99,7 +98,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichSessionVariable() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).build();
+    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("sessionVars['foo']", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getSession().getProperty("foo"), equalTo("bar"));

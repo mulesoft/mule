@@ -8,7 +8,7 @@
 	">
 
     <flow name="main">
-        <set-payload value="#[['a','b','c']]"/>
+        <set-payload value="#[mel:['a','b','c']]"/>
         <collection-splitter/>
         <collection-aggregator/>
         <flow-ref name="throw_an_exception"/>

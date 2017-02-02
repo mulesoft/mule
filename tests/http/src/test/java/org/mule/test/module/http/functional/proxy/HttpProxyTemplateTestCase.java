@@ -6,35 +6,24 @@
  */
 package org.mule.test.module.http.functional.proxy;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
-
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.http.api.HttpHeaders;
-import org.mule.tck.SensingNullRequestResponseMessageProcessor;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.http.functional.TestInputStream;
-import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -44,53 +33,31 @@ import org.apache.http.entity.ContentType;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+import static org.mule.service.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 
-@RunnerDelegateTo(Parameterized.class)
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.service.http.api.HttpHeaders;
+import org.mule.tck.SensingNullRequestResponseMessageProcessor;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.TestInputStream;
+import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
+
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
-  @Rule
-  public SystemProperty systemProperty;
-
   private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
-  private String configFile;
-  private String requestThreadNameSubString;
-  private String responeThreadNameSubString;
-  private boolean nonBlocking;
-
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"http-proxy-template-config.xml", "cpuLight", "worker", false}// ,
-        // {"http-proxy-template-config.xml", "worker", "proxyTemplate", true}
-    });
-  }
-
-  public HttpProxyTemplateTestCase(String configFile, String requestThreadNameSubString, String responeThreadNameSubString,
-                                   boolean nonBlocking) {
-    this.configFile = configFile;
-    this.requestThreadNameSubString = requestThreadNameSubString;
-    this.responeThreadNameSubString = responeThreadNameSubString;
-    this.nonBlocking = nonBlocking;
-    if (nonBlocking) {
-      systemProperty = new SystemProperty(MULE_DEFAULT_PROCESSING_STRATEGY, NON_BLOCKING_PROCESSING_STRATEGY);
-    }
-  }
+  private static String CPU_LIGHT_THREAD_PREFIX = "SchedulerService_cpuLight";
+  private static String IO_THREAD_PREFIX = "SchedulerService_io";
 
   @Override
   protected String getConfigFile() {
-    return configFile;
+    return "http-proxy-template-config.xml";
   }
 
   @Test
@@ -270,19 +237,15 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   public void requestThread() throws Exception {
     Request.Get(getProxyUrl("")).connectTimeout(RECEIVE_TIMEOUT).execute();
     SensingNullRequestResponseMessageProcessor sensingMessageProcessor = getSensingNullRequestResponseMessageProcessor();
-    assertThat(sensingMessageProcessor.requestThread.getName(), containsString(requestThreadNameSubString));
+    assertThat(sensingMessageProcessor.requestThread.getName(), startsWith(CPU_LIGHT_THREAD_PREFIX));
   }
 
   @Test
   public void responseThread() throws Exception {
     assertRequestOk(getProxyUrl(""), null);
     SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
-    if (nonBlocking) {
-      assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
-      assertThat(requestResponseProcessor.responseThread.getName(), containsString(responeThreadNameSubString));
-    } else {
-      assertThat(requestResponseProcessor.requestThread, equalTo(requestResponseProcessor.responseThread));
-    }
+    assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
+    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(IO_THREAD_PREFIX));
   }
 
   private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor() {

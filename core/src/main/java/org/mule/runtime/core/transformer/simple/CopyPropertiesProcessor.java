@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,7 +24,7 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CopyPropertiesProcessor implements Processor, MuleContextAware, Initialisable {
+public class CopyPropertiesProcessor extends AbstractAnnotatedObject implements Processor, MuleContextAware, Initialisable {
 
   private static final Logger logger = LoggerFactory.getLogger(CopyPropertiesProcessor.class);
 

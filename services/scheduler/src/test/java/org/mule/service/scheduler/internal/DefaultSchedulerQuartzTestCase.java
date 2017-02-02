@@ -17,6 +17,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -29,8 +30,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
@@ -49,23 +48,22 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
   private DefaultScheduler executor;
 
   @Override
-  @Before
   public void before() throws SchedulerException {
     super.before();
-    executor = new DefaultScheduler(sharedExecutor, 1, 1, sharedScheduledExecutor, sharedQuartzScheduler);;
+    executor = new DefaultScheduler(DefaultSchedulerQuartzTestCase.class.getSimpleName(), sharedExecutor, 1,
+                                    sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
   }
 
   @Override
-  @After
-  public void after() throws SchedulerException {
+  public void after() throws SchedulerException, InterruptedException {
     executor.shutdownNow();
+    executor.awaitTermination(5, SECONDS);
     super.after();
   }
 
   @Test
   @Description("Tests that a ScheduledFuture from a cron is properly cancelled before it starts executing")
   public void cancelCronBeforeFire() throws InterruptedException {
-
     final CountDownLatch latch = new CountDownLatch(1);
 
     final ScheduledFuture<?> scheduled = executor.scheduleWithCronExpression(() -> {
@@ -117,6 +115,7 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
     assertThat(scheduled.isDone(), is(true));
   }
 
+  @Override
   protected void assertTerminationIsNotDelayed(final ScheduledExecutorService executor) throws InterruptedException {
     long startTime = nanoTime();
     executor.shutdown();

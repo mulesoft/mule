@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import org.mule.runtime.core.config.MuleManifest;
 
 import java.net.UnknownHostException;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class MuleInstanceContextTestCase extends AbstractELTestCase {
 
@@ -31,11 +33,11 @@ public class MuleInstanceContextTestCase extends AbstractELTestCase {
 
   @Test
   public void home() throws UnknownHostException {
-    Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate("mule.home"));
+    Assert.assertEquals(muleContext.getConfiguration().getMuleHomeDirectory(), evaluate(MULE_HOME_DIRECTORY_PROPERTY));
   }
 
   public void assignValueToHomeDir() {
-    assertFinalProperty("mule.home='1'");
+    assertFinalProperty(MULE_HOME_DIRECTORY_PROPERTY + "='1'");
   }
 
   @Test

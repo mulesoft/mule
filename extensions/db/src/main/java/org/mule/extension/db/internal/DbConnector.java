@@ -6,6 +6,8 @@
  */
 package org.mule.extension.db.internal;
 
+import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
+import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.api.param.BulkQueryDefinition;
 import org.mule.extension.db.api.param.JdbcType;
 import org.mule.extension.db.api.param.QueryDefinition;
@@ -29,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,9 @@ import java.util.List;
 @ConnectionProviders({DataSourceReferenceConnectionProvider.class, GenericConnectionProvider.class, DerbyConnectionProvider.class,
     MySqlConnectionProvider.class, OracleDbConnectionProvider.class})
 @Xml(namespace = "db")
-@Export(classes = {QueryDefinition.class, StoredProcedureCall.class, BulkQueryDefinition.class})
+@Export(
+    classes = {QueryDefinition.class, StoredProcedureCall.class, BulkQueryDefinition.class, ConnectionCreationException.class})
+@ErrorTypes(DbError.class)
 public class DbConnector implements Initialisable {
 
   private DbTypeManager typeManager;
@@ -59,10 +64,7 @@ public class DbConnector implements Initialisable {
 
   private DbTypeManager createBaseTypeManager() {
     List<DbTypeManager> typeManagers = new ArrayList<>();
-
     typeManagers.add(new MetadataDbTypeManager());
-
-
     typeManagers.add(new StaticDbTypeManager(JdbcType.getAllTypes()));
 
     return new CompositeDbTypeManager(typeManagers);

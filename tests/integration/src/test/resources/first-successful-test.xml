@@ -32,14 +32,14 @@
     </flow>
 
     <flow name="test-router2">
-        <first-successful failureExpression="#[payload.contains('is a number')]">
+        <first-successful failureExpression="#[mel:payload.contains('is a number')]">
             <test:component appendString=" is a number" />
             <test:component appendString=" is a string" />
         </first-successful>
     </flow>
 
     <flow name="test-router3">
-        <first-successful failureExpression="#[payload.contains('is a ')]">
+        <first-successful failureExpression="#[mel:payload.contains('is a ')]">
             <test:component appendString=" is a number" />
             <test:component appendString=" is a string" />
         </first-successful>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <flow name="testFlow1">
+        <httpn:listener path="empty" allowedMethods="GET" config-ref="listenerConfig">
+            <httpn:response statusCode="204"/>
+        </httpn:listener>
+        <custom-processor class="org.mule.test.module.http.functional.listener.HttpListenerNoContentTestCase$StreamingProcessor"/>
+    </flow>
+
+    <flow name="testFlow2">
+        <httpn:listener path="content" allowedMethods="GET" config-ref="listenerConfig">
+            <httpn:response statusCode="204"/>
+        </httpn:listener>
+        <set-payload value="WAT"/>
+    </flow>
+
+</mule>

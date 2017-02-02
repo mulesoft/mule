@@ -50,7 +50,7 @@ public class PartialStartupTestCase extends AbstractIntegrationTestCase {
       public boolean isSatisfied() {
         List<String> currentThreads = collectThreadNames();
         return countOcurrences(currentThreads, "SHUTDOWN_TEST_FLOW") == 0
-            && countOcurrences(initialThreads, "MuleServer") == countOcurrences(currentThreads, "MuleServer") + 1;
+            && countOcurrences(initialThreads, "MuleContainer") == countOcurrences(currentThreads, "MuleContainer") + 1;
       }
 
       @Override

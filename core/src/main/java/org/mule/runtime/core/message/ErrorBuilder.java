@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 
 /**
  * Builder for {@link Error} instances.

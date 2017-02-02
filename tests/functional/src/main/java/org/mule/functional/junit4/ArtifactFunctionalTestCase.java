@@ -14,10 +14,8 @@ import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
-
-import org.mule.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
-import org.mule.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -25,6 +23,8 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.MuleServiceManager;
@@ -62,7 +62,7 @@ import org.junit.runner.RunWith;
  * <p/>
  * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with
  * {@link org.mule.runtime.extension.api.annotation.Extension}, if a class is annotated it will generate the metadata for the
- * extension in runtime and it will also register it to the {@link org.mule.runtime.extension.api.ExtensionManager}. Non extension
+ * extension in runtime and it will also register it to the {@link org.mule.runtime.core.api.extension.ExtensionManager}. Non extension
  * plugins will set its filter based on {@code mule-module.properties} file.
  * <p/>
  * By default this test runs internally with a {@link org.junit.runners.BlockJUnit4ClassRunner} runner. On those cases where the
@@ -70,7 +70,7 @@ import org.junit.runner.RunWith;
  * <p/>
  * {@link PluginClassLoadersAware} will define that this class also needs to get access to plugin {@link ArtifactClassLoader} in
  * order to load extension classes (they are not exposed to the application) for registering them to the
- * {@link org.mule.runtime.extension.api.ExtensionManager}.
+ * {@link org.mule.runtime.core.api.extension.ExtensionManager}.
  * <p/>
  * Due to the cost of reading the classpath, scanning the dependencies and classes to generate the {@link ClassLoader} is high,
  * this runner will hold an static reference to the {@link ClassLoader} created for the first test and will use the same during
@@ -95,7 +95,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;
   private static ClassLoader containerClassLoader;
-
   private static MuleServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
 
@@ -146,6 +145,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
       throw new IllegalStateException("Service class loaders were already set, it cannot be set again");
     }
     serviceClassLoaders = artifactClassLoaders;
+    createServiceManager();
   }
 
   @ContainerClassLoaderAware
@@ -169,23 +169,37 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return builder;
   }
 
-  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
-    if (serviceRepository == null) {
-      serviceRepository =
-          new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(serviceClassLoaders),
-                                                              new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
-      try {
-        serviceRepository.start();
-      } catch (MuleException e) {
-        throw new IllegalStateException("Couldn't start service manager", e);
-      }
-    }
+  /**
+   * Returns an instance of a given service if available
+   *
+   * @param serviceClass class of service to look for. Non null.
+   * @param <T> service class
+   * @return an instance of the provided service type if it was declared as a dependency on the test, null otherwise.
+   */
+  protected <T extends Service> T getService(Class<T> serviceClass) {
+    Optional<Service> service =
+        serviceRepository.getServices().stream().filter(s -> serviceClass.isAssignableFrom(s.getClass())).findFirst();
 
+    return service.isPresent() ? (T) service.get() : null;
+  }
+
+  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
     builder.addServiceConfigurator(new TestServicesMuleContextConfigurator(serviceRepository));
   }
 
+  private static void createServiceManager() {
+    serviceRepository =
+        new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(serviceClassLoaders),
+                                                            new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+    try {
+      serviceRepository.start();
+    } catch (MuleException e) {
+      throw new IllegalStateException("Couldn't start service manager", e);
+    }
+  }
+
   /**
-   * Adds a {@link ConfigurationBuilder} that sets the {@link org.mule.runtime.extension.api.ExtensionManager} into the
+   * Adds a {@link ConfigurationBuilder} that sets the {@link org.mule.runtime.core.api.extension.ExtensionManager} into the
    * {@link #muleContext}. This {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
    *
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}

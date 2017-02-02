@@ -17,7 +17,7 @@ public class ClassInterceptorTestCase extends AbstractInterceptorTestCase {
 
   @Test
   public void testInterceptor() throws Exception {
-    flowRunner("service").withPayload(MESSAGE).asynchronously().run();
+    flowRunner("service").withPayload(MESSAGE).run();
 
     assertMessageIntercepted();
   }

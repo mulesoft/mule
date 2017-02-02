@@ -10,10 +10,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.construct.AbstractFlowConstruct;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.construct.Flow;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
     Stoppable requestConfig = muleContext.getRegistry().lookupObject("requestConfig");
     requestConfig.stop();
     try {
-      expectedException.expectCause(isA(RetryPolicyExhaustedException.class));
+      expectedException.expectCause(isA(ConnectionException.class));
       runFlow("simpleRequest");
     } finally {
       ((Startable) requestConfig).start();
@@ -63,7 +63,7 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void restartFlow() throws Exception {
     verifyRequest();
-    AbstractFlowConstruct flow = (AbstractFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("simpleRequest");
+    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("simpleRequest");
     flow.stop();
     flow.start();
     verifyRequest();

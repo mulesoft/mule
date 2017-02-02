@@ -11,17 +11,17 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -122,7 +122,9 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
     InternalMessage response = muleContext.getClient().send(url, InternalMessage.of(TEST_PAYLOAD), GET_OPTIONS).getRight();
-    assertThat((Integer) response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), is(expectedStatus));
+    assertThat((Integer) response
+        .getInboundProperty(org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY),
+               is(expectedStatus));
     return IOUtils.toString((InputStream) response.getPayload().getValue());
   }
 

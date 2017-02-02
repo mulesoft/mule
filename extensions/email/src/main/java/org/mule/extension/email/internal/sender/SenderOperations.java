@@ -8,7 +8,9 @@ package org.mule.extension.email.internal.sender;
 
 
 import org.mule.extension.email.api.EmailBuilder;
+import org.mule.extension.email.api.exception.EmailSenderErrorTypeProvider;
 import org.mule.extension.email.internal.commands.SendCommand;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -34,6 +36,7 @@ public class SenderOperations {
    * @param emailBuilder  The builder of the email that is going to be send.
    */
   @Summary("Sends an email message")
+  @Throws(EmailSenderErrorTypeProvider.class)
   public void send(@Connection SenderConnection connection,
                    @UseConfig SMTPConfiguration configuration,
                    EmailBuilder emailBuilder) {

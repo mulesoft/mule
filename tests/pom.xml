@@ -17,13 +17,13 @@
         <module>infrastructure</module>
         <module>performance</module>
         <module>integration</module>
-        <module>integration-tranports</module>
         <module>http</module>
         <module>test-extensions</module>
-        <module>unit-transports</module>
-        <module>functional-transports</module>
+        <module>test-policies</module>
         <module>test-services</module>
         <module>runner</module>
+        <module>wsc</module>
+        <module>dsl</module>
     </modules>
 
     <build>

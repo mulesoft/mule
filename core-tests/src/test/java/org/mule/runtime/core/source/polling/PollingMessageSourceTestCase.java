@@ -6,26 +6,33 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -76,8 +83,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     PollingMessageSource pollingMessageSource = createMessageSource(event -> null);
 
     verify(muleContext.getSchedulerService()).ioScheduler();
-    List<Scheduler> createdSchedulers =
-        ((SimpleUnitTestSupportSchedulerService) (muleContext.getSchedulerService())).getCreatedSchedulers();
+    List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
     pollingMessageSource.start();
 
     Scheduler pollScheduler = createdSchedulers.get(createdSchedulers.size() - 1);
@@ -90,8 +96,34 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     verify(pollScheduler).stop(anyLong(), any());
   }
 
+  private PollingMessageSource pollingMessageSource;
+
+  @After
+  public void after() throws MuleException {
+    stopIfNeeded(pollingMessageSource);
+    disposeIfNeeded(pollingMessageSource, logger);
+  }
+
+  @Test
+  public void setExecutionClassLoader() throws Exception {
+    ClassLoader executionClassLoader = mock(ClassLoader.class);
+    muleContext.setExecutionClassLoader(executionClassLoader);
+
+    pollingMessageSource = createMessageSource(event -> {
+      assertThat(currentThread().getContextClassLoader(), sameInstance(executionClassLoader));
+      return Event.builder(event).message(InternalMessage.builder().payload(TEST_PAYLOAD).build()).build();
+    });
+
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    pollingMessageSource.setListener(flow);
+
+    pollingMessageSource.poll();
+
+    assertNotNull(flow.event);
+  }
+
   private PollingMessageSource createMessageSource(Processor processor) throws Exception {
-    PollingMessageSource pollingMessageSource =
+    pollingMessageSource =
         new PollingMessageSource(muleContext, processor, new NullOverride(), scheduler());
     pollingMessageSource.setFlowConstruct(getTestFlow(muleContext));
     pollingMessageSource.initialise();

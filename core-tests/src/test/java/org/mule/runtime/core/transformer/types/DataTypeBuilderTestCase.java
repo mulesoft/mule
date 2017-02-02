@@ -7,31 +7,43 @@
 package org.mule.runtime.core.transformer.types;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
-
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.metadata.SimpleDataType;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.api.metadata.FunctionDataType;
+import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.internal.metadata.SimpleDataType;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
@@ -54,11 +66,50 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void buildFunction() {
+    FunctionDataType dataType = (FunctionDataType) DataType.fromFunction(new ExpressionFunction() {
+
+      @Override
+      public Object call(Object[] objects, BindingContext bindingContext) {
+        return null;
+      }
+
+      @Override
+      public Optional<DataType> returnType() {
+        return of(STRING);
+      }
+
+      @Override
+      public List<FunctionParameter> parameters() {
+        List<FunctionParameter> parameters = new ArrayList<>();
+        parameters.add(new FunctionParameter("fst", NUMBER));
+        parameters.add(new FunctionParameter("snd", OBJECT, ctx -> "wow"));
+        return parameters;
+      }
+    });
+
+    //Return type
+    assertThat(dataType.getReturnType().isPresent(), is(true));
+    assertThat(dataType.getReturnType().get(), equalTo(STRING));
+    //Parameters
+    assertThat(dataType.getParameters(), hasSize(2));
+    FunctionParameter first = dataType.getParameters().get(0);
+    assertThat(first.getName(), is("fst"));
+    assertThat(first.getType(), equalTo(NUMBER));
+    assertThat(first.getDefaultValueResolver(), nullValue());
+    FunctionParameter second = dataType.getParameters().get(1);
+    assertThat(second.getName(), is("snd"));
+    assertThat(second.getType(), equalTo(OBJECT));
+    //Default
+    assertThat(second.getDefaultValueResolver().getDefaultValue(builder().build()), is("wow"));
+  }
+
+  @Test
   public void buildTypedCollection() {
     final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(List.class)));
-    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
   }
 
   @Test
@@ -94,7 +145,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(List.class)));
-    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.STRING));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
   }
 
   @Test

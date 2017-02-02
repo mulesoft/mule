@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 
 import java.io.File;
 
@@ -16,6 +16,14 @@ import java.io.File;
  * @since 4.0
  */
 public interface TemporaryArtifactBuilder {
+
+  /**
+   * Allows to add a library to the tooling artifact. The file type must be a jar.
+   *
+   * @param artifactLibraryFile a file pointer to a jar
+   * @return the builder
+   */
+  TemporaryArtifactBuilder addArtifactLibraryFile(File artifactLibraryFile);
 
   /**
    * Allows to add an extensions to be used in the tooling artifact. The file type must be zip and be an extension.
@@ -28,10 +36,10 @@ public interface TemporaryArtifactBuilder {
   /**
    * Allows to configure the set of mule components to be used by the artifact.
    *
-   * @param artifactConfiguration the mule configuration used by the artifact
+   * @param artifactDeclaration the mule configuration used by the artifact
    * @return the builder
    */
-  TemporaryArtifactBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
+  TemporaryArtifactBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration);
 
   /**
    * Builds a {@code ToolingArtifact} with the provided configuration.

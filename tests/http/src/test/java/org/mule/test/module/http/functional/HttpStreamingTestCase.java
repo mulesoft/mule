@@ -7,9 +7,13 @@
 package org.mule.test.module.http.functional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.extension.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
+
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -50,8 +54,10 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
 
   @Test
   public void requesterStreams() throws Exception {
-    runFlow("client");
+    Event response = flowRunner("client").run();
     stop.set(true);
+    assertThat(response.getMessage(), hasAttributes(instanceOf(HttpResponseAttributes.class)));
+    assertThat(response.getMessage().getPayload().getValue(), instanceOf(InputStream.class));
   }
 
   @Test

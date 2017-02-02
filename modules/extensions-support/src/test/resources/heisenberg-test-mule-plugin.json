@@ -1,0 +1,34 @@
+{
+  "name":"Heisenberg",
+  "minMuleVersion":"4.1.0",
+  "bundleDescriptorLoader": {
+    "id": "maven",
+    "attributes": {
+    }
+  },
+  "classLoaderModelLoaderDescriptor":{
+    "id":"maven",
+    "attributes":{
+      "exportedPackages":[
+        "org.mule.test.heisenberg.extension.model.types",
+        "org.mule.test.heisenberg.extension.exception",
+        "org.mule.tck.message",
+        "org.mule.test.heisenberg.extension.model"
+      ],
+      "exportedResources":[
+        "/META-INF/",
+        "/META-INF/extension-manifest.xml",
+        "/META-INF/mule-heisenberg.xsd",
+        "/META-INF/spring.handlers",
+        "/META-INF/spring.schemas"
+      ]
+    }
+  },
+  "extensionModelLoaderDescriptor":{
+    "id":"java",
+    "attributes":{
+      "type":"org.mule.test.heisenberg.extension.HeisenbergExtension",
+      "version":"4.0-SNAPSHOT"
+    }
+  }
+}

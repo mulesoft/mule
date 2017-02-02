@@ -7,19 +7,15 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.rule.WarningTimeout;
 
 import java.util.ArrayList;
@@ -34,6 +30,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
@@ -97,7 +94,7 @@ public abstract class AbstractMuleTestCase {
     int millisecondsTimeout = getTestTimeoutSecs() * 1000;
 
     if (isFailOnTimeout()) {
-      return new Timeout(millisecondsTimeout);
+      return new DisableOnDebug(new Timeout(millisecondsTimeout));
     } else {
       return new WarningTimeout(millisecondsTimeout);
     }
@@ -238,10 +235,6 @@ public abstract class AbstractMuleTestCase {
     if (testCaseName == null) {
       testCaseName = this.getClass().getName();
     }
-  }
-
-  public static void registerServices(MuleContext muleContext) throws RegistrationException {
-    when(muleContext.getSchedulerService()).thenReturn(new SimpleUnitTestSupportSchedulerService());
   }
 
   private Event _testEvent;

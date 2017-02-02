@@ -202,7 +202,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
 
     // set parameter
     Map<String, Object> params = new HashMap<>();
-    params.put("param1", "#[message.outboundProperties.myproperty]");
+    params.put("param1", "#[mel:message.outboundProperties.myproperty]");
     transformer.setContextProperties(params);
 
     // init transformer

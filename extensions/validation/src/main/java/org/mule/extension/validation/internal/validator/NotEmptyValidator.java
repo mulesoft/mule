@@ -10,7 +10,6 @@ import static org.mule.extension.validation.internal.ImmutableValidationResult.o
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 
@@ -37,7 +36,7 @@ public class NotEmptyValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(Event event) {
+  public ValidationResult validate() {
     if (value == null) {
       errorMessage = getMessages().valueIsNull();
       return fail();

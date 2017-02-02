@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+
 /**
  * Defines a {@link Transformer} that is a data type converters, ie: convert data from a type to another without modifying the
  * meaning of the data.
@@ -31,5 +34,15 @@ public interface Converter extends Transformer {
    *        {@link #MAX_PRIORITY_WEIGHTING}.
    */
   void setPriorityWeighting(int weighting);
+
+  @Override
+  default ProcessingType getProcessingType() {
+    if (getReturnDataType().isStreamType()
+        || getSourceDataTypes().stream().filter(dataType -> !dataType.isStreamType()).count() > 0) {
+      return IO_RW;
+    } else {
+      return CPU_LITE;
+    }
+  }
 
 }

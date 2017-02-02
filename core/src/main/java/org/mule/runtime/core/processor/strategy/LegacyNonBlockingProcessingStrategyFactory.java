@@ -7,18 +7,19 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,16 +32,20 @@ import org.reactivestreams.Publisher;
  *
  * @since 3.7
  */
+@Deprecated
 public class LegacyNonBlockingProcessingStrategyFactory extends LegacyAsynchronousProcessingStrategyFactory {
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new LegacyNonBlockingProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new LegacyNonBlockingProcessingStrategy(() -> muleContext.getSchedulerService()
+        .ioScheduler(config().withName(schedulersNamePrefix)),
                                                    scheduler -> scheduler
                                                        .stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
-  public static class LegacyNonBlockingProcessingStrategy implements ProcessingStrategy, Startable, Stoppable {
+  @Deprecated
+  public static class LegacyNonBlockingProcessingStrategy extends AbstractLegacyProcessingStrategy
+      implements Startable, Stoppable {
 
     private Supplier<Scheduler> schedulerSupplier;
     private Consumer<Scheduler> schedulerStopper;

@@ -6,20 +6,15 @@
  */
 package org.mule.extension.validation.internal;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Locale;
-
-import javax.inject.Inject;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
@@ -32,44 +27,38 @@ import org.slf4j.LoggerFactory;
  */
 abstract class ValidationSupport {
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
-  @Inject
-  protected MuleContext muleContext;
+  protected static final String ERROR_GROUP = "Error options";
+  protected final static Logger LOGGER = LoggerFactory.getLogger(ValidationSupport.class);
 
-  protected void validateWith(Validator validator, ValidationContext validationContext, Event event) throws Exception {
-    ValidationResult result = validator.validate(event);
+  protected void validateWith(Validator validator, ValidationContext validationContext) throws Exception {
+    ValidationResult result = validator.validate();
     if (result.isError()) {
       result = evaluateCustomMessage(result, validationContext);
-      String customExceptionClass = validationContext.getOptions().getExceptionClass();
-      if (StringUtils.isEmpty(customExceptionClass)) {
-        throw validationContext.getConfig().getExceptionFactory().createException(result, ValidationException.class, event);
-      } else {
-        throw validationContext.getConfig().getExceptionFactory().createException(result, customExceptionClass, event);
-      }
+      throw new ValidationException(result);
     } else {
-      logSuccessfulValidation(validator, event);
+      logSuccessfulValidation(validator);
     }
   }
 
   private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext) {
     String customMessage = validationContext.getOptions().getMessage();
-    return StringUtils.isBlank(customMessage)
+    return isBlank(customMessage)
         ? result
         : error(customMessage);
   }
 
-  protected ValidationContext createContext(ValidationOptions options, Event muleEvent, ValidationExtension config) {
-    return new ValidationContext(options, muleEvent, config);
+  protected ValidationContext createContext(ValidationOptions options, ValidationExtension config) {
+    return new ValidationContext(options, config);
   }
 
   protected Locale parseLocale(String locale) {
-    locale = StringUtils.isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
+    locale = isBlank(locale) ? ValidationExtension.DEFAULT_LOCALE : locale;
     return new Locale(locale);
   }
 
-  protected void logSuccessfulValidation(Validator validator, Event event) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
+  protected void logSuccessfulValidation(Validator validator) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
     }
   }
 }

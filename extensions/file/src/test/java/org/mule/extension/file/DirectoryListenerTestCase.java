@@ -19,7 +19,7 @@ import org.mule.extension.file.internal.DirectoryListener;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -66,7 +66,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void startIfNodeBecomesSecondary() throws Exception {
+  public void startIfNodeBecomesPrimary() throws Exception {
     ArgumentCaptor<PrimaryNodeLifecycleNotificationListener> listenerCaptor =
         ArgumentCaptor.forClass(PrimaryNodeLifecycleNotificationListener.class);
 
@@ -79,6 +79,7 @@ public class DirectoryListenerTestCase extends AbstractMuleContextTestCase {
     listener.onNotification(mock(ServerNotification.class));
 
     verify(mockMuleContext, times(2)).isPrimaryPollingInstance();
+
   }
 
 }

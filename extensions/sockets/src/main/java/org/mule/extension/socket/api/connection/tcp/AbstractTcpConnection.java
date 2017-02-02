@@ -9,7 +9,7 @@ package org.mule.extension.socket.api.connection.tcp;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.extension.socket.api.connection.AbstractSocketConnection;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -37,7 +37,7 @@ abstract class AbstractTcpConnection extends AbstractSocketConnection implements
    */
   protected final TcpProtocol protocol;
 
-  public AbstractTcpConnection(ConnectionSettings connectionSettings, TcpProtocol protocol) {
+  public AbstractTcpConnection(SocketConnectionSettings connectionSettings, TcpProtocol protocol) {
     super(connectionSettings);
     this.protocol = protocol;
   }
@@ -57,7 +57,7 @@ abstract class AbstractTcpConnection extends AbstractSocketConnection implements
    * @param failOnUnresolvedHost whether a {@link UnresolvableHostException} should be thrown if the address couldn't be resolved.
    * @return an {@link InetSocketAddress} configured with the host and port received
    */
-  protected InetSocketAddress getSocketAddress(ConnectionSettings connectionSettings, boolean failOnUnresolvedHost)
+  protected InetSocketAddress getSocketAddress(SocketConnectionSettings connectionSettings, boolean failOnUnresolvedHost)
       throws ConnectionException {
 
     InetSocketAddress address = connectionSettings.getInetSocketAddress();

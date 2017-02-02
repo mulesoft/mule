@@ -7,6 +7,7 @@
 package org.mule.extension.ws.internal.introspection;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -15,9 +16,12 @@ import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.metadata.xml.SchemaCollector;
 
 import com.ibm.wsdl.extensions.schema.SchemaSerializer;
+import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
+import com.ibm.wsdl.extensions.soap12.SOAP12OperationImpl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.wsdl.BindingInput;
@@ -33,8 +37,14 @@ import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
+import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.mime.MIMEPart;
+import javax.wsdl.extensions.soap.SOAPAddress;
+import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
+import javax.wsdl.extensions.soap12.SOAP12Address;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
+import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
@@ -48,16 +58,19 @@ import javax.xml.namespace.QName;
 @SuppressWarnings("unchecked")
 public class WsdlIntrospecter {
 
+  private static final String DOCUMENT_STYLE = "document";
+  private static final String RPC_STYLE = "rpc";
+
   private static final WsdlSchemasCollector schemaCollector = new WsdlSchemasCollector();
 
   private final Definition definition;
   private final Service service;
   private final Port port;
 
-  public WsdlIntrospecter(String wsdlLocation, String service, String port) {
+  public WsdlIntrospecter(String wsdlLocation, String serviceName, String portName) {
     this.definition = parseWsdl(wsdlLocation);
-    this.service = findService(service);
-    this.port = findPort(port);
+    this.service = findService(serviceName);
+    this.port = findPort(portName);
   }
 
   private Service findService(String serviceName) {
@@ -116,15 +129,15 @@ public class WsdlIntrospecter {
     List elements = delegate.getBindingType(bindingOperation).getExtensibilityElements();
     if (elements != null) {
       //TODO: MULE-10796 - what about other type of SOAP body out there? (e.g.: SOAP12Body)
-      Optional<SOAPBody> body = elements.stream().filter(e -> e instanceof SOAPBody).findFirst();
-      if (body.isPresent()) {
-        List bodyParts = body.get().getParts();
-        if (!bodyParts.isEmpty()) {
-          if (bodyParts.size() > 1) {
-            throw new InvalidWsdlException("Multipart body operations are not supported");
-          }
-          return ofNullable((String) bodyParts.get(0));
-        }
+
+      Optional<List> bodyParts = elements.stream()
+          .filter(e -> e instanceof SOAPBody || e instanceof SOAP12Body)
+          .map(e -> e instanceof SOAPBody ? ((SOAPBody) e).getParts() : ((SOAP12Body) e).getParts())
+          .map(parts -> parts == null ? emptyList() : parts)
+          .findFirst();
+
+      if (bodyParts.isPresent() && !bodyParts.get().isEmpty()) {
+        return ofNullable((String) bodyParts.get().get(0));
       }
     }
     return empty();
@@ -147,6 +160,64 @@ public class WsdlIntrospecter {
 
   public Port getPort() {
     return port;
+  }
+
+  /**
+   * Tries to find the address where the web service is located.
+   */
+  public Optional<String> getSoapAddress() {
+    String address = null;
+    if (port != null) {
+      for (Object element : port.getExtensibilityElements()) {
+        if (element instanceof SOAPAddress) {
+          address = ((SOAPAddress) element).getLocationURI();
+          break;
+        } else if (element instanceof SOAP12Address) {
+          address = ((SOAP12Address) element).getLocationURI();
+          break;
+        } else if (element instanceof HTTPAddress) {
+          address = ((HTTPAddress) element).getLocationURI();
+          break;
+        }
+      }
+    }
+    return ofNullable(address);
+  }
+
+  public boolean isRpcStyle() {
+    return isWsdlStyle(RPC_STYLE);
+  }
+
+  public boolean isDocumentStyle() {
+    return isWsdlStyle(DOCUMENT_STYLE);
+  }
+
+  /**
+   * Checks if the provided {@code style} is the same style as the introspected WSDL.
+   */
+  private boolean isWsdlStyle(String style) {
+
+    List elements = port.getBinding().getExtensibilityElements();
+    // Looking the style value in the binding.
+    Optional<String> bindingStyle = elements.stream()
+        .filter(e -> e instanceof SOAP12Binding || e instanceof SOAPBinding)
+        .map(e -> e instanceof SOAP12Binding ? ((SOAP12Binding) e).getStyle() : ((SOAPBinding) e).getStyle())
+        .filter(Objects::nonNull)
+        .findAny();
+
+    List bindingOperations = port.getBinding().getBindingOperations();
+    if (!bindingStyle.isPresent() && !bindingOperations.isEmpty()) {
+      // if not defined in the binding, one operation is taken to see if the style is defined there.
+      BindingOperation bop = (BindingOperation) bindingOperations.get(0);
+      bindingStyle = bop.getExtensibilityElements().stream()
+          .filter(e -> e instanceof SOAP12OperationImpl || e instanceof SOAPOperationImpl)
+          .map(e -> e instanceof SOAPOperationImpl ? ((SOAPOperationImpl) e).getStyle() : ((SOAP12OperationImpl) e).getStyle())
+          .filter(Objects::nonNull)
+          .findAny();
+    }
+
+    // if no style was found, the default one is DOCUMENT
+    return bindingStyle.orElse(DOCUMENT_STYLE).equalsIgnoreCase(style);
   }
 
   /**

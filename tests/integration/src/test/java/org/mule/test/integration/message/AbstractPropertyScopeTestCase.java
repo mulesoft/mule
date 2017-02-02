@@ -8,14 +8,14 @@ package org.mule.test.integration.message;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractPropertyScopeTestCase extends AbstractIntegrationTestCase {
+public abstract class AbstractPropertyScopeTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");

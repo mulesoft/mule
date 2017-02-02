@@ -12,14 +12,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -46,7 +47,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     attrEvaluator.initialize(muleContext.getExpressionManager());
     httpResponseToMuleEvent = new HttpResponseToMuleEvent(httpRequester, muleContext, attrEvaluator);
 
-    HttpResponseBuilder builder = new HttpResponseBuilder();
+    HttpResponseBuilder builder = HttpResponse.builder();
     builder.setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
     builder.addHeader(TEST_HEADER, TEST_VALUE);
     builder.addHeader(TEST_MULTIPLE_HEADER, TEST_VALUE);

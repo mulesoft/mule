@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RegistryLookupValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 

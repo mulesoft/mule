@@ -41,6 +41,7 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.dom.NodeOverNodeInfo;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.dom4j.io.DOMWriter;
@@ -230,8 +231,10 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
           transformer.bindDouble(paramKey, ((Double) o).doubleValue(), connection.createAtomicType(XQItemType.XQBASETYPE_DOUBLE));
         } else if (o instanceof Document) {
           transformer.bindDocument(paramKey, new DOMSource(((Document) o).getFirstChild()), connection.createNodeType());
-        } else if (o instanceof Node) {
+        } else if (o instanceof NodeOverNodeInfo) {
           transformer.bindDocument(paramKey, new DOMSource((Node) o), connection.createNodeType());
+        } else if (o instanceof Node) {
+          transformer.bindNode(paramKey, (Node) o, connection.createNodeType());
         } else {
           logger.warn(String.format("Cannot bind value for key '%s' because type '%s' is not supported", key,
                                     o.getClass().getName()));
@@ -396,7 +399,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
    * </p>
    * <p>
    * For example: If the current event's message has a property named "myproperty", to pass this in you would set the transform
-   * parameter's value to be "#[mule.message:header(myproperty)]".
+   * parameter's value to be "#[mel:mule.message:header(myproperty)]".
    * <p/>
    * <p>
    * This method may be overloaded by a sub class to provide a different dynamic parameter implementation.

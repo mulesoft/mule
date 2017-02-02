@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.interceptor;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 
 /**
@@ -25,6 +25,7 @@ public interface Interceptor extends InterceptingMessageProcessor {
    * @return A result message that may have been altered by this invocation
    * @throws MuleException if the invocation fails
    */
+  @Override
   Event process(Event event) throws MuleException;
 
 }

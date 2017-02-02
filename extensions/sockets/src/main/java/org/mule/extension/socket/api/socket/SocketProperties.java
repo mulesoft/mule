@@ -14,6 +14,8 @@ package org.mule.extension.socket.api.socket;
  */
 public interface SocketProperties {
 
+  String GROUP_NAME = "Socket Properties";
+
   /**
    * The size of the buffer (in bytes) used when sending data, set on the socket itself.
    */

@@ -10,11 +10,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -57,7 +58,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testFirstSuccessfulWithOneWayEndpoints() throws Exception {
-    flowRunner("test-router4").withPayload(TEST_MESSAGE).asynchronously().run();
+    flowRunner("test-router4").withPayload(TEST_MESSAGE).run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.security;
 
+import org.mule.runtime.api.security.Authentication;
+
 /**
  * <code>SecurityContextFactory</code> is responsible for creating a SecurityContext instance. The factory itself is associated
  * with an Authentication class type on the SecurityManager

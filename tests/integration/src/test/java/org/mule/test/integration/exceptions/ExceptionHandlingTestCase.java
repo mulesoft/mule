@@ -69,7 +69,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testAsyncInFlow() throws Exception {
-    flowRunner("asyncInFlow").withPayload(MESSAGE).asynchronously().run();
+    flowRunner("asyncInFlow").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://outFlow4", 3000).getRight().get();
@@ -79,7 +79,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testUntilSuccessfulInFlow() throws Exception {
-    flowRunner("untilSuccessfulInFlow").withPayload(MESSAGE).asynchronously().run();
+    flowRunner("untilSuccessfulInFlow").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://outFlow5", 3000).getRight().get();
@@ -102,7 +102,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testCustomProcessorInTransactionalScope() throws Exception {
-    flowRunner("customProcessorInTransactionalScope").withPayload(MESSAGE).asynchronously().run();
+    flowRunner("customProcessorInTransactionalScope").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://outTransactional1", 3000).getRight().get();
@@ -127,7 +127,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testCustomProcessorInExceptionStrategy() throws Exception {
-    flowRunner("customProcessorInExceptionStrategy").withPayload(MESSAGE).asynchronously().run();
+    flowRunner("customProcessorInExceptionStrategy").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://outStrategy1", 3000).getRight().get();
@@ -165,7 +165,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   private void testTransactionalScope(String flowName, String expected, Map<String, Serializable> messageProperties)
       throws Exception {
-    flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).asynchronously().run();
+    flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).dispatch();
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request(expected, 3000).getRight().get();
@@ -176,7 +176,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   private void testExceptionStrategy(String flowName, Map<String, Serializable> messageProperties) throws Exception {
     latch = spy(new CountDownLatch(2));
     try {
-      flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).asynchronously().run();
+      flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).dispatch();
     } catch (Exception e) {
       // do nothing
     }

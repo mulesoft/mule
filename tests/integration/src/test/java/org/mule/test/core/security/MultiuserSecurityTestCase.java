@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.security.MuleCredentials;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class MultiuserSecurityTestCase extends AbstractIntegrationTestCase {
     EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
 
     Map<String, Serializable> props = new HashMap<>();
-    props.put(MULE_USER_PROPERTY, MuleCredentials.createHeader(user, user, "PBE", strategy));
+    props.put(MULE_USER_PROPERTY, DefaultMuleCredentials.createHeader(user, user, "PBE", strategy));
     return flowRunner("testService").withPayload(data).withInboundProperties(props).run().getMessage();
   }
 }

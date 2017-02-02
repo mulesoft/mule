@@ -11,11 +11,11 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="#[timeout]" key="InputStream"/>
+        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="#[mel:timeout]"/>
     </flow>
 
     <flow name="requestFlowNoTimeout">
-        <httpn:request config-ref="requestConfig" method="POST" path="/" key="InputStream"/>
+        <httpn:request config-ref="requestConfig" method="POST" path="/"/>
     </flow>
 
 </mule>

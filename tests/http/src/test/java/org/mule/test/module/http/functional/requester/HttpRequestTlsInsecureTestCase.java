@@ -11,8 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -42,6 +41,8 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
   public DynamicPort port1 = new DynamicPort("port1");
   @Rule
   public SystemProperty insecure = new SystemProperty("insecure", "true");
+  @Rule
+  public ExpectedError expectedError = ExpectedError.none();
 
   @Override
   protected String getConfigFile() {
@@ -62,9 +63,9 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Test
   public void secureRequest() throws Exception {
-    MessagingException expectedException = flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).runExpectingException();
-    assertThat(expectedException.getCause(), instanceOf(IOException.class));
-    assertThat(expectedException.getCause(), hasMessage(containsString("General SSLEngine problem")));
+    expectedError.expectCause(instanceOf(IOException.class));
+    expectedError.expectCause(hasMessage(containsString("General SSLEngine problem")));
+    flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).run();
   }
 
 }

@@ -6,36 +6,40 @@
  */
 package org.mule.extension.validation;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.validation.api.ValidationErrorTypes.VALIDATION;
 import static org.mule.extension.validation.api.ValidationExtension.DEFAULT_LOCALE;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.junit.Test;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.exception.MessagingException;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
 public class BasicValidationTestCase extends ValidationTestCase {
 
   private static final String CUSTOM_VALIDATOR_MESSAGE = "Do you wanna build a snowman?";
   private static final String EMAIL_VALIDATION_FLOW = "email";
+  private static final String VALIDATION_NAMESPACE = "VALIDATION";
 
   @Override
   protected String getConfigFile() {
@@ -142,7 +146,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
     final String flow = "notEmpty";
 
     assertValid(flowRunner(flow).withPayload("a"));
-    assertValid(flowRunner(flow).withPayload(Arrays.asList("a")));
+    assertValid(flowRunner(flow).withPayload(singletonList("a")));
     assertValid(flowRunner(flow).withPayload(new String[] {"a"}));
     assertValid(flowRunner(flow).withPayload(ImmutableMap.of("a", "A")));
     assertInvalid(flowRunner(flow).withPayload(null), messages.valueIsNull());
@@ -164,7 +168,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
     assertValid(flowRunner(flow).withPayload(new String[] {}));
     assertValid(flowRunner(flow).withPayload(new HashMap<String, String>()));
     assertInvalid(flowRunner(flow).withPayload("a"), messages.stringIsNotBlank());
-    assertInvalid(flowRunner(flow).withPayload(Arrays.asList("a")), messages.collectionIsNotEmpty());
+    assertInvalid(flowRunner(flow).withPayload(singletonList("a")), messages.collectionIsNotEmpty());
     assertInvalid(flowRunner(flow).withPayload(new String[] {"a"}), messages.arrayIsNotEmpty());
     assertInvalid(flowRunner(flow).withPayload(new Object[] {new Object()}), messages.arrayIsNotEmpty());
     assertInvalid(flowRunner(flow).withPayload(new int[] {0}), messages.arrayIsNotEmpty());
@@ -174,7 +178,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
   @Test
   public void keepsPayloadWhenAllValidationsPass() throws Exception {
     FlowRunner runner = flowRunner("all");
-    cofigureGetAllRunner(runner, VALID_EMAIL, VALID_URL);
+    configureGetAllRunner(runner, VALID_EMAIL, VALID_URL);
 
     assertThat(runner.buildEvent().getMessage().getPayload().getValue(),
                is(sameInstance(runner.run().getMessage().getPayload().getValue())));
@@ -183,13 +187,14 @@ public class BasicValidationTestCase extends ValidationTestCase {
   @Test
   public void twoFailuresInAllWithoutException() throws Exception {
     FlowRunner runner = flowRunner("all");
-    cofigureGetAllRunner(runner, INVALID_EMAIL, INVALID_URL);
-    Exception e = runner.runExpectingException();
-    assertThat(e, is(instanceOf(MessagingException.class)));
-    assertThat(e.getCause(), is(instanceOf(MultipleValidationException.class)));
-    MultipleValidationResult result = ((MultipleValidationException) e.getCause()).getMultipleValidationResult();
+    configureGetAllRunner(runner, INVALID_EMAIL, INVALID_URL);
+    MessagingException e = runner.runExpectingException();
+    Error error = e.getEvent().getError().get();
+    assertThat(error.getCause(), is(instanceOf(MultipleValidationException.class)));
+    MultipleValidationResult result = ((MultipleValidationException) error.getCause()).getMultipleValidationResult();
     assertThat(result.getFailedValidationResults(), hasSize(2));
     assertThat(result.isError(), is(true));
+    assertThat(error.getErrorType(), is(errorType(VALIDATION_NAMESPACE, VALIDATION.getType())));
 
     String expectedMessage = Joiner.on('\n').join(messages.invalidUrl(INVALID_URL), messages.invalidEmail(INVALID_EMAIL));
 
@@ -203,11 +208,12 @@ public class BasicValidationTestCase extends ValidationTestCase {
   @Test
   public void oneFailInAll() throws Exception {
     FlowRunner runner = flowRunner("all");
-    cofigureGetAllRunner(runner, INVALID_EMAIL, VALID_URL);
-    Exception e = runner.runExpectingException();
-    assertThat(e, is(instanceOf(MessagingException.class)));
-    assertThat(e.getCause(), is(instanceOf(MultipleValidationException.class)));
-    MultipleValidationResult result = ((MultipleValidationException) e.getCause()).getMultipleValidationResult();
+    configureGetAllRunner(runner, INVALID_EMAIL, VALID_URL);
+    MessagingException e = runner.runExpectingException();
+    Error error = e.getEvent().getError().get();
+    assertThat(error.getCause(), is(instanceOf(MultipleValidationException.class)));
+    assertThat(error.getErrorType(), is(errorType(VALIDATION_NAMESPACE, VALIDATION.getType())));
+    MultipleValidationResult result = ((MultipleValidationException) error.getCause()).getMultipleValidationResult();
     assertThat(result.getFailedValidationResults(), hasSize(1));
     assertThat(result.isError(), is(true));
     assertThat(result.getMessage(), is(messages.invalidEmail(INVALID_EMAIL).getMessage()));
@@ -238,11 +244,13 @@ public class BasicValidationTestCase extends ValidationTestCase {
   }
 
   private void assertCustomValidator(String flowName, String customMessage, String expectedMessage) throws Exception {
-    Exception e = flowRunner(flowName).withPayload("").withVariable("customMessage", customMessage).runExpectingException();
-    assertThat(e.getCause().getMessage(), is(expectedMessage));
+    MessagingException e =
+        flowRunner(flowName).withPayload("").withVariable("customMessage", customMessage).runExpectingException();
+    assertThat(e.getCause().getMessage(), containsString(expectedMessage));
+    assertThat(e.getEvent().getError().get().getErrorType(), is(errorType("VALIDATION", "VALIDATION")));
   }
 
-  private void cofigureGetAllRunner(FlowRunner runner, String email, String url) {
+  private void configureGetAllRunner(FlowRunner runner, String email, String url) {
     runner.withPayload("").withVariable("url", url).withVariable(EMAIL_VALIDATION_FLOW, email);
   }
 
@@ -280,7 +288,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
   public static class TestCustomValidator implements Validator {
 
     @Override
-    public ValidationResult validate(Event event) {
+    public ValidationResult validate() {
       return error(CUSTOM_VALIDATOR_MESSAGE);
     }
   }

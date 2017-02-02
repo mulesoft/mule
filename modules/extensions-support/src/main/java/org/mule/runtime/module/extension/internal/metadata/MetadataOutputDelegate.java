@@ -6,23 +6,35 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.isVoid;
-import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.outputDescriptor;
-import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder.typeDescriptor;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.buildMessageType;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.extension.api.metadata.MetadataResolverUtils;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -32,8 +44,12 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
  */
 class MetadataOutputDelegate extends BaseMetadataDelegate {
 
-  public MetadataOutputDelegate(ComponentModel componentModel) {
+  MetadataOutputDelegate(ComponentModel componentModel) {
     super(componentModel);
+  }
+
+  Optional<String> getCategoryName() {
+    return MetadataResolverUtils.getCategoryName(resolverFactory);
   }
 
   /**
@@ -47,24 +63,36 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
    * resolution fails for any reason.
    */
   MetadataResult<OutputMetadataDescriptor> getOutputMetadataDescriptor(MetadataContext context, Object key) {
-    MetadataResult<MetadataType> outputMetadataResult = getOutputMetadata(context, key);
-    MetadataResult<MetadataType> attributesMetadataResult = getOutputAttributesMetadata(context, key);
+    MetadataResult<MetadataType> output = getOutputMetadata(context, key);
+    MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
 
-    MetadataResult<TypeMetadataDescriptor> outputDescriptor = toMetadataDescriptorResult(component.getOutput().getType(),
-                                                                                         component.getOutput().hasDynamicType(),
-                                                                                         outputMetadataResult);
+    MetadataResult<TypeMetadataDescriptor> outputDescriptor =
+        toMetadataDescriptorResult(component.getOutput().getType(), component.getOutput().hasDynamicType(), output);
     MetadataResult<TypeMetadataDescriptor> attributesDescriptor =
-        toMetadataDescriptorResult(component.getOutputAttributes().getType(), false,
-                                   attributesMetadataResult);
+        toMetadataDescriptorResult(component.getOutputAttributes().getType(), false, attributes);
 
-    OutputMetadataDescriptor descriptor =
-        outputDescriptor().withReturnType(outputDescriptor).withAttributesType(attributesDescriptor).build();
+    OutputMetadataDescriptor descriptor = OutputMetadataDescriptor.builder()
+        .withReturnType(outputDescriptor.get())
+        .withAttributesType(attributesDescriptor.get())
+        .build();
 
-    if (!outputMetadataResult.isSuccess() || !attributesMetadataResult.isSuccess()) {
-      return mergeFailures(descriptor, outputMetadataResult, attributesMetadataResult);
+    if (!output.isSuccess() || !attributes.isSuccess()) {
+      List<MetadataFailure> failures = ImmutableList.<MetadataFailure>builder()
+          .addAll(output.getFailures())
+          .addAll(attributes.getFailures())
+          .build();
+
+      return failure(descriptor, failures);
     }
-
     return success(descriptor);
+  }
+
+  Optional<NamedTypeResolver> getOutputResolver() {
+    return getOptionalResolver(resolverFactory.getOutputResolver());
+  }
+
+  Optional<NamedTypeResolver> getOutputAttributesResolver() {
+    return getOptionalResolver(resolverFactory.getOutputAttributesResolver());
   }
 
   /**
@@ -80,9 +108,20 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
       return success(output.getType());
     }
-
-    return resolveMetadataType(false, output.getType(),
-                               () -> resolverFactory.getOutputResolver().getOutputType(context, key), "Output");
+    try {
+      MetadataType metadata = resolverFactory.getOutputResolver().getOutputType(context, key);
+      if (isMetadataResolvedCorrectly(metadata, false)) {
+        return success(adaptToListIfNecessary(metadata, key, context));
+      }
+      MetadataFailure failure = newFailure()
+          .withMessage("Error resolving Output Payload metadata")
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onOutputPayload();
+      return failure(output.getType(), failure);
+    } catch (Exception e) {
+      return failure(output.getType(), newFailure(e).onOutputAttributes());
+    }
   }
 
   /**
@@ -98,26 +137,61 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
     }
-
-    return resolveMetadataType(false, attributes.getType(),
-                               () -> resolverFactory.getOutputAttributesResolver().getAttributesType(context, key),
-                               "OutputAttributes");
+    try {
+      MetadataType metadata = resolverFactory.getOutputAttributesResolver().getAttributesType(context, key);
+      if (isMetadataResolvedCorrectly(metadata, false)) {
+        return success(metadata);
+      }
+      MetadataFailure failure = newFailure()
+          .withMessage("Error resolving Output Attributes metadata")
+          .withFailureCode(NO_DYNAMIC_TYPE_AVAILABLE)
+          .withReason(NULL_TYPE_ERROR)
+          .onOutputAttributes();
+      return failure(attributes.getType(), failure);
+    } catch (Exception e) {
+      return failure(attributes.getType(), newFailure(e).onOutputAttributes());
+    }
   }
 
-  private MetadataResult<TypeMetadataDescriptor> toMetadataDescriptorResult(MetadataType type, boolean isDynamic,
+  private MetadataResult<TypeMetadataDescriptor> toMetadataDescriptorResult(MetadataType type,
+                                                                            boolean isDynamic,
                                                                             MetadataResult<MetadataType> result) {
     MetadataType resultingType = result.get() == null ? type : result.get();
-
-    TypeMetadataDescriptor descriptor = typeDescriptor()
+    TypeMetadataDescriptor descriptor = TypeMetadataDescriptor.builder()
         .withType(resultingType)
         .dynamic(isDynamic)
         .build();
 
-    if (result.isSuccess()) {
-      return success(descriptor);
-    }
-    MetadataFailure failure = result.getFailure().get();
-    return failure(descriptor, failure.getMessage(), failure.getFailureCode(), failure.getReason());
+    return result.isSuccess() ? success(descriptor) : failure(descriptor, result.getFailures());
   }
 
+  private MetadataType adaptToListIfNecessary(MetadataType resolvedType, Object key, MetadataContext metadataContext)
+      throws MetadataResolvingException {
+    if (!(component.getOutput().getType() instanceof ArrayType)) {
+      return resolvedType;
+    }
+
+    MetadataType outputType = ((ArrayType) component.getOutput().getType()).getType();
+    String typeId = getId(outputType);
+
+    if (Message.class.getName().equals(typeId)) {
+      resolvedType = wrapInMessageType(resolvedType, key, metadataContext);
+    }
+
+    return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
+  }
+
+  private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context)
+      throws MetadataResolvingException {
+    MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
+    if (attributes.isSuccess()) {
+      return buildMessageType(context.getTypeBuilder(), type, attributes.get());
+    } else {
+      throw new MetadataResolvingException("Could not resolve attributes of List<Message> output",
+                                           attributes.getFailures().stream()
+                                               .map(MetadataFailure::getFailureCode)
+                                               .findFirst()
+                                               .orElse(UNKNOWN));
+    }
+  }
 }

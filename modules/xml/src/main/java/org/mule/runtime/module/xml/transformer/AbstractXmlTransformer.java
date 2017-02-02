@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.runtime.core.util.XMLSecureFactories;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.io.InputStream;
@@ -69,7 +69,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
   @Override
   public final void initialise() throws InitialisationException {
-    xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, expandInternalEntities).createXmlInputFactory();
+    xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, expandInternalEntities).getXMLInputFactory();
     useStaxSource = !acceptExternalEntities || !expandInternalEntities;
     xmlOutputFactory = XMLOutputFactory.newInstance();
 
@@ -136,7 +136,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
       final DOMResult result;
 
       try {
-        DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+        DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
         result = new DOMResult(factory.newDocumentBuilder().newDocument());
       } catch (Exception e) {
         throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Could not create result document"), e);

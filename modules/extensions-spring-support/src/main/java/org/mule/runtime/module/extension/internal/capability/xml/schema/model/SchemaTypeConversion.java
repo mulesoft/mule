@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.acceptsExpressions;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_BOOLEAN;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_DATE_TIME;
@@ -29,14 +30,14 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
-import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.util.Reference;
 
 import javax.xml.namespace.QName;
 
@@ -44,7 +45,7 @@ public final class SchemaTypeConversion {
 
   public static QName convertType(final MetadataType type, ExpressionSupport expressionSupport) {
     final boolean dynamic = acceptsExpressions(expressionSupport);
-    final ValueHolder<QName> qName = new ValueHolder<>();
+    final Reference<QName> qName = new Reference<>(null);
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -87,8 +88,12 @@ public final class SchemaTypeConversion {
       }
 
       @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
+      public void visitObject(ObjectType objectType) {
+        if (isMap(objectType)) {
+          qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
+        } else {
+          defaultVisit(objectType);
+        }
       }
 
       @Override

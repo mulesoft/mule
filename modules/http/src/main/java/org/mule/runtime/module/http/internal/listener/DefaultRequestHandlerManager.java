@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import org.mule.service.http.api.server.RequestHandlerManager;
+
 public class DefaultRequestHandlerManager implements RequestHandlerManager {
 
   private final HttpListenerRegistry.PathMap requestHandlerOwner;

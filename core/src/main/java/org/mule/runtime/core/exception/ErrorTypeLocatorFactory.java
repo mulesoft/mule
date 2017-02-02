@@ -6,25 +6,23 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_ERROR_TYPE;
-import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
-import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.ErrorTypeBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import java.io.IOException;
@@ -37,21 +35,6 @@ import java.io.IOException;
 public class ErrorTypeLocatorFactory {
 
   /**
-   * Error type for which there's no clear reason for failure. Will be used when no specific match is found.
-   */
-  private static final ErrorType UNKNOWN_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)
-          .parentErrorType(ANY_ERROR_TYPE).build();
-
-  /**
-   * Error type for which there will be no handling since it represents an error so critical it should not be handled.
-   * If such an error occurs it will always be propagated.
-   */
-  public static final ErrorType CRITICAL_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
-          .parentErrorType(null).build();
-
-  /**
    * Creates the default {@link ErrorTypeLocator} to use in mule.
    * 
    * @param errorTypeRepository error type repository. Commonly created using {@link ErrorTypeRepositoryFactory}.
@@ -60,17 +43,19 @@ public class ErrorTypeLocatorFactory {
   public static ErrorTypeLocator createDefaultErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
     return ErrorTypeLocator.builder(errorTypeRepository)
         .defaultExceptionMapper(ExceptionMapper.builder()
-            .addExceptionMapping(MessageTransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION))
-            .addExceptionMapping(TransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION))
-            .addExceptionMapping(ExpressionRuntimeException.class, errorTypeRepository.lookupErrorType(EXPRESSION))
-            .addExceptionMapping(RoutingException.class, errorTypeRepository.lookupErrorType(ROUTING))
-            .addExceptionMapping(ConnectionException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY))
-            .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED))
-            .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY))
-            .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY))
-            .addExceptionMapping(MessageRedeliveredException.class, errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED))
-            .addExceptionMapping(Exception.class, UNKNOWN_ERROR_TYPE)
-            .addExceptionMapping(Error.class, CRITICAL_ERROR_TYPE)
+            .addExceptionMapping(MessageTransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION).get())
+            .addExceptionMapping(TransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION).get())
+            .addExceptionMapping(ExpressionRuntimeException.class, errorTypeRepository.lookupErrorType(EXPRESSION).get())
+            .addExceptionMapping(RoutingException.class, errorTypeRepository.lookupErrorType(ROUTING).get())
+            .addExceptionMapping(ConnectionException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
+            .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED).get())
+            .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
+            .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY).get())
+            .addExceptionMapping(SchedulerBusyException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
+            .addExceptionMapping(MessageRedeliveredException.class,
+                                 errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
+            .addExceptionMapping(Exception.class, errorTypeRepository.getErrorType(UNKNOWN).get())
+            .addExceptionMapping(Error.class, errorTypeRepository.getCriticalErrorType())
             .build())
         .build();
   }

@@ -9,18 +9,22 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+
+import java.util.List;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ArrayType}
@@ -37,14 +41,16 @@ class CollectionSchemaDelegate {
   }
 
   void generateCollectionElement(ArrayType metadataType, DslElementSyntax collectionDsl, String description, boolean required,
-                                 ExplicitGroup all) {
+                                 List<TopLevelElement> all) {
     LocalComplexType collectionComplexType = generateCollectionComplexType(collectionDsl, metadataType);
 
-    TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(), required ? ONE : ZERO, "1");
+    TopLevelElement collectionElement = builder.createTopLevelElement(collectionDsl.getElementName(),
+                                                                      required ? ONE : ZERO,
+                                                                      MAX_ONE);
     collectionElement.setAnnotation(builder.createDocAnnotation(description));
-    all.getParticle().add(objectFactory.createElement(collectionElement));
-
     collectionElement.setComplexType(collectionComplexType);
+
+    all.add(collectionElement);
   }
 
   private LocalComplexType generateCollectionComplexType(DslElementSyntax collectionDsl, final ArrayType metadataType) {
@@ -58,20 +64,27 @@ class CollectionSchemaDelegate {
     genericType.accept(new MetadataTypeVisitor() {
 
       /**
-       * For a Collection with an {@link ObjectType} as generic.
-       * The generated {@link ComplexType} declares a sequence of either a {@code ref} or a {@code choice}.
+       * For a Collection with an {@link ObjectType} as generic. The generated {@link ComplexType} declares a sequence of either a
+       * {@code ref} or a {@code choice}.
        * <p/>
-       * It creates an element {@code ref} to the concrete element whose {@code type} is the {@link ComplexType} associated
-       * to the {@code objectType}
+       * It creates an element {@code ref} to the concrete element whose {@code type} is the {@link ComplexType} associated to the
+       * {@code objectType}
        * <p/>
-       * In the case of having a {@link DslElementSyntax#isWrapped wrapped} {@link ObjectType}, then a
-       * {@link ExplicitGroup Choice} group that can receive a {@code ref} to any subtype that this wrapped type might have,
-       * be it either a top-level element for the mule schema, or if it can only be declared as child of this element.
+       * In the case of having a {@link DslElementSyntax#isWrapped wrapped} {@link ObjectType}, then a {@link ExplicitGroup
+       * Choice} group that can receive a {@code ref} to any subtype that this wrapped type might have, be it either a top-level
+       * element for the mule schema, or if it can only be declared as child of this element.
        *
+       * If the collections's value is a map, then a value attribute is created for the value map.
+       * 
        * @param objectType the item's type
        */
       @Override
       public void visitObject(ObjectType objectType) {
+        if (isMap(objectType)) {
+          defaultVisit(objectType);
+          return;
+        }
+
         DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType)
             .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] cannot be represented as a collection item",
                                                                    getId(objectType))));

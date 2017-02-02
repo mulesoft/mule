@@ -40,7 +40,7 @@ class WscConduitInitiator implements ConduitInitiator {
 
   @Override
   public Set<String> getUriPrefixes() {
-    return Stream.of("http://", "https://", "jms://", "smtp://", "tcp://").collect(toSet());
+    return Stream.of("http://", "https://", "jms://").collect(toSet());
   }
 
   @Override

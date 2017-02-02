@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.extension.internal.runtime.execution;
+
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+
+import reactor.core.publisher.MonoSink;
+
+/**
+ * Implementation of {@link CompletionCallback} which works using
+ * project Reactor.
+ *
+ * @since 4.0
+ */
+final class ReactorCompletionCallback implements CompletionCallback<Object, Attributes> {
+
+  private final MonoSink<Object> sink;
+  private final Event event;
+
+  ReactorCompletionCallback(MonoSink<Object> sink, Event event) {
+    this.sink = sink;
+    this.event = event;
+  }
+
+  @Override
+  public void success(Result<Object, Attributes> result) {
+    sink.success(result);
+  }
+
+  @Override
+  public void error(Exception e) {
+    sink.error(e);
+  }
+}

@@ -8,17 +8,17 @@ package org.mule.extension.ftp;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.FtpTestHarness;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 
 import java.nio.file.Paths;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class FtpCopyTestCase extends FtpConnectorTestCase {
 
@@ -26,9 +26,6 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
   private static final String SOURCE_DIRECTORY_NAME = "source";
   private static final String TARGET_DIRECTORY = "target";
   private static final String EXISTING_CONTENT = "I was here first!";
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   protected String sourcePath;
 
@@ -73,17 +70,15 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void nullTarget() throws Exception {
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "target path cannot be null nor blank");
     doExecute(null, false, false);
   }
 
   @Test
   public void copyToItselfWithoutOverwrite() throws Exception {
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     doExecute(getFlowName(), sourcePath, sourcePath, false, false);
   }
 
@@ -107,9 +102,10 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void toNonExistingFolderWithoutCreateParent() throws Exception {
+    testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
+                                            "destination path doesn't exists");
     testHarness.makeDir(TARGET_DIRECTORY);
     String target = format("%s/%s", TARGET_DIRECTORY, "a/b/c");
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
     doExecute(target, false, false);
   }
 
@@ -138,12 +134,12 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void withoutOverwrite() throws Exception {
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     final String existingFileName = "existing";
     testHarness.write(existingFileName, EXISTING_CONTENT);
-    final String target = getPath(existingFileName);
 
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-    doExecute(target, false, false);
+    doExecute(getPath(existingFileName), false, false);
   }
 
   @Test
@@ -183,6 +179,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   @Test
   public void directoryWithoutOverwrite() throws Exception {
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
+                                            "already exists");
     sourcePath = buildSourceDirectory();
 
     final String target = "target";
@@ -192,8 +190,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
     testHarness.write(SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME, EXISTING_CONTENT);
     testHarness.changeWorkingDirectory("../");
 
-    testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
     doExecute(format("%s/%s", target, SOURCE_DIRECTORY_NAME), false, false);
+
   }
 
   private String buildSourceDirectory() throws Exception {

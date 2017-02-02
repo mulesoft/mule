@@ -19,6 +19,7 @@
 
     <properties>
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.metadata.version>1.0.0-SNAPSHOT</mule.metadata.version>
     </properties>
 
     <modules>
@@ -27,10 +28,12 @@
         <module>file</module>
         <module>ftp</module>
         <module>http</module>
+        <module>oauth</module>
         <module>sockets</module>
         <module>validation</module>
         <module>email</module>
         <module>wsc</module>
+        <module>jms</module>
     </modules>
 
     <dependencies>
@@ -56,6 +59,24 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-metadata-model-xml</artifactId>
+            <version>${mule.metadata.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-metadata-model-java</artifactId>
+            <version>${mule.metadata.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-metadata-model-json</artifactId>
+            <version>${mule.metadata.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -138,21 +159,6 @@
                 </dependencies>
             </plugin>
             <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>mule-plugin</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>mule-plugin</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.mule.extensions</groupId>
                 <artifactId>mule-extensions-maven-plugin</artifactId>
                 <version>${mule.extensions.maven.plugin.version}</version>
@@ -165,6 +171,16 @@
                     <execution>
                         <id>analyze-dependencies-for-extension</id>
                         <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-module-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>

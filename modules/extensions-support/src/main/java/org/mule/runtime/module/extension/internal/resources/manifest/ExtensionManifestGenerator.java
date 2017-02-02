@@ -7,20 +7,21 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.LOADER_ID;
+import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.util.Optional;
 
 /**
  * A {@link GeneratedResourceFactory} which generates a {@link ExtensionManifest} and stores it in {@code XML} format
+ * TODO(fernandezlautaro): MULE-11136 this generator should be deleted
  *
  * @since 4.0
  */
@@ -42,7 +43,7 @@ public final class ExtensionManifestGenerator implements GeneratedResourceFactor
     builder.setName(extensionModel.getName()).setDescription(extensionModel.getDescription())
         .setVersion(extensionModel.getVersion()).setMinMuleVersion(extensionModel.getMinMuleVersion())
         .addExportedPackages(exportCollector.getExportedPackages()).addExportedResources(exportCollector.getExportedResources())
-        .withDescriber().setId(DESCRIBER_ID).addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
+        .withDescriber().setId(LOADER_ID).addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
 
     String manifestXml = new ExtensionManifestXmlSerializer().serialize(builder.build());
     return Optional.of(new GeneratedResource(EXTENSION_MANIFEST_FILE_NAME, manifestXml.getBytes()));

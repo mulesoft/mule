@@ -7,13 +7,16 @@
 
     <petstore:config name="configWithChildElements" cashierName="jim" >
         <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <flow name="getForbiddenPetWithExpression">
         <set-variable variableName="petName" value="DOG"/>
         <petstore:get-forbidden-pets>
             <petstore:forbidden-pets>
-                <petstore:forbidden-pet value="#[petName]"/>
+                <petstore:forbidden-pet value="#[mel:petName]"/>
                 <petstore:forbidden-pet value="CAT"/>
             </petstore:forbidden-pets>
         </petstore:get-forbidden-pets>

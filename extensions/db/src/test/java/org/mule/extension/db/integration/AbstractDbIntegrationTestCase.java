@@ -19,7 +19,9 @@ import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import org.mule.extension.db.api.StatementResult;
+import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
@@ -33,11 +35,10 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
@@ -59,9 +60,8 @@ import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class},
-    sharedRuntimeLibs = {"org.apache.derby:derby"})
-public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase
+    implements DbArtifactClassLoaderRunnerConfig {
 
   @Parameterized.Parameter(0)
   public String dataSourceConfigResource;
@@ -95,7 +95,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
               .get(testEvent())
               .getConnectionProvider().get();
 
-      return ((DbConnectionProvider) connectionProviderWrapper.getDelegate()).getConfiguredDataSource();
+      return ((DbConnectionProvider) unwrapProviderWrapper(connectionProviderWrapper)).getConfiguredDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -191,16 +191,19 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     return (Map<String, Object>) response.getPayload().getValue();
   }
 
-  protected MetadataResult<ComponentMetadataDescriptor> getMetadata(String flow, String query) throws RegistrationException {
+  protected MetadataResult<ComponentMetadataDescriptor<OperationModel>> getMetadata(String flow, String query)
+      throws RegistrationException {
     MetadataService metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
-    return metadataService.getMetadata(new ProcessorId(flow, "0"), newKey(query).build());
+    return metadataService.getOperationMetadata(new ProcessorId(flow, "0"), newKey(query).build());
   }
 
-  protected ParameterMetadataDescriptor getInputMetadata(String flow, String query) throws RegistrationException {
-    MetadataResult<ComponentMetadataDescriptor> metadata = getMetadata(flow, query);
+  protected MetadataType getInputMetadata(String flow, String query) throws RegistrationException {
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata(flow, query);
 
     assertThat(metadata.isSuccess(), is(true));
-    return metadata.get().getInputMetadata().get().getParameterMetadata("inputParameters").get();
+    return metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("inputParameters"))
+        .findFirst().get().getType();
   }
 
   protected void assertFieldOfType(ObjectType record, String name, MetadataType type) {
@@ -209,11 +212,16 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     assertThat(field.get().getValue(), equalTo(type));
   }
 
-  protected void assertOutputPayload(MetadataResult<ComponentMetadataDescriptor> metadata, MetadataType type) {
+  protected void assertOutputPayload(MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata, MetadataType type) {
     assertThat(metadata.isSuccess(), is(true));
-    assertThat(metadata.get().getOutputMetadata().isSuccess(), is(true));
-    MetadataResult<TypeMetadataDescriptor> output = metadata.get().getOutputMetadata().get().getPayloadMetadata();
-    assertThat(output.isSuccess(), is(true));
-    assertThat(output.get().getType(), is(type));
+    assertThat(metadata.get().getModel().getOutput().getType(), is(type));
   }
+
+  protected MetadataType getParameterValuesMetadata(String flow, String query) throws RegistrationException {
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata(flow, query);
+    assertThat(metadata.isSuccess(), is(true));
+    return metadata.get().getModel().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("parameterValues")).findFirst().get().getType();
+  }
+
 }

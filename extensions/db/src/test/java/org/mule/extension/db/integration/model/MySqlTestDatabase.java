@@ -8,9 +8,6 @@
 package org.mule.extension.db.integration.model;
 
 import org.mule.extension.db.integration.DbTestUtil;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataFormat;
-import org.mule.metadata.api.model.MetadataType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -36,7 +33,7 @@ public class MySqlTestDatabase extends AbstractTestDatabase {
   @Override
   public void createPlanetTable(Connection connection) throws SQLException {
     executeDdl(connection,
-               "CREATE TABLE PLANET(ID INTEGER NOT NULL AUTO_INCREMENT,POSITION INTEGER,NAME VARCHAR(255), PICTURE BLOB, PRIMARY KEY (ID))");
+               "CREATE TABLE PLANET(ID INTEGER NOT NULL AUTO_INCREMENT,POSITION INTEGER,NAME VARCHAR(255), PICTURE BLOB, DESCRIPTION LONGTEXT, PRIMARY KEY (ID))");
   }
 
   @Override
@@ -54,6 +51,19 @@ public class MySqlTestDatabase extends AbstractTestDatabase {
   public void createStoredProcedureUpdateTestType1(DataSource dataSource) throws SQLException {
     executeDdl(dataSource, "DROP PROCEDURE IF EXISTS updateTestType1;\n");
     createStoredProcedure(dataSource, SQL_CREATE_SP_UPDATE_TEST_TYPE_1);
+  }
+
+  @Override
+  public void createStoredProcedureParameterizedUpdatePlanetDescription(DataSource dataSource) throws SQLException {
+    executeDdl(dataSource, "DROP PROCEDURE IF EXISTS updatePlanetDescription;\n");
+
+    final String sql =
+        "CREATE DEFINER=CURRENT_USER PROCEDURE updatePlanetDescription(IN pName VARCHAR(50), IN pDescription LONGTEXT)\n" +
+            "BEGIN\n" +
+            "update Planet SET DESCRIPTION=pDescription where NAME = pName;\n" +
+            "END";
+
+    createStoredProcedure(dataSource, sql);
   }
 
   @Override
@@ -121,5 +131,11 @@ public class MySqlTestDatabase extends AbstractTestDatabase {
     final String sql = "CREATE FUNCTION DELAY(seconds INTEGER) RETURNS INTEGER\n" + "BEGIN\n" + " DO SLEEP(seconds * 1000);\n"
         + " RETURN 1;\n" + "END;";
     createStoredProcedure(dataSource, sql);
+  }
+
+  @Override
+  public Object getDescriptionFieldMetaDataType() {
+    // TODO(pablo.kraan): DB - what type must be used here?
+    return super.getDescriptionFieldMetaDataType();
   }
 }

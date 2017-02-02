@@ -30,8 +30,6 @@ public abstract class BaseWscResolver implements NamedTypeResolver {
   public static final String HEADERS_FIELD = "headers";
   public static final String ATTACHMENTS_FIELD = "attachments";
 
-
-
   @Override
   public String getCategoryName() {
     return WSC_CATEGORY;

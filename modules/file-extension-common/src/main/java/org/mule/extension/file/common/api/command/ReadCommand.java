@@ -7,6 +7,7 @@
 package org.mule.extension.file.common.api.command;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
@@ -22,16 +23,14 @@ import java.io.InputStream;
 public interface ReadCommand {
 
   /**
-   * Reads files under the considerations of {@link FileSystem#read(FileConnectorConfig, Message, String, boolean)}
+   * Reads files under the considerations of {@link FileSystem#read(FileConnectorConfig, String, MediaType, boolean)}
    *
    * @param config the config that is parameterizing this operation
-   * @param message the incoming Message
    * @param filePath the path of the file you want to read
    * @param lock whether or not to lock the file
    * @return An {@link Result} with an {@link InputStream} with the file's content as payload and a
    *         {@link FileAttributes} object as {@link Message#getAttributes()}
    * @throws IllegalArgumentException if the file at the given path doesn't exists
    */
-  Result<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
-                                           boolean lock);
+  Result<InputStream, FileAttributes> read(FileConnectorConfig config, String filePath, MediaType mediaType, boolean lock);
 }

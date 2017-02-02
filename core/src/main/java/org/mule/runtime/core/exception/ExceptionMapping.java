@@ -37,8 +37,8 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
    * @param exception exception to check if it matches with this mapping.
    * @return true if the exception type is associated with this mapping.
    */
-  public boolean matches(Throwable exception) {
-    return this.exceptionType.isAssignableFrom(exception.getClass());
+  public boolean matches(Class<? extends Throwable> exception) {
+    return this.exceptionType.isAssignableFrom(exception);
   }
 
   /**

@@ -1,0 +1,15 @@
+{
+  "title": "Example Schema",
+  "type": "object",
+  "properties": {
+    "petName": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "petName"
+  ]
+}

@@ -21,7 +21,7 @@ import java.util.List;
 
 public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRouteResolver, MuleContextAware {
 
-  private final String ID_EXPRESSION = "#[flowVars['id']]";
+  private final String ID_EXPRESSION = "#[mel:flowVars['id']]";
 
   private MuleContext muleContext;
 

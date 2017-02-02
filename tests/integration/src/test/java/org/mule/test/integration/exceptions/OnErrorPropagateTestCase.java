@@ -24,7 +24,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("On Error Propagate")
 public class OnErrorPropagateTestCase extends AbstractIntegrationTestCase {
 
   @Override
@@ -61,7 +65,7 @@ public class OnErrorPropagateTestCase extends AbstractIntegrationTestCase {
 
   private void verifyFlow(String flowName, Object payload) throws InterruptedException {
     try {
-      flowRunner(flowName).withPayload(payload).asynchronously().run().getMessage();
+      flowRunner(flowName).withPayload(payload).dispatch();
     } catch (Exception e) {
       assertThat(e.getCause(), is(instanceOf(FunctionalTestException.class)));
       if (!CallMessageProcessor.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {

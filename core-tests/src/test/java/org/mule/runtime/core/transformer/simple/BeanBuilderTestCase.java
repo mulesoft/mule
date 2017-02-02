@@ -28,8 +28,8 @@ public class BeanBuilderTestCase extends AbstractTransformerTestCase {
     muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
     trans.setBeanFactory(factory);
     trans.addArgument(new ExpressionArgument("brand", new ExpressionConfig("payload"), false));
-    trans.addArgument(new ExpressionArgument("segments", new ExpressionConfig("message.outboundProperties.segments"), false));
-    trans.addArgument(new ExpressionArgument("radius", new ExpressionConfig("message.outboundProperties.radius"), false));
+    trans.addArgument(new ExpressionArgument("segments", new ExpressionConfig("mel:message.outboundProperties.segments"), false));
+    trans.addArgument(new ExpressionArgument("radius", new ExpressionConfig("mel:message.outboundProperties.radius"), false));
     trans.initialise();
     return trans;
   }

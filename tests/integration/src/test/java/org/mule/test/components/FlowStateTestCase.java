@@ -6,15 +6,14 @@
  */
 package org.mule.test.components;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -38,23 +37,22 @@ public class FlowStateTestCase extends AbstractIntegrationTestCase {
   protected void doTestStarted(String flowName) throws Exception {
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName + "Flow");
     // Flow initially started
-    assertTrue(flow.isStarted());
-    assertFalse(flow.isStopped());
+    assertTrue(flow.getLifecycleState().isStarted());
+    assertFalse(flow.getLifecycleState().isStopped());
     assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
   }
 
   @Test
   public void testInitialStateStopped() throws Exception {
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("stoppedFlow");
-    assertEquals("stopped", flow.getInitialState());
     // Flow initially stopped
-    assertFalse(flow.isStarted());
-    assertTrue(flow.isStopped());
+    assertFalse(flow.getLifecycleState().isStarted());
+    assertTrue(flow.getLifecycleState().isStopped());
     assertFalse(((TestMessageSource) flow.getMessageSource()).isStarted());
 
     flow.start();
-    assertTrue(flow.isStarted());
-    assertFalse(flow.isStopped());
+    assertTrue(flow.getLifecycleState().isStarted());
+    assertFalse(flow.getLifecycleState().isStopped());
     assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
   }
 

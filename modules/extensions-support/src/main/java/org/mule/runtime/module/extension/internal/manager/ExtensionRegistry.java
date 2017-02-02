@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -75,12 +76,12 @@ final class ExtensionRegistry {
   /**
    * Registers the given {@code extension}
    *
-   * @param name the registration name you want for the {@code extension}
+   * @param name           the registration name you want for the {@code extension}
    * @param extensionModel a {@link ExtensionModel}
    */
   void registerExtension(String name, ExtensionModel extensionModel) {
     extensions.put(new ExtensionEntityKey(name), extensionModel);
-    getParameterClasses(extensionModel, Thread.currentThread().getContextClassLoader()).stream()
+    getParameterClasses(extensionModel, getClassLoader(extensionModel)).stream()
         .filter(type -> Enum.class.isAssignableFrom(type))
         .forEach(type -> {
           final Class<Enum> enumClass = (Class<Enum>) type;
@@ -104,7 +105,7 @@ final class ExtensionRegistry {
 
   /**
    * @return an {@link Optional} with the {@link ExtensionModel} which name and vendor equals {@code extensionName} and
-   *         {@code vendor}
+   * {@code vendor}
    */
   Optional<ExtensionModel> getExtension(String extensionName) {
     return Optional.ofNullable(extensions.get(new ExtensionEntityKey(extensionName)));
@@ -147,7 +148,7 @@ final class ExtensionRegistry {
    *
    * @param configurationProvider a {@link ConfigurationProvider} to be registered
    * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
-   * @throws MuleRuntimeException if the {@code configurationProvider} could not be registered
+   * @throws MuleRuntimeException     if the {@code configurationProvider} could not be registered
    */
   void registerConfigurationProvider(ConfigurationProvider configurationProvider) {
     checkArgument(configurationProvider != null, "Cannot register a null configurationProvider");

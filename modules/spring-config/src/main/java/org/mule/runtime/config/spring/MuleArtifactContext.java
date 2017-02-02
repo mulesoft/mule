@@ -8,9 +8,11 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
@@ -20,12 +22,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
@@ -34,7 +36,6 @@ import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
-import org.mule.runtime.config.spring.dsl.model.extension.loader.ModuleExtensionStore;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -47,11 +48,10 @@ import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
 import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
@@ -65,11 +65,9 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-import org.mule.runtime.extension.api.ExtensionManager;
 
 import com.google.common.collect.ImmutableList;
 
@@ -113,8 +111,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
-  private final ArtifactConfiguration artifactConfiguration;
-  private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = new XmlConfigurationDocumentLoader();
+  private final ArtifactDeclaration artifactDeclaration;
+  private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader;
   protected ApplicationModel applicationModel;
   protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
@@ -131,21 +129,21 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
    * registry implementation to wraps the spring ApplicationContext
    *
    * @param muleContext the {@link MuleContext} that own this context
-   * @param artifactConfiguration the mule configuration defined programmatically
+   * @param artifactDeclaration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *        org.mule.runtime.config.spring.SpringRegistry
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                             ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
+                             ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Map<String, String> artifactProperties, ArtifactType artifactType)
       throws BeansException {
-    this(muleContext, convert(artifactConfigResources), artifactConfiguration, optionalObjectsController, artifactProperties,
+    this(muleContext, convert(artifactConfigResources), artifactDeclaration, optionalObjectsController, artifactProperties,
          artifactType);
   }
 
   public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources,
-                             ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
+                             ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Map<String, String> artifactProperties, ArtifactType artifactType) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = muleContext;
@@ -153,7 +151,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
-    this.artifactConfiguration = artifactConfiguration;
+    this.artifactDeclaration = artifactDeclaration;
+    this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
@@ -162,21 +161,20 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
             ((MuleContextAware) componentBuildingDefinitionProvider).setMuleContext(muleContext);
           }
           componentBuildingDefinitionProvider.init();
-          componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream()
+          componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
               .forEach(componentBuildingDefinitionRegistry::register);
         });
 
-    ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
-    ErrorTypeLocator errorTypeLocator = createComponentErrorTypeLocator(errorTypeRepository);
-    ((DefaultMuleContext) muleContext).setErrorTypeLocator(errorTypeLocator);
-    ((DefaultMuleContext) muleContext).setErrorTypeRepository(errorTypeRepository);
-
     xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
-
-    this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
+    this.beanDefinitionFactory =
+        new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();
+  }
+
+  protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
+    return new XmlConfigurationDocumentLoader();
   }
 
   private ErrorTypeLocator createComponentErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
@@ -190,7 +188,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     }
     applicationModel.executeOnEveryComponentTree(componentModel -> {
       Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
-          .flatMap(parentComponentModel -> Optional.ofNullable(parentComponentModel.getIdentifier()));
+          .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
       if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
         componentNotSupportedByNewParsers.add(componentModel.getIdentifier());
         useNewParsingMechanism = false;
@@ -202,18 +200,18 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     try {
       ArtifactConfig.Builder applicationConfigBuilder = new ArtifactConfig.Builder();
       applicationConfigBuilder.setApplicationProperties(this.artifactProperties);
-      //looks for every module in the current classpath ONCE per app, and caches them in the moduleExtensionStore object
-      ModuleExtensionStore moduleExtensionStore = new ModuleExtensionStore();
       for (Resource springResource : artifactConfigResources) {
         Document document =
-            xmlConfigurationDocumentLoader.loadDocument(Optional.of(moduleExtensionStore), springResource.getInputStream());
+            xmlConfigurationDocumentLoader.loadDocument(ofNullable(muleContext.getExtensionManager()),
+                                                        springResource.getFilename(),
+                                                        springResource.getInputStream());
         ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
         applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
       }
       applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
-      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactConfiguration,
-                                              Optional.of(moduleExtensionStore),
-                                              Optional.of(componentBuildingDefinitionRegistry));
+      applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactDeclaration,
+                                              ofNullable(muleContext.getExtensionManager()),
+                                              of(componentBuildingDefinitionRegistry));
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }

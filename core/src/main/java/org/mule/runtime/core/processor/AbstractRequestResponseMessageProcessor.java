@@ -6,21 +6,21 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.util.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.util.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Base implementation of a {@link org.mule.runtime.core.api.processor.Processor} that may performs processing during both the
@@ -28,7 +28,7 @@ import reactor.core.publisher.Flux;
  * <p>
  * In order to define the process during the request phase you should override the
  * {@link #processRequest(org.mule.runtime.core.api.Event)} method. Symmetrically, if you need to define a process to be executed
- * during the response phase, then you should override the {@link #processResponse(Event, Event)} method.
+ * during the response phase, then you should override the {@link #processResponse(Event)} method.
  * <p>
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
  * override the {@link #processFinally(org.mule.runtime.core.api.Event, MessagingException)} method.
@@ -43,7 +43,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     MessagingException exception = null;
     Event response = null;
     try {
-      response = processResponse(processNext(processRequest(event)), event);
+      response = processResponse(processNext(processRequest(event)));
       return response;
     } catch (MessagingException e) {
       exception = e;
@@ -59,22 +59,22 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).concatMap(request -> {
-      Flux<Event> stream = just(request).transform(processRequest());
-      if (next != null) {
-        stream = stream.transform(s -> applyNext(s));
-      }
-      return stream.transform(processResponse(request));
-    })
+    Flux<Event> flux = from(publisher).transform(processRequest());
+    if (next != null) {
+      flux = flux.transform(applyNext());
+    }
+    return flux.transform(processResponse())
         .doOnNext(result -> processFinally(result, null))
-        .onErrorResumeWith(MessagingException.class, e -> {
+        .doOnError(EventDroppedException.class, dme -> processFinally(dme.getEvent(), null))
+        .onErrorResumeWith(MessagingException.class, exception -> {
           try {
-            return just(processCatch(e.getEvent(), e));
-          } catch (MessagingException e1) {
-            return error(e1);
+            return Mono.just(processCatch(exception.getEvent(), exception));
+          } catch (MessagingException me) {
+            return Mono.error(me);
+          } finally {
+            processFinally(exception.getEvent(), exception);
           }
-        })
-        .doOnError(MessagingException.class, checkedConsumer(e -> processFinally(e.getEvent(), e)));
+        });
   }
 
   /**
@@ -107,11 +107,10 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * Processes the response phase after the next message processor and it's response phase have been invoked
    *
    * @param response response event to be processed.
-   * @param request the request event
    * @return result of response processing.
    * @throws MuleException exception thrown by implementations of this method whiile performing response processing
    */
-  protected Event processResponse(Event response, final Event request) throws MuleException {
+  protected Event processResponse(Event response) throws MuleException {
     return response;
   }
 
@@ -120,8 +119,8 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    *
    * @return function that performs request processing
    */
-  protected Function<Publisher<Event>, Publisher<Event>> processResponse(Event request) {
-    return stream -> from(stream).handle(nullSafeMap(checkedFunction(response -> processResponse(response, request))));
+  protected Function<Publisher<Event>, Publisher<Event>> processResponse() {
+    return stream -> from(stream).handle(nullSafeMap(checkedFunction(response -> processResponse(response))));
   }
 
   /**

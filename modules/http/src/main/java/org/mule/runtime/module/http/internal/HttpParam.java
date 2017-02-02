@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.api.Event;
 
 public abstract class HttpParam {

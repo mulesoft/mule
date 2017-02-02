@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
- * <code>CryptoFailureException</code> is a generic exception thrown by an CryptoStrategy if encryption or decryption fails. The
- * constuctors of this exception accept a EncryptionStrategy that will be included in the exception message. Implementors of
- * EncryptionStrategy should provide a toString method that exposes *only* information that maybe useful for debugging not
- * passwords, secret keys, etc.
+ * {@code CryptoFailureException} is a generic exception thrown by an CryptoStrategy if encryption or decryption fails.
+ * The constructors of this exception accept a {@link EncryptionStrategy} that will be included in the exception message.
+ * Implementors of {@link EncryptionStrategy} should provide a toString method that exposes *only* information
+ * that maybe useful for debugging <b>not</b> passwords, secret keys, etc.
+ *
+ * @since 4.0
  */
 public class CryptoFailureException extends MuleException {
 
@@ -41,7 +42,7 @@ public class CryptoFailureException extends MuleException {
   }
 
   public CryptoFailureException(EncryptionStrategy strategy, Throwable cause) {
-    super(CoreMessages.cryptoFailure(), cause);
+    super(I18nMessageFactory.createStaticMessage("Crypto Failure"), cause);
     String s = (strategy == null ? "null" : strategy.toString());
     addInfo("Encryption", s);
     this.encryptionStrategy = strategy;

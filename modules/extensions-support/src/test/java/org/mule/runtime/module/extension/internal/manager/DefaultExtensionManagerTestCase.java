@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -24,45 +26,35 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DESCRIBER_ID;
-import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.TYPE_PROPERTY_NAME;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
-import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
 
@@ -88,7 +80,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String MULESOFT = "MuleSoft";
   private static final String OTHER_VENDOR = "OtherVendor";
-  private ExtensionManagerAdapter extensionsManager;
+  private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setNamespace("extension-namespace").build();
+  private ExtensionManager extensionsManager;
 
   private static final String EXTENSION1_NAME = "extension1";
   private static final String EXTENSION1_CONFIG_NAME = "extension1Config";
@@ -144,8 +137,15 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     extensionsManager.initialise();
     this.extensionsManager = extensionsManager;
 
+    mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+    mockClassLoaderModelProperty(extensionModel2, getClass().getClassLoader());
+    mockClassLoaderModelProperty(extensionModel3WithRepeatedName, getClass().getClassLoader());
+
     when(extensionModel1.getName()).thenReturn(EXTENSION1_NAME);
     mockClassLoaderModelProperty(extensionModel1, getClass().getClassLoader());
+
+    when(extensionModel1.getXmlDslModel()).thenReturn(XML_DSL_MODEL);
+    when(extensionModel2.getXmlDslModel()).thenReturn(XML_DSL_MODEL);
 
     when(extensionModel1.getConfigurationModels()).thenReturn(asList(extension1ConfigurationModel));
     when(extensionModel2.getName()).thenReturn(EXTENSION2_NAME);
@@ -165,11 +165,11 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockInterceptors(extension1ConfigurationModel, null);
     when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(ImmutableList.of());
+    mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 
-    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(Optional.of(extension1ConfigurationModel));
-    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(Optional.of(extension1OperationModel));
+    when(extensionModel1.getConfigurationModel(EXTENSION1_CONFIG_NAME)).thenReturn(of(extension1ConfigurationModel));
+    when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(of(extension1OperationModel));
     when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
 
     when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
@@ -191,7 +191,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {
-    Arrays.stream(extensionModels).forEach(extensionsManager::registerExtension);
+    Arrays.stream(extensionModels).forEach(extension -> {
+      when(extension.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(empty());
+      extensionsManager.registerExtension(extension);
+    });
   }
 
   @Test
@@ -242,7 +245,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
-    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
     ConfigurationInstance configInstance = extensionsManager.getConfiguration(extensionModel1, event);
     assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
@@ -254,7 +257,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
 
     MuleRegistry registry = muleContext.getRegistry();
-    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
 
     doAnswer(invocation -> {
@@ -302,34 +305,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void registerFromManifest() throws Exception {
-    final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(anyObject(), anyObject())).thenReturn(asList(new XmlModelEnricher()));
-
-    final String version = "4.0.0";
-    ExtensionManifestBuilder builder =
-        new ExtensionManifestBuilder().setName(HEISENBERG).setDescription(EXTENSION_DESCRIPTION).setVersion(version);
-    builder.withDescriber().setId(DESCRIBER_ID).addProperty(TYPE_PROPERTY_NAME, HeisenbergExtension.class.getName());
-
-    Describer describer = new DescriberResolver().resolve(builder.build(), classLoader);
-    final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
-
-    ExtensionFactory extensionFactory = new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader());
-
-    ExtensionModel extensionModel =
-        withContextClassLoader(classLoader, () -> extensionFactory.createFrom(describer.describe(context), context));
-
-    extensionsManager.registerExtension(extensionModel);
-
-    Optional<ExtensionModel> registered = extensionsManager.getExtension(HEISENBERG);
-    assertThat(registered.isPresent(), is(true));
-
-    final ExtensionModel registeredExtension = registered.get();
-    assertThat(registeredExtension.getName(), is(HEISENBERG));
-    assertThat(registeredExtension.getVersion(), is(version));
-  }
-
-  @Test
   public void enumTransformer() throws Exception {
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     extensionsManager.setMuleContext(muleContext);
@@ -341,7 +316,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     ParameterModel parameterOfRepeatedEnumType = mock(ParameterModel.class);
     when(parameterOfRepeatedEnumType.getType()).thenReturn(toMetadataType(TimeUnit.class));
 
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter, parameterOfRepeatedEnumType));
+    mockParameters(extension1ConfigurationModel, parameter, parameterOfRepeatedEnumType);
     extensionsManager.registerExtension(extensionModel1);
 
     verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
@@ -357,7 +332,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(parameter.getType())
         .thenReturn(create(JAVA).arrayType().of(toMetadataType(TimeUnit.class)).build());
 
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameter));
+    mockParameters(extension1ConfigurationModel, parameter);
     extensionsManager.registerExtension(extensionModel1);
 
     verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
@@ -367,7 +342,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     ParameterModel parameterModel1 = mock(ParameterModel.class);
     when(parameterModel1.isRequired()).thenReturn(true);
 
-    when(extension1ConfigurationModel.getParameterModels()).thenReturn(asList(parameterModel1, parameterModel1));
+    mockParameters(extension1ConfigurationModel, parameterModel1, parameterModel1);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
   }
 

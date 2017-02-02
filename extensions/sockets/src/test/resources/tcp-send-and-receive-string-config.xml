@@ -6,13 +6,13 @@
        http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
 
     <sockets:request-config name="tcp-requester">
-        <sockets:tcp-requester-connection host="localhost" port="${port}" protocol="#[flowVars.protocol]">
+        <sockets:tcp-requester-connection host="localhost" port="${port}" protocol="#[mel:flowVars.protocol]">
             <reconnect blocking="false" />
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
     <sockets:listener-config name="tcp-listener">
-        <sockets:tcp-listener-connection host="localhost" port="${port}" protocol="#[flowVars.protocol]"/>
+        <sockets:tcp-listener-connection host="localhost" port="${port}" protocol="#[mel:flowVars.protocol]"/>
     </sockets:listener-config>
 
     <flow name="tcp-send-and-receive">
@@ -22,7 +22,7 @@
     <flow name="tcp-listen-and-modify-string">
         <sockets:socket-listener config-ref="tcp-listener"/>
         <object-to-string-transformer mimeType="text/plain"/>
-        <set-payload value="#[payload]_modified"/>
+        <set-payload value="#[mel:payload]_modified"/>
     </flow>
 
 </mule>

@@ -16,13 +16,11 @@ import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 
 import java.io.File;
@@ -36,8 +34,8 @@ import org.apache.commons.io.FileUtils;
  * Base test class for {@link FunctionalTestCase}s that make use of components generated through the extensions API.
  * <p/>
  * The value added by this class in comparison to a traditional {@link FunctionalTestCase} is that before creating the
- * {@link MuleContext}, it creates a {@link ExtensionManager} and automatically registers extensions pointed by the
- * {@link #getDescribers()} or {@link #getAnnotatedExtensionClasses()} methods.
+ * {@link MuleContext}, it creates a {@link ExtensionManager} and automatically registers extensions pointed by
+ * {@link #getAnnotatedExtensionClasses()} methods.
  * <p/>
  * Once extensions are registered, a {@link ResourcesGenerator} is used to automatically generate any backing resources needed
  * (XSD schemas, spring bundles, etc).
@@ -52,22 +50,12 @@ import org.apache.commons.io.FileUtils;
  */
 public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
 
-  private ExtensionManagerAdapter extensionManager;
-
-  /**
-   * Implement this method to limit the amount of extensions initialised by providing the {@link Describer}s for the extensions
-   * that you actually want to use for this test. Returning a {@code null} or empty array will cause the
-   * {@link #getAnnotatedExtensionClasses()} method to be considered. Default implementation of this method returns {@code null}
-   */
-  protected Describer[] getDescribers() {
-    return null;
-  }
+  private ExtensionManager extensionManager;
 
   /**
    * Implement this method to limit the amount of extensions initialised by providing the annotated classes which define the
    * extensions that you actually want to use for this test. Returning a {@code null} or empty array forces the
    * {@link ExtensionManager} to perform a full classpath discovery. Default implementation of this method returns {@code null}.
-   * This method will only be considered if {@link #getDescribers()} returns {@code null}
    */
   protected Class<?>[] getAnnotatedExtensionClasses() {
     return null;
@@ -80,7 +68,8 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
    * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
    */
   @Override
-  protected final void addBuilders(List<ConfigurationBuilder> builders) {
+  //TODO - MULE-11119: Make final again once we can add the HTTP service injection as the scehduler's is
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
     builders.add(0, new AbstractConfigurationBuilder() {
 
@@ -100,7 +89,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
 
     ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer =
         new ExtensionsTestInfrastructureDiscoverer(extensionManager);
-    extensionsTestInfrastructureDiscoverer.discoverExtensions(getDescribers(), getAnnotatedExtensionClasses());
+    extensionsTestInfrastructureDiscoverer.discoverExtensions(getAnnotatedExtensionClasses());
 
     generateResourcesAndAddToClasspath(generatedResourcesDirectory,
                                        copyOf(extensionsTestInfrastructureDiscoverer

@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
@@ -35,16 +36,15 @@ import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
-import org.mule.runtime.core.lifecycle.phases.MuleContextDisposePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextInitialisePhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStartPhase;
-import org.mule.runtime.core.lifecycle.phases.MuleContextStopPhase;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.util.LinkedHashSet;
@@ -59,7 +59,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   @Override
   protected void registerPhases() {
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, emptyCallback);
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
     registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new SpringLifecycleCallback(this));
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
@@ -79,9 +79,9 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExtendedExpressionLanguage.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
       initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));

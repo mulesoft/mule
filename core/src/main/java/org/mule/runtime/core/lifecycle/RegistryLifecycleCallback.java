@@ -13,7 +13,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.lifecycle.phases.ContainerManagedLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.ContainerManagedLifecyclePhase;
 
 import java.util.Collection;
 import java.util.HashSet;

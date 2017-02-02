@@ -12,7 +12,7 @@
     </flow>
 
     <flow name="bulkUpdateMetadata">
-        <db:bulk-update parameterValues="#[payload]">
+        <db:bulk-update>
             <db:sql>update PLANET set NAME='Mercury' where NAME= :name</db:sql>
         </db:bulk-update>
     </flow>

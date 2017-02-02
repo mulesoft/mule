@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
@@ -41,7 +41,7 @@ import javax.inject.Inject;
  * Adds the capability to expose all the {@link MetadataKey}s associated with the {@link StaticConfigurationProvider}'s
  * components.
  *
- * @since 1.0
+ * @since 4.0
  */
 public final class ConfigurationProviderMetadataAdapter extends StaticConfigurationProvider
     implements MetadataKeyProvider {
@@ -62,14 +62,14 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
 
     MetadataKeysContainerBuilder keysBuilder = MetadataKeysContainerBuilder.getInstance();
-    MetadataContext metadataContext = getMetadataContext();
     try {
+      MetadataContext metadataContext = getMetadataContext();
       addComponentKeys(getConfigurationModel().getOperationModels(), metadataContext, keysBuilder);
       addComponentKeys(getConfigurationModel().getSourceModels(), metadataContext, keysBuilder);
+      metadataContext.dispose();
     } catch (Exception e) {
-      return failure(null, format("%s: %s"), e);
+      return failure(newFailure(e).onKeys());
     }
-
     return success(keysBuilder.build());
   }
 
@@ -86,7 +86,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     }
   }
 
-  private MetadataContext getMetadataContext() throws MetadataResolvingException {
+  private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
     Event fakeEvent = getInitialiserEvent(muleContext);
     return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,

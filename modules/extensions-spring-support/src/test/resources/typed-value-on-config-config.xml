@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd">
+
+
+    <typed-value:config name="dynamicConfig" stringTypedValue="#[mel:payload]">
+        <typed-value:differed-door address="#[mel:flowVars.address]"/>
+    </typed-value:config>
+
+    <typed-value:config name="staticConfig" stringTypedValue="string">
+        <typed-value:differed-door address="address"/>
+    </typed-value:config>
+
+    <flow name="typedValueOnDynamicConfig">
+        <set-variable variableName="address" value="address"/>
+        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <typed-value:typed-value-on-config config-ref="dynamicConfig" />
+    </flow>
+
+    <flow name="typedValueOnStaticConfig">
+        <typed-value:typed-value-on-config config-ref="staticConfig" />
+    </flow>
+
+</mule>

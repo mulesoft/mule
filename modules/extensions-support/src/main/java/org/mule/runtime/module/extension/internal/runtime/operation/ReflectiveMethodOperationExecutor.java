@@ -11,23 +11,25 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import java.lang.reflect.Method;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link OperationExecutor} which works by using reflection to invoke
- * a method from a class.
+ * Implementation of {@link OperationExecutor} which works by using reflection to invoke a method from a class.
  *
  * @since 3.7.0
  */
@@ -39,15 +41,20 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
   private MuleContext muleContext;
 
   public ReflectiveMethodOperationExecutor(OperationModel operationModel, Method operationMethod, Object operationInstance) {
-    executor = new ReflectiveMethodComponentExecutor<>(operationModel, operationMethod, operationInstance);
+    executor =
+        new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object execute(ExecutionContext<OperationModel> executionContext) throws Exception {
-    return executor.execute(executionContext);
+  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+    try {
+      return justOrEmpty(executor.execute(executionContext));
+    } catch (Exception e) {
+      return error(e);
+    }
   }
 
   @Override

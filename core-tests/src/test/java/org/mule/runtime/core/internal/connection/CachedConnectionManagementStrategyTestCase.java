@@ -13,7 +13,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -73,7 +72,7 @@ public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTest
   public void failDueToInvalidConnection() throws ConnectionException {
     String errorMessage = "Invalid username or password";
     when(connectionProvider.validate(connection)).thenReturn(ConnectionValidationResult
-        .failure(errorMessage, ConnectionExceptionCode.INCORRECT_CREDENTIALS, new Exception("401: UNAUTHORIZED")));
+        .failure(errorMessage, new Exception("401: UNAUTHORIZED")));
     CachedConnectionHandler connectionHandler = (CachedConnectionHandler) connectionStrategy.getConnectionHandler();
     ConnectionValidationResult validationResult = connectionHandler.validateConnection(connection);
 

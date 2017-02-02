@@ -30,7 +30,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   @Test
   public void testInlineScript() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("inlineScript").withPayload("hello").asynchronously().run();
+    flowRunner("inlineScript").withPayload("hello").run();
     InternalMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
@@ -39,7 +39,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   @Test
   public void testFileBasedScript() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("fileBasedScript").withPayload("hello").asynchronously().run();
+    flowRunner("fileBasedScript").withPayload("hello").run();
     InternalMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
@@ -48,7 +48,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   @Test
   public void testReferencedTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("referencedTransformer").withPayload("hello").asynchronously().run();
+    flowRunner("referencedTransformer").withPayload("hello").run();
     InternalMessage response = client.request("test://referencedTransformerTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
@@ -57,7 +57,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   @Test
   public void testReferencedTransformerWithParameters() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("referencedTransformerWithParameters").withPayload("hello").asynchronously().run();
+    flowRunner("referencedTransformerWithParameters").withPayload("hello").run();
     InternalMessage response =
         client.request("test://referencedTransformerWithParametersTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);

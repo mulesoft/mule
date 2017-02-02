@@ -8,7 +8,6 @@ package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.core.context.notification.Node;
 import org.mule.test.core.context.notification.RestrictedNode;
 
@@ -16,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.Factory;
-import org.junit.Before;
 import org.junit.Test;
 
 public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase {
@@ -24,13 +22,6 @@ public class MulticastingRouterNotificationTestCase extends AbstractMessageProce
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
-  }
-
-  private MuleClient client;
-
-  @Before
-  public void before() {
-    client = muleContext.getClient();
   }
 
   private Factory specificationFactory;

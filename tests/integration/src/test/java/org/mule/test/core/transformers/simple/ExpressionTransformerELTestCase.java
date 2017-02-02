@@ -40,11 +40,11 @@ public class ExpressionTransformerELTestCase extends AbstractIntegrationTestCase
     assertNotNull(transformer.getArguments());
     assertEquals(2, transformer.getArguments().size());
     ExpressionArgument arg1 = transformer.getArguments().get(0);
-    assertEquals("message.payloadAs(org.mule.tck.testmodels.fruit.FruitBasket)", arg1.getExpression());
+    assertEquals("mel:message.payloadAs(org.mule.tck.testmodels.fruit.FruitBasket)", arg1.getExpression());
     assertFalse(arg1.isOptional());
 
     ExpressionArgument arg2 = transformer.getArguments().get(1);
-    assertEquals("['foo' : message.outboundProperties.foo, 'bar' : message.outboundProperties.bar]", arg2.getExpression());
+    assertEquals("mel:['foo' : message.outboundProperties.foo, 'bar' : message.outboundProperties.bar]", arg2.getExpression());
     assertTrue(arg2.isOptional());
   }
 
@@ -70,7 +70,7 @@ public class ExpressionTransformerELTestCase extends AbstractIntegrationTestCase
 
     ExpressionArgument arg2 = transformer.getArguments().get(1);
     assertEquals("segments", arg2.getName());
-    assertEquals("message.outboundProperties['SEGMENTS']", arg2.getExpression());
+    assertEquals("mel:message.outboundProperties['SEGMENTS']", arg2.getExpression());
     assertTrue(arg2.isOptional());
   }
 

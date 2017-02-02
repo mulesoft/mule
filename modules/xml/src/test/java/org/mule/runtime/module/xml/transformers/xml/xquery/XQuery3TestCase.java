@@ -103,6 +103,26 @@ public class XQuery3TestCase extends FunctionalTestCase {
     }
   }
 
+  @Test
+  public void nodeFromXPath3() throws Exception {
+    InputStream books = IOUtils.getResourceAsStream("books.xml", getClass());
+    DocumentBuilder documentBuilder = new DocumentBuilderImpl();
+    Document booksDocument = documentBuilder.parse(books);
+    assertNodeGotFromXpath3("inputGotFromXpath3", booksDocument);
+  }
+
+  private void assertNodeGotFromXpath3(String flowName, Object books) throws Exception {
+    List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(books)
+        .run().getMessage().getPayload().getValue();
+    assertThat(elements, hasSize(1));
+
+    NodeList childNodes = elements.get(0).getChildNodes();
+    assertThat(childNodes.getLength(), greaterThan(0));
+
+    NamedNodeMap firstChildAttributes = childNodes.item(0).getAttributes();
+    assertThat(firstChildAttributes.getNamedItem("title").getNodeValue(), equalTo("Pride and Prejudice"));
+  }
+
   private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception {
     List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input).withVariable("books", books)
         .withVariable("cities", cities).run().getMessage().getPayload().getValue();

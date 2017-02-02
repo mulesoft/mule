@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -50,7 +50,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   protected MuleContext muleContext = mockContextWithServices();
   protected MuleSession session = mock(MuleSession.class);
-  protected Flow flow = mock(Flow.class);
+  protected DefaultFlowBuilder.DefaultFlow flow = mock(DefaultFlowBuilder.DefaultFlow.class);
   private EventContext context;
 
   @Before

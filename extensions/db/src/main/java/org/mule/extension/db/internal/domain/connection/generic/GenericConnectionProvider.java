@@ -6,10 +6,13 @@
  */
 package org.mule.extension.db.internal.domain.connection.generic;
 
+import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
+import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -23,9 +26,11 @@ import javax.sql.DataSource;
  */
 @DisplayName("Generic Connection")
 @Alias("generic")
+@ExternalLib(name = "JDBC Driver", description = "A JDBC driver which supports connecting to the Database",
+    fileName = DRIVER_FILE_NAME_PATTERN)
 public class GenericConnectionProvider extends DbConnectionProvider {
 
-  @ParameterGroup
+  @ParameterGroup(name = CONNECTION)
   private GenericConnectionParameters connectionParameters;
 
   @Override

@@ -8,12 +8,14 @@ package org.mule.test.integration.message;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.test.IntegrationTestCaseRunnerConfig;
 
 import org.junit.Test;
 
-public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
+public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase implements IntegrationTestCaseRunnerConfig {
 
   @Override
   protected String getConfigFile() {
@@ -30,7 +32,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
   @Test
   public void testOneWay() throws Exception {
-    flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").asynchronously().run();
+    flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT).getRight().get();
@@ -40,7 +42,7 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
   @Test
   public void testRRToOneWay() throws Exception {
-    flowRunner("rrToOneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "rrfooValue").asynchronously().run();
+    flowRunner("rrToOneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "rrfooValue").run();
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT).getRight().get();

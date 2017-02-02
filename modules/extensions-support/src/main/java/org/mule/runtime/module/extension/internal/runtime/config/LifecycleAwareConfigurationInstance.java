@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
@@ -30,15 +32,14 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +65,7 @@ import org.slf4j.Logger;
 public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
 
   private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationInstance.class);
+  private static final String DO_TEST_CONNECTIVITY_PROPERTY_NAME = "doTestConnectivity";
 
   private final String name;
   private final ConfigurationModel model;
@@ -85,6 +87,8 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private ConnectionManagerAdapter connectionManager;
 
   private Scheduler retryScheduler;
+
+  private boolean doTestConnectivity = getDoTestConnectivityProperty();
 
   /**
    * Creates a new instance
@@ -119,6 +123,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     try {
       initStats();
       doInitialise();
+      super.initialise();
     } catch (Exception e) {
       if (e instanceof InitialisationException) {
         throw (InitialisationException) e;
@@ -140,7 +145,9 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       if (!connectionManager.hasBinding(value)) {
         connectionManager.bind(value, connectionProvider.get());
       }
-      testConnectivity();
+      if (doTestConnectivity) {
+        testConnectivity();
+      }
     }
     startIfNeeded(value);
     super.start();
@@ -224,7 +231,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
     initialiseIfNeeded(value, true, muleContext);
     retryScheduler = schedulerService.ioScheduler();
-    super.initialise();
   }
 
   /**
@@ -276,5 +282,11 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
 
     configurationStats = new DefaultMutableConfigurationStats(timeSupplier);
+  }
+
+  private boolean getDoTestConnectivityProperty() {
+    return System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME) != null
+        ? valueOf(System.getProperty(DO_TEST_CONNECTIVITY_PROPERTY_NAME))
+        : true;
   }
 }

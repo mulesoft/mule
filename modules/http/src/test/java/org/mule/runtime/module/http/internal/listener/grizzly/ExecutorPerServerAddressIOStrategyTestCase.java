@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
+import org.mule.service.http.api.server.ServerAddress;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.InetAddress;

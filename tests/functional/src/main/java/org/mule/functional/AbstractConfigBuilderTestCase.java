@@ -9,13 +9,12 @@ package org.mule.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.PooledJavaComponent;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.interceptor.InterceptorStack;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;

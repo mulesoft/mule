@@ -64,7 +64,7 @@ public class ResultSetIterator implements Iterator<Map<String, Object>>, Closeab
           close();
         } catch (MuleException e) {
           if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Error closing resultset", e);
+            LOGGER.debug("Error closing resultSet", e);
           }
         }
       }

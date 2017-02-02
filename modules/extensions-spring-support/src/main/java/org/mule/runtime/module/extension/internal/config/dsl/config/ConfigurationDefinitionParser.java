@@ -13,16 +13,19 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+
+import java.util.List;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link ConfigurationProvider} instances through a
@@ -56,9 +59,15 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
         .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
         .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
 
-    parseParameters(configurationModel.getParameterModels());
-    parseConnectionProvider(definitionBuilder);
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(configurationModel);
 
+    parseParameters(getFlatParameters(inlineGroups, configurationModel.getAllParameterModels()));
+
+    for (ParameterGroupModel group : inlineGroups) {
+      parseParameterGroup(group);
+    }
+
+    parseConnectionProvider(definitionBuilder);
   }
 
   private void parseConnectionProvider(ComponentBuildingDefinition.Builder definitionBuilder) {

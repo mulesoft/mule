@@ -13,6 +13,8 @@ import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
 
 import java.io.File;
@@ -23,14 +25,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-
-import org.mule.tck.probe.JUnitProbe;
-import org.mule.tck.probe.PollingProber;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +86,7 @@ public class MuleDeployment extends MuleInstallation {
   private List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
+  private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
 
   public static class Builder {
 
@@ -94,6 +94,10 @@ public class MuleDeployment extends MuleInstallation {
 
     Builder() {
       deployment = new MuleDeployment();
+    }
+
+    Builder(String zippedDistribution) {
+      deployment = new MuleDeployment(zippedDistribution);
     }
 
     /**
@@ -125,6 +129,18 @@ public class MuleDeployment extends MuleInstallation {
      */
     public Builder withProperty(String property, String value) {
       deployment.properties.put(property, value);
+      return this;
+    }
+
+    /**
+     * Specifies a system property to be passed in the command line when starting Mule that need to be resolved in the before() of the MuleDeployment rule.
+     *
+     * @param property
+     * @param propertySupplier
+     * @return
+     */
+    public Builder withPropertyUsingLambda(String property, Supplier<String> propertySupplier) {
+      deployment.propertiesUsingLambdas.put(property, propertySupplier);
       return this;
     }
 
@@ -192,8 +208,17 @@ public class MuleDeployment extends MuleInstallation {
     return new Builder();
   }
 
+  public static MuleDeployment.Builder builder(String zippedDistribution) {
+    return new Builder(zippedDistribution);
+  }
+
+
   protected MuleDeployment() {
     super();
+  }
+
+  protected MuleDeployment(String zippedDistribution) {
+    super(zippedDistribution);
   }
 
   private String[] toArray(Map<String, String> map) {
@@ -254,11 +279,17 @@ public class MuleDeployment extends MuleInstallation {
       if (DEBUGGING_ENABLED) {
         setupDebugging();
       }
+      resolvePropertiesUsingLambdas();
       mule.start(toArray(properties));
       domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
       applications.forEach((application) -> checkAppIsDeployed(getName(application)));
       logger.info("Deployment successful");
     }
+  }
+
+  private void resolvePropertiesUsingLambdas() {
+    propertiesUsingLambdas
+        .forEach((propertyName, propertySupplierLambda) -> properties.put(propertyName, propertySupplierLambda.get()));
   }
 
   private void setupDebugging() {

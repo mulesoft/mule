@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.exception;
 
-
-
 /**
  * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
  */

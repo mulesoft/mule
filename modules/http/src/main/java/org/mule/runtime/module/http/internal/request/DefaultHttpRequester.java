@@ -30,16 +30,16 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.model.ParameterMap;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
 import com.google.common.collect.Lists;
 
@@ -55,7 +55,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     implements Initialisable, MuleContextAware, FlowConstructAware, DebugInfoProvider {
 
   public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
-  public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
+  public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[mel:payload]";
   public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
   private static final Logger logger = LoggerFactory.getLogger(DefaultHttpRequester.class);
 

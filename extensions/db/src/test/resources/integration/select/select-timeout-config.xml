@@ -7,7 +7,7 @@
 
     <flow name="queryTimeout">
         <db:select queryTimeout="1">
-            <db:sql>select * from PLANET where DELAY(#[payload]) = 1 order by ID</db:sql>
+            <db:sql>select * from PLANET where DELAY(#[mel:payload]) = 1 order by ID</db:sql>
         </db:select>
     </flow>
 </mule>

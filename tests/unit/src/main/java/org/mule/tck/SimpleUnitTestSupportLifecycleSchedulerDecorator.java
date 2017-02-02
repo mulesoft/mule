@@ -6,7 +6,7 @@
  */
 package org.mule.tck;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,18 +20,24 @@ import java.util.concurrent.TimeoutException;
 
 public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Scheduler {
 
+  private String name;
   private Scheduler decorated;
+  private SimpleUnitTestSupportSchedulerService ownerService;
   private boolean stopped;
 
-  public SimpleUnitTestSupportLifecycleSchedulerDecorator(Scheduler decorated) {
+  public SimpleUnitTestSupportLifecycleSchedulerDecorator(String name, Scheduler decorated,
+                                                          SimpleUnitTestSupportSchedulerService ownerService) {
     super();
+    this.name = name;
     this.decorated = decorated;
+    this.ownerService = ownerService;
   }
 
   @Override
   public void stop(long gracefulShutdownTimeout, TimeUnit unit) {
     this.stopped = true;
     decorated.stop(gracefulShutdownTimeout, unit);
+    ownerService.stoppedScheduler(this);
   }
 
   @Override
@@ -73,12 +79,15 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   public void shutdown() {
     this.stopped = true;
     decorated.shutdown();
+    ownerService.stoppedScheduler(this);
   }
 
   @Override
   public List<Runnable> shutdownNow() {
     this.stopped = true;
-    return decorated.shutdownNow();
+    final List<Runnable> cancelledJobs = decorated.shutdownNow();
+    ownerService.stoppedScheduler(this);
+    return cancelledJobs;
   }
 
   @Override
@@ -133,4 +142,13 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
     return decorated.invokeAny(tasks, timeout, unit);
   }
 
+  @Override
+  public String getName() {
+    return SimpleUnitTestSupportLifecycleSchedulerDecorator.class.getSimpleName() + ":" + decorated.getName() + "(" + name + ")";
+  }
+
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

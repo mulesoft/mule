@@ -7,10 +7,10 @@
 package org.mule.test.config.spring;
 
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 

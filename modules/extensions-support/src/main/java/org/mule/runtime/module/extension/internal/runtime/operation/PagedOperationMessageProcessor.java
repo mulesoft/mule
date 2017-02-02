@@ -6,22 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.Consumer;
 import org.mule.runtime.core.streaming.ConsumerIterator;
 import org.mule.runtime.core.streaming.ListConsumer;
 import org.mule.runtime.core.streaming.Producer;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
+
+import reactor.core.publisher.Mono;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which also implements {@link InterceptingMessageProcessor}.
@@ -35,27 +40,29 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         ConfigurationProvider configurationProvider,
                                         String target,
                                         ResolverSet resolverSet,
-                                        ExtensionManagerAdapter extensionManager) {
-    super(extensionModel, operationModel, configurationProvider, target, resolverSet, extensionManager);
+                                        ExtensionManager extensionManager,
+                                        PolicyManager policyManager) {
+    super(extensionModel, operationModel, configurationProvider, target, resolverSet, extensionManager, policyManager);
   }
 
   @Override
-  protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, ExecutionContextAdapter operationContext)
-      throws MuleException {
+  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
+    try {
+      Event resultEvent = super.doProcess(event, operationContext).block();
+      PagingProvider<?, ?> pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
 
-    Event resultEvent = (Event) super.doProcess(event, operationContext);
-    PagingProvider<?, ?> pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
+      if (pagingProvider == null) {
+        throw new IllegalStateException("Obtained paging delegate cannot be null");
+      }
 
-    if (pagingProvider == null) {
-      throw new IllegalStateException("Obtained paging delegate cannot be null");
+      Producer<?> producer =
+          new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
+                                     connectionManager);
+      Consumer<?> consumer = new ListConsumer(producer);
+
+      return just(returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext));
+    } catch (Exception e) {
+      return error(e);
     }
-
-    Producer<?> producer =
-        new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
-                                   connectionManager);
-    Consumer<?> consumer = new ListConsumer(producer);
-
-    return returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext);
   }
-
 }

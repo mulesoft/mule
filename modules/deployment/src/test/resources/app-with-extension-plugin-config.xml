@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/hello http://www.mulesoft.org/schema/mule/hello/current/mule-hello.xsd">
 
-    <hello:config name="pepe" message="Hello!!!"/>
+    <hello:config name="default" message="Hello from app!!!"/>
 
     <flow name="main">
         <poll frequency="1000">

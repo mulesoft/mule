@@ -422,7 +422,38 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-
+    <!--Operators-->
+    <xsd:element name="abstract-operator" abstract="true" type="abstractOperatorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for operator elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractOperatorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="error-mapping" type="errorMappingType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Adds an error mapping.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="errorMappingType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Determines that an error thrown by this operation should be mapped to another.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute type="errorIdentifierType" name="sourceType" default="ANY"/>
+        <xsd:attribute type="errorIdentifierType" name="targetType" use="required"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-observer-message-processor" abstract="true" type="abstractObserverMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -1114,17 +1145,24 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-configuration-element" abstract="true" type="abstractConfigurationElement">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for configuration elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractConfigurationElement">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="configurationType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
                 <xsd:sequence>
-                    <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The default threading profile, used by components for dispatching and receiving if no more specific configuration is given.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:element ref="abstract-configuration-element" minOccurs="0"/>
                     <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -1983,18 +2021,6 @@
     </xsd:complexType>
 
     <!--==============================================================-->
-
-    <xsd:element name="abstract-service-threading-profile" abstract="true"
-                 type="abstractServiceThreadingProfileType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for the service threading profile element. Threading profiles define how thread pools are used by a service.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractServiceThreadingProfileType"/>
-
-    <!--==============================================================-->
     <!--   Flow Constructs                                            -->
     <!--==============================================================-->
 
@@ -2734,14 +2760,14 @@
                 <xsd:attribute name="username" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A Mule expression which extracts the username from the message. Defaults to #[message.inboundProperties.username].
+                            A Mule expression which extracts the username from the message. Defaults to #[mel:message.inboundProperties.username].
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="password" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A Mule expression which extracts the password from the message. Defaults to #[message.inboundProperties.password].
+                            A Mule expression which extracts the password from the message. Defaults to #[mel:message.inboundProperties.password].
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2773,47 +2799,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:attributeGroup name="commonThreadPoolAttributes">
-        <xsd:attribute name="threadTTL" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Determines how long an inactive thread is kept in the pool before being discarded.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="poolExhaustedAction">
-            <xsd:annotation>
-                <xsd:documentation>
-                    When the maximum pool size or queue size is bounded, this value determines how to handle incoming tasks. Possible values are: WAIT (wait until a thread becomes available; don't use this value if the minimum number of threads is zero, in which case a thread may never become available), DISCARD (throw away the current request and return), DISCARD_OLDEST (throw away the oldest request and return), ABORT (throw a RuntimeException), and RUN (the default; the thread making the execute request runs the task itself, which helps guard against lockup).
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="WAIT"/>
-                    <xsd:enumeration value="DISCARD"/>
-                    <xsd:enumeration value="DISCARD_OLDEST"/>
-                    <xsd:enumeration value="ABORT"/>
-                    <xsd:enumeration value="RUN"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="threadWaitTimeout" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    How long to wait in milliseconds when the pool exhausted action is WAIT. If the value is negative, it will wait indefinitely.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="maxBufferSize" type="substitutableInt">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Determines how many requests are queued when the pool is at maximum usage capacity and the pool exhausted action is WAIT. The buffer is used as an overflow.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
-
 
     <!--==============================================================-->
     <!--   Filter elements                                            -->
@@ -3857,7 +3842,7 @@
     <xsd:complexType name="securityManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                The default security manager (type 'defaultSecurityManagerType') provides basic support for security functions. Other modules (JAAS, PGP, Spring Security) provide more advanced functionality.
+                The default security manager (type 'defaultSecurityManagerType') provides basic support for security functions. Other modules (PGP, Spring Security) provide more advanced functionality.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
@@ -4001,53 +3986,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="threading-profile" type="threadingProfileType"
-                 substitutionGroup="abstract-service-threading-profile">
-        <xsd:annotation>
-            <xsd:documentation>
-                The threading profile to use for the service.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <!-- this is a general threading type used by various elements here -->
-    <xsd:complexType name="threadingProfileType">
-        <xsd:complexContent>
-            <xsd:extension base="asynchronousThreadingProfileType">
-                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether threading should be used (default is true).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="asynchronousThreadingProfileType">
-        <xsd:complexContent>
-            <!-- this is a hack that allows us to use this general threading profile as a component threading profile
-                 without retyping everything -->
-            <xsd:extension base="abstractServiceThreadingProfileType">
-                <xsd:attribute name="maxThreadsActive" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The maximum number of threads that will be used.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="maxThreadsIdle" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The maximum number of idle or inactive threads that can be in the pool before they are destroyed.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attributeGroup ref="commonThreadPoolAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4468,7 +4406,7 @@
                  substitutionGroup="abstract-global-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[message:id]', which means the underlying message source must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[mel:message:id]', which means the underlying message source must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4482,7 +4420,7 @@
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use when extracting the ID from the message. For example, it would be possible to combine to headers as the ID of the message to provide idempotency: '#[headers:foo,bar]'. Or, you could combine the message ID with a header: '#[message:id]-#[header:foo]'. If this property is not set, '#[message:id]' will be used by default.
+                            Defines one or more expressions to use when extracting the ID from the message. For example, it would be possible to combine to headers as the ID of the message to provide idempotency: '#[mel:headers:foo,bar]'. Or, you could combine the message ID with a header: '#[mel:message:id]-#[mel:header:foo]'. If this property is not set, '#[mel:message:id]' will be used by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -4576,7 +4514,8 @@
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use to determine when a message has been redelivered. For example,it would be possible to combine to headers as the unique ID of the message : '#[headers:foo,bar]'. Or, you could combine the message ID with a header: '#[message:id]-#[header:foo]'. This property may only be set if useSecureHash is false..
+                            Defines one or more expressions to use to determine when a message has been redelivered.
+                            This property may only be set if useSecureHash is false..
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -5055,16 +4994,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
-                    <xsd:sequence>
-                        <xsd:element name="threading-profile" type="asynchronousThreadingProfileType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Threading profile used to process the message processors inside the until-successful.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
-                    </xsd:sequence>
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
                     <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -5148,15 +5078,15 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:element name="threading-profile" type="threadingProfileType" minOccurs="0">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Threading profile used to process the message processors inside the until-successful.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
                         <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
+                    <xsd:attribute name="parallel" type="substitutableBoolean" default="true">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Whether the configured routes will run in parallel (default is true).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                     <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -5291,6 +5221,94 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--===========-->
+    <!-- Streaming -->
+    <!--===========-->
+
+    <xsd:element name="abstract-streaming-strategy" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for a reconnection strategy element. Reconnection strategies define how Mule should attempt to handle a connection failure.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="repeatable-file-store-stream" type="repeatableFileStoreStreamType" substitutionGroup="abstract-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                //TODO: ADD docs
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="repeatableFileStoreStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="maxInMemorySize" type="substitutableDecimal" use="optional" default="256">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then
+                            it will start to buffer the content on disk. Default value is 256 KB.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sizeUnit" type="byteUnitType" use="optional" default="KB">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The unit in which maxInMemorySize is expressed
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                //TODO: ADD docs
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="repeatableInMemoryStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="maxInMemorySize" type="substitutableDecimal" use="optional" default="256">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised.
+                            Default value is 256 KB.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sizeUnit" type="byteUnitType" use="optional" default="KB">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The unit in which maxInMemorySize is expressed
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="in-memory-stream" type="inMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                This configuration allows the input stream to be read only once. It will not allow to seek randomly
+                which will limit the transformations that DW can perform on this stream.
+                Use this option for use cases which just require moving data around from one system to another to get optimum performance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="inMemoryStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType" />
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -5471,7 +5489,7 @@
                 </xsd:attribute>
                 <xsd:attribute name="evictionCheckIntervalMillis" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed..</xsd:documentation>
+                        <xsd:documentation>Specifies the number of milliseconds between runs of the object evictor. When non-positive, no object evictor is executed.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="minEvictionMillis" type="xsd:string">
@@ -6025,6 +6043,20 @@
             <xsd:enumeration value="MINUTES"/>
             <xsd:enumeration value="DAYS"/>
             <xsd:enumeration value="HOURS"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="byteUnitType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Byte units enumeration
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="BYTE"/>
+            <xsd:enumeration value="KB"/>
+            <xsd:enumeration value="MB"/>
+            <xsd:enumeration value="GB"/>
         </xsd:restriction>
     </xsd:simpleType>
 

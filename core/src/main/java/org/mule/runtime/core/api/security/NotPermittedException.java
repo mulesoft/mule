@@ -10,6 +10,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
 
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 

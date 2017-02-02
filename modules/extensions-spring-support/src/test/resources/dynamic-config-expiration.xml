@@ -15,7 +15,7 @@
     </configuration>
 
     <heisenberg:config name="heisenberg"
-                       myName="#[payload]"
+                       myName="#[mel:payload]"
                        age="50"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"
@@ -26,6 +26,17 @@
         <extension:dynamic-config-policy>
             <extension:expiration-policy maxIdleTime="100" timeUnit="MILLISECONDS" />
         </extension:dynamic-config-policy>
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
     </heisenberg:config>
 
     <flow name="dynamic">

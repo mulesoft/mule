@@ -6,20 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
-import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.runtime.extension.api.runtime.RetryRequest;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
-
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -61,23 +57,6 @@ public final class ConnectionInterceptor implements Interceptor {
     if (connection != null) {
       connection.release();
     }
-  }
-
-  /**
-   * If the {@code exception} is a {@link ConnectionException} a retry of failed request will be asked
-   *
-   * @param executionContext the {@link ExecutionContext} that was used to execute the operation
-   * @param retryRequest a {@link RetryRequest} in case that the operation should be retried
-   * @param exception the {@link Exception} that was thrown by the failing operation
-   * @return the same {@link Throwable} given in the parameter
-   */
-  @Override
-  public Throwable onError(ExecutionContext executionContext, RetryRequest retryRequest, Throwable exception) {
-    Optional<ConnectionException> connectionException = extractConnectionException(exception);
-    if (connectionException.isPresent()) {
-      retryRequest.request();
-    }
-    return exception;
   }
 
   private ConnectionHandler<?> getConnection(ExecutionContextAdapter operationContext)

@@ -16,7 +16,9 @@ import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.TypedException;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {ValidationMessages.class})
@@ -42,10 +44,11 @@ abstract class ValidationTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   protected void assertInvalid(FlowRunner runner, I18nMessage expectedMessage) throws Exception {
-    Exception e = runner.runExpectingException();
+    MessagingException e = runner.runExpectingException();
     assertThat(e, is(instanceOf(MessagingException.class)));
-    assertThat(e.getCause(), is(instanceOf(ValidationException.class)));
-    assertThat(e.getCause().getMessage(), is(expectedMessage.getMessage()));
+    Error error = e.getEvent().getError().get();
+    assertThat(error.getCause(), is(instanceOf(ValidationException.class)));
+    assertThat(error.getDescription(), is(expectedMessage.getMessage()));
     // assert that all placeholders were replaced in message
     assertThat(e.getMessage(), not(containsString("${")));
     runner.reset();

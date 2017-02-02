@@ -13,13 +13,14 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
-
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.message.StringAttributes;
 
 import java.util.Set;
@@ -29,6 +30,10 @@ import org.junit.Test;
 
 public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase {
 
+  private static final MetadataComponentDescriptorProvider<SourceModel> explicitMetadataResolver =
+      MetadataService::getSourceMetadata;
+
+
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;
@@ -37,6 +42,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
   @Before
   public void setUp() {
     componentId = new SourceId(SOURCE_METADATA);
+    provider = explicitMetadataResolver;
   }
 
   @Test
@@ -60,7 +66,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
 
   @Test
   public void getSourceDynamicOutputMetadata() throws Exception {
-    final ComponentMetadataDescriptor componentMetadata = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, typeLoader.load(StringAttributes.class));
+    final ComponentMetadataDescriptor<SourceModel> componentMetadata = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
+    assertExpectedOutput(componentMetadata.getModel(), personType, typeLoader.load(StringAttributes.class));
   }
 }

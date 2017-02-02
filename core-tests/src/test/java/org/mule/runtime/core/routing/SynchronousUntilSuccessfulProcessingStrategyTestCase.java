@@ -19,13 +19,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -45,7 +46,6 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
       mock(UntilSuccessfulConfiguration.class, Answers.RETURNS_DEEP_STUBS.get());
   private Processor mockRoute = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
   private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, Answers.RETURNS_DEEP_STUBS.get());
-  private ThreadingProfile mockThreadingProfile = mock(ThreadingProfile.class, Answers.RETURNS_DEEP_STUBS.get());
   private ListableObjectStore<Event> mockObjectStore = mock(ListableObjectStore.class, Answers.RETURNS_DEEP_STUBS.get());
 
   @Before
@@ -54,16 +54,9 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-    when(mockUntilSuccessfulConfiguration.getThreadingProfile()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
     setCurrentEvent(null);
-  }
-
-  @Test(expected = InitialisationException.class)
-  public void failWhenThreadingProfileIsConfigured() throws Exception {
-    when(mockUntilSuccessfulConfiguration.getThreadingProfile()).thenReturn(mockThreadingProfile);
-    createProcessingStrategy();
   }
 
   @Test(expected = InitialisationException.class)
@@ -141,16 +134,15 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
   @Test
   public void successfulExecutionWithAckExpression() throws Exception {
     String ackExpression = "some-expression";
-    String expressionEvalutaionResult = "new payload";
+    String expressionEvaluationResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    TypedValue mockTypedValue = mock(TypedValue.class);
-    when(mockTypedValue.getValue()).thenReturn(expressionEvalutaionResult);
+    TypedValue<String> typedValue = new TypedValue<>(expressionEvaluationResult, STRING);
     when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()
-        .evaluate(eq(ackExpression), any(Event.class))).thenReturn(mockTypedValue);
+        .evaluate(eq(ackExpression), any(Event.class))).thenReturn(typedValue);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
     Event response = processingStrategy.route(testEvent(), getTestFlow(muleContext));
-    assertThat(response.getMessage().getPayload().getValue(), equalTo(expressionEvalutaionResult));
+    assertThat(response.getMessage().getPayload().getValue(), equalTo(expressionEvaluationResult));
     verify(mockRoute).process(any(Event.class));
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()).evaluate(eq(ackExpression),
                                                                                               any(Event.class));

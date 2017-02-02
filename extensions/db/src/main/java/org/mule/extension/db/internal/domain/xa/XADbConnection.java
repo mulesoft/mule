@@ -12,7 +12,7 @@ import org.mule.extension.db.internal.domain.type.DbType;
 import org.mule.extension.db.internal.result.resultset.ResultSetHandler;
 import org.mule.extension.db.internal.result.statement.StatementResultIteratorFactory;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.transaction.TransactionException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 
 import java.sql.Connection;
@@ -30,17 +30,17 @@ public class XADbConnection implements DbConnection, XATransactionalConnection {
   private static final Logger LOGGER = LoggerFactory.getLogger(XADbConnection.class);
 
   private final DbConnection connection;
-  private final XAConnection xaResource;
+  private final XAConnection xaConnection;
 
-  public XADbConnection(DbConnection connection, XAConnection xaResource) {
+  public XADbConnection(DbConnection connection, XAConnection xaConnection) {
     this.connection = connection;
-    this.xaResource = xaResource;
+    this.xaConnection = xaConnection;
   }
 
   @Override
   public XAResource getXAResource() {
     try {
-      return xaResource.getXAResource();
+      return xaConnection.getXAResource();
     } catch (SQLException e) {
       throw new MuleRuntimeException(new TransactionException(createStaticMessage("Could not obtain XA Resource"), e));
     }
@@ -51,7 +51,7 @@ public class XADbConnection implements DbConnection, XATransactionalConnection {
     connection.release();
 
     try {
-      xaResource.close();
+      xaConnection.close();
     } catch (SQLException e) {
       LOGGER.info("Exception while explicitly closing the xaConnection (some providers require this). "
           + "The exception will be ignored and only logged: " + e.getMessage(), e);

@@ -6,8 +6,6 @@
  */
 package org.mule.extension.ws.internal.transport;
 
-import static org.apache.commons.lang.StringUtils.*;
-
 import java.util.Iterator;
 
 import javax.xml.transform.Source;
@@ -59,11 +57,7 @@ public class WscTransportFactory extends AbstractTransportFactory {
     factory.getFeatures().add(new StaxDataBindingFeature());
     factory.setAddress(address);
     factory.setBus(bus);
-
-    // If there's a soapVersion defined then the corresponding bindingId will be set
-    if (isBlank(soapVersion)) {
-      factory.setBindingId(getBindingIdForSoapVersion(soapVersion));
-    }
+    factory.setBindingId(getBindingIdForSoapVersion(soapVersion));
 
     return factory.create();
   }

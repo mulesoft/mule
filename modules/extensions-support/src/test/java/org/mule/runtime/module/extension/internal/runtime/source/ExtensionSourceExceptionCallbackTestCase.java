@@ -6,16 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -34,8 +41,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCase {
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private Event event;
+
+  @Mock
+  private MessageProcessContext messageProcessContext;
 
   @Mock
   private ResponseCompletionCallback responseCallback;
@@ -43,12 +53,26 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   @Mock
   private Consumer<MessagingException> exceptionHandlingCallback;
 
+  @Mock
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Mock
+  private MessageSource messageSource;
+
+  @Mock
+  private ErrorType errorType;
+
   private ExtensionSourceExceptionCallback callback;
   private Exception exception = new Exception();
 
   @Before
   public void before() {
-    callback = new ExtensionSourceExceptionCallback(responseCallback, event, exceptionHandlingCallback);
+    when(event.getError()).thenReturn(empty());
+    when(event.getMessage()).thenReturn(null);
+    when(errorTypeLocator.lookupErrorType(any(Exception.class))).thenReturn(errorType);
+    when(messageProcessContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
+    when(messageProcessContext.getMessageSource()).thenReturn(messageSource);
+    callback = new ExtensionSourceExceptionCallback(responseCallback, event, exceptionHandlingCallback, messageProcessContext);
   }
 
   @Test
@@ -58,9 +82,16 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(exception);
+        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(exception);
       }
-    }), eq(event));
+    }), argThat(new ArgumentMatcher<Event>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o instanceof Event && ((Event) o).getError().isPresent()
+            && ((Event) o).getError().get().getErrorType().equals(errorType);
+      }
+    }));
   }
 
   @Test

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+
+    <ftp:config name="ftpConfigInvalidCredentials">
+        <ftp:connection username="invalidUser" password="invalidPassword" host="localhost" port="${ftpPort}" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="ftpConfigConnectionTimeout">
+        <ftp:connection username="anonymous" password="password" host="google.com" port="${ftpPort}" workingDir="${workingDir}" connectionTimeout="1" connectionTimeoutUnit="MILLISECONDS"/>
+    </ftp:config>
+
+    <ftp:config name="ftpConfigConnectionRefused">
+        <ftp:connection username="anonymous" password="password" host="localhost" port="8888" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="ftpConfigMissingCredentials">
+        <ftp:connection host="localhost" port="${ftpPort}" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="ftpConfigUnknownHost">
+        <ftp:connection username="anonymous" password="password"  host="dsadsadas" port="${ftpPort}" workingDir="${workingDir}"/>
+    </ftp:config>
+
+    <ftp:config name="ftpConfigFirstConnection">
+        <ftp:connection username="limitedUsed" password="limitedUsed"  host="localhost" port="${ftpPort}" workingDir="${workingDir}" />
+    </ftp:config>
+
+    <ftp:config name="ftpConfigServiceUnavailable">
+        <ftp:connection username="limitedUsed" password="limitedUsed"  host="localhost" port="${ftpPort}" workingDir="${workingDir}" />
+    </ftp:config>
+</mule>

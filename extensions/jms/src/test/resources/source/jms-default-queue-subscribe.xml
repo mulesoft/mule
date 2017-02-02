@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <flow name="subscriber">
+        <jmsn:listener config-ref="config" destination="#[destination]"/>
+        <flow-ref name="onIncomingConnection"/>
+    </flow>
+
+    <sub-flow name="onIncomingConnection">
+        <expression-component>mel:
+            new org.mule.extensions.jms.test.JmsAbstractTestCase$OnIncomingConnection().onCall(message)
+        </expression-component>
+    </sub-flow>
+
+</mule>

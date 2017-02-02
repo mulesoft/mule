@@ -30,17 +30,17 @@
     </flow>
 
     <flow name="ServiceOne">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Fruit]"/>
         <test:queue name="collector.queue"/>
     </flow>
 
     <flow name="ServiceTwo">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Fruit]"/>
         <test:queue name="collector.queue"/>
     </flow>
 
     <flow name="ServiceThree">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Fruit]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Fruit]"/>
         <test:queue name="collector.queue"/>
     </flow>
 

@@ -6,18 +6,36 @@
  */
 package org.mule.runtime.deployment.model.api.plugin;
 
+
+import static java.io.File.separator;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
+  private static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
-  public static final String EXTENSION_BUNDLE_TYPE = "zip";
+  public static final String EXTENSION_BUNDLE_TYPE = "jar";
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
+  /**
+   * Target folder for any files used at deployment time or when generating the {@link ExtensionModel}
+   */
+  public static final String MULE_ARTIFACT_FOLDER = META_INF + separator + "mule-artifact";
+  public static final String MULE_PLUGIN_JSON = "mule-plugin.json";
+  public static final String MULE_PLUGIN_POM = "pom.xml";
+  /**
+   * Target folder for the internal and cloned repository within the plugin end package.
+   */
+  public static final String REPOSITORY = MULE_ARTIFACT_FOLDER + separator + "repository";
 
   private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
+  private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();
 
   /**
    * Creates a new artifact plugin descriptor
@@ -34,5 +52,22 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
   public void setArtifactPluginDescriptors(List<ArtifactPluginDescriptor> pluginDependencyDescriptors) {
     this.artifactPluginDescriptors = pluginDependencyDescriptors;
+  }
+
+  /**
+   * @return the {@link LoaderDescriber} that will contain all mandatory values to generate an {@link ExtensionModel}
+   * from it.
+   */
+  public Optional<LoaderDescriber> getExtensionModelDescriptorProperty() {
+    return extensionModelDescriptorProperty;
+  }
+
+  /**
+   * Takes a {@link LoaderDescriber} that should contain the values used to properly initialize an {@link ExtensionModel}
+   *
+   * @param extensionModelLoaderDescriber the {@link LoaderDescriber} with the values
+   */
+  public void setExtensionModelDescriptorProperty(LoaderDescriber extensionModelLoaderDescriber) {
+    this.extensionModelDescriptorProperty = ofNullable(extensionModelLoaderDescriber);
   }
 }

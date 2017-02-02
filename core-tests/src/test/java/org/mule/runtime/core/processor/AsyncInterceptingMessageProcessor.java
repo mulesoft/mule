@@ -7,14 +7,13 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 
 import java.util.function.Supplier;
 
@@ -47,11 +46,11 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).publishOn(fromExecutorService(scheduler.get())).transform(s -> applyNext(s));
+    return from(publisher).publishOn(fromExecutorService(scheduler.get())).transform(applyNext());
   }
 
   @Override
-  public ProcessingType getProccesingType() {
+  public ProcessingType getProcessingType() {
     return CPU_LITE;
   }
 

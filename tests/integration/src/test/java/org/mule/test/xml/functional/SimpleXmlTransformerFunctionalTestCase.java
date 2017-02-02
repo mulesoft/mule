@@ -33,7 +33,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationT
   @Test
   public void testXmlOut() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("xml to object").withPayload(SERIALIZED).asynchronously().run();
+    flowRunner("xml to object").withPayload(SERIALIZED).run();
     Parent parent = (Parent) request(client, "test://xml-object-out", Parent.class);
     assertNotNull(parent);
     assertNotNull(parent.getChild());
@@ -43,7 +43,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationT
   @Test
   public void testObjectXmlOut() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("object to xml").withPayload(new Parent(new Child("theChild"))).asynchronously().run();
+    flowRunner("object to xml").withPayload(new Parent(new Child("theChild"))).run();
     String xml = (String) request(client, "test://object-xml-out", String.class);
     assertXMLEqual(SERIALIZED, xml);
   }

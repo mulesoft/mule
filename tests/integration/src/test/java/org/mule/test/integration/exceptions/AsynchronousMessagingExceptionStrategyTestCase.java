@@ -17,21 +17,21 @@ public class AsynchronousMessagingExceptionStrategyTestCase extends AbstractExce
 
   @Test
   public void testTransformerException() throws Exception {
-    flowRunner("TransformerException").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("TransformerException").withPayload(TEST_PAYLOAD).dispatch();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testScriptComponentException() throws Exception {
-    flowRunner("ScriptComponentException").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("ScriptComponentException").withPayload(TEST_PAYLOAD).dispatch();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testCustomProcessorException() throws Exception {
-    flowRunner("CustomProcessorException").withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner("CustomProcessorException").withPayload(TEST_PAYLOAD).dispatch();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }

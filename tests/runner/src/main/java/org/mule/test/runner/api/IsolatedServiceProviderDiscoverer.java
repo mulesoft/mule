@@ -9,9 +9,10 @@ package org.mule.test.runner.api;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -76,7 +77,7 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
         }
       });
     } catch (RuntimeException e) {
-      throw new ServiceResolutionError(e.getMessage());
+      throw new ServiceResolutionError(e.getMessage(), e);
     }
 
     if (!(reflectedObject instanceof ServiceProvider)) {

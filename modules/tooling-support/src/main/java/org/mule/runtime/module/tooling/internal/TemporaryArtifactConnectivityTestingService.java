@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.base.Throwables.getCausalChain;
+import static com.google.common.collect.FluentIterable.from;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -47,11 +50,12 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
       if (!temporaryArtifact.isStarted()) {
         try {
           temporaryArtifact.start();
-        } catch (InitialisationException e) {
-          return failure(e.getMessage(), UNKNOWN, e);
-        } catch (ConfigurationException e) {
-          return failure(e.getMessage(), UNKNOWN, e);
+        } catch (InitialisationException | ConfigurationException e) {
+          return failure(e.getMessage(), e);
         } catch (Exception e) {
+          if (from(getCausalChain(e)).filter(instanceOf(ConnectionException.class)).first().isPresent()) {
+            return failure(e.getMessage(), e);
+          }
           throw new MuleRuntimeException(e);
         }
       }

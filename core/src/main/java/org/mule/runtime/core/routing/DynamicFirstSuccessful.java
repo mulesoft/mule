@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,7 +24,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * be route to the next route. This continues until a successful route is found.
  *
  */
-public class DynamicFirstSuccessful implements Processor, Initialisable, MuleContextAware {
+public class DynamicFirstSuccessful extends AbstractAnnotatedObject implements Processor, Initialisable, MuleContextAware {
 
   private FirstSuccessfulRoutingStrategy routingStrategy;
   private MuleContext muleContext;

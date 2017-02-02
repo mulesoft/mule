@@ -20,7 +20,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_R
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -29,8 +29,8 @@ import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.XMLSecureFactories;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableList;
 
@@ -343,7 +343,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
       // we can invoke the DefaultBeanDefinitionDocumentReader via registerBeanDefinitions
       // but we need to create a new DOM document from the element first
       try {
-        Document doc = new XMLSecureFactories().createDocumentBuilderFactory().newDocumentBuilder().newDocument();
+        Document doc = XMLSecureFactories.createDefault().getDocumentBuilderFactory().newDocumentBuilder().newDocument();
         doc.appendChild(doc.importNode(element, true));
         beanDefinitionDocumentReader.registerBeanDefinitions(doc, getReaderContext());
       } catch (ParserConfigurationException e) {

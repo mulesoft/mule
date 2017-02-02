@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.listener;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

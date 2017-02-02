@@ -10,11 +10,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -25,6 +26,9 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -37,7 +41,11 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Error Handling")
+@Stories("On Error Continue")
 public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   public static final int TIMEOUT = 5000;
@@ -50,9 +58,9 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
   public DynamicPort dynamicPort1 = new DynamicPort("port1");
   @Rule
   public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
   @Rule
   public DynamicPort dynamicPort3 = new DynamicPort("port3");
-
   private DefaultTlsContextFactory tlsContextFactory;
 
   @Override
@@ -95,9 +103,8 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
   private void assertResponse(InternalMessage response) throws Exception {
     assertThat(response, IsNull.<Object>notNullValue());
     // compare the structure and values but not the attributes' order
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
-    JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
+    JsonNode actualJsonNode = new ObjectMapper().readTree(getPayloadAsString(response));
+    JsonNode expectedJsonNode = new ObjectMapper().readTree(JSON_RESPONSE);
     assertThat(actualJsonNode, Is.is(expectedJsonNode));
   }
 
@@ -157,7 +164,24 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      NewsRequest newsRequest = (NewsRequest) event.getMessage().getPayload().getValue();
+      NewsRequest newsRequest;
+
+      try {
+        Object payload = event.getMessage().getPayload().getValue();
+        if (payload instanceof InputStream) {
+          InputStreamReader inputStreamReader =
+              new InputStreamReader((InputStream) payload, "UTF-8");
+
+          newsRequest = new ObjectMapper().readValue(inputStreamReader, NewsRequest.class);
+        } else if (payload instanceof String) {
+          newsRequest = new ObjectMapper().readValue((String) payload, NewsRequest.class);
+        } else {
+          throw new RuntimeException("Cannot create an object from a " + payload.getClass().getName());
+        }
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+
       NewsResponse newsResponse = new NewsResponse();
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
@@ -169,8 +193,18 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      ((NewsResponse) event.getMessage().getPayload().getValue()).setErrorMessage(ERROR_PROCESSING_NEWS);
-      return event;
+
+      NewsResponse newsResponse = (NewsResponse) event.getMessage().getPayload().getValue();
+      newsResponse.setErrorMessage(ERROR_PROCESSING_NEWS);
+
+      StringWriter writer = new StringWriter();
+      try {
+        new ObjectMapper().writeValue(writer, newsResponse);
+      } catch (IOException e) {
+        throw new DefaultMuleException(e);
+      }
+
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(writer.toString()).build()).build();
     }
   }
 

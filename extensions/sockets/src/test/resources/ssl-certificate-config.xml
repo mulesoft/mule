@@ -19,8 +19,8 @@
                                           failOnUnresolvedHost="true"
                                           sendTcpNoDelay="true"
                                           tlsContext="tlsContext">
-            <pooling-profile maxActive="1"/>
             <reconnect blocking="false" />
+            <pooling-profile maxActive="1"/>
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
@@ -43,6 +43,6 @@
 
     <sub-flow name="respond">
         <object-to-string-transformer mimeType="text/plain"/>
-        <set-payload value="#[payload]_modified"/>
+        <set-payload value="#[mel:payload]_modified"/>
     </sub-flow>
 </mule>

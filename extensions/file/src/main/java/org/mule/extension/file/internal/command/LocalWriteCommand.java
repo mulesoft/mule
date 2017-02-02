@@ -10,14 +10,16 @@ import static java.lang.String.format;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
+
 import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.io.IOException;
@@ -50,7 +52,7 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, Event event,
                     boolean lock, boolean createParentDirectory, String encoding) {
     Path path = resolvePath(filePath);
     assureParentFolderExists(path, createParentDirectory);
@@ -61,7 +63,11 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
     try (OutputStream out = getOutputStream(path, openOptions, mode)) {
       new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(out, event, encoding));
     } catch (AccessDeniedException e) {
-      throw exception(format("Could not write to file '%s' because access was denied by the operating system", path), e);
+      throw new FileAccessDeniedException(format("Could not write to file '%s' because access was denied by the operating system",
+                                                 path),
+                                          e);
+    } catch (org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException e) {
+      throw e;
     } catch (Exception e) {
       throw exception(format("Exception was found writing to file '%s'", path), e);
     } finally {
@@ -73,10 +79,11 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
     try {
       return Files.newOutputStream(path, openOptions);
     } catch (FileAlreadyExistsException e) {
-      throw new IllegalArgumentException(String.format(
-                                                       "Cannot write to path '%s' because it already exists and write mode '%s' was selected. "
-                                                           + "Use a different write mode or point to a path which doesn't exists",
-                                                       path, mode));
+      throw new org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException(format(
+                                                                                                "Cannot write to path '%s' because it already exists and write mode '%s' was selected. "
+                                                                                                    + "Use a different write mode or point to a path which doesn't exists",
+                                                                                                path, mode),
+                                                                                         e);
     }
   }
 

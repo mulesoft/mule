@@ -15,11 +15,11 @@
                     <message-property-filter scope="inbound" pattern="AcquirerCountry=MyCountry"/>
                 </not-filter>
                 <and-filter>
-                    <expression-filter expression="#[message.inboundProperties['Amount'] &lt; 5000]"/>
+                    <expression-filter expression="#[mel:message.inboundProperties['Amount'] &lt; 5000]"/>
                     <not-filter>
                         <or-filter>
                             <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Apple"/>
-                            <expression-filter expression="#[payload == null]"/>
+                            <expression-filter expression="#[mel:payload == null]"/>
                         </or-filter>
                     </not-filter>
                 </and-filter>
@@ -30,7 +30,7 @@
 
     <flow name="NestedChoice">
         <choice>
-            <when expression="payload is org.mule.tck.testmodels.fruit.Apple">
+            <when expression="mel:payload is org.mule.tck.testmodels.fruit.Apple">
                 <script:transformer>
                     <script:script engine="groovy">
                         return ""
@@ -38,10 +38,10 @@
                 </script:transformer>
                 <append-string-transformer message="A"/>
                 <choice>
-                    <when expression="message.inboundProperties.AcquirerCountry=='MyCountry'">
+                    <when expression="mel:message.inboundProperties.AcquirerCountry=='MyCountry'">
                         <append-string-transformer message="B"/>
                         <choice>
-                            <when expression="#[message.inboundProperties['Amount'] &lt; 5000]">
+                            <when expression="#[mel:message.inboundProperties['Amount'] &lt; 5000]">
                                 <append-string-transformer message="C"/>
                                 <test:queue name="outChoice"/>
                             </when>

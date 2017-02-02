@@ -6,28 +6,29 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static com.google.common.collect.Multimaps.newMultimap;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 public class HttpResponseHeaderBuilder {
 
-  private List<String> calculatedHeadersNames = Arrays.asList(TRANSFER_ENCODING, CONTENT_LENGTH);
+  private List<String> uniqueHeadersNames =
+      asList(TRANSFER_ENCODING.toLowerCase(), CONTENT_LENGTH.toLowerCase(), CONTENT_TYPE.toLowerCase());
 
-  Multimap<String, String> headers =
-      Multimaps.newMultimap(new CaseInsensitiveMapWrapper<>(HashMap.class), () -> Sets.newHashSet());
+  Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
 
   public void addHeader(String headerName, Object headerValue) {
     if (headerValue instanceof Iterable) {
@@ -52,13 +53,13 @@ public class HttpResponseHeaderBuilder {
   }
 
   private void failIfHeaderDoesNotSupportMultipleValues(String headerName) {
-    if (calculatedHeadersNames.contains(headerName)) {
-      throw new MuleRuntimeException(createStaticMessage("Header: " + headerName + " does not support multiple values"));
+    if (uniqueHeadersNames.contains(headerName.toLowerCase())) {
+      throw new MuleRuntimeException(createStaticMessage("Header " + headerName + " does not support multiple values"));
     }
   }
 
   private void addSimpleValue(String headerName, String headerValue) {
-    if (headers.containsValue(headerName)) {
+    if (headers.containsKey(headerName)) {
       failIfHeaderDoesNotSupportMultipleValues(headerName);
     }
     headers.put(headerName, headerValue);

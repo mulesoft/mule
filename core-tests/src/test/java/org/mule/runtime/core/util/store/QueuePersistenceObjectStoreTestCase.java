@@ -18,14 +18,13 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
@@ -163,7 +162,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     String id = UUID.getUUID();
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     InternalMessage msg = InternalMessage.builder().payload("Hello").build();
-    Event event = eventBuilder().message(msg).exchangePattern(ONE_WAY).build();
+    Event event = eventBuilder().message(msg).build();
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
     monitored.store(key, event);

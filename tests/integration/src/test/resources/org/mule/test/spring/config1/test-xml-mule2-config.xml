@@ -10,10 +10,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30">
-        <default-threading-profile maxBufferSize="42" maxThreadsActive="16"
-                                   maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
-    </configuration>
+    <configuration defaultResponseTimeout="10" defaultTransactionTimeout="20" shutdownTimeout="30"/>
 
     <global-property name="doCompression" value="true"/>
     <global-property name="beanProperty1" value="this was set from the manager properties!"/>

@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
@@ -18,7 +19,6 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
@@ -87,9 +87,30 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
   }
 
+  @Test
+  public void flowWithSourcePathToMp() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/0");
+    assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
+               is(parseComponentIdentifier("mule:set-payload")));
+  }
+
+  @Test
+  public void flowWithSourcePathToSource() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/source");
+    assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
+               is(parseComponentIdentifier("mule:poll")));
+  }
+
   private MinimalApplicationModelGenerator createGeneratorForConfig(String configFileName) throws Exception {
     Optional<ConfigLine> configLine = xmlApplicationParser.parse(documentLoader
-        .loadDocument(getClass().getClassLoader().getResourceAsStream("model-generator/" + configFileName)).getDocumentElement());
+        .loadDocument(configFileName, getClass().getClassLoader().getResourceAsStream("model-generator/" + configFileName))
+        .getDocumentElement());
     ConfigFile configFile = new ConfigFile("test", Arrays.asList(configLine.get()));
     ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     CoreComponentBuildingDefinitionProvider coreComponentBuildingDefinitionProvider =
@@ -99,7 +120,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);
     return new MinimalApplicationModelGenerator(new ApplicationModel(new ArtifactConfig.Builder().addConfigFile(configFile)
-        .build(), new ArtifactConfiguration(emptyList()), Optional.empty(), Optional.of(componentBuildingDefinitionRegistry)),
+        .build(), new ArtifactDeclaration(), Optional.empty(), Optional.of(componentBuildingDefinitionRegistry)),
                                                 componentBuildingDefinitionRegistry);
   }
 

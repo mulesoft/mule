@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.lifecycle.processor;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -30,8 +31,13 @@ public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessagePr
   }
 
   @Override
-  protected Event handleUnaccepted(Event event) throws LifecycleException {
-    throw new LifecycleException(CoreMessages.isStopped(getStartableName(startable)), event.getMessage());
+  public boolean isThrowOnUnaccepted() {
+    return true;
+  }
+
+  @Override
+  protected MuleException filterUnacceptedException(Event event) {
+    return new LifecycleException(CoreMessages.isStopped(getStartableName(startable)), event.getMessage());
   }
 
   protected String getStartableName(Startable startableObject) {

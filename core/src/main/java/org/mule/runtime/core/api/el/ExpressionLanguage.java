@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.el;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -22,7 +21,16 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 public interface ExpressionLanguage {
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext} and an {@link MuleEvent}.
+   * Registers the given {@link BindingContext} entries as globals. Notice globals cannot be removed once registered, only
+   * overwritten by the registration of a binding with the same identifier.
+   * Implementations should be thread safe to avoid race conditions between registration and expression evaluation.
+   *
+   * @param bindingContext the context to register
+   */
+  void registerGlobalContext(BindingContext bindingContext);
+
+  /**
+   * Evaluates an expression according to a given {@link BindingContext} and an {@link Event}.
    *
    * @param expression the EL expression
    * @param event the current event to consider
@@ -33,7 +41,7 @@ public interface ExpressionLanguage {
   TypedValue evaluate(String expression, Event event, BindingContext context) throws ExpressionRuntimeException;
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, an {@link MuleEvent} and a {@link FlowConstruct}.
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
    *
    * @param expression the expression to be executed
    * @param event the current event being processed

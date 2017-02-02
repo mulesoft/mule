@@ -13,11 +13,12 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.service.http.api.HttpHeaders.Names.HOST;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;

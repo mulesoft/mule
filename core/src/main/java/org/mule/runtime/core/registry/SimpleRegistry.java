@@ -8,14 +8,13 @@ package org.mule.runtime.core.registry;
 
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.lang.reflect.Field;
 
@@ -42,7 +41,6 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
   @Override
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
-    initialiseObjects();
     super.doInitialise();
   }
 
@@ -132,9 +130,12 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
     for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
       Class<?> dependencyType = field.getType();
       try {
+        field.setAccessible(true);
         Object dependency = lookupObject(dependencyType);
+        if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
+          dependency = muleContext;
+        }
         if (dependency != null) {
-          field.setAccessible(true);
           field.set(object, dependency);
         }
       } catch (Exception e) {
@@ -145,16 +146,5 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
     }
 
     return object;
-  }
-
-
-  private void initialiseObjects() throws InitialisationException {
-    try {
-      for (Initialisable initialisable : lookupObjects(Initialisable.class)) {
-        getLifecycleManager().applyPhase(initialisable, NotInLifecyclePhase.PHASE_NAME, Initialisable.PHASE_NAME);
-      }
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
-    }
   }
 }

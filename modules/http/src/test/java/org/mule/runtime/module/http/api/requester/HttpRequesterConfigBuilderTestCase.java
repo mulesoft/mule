@@ -11,14 +11,14 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.api.tls.TlsContextFactory;

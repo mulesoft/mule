@@ -6,9 +6,6 @@
  */
 package org.mule.extension.ftp.internal;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-
 import org.mule.extension.file.common.api.FileSystemProvider;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
@@ -16,10 +13,10 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.concurrent.TimeUnit;
@@ -51,58 +48,8 @@ public abstract class AbstractFtpConnectionProvider<C extends FtpFileSystem>
   @DisplayName("Working Directory")
   private String workingDir = null;
 
-  /**
-   * The FTP server host, such as www.mulesoft.com, localhost, or 192.168.0.1, etc
-   */
-  @Parameter
-  @Placement(group = CONNECTION, order = 1)
-  private String host;
-
-  /**
-   * A scalar value representing the amount of time to wait before a connection attempt times out. This attribute works in tandem
-   * with {@link #connectionTimeoutUnit}.
-   * <p>
-   * Defaults to {@code 10}
-   */
-  @Parameter
-  @Optional(defaultValue = "10")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 2)
-  @Summary("Connection timeout value")
-  private Integer connectionTimeout;
-
-  /**
-   * A {@link TimeUnit} which qualifies the {@link #connectionTimeout} attribute.
-   * <p>
-   * Defaults to {@code SECONDS}
-   */
-  @Parameter
-  @Optional(defaultValue = "SECONDS")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 1)
-  @Summary("Time unit to be used in the Connection Timeout")
-  private TimeUnit connectionTimeoutUnit;
-
-  /**
-   * A scalar value representing the amount of time to wait before a request for data times out. This attribute works in tandem
-   * with {@link #responseTimeoutUnit}.
-   * <p>
-   * Defaults to {@code 10}
-   */
-  @Parameter
-  @Optional(defaultValue = "10")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
-  @Summary("Response timeout value")
-  private Integer responseTimeout;
-
-  /**
-   * A {@link TimeUnit} which qualifies the {@link #responseTimeoutUnit} attribute.
-   * <p>
-   * Defaults to {@code SECONDS}
-   */
-  @Parameter
-  @Optional(defaultValue = "SECONDS")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
-  @Summary("Time unit to be used in the Response Timeout")
-  private TimeUnit responseTimeoutUnit;
+  @ParameterGroup(name = TIMEOUT_CONFIGURATION)
+  private TimeoutSettings timeoutSettings = new TimeoutSettings();
 
   /**
    * Invokes the {@link ClassicFtpFileSystem#disconnect()} method on the given {@code ftpFileSystem}
@@ -132,43 +79,35 @@ public abstract class AbstractFtpConnectionProvider<C extends FtpFileSystem>
     return workingDir;
   }
 
-  protected String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
-  }
-
   protected Integer getConnectionTimeout() {
-    return connectionTimeout;
+    return timeoutSettings.getConnectionTimeout();
   }
 
   protected TimeUnit getConnectionTimeoutUnit() {
-    return connectionTimeoutUnit;
+    return timeoutSettings.getConnectionTimeoutUnit();
   }
 
   protected Integer getResponseTimeout() {
-    return responseTimeout;
+    return timeoutSettings.getResponseTimeout();
   }
 
   protected TimeUnit getResponseTimeoutUnit() {
-    return responseTimeoutUnit;
+    return timeoutSettings.getResponseTimeoutUnit();
   }
 
   public void setConnectionTimeout(Integer connectionTimeout) {
-    this.connectionTimeout = connectionTimeout;
+    timeoutSettings.setConnectionTimeout(connectionTimeout);
   }
 
   public void setConnectionTimeoutUnit(TimeUnit connectionTimeoutUnit) {
-    this.connectionTimeoutUnit = connectionTimeoutUnit;
+    timeoutSettings.setConnectionTimeoutUnit(connectionTimeoutUnit);
   }
 
   public void setResponseTimeout(Integer responseTimeout) {
-    this.responseTimeout = responseTimeout;
+    timeoutSettings.setResponseTimeout(responseTimeout);
   }
 
   public void setResponseTimeoutUnit(TimeUnit responseTimeoutUnit) {
-    this.responseTimeoutUnit = responseTimeoutUnit;
+    timeoutSettings.setResponseTimeoutUnit(responseTimeoutUnit);
   }
 }

@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.source;
 
+import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
+
+import java.util.List;
 
 /**
  * An {@link ExtensionMessageSource} used to parse instances of {@link ExtensionMessageSource} instances through a
@@ -52,8 +55,17 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
         .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
         .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
-        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME, fromSimpleReferenceParameter(CONFIG_ATTRIBUTE).build());
+        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
+                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build());
 
-    parseParameters(sourceModel.getParameterModels());
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(sourceModel);
+    sourceModel.getErrorCallback().ifPresent(cb -> inlineGroups.addAll(getInlineGroups(cb)));
+    sourceModel.getSuccessCallback().ifPresent(cb -> inlineGroups.addAll(getInlineGroups(cb)));
+
+    parseParameters(getFlatParameters(inlineGroups, sourceModel.getAllParameterModels()));
+
+    for (ParameterGroupModel group : inlineGroups) {
+      parseParameterGroup(group);
+    }
   }
 }

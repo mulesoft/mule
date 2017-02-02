@@ -40,10 +40,6 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
    * @param message existing {@link Message} to use as a template to create a new {@link Builder} instance.
    * @return a new {@link Builder} based on the template {@code message} provided.
    */
-  static Builder builder(InternalMessage message) {
-    return DefaultMessageBuilderFactory.getInstance().create(message);
-  }
-
   static Builder builder(Message message) {
     return DefaultMessageBuilderFactory.getInstance().create(message);
   }

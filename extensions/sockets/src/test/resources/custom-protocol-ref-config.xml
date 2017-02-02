@@ -11,8 +11,8 @@
 
     <sockets:request-config name="tcp-requester">
         <sockets:tcp-requester-connection host="localhost" port="${port}" protocol="myProtocolRef" failOnUnresolvedHost="true" sendTcpNoDelay="true">
-            <pooling-profile maxActive="1"/>
             <reconnect blocking="false" />
+            <pooling-profile maxActive="1"/>
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
@@ -32,7 +32,7 @@
     </flow>
 
     <sub-flow name="onIncomingConnection">
-        <expression-component>new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
+        <expression-component>mel:new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
         </expression-component>
     </sub-flow>
 </mule>

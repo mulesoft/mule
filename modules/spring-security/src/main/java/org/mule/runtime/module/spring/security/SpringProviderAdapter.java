@@ -7,8 +7,8 @@
 package org.mule.runtime.module.spring.security;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.Authentication;
-import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.security.AbstractSecurityProvider;
 import org.mule.runtime.module.spring.security.config.SecurityProperty;
 
@@ -49,6 +49,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
     setSecurityContextFactory(new SpringSecurityContextFactory());
   }
 
+  @Override
   public Authentication authenticate(Authentication authentication) throws SecurityException {
     org.springframework.security.core.Authentication auth = null;
     if (authentication instanceof SpringAuthenticationAdapter) {
@@ -58,9 +59,10 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
 
     }
     auth = delegate.authenticate(auth);
-    return new SpringAuthenticationAdapter(auth, getSecurityProperties(), authentication.getEvent());
+    return new SpringAuthenticationAdapter(auth, getSecurityProperties());
   }
 
+  @Override
   public org.springframework.security.core.Authentication authenticate(org.springframework.security.core.Authentication authentication)
       throws AuthenticationException {
     return delegate.authenticate(authentication);

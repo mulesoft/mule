@@ -7,6 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,10 +16,9 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.context.notification.MessageProcessingFlowTraceManager.FLOW_STACK_INFO_KEY;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.CoreEventContext;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -42,8 +42,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @SmallTest
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase {
@@ -219,7 +217,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     manager.onMessageProcessorNotificationPreInvoke(buildProcessorNotification(eventCopy, mock(Processor.class),
                                                                                "/asyncComp"));
 
-    assertThat(((CoreEventContext) event.getContext()).getProcessorsTrace(),
+    assertThat(event.getContext().getProcessorsTrace(),
                hasExecutedProcessors("/comp @ " + APP_ID, "/asyncComp @ " + APP_ID));
   }
 
@@ -288,7 +286,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
 
     manager.onPipelineNotificationComplete(pipelineNotification);
 
-    assertThat(((CoreEventContext) event.getContext()).getProcessorsTrace(),
+    assertThat(event.getContext().getProcessorsTrace(),
                hasExecutedProcessors("/scatter-gather @ " + APP_ID, "/route_0 @ " + APP_ID,
                                      NESTED_FLOW_NAME + "_ref @ " + APP_ID, "/route_1 @ " + APP_ID));
   }

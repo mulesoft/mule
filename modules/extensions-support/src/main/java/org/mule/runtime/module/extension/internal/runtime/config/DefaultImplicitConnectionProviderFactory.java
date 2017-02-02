@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.buildImplicitResolverSet;
-import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
+import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
@@ -27,6 +28,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  * @since 4.0
  */
 public final class DefaultImplicitConnectionProviderFactory implements ImplicitConnectionProviderFactory {
+
+  ConnectionManagerAdapter connectionManagerAdapter;
 
   /**
    * {@inheritDoc}
@@ -45,8 +48,9 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
     }
 
     final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, muleContext);
-    ConnectionProviderObjectBuilder builder =
-        new ConnectionProviderObjectBuilder(implicitModel, resolverSet, muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER));
+    ConnectionProviderObjectBuilder<T> builder =
+        new ConnectionProviderObjectBuilder<>(implicitModel, resolverSet, getConnectionManager(muleContext), extensionModel,
+                                              muleContext);
     builder.setOwnerConfigName(configName);
 
     try {
@@ -54,5 +58,12 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private ConnectionManagerAdapter getConnectionManager(MuleContext muleContext) {
+    if (connectionManagerAdapter == null) {
+      connectionManagerAdapter = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
+    }
+    return connectionManagerAdapter;
   }
 }

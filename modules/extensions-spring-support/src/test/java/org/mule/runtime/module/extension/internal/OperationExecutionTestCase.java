@@ -7,18 +7,15 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -31,22 +28,23 @@ import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -63,12 +61,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatcher;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -81,8 +77,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
   private static final String VICTIM = "Skyler";
   private static final String EMPTY_STRING = "";
-  private static final Matcher<? super Weapon> WEAPON_MATCHER =
-      allOf(notNullValue(), instanceOf(Ricin.class), hasProperty("microgramsPerKilo", is(100L)));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -116,6 +110,41 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test
+  public void getInlineGroupDefinition() throws Exception {
+    InternalMessage message = flowRunner("getBarberPreferences").withPayload(EMPTY_STRING).run().getMessage();
+
+    assertThat(message.getPayload().getValue(), is(notNullValue()));
+
+    BarberPreferences preferences = (BarberPreferences) message.getPayload().getValue();
+    assertThat(preferences.getBeardTrimming(), is(BarberPreferences.BEARD_KIND.MUSTACHE));
+    assertThat(preferences.isFullyBald(), is(false));
+  }
+
+  @Test
+  public void getInlineGroupDefinitionAsArgument() throws Exception {
+    InternalMessage message = flowRunner("getInlineInfo").withPayload(EMPTY_STRING).run().getMessage();
+
+    assertThat(message.getPayload().getValue(), is(notNullValue()));
+
+    BarberPreferences preferences = (BarberPreferences) message.getPayload().getValue();
+    assertThat(preferences.getBeardTrimming(), is(BarberPreferences.BEARD_KIND.MUSTACHE));
+    assertThat(preferences.isFullyBald(), is(true));
+  }
+
+  @Test
+  public void getInlineGroupPersonalInfoAsArgument() throws Exception {
+    InternalMessage message = flowRunner("getInlinePersonalInfo").withPayload(EMPTY_STRING).run().getMessage();
+
+    assertThat(message.getPayload().getValue(), is(notNullValue()));
+    PersonalInfo value = (PersonalInfo) message.getPayload().getValue();
+    assertThat(value.getAge(), is(26));
+    assertThat(value.getKnownAddresses().get(0), is("explicitAddress"));
+
+    // TODO MULE-11315: Enable this assertion when aliased parameters are injected correctly
+    //assertThat(value.getName(), is("Pepe"));
+  }
+
+  @Test
   public void voidOperationWithoutParameters() throws Exception {
     Event responseEvent = flowRunner("die").withPayload(EMPTY).run();
 
@@ -131,6 +160,38 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void operationWithDefaulValueParameter() throws Exception {
     assertThat(GUSTAVO_FRING, equalTo(runFlow("getDefaultEnemy").getMessage().getPayload().getValue()));
+  }
+
+  @Test
+  public void operationWhichReturnsListOfMessages() throws Exception {
+    List<Message> enemies = (List<Message>) runFlow("getAllEnemies").getMessage().getPayload().getValue();
+    HeisenbergExtension heisenberg = getConfig(HEISENBERG);
+
+    assertThat(enemies, hasSize(heisenberg.getEnemies().size()));
+
+    int index = 0;
+    for (Message enemyMessage : enemies) {
+      assertEnemyMessage(heisenberg, index, enemyMessage);
+      index++;
+    }
+  }
+
+  private void assertEnemyMessage(HeisenbergExtension heisenberg, int index, Message enemyMessage) {
+    assertThat(enemyMessage.getPayload().getValue(), is(heisenberg.getEnemies().get(index)));
+    assertThat(enemyMessage.getAttributes(), is(instanceOf(IntegerAttributes.class)));
+    assertThat(((IntegerAttributes) enemyMessage.getAttributes()).getValue(), is(index));
+  }
+
+  @Test
+  public void randomAccessOnOperationWhichReturnsListOfMessages() throws Exception {
+    List<Message> enemies = (List<Message>) runFlow("getAllEnemies").getMessage().getPayload().getValue();
+    HeisenbergExtension heisenberg = getConfig(HEISENBERG);
+
+    assertThat(enemies, hasSize(heisenberg.getEnemies().size()));
+    int index = enemies.size() - 1;
+    assertEnemyMessage(heisenberg, index, enemies.get(index));
+    index = 0;
+    assertEnemyMessage(heisenberg, index, enemies.get(index));
   }
 
   @Test
@@ -264,8 +325,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithExceptionEnricher() throws Throwable {
-    expectedException.expect(HeisenbergException.class);
-    expectedException.expectMessage(is(CURE_CANCER_MESSAGE));
+    expectedException.expectCause(is(instanceOf(HeisenbergException.class)));
+    expectedException.expectMessage(containsString(CURE_CANCER_MESSAGE));
     runFlowAndThrowCause("cureCancer");
   }
 
@@ -348,18 +409,18 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   public void operationWithLiteralArgument() throws Exception {
     Event event = flowRunner("literalEcho").withPayload(EMPTY).run();
     assertThat(((ParameterResolver<String>) event.getMessage().getPayload().getValue()).getExpression(),
-               is(Optional.of("#[money]")));
+               is(Optional.of("#[mel:money]")));
   }
 
   @Test
   public void getMedicalHistory() throws Exception {
-    Map<Integer, HealthStatus> getMedicalHistory =
-        (Map<Integer, HealthStatus>) flowRunner("getMedicalHistory").run().getMessage().getPayload().getValue();
+    Map<String, HealthStatus> getMedicalHistory =
+        (Map<String, HealthStatus>) flowRunner("getMedicalHistory").run().getMessage().getPayload().getValue();
     assertThat(getMedicalHistory, is(notNullValue()));
     assertThat(getMedicalHistory.entrySet().size(), is(3));
-    assertThat(getMedicalHistory.get(2013), is(HEALTHY));
-    assertThat(getMedicalHistory.get(2014), is(CANCER));
-    assertThat(getMedicalHistory.get(2015), is(DEAD));
+    assertThat(getMedicalHistory.get("2013"), is(HEALTHY));
+    assertThat(getMedicalHistory.get("2014"), is(CANCER));
+    assertThat(getMedicalHistory.get("2015"), is(DEAD));
   }
 
   @Test
@@ -424,26 +485,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test
-  public void operationWithExpressionResolver() throws Exception {
-    assertExpressionResolverWeapon("processWeapon", PAYLOAD, WEAPON_MATCHER);
-  }
-
-  @Test
-  public void operationWithExpressionResolverAsStaticChildElement() throws Exception {
-    assertExpressionResolverWeapon("processWeaponAsStaticChildElement", null, WEAPON_MATCHER);
-  }
-
-  @Test
-  public void operationWithExpressionResolverAsDynamicChildElement() throws Exception {
-    assertExpressionResolverWeapon("processWeaponAsDynamicChildElement", null, WEAPON_MATCHER);
-  }
-
-  @Test
-  public void parameterResolverWithDefaultValue() throws Exception {
-    assertExpressionResolverWeapon("processWeaponWithDefaultValue", PAYLOAD, WEAPON_MATCHER);
-  }
-
-  @Test
   public void listOfMapsAsParameter() throws Exception {
     String expectedMessage = "an Apple";
     List<Map<String, String>> listOfMaps = new ArrayList<>();
@@ -454,35 +495,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     List<Map<String, String>> result = (List<Map<String, String>>) event.getMessage().getPayload().getValue();
     assertThat(result, hasSize(1));
     assertThat(result.get(0).get(Apple.class.getSimpleName()), is(expectedMessage));
-  }
-
-  @Test
-  public void operationWithExpressionResolverAndNullWeapon() throws Exception {
-    assertExpressionResolverWeapon("processNullWeapon", null, is(nullValue()));
-  }
-
-  @Test
-  public void operationWithExpressionResolverNegative() throws Exception {
-    expectedException.expect(new ArgumentMatcher<MessagingException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof MuleRuntimeException &&
-            ((MuleRuntimeException) o).getCause().getCause() instanceof TransformerException;
-      }
-    });
-
-    final ParameterResolver<Weapon> weapon =
-        (ParameterResolver<Weapon>) flowRunner("processWrongWeapon").run().getMessage().getPayload().getValue();
-    weapon.resolve();
-  }
-
-  private void assertExpressionResolverWeapon(String flowName, String expression, Matcher<? super Weapon> weaponMatcher)
-      throws Exception {
-    ParameterResolver<Weapon> weaponInfo =
-        (ParameterResolver<Weapon>) flowRunner(flowName).run().getMessage().getPayload().getValue();
-    assertThat(weaponInfo.getExpression(), is(Optional.ofNullable(expression)));
-    assertThat(weaponInfo.resolve(), weaponMatcher);
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {

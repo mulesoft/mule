@@ -6,36 +6,53 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.ALL_INTERFACES_IP;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpHeaders.Names.HOST;
+import static org.mule.runtime.module.http.internal.listener.HttpRequestToMuleEvent.transform;
+import static org.mule.service.http.api.domain.HttpProtocol.HTTP_0_9;
+import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_0;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.execution.MessageProcessingManager;
-import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
+import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
+import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.runtime.module.http.internal.listener.async.RequestHandler;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.MethodRequestMatcher;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.domain.request.HttpRequestContext;
+import org.mule.service.http.api.server.MethodRequestMatcher;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,9 +135,9 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                                                errorResponseBuilder);
           final HttpMessageProcessContext messageProcessContext =
               new HttpMessageProcessContext(DefaultHttpListener.this, flowConstruct, config.getWorkManager(),
-                                            muleContext.getExecutionClassLoader());
+                                            muleContext.getExecutionClassLoader(), muleContext.getErrorTypeLocator());
           messageProcessingManager.processMessage(httpMessageProcessorTemplate, messageProcessContext);
-        } catch (HttpRequestParsingException | IllegalArgumentException e) {
+        } catch (HttpMessageParsingException | IllegalArgumentException e) {
           logger.warn("Exception occurred parsing request:", e);
           sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
         } catch (RuntimeException e) {
@@ -132,7 +149,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
       }
 
       private void sendErrorResponse(final HttpStatus status, String message, HttpResponseReadyCallback responseCallback) {
-        responseCallback.responseReady(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder()
+        responseCallback.responseReady(HttpResponse.builder()
             .setStatusCode(status.getStatusCode())
             .setReasonPhrase(status.getReasonPhrase())
             .setEntity(new ByteArrayHttpEntity(message.getBytes()))
@@ -153,19 +170,56 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     };
   }
 
-  private Event createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException {
-    Event muleEvent =
-        HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
+  private Event createEvent(HttpRequestContext requestContext) throws HttpMessageParsingException {
+    Event muleEvent = Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(
+                                                                                                          transform(requestContext,
+                                                                                                                    SystemUtils
+                                                                                                                        .getDefaultEncoding(muleContext),
+                                                                                                                    parseRequest,
+                                                                                                                    listenerPath))
+        .flow(flowConstruct).session(new DefaultMuleSession()).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(muleEvent);
     return muleEvent;
+  }
+
+  private static URI resolveUri(final HttpRequestContext requestContext) {
+    try {
+      String hostAndPort = resolveTargetHost(requestContext.getRequest());
+      String[] hostAndPortParts = hostAndPort.split(":");
+      String host = hostAndPortParts[0];
+      int port = requestContext.getScheme().equals(HttpConstants.Protocols.HTTP) ? 80 : 4343;
+      if (hostAndPortParts.length > 1) {
+        port = Integer.valueOf(hostAndPortParts[1]);
+      }
+      return new URI(requestContext.getScheme(), null, host, port, requestContext.getRequest().getPath(), null, null);
+    } catch (URISyntaxException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  /**
+   * See <a href="http://www8.org/w8-papers/5c-protocols/key/key.html#SECTION00070000000000000000" >Internet address
+   * conservation</a>.
+   */
+  private static String resolveTargetHost(HttpRequest request) {
+    String hostHeaderValue = request.getHeaderValueIgnoreCase(HOST);
+    if (HTTP_1_0.equals(request.getProtocol()) || HTTP_0_9.equals(request.getProtocol())) {
+      return hostHeaderValue == null ? ALL_INTERFACES_IP : hostHeaderValue;
+    } else {
+      if (hostHeaderValue == null) {
+        throw new IllegalArgumentException("Missing 'host' header");
+      } else {
+        return hostHeaderValue;
+      }
+    }
   }
 
   @Override
   public synchronized void initialise() throws InitialisationException {
     if (allowedMethods != null) {
       parsedAllowedMethods = extractAllowedMethods();
-      methodRequestMatcher = new MethodRequestMatcher(parsedAllowedMethods);
+      methodRequestMatcher = new DefaultMethodRequestMatcher(parsedAllowedMethods);
     }
     if (responseBuilder == null) {
       responseBuilder = HttpResponseBuilder.emptyInstance(muleContext);

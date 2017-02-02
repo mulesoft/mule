@@ -17,27 +17,23 @@
         <module>all-modules</module>
         <module>artifact</module>
         <module>builders</module>
-        <module>cxf</module>
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>
         <module>deployment-model-impl</module>
         <module>dsl-api</module>
         <module>extensions-support</module>
+        <module>extensions-xml-support</module>
         <module>file-extension-common</module>
         <module>launcher</module>
+        <module>http-api</module>
         <module>http</module>
-        <module>jaas</module>
         <module>jboss-transactions</module>
-        <module>json</module>
         <module>management</module>
-        <module>oauth</module>
-        <module>pgp</module>
         <module>reboot</module>
         <module>schedulers</module>
         <module>scripting</module>
         <module>scripting-jruby</module>
-        <module>spring-extras</module>
         <module>spring-config</module>
         <module>service</module>
 

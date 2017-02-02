@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="config" cashierName="cashierName">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <flow name="noMapping">
+        <petstore:fail petNames="#[mel:names]"/>
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="simpleMapping">
+        <petstore:fail petNames="#[mel:names]">
+            <error-mapping targetType="MY_REQUESTER"/>
+        </petstore:fail>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="complexMapping">
+        <petstore:fail petNames="#[mel:names]">
+            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+        </petstore:fail>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="multipleMappings">
+        <petstore:fail petNames="#[mel:names]">
+            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="TRANSFORMATION" targetType="MY_OTHER_ERROR"/>
+        </petstore:fail>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue type="MY_OTHER_ERROR">
+                <set-payload value="Bad expression."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+</mule>

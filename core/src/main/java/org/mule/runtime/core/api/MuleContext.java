@@ -9,12 +9,8 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DataTypeConversionResolver;
-import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -23,6 +19,8 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -33,6 +31,7 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
@@ -42,16 +41,14 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.extension.api.ExtensionManager;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
@@ -159,18 +156,6 @@ public interface MuleContext extends Lifecycle {
    */
   SecurityManager getSecurityManager();
 
-  /**
-   * Obtains a workManager instance that can be used to schedule work in a thread pool. This will be used primarially by Agents
-   * wanting to schedule work. This work Manager must <b>never</b> be used by provider implementations as they have their own
-   * workManager accible on the connector.
-   *
-   * @return a workManager instance used by the current MuleManager
-   */
-  @Deprecated
-  WorkManager getWorkManager();
-
-  WorkListener getWorkListener();
-
   SchedulerService getSchedulerService();
 
   /**
@@ -214,18 +199,6 @@ public interface MuleContext extends Lifecycle {
   Injector getInjector();
 
   MuleConfiguration getConfiguration();
-
-  @Deprecated
-  ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
-
-  @Deprecated
-  ThreadingProfile getDefaultMessageRequesterThreadingProfile();
-
-  @Deprecated
-  ThreadingProfile getDefaultMessageReceiverThreadingProfile();
-
-  @Deprecated
-  ThreadingProfile getDefaultThreadingProfile();
 
   /**
    * Returns the configured {@link org.mule.runtime.core.api.util.StreamCloserService}
@@ -315,7 +288,7 @@ public interface MuleContext extends Lifecycle {
   SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
   /**
-   * @return a non null {@link org.mule.runtime.core.DataTypeConversionResolver} instance to resolve implicit data type
+   * @return a non null {@link DataTypeConversionResolver} instance to resolve implicit data type
    *         conversions
    */
   DataTypeConversionResolver getDataTypeConverterResolver();
@@ -416,6 +389,9 @@ public interface MuleContext extends Lifecycle {
    */
   ErrorTypeRepository getErrorTypeRepository();
 
+  // TODO MULE-11521 Define if this will remain here
+  ProcessorInterceptorProvider getProcessorInterceptorManager();
+
   /**
    * Sets application wide instance of {@link BootstrapServiceDiscoverer}
    *
@@ -427,5 +403,6 @@ public interface MuleContext extends Lifecycle {
    * @return locator for accessing runtime object created by the mule configuration.
    */
   ConfigurationComponentLocator getConfigurationComponentLocator();
+
 }
 

@@ -10,13 +10,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
+import static org.mule.tck.util.FlowTraceUtils.FlowStackAsserter.stackToAssert;
 import static org.mule.tck.util.FlowTraceUtils.assertStackElements;
 import static org.mule.tck.util.FlowTraceUtils.isFlowStackElement;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.util.FlowTraceUtils.FlowStackAsserter;
 import org.mule.tck.util.FlowTraceUtils.FlowStackAsyncAsserter;
 
 import java.util.concurrent.CountDownLatch;
@@ -41,17 +41,17 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
     muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class,
                                                             MessageProcessorNotification.class);
 
-    FlowStackAsserter.stackToAssert = null;
+    stackToAssert = null;
     FlowStackAsyncAsserter.latch = new CountDownLatch(1);
   }
 
   @Test
   public void flowStatic() throws Exception {
-    flowRunner("flowStatic").withPayload("payload").run();
+    flowRunner("flowStatic").withPayload(TEST_MESSAGE).run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowStatic", "/flowStatic/processors/0"));
   }
 
@@ -59,9 +59,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowStatic() throws Exception {
     flowRunner("subFlowStatic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowStatic/processors/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowStatic", "/subFlowStatic/processors/0"));
   }
@@ -70,9 +70,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowDynamic() throws Exception {
     flowRunner("flowDynamic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowDynamic", "/flowDynamic/processors/0"));
   }
 
@@ -80,9 +80,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowDynamic() throws Exception {
     flowRunner("subFlowDynamic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowDynamic/processors/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowDynamic", "/subFlowDynamic/processors/0"));
   }
@@ -91,9 +91,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void secondFlowStatic() throws Exception {
     flowRunner("secondFlowStatic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("secondFlowStatic", "/secondFlowStatic/processors/1"));
   }
 
@@ -101,9 +101,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void secondSubFlowStatic() throws Exception {
     flowRunner("secondSubFlowStatic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/secondSubFlowStatic/processors/1/subFlow/subprocessors/0"),
                         isFlowStackElement("secondSubFlowStatic", "/secondSubFlowStatic/processors/1"));
   }
@@ -112,9 +112,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void secondFlowDynamic() throws Exception {
     flowRunner("secondFlowDynamic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("secondFlowDynamic", "/secondFlowDynamic/processors/1"));
   }
 
@@ -122,9 +122,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void secondSubFlowDynamic() throws Exception {
     flowRunner("secondSubFlowDynamic").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/secondSubFlowDynamic/processors/1/subFlow/subprocessors/0"),
                         isFlowStackElement("secondSubFlowDynamic", "/secondSubFlowDynamic/processors/1"));
   }
@@ -134,9 +134,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
     flowRunner("flowStaticWithAsync").withPayload("payload").run();
 
     FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flowInAsync", "/flowInAsync/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flowInAsync", "/flowInAsync/processors/0"),
                         isFlowStackElement("flowStaticWithAsync", "/flowStaticWithAsync/processors/0/0"));
   }
 
@@ -146,9 +146,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
 
     FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlowInAsync",
                                            "/subFlowStaticWithAsync/processors/0/0/subFlowInAsync/subprocessors/0"),
                         isFlowStackElement("subFlowStaticWithAsync", "/subFlowStaticWithAsync/processors/0/0"));
@@ -160,9 +160,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
 
     FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flowInAsync", "/flowInAsync/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flowInAsync", "/flowInAsync/processors/0"),
                         isFlowStackElement("flowDynamicWithAsync", "/flowDynamicWithAsync/processors/0/0"));
   }
 
@@ -172,9 +172,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
 
     FlowStackAsyncAsserter.latch.await(1, TimeUnit.SECONDS);
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlowInAsync",
                                            "/subFlowDynamicWithAsync/processors/0/0/subFlowInAsync/subprocessors/0"),
                         isFlowStackElement("subFlowDynamicWithAsync", "/subFlowDynamicWithAsync/processors/0/0"));
@@ -184,9 +184,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowStaticWithEnricher() throws Exception {
     flowRunner("flowStaticWithEnricher").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowStaticWithEnricher", "/flowStaticWithEnricher/processors/0/0"));
   }
 
@@ -194,9 +194,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowStaticWithEnricher() throws Exception {
     flowRunner("subFlowStaticWithEnricher").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowStaticWithEnricher/processors/0/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowStaticWithEnricher", "/subFlowStaticWithEnricher/processors/0/0"));
   }
@@ -205,9 +205,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowDynamicWithEnricher() throws Exception {
     flowRunner("flowDynamicWithEnricher").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowDynamicWithEnricher", "/flowDynamicWithEnricher/processors/0/0"));
   }
 
@@ -215,9 +215,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowDynamicWithEnricher() throws Exception {
     flowRunner("subFlowDynamicWithEnricher").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowDynamicWithEnricher/processors/0/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowDynamicWithEnricher", "/subFlowDynamicWithEnricher/processors/0/0"));
   }
@@ -226,9 +226,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowStaticWithChoice() throws Exception {
     flowRunner("flowStaticWithChoice").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowStaticWithChoice", "/flowStaticWithChoice/processors/0/0/0"));
   }
 
@@ -236,9 +236,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowStaticWithChoice() throws Exception {
     flowRunner("subFlowStaticWithChoice").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowStaticWithChoice/processors/0/0/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowStaticWithChoice", "/subFlowStaticWithChoice/processors/0/0/0"));
   }
@@ -247,9 +247,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowDynamicWithChoice() throws Exception {
     flowRunner("flowDynamicWithChoice").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowDynamicWithChoice", "/flowDynamicWithChoice/processors/0/0/0"));
   }
 
@@ -257,9 +257,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowDynamicWithChoice() throws Exception {
     flowRunner("subFlowDynamicWithChoice").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowDynamicWithChoice/processors/0/0/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowDynamicWithChoice", "/subFlowDynamicWithChoice/processors/0/0/0"));
   }
@@ -268,9 +268,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowStaticWithScatterGather() throws Exception {
     flowRunner("flowStaticWithScatterGather").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowStaticWithScatterGather", "/flowStaticWithScatterGather/processors/0/1/0"));
   }
 
@@ -278,9 +278,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowStaticWithScatterGather() throws Exception {
     flowRunner("subFlowStaticWithScatterGather").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowStaticWithScatterGather/processors/0/1/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowStaticWithScatterGather", "/subFlowStaticWithScatterGather/processors/0/1/0"));
   }
@@ -289,9 +289,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowDynamicWithScatterGather() throws Exception {
     flowRunner("flowDynamicWithScatterGather").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowDynamicWithScatterGather", "/flowDynamicWithScatterGather/processors/0/1/0"));
   }
 
@@ -299,9 +299,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowDynamicWithScatterGather() throws Exception {
     flowRunner("subFlowDynamicWithScatterGather").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow",
                                            "/subFlowDynamicWithScatterGather/processors/0/1/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowDynamicWithScatterGather",
@@ -312,9 +312,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowStaticWithScatterGatherChain() throws Exception {
     flowRunner("flowStaticWithScatterGatherChain").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowStaticWithScatterGatherChain",
                                            "/flowStaticWithScatterGatherChain/processors/0/1/0"));
   }
@@ -323,9 +323,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowStaticWithScatterGatherChain() throws Exception {
     flowRunner("subFlowStaticWithScatterGatherChain").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow",
                                            "/subFlowStaticWithScatterGatherChain/processors/0/1/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowStaticWithScatterGatherChain",
@@ -336,9 +336,9 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void flowDynamicWithScatterGatherChain() throws Exception {
     flowRunner("flowDynamicWithScatterGatherChain").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
+    assertStackElements(stackToAssert, isFlowStackElement("flow", "/flow/processors/0"),
                         isFlowStackElement("flowDynamicWithScatterGatherChain",
                                            "/flowDynamicWithScatterGatherChain/processors/0/1/0"));
   }
@@ -347,12 +347,64 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
   public void subFlowDynamicWithScatterGatherChain() throws Exception {
     flowRunner("subFlowDynamicWithScatterGatherChain").withPayload("payload").run();
 
-    assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
+    assertThat(stackToAssert, not(nullValue()));
 
-    assertStackElements(FlowStackAsserter.stackToAssert,
+    assertStackElements(stackToAssert,
                         isFlowStackElement("subFlow",
                                            "/subFlowDynamicWithScatterGatherChain/processors/0/1/0/subFlow/subprocessors/0"),
                         isFlowStackElement("subFlowDynamicWithScatterGatherChain",
                                            "/subFlowDynamicWithScatterGatherChain/processors/0/1/0"));
+  }
+
+  @Test
+  public void flowChainedFilter() throws Exception {
+    flowRunner("flowChainedFilter").withPayload("payload").run();
+
+    assertThat(stackToAssert, not(nullValue()));
+
+    assertStackElements(stackToAssert,
+                        isFlowStackElement("flow",
+                                           "/flow/processors/0"),
+                        isFlowStackElement("flowChainedFilter",
+                                           "/flowChainedFilter/processors/0/1"));
+  }
+
+  @Test
+  public void flowChainedFilterManyProcessors() throws Exception {
+    flowRunner("flowChainedFilterManyProcessors").withPayload("payload").run();
+
+    assertThat(stackToAssert, not(nullValue()));
+
+    assertStackElements(stackToAssert,
+                        isFlowStackElement("flow",
+                                           "/flow/processors/0"),
+                        isFlowStackElement("flowChainedFilterManyProcessors",
+                                           "/flowChainedFilterManyProcessors/processors/0/2"));
+  }
+
+  @Test
+  public void flowForEach() throws Exception {
+    flowRunner("flowForEach").withPayload("payload").run();
+
+    assertThat(stackToAssert, not(nullValue()));
+
+    assertStackElements(stackToAssert,
+                        isFlowStackElement("flow",
+                                           "/flow/processors/0"),
+                        isFlowStackElement("flowForEach",
+                                           "/flowForEach/processors/0/1"));
+  }
+
+  @Test
+  public void flowForEachFilter() throws Exception {
+    flowRunner("flowForEachFilter").withPayload("payload").run();
+
+    assertThat(stackToAssert, not(nullValue()));
+
+    assertStackElements(stackToAssert,
+                        isFlowStackElement("flow",
+                                           "/flow/processors/0"),
+                        isFlowStackElement("flowForEachFilter",
+                                           "/flowForEachFilter/processors/0/1"));
   }
 }

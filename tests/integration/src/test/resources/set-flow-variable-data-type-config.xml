@@ -4,7 +4,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="main">
-        <set-variable variableName="testVariable" value="#['test']" encoding="UTF-16" mimeType="text/xml"/>
+        <set-variable variableName="testVariable" value="#[mel:'test']" encoding="UTF-16" mimeType="text/xml"/>
 
         <component class="org.mule.test.core.transformers.simple.SetFlowVariableDataTypeTestCase$FlowVariableDataTypeAccessor"/>
     </flow>

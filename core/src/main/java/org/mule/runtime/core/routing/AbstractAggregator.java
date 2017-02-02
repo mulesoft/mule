@@ -9,6 +9,9 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.internal.util.rx.Operators.echoOnNullMap;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -34,6 +37,7 @@ import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.util.store.ProvidedPartitionableObjectStoreWrapper;
 
 import org.apache.commons.collections.Factory;
+import org.reactivestreams.Publisher;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message. <b>EIP Reference:</b>
@@ -141,9 +145,14 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   public Event process(Event event) throws MuleException {
     Event result = eventCorrelator.process(event);
     if (result == null) {
-      return result;
+      return null;
     }
     return processNext(result);
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).handle(echoOnNullMap(checkedFunction(event -> process(event))));
   }
 
   @Override

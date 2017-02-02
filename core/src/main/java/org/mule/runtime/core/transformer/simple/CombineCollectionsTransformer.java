@@ -8,6 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -26,7 +27,7 @@ import java.util.List;
  * This transformer will also work on MuleMessageCollections. In this case, it will take the individual Collection payloads of
  * each Message and merge them into a single Collection on a new Message.
  */
-public class CombineCollectionsTransformer implements Processor {
+public class CombineCollectionsTransformer extends AbstractAnnotatedObject implements Processor {
 
   @Override
   public Event process(Event event) throws MuleException {

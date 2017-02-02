@@ -51,12 +51,12 @@
     </flow>
 
     <flow name="write-bytearray">
-        <expression-transformer expression="#[result = '\u0003H\u0001e\u0002l\u0004l\u0005o\u0008\u0020\u0040\u0035北\u0003'.getBytes('ASCII'); return result[1]]"/>
+        <expression-transformer expression="#[mel:result = '\u0003H\u0001e\u0002l\u0004l\u0005o\u0008\u0020\u0040\u0035北\u0003'.getBytes('ASCII'); return result[1]]"/>
         <file:write path="byte-array.txt" mode="OVERWRITE" createParentDirectories="false" lock="false" />
     </flow>
 
     <flow name="write-iterable">
-        <set-payload value="#[['1','2','3','4']]" />
+        <set-payload value="#[mel:['1','2','3','4']]" />
         <file:write path="iterable.txt"  mode="OVERWRITE" createParentDirectories="false" lock="false" />
     </flow>
 

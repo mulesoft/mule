@@ -8,14 +8,16 @@ package org.mule.extension.ftp.internal.sftp.command;
 
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.io.OutputStream;
@@ -46,7 +48,7 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, Event event,
                     boolean lock, boolean createParentDirectory, String encoding) {
     Path path = resolvePath(filePath);
     FileAttributes file = getFile(filePath);
@@ -55,10 +57,10 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
       assureParentFolderExists(path, createParentDirectory);
     } else {
       if (mode == FileWriteMode.CREATE_NEW) {
-        throw new IllegalArgumentException(String.format(
-                                                         "Cannot write to path '%s' because it already exists and write mode '%s' was selected. "
-                                                             + "Use a different write mode or point to a path which doesn't exists",
-                                                         path, mode));
+        throw new FileAlreadyExistsException(format(
+                                                    "Cannot write to path '%s' because it already exists and write mode '%s' was selected. "
+                                                        + "Use a different write mode or point to a path which doesn't exists",
+                                                    path, mode));
       }
     }
 
@@ -74,7 +76,7 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
     try {
       return client.getOutputStream(path.toString(), mode);
     } catch (Exception e) {
-      throw exception(String.format("Could not open stream to write to path '%s' using mode '%s'", path, mode), e);
+      throw exception(format("Could not open stream to write to path '%s' using mode '%s'", path, mode), e);
     }
   }
 }

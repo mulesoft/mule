@@ -7,24 +7,29 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
+import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Mono.empty;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategyFactory.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.util.function.Consumer;
@@ -40,33 +45,36 @@ import org.slf4j.Logger;
  * This factory's strategy uses a {@link WorkManager} to schedule the processing of the pipeline of message processors in a single
  * worker thread.
  */
+@Deprecated
 public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
   private static final Logger LOGGER = getLogger(LegacyAsynchronousProcessingStrategyFactory.class);
 
-  public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a synchronous event asynchronously";
+  public static final String SYNCHRONOUS_EVENT_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
   @Override
-  public ProcessingStrategy create(MuleContext muleContext) {
-    return new LegacyAsynchronousProcessingStrategy(() -> muleContext.getSchedulerService().ioScheduler(),
+  public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
+    return new LegacyAsynchronousProcessingStrategy(() -> muleContext.getSchedulerService()
+        .ioScheduler(config().withName(schedulersNamePrefix)),
                                                     scheduler -> scheduler
                                                         .stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
                                                     muleContext);
   }
 
-  static class LegacyAsynchronousProcessingStrategy extends AsynchronousProcessingStrategy {
+  @Deprecated
+  static class LegacyAsynchronousProcessingStrategy extends AbstractLegacyProcessingStrategy
+      implements Startable, Stoppable {
 
+    private Consumer<Scheduler> schedulerStopper;
+    private MuleContext muleContext;
+    private Supplier<Scheduler> schedulerSupplier;
+    private Scheduler scheduler;
 
     public LegacyAsynchronousProcessingStrategy(Supplier<Scheduler> schedulerSupplier, Consumer<Scheduler> schedulerStopper,
                                                 MuleContext muleContext) {
-      super(schedulerSupplier, schedulerStopper, muleContext);
-    }
-
-    @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-
-      return onPipeline(flowConstruct, pipelineFunction, flowConstruct.getExceptionListener());
+      this.schedulerSupplier = schedulerSupplier;
+      this.schedulerStopper = schedulerStopper;
+      this.muleContext = muleContext;
     }
 
     @Override
@@ -78,28 +86,39 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
       // i) The request event is echoed rather than the the result of async processing returned
       // ii) Any exceptions that occur due to async processing are not propagated upwards
       return publisher -> from(publisher)
-          .doOnNext(assertCanProcessAsync())
+          .doOnNext(createOnEventConsumer())
           .doOnNext(fireAsyncScheduledNotification(flowConstruct))
           .doOnNext(request -> just(request)
               .map(event -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
-              .publishOn(fromExecutorService(getScheduler()))
+              .publishOn(fromExecutorService(scheduler))
               .transform(pipelineFunction)
               .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
               .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
               .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
-              .doOnError(exception -> {
-                if (!(exception instanceof MessagingException))
-                  LOGGER.error("Unhandled exception in async processing " + exception);
-              })
+              .onErrorResumeWith(EventDroppedException.class, mde -> empty())
+              .doOnError(UNEXPECTED_EXCEPTION_PREDICATE, exception -> LOGGER.error("Unhandled exception in async processing.",
+                                                                                   exception))
               .subscribe());
     }
 
-    private Consumer<Event> assertCanProcessAsync() {
-      return event -> {
-        if (event.isSynchronous() || isTransactionActive()) {
-          throw propagate(new DefaultMuleException(createStaticMessage(SYNCHRONOUS_EVENT_ERROR_MESSAGE)));
-        }
-      };
+    @Override
+    public void start() throws MuleException {
+      this.scheduler = schedulerSupplier.get();
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      schedulerStopper.accept(scheduler);
+    }
+
+    protected Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
+      return event -> muleContext.getNotificationManager()
+          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_SCHEDULED));
+    }
+
+    protected void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
+      muleContext.getNotificationManager()
+          .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_COMPLETE, exception));
     }
 
   }

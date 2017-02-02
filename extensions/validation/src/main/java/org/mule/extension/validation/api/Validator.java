@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.Event;
 /**
  * A component which performs a validation and expresses its result through a {@link ValidationResult} object.
  * <p/>
- * The {@link #validate(Event)} method receives a {@link Event} in order to make it generic and easy to extend. However, that
+ * The {@link #validate()} method receives a {@link Event} in order to make it generic and easy to extend. However, that
  * doesn't necessarily mean that all the validation is performed with or over the event exclusively. Thread safeness is not to be
  * assumed over instances of this class since the validator could be stateful.
  *
@@ -22,8 +22,7 @@ public interface Validator {
   /**
    * Performs the validation and generates a {@link ValidationResult} back.
    *
-   * @param event the current {@link Event}
    * @return a {@link ValidationResult}
    */
-  ValidationResult validate(Event event);
+  ValidationResult validate();
 }

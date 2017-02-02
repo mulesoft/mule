@@ -8,13 +8,14 @@ package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
+import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.extension.file.common.api.FileWriteMode;
-import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -23,11 +24,11 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
+  protected static final String NAMESPACE = "FILE";
   protected static final String HELLO_WORLD = "Hello World!";
   protected static final String HELLO_FILE_NAME = "hello.json";
   protected static final String HELLO_PATH = "files/" + HELLO_FILE_NAME;
@@ -39,7 +40,7 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
   public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Rule
-  public ExpectedException expectedException = none();
+  public ExpectedError expectedError = none();
 
   @Rule
   public SystemProperty workingDir = new SystemProperty("workingDir", temporaryFolder.getRoot().getAbsolutePath());

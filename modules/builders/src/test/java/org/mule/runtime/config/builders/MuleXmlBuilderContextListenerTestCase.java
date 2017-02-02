@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.config.builders;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 
@@ -97,6 +97,6 @@ public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase 
     // handle Windows filenames, just in case
     String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory().replace('\\', '/');
     workingDirectory = FilenameUtils.separatorsToUnix(workingDirectory);
-    assertTrue(workingDirectory.endsWith(expected));
+    assertThat(workingDirectory, endsWith(expected));
   }
 }

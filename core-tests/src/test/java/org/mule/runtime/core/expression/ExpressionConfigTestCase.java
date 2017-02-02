@@ -7,8 +7,8 @@
 package org.mule.runtime.core.expression;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.api.el.ExpressionManager;
 
+import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -17,7 +17,7 @@ import org.junit.Test;
 
 public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
 
-  private ExpressionManager expressionManager;
+  private ExpressionEvaluator expressionManager;
 
   @Before
   public void setup() throws InitialisationException {

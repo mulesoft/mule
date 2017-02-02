@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -48,6 +47,6 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
   }
 
   private ConnectionValidationResult unknownFailureResponse(Exception e) {
-    return failure(e.getMessage(), UNKNOWN, e);
+    return failure(e.getMessage(), e);
   }
 }

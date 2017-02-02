@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.internal.introspection.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableList;

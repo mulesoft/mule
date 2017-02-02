@@ -26,11 +26,11 @@
     </httpn:listener-config>
     <flow name="persistentCloseHeader">
         <httpn:listener path="/" config-ref="persistentConfigCloseHeader" >
-            <httpn:response-builder>
+            <httpn:response>
                 <httpn:headers>
-                    #[['Connection' : 'close']]
+                    #[mel:['Connection' : 'close']]
                 </httpn:headers>
-            </httpn:response-builder>
+            </httpn:response>
                 </httpn:listener>
         <echo-component/>
     </flow>

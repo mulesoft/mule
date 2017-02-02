@@ -8,7 +8,6 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
@@ -18,8 +17,8 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
-import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
-import org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.AbstractArgumentEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
@@ -42,7 +41,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     resolver.addMethod("bite");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
@@ -55,7 +53,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     resolver.addMethod("wash");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
@@ -67,7 +64,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
@@ -80,7 +76,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
@@ -93,7 +88,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     assertTrue(resolver.removeIgnoredMethod("is*"));
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
@@ -108,7 +102,6 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     resolver.addMethod("wash");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(null))
-        .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));

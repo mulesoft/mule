@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.http.internal.listener.grizzly;
 
+import org.mule.runtime.module.http.internal.listener.DefaultServerAddress;
 import org.mule.runtime.module.http.internal.listener.ServerAddressMap;
-import org.mule.runtime.module.http.internal.listener.ServerAddress;
+import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -123,7 +124,7 @@ public class GrizzlyAddressDelegateFilter<F extends BaseFilter> extends BaseFilt
     final InetSocketAddress inetAddress = (InetSocketAddress) connection.getLocalAddress();
     final int port = inetAddress.getPort();
     final String ip = inetAddress.getAddress().getHostAddress();
-    return filters.get(new ServerAddress(ip, port));
+    return filters.get(new DefaultServerAddress(ip, port));
   }
 
   /**
@@ -134,5 +135,11 @@ public class GrizzlyAddressDelegateFilter<F extends BaseFilter> extends BaseFilt
    */
   public synchronized void addFilterForAddress(ServerAddress serverAddress, F filter) {
     filters.put(serverAddress, filter);
+  }
+
+  public synchronized void removeFilterForAddress(ServerAddress serverAddress) {
+    if (filters.containsKey(serverAddress)) {
+      filters.remove(serverAddress);
+    }
   }
 }

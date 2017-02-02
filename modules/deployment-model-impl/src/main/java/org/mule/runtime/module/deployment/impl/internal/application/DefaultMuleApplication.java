@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationListener
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -45,6 +45,7 @@ import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassL
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -63,6 +64,7 @@ public class DefaultMuleApplication implements Application {
   private final DomainRepository domainRepository;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ServiceRepository serviceRepository;
+  private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
   private ApplicationStatus status;
@@ -71,19 +73,24 @@ public class DefaultMuleApplication implements Application {
   protected MuleContextListener muleContextListener;
   private ServerNotificationListener<MuleContextNotification> statusListener;
   private ArtifactContext artifactContext;
+  private ApplicationPolicyProvider policyManager;
 
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository, File location,
-                                ClassLoaderRepository classLoaderRepository) {
+                                ServiceRepository serviceRepository,
+                                ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
+                                ClassLoaderRepository classLoaderRepository,
+                                ApplicationPolicyProvider applicationPolicyProvider) {
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.classLoaderRepository = classLoaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.location = location;
     this.deploymentClassLoader = deploymentClassLoader;
+    this.policyManager = applicationPolicyProvider;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -176,7 +183,9 @@ public class DefaultMuleApplication implements Application {
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
               .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
-              .setClassLoaderRepository(classLoaderRepository);
+              .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
+              .setClassLoaderRepository(classLoaderRepository)
+              .setPolicyProvider(policyManager);
 
       Domain domain = domainRepository.getDomain(descriptor.getDomain());
       if (domain.getMuleContext() != null) {
@@ -359,6 +368,22 @@ public class DefaultMuleApplication implements Application {
   @Override
   public ApplicationStatus getStatus() {
     return status;
+  }
+
+  @Override
+  public RegionClassLoader getRegionClassLoader() {
+    ClassLoader parentClassLoader = deploymentClassLoader.getClassLoader().getParent();
+
+    if (parentClassLoader instanceof RegionClassLoader) {
+      return (RegionClassLoader) parentClassLoader;
+    } else {
+      throw new IllegalStateException("Application is not a region owner");
+    }
+  }
+
+  @Override
+  public ApplicationPolicyProvider getPolicyManager() {
+    return policyManager;
   }
 
   @Override

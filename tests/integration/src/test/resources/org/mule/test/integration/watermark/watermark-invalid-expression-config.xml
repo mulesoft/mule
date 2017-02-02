@@ -7,7 +7,7 @@
 
     <flow name="invalidUpdateExpression" processingStrategy="synchronous">
         <poll frequency="1000">
-            <watermark variable="test1" default-expression="#[string:noKey]" update-expression="not a expression"/>
+            <watermark variable="test1" default-expression="#[mel:string:noKey]" update-expression="not a expression"/>
             <set-payload value="hello world" />
         </poll>
         <logger message="Executed With watermark"/>

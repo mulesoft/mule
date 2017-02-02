@@ -8,7 +8,7 @@
     <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.SimpleMemoryObjectStore" />
 
     <flow name="withSplitter">
-        <set-payload value="#[['a','b']]" />
+        <set-payload value="#[mel:['a','b']]" />
         <collection-splitter />
         <until-successful objectStore-ref="objectStore" maxRetries="2" secondsBetweenRetries="1">
             <custom-processor class="org.mule.test.routing.UntilSuccessfulWithSplitterTestCase$FailAtFirstAttempt" />

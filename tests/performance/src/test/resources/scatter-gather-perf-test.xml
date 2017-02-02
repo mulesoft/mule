@@ -16,18 +16,17 @@
 
     <flow name="parallelProcessing">
         <scatter-gather>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
         </scatter-gather>
     </flow>
 
     <flow name="sequentialProcessing">
-        <scatter-gather>
-            <threading-profile doThreading="false"/>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
-            <expression-component><![CDATA[Thread.sleep(5);]]></expression-component>
+        <scatter-gather parallel="false">
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
+            <expression-component><![CDATA[mel:Thread.sleep(5);]]></expression-component>
         </scatter-gather>
     </flow>
 
@@ -40,8 +39,7 @@
     </flow>
 
     <flow name="sequentialHttpProcessing">
-        <scatter-gather>
-            <threading-profile doThreading="false"/>
+        <scatter-gather parallel="false">
             <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
             <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
             <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
@@ -50,7 +48,7 @@
 
     <flow name="Http">
         <httpn:listener config-ref="HTTP" path="do"/>
-        <expression-component><![CDATA[Thread.sleep(1);]]></expression-component>
+        <expression-component><![CDATA[mel:Thread.sleep(1);]]></expression-component>
     </flow>
 
 </mule>

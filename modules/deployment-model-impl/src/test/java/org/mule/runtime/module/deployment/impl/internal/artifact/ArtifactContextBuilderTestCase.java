@@ -18,6 +18,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_CONFIGURATOR_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 
@@ -67,6 +68,12 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   public void setNullClassLoaderRepository() throws Exception {
     expectedException.expectMessage(CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL);
     newBuilder().setClassLoaderRepository(null);
+  }
+
+  @Test
+  public void setNullServiceConfigurator() throws Exception {
+    expectedException.expectMessage(SERVICE_CONFIGURATOR_CANNOT_BE_NULL);
+    newBuilder().withServiceConfigurator(null);
   }
 
   @Test

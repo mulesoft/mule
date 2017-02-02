@@ -44,10 +44,6 @@
             <name>Ana Felisatti</name>
         </developer>
         <developer>
-            <id>LucianoGandini</id>
-            <name>Luciano Gandini</name>
-        </developer>
-        <developer>
             <id>marianogonzalez</id>
             <name>Mariano Gonzalez</name>
         </developer>
@@ -76,8 +72,12 @@
             <name>Guillermo Fernandes</name>
         </developer>
         <developer>
-            <id>asequeira</id>
-            <name>Alejandro Sequeira</name>
+            <id>alepulver</id>
+            <name>Alejandro Pulver</name>
+        </developer>
+        <developer>
+            <id>mbuchwald</id>
+            <name>Martin Buchwald</name>
         </developer>
     </developers>
     <contributors>
@@ -85,14 +85,14 @@
     </contributors>
     <issueManagement>
         <system>jira</system>
-        <url>http://www.mulesoft.org/jira/browse/MULE</url>
+        <url>https://www.mulesoft.org/jira/projects/MULE/issues/</url>
     </issueManagement>
 
     <!-- Build -->
     <scm>
         <connection>scm:git:git://github.com/mulesoft/mule.git</connection>
         <developerConnection>scm:git:git@github.com:mulesoft/mule.git</developerConnection>
-        <url>http://github.com/mulesoft/mule</url>
+        <url>https://github.com/mulesoft/mule</url>
     </scm>
 
     <modules>
@@ -103,7 +103,7 @@
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
-        <module>transports</module>
+        <module>compatibility</module>
     </modules>
 
     <properties>
@@ -121,15 +121,13 @@
         <skipInstalls>false</skipInstalls>
 
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-        <coberturaVersion>2.5</coberturaVersion>
-        <groovyVersion>2.4.4</groovyVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <xDocLint>-Xdoclint:none</xDocLint>
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
          -->
-        <productUrl>http://www.mulesoft.org</productUrl>
+        <productUrl>https://developer.mulesoft.com/</productUrl>
         <dev.list>mule-esb@mulesoft.com</dev.list>
 
         <!--
@@ -140,17 +138,14 @@
 
         <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.7.0</antVersion>
-        <antlrVersion>3.5</antlrVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.39</asyncHttpClientVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
-        <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.54</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
-        <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
@@ -162,19 +157,17 @@
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
-        <commonsNetVersion>3.3</commonsNetVersion>
+        <commonsNetVersion>3.5</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
         <cxfVersion>2.7.18</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
-        <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
-        <geronimoSpecsEjbVersion>1.1</geronimoSpecsEjbVersion>
-        <geronimoSpecsJaxRpcVersion>2.1</geronimoSpecsJaxRpcVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
         <grizzlyVersion>2.3.26</grizzlyVersion>
+        <groovyVersion>2.4.4</groovyVersion>
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
@@ -184,42 +177,34 @@
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
-        <javaXmlBindVersion>2.1.17</javaXmlBindVersion>
-        <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
+        <javaXmlBindVersion>2.1.13</javaXmlBindVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.15.0.Final</jbossTsVersion>
-        <jbpmVersion>4.4</jbpmVersion>
-        <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.53</jschVersion>
         <jsonVersion>20140107</jsonVersion>
-        <junitVersion>4.11</junitVersion>
+        <junitVersion>4.12</junitVersion>
         <log4jVersion>2.5</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <!-- TODO EE-1395 -->
-        <mqSeriesVersion>6.0</mqSeriesVersion>
         <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
         <muleMvelVersion>2.1.9-MULE-010</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
-        <ognlVersion>2.7.3</ognlVersion>
-        <oroVersion>2.0.8</oroVersion>
         <!-- TODO MULE-10771 -->
-        <projectReactorVersion>3.0.3.BUILD-SNAPSHOT</projectReactorVersion>
+        <projectReactorVersion>3.0.5.BUILD-SNAPSHOT</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.3</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
-        <saajVersion>1.3</saajVersion>
         <saxonVersion>9.7.0-3</saxonVersion>
         <slf4jVersion>1.7.7</slf4jVersion>
-        <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>4.1.9.RELEASE</springVersion>
         <springSecurityVersion>4.0.4.RELEASE</springSecurityVersion>
         <sshCoreVersion>1.0.0</sshCoreVersion>
@@ -240,7 +225,6 @@
         <xmlSecurityVersion>1.5.8</xmlSecurityVersion>
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
-        <muleCommonVersion>3.8.0</muleCommonVersion>
         <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
 
         <!--Maven plugins versions-->
@@ -258,7 +242,6 @@
         <war.plugin.version>2.6</war.plugin.version>
         <shade.plugin.version>2.4.3</shade.plugin.version>
         <build.helper.maven.plugin.version>1.10</build.helper.maven.plugin.version>
-        <shitty.maven.plugin.version>1.0-alpha-3</shitty.maven.plugin.version>
         <assembly.verifier.version>1.4</assembly.verifier.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
@@ -284,6 +267,7 @@
         <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
+        <formatterGoal>validate</formatterGoal>
     </properties>
 
     <dependencies>
@@ -329,9 +313,19 @@
                 <version>${muleApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule.common</groupId>
-                <artifactId>mule-common</artifactId>
-                <version>${muleCommonVersion}</version>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-metadata-model-xml</artifactId>
+                <version>${muleMetadataModelVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-metadata-model-java</artifactId>
+                <version>${muleMetadataModelVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-metadata-model-json</artifactId>
+                <version>${muleMetadataModelVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.annotation</groupId>
@@ -1160,27 +1154,6 @@
                 <artifactId>asm</artifactId>
                 <version>${asmVersion}</version>
             </dependency>
-            <!-- BouncyCastle deps -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpg-jdk15on</artifactId>
-                <version>${bouncycastleVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk15on</artifactId>
-                <version>${bouncycastleVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
-                <version>${bouncycastleVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
-                <version>${bouncycastleVersion}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
@@ -1587,9 +1560,10 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>apply-format</id>
                             <phase>compile</phase>
                             <goals>
-                                <goal>validate</goal>
+                                <goal>${formatterGoal}</goal>
                             </goals>
                             <configuration>
                                 <skipFormatting>${skipVerifications}</skipFormatting>
@@ -1713,7 +1687,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <argLine>-Xms64m -Xmx512m</argLine>
+                        <argLine>-Xmx1024m -Xms256m</argLine>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
@@ -1752,16 +1726,11 @@
                     <version>${build.helper.maven.plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>shitty-maven-plugin</artifactId>
-                    <version>${shitty.maven.plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
                     <configuration>
-                        <skip>${skipDistributions}</skip>
+                        <skip>${skipVerifications}</skip>
                     </configuration>
                     <dependencies>
                         <!--

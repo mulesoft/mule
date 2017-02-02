@@ -40,7 +40,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
 
   private static final ThreadLocal<String> taskTokenInThread = new ThreadLocal<>();
 
-  protected String responseExpression = "#[true]";
+  protected String responseExpression = "#[mel:true]";
   private int responseCount = 1;
   private boolean responseSameTask = true;
 

@@ -9,14 +9,17 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
 import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,15 +37,14 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   private final List<ValueSetter> singleValueSetters;
   private final List<ValueSetter> groupValueSetters;
 
-  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, EnrichableModel model, ResolverSet resolverSet) {
-    this(prototypeClass, model.getModelProperty(ParameterGroupModelProperty.class), resolverSet);
+  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ResolverSet resolverSet) {
+    this(prototypeClass, null, resolverSet);
   }
 
-  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, Optional<ParameterGroupModelProperty> groupModelProperty,
-                                       ResolverSet resolverSet) {
+  public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ParameterizedModel model, ResolverSet resolverSet) {
     this.resolverSet = resolverSet;
     singleValueSetters = createSingleValueSetters(prototypeClass, resolverSet);
-    groupValueSetters = GroupValueSetter.settersFor(groupModelProperty);
+    groupValueSetters = model != null ? GroupValueSetter.settersFor(model) : ImmutableList.of();
   }
 
   /**
@@ -71,9 +73,9 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   }
 
   private List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
-    return resolverSet.getResolvers().keySet().stream().map(parameterModel -> {
+    return resolverSet.getResolvers().keySet().stream().map(parameterName -> {
       // if no field, then it means this is a group attribute
-      return getField(prototypeClass, parameterModel).map(f -> new SingleValueSetter(parameterModel, f));
+      return getField(prototypeClass, parameterName).map(f -> new SingleValueSetter(parameterName, f));
     }).filter(Optional::isPresent).map(Optional::get).collect(new ImmutableListCollector<>());
   }
 

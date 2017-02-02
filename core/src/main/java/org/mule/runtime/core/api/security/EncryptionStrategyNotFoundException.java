@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.security;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * <code>EncryptionStrategyNotFoundException</code> is thrown by the SecurityManager when an encryption scheme is set in a
- * property or header that has not been registered witrh the manager
+ * {@code EncryptionStrategyNotFoundException} thrown by the {@link java.lang.SecurityManager} when an encryption
+ * scheme is set in a property or header that has not been registered with the manager.
+ *
+ * @since 4.0
  */
 public class EncryptionStrategyNotFoundException extends MuleException {
 
@@ -21,10 +23,10 @@ public class EncryptionStrategyNotFoundException extends MuleException {
   private static final long serialVersionUID = 3916371211189075139L;
 
   public EncryptionStrategyNotFoundException(String strategyName) {
-    super(CoreMessages.authNoEncryptionStrategy(strategyName));
+    super(createStaticMessage("There is no Encryption Strategy registered called '%s'", strategyName));
   }
 
   public EncryptionStrategyNotFoundException(String strategyName, Throwable cause) {
-    super(CoreMessages.authNoEncryptionStrategy(strategyName), cause);
+    super(createStaticMessage("There is no Encryption Strategy registered called '%s'", strategyName), cause);
   }
 }

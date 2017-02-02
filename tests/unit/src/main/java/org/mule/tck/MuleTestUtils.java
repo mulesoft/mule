@@ -9,15 +9,22 @@ package org.mule.tck;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 
 import java.util.function.Function;
 
@@ -51,7 +58,9 @@ public final class MuleTestUtils {
   }
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
-    final Flow flow = new Flow(APPLE_FLOW, context);
+    // Use synchronous processing strategy given flow used in test event is not used for processing.
+    final Flow flow =
+        builder(APPLE_FLOW, context).processingStrategyFactory(new SynchronousProcessingStrategyFactory()).build();
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
     }
@@ -109,15 +118,14 @@ public final class MuleTestUtils {
     return null;
   }
 
-  public static Event processAsStreamAndBlock(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
+  public static Event processWithMonoAndBlock(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
       throws MuleException {
     try {
-      return just(event)
-          .transform(processor)
-          .subscribe()
-          .block();
+      return just(event).transform(processor).otherwise(EventDroppedException.class, mde -> empty())
+          .blockMillis(RECEIVE_TIMEOUT);
     } catch (Throwable exception) {
       throw rxExceptionToMuleException(exception);
     }
   }
+
 }

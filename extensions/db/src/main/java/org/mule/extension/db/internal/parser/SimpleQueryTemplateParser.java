@@ -49,17 +49,19 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser {
   private static final String UPDATE_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "UPDATE");
   private static final String SELECT_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "SELECT");
   private static final String INSERT_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "INSERT");
-  private static final String DELETE = String.format(OPERATION_REGEX_TEMPLATE, "DELETE");
-  private static final String TRUNCATE = String.format(OPERATION_REGEX_TEMPLATE, "TRUNCATE TABLE");
+  private static final String DELETE_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "DELETE");
+  private static final String TRUNCATE_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "TRUNCATE TABLE");
   private static final String MERGE_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "MERGE");
+  private static final String WITH_REGEX = String.format(OPERATION_REGEX_TEMPLATE, "WITH");
 
   private final Pattern storedProcedureMatcher = Pattern.compile(STORED_PROCEDURE_REGEX);
   private final Pattern updateMatcher = Pattern.compile(UPDATE_REGEX);
   private final Pattern selectMatcher = Pattern.compile(SELECT_REGEX);
   private final Pattern insertMatcher = Pattern.compile(INSERT_REGEX);
-  private final Pattern deleteMatcher = Pattern.compile(DELETE);
-  private final Pattern truncateMatcher = Pattern.compile(TRUNCATE);
+  private final Pattern deleteMatcher = Pattern.compile(DELETE_REGEX);
+  private final Pattern truncateMatcher = Pattern.compile(TRUNCATE_REGEX);
   private final Pattern mergeMatcher = Pattern.compile(MERGE_REGEX);
+  private final Pattern withMatcher = Pattern.compile(WITH_REGEX);
 
   @Override
   public QueryTemplate parse(String sql) {
@@ -89,6 +91,8 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser {
       queryType = QueryType.TRUNCATE;
     } else if (isMerge(sql)) {
       queryType = QueryType.MERGE;
+    } else if (isWith(sql)) {
+      queryType = QueryType.SELECT;
     } else {
       queryType = QueryType.DDL;
     }
@@ -227,6 +231,12 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser {
 
   private boolean isSelect(String sqlText) {
     Matcher m = selectMatcher.matcher(sqlText);
+
+    return m.matches();
+  }
+
+  private boolean isWith(String sqlText) {
+    Matcher m = withMatcher.matcher(sqlText);
 
     return m.matches();
   }

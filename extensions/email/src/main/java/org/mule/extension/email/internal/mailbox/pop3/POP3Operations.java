@@ -12,7 +12,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorConstants.DEF
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.PAGE_SIZE_ERROR_MESSAGE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.email.api.EmailMetadataKey;
 import org.mule.extension.email.api.EmailMetadataResolver;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
@@ -70,7 +70,7 @@ public class POP3Operations {
                                                                                              defaultValue = "false") boolean deleteAfterRetrieve,
                                                                                          @MetadataKeyId @Optional(
                                                                                              defaultValue = "ANY") @Placement(
-                                                                                                 tab = ADVANCED) EmailMetadataKey outputType,
+                                                                                                 tab = ADVANCED_TAB) EmailMetadataKey outputType,
                                                                                          @Optional(
                                                                                              defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
     checkArgument(pageSize > 0, format(PAGE_SIZE_ERROR_MESSAGE, pageSize));

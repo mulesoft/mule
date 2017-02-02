@@ -7,17 +7,16 @@
 package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.expression.ExpressionConfig;
 
 import java.text.MessageFormat;
@@ -29,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify a
  * boolean expression when using an expression filter or use one of the standard Mule filters. Otherwise you can use eny
  * expression filter providing you can define a boolean expression i.e. <code>
- * #[xpath:count(/Foo/Bar) == 0]
+ * #[mel:xpath:count(/Foo/Bar) == 0]
  * </code> Note that it if the expression is not a boolean expression this filter will return true if the expression returns a
  * result
  */
@@ -82,9 +81,8 @@ public class ExpressionFilter implements Filter, MuleContextAware {
     }
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
-    Flow flowConstruct = new Flow("", muleContext);
-    return accept(Event.builder(create(flowConstruct, "ExpressionFilter")).message(message).exchangePattern(ONE_WAY)
-        .flow(flowConstruct).build(), builder);
+    Flow flowConstruct = builder("ExpressionFilterFlow", muleContext).build();
+    return accept(Event.builder(create(flowConstruct, "ExpressionFilter")).message(message).flow(flowConstruct).build(), builder);
   }
 
   /**

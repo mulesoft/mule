@@ -7,6 +7,7 @@
 package org.mule.runtime.core.message;
 
 import org.mule.runtime.api.message.AbstractMuleMessageBuilderFactory;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
@@ -26,11 +27,7 @@ public class DefaultMessageBuilderFactory extends AbstractMuleMessageBuilderFact
   }
 
   @Override
-  public InternalMessage.Builder create(org.mule.runtime.api.message.Message message) {
-    return new DefaultMessageBuilder(message);
-  }
-
-  public InternalMessage.Builder create(InternalMessage message) {
+  public InternalMessage.Builder create(Message message) {
     return new DefaultMessageBuilder(message);
   }
 

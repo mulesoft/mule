@@ -18,11 +18,9 @@
     <flow name="requesterBuilderContentType" >
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="text/plain" encoding="UTF-8"/>
         <httpn:request config-ref="requesterConfig" port="${httpPort}" path="testPath" method="GET">
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['content-type' : 'application/json; charset=UTF-8']]
-                </httpn:headers>
-            </httpn:request-builder>
+            <httpn:headers>
+                #[mel:['content-type' : 'application/json; charset=UTF-8']]
+            </httpn:headers>
         </httpn:request>
     </flow>
 </mule>

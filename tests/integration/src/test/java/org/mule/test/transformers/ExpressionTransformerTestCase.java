@@ -30,7 +30,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
   public void testExpressionEvaluationClassLoaderEL() throws ClassNotFoundException, TransformerException {
     ExpressionTransformer transformer = new ExpressionTransformer();
     transformer.setMuleContext(muleContext);
-    transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("payload is org.MyClass"), false));
+    transformer.addArgument(new ExpressionArgument("test", new ExpressionConfig("mel:payload is org.MyClass"), false));
 
     withContextClassLoader(new MyClassClassLoader(), () -> {
       try {

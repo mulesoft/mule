@@ -34,7 +34,7 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
   public void rejectsMissingCertificate() throws Exception {
     MessagingException e = flowRunner("missingCertFlow").withPayload(TEST_MESSAGE).runExpectingException();
     assertThat(e, is(instanceOf(MessagingException.class)));
-    assertThat(e.getCauseException(), is(instanceOf(GeneralSecurityException.class)));
+    assertThat(e.getRootCause(), is(instanceOf(GeneralSecurityException.class)));
   }
 
   @Test

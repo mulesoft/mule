@@ -33,8 +33,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   private ChoiceRouter choiceRouter;
 
-  public ChoiceRouterTestCase(boolean nonBlocking) {
-    super(nonBlocking);
+  public ChoiceRouterTestCase(Mode mode) {
+    super(mode);
     setDisposeContextPerClass(true);
   }
 

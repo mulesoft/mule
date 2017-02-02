@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.core.api.security;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.authDeniedOnEndpoint;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
-import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.security.SecurityException;
 
 /**
- * <code>UnauthorisedException</code> is thrown if authentication fails
+ * {@code UnauthorisedException} is thrown if authentication fails.
+ *
+ * @since 4.0
  */
-
 public class UnauthorisedException extends SecurityException {
 
   /**
@@ -31,18 +30,19 @@ public class UnauthorisedException extends SecurityException {
     super(message, cause);
   }
 
-  public UnauthorisedException(Event event, SecurityContext context, SecurityFilter filter) {
-    super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter));
+  public UnauthorisedException(SecurityContext context, String filter, String connector) {
+    super(constructMessage(context, connector, filter));
   }
 
-  private static I18nMessage constructMessage(SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
+  private static I18nMessage constructMessage(SecurityContext context, String originatingConnectorName, String filter) {
     I18nMessage m;
     if (context == null) {
-      m = authSetButNoContext(filter.getClass().getName());
+      m = createStaticMessage("Registered authentication is set to %s but there was no security context on the session",
+                              filter);
     } else {
-      m = authFailedForUser(context.getAuthentication().getPrincipal());
+      m = createStaticMessage("Authentication failed for principal %s", context.getAuthentication().getPrincipal());
     }
-    m.setNextMessage(authDeniedOnEndpoint(originatingConnectorName));
+    m.setNextMessage(createStaticMessage("Authentication denied on connector %s", originatingConnectorName));
     return m;
   }
 

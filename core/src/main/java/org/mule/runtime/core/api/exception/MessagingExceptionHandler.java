@@ -14,12 +14,11 @@ import org.mule.runtime.core.exception.MessagingException;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
  */
-public interface MessagingExceptionHandler extends ExceptionHandler, Function<MessagingException, Publisher<? extends Event>> {
+public interface MessagingExceptionHandler extends ExceptionHandler, Function<MessagingException, Publisher<Event>> {
 
   /**
    * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
@@ -31,7 +30,7 @@ public interface MessagingExceptionHandler extends ExceptionHandler, Function<Me
   Event handleException(MessagingException exception, Event event);
 
   @Override
-  default Publisher<? extends Event> apply(MessagingException exception) {
+  default Publisher<Event> apply(MessagingException exception) {
     exception.setProcessedEvent(handleException(exception, exception.getEvent()));
     if (exception.handled()) {
       return just(exception.getEvent());

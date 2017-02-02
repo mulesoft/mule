@@ -8,9 +8,11 @@ package org.mule.extension.ws.internal.metadata;
 
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getAttachmentFields;
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getOperationType;
-import static org.mule.metadata.internal.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
+import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.internal.introspection.InputTypeIntrospecterDelegate;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 
 import java.util.List;
 
@@ -31,13 +34,22 @@ import java.util.List;
  */
 public class MessageBuilderResolver extends BaseWscResolver implements InputTypeResolver<String> {
 
+  private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+
   private final BodyElementResolver bodyElementResolver;
   private final HeadersElementResolver headersElementResolver;
+  private final MetadataType attachmentsType;
 
   public MessageBuilderResolver() {
     InputTypeIntrospecterDelegate delegate = new InputTypeIntrospecterDelegate();
     bodyElementResolver = new BodyElementResolver(delegate);
     headersElementResolver = new HeadersElementResolver(delegate);
+    attachmentsType = TYPE_LOADER.load(SoapAttachment.class);
+  }
+
+  @Override
+  public String getResolverName() {
+    return "ConsumeInputResolver";
   }
 
   /**
@@ -69,12 +81,12 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
    * @param builder     a {@link BaseTypeBuilder} to create the type.
    * @param attachments the list of attachments required by the operation.
    */
-  public MetadataType getInputAttachmentsType(BaseTypeBuilder builder, List<ObjectFieldType> attachments) {
+  private MetadataType getInputAttachmentsType(BaseTypeBuilder builder, List<ObjectFieldType> attachments) {
     if (attachments.isEmpty()) {
       return NULL_TYPE;
     }
     ObjectTypeBuilder type = builder.objectType();
-    attachments.forEach(a -> type.addField().key(getLocalPart(a)).value(a.getValue()));
+    attachments.forEach(a -> type.addField().key(getLocalPart(a)).value(attachmentsType));
     return type.build();
   }
 
@@ -88,7 +100,7 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
    * @param attachments the attachments fields on found in the type.
    * @return the body {@link MetadataType} without the attachment fields.
    */
-  public MetadataType getInputBodyType(MetadataType bodyType, List<ObjectFieldType> attachments) {
+  private MetadataType getInputBodyType(MetadataType bodyType, List<ObjectFieldType> attachments) {
     if (!attachments.isEmpty() && bodyType instanceof ObjectType) {
       ObjectType operationType = getOperationType(bodyType);
       attachments.forEach(a -> operationType.getFields().removeIf(f -> getLocalPart(f).equals(getLocalPart(a))));

@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.connector.ConnectException;
-import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -242,7 +242,7 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
   public void reset() {
     completedPhases.clear();
     setExecutingPhase(null);
-    setCurrentPhase(NOT_IN_LIFECYCLE_PHASE.getName());
+    setCurrentPhase(NotInLifecyclePhase.PHASE_NAME);
     completedPhases.add(getCurrentPhase());
   }
 

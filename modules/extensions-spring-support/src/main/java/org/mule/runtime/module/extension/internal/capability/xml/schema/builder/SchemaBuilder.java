@@ -9,21 +9,26 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static java.util.Collections.singleton;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.mule.runtime.api.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
-import static org.mule.runtime.module.extension.internal.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
@@ -31,44 +36,45 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPR
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.USE_OPTIONAL;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.ElementDslModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
-import org.mule.runtime.api.meta.model.SubTypesModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.declaration.type.TypeUtils;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.internal.property.QNameModelProperty;
+import org.mule.runtime.extension.internal.util.ParameterModelComparator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Documentation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.FormChoice;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Group;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Import;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalSimpleType;
@@ -80,7 +86,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Sc
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
-import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import java.math.BigInteger;
@@ -105,25 +110,24 @@ public final class SchemaBuilder {
   private static final String GLOBAL_ABSTRACT_ELEMENT_MASK = "global-%s";
 
   private final Set<StringType> registeredEnums = new LinkedHashSet<>();
-
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  private final ConfigurationSchemaDelegate configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
-  private final ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
-  private final OperationSchemaDelegate operationSchemaDelegate = new OperationSchemaDelegate(this);
-  private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this);
-  private final CollectionSchemaDelegate collectionDelegate = new CollectionSchemaDelegate(this);
-  private final ObjectTypeSchemaDelegate objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
-  private final MapSchemaDelegate mapDelegate = new MapSchemaDelegate(this);
-
   private Schema schema;
   private boolean requiresTls = false;
 
   private ExtensionModel extensionModel;
   private DslSyntaxResolver dslResolver;
-  private SubTypesMappingContainer subTypesMapping;
   private Set<ImportedTypeModel> importedTypes;
-  private DslResolvingContext dslExtensionContext;
+
+  private TypeCatalog typesMapping;
+  private DslResolvingContext dslContext;
+  private ConfigurationSchemaDelegate configurationSchemaDelegate;
+  private ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate;
+  private OperationSchemaDelegate operationSchemaDelegate;
+  private SourceSchemaDelegate sourceSchemaDelegate;
+  private CollectionSchemaDelegate collectionDelegate;
+  private ObjectTypeSchemaDelegate objectTypeDelegate;
+  private MapSchemaDelegate mapDelegate;
 
   public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                         DslResolvingContext dslContext) {
@@ -140,29 +144,40 @@ public final class SchemaBuilder {
         .importMuleNamespace()
         .importMuleExtensionNamespace();
 
-    builder.withImportedTypes(extensionModel.getImportedTypes());
+    builder.initialiseDelegates();
 
-    builder.withTypeMapping(extensionModel.getSubTypes());
+    builder.withImportedTypes(extensionModel.getImportedTypes());
+    builder.withTypeMapping(extensionModel);
     builder.withTypes(extensionModel.getTypes());
 
     return builder;
   }
 
+  private void initialiseDelegates() {
+    configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
+    connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
+    operationSchemaDelegate = new OperationSchemaDelegate(this);
+    sourceSchemaDelegate = new SourceSchemaDelegate(this);
+    collectionDelegate = new CollectionSchemaDelegate(this);
+    objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
+    mapDelegate = new MapSchemaDelegate(this, typeLoader);
+  }
+
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
-    this.dslExtensionContext = dslContext;
-    this.dslResolver = new DslSyntaxResolver(model, dslContext);
+    this.dslContext = dslContext;
+    this.dslResolver = DslSyntaxResolver.getDefault(model, dslContext);
     return this;
   }
 
-  private SchemaBuilder withTypeMapping(Collection<SubTypesModel> subTypesModels) {
-    this.subTypesMapping = new SubTypesMappingContainer(subTypesModels);
-    subTypesModels.forEach(objectTypeDelegate::registerPojoSubtypes);
+  private SchemaBuilder withTypeMapping(ExtensionModel model) {
+    this.typesMapping = TypeCatalog.getDefault(singleton(model));
+    model.getSubTypes().forEach(objectTypeDelegate::registerPojoSubtypes);
     return this;
   }
 
   private SchemaBuilder withImportedTypes(Set<ImportedTypeModel> importedTypes) {
     this.importedTypes = importedTypes;
-    importedTypes.forEach(type -> dslExtensionContext.getExtension(type.getOriginExtensionName())
+    importedTypes.forEach(type -> dslContext.getExtension(type.getOriginExtensionName())
         .ifPresent(this::registerExtensionImport));
     return this;
   }
@@ -174,10 +189,6 @@ public final class SchemaBuilder {
     }).forEach(t -> objectTypeDelegate.registerPojoType(t, t.getDescription().orElse(EMPTY)));
 
     return this;
-  }
-
-  SubTypesMappingContainer getSubTypesMapping() {
-    return subTypesMapping;
   }
 
   DslSyntaxResolver getDslResolver() {
@@ -205,7 +216,7 @@ public final class SchemaBuilder {
 
   private SchemaBuilder importMuleNamespace() {
     Import muleSchemaImport = new Import();
-    muleSchemaImport.setNamespace(MULE_NAMESPACE);
+    muleSchemaImport.setNamespace(MULE_NAMESPACE_SCHEMA_LOCATION);
     muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
     schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
     return this;
@@ -229,13 +240,8 @@ public final class SchemaBuilder {
     return this;
   }
 
-  void addRetryPolicy(ExplicitGroup sequence) {
-    TopLevelElement providerElementRetry = createRefElement(MULE_ABSTRACT_RECONNECTION_STRATEGY, false);
-    sequence.getParticle().add(objectFactory.createElement(providerElementRetry));
-  }
-
   public SchemaBuilder registerConnectionProviderElement(ConnectionProviderModel providerModel) {
-    connectionProviderSchemaDelegate.registerConnectionProviderElement(providerModel);
+    connectionProviderSchemaDelegate.registerConnectionProviderElement(providerModel, dslResolver.resolve(providerModel));
     return this;
   }
 
@@ -245,7 +251,7 @@ public final class SchemaBuilder {
   }
 
   Attribute createNameAttribute(boolean required) {
-    return createAttribute(SchemaConstants.ATTRIBUTE_NAME_NAME, load(String.class), required, NOT_SUPPORTED);
+    return createAttribute(NAME_ATTRIBUTE_NAME, load(String.class), required, NOT_SUPPORTED);
   }
 
   public SchemaBuilder registerOperation(OperationModel operationModel) {
@@ -254,19 +260,20 @@ public final class SchemaBuilder {
   }
 
   public SchemaBuilder registerMessageSource(SourceModel sourceModel) {
-
     sourceSchemaDelegate.registerMessageSource(sourceModel, dslResolver.resolve(sourceModel));
     return this;
   }
 
-  void registerParameters(ExtensionType type, ExplicitGroup choice, Collection<ParameterModel> parameterModels) {
-    for (final ParameterModel parameterModel : getSortedParameterModels(parameterModels)) {
-      declareAsParameter(parameterModel.getType(), type, choice, parameterModel);
-    }
+  List<TopLevelElement> registerParameters(ExtensionType type, Collection<ParameterModel> parameterModels) {
+    List<TopLevelElement> all = new ArrayList<>(parameterModels.size());
+    getSortedParameterModels(parameterModels).stream()
+        .filter(p -> !p.getModelProperty(QNameModelProperty.class).isPresent())
+        .forEach(parameterModel -> {
+          DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
+          declareAsParameter(parameterModel.getType(), type, parameterModel, paramDsl, all);
+        });
 
-    if (!choice.getParticle().isEmpty()) {
-      type.setSequence(choice);
-    }
+    return all;
   }
 
   /**
@@ -280,24 +287,7 @@ public final class SchemaBuilder {
    */
   private List<ParameterModel> getSortedParameterModels(Collection<ParameterModel> parameterModels) {
     List<ParameterModel> sortedParameters = new ArrayList<>(parameterModels);
-    sortedParameters.sort((left, right) -> {
-      boolean isLeftInfrastructure = left.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
-      boolean isRightInfrastructure = right.getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
-
-      if (!isLeftInfrastructure && !isRightInfrastructure) {
-        return 0;
-      }
-
-      if (!isLeftInfrastructure) {
-        return 1;
-      }
-
-      if (!isRightInfrastructure) {
-        return -1;
-      }
-
-      return left.getName().compareTo(right.getName());
-    });
+    sortedParameters.sort(new ParameterModelComparator(true));
     return sortedParameters;
   }
 
@@ -355,10 +345,10 @@ public final class SchemaBuilder {
   private Attribute createAttribute(final String name, String description, final MetadataType type, Object defaultValue,
                                     boolean required, final ExpressionSupport expressionSupport) {
     final Attribute attribute = new Attribute();
-    attribute.setUse(required ? SchemaConstants.USE_REQUIRED : SchemaConstants.USE_OPTIONAL);
+    attribute.setUse(required ? USE_REQUIRED : USE_OPTIONAL);
     attribute.setAnnotation(createDocAnnotation(description));
 
-    if (defaultValue instanceof String && StringUtils.isNotBlank(defaultValue.toString())) {
+    if (defaultValue instanceof String && isNotBlank(defaultValue.toString())) {
       attribute.setDefault(defaultValue.toString());
     }
 
@@ -398,7 +388,7 @@ public final class SchemaBuilder {
   }
 
   Attribute createValueAttribute(MetadataType genericType) {
-    return createAttribute(ATTRIBUTE_NAME_VALUE, genericType, true, SUPPORTED);
+    return createAttribute(VALUE_ATTRIBUTE_NAME, genericType, true, SUPPORTED);
   }
 
 
@@ -409,17 +399,17 @@ public final class SchemaBuilder {
    * support only local declarations as childs.
    * <p/>
    * For example, a resulting choice group for a type of name {@code TypeName} will look like:
-   *
+   * <p>
    * <xs:complexType>
-   *  <xs:choice minOccurs="1" maxOccurs="1">
-   *    <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
-   *    <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element>
-   *  </xs:choice>
+   * <xs:choice minOccurs="1" maxOccurs="1">
+   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
+   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element>
+   * </xs:choice>
    * </xs:complexType>
    * <p/>
    *
-   * @param typeDsl {@link DslElementSyntax} of the referenced type
-   * @param type the {@link MetadataType type} of the base element that will be referenced
+   * @param typeDsl   {@link DslElementSyntax} of the referenced type
+   * @param type      the {@link MetadataType type} of the base element that will be referenced
    * @param minOccurs {@link BigInteger#ZERO} if the {@code group} is optional or {@link BigInteger#ONE} if required
    * @param maxOccurs the maximum number of occurrences for this group
    * @return a {@link ExplicitGroup Choice} group with the necessary options for this case
@@ -453,9 +443,7 @@ public final class SchemaBuilder {
 
   boolean isImported(MetadataType type) {
     return importedTypes.stream()
-        .filter(t -> Objects.equals(getTypeId(t.getImportedType()), getTypeId(type)))
-        .findFirst()
-        .isPresent();
+        .anyMatch(t -> Objects.equals(getTypeId(t.getImportedType()), getTypeId(type)));
   }
 
   private String getTypeId(MetadataType type) {
@@ -468,18 +456,18 @@ public final class SchemaBuilder {
    * the referenced abstract-element
    * <p/>
    * For example, if we create this ref element to the type of name {@code TypeName}:
-   *
+   * <p>
    * <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
-   *
+   * <p>
    * <p/>
    * Then, any of the following elements are allowed to be used where the ref exists:
-   *
+   * <p>
    * <xs:element type="ns:org.mule.test.SomeType" substitutionGroup="ns:abstract-type-name" name="some-type"></xs:element>
-   *
+   * <p>
    * <xs:element type="ns:org.mule.test.OtherType" substitutionGroup="ns:abstract-type-name" name="other-type"></xs:element>
    *
-   * @param typeDsl {@link DslElementSyntax} of the referenced {@code type}
-   * @param type {@link MetadataType} of the referenced {@code type}
+   * @param typeDsl    {@link DslElementSyntax} of the referenced {@code type}
+   * @param type       {@link MetadataType} of the referenced {@code type}
    * @param isRequired whether or not the element element is required
    * @return the {@link TopLevelElement element} representing the reference
    */
@@ -496,29 +484,33 @@ public final class SchemaBuilder {
     return createRefElement(refQName, isRequired);
   }
 
-  void declareAsParameter(MetadataType type, ExtensionType extensionType, ExplicitGroup all, ParameterModel parameterModel) {
-    if (ExtensionModelUtils.isContent(parameterModel) || TypeUtils.isContent(type)) {
-      DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
-      generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired(), all);
+  void declareAsParameter(MetadataType type, ExtensionType extensionType, ParameterModel parameterModel,
+                          DslElementSyntax paramDsl, List<TopLevelElement> childElements) {
+
+    if (isContent(parameterModel) || isContent(type)) {
+      childElements.add(generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired()));
     } else {
-      type.accept(getParameterDeclarationVisitor(extensionType, all, parameterModel));
+      type.accept(getParameterDeclarationVisitor(extensionType, childElements, parameterModel));
     }
   }
 
-  private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
+  private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
+                                                             final List<TopLevelElement> childElements,
                                                              final ParameterModel parameterModel) {
     final DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
-    return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(),
+    return getParameterDeclarationVisitor(extensionType, childElements,
+                                          parameterModel.getName(), parameterModel.getDescription(),
                                           parameterModel.getExpressionSupport(), parameterModel.isRequired(),
                                           parameterModel.getDefaultValue(), paramDsl,
-                                          parameterModel.getDslModel());
+                                          parameterModel.getDslConfiguration());
   }
 
-  private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
+  private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType,
+                                                             final List<TopLevelElement> childElements,
                                                              final String name, final String description,
                                                              ExpressionSupport expressionSupport, boolean required,
                                                              Object defaultValue, DslElementSyntax paramDsl,
-                                                             ElementDslModel dslModel) {
+                                                             ParameterDslConfiguration dslModel) {
     return new MetadataTypeVisitor() {
 
       private boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
@@ -527,15 +519,9 @@ public final class SchemaBuilder {
       public void visitArrayType(ArrayType arrayType) {
         defaultVisit(arrayType);
         if (paramDsl.supportsChildDeclaration()) {
-          collectionDelegate.generateCollectionElement(arrayType, paramDsl, description, false, all);
-        }
-      }
-
-      @Override
-      public void visitDictionary(DictionaryType dictionaryType) {
-        defaultVisit(dictionaryType);
-        if (paramDsl.supportsChildDeclaration()) {
-          mapDelegate.generateMapElement(dictionaryType, paramDsl, description, false, all);
+          collectionDelegate.generateCollectionElement(arrayType, paramDsl, description,
+                                                       !paramDsl.supportsAttributeDeclaration(),
+                                                       childElements);
         }
       }
 
@@ -543,23 +529,26 @@ public final class SchemaBuilder {
       public void visitObject(ObjectType objectType) {
         final String id = getId(objectType);
         if (id.equals(TlsContextFactory.class.getName())) {
-          addTlsSupport(extensionType, all);
-          return;
-        }
-
-        if (id.equals(ThreadingProfile.class.getName())) {
-          addAttributeAndElement(extensionType, all, THREADING_PROFILE_ATTRIBUTE_NAME, MULE_ABSTRACT_THREADING_PROFILE);
+          addTlsSupport(extensionType, childElements);
           return;
         }
 
         defaultVisit(objectType);
-        objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, all);
+        if (isMap(objectType)) {
+          if (paramDsl.supportsChildDeclaration()) {
+            mapDelegate.generateMapElement(objectType, paramDsl, description,
+                                           !paramDsl.supportsAttributeDeclaration(),
+                                           childElements);
+          }
+        } else {
+          objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
+        }
       }
 
       @Override
       public void visitString(StringType stringType) {
         if (paramDsl.supportsChildDeclaration()) {
-          generateTextElement(paramDsl, description, isRequired(forceOptional, required), all);
+          childElements.add(generateTextElement(paramDsl, description, isRequired(forceOptional, required)));
         } else {
           defaultVisit(stringType);
         }
@@ -567,8 +556,11 @@ public final class SchemaBuilder {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue,
-                                                                         isRequired(forceOptional, required), expressionSupport));
+        if (paramDsl.supportsAttributeDeclaration()) {
+          extensionType.getAttributeOrAttributeGroup().add(createAttribute(name, description, metadataType, defaultValue,
+                                                                           isRequired(forceOptional, required),
+                                                                           expressionSupport));
+        }
       }
 
       private boolean isRequired(boolean forceOptional, boolean required) {
@@ -589,35 +581,36 @@ public final class SchemaBuilder {
     return languageModel;
   }
 
-  private void addTlsSupport(ExtensionType extensionType, ExplicitGroup all) {
+  private void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
     if (!requiresTls) {
       importTlsNamespace();
       requiresTls = true;
     }
 
-    addAttributeAndElement(extensionType, all, TLS_ATTRIBUTE_NAME, TLS_CONTEXT_TYPE);
+    addAttributeAndElement(extensionType, childElements, TLS_PARAMETER_NAME, TLS_CONTEXT_TYPE);
   }
 
-  private void addAttributeAndElement(ExtensionType extensionType, ExplicitGroup all, String attributeName, QName elementRef) {
+  private void addAttributeAndElement(ExtensionType extensionType, List<TopLevelElement> childElements,
+                                      String attributeName, QName elementRef) {
 
     extensionType.getAttributeOrAttributeGroup()
-        .add(createAttribute(attributeName, load(String.class), false, ExpressionSupport.NOT_SUPPORTED));
+        .add(createAttribute(attributeName, load(String.class), false, NOT_SUPPORTED));
 
-    all.getParticle().add(objectFactory.createElement(createRefElement(elementRef, false)));
+    childElements.add(createRefElement(elementRef, false));
   }
 
   TopLevelElement createRefElement(QName elementRef, boolean isRequired) {
     TopLevelElement element = new TopLevelElement();
     element.setRef(elementRef);
     element.setMinOccurs(isRequired ? ONE : ZERO);
-    element.setMaxOccurs("1");
+    element.setMaxOccurs(MAX_ONE);
     return element;
   }
 
   Attribute createAttribute(String name, String description, boolean optional, QName type) {
     Attribute attr = new Attribute();
     attr.setName(name);
-    attr.setUse(optional ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
+    attr.setUse(optional ? USE_OPTIONAL : USE_REQUIRED);
     attr.setType(type);
 
     if (description != null) {
@@ -629,6 +622,10 @@ public final class SchemaBuilder {
 
   Schema getSchema() {
     return schema;
+  }
+
+  TypeCatalog getTypesMapping() {
+    return typesMapping;
   }
 
   Annotation createDocAnnotation(String content) {
@@ -666,11 +663,51 @@ public final class SchemaBuilder {
     return extensionModel;
   }
 
-  private void generateTextElement(DslElementSyntax paramDsl, String description, boolean isRequired, Group all) {
-    TopLevelElement textElement = createTopLevelElement(paramDsl.getElementName(), isRequired ? ONE : ZERO, "1");
+  private TopLevelElement generateTextElement(DslElementSyntax paramDsl, String description, boolean isRequired) {
+    TopLevelElement textElement = createTopLevelElement(paramDsl.getElementName(), isRequired ? ONE : ZERO, MAX_ONE);
     textElement.setAnnotation(createDocAnnotation(description));
     textElement.setType(STRING);
 
-    all.getParticle().add(objectFactory.createElement(textElement));
+    return textElement;
+  }
+
+  boolean isRequired(TopLevelElement element) {
+    return element.getMinOccurs().equals(ONE);
+  }
+
+  void addParameterToSequence(List<TopLevelElement> parameters, ExplicitGroup sequence) {
+    parameters.forEach(parameter -> {
+      sequence.getParticle().add(objectFactory.createElement(parameter));
+      if (isRequired(parameter)) {
+        sequence.setMinOccurs(ONE);
+      }
+    });
+  }
+
+  void addInfrastructureParameters(ParameterizedModel model, ExplicitGroup sequence) {
+    model.getAllParameterModels().stream()
+        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+        .forEach(parameter -> parameter.getModelProperty(QNameModelProperty.class).map(QNameModelProperty::getValue)
+            .ifPresent(qName -> {
+              TopLevelElement refElement = createRefElement(qName, false);
+              sequence.getParticle().add(objectFactory.createElement(refElement));
+            }));
+  }
+
+  void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
+    DslElementSyntax groupDsl = dslResolver.resolveInline(group);
+
+    LocalComplexType complexType = objectTypeDelegate.createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
+    ExplicitGroup groupSequence = new ExplicitGroup();
+
+    List<TopLevelElement> parameters =
+        registerParameters(complexType.getComplexContent().getExtension(), group.getParameterModels());
+    addParameterToSequence(parameters, groupSequence);
+
+    TopLevelElement groupElement = createTopLevelElement(groupDsl.getElementName(), ZERO, MAX_ONE);
+    groupElement.setComplexType(complexType);
+
+    complexType.getComplexContent().getExtension().setSequence(groupSequence);
+    parentSequence.getParticle().add(objectFactory.createElement(groupElement));
   }
 }

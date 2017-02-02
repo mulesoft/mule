@@ -6,8 +6,16 @@
  */
 package org.mule.service.scheduler;
 
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
+
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MockSchedulerService implements SchedulerService {
 
@@ -27,22 +35,37 @@ public class MockSchedulerService implements SchedulerService {
   }
 
   @Override
-  public Scheduler computationScheduler() {
+  public Scheduler cpuIntensiveScheduler() {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config) {
     return new MockScheduler();
   }
 
   @Override
-  public boolean isCurrentThreadCpuLight() {
-    return false;
+  public Scheduler ioScheduler(SchedulerConfig config) {
+    return new MockScheduler();
   }
 
   @Override
-  public boolean isCurrentThreadIo() {
-    return false;
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler customScheduler(SchedulerConfig config) {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
+    return new MockScheduler();
   }
 
   @Override
-  public boolean isCurrentThreadComputation() {
-    return false;
+  public List<Scheduler> getSchedulers() {
+    return singletonList(new MockScheduler());
   }
 }

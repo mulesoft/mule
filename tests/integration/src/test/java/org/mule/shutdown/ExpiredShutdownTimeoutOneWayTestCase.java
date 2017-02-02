@@ -49,7 +49,7 @@ public class ExpiredShutdownTimeoutOneWayTestCase extends AbstractShutdownTimeou
       @Override
       public void run() {
         try {
-          flowRunner(flowName).withPayload(TEST_MESSAGE).asynchronously().run();
+          flowRunner(flowName).withPayload(TEST_MESSAGE).dispatch();
           results[0] = !client.request("test://response", RECEIVE_TIMEOUT).getRight().isPresent();
         } catch (Exception e) {
           e.printStackTrace();

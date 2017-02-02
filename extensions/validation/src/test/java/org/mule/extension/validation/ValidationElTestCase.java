@@ -36,7 +36,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void email() throws Exception {
-    final String expression = "#[validator.validateEmail(email)]";
+    final String expression = "#[mel:validator.validateEmail(email)]";
     Event event = eventBuilder().message(InternalMessage.of("")).addVariable("email", VALID_EMAIL).build();
 
     assertValid(expression, event);
@@ -48,7 +48,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   @Test
   public void matchesRegex() throws Exception {
     final String regex = "[tT]rue";
-    final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
+    final String expression = "#[mel:validator.matchesRegex(payload, regexp, caseSensitive)]";
 
     Event event = eventBuilder().message(InternalMessage.of("true")).addVariable("regexp", regex)
         .addVariable("caseSensitive", false).build();
@@ -75,11 +75,11 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
         .addVariable("invalidPattern", "yyMMddHHmmssZ")
         .build();
 
-    assertValid("#[validator.isTime(payload, validPattern)]", event);
-    assertValid("#[validator.isTime(payload, validPattern, 'US')]", event);
+    assertValid("#[mel:validator.isTime(payload, validPattern)]", event);
+    assertValid("#[mel:validator.isTime(payload, validPattern, 'US')]", event);
 
-    assertInvalid("#[validator.isTime(payload, invalidPattern)]", event);
-    assertInvalid("#[validator.isTime(payload, invalidPattern, 'US')]", event);
+    assertInvalid("#[mel:validator.isTime(payload, invalidPattern)]", event);
+    assertInvalid("#[mel:validator.isTime(payload, invalidPattern, 'US')]", event);
   }
 
   @Test
@@ -124,14 +124,14 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void size() throws Exception {
-    assertValid("#[validator.validateSize('John', 0, 4)]", testEvent());
-    assertInvalid("#[validator.validateSize(payload, 1, 4)]",
+    assertValid("#[mel:validator.validateSize('John', 0, 4)]", testEvent());
+    assertInvalid("#[mel:validator.validateSize(payload, 1, 4)]",
                   eventBuilder().message(InternalMessage.of(ImmutableList.of())).build());
   }
 
   @Test
   public void notNull() throws Exception {
-    final String expression = "#[validator.isNotNull(payload)]";
+    final String expression = "#[mel:validator.isNotNull(payload)]";
     assertValid(expression, testEvent());
 
     assertInvalid(expression, nullPayloadEvent());
@@ -139,7 +139,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void isNull() throws Exception {
-    final String expression = "#[validator.isNull(payload)]";
+    final String expression = "#[mel:validator.isNull(payload)]";
     assertValid(expression, nullPayloadEvent());
 
     assertInvalid(expression, testEvent());
@@ -147,7 +147,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void isNumber() throws Exception {
-    final String expression = "#[validator.isNumber(payload, numberType, minValue, maxValue)]";
+    final String expression = "#[mel:validator.isNumber(payload, numberType, minValue, maxValue)]";
     assertNumberValue(expression, NumberType.LONG, Long.MAX_VALUE / 2, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MIN_VALUE,
                       Long.MAX_VALUE);
     assertNumberValue(expression, NumberType.INTEGER, Integer.MAX_VALUE / 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1,
@@ -161,14 +161,14 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void ip() throws Exception {
-    final String expression = "#[validator.validateIp(payload)]";
+    final String expression = "#[mel:validator.validateIp(payload)]";
     assertValid(expression, eventBuilder().message(InternalMessage.of("127.0.0.1")).build());
     assertInvalid(expression, eventBuilder().message(InternalMessage.of("ET phone home")).build());
   }
 
   @Test
   public void url() throws Exception {
-    final String expression = "#[validator.validateUrl(payload)]";
+    final String expression = "#[mel:validator.validateUrl(payload)]";
     assertValid(expression, eventBuilder().message(InternalMessage.of(VALID_URL)).build());
     assertInvalid(expression, eventBuilder().message(InternalMessage.of(INVALID_URL)).build());
   }
@@ -197,11 +197,11 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   }
 
   private void assertEmpty(Object value, boolean expected) throws Exception {
-    testExpression("#[validator.isEmpty(payload)]", eventBuilder().message(InternalMessage.of(value)).build(), expected);
+    testExpression("#[mel:validator.isEmpty(payload)]", eventBuilder().message(InternalMessage.of(value)).build(), expected);
   }
 
   private void assertNotEmpty(Object value, boolean expected) throws Exception {
-    testExpression("#[validator.notEmpty(payload)]", eventBuilder().message(InternalMessage.of(value)).build(), expected);
+    testExpression("#[mel:validator.notEmpty(payload)]", eventBuilder().message(InternalMessage.of(value)).build(), expected);
   }
 
   private boolean evaluate(String expression, Event event) {

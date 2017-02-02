@@ -6,14 +6,13 @@
  */
 package org.mule.extension.db.api.param;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 
 /**
  * Parameters to configure queries
@@ -22,14 +21,13 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
  */
 public class QuerySettings {
 
-  private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
   /**
    * Indicates the minimum amount of time before the JDBC driver attempts to cancel a running statement. No timeout is used by
    * default.
    */
   @Parameter
   @Optional(defaultValue = "0")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION)
+  @Placement(tab = ADVANCED_TAB)
   private int queryTimeout = 0;
 
   /**
@@ -37,8 +35,13 @@ public class QuerySettings {
    */
   @Parameter
   @Optional(defaultValue = "SECONDS")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION)
+  @Placement(tab = ADVANCED_TAB)
   private TimeUnit queryTimeoutUnit = SECONDS;
+
+  public void copyInto(QuerySettings other) {
+    other.queryTimeout = queryTimeout;
+    other.queryTimeoutUnit = queryTimeoutUnit;
+  }
 
   public int getQueryTimeout() {
     return queryTimeout;
@@ -47,4 +50,5 @@ public class QuerySettings {
   public TimeUnit getQueryTimeoutUnit() {
     return queryTimeoutUnit;
   }
+
 }

@@ -12,14 +12,12 @@
 
     <flow name="requestFlow">
         <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
+            <httpn:headers>
+                #[mel:['Expect' : '100-continue']]
+            </httpn:headers>
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>
-            <httpn:request-builder>
-                <httpn:headers>
-                    #[['Expect' : '100-continue']]
-                </httpn:headers>
-            </httpn:request-builder>
         </httpn:request>
     </flow>
 

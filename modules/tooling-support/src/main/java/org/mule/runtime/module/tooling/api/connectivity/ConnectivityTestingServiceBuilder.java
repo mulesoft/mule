@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.tooling.api.connectivity;
 
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 
 /**
@@ -16,6 +16,16 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
  * @since 4.0
  */
 public interface ConnectivityTestingServiceBuilder {
+
+  /**
+   * Adds a dependency needed by the artifact that must be included in order to do connectivity testing
+   *
+   * @param groupId group id of the artifact
+   * @param artifactId artifact id of the artifact
+   * @param artifactVersion verion of the artifact
+   * @return the builder
+   */
+  ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion);
 
   /**
    * Adds an extension that must be used to do connectivity testing
@@ -30,10 +40,10 @@ public interface ConnectivityTestingServiceBuilder {
   /**
    * Configures the mule components required to do connectivity testing
    *
-   * @param artifactConfiguration set of mule components required to do connectivity testing
+   * @param artifactDeclaration set of mule components required to do connectivity testing
    * @return the builder
    */
-  ConnectivityTestingServiceBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration);
+  ConnectivityTestingServiceBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration);
 
   /**
    * Creates a {@code ConnectivityTestingService} with the provided configuration

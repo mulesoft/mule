@@ -7,12 +7,19 @@
 package org.mule.extension.ws.internal.connection;
 
 import org.mule.extension.ws.api.SoapVersion;
+import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.service.http.api.HttpService;
+
+import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * {@link ConnectionProvider} that returns instances of {@link WscConnection}.
@@ -20,6 +27,9 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 public class WscConnectionProvider implements PoolingConnectionProvider<WscConnection> {
+
+  @Inject
+  private HttpService httpService;
 
   /**
    * The WSDL file URL remote or local.
@@ -47,11 +57,16 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   private String address;
 
   /**
-   * If should use the MTOM protocol to manage the attachments or not.
+   * The security strategies configured to protect the SOAP messages.
    */
   @Parameter
-  @Optional(defaultValue = "false")
-  private boolean mtomEnabled;
+  @Optional
+  @NullSafe
+  private List<SecurityStrategy> securityStrategies;
+
+  @Parameter
+  @Optional
+  private String transportConfiguration;
 
   /**
    * The soap version of the WSDL.
@@ -60,16 +75,40 @@ public class WscConnectionProvider implements PoolingConnectionProvider<WscConne
   @Optional(defaultValue = "SOAP11")
   private SoapVersion soapVersion;
 
+  /**
+   * If should use the MTOM protocol to manage the attachments or not.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  private boolean mtomEnabled;
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public WscConnection connect() throws ConnectionException {
-    return new WscConnection(wsdlLocation, address, service, port, soapVersion, mtomEnabled);
+    return new WscConnection(wsdlLocation,
+                             address,
+                             service,
+                             port,
+                             soapVersion,
+                             mtomEnabled,
+                             securityStrategies,
+                             httpService,
+                             null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void disconnect(WscConnection client) {
     client.disconnect();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ConnectionValidationResult validate(WscConnection client) {
     return client.validateConnection();

@@ -19,19 +19,21 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.core.construct.AbstractPipeline;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 
@@ -48,6 +50,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * {@link #disposeContextPerClass}.
    */
   private static ArtifactClassLoader executionClassLoader;
+
+  private volatile boolean tearingDown = false;
+  private Set<FlowRunner> runners = new HashSet<>();
 
   public FunctionalTestCase() {
     super();
@@ -117,8 +122,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * component is declared as a singleton, otherwise this will not work.
    */
   protected Object getComponent(FlowConstruct flowConstruct) throws Exception {
-    if (flowConstruct instanceof AbstractPipeline) {
-      AbstractPipeline flow = (AbstractPipeline) flowConstruct;
+    if (flowConstruct instanceof Pipeline) {
+      Pipeline flow = (Pipeline) flowConstruct;
       // Retrieve the first component
       for (Processor processor : flow.getMessageProcessors()) {
         if (processor instanceof Component) {
@@ -158,7 +163,10 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected void doTearDown() throws Exception {
-    executionClassLoader = null;
+    tearingDown = true;
+    for (FlowRunner runner : runners) {
+      runner.dispose();
+    }
     super.doTearDown();
   }
 
@@ -192,7 +200,12 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return the {@link FlowRunner}
    */
   protected FlowRunner flowRunner(String flowName) {
-    return new FlowRunner(muleContext, flowName);
+    if (tearingDown) {
+      throw new IllegalStateException("Already tearing down.");
+    }
+    final FlowRunner flowRunner = new FlowRunner(muleContext, flowName);
+    runners.add(flowRunner);
+    return flowRunner;
   }
 
   /**

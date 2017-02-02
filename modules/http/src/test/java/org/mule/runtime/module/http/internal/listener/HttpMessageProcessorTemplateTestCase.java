@@ -24,7 +24,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -33,9 +33,9 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
-import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.service.http.api.server.async.ResponseStatusCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -120,7 +120,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean matches(Object o) {
-        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(expected);
+        return o instanceof MessagingException && ((MessagingException) o).getRootCause().equals(expected);
       }
     }), eq(testEvent));
     assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));

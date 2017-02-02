@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
@@ -130,7 +129,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failingConnectionProviderConnectivity() throws Exception {
-    ConnectionValidationResult validationResult = failure("oops", UNKNOWN, new Exception());
+    ConnectionValidationResult validationResult = failure("oops", new Exception());
     when(testeableConnectionProvider.validate(connection)).thenReturn(validationResult);
     ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
     assertThat(result, is(sameInstance(validationResult)));

@@ -7,15 +7,12 @@
 package org.mule.test.core.context.notification;
 
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
-import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-
-import org.mule.runtime.core.api.message.InternalMessage;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -24,14 +21,13 @@ import org.junit.Test;
 public class ConnectorMessageNotificationTestCase extends AbstractNotificationTestCase {
 
   private static final String FLOW_ID = "testFlow";
-  private static final String MULE_CLIENT_ID = "MuleClient";
-
   private static final int TIMEOUT = 1000;
-  private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions()
-      .method(HttpConstants.Methods.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {
@@ -40,16 +36,17 @@ public class ConnectorMessageNotificationTestCase extends AbstractNotificationTe
 
   @Test
   public void doTest() throws Exception {
-    final String url = String.format("http://localhost:%s/path", port.getNumber());
-    muleContext.getClient().send(url, InternalMessage.of(TEST_PAYLOAD), GET_OPTIONS);
+    HttpRequest request =
+        HttpRequest.builder().setUri(String.format("http://localhost:%s/path", port.getNumber())).setMethod(POST.name()).build();
+
+    httpClient.send(request, TIMEOUT, false, null);
 
     assertNotifications();
   }
 
   @Override
   public RestrictedNode getSpecification() {
-    return new Node().parallel(new Node(ConnectorMessageNotification.class, MESSAGE_REQUEST_BEGIN, MULE_CLIENT_ID))
-        .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_REQUEST_END, MULE_CLIENT_ID))
+    return new Node()
         .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_RECEIVED, FLOW_ID))
         .parallel(new Node(ConnectorMessageNotification.class, MESSAGE_RESPONSE, FLOW_ID));
   }

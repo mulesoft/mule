@@ -6,17 +6,19 @@
  */
 package org.mule.test.integration.xml;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -30,7 +32,8 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  private static final HttpRequestOptions httpOptions = newOptions().disableStatusCodeValidation().method(POST.name()).build();
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {
@@ -39,70 +42,67 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testXmlFilter() throws Exception {
+    String url = "http://localhost:" + dynamicPort.getNumber() + "/xml-parse";
+
     InputStream xml = getClass().getResourceAsStream("request.xml");
+    HttpRequest request = HttpRequest.builder().setUri(url)
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
 
-    assertNotNull(xml);
-
-    MuleClient client = muleContext.getClient();
-
-    // this will submit the xml via a POST request
-    InternalMessage message = client
-        .send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", InternalMessage.of(xml), httpOptions).getRight();
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    HttpResponse httpResponse = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
 
     // This won't pass the filter
     xml = getClass().getResourceAsStream("validation1.xml");
-    message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", InternalMessage.of(xml), httpOptions)
-        .getRight();
-    assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    request = HttpRequest.builder().setUri(url).setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+
+    httpResponse = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    assertThat(httpResponse.getStatusCode(), equalTo(NOT_ACCEPTABLE.getStatusCode()));
   }
 
   @Test
   public void testXmlFilterAndXslt() throws Exception {
     InputStream xml = getClass().getResourceAsStream("request.xml");
-
     assertNotNull(xml);
 
-    MuleClient client = muleContext.getClient();
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse")
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
 
-    // this will submit the xml via a POST request
-    InternalMessage message = client
-        .send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", InternalMessage.of(xml), httpOptions).getRight();
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    HttpResponse httpResponse = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
   }
 
   @Test
   public void testXmlValidation() throws Exception {
+    String url = "http://localhost:" + dynamicPort.getNumber() + "/validate";
+
     InputStream xml = getClass().getResourceAsStream("validation1.xml");
-
-    assertNotNull(xml);
-
-    MuleClient client = muleContext.getClient();
-
-    // this will submit the xml via a POST request
-    InternalMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", InternalMessage.of(xml), httpOptions).getRight();
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    HttpRequest httpRequest = HttpRequest.builder().setUri(url)
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+    assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
 
     xml = getClass().getResourceAsStream("validation2.xml");
-    message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", InternalMessage.of(xml), httpOptions).getRight();
-    assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    httpRequest = HttpRequest.builder().setUri(url)
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+    httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+    assertThat(httpResponse.getStatusCode(), equalTo(NOT_ACCEPTABLE.getStatusCode()));
 
     xml = getClass().getResourceAsStream("validation3.xml");
-    message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", InternalMessage.of(xml), httpOptions).getRight();
-    assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
+    httpRequest = HttpRequest.builder().setUri(url)
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+    httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
+    assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
   }
 
   @Test
   public void testExtractor() throws Exception {
     InputStream xml = getClass().getResourceAsStream("validation1.xml");
-    MuleClient client = muleContext.getClient();
+    HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/extract")
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
-    // this will submit the xml via a POST request
-    InternalMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", InternalMessage.of(xml), httpOptions).getRight();
-    assertThat(getPayloadAsString(message), equalTo("some"));
+    String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream(), UTF_8);
+    assertThat(payload, equalTo("some"));
   }
 }

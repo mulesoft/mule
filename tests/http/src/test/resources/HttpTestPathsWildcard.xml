@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <flow name="taxes-main-v1">
+        <httpn:listener path="${path1}" config-ref="listenerConfig"/>
+        <set-payload value="${response1}"/>
+    </flow>
+    <flow name="taxes-main-v2">
+        <httpn:listener path="${path2}" config-ref="listenerConfig"/>
+        <set-payload value="${response2}"/>
+    </flow>
+    <flow name="HealthcheckV2">
+        <httpn:listener path="${path3}" config-ref="listenerConfig"/>
+        <set-payload value="${response3}"/>
+    </flow>
+</mule>

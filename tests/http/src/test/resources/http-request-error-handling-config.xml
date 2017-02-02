@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="simpleConfig">
+        <httpn:request-connection host="localhost" port="${port}"/>
+    </httpn:request-config>
+
+    <flow name="noMapping">
+        <httpn:request config-ref="simpleConfig" path="testPath"/>
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="simpleMapping">
+        <httpn:request config-ref="simpleConfig" path="testPath">
+            <error-mapping targetType="MY_REQUESTER"/>
+        </httpn:request>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="complexMapping">
+        <httpn:request config-ref="simpleConfig" path="testPath">
+            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <httpn:headers>#[mel:headers]</httpn:headers>
+        </httpn:request>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="multipleMappings">
+        <httpn:request config-ref="simpleConfig" path="testPath">
+            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="TRANSFORMATION" targetType="MY_OTHER_ERROR"/>
+            <httpn:headers>#[mel:headers]</httpn:headers>
+        </httpn:request>
+        <error-handler>
+            <on-error-continue type="MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue type="MY_OTHER_ERROR">
+                <set-payload value="Bad expression."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+</mule>

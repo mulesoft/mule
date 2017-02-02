@@ -12,8 +12,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
+import org.mule.service.http.api.client.HttpAuthenticationType;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
+import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 

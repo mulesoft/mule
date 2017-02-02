@@ -26,7 +26,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testInlineScript() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("inlineScript").withPayload("Important Message").asynchronously().run();
+    flowRunner("inlineScript").withPayload("Important Message").run();
     InternalMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received", getPayloadAsString(response));
@@ -36,7 +36,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testFileBasedScript() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("fileBasedScript").withPayload("Important Message").asynchronously().run();
+    flowRunner("fileBasedScript").withPayload("Important Message").run();
     InternalMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received", getPayloadAsString(response));
@@ -45,7 +45,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testReferencedScript() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("referencedScript").withPayload("Important Message").asynchronously().run();
+    flowRunner("referencedScript").withPayload("Important Message").run();
     InternalMessage response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received", getPayloadAsString(response));
@@ -55,7 +55,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testScriptVariables() throws Exception {
     MuleClient client = muleContext.getClient();
-    flowRunner("scriptVariables").withPayload("Important Message").asynchronously().run();
+    flowRunner("scriptVariables").withPayload("Important Message").run();
     InternalMessage response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received A-OK", getPayloadAsString(response));

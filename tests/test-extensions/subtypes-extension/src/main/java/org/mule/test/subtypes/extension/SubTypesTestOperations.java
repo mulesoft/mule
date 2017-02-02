@@ -7,6 +7,8 @@
 package org.mule.test.subtypes.extension;
 
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -16,9 +18,6 @@ import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 
 @MetadataScope(outputResolver = SubtypesOutputResolver.class)
 public class SubTypesTestOperations {
@@ -39,9 +38,10 @@ public class SubTypesTestOperations {
     return connection;
   }
 
-  public List<Object> subtypedAndConcreteParameters(ParentShape baseShape, Door door, FinalPojo finalPojo, VeganCookBook cookBook,
-                                                    ParentShape squareShape, ParentShape triangle,
-                                                    @XmlHints(allowReferences = false) NoReferencePojo noRef) {
+  public List<Object> subtypedAndConcreteParameters(@Optional ParentShape baseShape, @Optional Door door,
+                                                    @Optional FinalPojo finalPojo, @Optional VeganCookBook cookBook,
+                                                    @Optional ParentShape squareShape, @Optional ParentShape triangle,
+                                                    @Optional @XmlHints(allowReferences = false) NoReferencePojo noRef) {
     return asList(baseShape, door, finalPojo, cookBook, squareShape, triangle, noRef);
   }
 

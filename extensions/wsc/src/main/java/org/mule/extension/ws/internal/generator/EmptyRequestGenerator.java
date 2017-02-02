@@ -11,7 +11,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getOperationType;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.exception.BadRequestException;
+import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -54,28 +55,29 @@ final class EmptyRequestGenerator {
     Optional<List<String>> soapBodyParts = getSoapBodyParts(bindingOperation);
 
     if (!soapBodyParts.isPresent()) {
-      throw new WscException("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation "
-          + "requires input parameters.");
+      throw new InvalidWsdlException(format("No SOAP body defined in the WSDL for the specified operation, cannot check if the operation"
+          + " requires input parameters. Cannot build a default body request for the specified operation [%s]", operation));
     }
 
     Message message = bindingOperation.getOperation().getInput().getMessage();
     Optional<Part> part = getSinglePart(soapBodyParts.get(), message);
 
     if (!part.isPresent()) {
-      throw new WscException(
-                             format(REQUIRED_PARAMS_ERROR_MASK, operation, " there is no single part in the input message"));
+      throw new BadRequestException(
+                                    format(REQUIRED_PARAMS_ERROR_MASK, operation,
+                                           " there is no single part in the input message"));
     }
 
     if (part.get().getElementName() == null) {
-      throw new WscException(
-                             format(REQUIRED_PARAMS_ERROR_MASK, operation,
-                                    " there is one message body part but no does not have an element defined"));
+      throw new BadRequestException(
+                                    format(REQUIRED_PARAMS_ERROR_MASK, operation,
+                                           " there is one message body part but no does not have an element defined"));
     }
 
     Part bodyPart = part.get();
     if (isOperationWithRequiredParameters(loader, bodyPart)) {
       // operation has required parameters
-      throw new WscException(format(REQUIRED_PARAMS_ERROR_MASK, operation, ""));
+      throw new BadRequestException(format(REQUIRED_PARAMS_ERROR_MASK, operation, ""));
     }
 
     // There is a single part with an element defined and it does not require parameters

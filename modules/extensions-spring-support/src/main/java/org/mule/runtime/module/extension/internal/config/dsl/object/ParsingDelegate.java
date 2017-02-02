@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
 /**
  * A simple delegate interface for optionally parsing entities which type is represented by {@code M} and produce a value of type

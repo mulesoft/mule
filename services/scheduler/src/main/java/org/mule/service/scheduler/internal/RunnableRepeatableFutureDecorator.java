@@ -6,8 +6,10 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Thread.currentThread;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
@@ -33,6 +35,8 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   private final DefaultScheduler scheduler;
 
+  private final String taskAsString;
+
   private volatile boolean running = false;
   private volatile boolean cancelled = false;
   private RunnableFuture<V> task;
@@ -40,20 +44,28 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   /**
    * Decorates the given {@code task}
    * 
-   * @param task the task to be decorated
+   * @param taskSupplier the supplier for tasks to be decorated
+   * @param wrapUpCallback the callback to execute after the task is done
    * @param scheduler the owner {@link Executor} of this task
+   * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
+   * @param id a unique it for this task.
    */
   RunnableRepeatableFutureDecorator(Supplier<RunnableFuture<V>> taskSupplier,
                                     Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback,
-                                    DefaultScheduler scheduler) {
+                                    DefaultScheduler scheduler, String taskAsString, Integer id) {
+    super(id);
     this.taskSupplier = taskSupplier;
     this.wrapUpCallback = wrapUpCallback;
     this.scheduler = scheduler;
+    this.taskAsString = taskAsString;
   }
 
   @Override
   public void run() {
     if (running) {
+      if (logger.isTraceEnabled()) {
+        logger.trace(this.toString() + " still running, returning.");
+      }
       return;
     }
     if (cancelled) {
@@ -66,6 +78,13 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
     try {
       running = true;
       task.run();
+      task.get();
+    } catch (ExecutionException e) {
+      logger.error("Uncaught throwable in task " + toString(), e);
+    } catch (CancellationException e) {
+      logger.trace("Task " + toString() + " cancelled");
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
     } finally {
       wrapUp();
       if (logger.isTraceEnabled()) {
@@ -76,9 +95,9 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   @Override
   protected void wrapUp() {
-    super.wrapUp();
     wrapUpCallback.accept(this);
     running = false;
+    super.wrapUp();
   }
 
   @Override
@@ -129,6 +148,6 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   @Override
   public String toString() {
-    return "RunnableRepeatableFutureDecorator[" + taskSupplier.toString() + "]";
+    return taskAsString + "(repeatable)";
   }
 }

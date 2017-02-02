@@ -57,7 +57,7 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
           MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE)
               .withVariable("timeout", responseTimeoutRequester).runExpectingException();
 
-          assertThat(e.getCauseException(), instanceOf(TimeoutException.class));
+          assertThat(e.getRootCause(), instanceOf(TimeoutException.class));
           requestTimeoutLatch.release();
         } catch (Exception e) {
           throw new RuntimeException(e);

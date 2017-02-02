@@ -6,14 +6,12 @@
  */
 package org.mule.extension.db.internal.domain.connection.generic;
 
-import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
  *  {@link DbConnectionParameters} for the {@link GenericConnectionProvider}
@@ -26,7 +24,7 @@ public final class GenericConnectionParameters extends BaseDbConnectionParameter
    * JDBC URL to be used to connect to the database.
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 1)
+  @Placement(order = 1)
   @DisplayName("URL")
   private String url;
 
@@ -34,7 +32,7 @@ public final class GenericConnectionParameters extends BaseDbConnectionParameter
    * Fully-qualified name of the database driver class.
    */
   @Parameter
-  @Placement(group = CONNECTION, order = 2)
+  @Placement(order = 2)
   private String driverClassName;
 
   @Override

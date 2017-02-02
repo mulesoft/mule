@@ -6,10 +6,13 @@
  */
 package org.mule.functional.listener;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
@@ -21,13 +24,17 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listener for exceptions managed by the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler}.
  */
 public class SystemExceptionListener {
+
+  private static final Logger logger = LoggerFactory.getLogger(SystemExceptionListener.class);
 
   private CountDownLatch exceptionThrownLatch = new Latch();
   private int timeout = 10000;
@@ -37,36 +44,9 @@ public class SystemExceptionListener {
   public SystemExceptionListener(MuleContext muleContext) {
     try {
       final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
-      muleContext.setExceptionListener(new SystemExceptionHandler() {
-
-        @Override
-        public void handleException(Exception exception, RollbackSourceCallback rollbackMethod) {
-          try {
-            numberOfInvocations.incrementAndGet();
-            exceptionListener.handleException(exception, rollbackMethod);
-          } finally {
-            exceptionThrownLatch.countDown();
-          }
-        }
-
-        @Override
-        public void handleException(Exception exception) {
-          try {
-            numberOfInvocations.incrementAndGet();
-            exceptionListener.handleException(exception);
-          } finally {
-            exceptionThrownLatch.countDown();
-          }
-        }
-      });
-      muleContext.registerListener(new ExceptionNotificationListener<ExceptionNotification>() {
-
-        @Override
-        public void onNotification(ExceptionNotification notification) {
-          exceptionNotifications.add(notification);
-
-        }
-      });
+      muleContext.setExceptionListener(new CountingSystemExceptionHandler(exceptionListener));
+      muleContext.registerListener((ExceptionNotificationListener) (notification -> exceptionNotifications
+          .add((ExceptionNotification) notification)));
     } catch (NotificationException e) {
       throw new RuntimeException(e);
     }
@@ -74,7 +54,7 @@ public class SystemExceptionListener {
 
   public SystemExceptionListener waitUntilAllNotificationsAreReceived() {
     try {
-      if (!exceptionThrownLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+      if (!exceptionThrownLatch.await(timeout, MILLISECONDS)) {
         fail("An exception was never thrown");
       }
     } catch (InterruptedException e) {
@@ -105,5 +85,39 @@ public class SystemExceptionListener {
    */
   public void assertNotInvoked() {
     assertThat(this.numberOfInvocations.get(), is(0));
+  }
+
+  private class CountingSystemExceptionHandler implements SystemExceptionHandler, Disposable {
+
+    private final SystemExceptionHandler exceptionListener;
+
+    private CountingSystemExceptionHandler(SystemExceptionHandler exceptionListener) {
+      this.exceptionListener = exceptionListener;
+    }
+
+    @Override
+    public void handleException(Exception exception, RollbackSourceCallback rollbackMethod) {
+      try {
+        numberOfInvocations.incrementAndGet();
+        exceptionListener.handleException(exception, rollbackMethod);
+      } finally {
+        exceptionThrownLatch.countDown();
+      }
+    }
+
+    @Override
+    public void handleException(Exception exception) {
+      try {
+        numberOfInvocations.incrementAndGet();
+        exceptionListener.handleException(exception);
+      } finally {
+        exceptionThrownLatch.countDown();
+      }
+    }
+
+    @Override
+    public void dispose() {
+      disposeIfNeeded(exceptionListener, logger);
+    }
   }
 }

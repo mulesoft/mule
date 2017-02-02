@@ -15,7 +15,8 @@ import static org.mockito.Mockito.spy;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
@@ -32,7 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 public class SimpleUnitTestSupportSchedulerService implements SchedulerService, Stoppable {
 
   private SimpleUnitTestSupportScheduler scheduler =
-      new SimpleUnitTestSupportScheduler(2, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
+      new SimpleUnitTestSupportScheduler(8, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
                                          new AbortPolicy());
 
   private List<Scheduler> decorators = new ArrayList<>();
@@ -44,31 +45,93 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler cpuLightScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
   public Scheduler ioScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
-  public Scheduler computationScheduler() {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler();
+  public Scheduler cpuIntensiveScheduler() {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
     decorators.add(decorator);
     return decorator;
   }
 
-  protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler() {
-    SimpleUnitTestSupportLifecycleSchedulerDecorator spied = spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(scheduler));
+  @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler ioScheduler(SchedulerConfig config) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(scheduler);
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler customScheduler(SchedulerConfig config) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
+                                                             new NamedThreadFactory(config.getSchedulerName()),
+                                                             new AbortPolicy()));
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  @Override
+  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
+        decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
+                                                             new NamedThreadFactory(config.getSchedulerName()),
+                                                             new AbortPolicy()));
+    decorators.add(decorator);
+    return decorator;
+  }
+
+  protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
+    SimpleUnitTestSupportLifecycleSchedulerDecorator spied =
+        spy(new SimpleUnitTestSupportLifecycleSchedulerDecorator(resolveSchedulerCreationLocation(), scheduler, this));
 
     doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString());
     doReturn(mock(ScheduledFuture.class)).when(spied).scheduleWithCronExpression(any(), anyString(), any());
     return spied;
+  }
+
+  private String resolveSchedulerCreationLocation() {
+    int i = 0;
+    final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+    StackTraceElement ste = stackTrace[i++];
+    // We have to go deep enough, right before the mockito call
+    while (skip(ste) && i < stackTrace.length) {
+      ste = stackTrace[i++];
+    }
+    if (skip(ste)) {
+      ste = stackTrace[3];
+    }
+
+    return ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber();
+  }
+
+  private boolean skip(StackTraceElement ste) {
+    return ste.getClassName().startsWith(SimpleUnitTestSupportSchedulerService.class.getName())
+        || ste.getClassName().startsWith("org.mockito");
   }
 
   @Override
@@ -76,39 +139,20 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     scheduler.shutdownNow();
   }
 
-  public List<Scheduler> getCreatedSchedulers() {
-    return unmodifiableList(decorators);
+  @Override
+  public List<Scheduler> getSchedulers() {
+    return unmodifiableList(new ArrayList<>(decorators));
   }
 
   public void clearCreatedSchedulers() {
     decorators.clear();
   }
 
+  void stoppedScheduler(Scheduler scheduler) {
+    decorators.remove(scheduler);
+  }
+
   public int getScheduledTasks() {
     return scheduler.getScheduledTasks();
-  }
-
-  /**
-   * @return {@code true} since this Services's scheduler unit testing threads are general purpose.
-   */
-  @Override
-  public boolean isCurrentThreadCpuLight() {
-    return true;
-  }
-
-  /**
-   * @return {@code true} since this Services's scheduler unit testing threads are general purpose.
-   */
-  @Override
-  public boolean isCurrentThreadIo() {
-    return true;
-  }
-
-  /**
-   * @return {@code true} since this Services's scheduler unit testing threads are general purpose.
-   */
-  @Override
-  public boolean isCurrentThreadComputation() {
-    return true;
   }
 }

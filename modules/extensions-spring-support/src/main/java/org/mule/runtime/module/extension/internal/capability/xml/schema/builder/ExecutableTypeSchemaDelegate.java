@@ -10,13 +10,14 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.GROUP_SUFFIX;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
@@ -25,14 +26,15 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.extension.api.annotation.Extensible;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -43,12 +45,13 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Na
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypeRestrictionModelProperty;
 
 import javax.xml.namespace.QName;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Base builder delegation class to generate an XSD schema that describes an executable {@link ComponentModel}
@@ -60,13 +63,14 @@ abstract class ExecutableTypeSchemaDelegate {
   protected final SchemaBuilder builder;
   protected final ObjectFactory objectFactory = new ObjectFactory();
   private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
+  private final DslSyntaxResolver dsl;
 
   ExecutableTypeSchemaDelegate(SchemaBuilder builder) {
     this.builder = builder;
+    this.dsl = builder.getDslResolver();
   }
 
-  protected ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
-                                                 DslElementSyntax dslSyntax) {
+  protected ExtensionType createExecutableType(String name, QName base, DslElementSyntax dslSyntax) {
     TopLevelComplexType complexType = new TopLevelComplexType();
     complexType.setName(name);
 
@@ -77,46 +81,77 @@ abstract class ExecutableTypeSchemaDelegate {
     complexContent.setExtension(complexContentExtension);
 
     if (dslSyntax.requiresConfig()) {
-      Attribute configAttr = builder.createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
+      Attribute configAttr =
+          builder.createAttribute(CONFIG_ATTRIBUTE_NAME, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
       complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
     }
 
-    final ExplicitGroup all = new ExplicitGroup();
-    complexContentExtension.setSequence(all);
-
-    for (final ParameterModel parameterModel : parameterizedModel.getParameterModels()) {
-      MetadataType parameterType = parameterModel.getType();
-
-      if (isOperation(parameterType)) {
-        String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : "1";
-        generateNestedProcessorElement(all, parameterModel, maxOccurs);
-      } else {
-        builder.declareAsParameter(parameterType, complexContentExtension, all, parameterModel);
-      }
-    }
-
-    if (all.getParticle().isEmpty()) {
-      complexContentExtension.setSequence(null);
-    }
-
-    builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
-
+    this.builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
     return complexContentExtension;
   }
 
-  private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs) {
+  protected ExtensionType registerParameters(ExtensionType type, List<ParameterModel> parameterModels) {
+    List<TopLevelElement> childElements = new LinkedList<>();
+    parameterModels.forEach(parameter -> {
+      DslElementSyntax paramDsl = dsl.resolve(parameter);
+      MetadataType parameterType = parameter.getType();
+
+      if (isOperation(parameterType)) {
+        String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
+        childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
+      } else {
+        boolean shouldDeclare = true;
+        if (parameter.getModelProperty(QNameModelProperty.class).isPresent()
+            && !parameter.getDslConfiguration().allowsReferences()) {
+          shouldDeclare = false;
+        }
+
+        if (shouldDeclare) {
+          this.builder.declareAsParameter(parameterType, type, parameter, paramDsl, childElements);
+        }
+      }
+    });
+
+    if (!childElements.isEmpty()) {
+      if (type.getSequence() == null) {
+        final ExplicitGroup all = new ExplicitGroup();
+        all.setMinOccurs(ZERO);
+        all.setMaxOccurs(MAX_ONE);
+        builder.addParameterToSequence(childElements, all);
+        type.setSequence(all);
+
+      } else {
+        builder.addParameterToSequence(childElements, type.getSequence());
+      }
+    }
+
+    return type;
+  }
+
+  protected void initialiseSequence(ExtensionType operationType) {
+    if (operationType.getSequence() == null) {
+      ExplicitGroup sequence = new ExplicitGroup();
+      sequence.setMinOccurs(ZERO);
+      sequence.setMaxOccurs(MAX_ONE);
+      operationType.setSequence(sequence);
+    }
+  }
+
+  private TopLevelElement generateNestedProcessorElement(DslElementSyntax paramDsl, ParameterModel parameterModel,
+                                                         String maxOccurs) {
     LocalComplexType collectionComplexType = new LocalComplexType();
     GroupRef group = generateNestedProcessorGroup(parameterModel, maxOccurs);
     collectionComplexType.setGroup(group);
     collectionComplexType.setAnnotation(builder.createDocAnnotation(parameterModel.getDescription()));
 
     TopLevelElement collectionElement = new TopLevelElement();
-    collectionElement.setName(hyphenize(parameterModel.getName()));
+    collectionElement.setName(paramDsl.getElementName());
     collectionElement.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
     collectionElement.setMaxOccurs(maxOccurs);
     collectionElement.setComplexType(collectionComplexType);
     collectionElement.setAnnotation(builder.createDocAnnotation(EMPTY));
-    all.getParticle().add(objectFactory.createElement(collectionElement));
+
+    return collectionElement;
   }
 
   private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs) {
@@ -137,7 +172,10 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   private boolean isOperation(MetadataType type) {
-    ValueHolder<Boolean> isOperation = new ValueHolder<>(false);
+    if (!type.getMetadataFormat().equals(JAVA)) {
+      return false;
+    }
+    Reference<Boolean> isOperation = new Reference<>(false);
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -175,7 +213,7 @@ abstract class ExecutableTypeSchemaDelegate {
       TopLevelElement element = new TopLevelElement();
       element.setName(name);
       element.setAbstract(true);
-      element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_PROCESSOR);
+      element.setSubstitutionGroup(MULE_ABSTRACT_OPERATOR);
       builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
 
       group = new NamedGroup();

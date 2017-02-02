@@ -11,7 +11,7 @@
         </db:select>
 
         <db:update config-ref="dbConfig" bulkMode="true">
-            <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=#[payload.type]</db:parameterized-query>
+            <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=#[mel:payload.type]</db:parameterized-query>
         </db:update>
     </flow>
 </mule>

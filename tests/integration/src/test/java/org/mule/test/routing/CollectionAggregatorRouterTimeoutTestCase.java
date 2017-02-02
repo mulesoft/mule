@@ -56,7 +56,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrati
     MuleClient client = muleContext.getClient();
     List<String> list = Arrays.asList("first", "second");
 
-    flowRunner("splitter").withPayload(list).asynchronously().run();
+    flowRunner("splitter").withPayload(list).run();
 
     Thread.sleep(RECEIVE_TIMEOUT);
 

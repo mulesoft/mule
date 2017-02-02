@@ -8,14 +8,13 @@ package org.mule.runtime.core.message;
 
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -27,17 +26,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.connector.DefaultReplyToHandler;
+import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory.LegacyNonBlockingProcessingStrategy;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -59,17 +53,15 @@ public class DefaultEventBuilder implements Event.Builder {
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
 
   private EventContext context;
-  private InternalMessage message;
-  private Map<String, DefaultTypedValue<Object>> flowVariables = new HashMap<>();
+  private Message message;
+  private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
   private Error error;
-  private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
   private FlowConstruct flow;
   private GroupCorrelation groupCorrelation = new GroupCorrelation(null, null);
   private String legacyCorrelationId;
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
-  private Boolean synchronous;
   private MuleSession session = new DefaultMuleSession();
   private Event originalEvent;
   private boolean modified;
@@ -80,36 +72,30 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   public DefaultEventBuilder(Event event) {
+    this(event.getContext(), event);
+  }
+
+  public DefaultEventBuilder(EventContext messageContext, Event event) {
+    this.context = messageContext;
     this.originalEvent = event;
-    this.context = event.getContext();
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
     this.groupCorrelation = event.getGroupCorrelation();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
-
     this.flowCallStack = event.getFlowCallStack().clone();
-
-    this.exchangePattern = event.getExchangePattern();
-
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
     this.message = event.getMessage();
-
-    if (event.isSynchronous()) {
-      this.synchronous = event.isSynchronous();
-    }
-
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
-
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     event.getVariableNames().forEach(key -> this.flowVariables
-        .put(key, (DefaultTypedValue<Object>) event.getVariable(key)));
+        .put(key, event.getVariable(key)));
   }
 
   @Override
-  public Event.Builder message(InternalMessage message) {
+  public Event.Builder message(Message message) {
     this.message = message;
     this.modified = true;
     return this;
@@ -118,14 +104,14 @@ public class DefaultEventBuilder implements Event.Builder {
   @Override
   public Event.Builder variables(Map<String, Object> flowVariables) {
     this.flowVariables.clear();
-    flowVariables.forEach((s, o) -> this.flowVariables.put(s, new DefaultTypedValue<>(o, DataType.fromObject(o))));
+    flowVariables.forEach((s, o) -> this.flowVariables.put(s, new TypedValue<>(o, DataType.fromObject(o))));
     this.modified = true;
     return this;
   }
 
   @Override
   public Event.Builder addVariable(String key, Object value) {
-    flowVariables.put(key, new DefaultTypedValue<>(value, DataType.fromObject(value)));
+    flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.modified = true;
     return this;
 
@@ -133,7 +119,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   @Override
   public Event.Builder addVariable(String key, Object value, DataType dataType) {
-    flowVariables.put(key, new DefaultTypedValue<>(value, dataType));
+    flowVariables.put(key, new TypedValue<>(value, dataType));
     this.modified = true;
     return this;
   }
@@ -162,20 +148,6 @@ public class DefaultEventBuilder implements Event.Builder {
   @Override
   public Event.Builder error(Error error) {
     this.error = error;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
-  public Event.Builder synchronous(boolean synchronous) {
-    this.synchronous = synchronous;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
-  public Event.Builder exchangePattern(MessageExchangePattern exchangePattern) {
-    this.exchangePattern = exchangePattern;
     this.modified = true;
     return this;
   }
@@ -220,27 +192,10 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, message, flowVariables, exchangePattern, flow, session,
-                                     synchronous == null ? resolveEventSynchronicity() : synchronous,
-                                     replyToDestination,
-                                     replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
-                                     notificationsEnabled);
+      return new EventImplementation(context, (InternalMessage) message, flowVariables, flow, session, replyToDestination,
+                                     replyToHandler,
+                                     flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
     }
-  }
-
-  protected boolean resolveEventSynchronicity() {
-    return isFlowConstructSynchronous()
-        || (exchangePattern != null && exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy());
-  }
-
-  private boolean isFlowConstructSynchronous() {
-    return (flow instanceof ProcessingDescriptor) && ((ProcessingDescriptor) flow)
-        .isSynchronous();
-  }
-
-  protected boolean isFlowConstructNonBlockingProcessingStrategy() {
-    return (flow instanceof Pipeline)
-        && ((Pipeline) flow).getProcessingStrategy() instanceof LegacyNonBlockingProcessingStrategy;
   }
 
   /**
@@ -257,45 +212,46 @@ public class DefaultEventBuilder implements Event.Builder {
 
     /** Immutable MuleEvent state **/
 
-    private final EventContext context;
+    private EventContext context;
     // TODO MULE-10013 make this final
     private InternalMessage message;
     private final MuleSession session;
     // TODO MULE-10013 make this final
     private transient FlowConstruct flowConstruct;
 
-    private final MessageExchangePattern exchangePattern;
     private final ReplyToHandler replyToHandler;
-    private final boolean synchronous;
 
     /** Mutable MuleEvent state **/
     private final Object replyToDestination;
 
     private final boolean notificationsEnabled;
 
-    private final CopyOnWriteCaseInsensitiveMap<String, DefaultTypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
+    private final CopyOnWriteCaseInsensitiveMap<String, TypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private final String legacyCorrelationId;
     private final Error error;
 
+    // Used in deserialization to obtain instance of flowConstruct via registry lookup.
+    private String flowName;
+
     // Use this constructor from the builder
-    private EventImplementation(EventContext context, InternalMessage message,
-                                Map<String, DefaultTypedValue<Object>> variables,
-                                MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
-                                boolean synchronous, Object replyToDestination, ReplyToHandler replyToHandler,
+    private EventImplementation(EventContext context, InternalMessage message, Map<String, TypedValue<Object>> variables,
+                                FlowConstruct flowConstruct, MuleSession session,
+                                Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
                                 String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.flowConstruct = flowConstruct;
+      if (flowConstruct != null) {
+        this.flowName = flowConstruct.getName();
+      }
       this.session = session;
       this.message = message;
-      variables.forEach((s, value) -> this.variables.put(s, new DefaultTypedValue<>(value.getValue(), value.getDataType())));
+      variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
 
-      this.exchangePattern = exchangePattern;
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
-      this.synchronous = synchronous;
 
       this.flowCallStack = flowCallStack;
 
@@ -426,6 +382,7 @@ public class DefaultEventBuilder implements Event.Builder {
      */
     @SuppressWarnings({"unused"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {
+      // TODO MULE-10013 remove this logic from here
       if (message instanceof InternalMessage) {
         setMessage(message);
       }
@@ -440,20 +397,21 @@ public class DefaultEventBuilder implements Event.Builder {
         }
 
       }
-      // Can be null if service call originates from MuleClient
-      if (context.getOriginatingFlowName() != null) {
-        flowConstruct = muleContext.getRegistry().lookupFlowConstruct(context.getOriginatingFlowName());
+      if (flowName != null) {
+        flowConstruct = muleContext.getRegistry().lookupFlowConstruct(flowName);
+        // If flow construct is a Pipeline and has a EventContext instance cache, then reestablish the event context here with
+        // that instance in order to conserve non-serializable subscribers which in turn reference callbacks. Otherwise use the
+        // serialized version with no subscribers.
+        if (flowConstruct instanceof Pipeline) {
+          EventContext cachedValue = ((Pipeline) flowConstruct).getSerializationEventContextCache().remove(context.getId());
+          context = cachedValue != null ? cachedValue : context;
+        }
       }
     }
 
     @Override
     public MuleContext getMuleContext() {
       return flowConstruct.getMuleContext();
-    }
-
-    @Override
-    public MessageExchangePattern getExchangePattern() {
-      return exchangePattern;
     }
 
     @Override
@@ -466,18 +424,17 @@ public class DefaultEventBuilder implements Event.Builder {
       return replyToDestination;
     }
 
-    @Override
-    public boolean isSynchronous() {
-      return synchronous;
-    }
-
     // //////////////////////////
     // Serialization methods
     // //////////////////////////
 
     private void writeObject(ObjectOutputStream out) throws IOException {
+      // TODO MULE-10013 remove this logic from here
       out.defaultWriteObject();
-      for (Map.Entry<String, DefaultTypedValue> entry : variables.entrySet()) {
+      if (flowName != null && flowConstruct instanceof Pipeline) {
+        ((Pipeline) flowConstruct).getSerializationEventContextCache().put(context.getId(), context);
+      }
+      for (Map.Entry<String, TypedValue> entry : variables.entrySet()) {
         Object value = entry.getValue();
         if (value != null && !(value instanceof Serializable)) {
           String message = String.format(
@@ -486,7 +443,6 @@ public class DefaultEventBuilder implements Event.Builder {
           throw new IOException(message);
         }
       }
-
     }
 
     private void setMessage(InternalMessage message) {
@@ -500,7 +456,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     @Override
     public <T> TypedValue<T> getVariable(String key) {
-      DefaultTypedValue<T> typedValue = variables.get(key);
+      TypedValue<T> typedValue = variables.get(key);
 
       if (typedValue == null) {
         throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");

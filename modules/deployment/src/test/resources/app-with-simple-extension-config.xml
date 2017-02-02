@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:simple="http://www.mulesoft.org/schema/mule/simple"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/simple http://www.mulesoft.org/schema/mule/simple/current/mule-simple.xsd">
+
+    <flow name="main">
+        <poll frequency="10000">
+            <set-payload value=""/>
+        </poll>
+
+        <simple:print-message/>
+        <echo-component/>
+    </flow>
+</mule>

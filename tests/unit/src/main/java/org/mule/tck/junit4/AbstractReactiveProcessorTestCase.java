@@ -7,25 +7,27 @@
 package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
-import static org.mule.tck.MuleTestUtils.processAsStreamAndBlock;
-import static reactor.core.Exceptions.unwrap;
-import static reactor.core.publisher.Mono.just;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
+import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
+
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.scheduler.Scheduler;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.Collection;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or
- * {@link org.mule.runtime.core.construct.Flow} that implements both {@link Processor#process(Event)} and
+ * {@link Flow} that implements both {@link Processor#process(Event)} and
  * {@link Processor#apply(Publisher)} needs paramatized tests so that both approaches are tested with the same test method. Test
  * cases that extend this abstract class should use (@link {@link #process(Processor, Event)} to invoke {@link Processor}'s as
  * part of the test, rather than invoking them directly.
@@ -35,21 +37,21 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   protected Scheduler scheduler;
 
-  private boolean reactive;
+  protected Mode mode;
 
-  public AbstractReactiveProcessorTestCase(boolean reactive) {
-    this.reactive = reactive;
+  public AbstractReactiveProcessorTestCase(Mode mode) {
+    this.mode = mode;
   }
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return asList(new Object[][] {{false}, {true}});
+    return asList(new Object[][] {{BLOCKING}, {NON_BLOCKING}});
   }
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    scheduler = new SimpleUnitTestSupportSchedulerService().computationScheduler();
+    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
   }
 
   @Override
@@ -60,38 +62,40 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   @Override
   protected Event process(Processor processor, Event event) throws Exception {
+    setMuleContextIfNeeded(processor, muleContext);
     try {
-      if (reactive) {
-        return processAsStreamAndBlock(event, processor);
+      switch (mode) {
+        case BLOCKING:
+          return processor.process(event);
+        case NON_BLOCKING:
+          return processWithMonoAndBlock(event, processor);
+        default:
+          return null;
+      }
+    } catch (Exception exception) {
+      // Do not unwrap MessagingException thrown by use of apply() with Flow for compatibility with flow.process()
+      if (!(processor instanceof Flow) && exception instanceof MessagingException) {
+        throw messagingExceptionToException((MessagingException) exception);
       } else {
-        return processor.process(event);
+        throw exception;
       }
-    } catch (MessagingException msgException) {
-      // unwrap MessagingException to ensure same exception is thrown by blocking and non-blocking processing
-      throw (msgException.getCause() instanceof Exception) ? (Exception) msgException.getCause()
-          : new RuntimeException(msgException.getCause());
     }
   }
 
-  /*
-   * Do not unwrap MessagingException thrown by use of apply() for compatability with flow.process()
-   */
-  protected Event processFlow(Flow flow, Event event) throws Exception {
-    if (reactive) {
-      try {
-        return just(event)
-            .transform(flow)
-            .subscribe()
-            .blockMillis(RECEIVE_TIMEOUT);
-      } catch (Throwable exception) {
-        throw (Exception) unwrap(exception);
-      }
-    } else {
-      return flow.process(event);
-    }
+  private Exception messagingExceptionToException(MessagingException msgException) {
+    // unwrap MessagingException to ensure same exception is thrown by blocking and non-blocking processing
+    return (msgException.getCause() instanceof Exception) ? (Exception) msgException.getCause()
+        : new RuntimeException(msgException.getCause());
   }
 
-  protected boolean isReactive() {
-    return reactive;
+  public enum Mode {
+    /**
+     * Test using {@link Processor#process(Event)} blocking API.
+     */
+    BLOCKING,
+    /**
+     * Test using new reactive API by creating a {@link Mono} and blocking and waiting for completion (value, empty or error)
+     */
+    NON_BLOCKING,
   }
 }

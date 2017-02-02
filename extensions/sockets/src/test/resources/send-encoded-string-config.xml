@@ -21,7 +21,7 @@
     </sockets:listener-config>
 
     <flow name="tcp-send">
-        <sockets:send config-ref="tcp-requester" hasResponse="false" outputEncoding="#[flowVars.encoding]"/>
+        <sockets:send config-ref="tcp-requester" hasResponse="false" outputEncoding="#[mel:flowVars.encoding]"/>
     </flow>
 
     <flow name="tcp-listen">
@@ -31,7 +31,7 @@
     </flow>
 
     <sub-flow name="onIncomingConnection">
-        <expression-component>new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
+        <expression-component>mel:new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
         </expression-component>
     </sub-flow>
 </mule>

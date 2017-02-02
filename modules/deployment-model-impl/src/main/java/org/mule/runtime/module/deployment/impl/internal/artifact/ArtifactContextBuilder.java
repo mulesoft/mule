@@ -8,36 +8,42 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
-
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
-import org.mule.runtime.module.deployment.impl.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -64,13 +70,16 @@ public class ArtifactContextBuilder {
   protected static final String ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT =
       "Only applications are allowed to have a parent context";
   protected static final String SERVICE_REPOSITORY_CANNOT_BE_NULL = "serviceRepository cannot be null";
+  protected static final String EXTENSION_MODEL_LOADER_REPOSITORY_CANNOT_BE_NULL =
+      "extensionModelLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL = "classLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
+  protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
   private String[] configurationFiles = new String[0];
-  private ArtifactConfiguration artifactConfiguration;
+  private ArtifactDeclaration artifactDeclaration;
   private Map<String, String> artifactProperties = new HashMap<>();
   private String artifactName = getUUID();
   private MuleContextBuilder muleContextBuilder;
@@ -80,9 +89,13 @@ public class ArtifactContextBuilder {
   private MuleContextListener muleContextListener;
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
+  private ExtensionModelLoaderRepository extensionModelLoaderRepository = (loaderDescriber) -> empty();
   private boolean enableLazyInit;
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
+  private PolicyProvider policyProvider;
+  private List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
+  private ExtensionManagerFactory extensionManagerFactory;
 
   private ArtifactContextBuilder() {}
 
@@ -130,11 +143,11 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * @param artifactConfiguration
+   * @param artifactDeclaration
    * @return
    */
-  public ArtifactContextBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
-    this.artifactConfiguration = artifactConfiguration;
+  public ArtifactContextBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
+    this.artifactDeclaration = artifactDeclaration;
     return this;
   }
 
@@ -246,6 +259,23 @@ public class ArtifactContextBuilder {
   }
 
   /**
+   * Sets a {@link ExtensionModelLoaderRepository} that allows to retrieve the available extension loaders.
+   *
+   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @return the builder
+   */
+  public ArtifactContextBuilder setExtensionModelLoaderRepository(ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+    checkArgument(extensionModelLoaderRepository != null, EXTENSION_MODEL_LOADER_REPOSITORY_CANNOT_BE_NULL);
+    this.extensionModelLoaderRepository = extensionModelLoaderRepository;
+    return this;
+  }
+
+  public ArtifactContextBuilder setPolicyProvider(PolicyProvider policyProvider) {
+    this.policyProvider = policyProvider;
+    return this;
+  }
+
+  /**
    * Allows to lazily create the artifact resources.
    *
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
@@ -274,6 +304,18 @@ public class ArtifactContextBuilder {
   }
 
   /**
+   * Adds a service configurator to configure the created context.
+   *
+   * @param serviceConfigurator used to configure the create context. Non null.
+   * @return the builder
+   */
+  public ArtifactContextBuilder withServiceConfigurator(MuleContextServiceConfigurator serviceConfigurator) {
+    checkState(serviceConfigurator != null, SERVICE_CONFIGURATOR_CANNOT_BE_NULL);
+    this.serviceConfigurators.add(serviceConfigurator);
+    return this;
+  }
+
+  /**
    * @return the {@code MuleContext} created with the provided configuration
    * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
@@ -287,7 +329,13 @@ public class ArtifactContextBuilder {
         List<ConfigurationBuilder> builders = new LinkedList<>();
         builders.addAll(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
-        builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
+        if (extensionManagerFactory == null) {
+          extensionManagerFactory =
+              new ArtifactExtensionManagerFactory(artifactPlugins, extensionModelLoaderRepository,
+                                                  new DefaultExtensionManagerFactory());
+        }
+        builders.add(new ArtifactExtensionManagerConfigurationBuilder(artifactPlugins,
+                                                                      extensionManagerFactory));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         ArtifactConfigurationProcessor artifactConfigurationProcessor = ArtifactConfigurationProcessor.discover();
         AtomicReference<ArtifactContext> artifactContext = new AtomicReference<>();
@@ -297,18 +345,26 @@ public class ArtifactContextBuilder {
 
           @Override
           public void configure(MuleContext muleContext) throws ConfigurationException {
+            if (serviceRepository != null) {
+              serviceConfigurators.add(new ContainerServicesMuleContextConfigurator(serviceRepository));
+            }
+            if (classLoaderRepository != null) {
+              serviceConfigurators.add(customizationService -> customizationService
+                  .registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository));
+            }
+            if (policyProvider != null) {
+              serviceConfigurators.add(customizationService -> customizationService
+                  .registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, policyProvider));
+            }
             ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
                 ArtifactContextConfiguration.builder()
                     .setMuleContext(muleContext)
                     .setConfigResources(configurationFiles)
-                    .setArtifactConfiguration(artifactConfiguration)
+                    .setArtifactDeclaration(artifactDeclaration)
                     .setArtifactProperties(artifactProperties)
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
-                    .setServiceConfigurators(asList(new ContainerServicesMuleContextConfigurator(serviceRepository),
-                                                    customizationService -> customizationService
-                                                        .registerCustomServiceImpl(MuleProperties.OBJECT_CLASSLOADER_REPOSITORY,
-                                                                                   classLoaderRepository)));
+                    .setServiceConfigurators(serviceConfigurators);
             if (parentContext != null) {
               artifactContextConfigurationBuilder.setParentContext(parentContext);
             }
@@ -360,5 +416,11 @@ public class ArtifactContextBuilder {
     }
     artifactProperties.put(APP_NAME_PROPERTY, artifactName);
     return new SimpleConfigurationBuilder(artifactProperties);
+  }
+
+  public ArtifactContextBuilder setExtensionManagerFactory(ExtensionManagerFactory extensionManagerFactory) {
+    this.extensionManagerFactory = extensionManagerFactory;
+
+    return this;
   }
 }

@@ -12,11 +12,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -24,7 +26,7 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpResponseBuilderTestCase {
+public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
   public static final String EXAMPLE_STRING = "exampleString";
   private MuleContext muleContext;
@@ -45,7 +47,7 @@ public class HttpResponseBuilderTestCase {
     mockMuleMessage(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), contentLengthDifferingPayloadSize);
 
     HttpResponse httpResponse =
-        httpResponseBuilder.build(new org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder(), mockEvent);
+        httpResponseBuilder.build(HttpResponse.builder(), mockEvent);
     assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
   }
 

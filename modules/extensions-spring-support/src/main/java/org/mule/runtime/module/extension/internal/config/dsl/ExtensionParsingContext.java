@@ -6,21 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
+import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.singleton;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-
-import com.google.common.collect.ImmutableList;
+import org.mule.runtime.api.meta.type.TypeCatalog;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Context to be used while registering parsers for an {@link ExtensionModel} definition, to keep track of global data accross all
@@ -31,7 +28,11 @@ import java.util.Optional;
 public class ExtensionParsingContext {
 
   private final Map<String, MetadataType> parsedObjectTypes = new HashMap<>();
-  private Optional<SubTypesMappingContainer> subTypesMapping = empty();
+  private final TypeCatalog typeCatalog;
+
+  public ExtensionParsingContext(ExtensionModel extensionModel) {
+    typeCatalog = TypeCatalog.getDefault(singleton(extensionModel));
+  }
 
   /**
    * Register an {@link ObjectType} to indicate it has already being parsed for the given {@code name} and {@code namespace}
@@ -65,31 +66,22 @@ public class ExtensionParsingContext {
    * @param type the {@link MetadataType} for which to retrieve its declared subTypes
    * @return a {@link Collection} with all the declared subtypes for the indicated {@link MetadataType}
    */
-  public Collection<MetadataType> getSubTypes(MetadataType type) {
-    return subTypesMapping.map(mapping -> mapping.getSubTypes(type)).orElse(ImmutableList.of());
-  }
-
-  /**
-   * Configures the subtype mapping to use
-   *
-   * @param subTypesMapping a {@link SubTypesMappingContainer}
-   */
-  public void setSubTypesMapping(SubTypesMappingContainer subTypesMapping) {
-    this.subTypesMapping = ofNullable(subTypesMapping);
+  public Collection<ObjectType> getSubTypes(ObjectType type) {
+    return typeCatalog.getSubTypes(type);
   }
 
   /**
    * @return a {@link List} with all the types that are extended by another type
    */
   public List<MetadataType> getAllBaseTypes() {
-    return subTypesMapping.map(SubTypesMappingContainer::getAllBaseTypes).orElse(ImmutableList.of());
+    return copyOf(typeCatalog.getAllBaseTypes());
   }
 
   /**
    * @return a {@link List} with all the types which extend another type, in no particular order
    */
   public List<MetadataType> getAllSubTypes() {
-    return subTypesMapping.map(SubTypesMappingContainer::getAllSubTypes).orElse(ImmutableList.of());
+    return copyOf(typeCatalog.getAllSubTypes());
   }
 
   private String generateObjectKey(String name, String namespace) {

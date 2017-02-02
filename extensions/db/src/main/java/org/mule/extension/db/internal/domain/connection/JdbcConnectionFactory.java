@@ -24,7 +24,7 @@ import javax.sql.DataSource;
  *
  * @since 4.0
  */
-class JdbcConnectionFactory {
+public class JdbcConnectionFactory {
 
   /**
    * Creates a new JDBC {@link Connection}
@@ -32,15 +32,11 @@ class JdbcConnectionFactory {
    * @param dataSource the {@link DataSource} from which the connection comes from
    * @param customDataTypes user defined data types
    * @return a {@link Connection}
-   * @throws ConnectionException if the connection could not be established
    */
-  public Connection createConnection(DataSource dataSource, List<DbType> customDataTypes) throws ConnectionException {
+  public Connection createConnection(DataSource dataSource, List<DbType> customDataTypes)
+      throws SQLException, ConnectionCreationException {
     Connection connection;
-    try {
-      connection = dataSource.getConnection();
-    } catch (SQLException e) {
-      throw new ConnectionCreationException("Could not obtain connection from data source", e);
-    }
+    connection = dataSource.getConnection();
 
     if (connection == null) {
       throw new ConnectionCreationException("Unable to create connection to the provided dataSource: " + dataSource);
@@ -49,11 +45,7 @@ class JdbcConnectionFactory {
     Map<String, Class<?>> typeMapping = createTypeMapping(customDataTypes);
 
     if (typeMapping != null && !typeMapping.isEmpty()) {
-      try {
-        connection.setTypeMap(typeMapping);
-      } catch (SQLException e) {
-        throw new ConnectionCreationException("Could not set custom data types on connection", e);
-      }
+      connection.setTypeMap(typeMapping);
     }
 
     return connection;
@@ -73,6 +65,4 @@ class JdbcConnectionFactory {
 
     return typeMapping;
   }
-
-
 }

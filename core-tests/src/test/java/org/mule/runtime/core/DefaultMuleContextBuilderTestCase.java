@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
@@ -41,7 +43,6 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.work.MuleWorkManager;
 
 import java.util.Map;
 import java.util.Set;
@@ -57,11 +58,10 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
     MuleContext muleContext = builder.buildMuleContext();
 
     // Assert
-    assertNotNull(muleContext);
-    assertEquals(DefaultMuleConfiguration.class, muleContext.getConfiguration().getClass());
-    assertEquals(MuleContextLifecycleManager.class, muleContext.getLifecycleManager().getClass());
-    assertEquals(ServerNotificationManager.class, muleContext.getNotificationManager().getClass());
-    assertEquals(MuleWorkManager.class, muleContext.getWorkManager().getClass());
+    assertThat(muleContext, notNullValue());
+    assertThat(muleContext.getConfiguration(), instanceOf(DefaultMuleConfiguration.class));
+    assertThat(muleContext.getLifecycleManager(), instanceOf(MuleContextLifecycleManager.class));
+    assertThat(muleContext.getNotificationManager(), instanceOf(ServerNotificationManager.class));
   }
 
   @Test
@@ -70,11 +70,10 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
     MuleContext muleContext = build();
 
     // Assert
-    assertNotNull(muleContext);
-    assertEquals(MyMuleConfiguration.class, muleContext.getConfiguration().getClass());
-    assertEquals(MyLifeCycleManager.class, muleContext.getLifecycleManager().getClass());
-    assertEquals(MyServerNotificationManager.class, muleContext.getNotificationManager().getClass());
-    assertEquals(MyWorkManager.class, muleContext.getWorkManager().getClass());
+    assertThat(muleContext, notNullValue());
+    assertThat(muleContext.getConfiguration(), instanceOf(MyMuleConfiguration.class));
+    assertThat(muleContext.getLifecycleManager(), instanceOf(MyLifeCycleManager.class));
+    assertThat(muleContext.getNotificationManager(), instanceOf(MyServerNotificationManager.class));
   }
 
   /**
@@ -87,7 +86,6 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
     DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder();
     builder.setMuleConfiguration(new MyMuleConfiguration());
     builder.setLifecycleManager(new MyLifeCycleManager());
-    builder.setWorkManager(new MyWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "test"));
     MuleContext muleContext = builder.buildMuleContext();
 
     Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaces =
@@ -114,7 +112,6 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
     builder.setMuleConfiguration(new MyMuleConfiguration());
     builder.setLifecycleManager(new MyLifeCycleManager());
     builder.setNotificationManager(new MyServerNotificationManager());
-    builder.setWorkManager(new MyWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "test"));
     return builder.buildMuleContext();
   }
 
@@ -135,12 +132,5 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
 
   static class MyServerNotificationManager extends ServerNotificationManager {
     // subclass just for testing
-  }
-
-  static class MyWorkManager extends MuleWorkManager {
-
-    public MyWorkManager(ThreadingProfile profile, String name) {
-      super(profile, name, 5000);
-    }
   }
 }

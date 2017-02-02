@@ -19,6 +19,7 @@ import org.mule.runtime.api.exception.MuleException;
  * For example, whether connections should be pooled, tied to an OAuth token, cached, etc.
  *
  * @param <C> the generic type of the connection being managed by {@code this} instance
+ *
  * @since 1.0
  */
 abstract class ConnectionManagementStrategy<C> implements Closeable {

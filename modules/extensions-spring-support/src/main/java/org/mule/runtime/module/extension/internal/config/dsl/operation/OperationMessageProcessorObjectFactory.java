@@ -7,21 +7,14 @@
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorFactory.getOperationMessageProcessor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.extension.api.model.property.PagedOperationModelProperty;
+import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
-import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.operation.InterceptingOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.operation.PagedOperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
@@ -32,48 +25,26 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
 
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
-
-  private ConfigurationProvider configurationProvider;
+  private final PolicyManager policyManager;
+  private ConfigurationProvider configuration;
   private String target = EMPTY;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel, OperationModel operationModel,
-                                                MuleContext muleContext) {
+                                                MuleContext muleContext, PolicyManager policyManager) {
     super(muleContext);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
+    this.policyManager = policyManager;
   }
 
   @Override
-  public OperationMessageProcessor getObject() throws Exception {
-    return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      try {
-        ResolverSet resolverSet = getParametersAsResolverSet(operationModel);
-        OperationMessageProcessor processor = createMessageProcessor(resolverSet);
-
-        // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
-        muleContext.getInjector().inject(processor);
-        return processor;
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    });
+  public OperationMessageProcessor doGetObject() throws Exception {
+    return getOperationMessageProcessor(extensionModel, operationModel, configuration, policyManager, parameters, muleContext,
+                                        target);
   }
 
-  private OperationMessageProcessor createMessageProcessor(ResolverSet resolverSet) {
-    if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
-      return new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target,
-                                                       resolverSet, (ExtensionManagerAdapter) muleContext.getExtensionManager());
-    } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                (ExtensionManagerAdapter) muleContext.getExtensionManager());
-    } else {
-      return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                           (ExtensionManagerAdapter) muleContext.getExtensionManager());
-    }
-  }
-
-  public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
-    this.configurationProvider = configurationProvider;
+  public void setConfigurationProvider(ConfigurationProvider configuration) {
+    this.configuration = configuration;
   }
 
   public void setTarget(String target) {

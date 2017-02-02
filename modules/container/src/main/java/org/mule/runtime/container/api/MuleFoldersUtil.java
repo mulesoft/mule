@@ -7,6 +7,7 @@
 
 package org.mule.runtime.container.api;
 
+import static java.io.File.separator;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -22,6 +23,8 @@ public class MuleFoldersUtil {
 
   public static final String EXECUTION_FOLDER = ".mule";
   public static final String LIB_FOLDER = "lib";
+  public static final String CONFIG_FOLDER = "mule";
+  public static final String SHARED_FOLDER = "shared";
   public static final String APPS_FOLDER = "apps";
   public static final String PLUGINS_FOLDER = "plugins";
   public static final String CLASSES_FOLDER = "classes";
@@ -81,18 +84,66 @@ public class MuleFoldersUtil {
     return new File(getAppFolder(appName), CLASSES_FOLDER);
   }
 
+  /**
+   * @param appName name of the application to look for
+   * @return the libraries folder in the deployed application with the given name
+   */
   public static File getAppLibFolder(String appName) {
-    return new File(getAppFolder(appName), LIB_FOLDER);
+    return new File(getAppFolder(appName), getAppLibsFolderPath());
   }
 
+  /**
+   * @param appName name of the application to look for
+   * @return the plugins folder in the deployed application with the given name
+   */
   public static File getAppPluginsFolder(String appName) {
-    return new File(getAppFolder(appName), PLUGINS_FOLDER);
+    return new File(getAppFolder(appName), getAppPluginsFolderPath());
   }
 
-  public static File getAppSharedPluginLibsFolder(String appName) {
-    return new File(getAppPluginsFolder(appName), LIB_FOLDER);
+  /**
+   * @return relative path for plugins on an application
+   */
+  public static String getAppPluginsFolderPath() {
+    return PLUGINS_FOLDER + separator;
   }
 
+  /**
+   * @param appName name of the application to look for
+   * @return the shared libraries folder in the deployed application with the given name
+   */
+  public static File getAppSharedLibsFolder(String appName) {
+    return new File(getAppFolder(appName), getAppSharedLibsFolderPath());
+  }
+
+  /**
+   * @return relative path for shared libraries on an application
+   */
+  public static String getAppSharedLibsFolderPath() {
+    return getAppLibsFolderPath() + SHARED_FOLDER + separator;
+  }
+
+  private static String getAppLibsFolderPath() {
+    return LIB_FOLDER + separator;
+  }
+
+  /**
+   * @param appName name of the application to look for
+   * @return the config folder in the deployed application with the given name
+   */
+  public static File getAppConfigFolder(String appName) {
+    return new File(getAppFolder(appName), getAppConfigFolderPath());
+  }
+
+  /*
+   * @return relative path for configuration files on an application
+   */
+  public static String getAppConfigFolderPath() {
+    return CONFIG_FOLDER + separator;
+  }
+
+  /**
+   * @return relative path for libraries on an application
+   */
   public static File getExecutionFolder() {
     return new File(getMuleHomeFolder(), EXECUTION_FOLDER);
   }

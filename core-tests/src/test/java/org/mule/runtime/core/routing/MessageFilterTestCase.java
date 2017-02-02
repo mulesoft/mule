@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -22,8 +21,8 @@ import org.junit.Test;
 
 public class MessageFilterTestCase extends AbstractReactiveProcessorTestCase {
 
-  public MessageFilterTestCase(boolean nonBlocking) {
-    super(nonBlocking);
+  public MessageFilterTestCase(Mode mode) {
+    super(mode);
   }
 
   @Test
@@ -76,7 +75,7 @@ public class MessageFilterTestCase extends AbstractReactiveProcessorTestCase {
     mp.setMuleContext(muleContext);
     mp.setListener(out);
 
-    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(ONE_WAY).build();
+    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     Event resultEvent = process(mp, inEvent);
 

@@ -7,30 +7,30 @@
 
     <flow name="Distributor">
         <!-- FruitBowl.getFruit() List -->
-        <splitter expression="#[payload.fruit]"/>
+        <splitter expression="#[mel:payload.fruit]"/>
         <choice>
-            <when expression="#[payload is org.mule.tck.testmodels.fruit.Apple]">
+            <when expression="#[mel:payload is org.mule.tck.testmodels.fruit.Apple]">
                 <flow-ref name="ServiceOne"/>
             </when>
-            <when expression="#[payload is org.mule.tck.testmodels.fruit.Banana]">
+            <when expression="#[mel:payload is org.mule.tck.testmodels.fruit.Banana]">
                 <flow-ref name="ServiceTwo"/>
             </when>
-            <when expression="#[payload is org.mule.tck.testmodels.fruit.Orange]">
+            <when expression="#[mel:payload is org.mule.tck.testmodels.fruit.Orange]">
                 <flow-ref name="ServiceThree"/>
             </when>
         </choice>
     </flow>
 
     <flow name="ServiceOne">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Apple]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Apple]"/>
     </flow>
 
     <flow name="ServiceTwo">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Banana]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Banana]"/>
     </flow>
 
     <flow name="ServiceThree">
-        <test:assert expression="#[payload is org.mule.tck.testmodels.fruit.Orange]"/>
+        <test:assert expression="#[mel:payload is org.mule.tck.testmodels.fruit.Orange]"/>
     </flow>
 
 </mule>

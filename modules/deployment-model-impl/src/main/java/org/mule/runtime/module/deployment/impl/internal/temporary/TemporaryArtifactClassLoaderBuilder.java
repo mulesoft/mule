@@ -6,17 +6,28 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.temporary;
 
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
+import static com.google.common.collect.Lists.newArrayList;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarExplorer;
+import org.mule.runtime.module.artifact.util.JarInfo;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders used by mule artifacts such as domains or applications.
@@ -29,21 +40,29 @@ import java.io.IOException;
 public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder<TemporaryArtifactClassLoaderBuilder> {
 
   private ArtifactClassLoader parentClassLoader;
+  private List<URL> urls = newArrayList();
+  private DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
 
   /**
    * Creates an {@link TemporaryArtifactClassLoaderBuilder}.
    * 
    * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
    * @param artifactPluginClassLoaderFactory factory for creating class loaders for artifact plugins. Must be not null.
-   * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to resolve.
-   * @param dependenciesProvider resolver for missing dependencies.
+   * @param artifactClassLoaderFactory creates artifact class loaders from descriptors
+   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
                                              ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                             ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                             DependenciesProvider dependenciesProvider) {
-    super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository,
-          artifactPluginClassLoaderFactory, artifactDescriptorFactory, dependenciesProvider);
+                                             DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
+                                             PluginDependenciesResolver pluginDependenciesResolver) {
+    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+
+    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
+  }
+
+  @Override
+  protected ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader) {
+    return artifactClassLoaderFactory.create(artifactId, regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
   }
 
   /**
@@ -56,12 +75,49 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
   }
 
   /**
+   * Adds a {@link URL} to the {@link ArtifactDescriptor}.
+   *
+   * @param url {@link URL} to be included as part of the {@link ArtifactDescriptor} definition.
+   * @return the builder
+   */
+  public TemporaryArtifactClassLoaderBuilder addUrl(URL url) {
+    this.urls.add(url);
+    return this;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public MuleDeployableArtifactClassLoader build() throws IOException {
-    setArtifactDescriptor(new ArtifactDescriptor("temp"));
+    final ApplicationDescriptor artifactDescriptor = new ApplicationDescriptor("temp");
+    if (!urls.isEmpty()) {
+      ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
+
+      JarInfo jarInfo = createJarInfo(this.urls);
+      classLoaderModelBuilder.exportingPackages(jarInfo.getPackages())
+          .exportingResources(jarInfo.getResources());
+
+      this.urls.stream().forEach(url -> classLoaderModelBuilder.containing(url));
+
+      artifactDescriptor.setClassLoaderModel(classLoaderModelBuilder.build());
+    }
+    setArtifactDescriptor(artifactDescriptor);
     return (MuleDeployableArtifactClassLoader) super.build();
+  }
+
+  private JarInfo createJarInfo(List<URL> urls) {
+    Set<String> packages = new HashSet<>();
+    Set<String> resources = new HashSet<>();
+    final JarExplorer jarExplorer = new FileJarExplorer();
+
+    for (URL library : urls) {
+      final JarInfo jarInfo = jarExplorer.explore(library);
+      packages.addAll(jarInfo.getPackages());
+      resources.addAll(jarInfo.getResources());
+    }
+
+    return new JarInfo(packages, resources);
   }
 
   @Override

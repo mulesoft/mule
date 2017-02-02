@@ -6,24 +6,23 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
-import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+
+import javax.inject.Inject;
 
 public abstract class PetStoreConnectionProvider<T extends PetStoreClient> implements ConnectionProvider<T>, Lifecycle {
 
@@ -39,9 +38,6 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
   @Parameter
   @Optional
   protected TlsContextFactory tls;
-  @Parameter
-  @Optional
-  protected ThreadingProfile threadingProfile;
   @Optional
   @Parameter
   protected Date openingDate;
@@ -55,8 +51,7 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
 
   @Override
   public T connect() {
-    return (T) new PetStoreClient(username, password, tls, threadingProfile, configName, openingDate, closedForHolidays,
-                                  discountDates);
+    return (T) new PetStoreClient(username, password, tls, configName, openingDate, closedForHolidays, discountDates);
   }
 
   @Override
@@ -71,8 +66,7 @@ public abstract class PetStoreConnectionProvider<T extends PetStoreClient> imple
     if (connection.getUsername().equals("john") && connection.getPassword().equals("doe")) {
       return ConnectionValidationResult.success();
     } else {
-      return ConnectionValidationResult.failure("Invalid credentials", ConnectionExceptionCode.INCORRECT_CREDENTIALS,
-                                                new Exception("Invalid credentials"));
+      return ConnectionValidationResult.failure("Invalid credentials", new Exception("Invalid credentials"));
     }
   }
 

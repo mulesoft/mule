@@ -6,11 +6,11 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-
+import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -26,7 +26,6 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Sets up some HTTPS servers and clients with different protocols and ciphers. Verifies only matching configurations are
@@ -41,11 +40,11 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Rule
   public DynamicPort port3 = new DynamicPort("port3");
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
-  @Rule
   public SystemProperty cipherSuites = new SystemProperty("cipherSuites", "TLS_DHE_DSS_WITH_AES_128_CBC_SHA");
   @Rule
   public SystemProperty protocol = new SystemProperty("protocol", "HTTPS");
+  @Rule
+  public ExpectedError expectedError = ExpectedError.none();
 
   private HttpRequestOptionsBuilder optionsBuilder = HttpRequestOptionsBuilder.newOptions().method(POST.name());
   private DefaultTlsContextFactory tlsContextFactory;
@@ -93,13 +92,13 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Test
   public void failsWithProtocolMismatch() throws Exception {
-    expectedException.expectCause(isA(IOException.class));
+    expectedError.expectCause(instanceOf(IOException.class));
     flowRunner("12Client1Server").withPayload(TEST_PAYLOAD).run();
   }
 
   @Test
   public void failsWithCipherSuiteMismatch() throws Exception {
-    expectedException.expectCause(isA(IOException.class));
+    expectedError.expectCause(instanceOf(IOException.class));
     flowRunner("12CipherClient1CipherServer").withPayload(TEST_PAYLOAD).run();
   }
 }

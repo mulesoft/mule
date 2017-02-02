@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
+
+
+    <vegan:banana-config name="banana">
+        <vegan:banana-plantain-connection originCountry="Brazil"/>
+    </vegan:banana-config>
+
+    <flow name="alias">
+        <vegan:eat-banana config-ref="banana"/>
+    </flow>
+
+</mule>

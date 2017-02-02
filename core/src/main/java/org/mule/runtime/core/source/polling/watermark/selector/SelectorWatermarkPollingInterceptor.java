@@ -9,11 +9,12 @@ package org.mule.runtime.core.source.polling.watermark.selector;
 
 import static java.lang.String.format;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
@@ -58,8 +59,8 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
    */
   @SuppressWarnings("unchecked")
   @Override
-  public Event prepareRouting(Event sourceEvent, Event event) throws ConfigurationException {
-    event = super.prepareRouting(sourceEvent, event);
+  public Event prepareRouting(Event sourceEvent, Event event, FlowConstruct flow) throws ConfigurationException {
+    event = super.prepareRouting(sourceEvent, event, flow);
     Object payload = event.getMessage().getPayload().getValue();
     final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector, this.selectorExpression, event, muleContext);
 

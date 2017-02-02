@@ -23,7 +23,7 @@
 
     <flow name="multipleDynamicRoundRobin">
         <choice>
-            <when expression="#[flowVars['first-router']]">
+            <when expression="#[mel:flowVars['first-router']]">
                 <dynamic-round-robin>
                     <custom-route-resolver ref="beanRouteResolver" />
                 </dynamic-round-robin>
@@ -38,7 +38,7 @@
 
     <flow name="multipleDynamicRoundRobinWithId">
         <choice>
-            <when expression="#[flowVars['first-router']]">
+            <when expression="#[mel:flowVars['first-router']]">
                 <dynamic-round-robin>
                     <custom-route-resolver ref="identifiableRouteResolver" />
                 </dynamic-round-robin>

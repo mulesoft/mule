@@ -11,6 +11,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -40,7 +41,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -49,11 +49,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
@@ -72,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * Dependencies resolution uses dependencies management declared by these artifacts while resolving the dependency graph.
  * <p/>
  * Plugins are discovered as {@link Extension} if they do have a annotated a {@link Class}. It generates the {@link Extension}
- * metadata in order to later register it to an {@link org.mule.runtime.extension.api.ExtensionManager}.
+ * metadata in order to later register it to an {@link org.mule.runtime.core.api.extension.ExtensionManager}.
  *
  * @since 4.0
  */
@@ -242,8 +244,21 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                     List<ArtifactUrlClassification> serviceUrlClassifications,
                                                     List<PluginUrlClassification> pluginUrlClassifications,
                                                     ArtifactClassificationType rootArtifactType) {
+    PatternInclusionsDependencyFilter inclusionsDependencyFilter =
+        new PatternInclusionsDependencyFilter(context.getProvidedInclusions());
+
     directDependencies = directDependencies.stream()
         .filter(getContainerDirectDependenciesFilter(rootArtifactType))
+        .filter(dependency -> {
+          Artifact artifact = dependency.getArtifact();
+          return (!serviceUrlClassifications.stream()
+              .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(toId(artifact))).findAny()
+              .isPresent()
+              && !pluginUrlClassifications.stream()
+                  .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(toId(artifact))).findAny()
+                  .isPresent())
+              || inclusionsDependencyFilter.accept(new DefaultDependencyNode(new Dependency(artifact, COMPILE)), emptyList());
+        })
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
@@ -261,6 +276,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       excludedFilterPattern.addAll(pluginUrlClassifications.stream()
           .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId())
           .collect(toList()));
+    }
+    if (!serviceUrlClassifications.isEmpty()) {
       excludedFilterPattern.addAll(serviceUrlClassifications.stream()
           .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId())
           .collect(toList()));
@@ -271,8 +288,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       logger.debug("Resolving dependencies for container using inclusion filter patterns: {}", context.getProvidedInclusions());
     }
 
-    final DependencyFilter dependencyFilter = orFilter(new PatternInclusionsDependencyFilter(context.getProvidedInclusions()),
-                                                       new PatternExclusionsDependencyFilter(excludedFilterPattern));
+    final DependencyFilter dependencyFilter =
+        orFilter(inclusionsDependencyFilter, new PatternExclusionsDependencyFilter(excludedFilterPattern));
 
     List<URL> containerUrls;
     try {
@@ -406,8 +423,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
 
       for (ArtifactClassificationNode pluginClassifiedNode : pluginsClassified.values()) {
-        generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
-                                  pluginClassifiedNode.getUrls());
+        List<URL> urls = generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
+                                                   pluginClassifiedNode.getUrls());
+        pluginClassifiedNode.setUrls(urls);
       }
 
       extensionPluginMetadataGenerator.generateDslResources();
@@ -434,7 +452,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         if (node.getExportClasses() != null && !node.getExportClasses().isEmpty()) {
           logger.warn("exportClasses is not supported for services artifacts, they are going to be ignored");
         }
-        return new ArtifactUrlClassification(toClassifierLessId(node.getArtifact()), serviceProviderClassName, node.getUrls());
+        return new ArtifactUrlClassification(toId(node.getArtifact()), serviceProviderClassName, node.getUrls());
       } catch (IOException e) {
         throw new IllegalArgumentException("Couldn't read " + SERVICE_PROPERTIES_FILE_NAME + " for artifact: "
             + node.getArtifact(), e);
@@ -454,9 +472,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     for (ArtifactClassificationNode node : classificationNodes) {
       final List<String> pluginDependencies = node.getArtifactDependencies().stream()
-          .map(dependency -> toClassifierLessId(dependency.getArtifact()))
+          .map(dependency -> toId(dependency.getArtifact()))
           .collect(toList());
-      final String classifierLessId = toClassifierLessId(node.getArtifact());
+      final String classifierLessId = toId(node.getArtifact());
       final PluginUrlClassification pluginUrlClassification =
           pluginResourcesResolver.resolvePluginResourcesFor(
                                                             new PluginUrlClassification(classifierLessId, node.getUrls(),
@@ -522,7 +540,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     logger.debug("Artifacts {} identified a plugin dependencies for plugin {}", pluginArtifactDependencies, artifactToClassify);
     pluginArtifactDependencies.stream()
         .map(artifact -> {
-          String artifactClassifierLessId = toClassifierLessId(artifact);
+          String artifactClassifierLessId = toId(artifact);
           if (!artifactsClassified.containsKey(artifactClassifierLessId)) {
             buildPluginUrlClassification(artifact, context, rootArtifactDirectDependencies, directDependenciesFilter,
                                          artifactsClassified);
@@ -531,18 +549,46 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         })
         .forEach(artifactDependencies::add);
 
-    final ArrayList<Class> exportClasses = newArrayList(context.getExportPluginClasses(artifactToClassify));
+    final List<Class> exportClasses = getArtifactExportedClasses(artifactToClassify, context);
+
     ArtifactClassificationNode artifactUrlClassification = new ArtifactClassificationNode(artifactToClassify,
                                                                                           urls,
                                                                                           exportClasses,
                                                                                           artifactDependencies);
 
-    artifactsClassified.put(toClassifierLessId(artifactToClassify), artifactUrlClassification);
+    artifactsClassified.put(toId(artifactToClassify), artifactUrlClassification);
   }
 
   /**
-   * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier
-   * especified.
+   * Resolves the exported plugin classes from the given {@link Artifact}
+   *
+   * @param exporterArtifact {@link Artifact} used to resolve the exported classes
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @return {@link List} of {@link Class} that the given {@link Artifact} exports
+   */
+  private List<Class> getArtifactExportedClasses(Artifact exporterArtifact, ClassPathClassifierContext context) {
+    final AtomicReference<URL> artifactUrl = new AtomicReference<>();
+    try {
+      artifactUrl.set(dependencyResolver.resolveArtifact(exporterArtifact).getArtifact().getFile().toURI().toURL());
+    } catch (MalformedURLException | ArtifactResolutionException e) {
+      throw new IllegalStateException("Unable to resolve artifact URL", e);
+    }
+    Artifact rootArtifact = context.getRootArtifact();
+
+    return context.getExportPluginClasses().stream()
+        .filter(clazz -> {
+          boolean isFromCurrentArtifact = clazz.getProtectionDomain().getCodeSource().getLocation().equals(artifactUrl.get());
+          if (isFromCurrentArtifact && exporterArtifact != rootArtifact) {
+            logger.warn("Exported class '{}' from plugin '{}' is being used from another artifact, {}", clazz.getSimpleName(),
+                        exporterArtifact, rootArtifact);
+          }
+          return isFromCurrentArtifact;
+        })
+        .collect(toList());
+  }
+
+  /**
+   * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier specified.
    *
    * @param directDependencies {@link List} of direct {@link Dependency}
    * @return {@link List} of {@link Artifact}s for those dependencies classified as with the give classifier, can be
@@ -615,11 +661,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     return directDependencies.isEmpty() ? Optional.<Dependency>empty()
         : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(groupId)
             && dependency.getArtifact().getArtifactId().equals(artifactId)).findFirst();
-  }
-
-  private String toClassifierLessId(Artifact pluginArtifact) {
-    return toId(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getExtension(), null,
-                pluginArtifact.getVersion());
   }
 
   /**
@@ -748,16 +789,19 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     } else {
       logger.debug("RootArtifact already classified as plugin or module, excluding it from application classification");
       exclusionsPatterns.add(rootArtifact.getGroupId() + MAVEN_COORDINATES_SEPARATOR + rootArtifact.getArtifactId() +
-          MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR + rootArtifact.getVersion());
+          MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR
+          + rootArtifact.getVersion());
     }
 
     directDependencies = directDependencies.stream()
         .map(toTransform -> {
           if (toTransform.getScope().equals(TEST)) {
-            return new Dependency(toTransform.getArtifact(), COMPILE);
+            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
+            return toTransform.setScope(COMPILE);
           }
           if (PLUGIN.equals(rootArtifactType) && toTransform.getScope().equals(COMPILE)) {
-            return new Dependency(toTransform.getArtifact(), PROVIDED);
+            // TODO MULE-11332 Review other manifestations of this bug and add unit tests
+            return toTransform.setScope(PROVIDED);
           }
           return toTransform;
         })

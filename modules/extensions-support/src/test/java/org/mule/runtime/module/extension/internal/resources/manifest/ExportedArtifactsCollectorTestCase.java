@@ -6,37 +6,43 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.model.property.ExportModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.vegan.extension.VeganAttributes;
 
+import com.google.common.reflect.TypeToken;
+
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExportedArtifactsCollectorTestCase {
@@ -48,6 +54,7 @@ public class ExportedArtifactsCollectorTestCase {
   private static final String SEED_PACKAGE = "org.mule.tck.testmodels.fruit.seed";
   private static final String VEGAN_PACKAGE = "org.mule.test.vegan.extension";
   private static final String SHAPE_PACKAGE = "org.mule.test.metadata.extension.model.shapes";
+  private static final String EXCEPTION_PACKAGE = "org.mule.test.heisenberg.extension.exception";
 
   @Mock
   private ExtensionModel extensionModel;
@@ -56,27 +63,34 @@ public class ExportedArtifactsCollectorTestCase {
 
   @Before
   public void setup() {
-    ExportModelProperty exportModelProperty = new ExportModelProperty(emptyList(), emptyList());
-    when(extensionModel.getModelProperty(ExportModelProperty.class)).thenReturn(Optional.of(exportModelProperty));
     ClassLoaderModelProperty classLoaderModelProperty = new ClassLoaderModelProperty(getClass().getClassLoader());
-    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(Optional.of(classLoaderModelProperty));
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(of(classLoaderModelProperty));
 
     OutputModel appleList = mockOutputModel(new TypeToken<List<Apple>>() {}.getType());
     OperationModel firstOperation = mockOperationModel(appleList, mockOutputModel(List.class));
+    withMethod(firstOperation, getOperationMethods(HeisenbergOperations.class).stream()
+        .filter(m -> m.getName().equals("callGusFring"))
+        .findFirst());
 
     ParameterModel parameter = mockParameterModel(Shape.class);
     OutputModel resultList = mockOutputModel(new TypeToken<List<Result<Apple, VeganAttributes>>>() {}.getType());
     OperationModel secondOperation = mockOperationModel(resultList, mockOutputModel(List.class), parameter);
-
+    withMethod(secondOperation, empty());
     when(extensionModel.getOperationModels()).thenReturn(asList(firstOperation, secondOperation));
     collector = new ExportedArtifactsCollector(extensionModel);
+  }
+
+  private void withMethod(OperationModel operationModel, Optional<Method> method) {
+    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
+        .thenReturn(method.map(ImplementingMethodModelProperty::new));
   }
 
   @Test
   public void collect() {
     Set<String> exportedPackages = collector.getExportedPackages();
-    assertThat(exportedPackages, hasSize(5));
-    assertThat(exportedPackages, hasItems(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE));
+    assertThat(exportedPackages, hasSize(6));
+    assertThat(exportedPackages,
+               containsInAnyOrder(SHAPE_PACKAGE, APPLE_PACKAGE, VEGAN_PACKAGE, PEEL_PACKAGE, SEED_PACKAGE, EXCEPTION_PACKAGE));
   }
 
   private OutputModel mockOutputModel(Type type) {
@@ -96,7 +110,7 @@ public class ExportedArtifactsCollectorTestCase {
     when(op.getOutput()).thenReturn(output);
     when(op.getOutputAttributes()).thenReturn(attributes);
     if (params != null) {
-      when(op.getParameterModels()).thenReturn(asList(params));
+      mockParameters(op, params);
     }
     return op;
   }

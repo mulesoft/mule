@@ -79,6 +79,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Mule Plugins -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -91,6 +99,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -98,6 +107,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -105,6 +115,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -112,6 +123,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -179,6 +191,18 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-jaas</artifactId>
             <version>${activemqVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jacksonVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jacksonVersion}</version>
             <scope>test</scope>
         </dependency>
         <!-- Used by ActiveMQ if persistent=true -->
@@ -339,6 +363,20 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-deployment-model-impl</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>

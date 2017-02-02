@@ -6,12 +6,10 @@
  */
 package org.mule.extension.email.internal.mailbox;
 
-import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.extension.email.internal.AbstractEmailConnection;
 import org.mule.extension.email.internal.AbstractEmailConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 /**
@@ -20,20 +18,14 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  * @since 4.0
  */
 // TODO: Change generic signature for a more specific one. MULE-9874
-public abstract class AbstractMailboxConnectionProvider<Connection extends AbstractEmailConnection>
-    extends AbstractEmailConnectionProvider<Connection> implements PoolingConnectionProvider<Connection> {
-
-  /**
-   * A basic set of parameters for email connections.
-   */
-  @ParameterGroup
-  protected EmailConnectionSettings settings;
+public abstract class AbstractMailboxConnectionProvider<C extends AbstractEmailConnection>
+    extends AbstractEmailConnectionProvider<C> implements PoolingConnectionProvider<C> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void disconnect(Connection connection) {
+  public void disconnect(C connection) {
     connection.disconnect();
   }
 
@@ -41,12 +33,12 @@ public abstract class AbstractMailboxConnectionProvider<Connection extends Abstr
    * {@inheritDoc}
    */
   @Override
-  public ConnectionValidationResult validate(Connection connection) {
+  public ConnectionValidationResult validate(C connection) {
     return connection.validate();
   }
 
   @Override
-  public void onBorrow(Connection connection) {
+  public void onBorrow(C connection) {
     if (connection instanceof MailboxConnection) {
       ((MailboxConnection) connection).closeFolder(false);
     }

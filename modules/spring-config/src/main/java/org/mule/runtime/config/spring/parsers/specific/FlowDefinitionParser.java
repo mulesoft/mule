@@ -11,7 +11,7 @@ import static org.mule.runtime.config.spring.util.ProcessingStrategyParserUtils.
 
 import org.mule.runtime.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 public class FlowDefinitionParser extends OrphanDefinitionParser {
 
   public FlowDefinitionParser() {
-    super(Flow.class, true);
+    super(DefaultFlowBuilder.DefaultFlow.class, true);
     addIgnored("abstract");
     addIgnored("name");
     addIgnored(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE);

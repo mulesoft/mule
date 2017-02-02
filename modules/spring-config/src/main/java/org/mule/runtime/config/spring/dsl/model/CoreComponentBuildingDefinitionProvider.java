@@ -21,6 +21,12 @@ import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
@@ -38,13 +44,10 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
-import static org.mule.runtime.dsl.api.component.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.dsl.api.xml.DslConstants.CORE_NAMESPACE;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -76,18 +79,18 @@ import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
-import org.mule.runtime.core.api.EncryptionStrategy;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -100,9 +103,7 @@ import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.component.simple.LogComponent;
 import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
@@ -119,15 +120,16 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
-import org.mule.runtime.core.model.resolvers.CallableEntryPointResolver;
-import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.runtime.core.model.resolvers.ExplicitMethodEntryPointResolver;
-import org.mule.runtime.core.model.resolvers.MethodHeaderPropertyEntryPointResolver;
-import org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver;
-import org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
@@ -199,6 +201,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -220,6 +223,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CUSTOM_EXCEPTION_STRATEGY = "custom-exception-strategy";
   private static final String ERROR_HANDLER = "error-handler";
   private static final String SET_PAYLOAD = "set-payload";
+  private static final String LOGGER = "logger";
   private static final String PROCESSOR_CHAIN = "processor-chain";
   private static final String PROCESSOR = "processor";
   private static final String TRANSFORMER = "transformer";
@@ -323,6 +327,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build()).build());
 
     componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(LOGGER).withTypeDefinition(fromType(LoggerMessageProcessor.class))
+            .withSetterParameterDefinition("message", fromSimpleParameter("message").build())
+            .withSetterParameterDefinition("category", fromSimpleParameter("category").build())
+            .withSetterParameterDefinition("level", fromSimpleParameter("level").build()).build());
+
+    componentBuildingDefinitions
         .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyProcessor.class),
                                                AddPropertyProcessor.class,
                                                newBuilder()
@@ -412,22 +422,23 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withConstructorParameterDefinition(fromChildConfiguration(Filter.class).build())
             .withConstructorParameterDefinition(fromSimpleParameter("throwOnUnaccepted").withDefaultValue(false).build())
             .withConstructorParameterDefinition(fromSimpleReferenceParameter("onUnaccepted").build()).asPrototype().build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(Flow.class))
-        .withConstructorParameterDefinition(fromSimpleParameter(NAME).build())
-        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
-        .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
-                                       fromChildConfiguration(MessagingExceptionHandler.class).build())
-        .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
-                                       fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
-        .build());
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(FLOW).withTypeDefinition(fromType(DefaultFlowBuilder.DefaultFlow.class))
+            .withConstructorParameterDefinition(fromSimpleParameter(NAME).build())
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+            .withSetterParameterDefinition("initialState", fromSimpleParameter("initialState").build())
+            .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
+            .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+            .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
+                                           fromChildConfiguration(MessagingExceptionHandler.class).build())
+            .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
+                                           fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
+            .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SCATTER_GATHER)
         .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
+        .withSetterParameterDefinition("parallel", fromSimpleParameter("parallel").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("aggregationStrategy", fromChildConfiguration(AggregationStrategy.class).build())
-        .withSetterParameterDefinition("threadingProfile", fromChildConfiguration(ThreadingProfile.class).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(WIRE_TAP).withTypeDefinition(fromType(WireTap.class))
@@ -469,7 +480,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("failureExpression", fromSimpleParameter("failureExpression").build())
             .withSetterParameterDefinition("ackExpression", fromSimpleParameter("ackExpression").build())
             .withSetterParameterDefinition("synchronous", fromSimpleParameter("synchronous").build())
-            .withSetterParameterDefinition("threadingProfile", fromChildConfiguration(ThreadingProfile.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FOREACH).withTypeDefinition(fromType(Foreach.class))
@@ -539,11 +549,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
 
-    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier("reconnect-forever")
+    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
         .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
-    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier("reconnect")
+    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
@@ -584,19 +594,18 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
         .build());
 
-    componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier("notifications").withTypeDefinition(fromType(ServerNotificationManager.class))
-            .withObjectFactoryType(ServerNotificationManagerConfigurator.class)
-            .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
-            .withSetterParameterDefinition("enabledNotifications",
-                                           fromChildCollectionConfiguration(NotificationConfig.EnabledNotificationConfig.class)
-                                               .build())
-            .withSetterParameterDefinition("disabledNotifications",
-                                           fromChildCollectionConfiguration(NotificationConfig.DisabledNotificationConfig.class)
-                                               .build())
-            .withSetterParameterDefinition("notificationListeners",
-                                           fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
-            .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("notifications")
+        .withTypeDefinition(fromType(ServerNotificationManagerConfigurator.class))
+        .withSetterParameterDefinition("notificationDynamic", fromSimpleParameter("dynamic").build())
+        .withSetterParameterDefinition("enabledNotifications",
+                                       fromChildCollectionConfiguration(NotificationConfig.EnabledNotificationConfig.class)
+                                           .build())
+        .withSetterParameterDefinition("disabledNotifications",
+                                       fromChildCollectionConfiguration(NotificationConfig.DisabledNotificationConfig.class)
+                                           .build())
+        .withSetterParameterDefinition("notificationListeners",
+                                       fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
+        .build());
 
     ComponentBuildingDefinition.Builder baseNotificationDefinition =
         baseDefinition.copy().withSetterParameterDefinition("interfaseName", fromSimpleParameter("interface").build())
@@ -632,7 +641,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       String[] errorTypeIdentifiers = value.split(",");
       List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
         String parsedIdentifier = identifier.trim();
-        ErrorType errorType = muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
+        Optional<ErrorType> optional =
+            muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
+        ErrorType errorType = optional
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
+                                                                            parsedIdentifier)));
         return new SingleErrorTypeMatcher(errorType);
       }).collect(toList());
       return new DisjunctiveErrorTypeMatcher(matchers);
@@ -1080,7 +1093,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     buildingDefinitions.add(baseDefinition
         .copy()
-        .withIdentifier("pooling-profile")
+        .withIdentifier(POOLING_PROFILE_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(PoolingProfile.class))
         .withConstructorParameterDefinition(fromSimpleParameter("maxActive").withDefaultValue(DEFAULT_MAX_POOL_ACTIVE).build())
         .withConstructorParameterDefinition(fromSimpleParameter("maxIdle").withDefaultValue(DEFAULT_MAX_POOL_IDLE).build())

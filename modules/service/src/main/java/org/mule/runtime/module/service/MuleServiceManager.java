@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.service;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -75,7 +76,13 @@ public class MuleServiceManager implements ServiceManager {
   private void startServices() throws MuleException {
     for (Service service : registeredServices) {
       if (service instanceof Startable) {
-        ((Startable) service).start();
+        ClassLoader originalContextClassLoader = currentThread().getContextClassLoader();
+        try {
+          currentThread().setContextClassLoader(service.getClass().getClassLoader());
+          ((Startable) service).start();
+        } finally {
+          currentThread().setContextClassLoader(originalContextClassLoader);
+        }
       }
     }
   }

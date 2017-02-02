@@ -1,0 +1,33 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <wsc:config name="attachmentsConfig">
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/server?wsdl" service="TestService" port="TestPort"
+                        mtomEnabled="${mtomEnabled}" soapVersion="${soapVersion}">
+            <reconnect blocking="false"/>
+        </wsc:connection>
+    </wsc:config>
+
+    <flow name="downloadAttachment">
+        <wsc:consume config-ref="attachmentsConfig" operation="downloadAttachment">
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+            </wsc:message>
+        </wsc:consume>
+    </flow>
+
+    <flow name="uploadAttachment">
+        <wsc:consume config-ref="attachmentsConfig" operation="uploadAttachment">
+            <wsc:message>
+                <wsc:body>#[payload]</wsc:body>
+                <wsc:attachments>
+                    #[{ attachment: { id: "SomeId", content: "Some Content" } as Object { class : "org.mule.extension.ws.api.SoapAttachment" } } ]
+                </wsc:attachments>
+            </wsc:message>
+        </wsc:consume>
+    </flow>
+
+</mule>

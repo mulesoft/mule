@@ -9,18 +9,20 @@ package org.mule.extension.file;
 import static java.nio.charset.Charset.availableCharsets;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
-
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.FileUtils;
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.FileError;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -65,25 +67,29 @@ public class FileWriteTestCase extends FileConnectorTestCase {
 
   @Test
   public void createNewOnExistingFile() throws Exception {
-    expectedException.expectCause(instanceOf(MuleRuntimeException.class));
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class,
+                              "Use a different write mode or point to a path which doesn't exists");
     doWriteOnExistingFile(CREATE_NEW);
   }
 
   @Test
   public void appendOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
+                              "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(APPEND);
   }
 
   @Test
   public void overwriteOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
+                              "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(OVERWRITE);
   }
 
   @Test
   public void createNewOnNotExistingParentWithoutCreateFolder() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class,
+                              "because path to it doesn't exist");
     doWriteOnNotExistingParentWithoutCreateFolder(CREATE_NEW);
   }
 

@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.runner.RunWith;
@@ -22,11 +23,11 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new ValueReturnDelegate(muleContext);
+    return new ValueReturnDelegate(componentModel, muleContext);
   }
 
   @Override
-  protected Message getOutputMessage(org.mule.runtime.api.message.MuleEvent result) {
+  protected Message getOutputMessage(Event result) {
     Message message = result.getMessage();
 
     assertThat(message, is(notNullValue()));

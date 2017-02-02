@@ -7,14 +7,15 @@
 package org.mule.extension.ftp.internal;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
-import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.api.message.MuleEvent;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.core.api.Event;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,10 +51,10 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
    * @param source the {@link FileAttributes} for the file to be copied
    * @param targetPath the {@link Path} to the target destination
    * @param overwrite whether to overwrite existing target paths
-   * @param event the {@link MuleEvent} which triggered this operation
+   * @param event the {@link Event} which triggered this operation
    */
   @Override
-  public void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event) {
+  public void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite, Event event) {
     ConnectionHandler<FtpFileSystem> writerConnectionHandler;
     final FtpFileSystem writerConnection;
     try {
@@ -85,10 +86,10 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
    * @param target the target path
    * @param overwrite whether to overwrite the target files if they already exists
    * @param writerConnection the {@link FtpFileSystem} which connects to the target endpoint
-   * @param event the {@link MuleEvent} which triggered this operation
+   * @param event the {@link Event} which triggered this operation
    */
   protected abstract void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite,
-                                        FtpFileSystem writerConnection, MuleEvent event);
+                                        FtpFileSystem writerConnection, Event event);
 
   /**
    * Copies one individual file
@@ -98,10 +99,10 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
    * @param target the target path
    * @param overwrite whether to overwrite the target files if they already exists
    * @param writerConnection the {@link FtpFileSystem} which connects to the target endpoint
-   * @param event the {@link MuleEvent} which triggered this operation
+   * @param event the {@link Event} which triggered this operation
    */
   protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite,
-                          FtpFileSystem writerConnection, MuleEvent event) {
+                          FtpFileSystem writerConnection, Event event) {
     FileAttributes targetFile = command.getFile(target.toString());
     if (targetFile != null) {
       if (overwrite) {
@@ -125,7 +126,7 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
   }
 
   private void writeCopy(FileConnectorConfig config, String targetPath, InputStream inputStream, boolean overwrite,
-                         FtpFileSystem writerConnection, MuleEvent event)
+                         FtpFileSystem writerConnection, Event event)
       throws IOException {
     final FileWriteMode mode = overwrite ? FileWriteMode.OVERWRITE : FileWriteMode.CREATE_NEW;
     writerConnection.write(targetPath, inputStream, mode, event, false, true, config.getDefaultWriteEncoding());

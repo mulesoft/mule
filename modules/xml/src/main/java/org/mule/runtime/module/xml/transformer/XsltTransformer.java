@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -58,14 +59,14 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * 
  * <pre>
  *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot; xslFile=&quot;myXslFile.xsl&quot;&amp;gt
- *      &lt;context-property name=&quot;myParameter&quot; value=&quot;#[head:myproperty]&quot;/&amp;gt
- *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;#[function:uuid]&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter&quot; value=&quot;#[mel:head:myproperty]&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;#[mel:function:uuid]&quot;/&amp;gt
  *  &lt;/mxml:xslt-transformer&amp;gt
  * </pre>
  * <p/>
  * <p>
  * The 'header' expression pulls a header from the current message and 'function' can execute a set of arbitrary functions. You
- * can also pass in static values by ommitting the expression prefix '#['.
+ * can also pass in static values by ommitting the expression prefix '#[mel:'.
  * </p>
  * <p/>
  * In addition to being able to pass in an XSLT file you can also define templates inline. For example -
@@ -441,4 +442,5 @@ public class XsltTransformer extends AbstractXmlTransformer {
 
     return value;
   }
+
 }

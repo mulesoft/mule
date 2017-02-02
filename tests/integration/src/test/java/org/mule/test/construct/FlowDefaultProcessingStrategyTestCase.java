@@ -12,10 +12,8 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 
-import org.mule.functional.junit4.TransactionConfigEnum;
-import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
@@ -38,12 +36,12 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     InternalMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
     assertThat(response.getPayload().getValue().toString(), is(TEST_PAYLOAD));
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
+    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(currentThread().getName())));
   }
 
   @Test
   public void oneWay() throws Exception {
-    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
+    flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run();
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(currentThread().getName())));
   }
@@ -60,7 +58,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
   @Test
   public void oneWayTransacted() throws Exception {
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory())
-        .asynchronously().run();
+        .run();
 
     InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));

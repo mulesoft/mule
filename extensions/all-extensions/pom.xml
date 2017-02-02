@@ -23,7 +23,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-email</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -48,7 +48,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -70,7 +70,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>commons-io</groupId>
@@ -83,7 +83,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ftp</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -117,7 +117,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -153,10 +153,6 @@
                     <artifactId>commons-dbutils</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.common</groupId>
-                    <artifactId>mule-common</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>xmlunit</groupId>
                     <artifactId>xmlunit</artifactId>
                 </exclusion>
@@ -183,7 +179,7 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <exclusions>
                 <!--TODO(gfernandes): remove this, see validation's comment-->
                 <exclusion>
@@ -227,9 +223,23 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-oauth</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <!--TODO(gfernandes): remove this, see validation's comment-->
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-wsc</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <!--TODO(gfernandes): remove this, see validation's comment-->
             <exclusions>
                 <exclusion>
@@ -238,11 +248,15 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-frontend-simple</artifactId>
+                    <artifactId>cxf-rt-ws-security</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule</groupId>
-                    <artifactId>mule-metadata-model-xml</artifactId>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-ws-rm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-frontend-simple</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -262,9 +276,52 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jms</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <!--TODO(gfernandes): remove this, see validation's comment-->
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>javax.jms-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jms</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-broker</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-kahadb-store</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
+            <classifier>mule-plugin</classifier>
             <!--TODO(gfernandes): https://www.mulesoft.org/jira/browse/MULE-9810
                 Remove explicit exclusions whenever this issue is fixed (this applies to all the zip type
                 dependencies

@@ -14,10 +14,6 @@ public interface FlowConstructStatsMBean {
 
   void clearStatistics();
 
-  long getAsyncEventsReceived();
-
-  long getSyncEventsReceived();
-
   long getTotalEventsReceived();
 
   long getProcessedEvents();

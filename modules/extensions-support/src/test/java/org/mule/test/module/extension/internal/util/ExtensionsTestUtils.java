@@ -7,10 +7,15 @@
 package org.mule.test.module.extension.internal.util;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -19,47 +24,63 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_ATTRIBUTES_FIELD_NAME;
+import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_PAYLOAD_FIELD_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.TypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
-import org.mule.runtime.api.meta.model.ElementDslModel;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.model.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.model.property.ConfigTypeModelProperty;
-import org.mule.runtime.extension.api.model.property.ConnectivityModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionEnricherFactory;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.model.property.ConfigurationFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.ExceptionEnricherModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.InterceptorsModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -69,18 +90,33 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-public abstract class ExtensionsTestUtils {
+public final class ExtensionsTestUtils {
 
   public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   public static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
 
   public static final String HELLO_WORLD = "Hello World!";
 
+  private ExtensionsTestUtils() {}
+
   public static MetadataType toMetadataType(Class<?> type) {
     return TYPE_LOADER.load(type);
+  }
+
+  public static ProblemsReporter validate(Class<?> clazz, ExtensionModelValidator validator) {
+    return validate(MuleExtensionUtils.loadExtension(clazz), validator);
+  }
+
+  public static ProblemsReporter validate(ExtensionModel model, ExtensionModelValidator validator) {
+    ProblemsReporter problemsReporter = new ProblemsReporter(model);
+    validator.validate(model, problemsReporter);
+
+    if (problemsReporter.hasErrors()) {
+      throw new IllegalModelDefinitionException(problemsReporter.toString());
+    }
+
+    return problemsReporter;
   }
 
   public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType) {
@@ -91,14 +127,14 @@ public abstract class ExtensionsTestUtils {
     return arrayTypeBuilder.build();
   }
 
-  public static DictionaryType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> keyTypeBuilder,
-                                            TypeBuilder<?> valueTypeBuilder) {
-    return TYPE_BUILDER.dictionaryType().id(clazz.getName()).ofKey(keyTypeBuilder).ofValue(valueTypeBuilder).build();
+  public static ObjectType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> valueTypeBuilder) {
+    return TYPE_BUILDER.objectType().id(clazz.getName()).openWith(valueTypeBuilder).build();
   }
 
   public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz) {
     BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
-    final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory().createTypeHandlerManager();
+    final TypeHandlerManager typeHandlerManager = new ExtensionsTypeHandlerManagerFactory()
+        .createTypeHandlerManager();
     typeHandlerManager.handle(clazz, new ParsingContext(), typeBuilder);
 
     return typeBuilder;
@@ -123,6 +159,15 @@ public abstract class ExtensionsTestUtils {
     return resolver;
   }
 
+  public static void assertMessageType(MetadataType type, MetadataType payloadType, MetadataType attributesType) {
+    assertThat(type, is(instanceOf(ObjectType.class)));
+    assertThat(getTypeId(type).get(), is(Message.class.getName()));
+
+    ObjectType messageType = (ObjectType) type;
+    assertThat(messageType.getFieldByName(MESSAGE_PAYLOAD_FIELD_NAME).get().getValue(), equalTo(payloadType));
+    assertThat(messageType.getFieldByName(MESSAGE_ATTRIBUTES_FIELD_NAME).get().getValue(), equalTo(attributesType));
+  }
+
   public static ParameterModel getParameter(String name, Class<?> type) {
     ParameterModel parameterModel = getParameter();
     when(parameterModel.getName()).thenReturn(name);
@@ -141,7 +186,7 @@ public abstract class ExtensionsTestUtils {
   private static ParameterModel getParameter() {
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
-    when(parameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
+    when(parameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(parameterModel.getRole()).thenReturn(BEHAVIOUR);
     return parameterModel;
 
@@ -225,12 +270,46 @@ public abstract class ExtensionsTestUtils {
     }
   }
 
-  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionEnricherFactory exceptionEnricherFactory) {
-    Optional<ExceptionEnricherModelProperty> property = exceptionEnricherFactory != null
-        ? of(new ExceptionEnricherModelProperty(exceptionEnricherFactory))
+  public static ParameterGroupModel mockParameters(ParameterizedModel parameterizedModel, ParameterModel... parameterModels) {
+    return mockParameters(parameterizedModel, DEFAULT_GROUP_NAME, parameterModels);
+  }
+
+  public static ParameterGroupModel mockParameters(ParameterizedModel parameterizedModel, String groupName,
+                                                   ParameterModel... parameterModels) {
+    ParameterGroupModel group = mock(ParameterGroupModel.class);
+    when(group.getName()).thenReturn(groupName);
+    when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(parameterizedModel.getParameterGroupModels()).thenReturn(asList(group));
+    when(group.getParameterModels()).thenReturn(asList(parameterModels));
+    when(parameterizedModel.getAllParameterModels()).thenReturn(asList(parameterModels));
+
+    return group;
+  }
+
+  public static ParameterGroupDeclaration mockParameters(ParameterizedDeclaration declaration,
+                                                         ParameterDeclaration... parameters) {
+    return mockParameters(declaration, DEFAULT_GROUP_NAME, parameters);
+  }
+
+  public static ParameterGroupDeclaration mockParameters(ParameterizedDeclaration declaration, String groupName,
+                                                         ParameterDeclaration... parameters) {
+    ParameterGroupDeclaration group = mock(ParameterGroupDeclaration.class);
+    when(group.getName()).thenReturn(groupName);
+    when(declaration.getParameterGroups()).thenReturn(asList(group));
+    when(declaration.getParameterGroup(groupName)).thenReturn(group);
+    List<ParameterDeclaration> params = new ArrayList<>(asList(parameters));
+    when(group.getParameters()).thenReturn(params);
+    when(declaration.getAllParameters()).thenReturn(params);
+
+    return group;
+  }
+
+  public static void mockExceptionEnricher(EnrichableModel enrichableModel, ExceptionHandlerFactory exceptionHandlerFactory) {
+    Optional<ExceptionHandlerModelProperty> property = exceptionHandlerFactory != null
+        ? of(new ExceptionHandlerModelProperty(exceptionHandlerFactory))
         : empty();
 
-    when(enrichableModel.getModelProperty(ExceptionEnricherModelProperty.class)).thenReturn(property);
+    when(enrichableModel.getModelProperty(ExceptionHandlerModelProperty.class)).thenReturn(property);
   }
 
   public static void mockInterceptors(EnrichableModel enrichableModel, List<InterceptorFactory> interceptorFactories) {
@@ -247,17 +326,13 @@ public abstract class ExtensionsTestUtils {
     when(configurationFactory.newInstance()).thenReturn(config);
     when(configurationFactory.getObjectType()).thenReturn((Class) config.getClass());
 
-    when(configurationModel.getModelProperty(any())).thenAnswer(new Answer<Optional<ModelProperty>>() {
-
-      @Override
-      public Optional<ModelProperty> answer(InvocationOnMock invocationOnMock) throws Throwable {
-        Class<? extends ModelProperty> propertyType = (Class<? extends ModelProperty>) invocationOnMock.getArguments()[0];
-        if (ConfigurationFactoryModelProperty.class.equals(propertyType)) {
-          return of(new ConfigurationFactoryModelProperty(configurationFactory));
-        }
-
-        return empty();
+    when(configurationModel.getModelProperty(any())).thenAnswer(invocationOnMock -> {
+      Class<? extends ModelProperty> propertyType = (Class<? extends ModelProperty>) invocationOnMock.getArguments()[0];
+      if (ConfigurationFactoryModelProperty.class.equals(propertyType)) {
+        return of(new ConfigurationFactoryModelProperty(configurationFactory));
       }
+
+      return empty();
     });
   }
 

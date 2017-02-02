@@ -9,7 +9,7 @@ package org.mule.extension.ws.internal.connection;
 import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.extension.ws.api.SoapVersion;
-import org.mule.extension.ws.api.exception.WscException;
+import org.mule.extension.ws.api.security.SecurityStrategy;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentRequestEnricher;
 import org.mule.extension.ws.internal.generator.attachment.AttachmentResponseEnricher;
 import org.mule.extension.ws.internal.generator.attachment.MtomRequestEnricher;
@@ -21,16 +21,13 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.service.http.api.HttpService;
 
-import java.util.Map;
+import java.util.List;
 
-import javax.xml.namespace.QName;
-
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.binding.soap.SoapHeader;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
-import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**
  * A connection with a web service for consuming it's exposed resources.
@@ -39,12 +36,11 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public class WscConnection {
 
-  private static ClientFactory clientFactory = ClientFactory.getInstance();
+  private static final ClientFactory clientFactory = ClientFactory.getInstance();
 
-  private final Client client;
+  private final WscClient client;
   private final WsdlIntrospecter wsdlIntrospecter;
   private final TypeLoader typeLoader;
-  private final boolean mtomEnabled;
   private final AttachmentRequestEnricher requestEnricher;
   private final AttachmentResponseEnricher responseEnricher;
 
@@ -52,14 +48,24 @@ public class WscConnection {
                        String address,
                        String service,
                        String port,
-                       SoapVersion soapVersion,
-                       boolean mtomEnabled)
+                       SoapVersion version,
+                       boolean mtomEnabled,
+                       List<SecurityStrategy> securities,
+                       HttpService httpService,
+                       String transportConfig)
       throws ConnectionException {
-    this.wsdlIntrospecter = new WsdlIntrospecter(wsdlLocation, service, port);
-    this.typeLoader = new XmlTypeLoader(this.wsdlIntrospecter.getSchemas());
-    this.mtomEnabled = mtomEnabled;
-    this.client = clientFactory.create(address, wsdlIntrospecter.getPort(), soapVersion, mtomEnabled);
 
+    this.wsdlIntrospecter = new WsdlIntrospecter(wsdlLocation, service, port);
+
+    if (wsdlIntrospecter.isRpcStyle()) {
+      // TODO: MULE-11082
+      throw new ConnectionException(format("The provided WSDL [%s] is RPC style, RPC WSDLs are not supported", wsdlLocation));
+    }
+
+    this.typeLoader = new XmlTypeLoader(wsdlIntrospecter.getSchemas());
+    this.client = clientFactory.create(findAddress(address), version, mtomEnabled, securities, httpService, transportConfig);
+
+    // TODO: MULE-10889 -> instead of creating this enrichers, interceptors that works with the live stream would be ideal
     if (mtomEnabled) {
       this.responseEnricher = new MtomResponseEnricher();
       this.requestEnricher = new MtomRequestEnricher();
@@ -67,17 +73,18 @@ public class WscConnection {
       this.responseEnricher = new SoapAttachmentResponseEnricher();
       this.requestEnricher = new SoapAttachmentRequestEnricher();
     }
-
   }
 
-  public Object[] invoke(String operation, Object payload, Map<String, Object> ctx, Exchange exchange) {
-    try {
-      return client.invoke(getInvocationOperation(), new Object[] {payload}, ctx, exchange);
-    } catch (SoapFault sf) {
-      throw sf;
-    } catch (Exception e) {
-      throw new WscException(format("An unexpected error occur while consuming the [%s] web service operation", operation), e);
-    }
+  /**
+   * Invokes a Web Service Operation.
+   */
+  public Object[] invoke(String operation,
+                         Object payload,
+                         List<SoapHeader> headers,
+                         List<Attachment> attachments,
+                         String encoding,
+                         Exchange exchange) {
+    return client.invoke(operation, payload, headers, attachments, encoding, exchange);
   }
 
   public void disconnect() {
@@ -97,10 +104,6 @@ public class WscConnection {
     return typeLoader;
   }
 
-  public boolean isMtomEnabled() {
-    return mtomEnabled;
-  }
-
   public AttachmentRequestEnricher getRequestEnricher() {
     return requestEnricher;
   }
@@ -109,17 +112,11 @@ public class WscConnection {
     return responseEnricher;
   }
 
-  private BindingOperationInfo getInvocationOperation() throws Exception {
-    // Normally its not this hard to invoke the CXF Client, but we're
-    // sending along some exchange properties, so we need to use a more advanced
-    // method
-    Endpoint ep = client.getEndpoint();
-    // The operation is always named invoke because hits our ProxyService implementation.
-    QName q = new QName(ep.getService().getName().getNamespaceURI(), "invoke");
-    BindingOperationInfo bop = ep.getBinding().getBindingInfo().getOperation(q);
-    if (bop.isUnwrappedCapable()) {
-      bop = bop.getUnwrappedOperation();
+  private String findAddress(String address) throws ConnectionException {
+    if (address != null) {
+      return address;
     }
-    return bop;
+    return wsdlIntrospecter.getSoapAddress()
+        .orElseThrow(() -> new ConnectionException("No address was specified and no one was found for the given configuration"));
   }
 }

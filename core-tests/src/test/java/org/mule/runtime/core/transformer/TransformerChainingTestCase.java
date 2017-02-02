@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;

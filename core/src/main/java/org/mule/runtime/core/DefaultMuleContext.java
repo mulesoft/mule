@@ -6,16 +6,11 @@
  */
 package org.mule.runtime.core;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
@@ -26,6 +21,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.invalidJdk;
@@ -41,6 +38,7 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -51,16 +49,17 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
+import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -69,6 +68,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -81,16 +81,15 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.util.StreamCloserService;
-import org.mule.runtime.core.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.ClusterConfiguration;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.connector.ConnectException;
-import org.mule.runtime.core.connector.DefaultPollingController;
-import org.mule.runtime.core.connector.PollingController;
+import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.internal.connector.DefaultPollingController;
+import org.mule.runtime.core.api.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
@@ -99,6 +98,7 @@ import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
@@ -112,9 +112,9 @@ import org.mule.runtime.core.util.ServerStartupSplashScreen;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.lock.LockFactory;
+import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -123,12 +123,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -170,10 +170,6 @@ public class DefaultMuleContext implements MuleContext {
    * stats used for management
    */
   private AllStatistics stats = new AllStatistics();
-
-  private WorkManager workManager;
-
-  private WorkListener workListener;
 
   private volatile SchedulerService schedulerService;
 
@@ -245,12 +241,13 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
+  private ProcessorInterceptorProvider processorInterceptorManager;
 
   static {
     // Ensure reactor operatorError hook is always registered.
     Hooks.onOperatorError((throwable, signal) -> {
       // Only apply hook for Event signals.
-      if (signal instanceof Event) {
+      if (signal instanceof Event && !(throwable instanceof EventDroppedException)) {
         throwable = unwrap(throwable);
         return throwable instanceof MessagingException ? throwable
             : new MessagingException((Event) signal, getRootCauseException(throwable));
@@ -264,12 +261,10 @@ public class DefaultMuleContext implements MuleContext {
    * @deprecated Use empty constructor instead and use setter for dependencies.
    */
   @Deprecated
-  public DefaultMuleContext(MuleConfiguration config, WorkManager workManager, WorkListener workListener,
-                            MuleContextLifecycleManager lifecycleManager, ServerNotificationManager notificationManager) {
+  public DefaultMuleContext(MuleConfiguration config, MuleContextLifecycleManager lifecycleManager,
+                            ServerNotificationManager notificationManager) {
     this.config = config;
     ((MuleContextAware) config).setMuleContext(this);
-    this.workManager = workManager;
-    this.workListener = workListener;
     this.lifecycleManager = lifecycleManager;
     this.notificationManager = notificationManager;
     this.notificationManager.setMuleContext(this);
@@ -299,9 +294,6 @@ public class DefaultMuleContext implements MuleContext {
     if (getNotificationManager() == null) {
       throw new MuleRuntimeException(objectIsNull(OBJECT_NOTIFICATION_MANAGER));
     }
-    if (workManager == null) {
-      throw new MuleRuntimeException(objectIsNull("workManager"));
-    }
 
     try {
       JdkVersionUtils.validateJdk();
@@ -314,16 +306,11 @@ public class DefaultMuleContext implements MuleContext {
       // The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
       getRegistry().initialise();
 
-      // We need to start the work manager straight away since we need it to fire notifications
-      if (workManager instanceof MuleContextAware) {
-        MuleContextAware contextAware = (MuleContextAware) workManager;
-        contextAware.setMuleContext(this);
-      }
-
-      workManager.start();
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
+
+      initialiseIfNeeded(getExceptionListener(), this);
 
       getNotificationManager().initialise();
     } catch (InitialisationException e) {
@@ -418,6 +405,8 @@ public class DefaultMuleContext implements MuleContext {
 
     fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSING));
 
+    disposeIfNeeded(getExceptionListener(), logger);
+
     try {
       getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
 
@@ -444,7 +433,6 @@ public class DefaultMuleContext implements MuleContext {
 
   private void disposeManagers() {
     notificationManager.dispose();
-    workManager.dispose();
   }
 
   /**
@@ -593,29 +581,6 @@ public class DefaultMuleContext implements MuleContext {
     return securityManager;
   }
 
-  /**
-   * Obtains a workManager instance that can be used to schedule work in a thread pool. This will be used primarially by Agents
-   * wanting to schedule work. This work Manager must <b>never</b> be used by provider implementations as they have their own
-   * workManager accible on the connector.
-   * <p/>
-   * If a workManager has not been set by the time the <code>initialise()</code> method has been called a default
-   * <code>MuleWorkManager</code> will be created using the <i>DefaultThreadingProfile</i> on the <code>MuleConfiguration</code>
-   * object.
-   *
-   * @return a workManager instance used by the current MuleManager
-   * @see org.mule.runtime.core.api.config.ThreadingProfile
-   * @see DefaultMuleConfiguration
-   */
-  @Override
-  public WorkManager getWorkManager() {
-    return workManager;
-  }
-
-  @Override
-  public WorkListener getWorkListener() {
-    return workListener;
-  }
-
   @Override
   public SchedulerService getSchedulerService() {
     if (this.schedulerService == null) {
@@ -753,21 +718,6 @@ public class DefaultMuleContext implements MuleContext {
     return injector;
   }
 
-  @Override
-  public ThreadingProfile getDefaultMessageDispatcherThreadingProfile() {
-    return (ThreadingProfile) getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
-  }
-
-  @Override
-  public ThreadingProfile getDefaultMessageRequesterThreadingProfile() {
-    return (ThreadingProfile) getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
-  }
-
-  @Override
-  public ThreadingProfile getDefaultMessageReceiverThreadingProfile() {
-    return (ThreadingProfile) getRegistry().lookupObject(OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -782,11 +732,6 @@ public class DefaultMuleContext implements MuleContext {
     }
 
     return this.streamCloserService;
-  }
-
-  @Override
-  public ThreadingProfile getDefaultThreadingProfile() {
-    return (ThreadingProfile) getRegistry().lookupObject(OBJECT_DEFAULT_THREADING_PROFILE);
   }
 
   /**
@@ -994,14 +939,6 @@ public class DefaultMuleContext implements MuleContext {
     this.config = muleConfiguration;
   }
 
-  public void setWorkManager(WorkManager workManager) {
-    this.workManager = workManager;
-  }
-
-  public void setworkListener(WorkListener workListener) {
-    this.workListener = workListener;
-  }
-
   public void setNotificationManager(ServerNotificationManager notificationManager) {
     this.notificationManager = notificationManager;
   }
@@ -1022,8 +959,8 @@ public class DefaultMuleContext implements MuleContext {
     this.muleRegistryHelper = muleRegistry;
   }
 
-  public void setLocalMuleClient(DefaultLocalMuleClient localMuleContext) {
-    this.localMuleClient = localMuleContext;
+  public void setLocalMuleClient(MuleClient muleClient) {
+    this.localMuleClient = muleClient;
   }
 
   public void setExtensionManager(ExtensionManager extensionManager) {
@@ -1108,7 +1045,7 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public String getId() {
     MuleConfiguration conf = getConfiguration();
-    return format("%s.%s.%s", conf.getDomainId(), getClusterId(), conf.getId());
+    return conf.getDomainId() + "." + getClusterId() + "." + conf.getId();
   }
 
   public void setErrorTypeLocator(ErrorTypeLocator errorTypeLocator) {
@@ -1129,6 +1066,18 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public ErrorTypeRepository getErrorTypeRepository() {
     return errorTypeRepository;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ProcessorInterceptorProvider getProcessorInterceptorManager() {
+    return processorInterceptorManager;
+  }
+
+  public void setProcessorInterceptorManager(ProcessorInterceptorProvider processorInterceptorManager) {
+    this.processorInterceptorManager = processorInterceptorManager;
   }
 
   public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {

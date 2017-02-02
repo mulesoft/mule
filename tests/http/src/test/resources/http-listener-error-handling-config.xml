@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <configuration>
+        <expression-language>
+            <import class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase"/>
+            <alias name="inputStreamPayload" expression="AbstractHttpListenerErrorHandlingTestCase.stream"/>
+        </expression-language>
+    </configuration>
+
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
+
+    <flow name="exceptionBuildingResponseParameters">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseParameters">
+            <httpn:response>
+                <httpn:headers>
+                    #[{ Content-Type: contentType}]
+                </httpn:headers>
+            </httpn:response>
+        </httpn:listener>
+        <set-payload value="#[mel:inputStreamPayload]"/>
+        <error-handler>
+            <on-error-continue type="EXPRESSION">
+                <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+                <set-payload value="#['Exception Handled']"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="exceptionBuildingResponse">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
+        <set-payload value="#[mel:inputStreamPayload]"/>
+        <error-handler>
+            <on-error-continue type="ANY">
+                <custom-processor class="org.mule.test.module.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+                <set-payload value="#['Exception Handled']"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+</mule>

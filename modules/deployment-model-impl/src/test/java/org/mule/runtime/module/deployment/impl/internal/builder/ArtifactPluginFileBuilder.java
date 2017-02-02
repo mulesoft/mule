@@ -8,13 +8,22 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.io.File.separator;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.REPOSITORY;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -25,6 +34,7 @@ import java.util.Properties;
 public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<ArtifactPluginFileBuilder> {
 
   private Properties properties = new Properties();
+  private MulePluginModel mulePluginModel;
 
   /**
    * Creates a new builder
@@ -76,7 +86,20 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   }
 
   /**
-   * Adds a resource file to the application classes folder.
+   * Adds a describer into the plugin describer file.
+   *
+   * @param mulePluginModel the describer to store under {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
+    checkImmutable();
+    checkArgument(mulePluginModel != null, "JSON describer cannot be null");
+    this.mulePluginModel = mulePluginModel;
+    return this;
+  }
+
+  /**
+   * Adds a resource file to the plugin root folder.
    *
    * @param resourceFile resource file from a external file or test resource.
    * @return the same builder instance
@@ -84,7 +107,50 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   public ArtifactPluginFileBuilder containingResource(String resourceFile, String alias) {
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, "classes/" + alias));
+    resources.add(new ZipResource(resourceFile, alias));
+    return this;
+  }
+
+  /**
+   * Adds a class file to the artifact classes folder.
+   *
+   * @param classFile class file to include. Non null.
+   * @param alias path where the file must be added inside the app file
+   * @return the same builder instance
+   */
+  @Override
+  public ArtifactPluginFileBuilder containingClass(File classFile, String alias) {
+    checkImmutable();
+    checkArgument(classFile != null, "Class file cannot be null");
+    resources.add(new ZipResource(classFile.getAbsolutePath(), alias));
+    return getThis();
+  }
+
+  /**
+   * Adds a resource file to the application {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder.
+   *
+   * @param resourceFile resource file from a external file or test resource.
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder containingMuleArtifactResource(String resourceFile, String alias) {
+    checkImmutable();
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+    resources.add(new ZipResource(resourceFile, MULE_ARTIFACT_FOLDER + "/" + alias));
+    return this;
+  }
+
+  /**
+   * Adds a resource file to the application {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder.
+   *
+   * @param resourceFile resource file from a external file or test resource.
+   * @param alias relative path of the artifact to "install" in the plugin's {@link ArtifactPluginDescriptor#REPOSITORY}
+   *              folder, it must respect the Maven repository format. E.g.: /org/mule/modules/mule-module-ble/4.0-SNAPSHOT/mule-module-ble-4.0-SNAPSHOT.jar
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder containingRepositoryResource(String resourceFile, String alias) {
+    checkImmutable();
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+    resources.add(new ZipResource(resourceFile, REPOSITORY + "/" + alias));
     return this;
   }
 
@@ -119,6 +185,19 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       createPropertiesFile(applicationPropertiesFile, properties);
 
       customResources.add(new ZipResource(applicationPropertiesFile.getAbsolutePath(), PLUGIN_PROPERTIES));
+    }
+
+    if (mulePluginModel != null) {
+      final File jsonDescriptorFile = new File(getTempFolder(), MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON);
+      jsonDescriptorFile.deleteOnExit();
+
+      String jsonDescriber = new MulePluginModelJsonSerializer().serialize(mulePluginModel);
+      try {
+        FileUtils.writeStringToFile(jsonDescriptorFile, jsonDescriber);
+      } catch (IOException e) {
+        throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
+      }
+      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), MULE_ARTIFACT_FOLDER + "/" + MULE_PLUGIN_JSON));
     }
 
     return customResources;

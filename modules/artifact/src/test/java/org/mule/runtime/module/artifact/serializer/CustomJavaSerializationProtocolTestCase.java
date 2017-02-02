@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
-import org.mule.runtime.core.serialization.AbstractSerializerProtocolContractTestCase;
+import org.mule.runtime.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;

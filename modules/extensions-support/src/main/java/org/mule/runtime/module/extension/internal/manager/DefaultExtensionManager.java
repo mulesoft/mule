@@ -7,36 +7,33 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.time.Time;
+import org.mule.runtime.core.api.time.Time;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
-import org.mule.runtime.extension.api.declaration.spi.Describer;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
@@ -53,9 +50,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * Default implementation of {@link ExtensionManagerAdapter}. This implementation uses standard Java SPI as a discovery mechanism.
+ * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI as a discovery mechanism.
  * <p/>
  * Although it allows registering {@link ConfigurationProvider} instances through the
  * {@link #registerConfigurationProvider(ConfigurationProvider)} method (and that's still the correct way of registering them),
@@ -63,25 +59,23 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager
-    implements ExtensionManagerAdapter, MuleContextAware, Initialisable, Startable, Stoppable {
+public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
-  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory =
       new DefaultImplicitConfigurationProviderFactory();
-  private final DescriberResolver describerResolver = new DescriberResolver();
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
-  private ExtensionFactory extensionFactory;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
+  private ExtensionErrorsRegistrant extensionErrorsRegistrant;
 
   @Override
   public void initialise() throws InitialisationException {
     extensionRegistry = new ExtensionRegistry(muleContext.getRegistry());
-    extensionFactory = new DefaultExtensionFactory(serviceRegistry, muleContext.getExecutionClassLoader());
+    extensionErrorsRegistrant =
+        new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(), muleContext.getErrorTypeLocator());
   }
 
   /**
@@ -122,21 +116,11 @@ public final class DefaultExtensionManager
                      extensionVersion, extensionVendor);
       }
     } else {
-      extensionRegistry.registerExtension(extensionName, extensionModel);
+      withContextClassLoader(getClassLoader(extensionModel), () -> {
+        extensionRegistry.registerExtension(extensionName, extensionModel);
+        extensionErrorsRegistrant.registerErrors(extensionModel);
+      });
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void registerExtension(ExtensionManifest manifest, ClassLoader classLoader) {
-    Describer describer = describerResolver.resolve(manifest, classLoader);
-    final DefaultDescribingContext context = new DefaultDescribingContext(classLoader);
-    withContextClassLoader(classLoader, () -> {
-      ExtensionModel extensionModel = extensionFactory.createFrom(describer.describe(context), context);
-      registerExtension(extensionModel);
-    });
   }
 
   /**
@@ -151,24 +135,25 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(String configurationProviderName,
-                                                org.mule.runtime.api.message.MuleEvent muleEvent) {
+  public ConfigurationInstance getConfiguration(String configurationProviderName, Event muleEvent) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
         .orElseThrow(() -> new IllegalArgumentException(String
-            .format("There is no registered configurationProvider under name '%s'", configurationProviderName)));
+            .format(
+                    "There is no registered configurationProvider under name '%s'",
+                    configurationProviderName)));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, org.mule.runtime.api.message.MuleEvent muleEvent) {
+  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, Event muleEvent) {
     Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel);
     if (provider.isPresent()) {
       return provider.get().get(muleEvent);
     }
 
-    createImplicitConfiguration(extensionModel, (Event) muleEvent);
+    createImplicitConfiguration(extensionModel, muleEvent);
     return getConfiguration(extensionModel, muleEvent);
   }
 

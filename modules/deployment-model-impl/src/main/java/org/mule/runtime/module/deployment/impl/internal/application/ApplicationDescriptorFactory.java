@@ -8,13 +8,16 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -28,6 +31,8 @@ import org.mule.runtime.module.artifact.util.JarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,10 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates artifact descriptor for application
@@ -90,9 +91,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       final File appPropsFile = new File(artifactFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
       setApplicationProperties(desc, appPropsFile);
 
-      final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
-      verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
-      desc.setPlugins(plugins);
+      desc.setPlugins(parsePluginDescriptors(artifactFolder, desc));
       File appClassesFolder = getAppClassesFolder(desc);
       URL[] libraries = findLibraries(desc);
       URL[] sharedLibraries = findSharedLibraries(desc);
@@ -127,11 +126,11 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   }
 
   private URL[] findSharedLibraries(ApplicationDescriptor descriptor) throws MalformedURLException {
-    return findJars(getAppSharedPluginLibsFolder(descriptor)).toArray(new URL[0]);
+    return findJars(getAppSharedLibsFolder(descriptor)).toArray(new URL[0]);
   }
 
-  protected File getAppSharedPluginLibsFolder(ApplicationDescriptor descriptor) {
-    return MuleFoldersUtil.getAppSharedPluginLibsFolder(descriptor.getName());
+  protected File getAppSharedLibsFolder(ApplicationDescriptor descriptor) {
+    return MuleFoldersUtil.getAppSharedLibsFolder(descriptor.getName());
   }
 
   private JarInfo findApplicationResources(ApplicationDescriptor descriptor, URL[] sharedLibraries) {
@@ -203,31 +202,11 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     return result;
   }
 
-  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
-    final Map<String, List<String>> exportedPackages = new HashMap<>();
-
-    boolean error = false;
-    for (ArtifactPluginDescriptor plugin : plugins) {
-      for (String packageName : plugin.getClassLoaderModel().getExportedPackages()) {
-        List<String> exportedOn = exportedPackages.get(packageName);
-
-        if (exportedOn == null) {
-          exportedOn = new LinkedList<>();
-          exportedPackages.put(packageName, exportedOn);
-        } else {
-          error = true;
-        }
-        exportedOn.add(plugin.getName());
-      }
-    }
-
-    // TODO(pablo.kraan): MULE-9649 - de add validation when a decision is made about how to, in a plugin,
-  }
-
   private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor)
       throws IOException {
     final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
-    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
+    //TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files
+    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE));
     if (pluginZips == null || pluginZips.length == 0) {
       return emptySet();
     }

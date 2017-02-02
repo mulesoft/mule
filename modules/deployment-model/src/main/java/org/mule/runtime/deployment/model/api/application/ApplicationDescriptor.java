@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.api.application;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -22,12 +23,12 @@ import java.util.Set;
 
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
-  public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
+  public static final String DEFAULT_CONFIGURATION_RESOURCE = getAppConfigFolderPath() + "mule-config.xml";
   public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
 
   private String encoding;
   private String domain = DEFAULT_DOMAIN_NAME;
-  private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
+  private String[] configResources = new String[] {getAppConfigFolderPath() + DEFAULT_CONFIGURATION_RESOURCE};
   private String[] absoluteResourcePaths;
   private File[] configResourcesFile;
   private Map<String, String> appProperties = new HashMap<String, String>();

@@ -11,6 +11,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
+import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
@@ -59,8 +61,8 @@ public abstract class FileCommand<F extends FileSystem> {
       if (createParentFolder) {
         mkdirs(parentFolder);
       } else {
-        throw new IllegalArgumentException(format("Cannot write to file '%s' because path to it doesn't exist. Consider setting the 'createParentFolder' attribute to 'true'",
-                                                  path));
+        throw new IllegalPathException(format("Cannot write to file '%s' because path to it doesn't exist. Consider setting the 'createParentFolder' attribute to 'true'",
+                                              path));
       }
     }
   }
@@ -71,7 +73,7 @@ public abstract class FileCommand<F extends FileSystem> {
    * @param directoryPath the {@link Path} to the directory you want to create
    */
   protected final void mkdirs(Path directoryPath) {
-    Lock lock = fileSystem.createMuleLock(String.format("%s-mkdirs-%s", getClass().getName(), directoryPath));
+    Lock lock = fileSystem.createMuleLock(format("%s-mkdirs-%s", getClass().getName(), directoryPath));
     lock.lock();
     try {
       // verify no other thread beat us to it
@@ -168,7 +170,7 @@ public abstract class FileCommand<F extends FileSystem> {
    * @return {@link RuntimeException}
    */
   protected RuntimeException cannotReadDirectoryException(Path path) {
-    return new IllegalArgumentException(format("Cannot read path '%s' since it's a directory", path));
+    return new IllegalPathException(format("Cannot read path '%s' since it's a directory", path));
   }
 
   /**
@@ -180,8 +182,8 @@ public abstract class FileCommand<F extends FileSystem> {
    * @return {@link RuntimeException}
    */
   protected RuntimeException cannotListFileException(Path path) {
-    return new IllegalArgumentException(format("Cannot list path '%s' because it's a file. Only directories can be listed",
-                                               path));
+    return new IllegalPathException(format("Cannot list path '%s' because it's a file. Only directories can be listed",
+                                           path));
   }
 
   /**
@@ -193,7 +195,7 @@ public abstract class FileCommand<F extends FileSystem> {
    * @return {@link RuntimeException}
    */
   protected RuntimeException pathNotFoundException(Path path) {
-    return new IllegalArgumentException(format("Path '%s' doesn't exists", path));
+    return new IllegalPathException(format("Path '%s' doesn't exists", path));
   }
 
   /**
@@ -203,8 +205,8 @@ public abstract class FileCommand<F extends FileSystem> {
    * @param path the {@link Path} that the operation tried to modify
    * @return {@link RuntimeException}
    */
-  public IllegalArgumentException alreadyExistsException(Path path) {
-    return new IllegalArgumentException(format("'%s' already exists. Set the 'overwrite' parameter to 'true' to perform the operation anyway",
-                                               path));
+  public FileAlreadyExistsException alreadyExistsException(Path path) {
+    return new FileAlreadyExistsException(format("'%s' already exists. Set the 'overwrite' parameter to 'true' to perform the operation anyway",
+                                                 path));
   }
 }

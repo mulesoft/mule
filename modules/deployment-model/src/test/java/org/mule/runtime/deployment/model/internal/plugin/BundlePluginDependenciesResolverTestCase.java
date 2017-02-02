@@ -8,6 +8,7 @@
 package org.mule.runtime.deployment.model.internal.plugin;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -24,8 +25,10 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderM
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -242,6 +245,24 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
     assertPluginExportedPackages(fooPlugin, "org.foo", "org.foo.mule");
     assertPluginExportedPackages(bazPlugin, "org.baz");
     assertPluginExportedPackages(barPlugin, "org.bar", "org.bar.mule");
+  }
+
+  @Test
+  public void detectsDuplicateExportedPackagesOnIndependentPlugins() throws Exception {
+    fooPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getFooExportedPackages()).build());
+
+    barPlugin.setClassLoaderModel(new ClassLoaderModelBuilder().exportingPackages(getBarExportedPackages()).build());
+
+    final List<ArtifactPluginDescriptor> pluginDescriptors = createPluginDescriptors(fooPlugin, barPlugin);
+
+    Map<String, List<String>> pluginsPerPackage = new HashMap<>();
+    pluginsPerPackage.put("org.foo", asList("bar, foo"));
+    pluginsPerPackage.put("org.foo.mule", asList("bar, foo"));
+    String expectedErrorMessage = new DuplicateExportedPackageException(pluginsPerPackage).getMessage();
+
+    this.expectedException.expect(DuplicateExportedPackageException.class);
+    this.expectedException.expectMessage(expectedErrorMessage);
+    dependenciesResolver.resolve(pluginDescriptors);
   }
 
   private Set<String> getBarExportedPackages() {

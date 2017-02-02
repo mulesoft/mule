@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.routing.filters.RegExFilter;
@@ -63,21 +62,21 @@ public class MessagingException extends MuleException {
    */
   @Deprecated
   public MessagingException(I18nMessage message, InternalMessage muleMessage, MuleContext context) {
-    super();
+    super(message);
     this.muleMessage = muleMessage;
     this.event = null;
     setMessage(generateMessage(message, context));
   }
 
   public MessagingException(I18nMessage message, Event event) {
-    super();
+    super(message);
     this.event = event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, Event event, Processor failingMessageProcessor) {
-    super();
+    super(message);
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
@@ -89,21 +88,21 @@ public class MessagingException extends MuleException {
    */
   @Deprecated
   public MessagingException(I18nMessage message, InternalMessage muleMessage, MuleContext context, Throwable cause) {
-    super(cause);
+    super(message, cause);
     this.muleMessage = muleMessage;
     this.event = null;
     setMessage(generateMessage(message, context));
   }
 
   public MessagingException(I18nMessage message, Event event, Throwable cause) {
-    super(cause);
+    super(message, cause);
     this.event = event;
     extractMuleMessage(event);
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, Event event, Throwable cause, Processor failingMessageProcessor) {
-    super(cause);
+    super(message, cause);
     this.event = event;
     extractMuleMessage(event);
     this.failingMessageProcessor = failingMessageProcessor;
@@ -238,12 +237,12 @@ public class MessagingException extends MuleException {
   /**
    * @return the exception thrown by the failing message processor
    */
-  public Exception getCauseException() {
+  public Throwable getRootCause() {
     Throwable rootException = ExceptionHelper.getRootException(this);
     if (rootException == null) {
       rootException = this;
     }
-    return (Exception) rootException;
+    return rootException;
   }
 
   /**

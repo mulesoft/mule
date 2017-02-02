@@ -18,6 +18,7 @@ import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.BulkUpdateExecutor;
+import org.mule.extension.db.internal.domain.metadata.DbBulkInputMetadataResolver;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
@@ -29,6 +30,7 @@ import org.mule.extension.db.internal.resolver.query.BulkQueryResolver;
 import org.mule.extension.db.internal.resolver.query.DefaultBulkQueryFactory;
 import org.mule.extension.db.internal.resolver.query.FileBulkQueryFactory;
 import org.mule.extension.db.internal.util.DefaultFileReader;
+import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -61,8 +63,9 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] bulkInsert(@Content @Placement(order = 1) List<Map<String, Object>> parameterValues,
-                          @ParameterGroup BulkQueryDefinition query,
+  public int[] bulkInsert(@Content @Placement(
+      order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
+                          @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -83,8 +86,9 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] bulkUpdate(@Content @Placement(order = 1) List<Map<String, Object>> parameterValues,
-                          @ParameterGroup BulkQueryDefinition query,
+  public int[] bulkUpdate(@Content @Placement(
+      order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
+                          @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -105,8 +109,9 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] bulkDelete(@Content @Placement(order = 1) List<Map<String, Object>> parameterValues,
-                          @ParameterGroup BulkQueryDefinition query,
+  public int[] bulkDelete(@Content @Placement(
+      order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
+                          @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
                           @UseConfig DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
@@ -125,8 +130,8 @@ public class BulkOperations extends BaseDbOperations {
    *         according to the order in which commands were added to the batch.
    * @throws SQLException if an error is produced
    */
-  public int[] executeScript(@ParameterGroup BulkScript script,
-                             @ParameterGroup QuerySettings settings,
+  public int[] executeScript(@ParameterGroup(name = QUERY_GROUP) BulkScript script,
+                             @ParameterGroup(name = QUERY_SETTINGS) QuerySettings settings,
                              @Connection DbConnection connection)
       throws SQLException {
 
@@ -160,7 +165,7 @@ public class BulkOperations extends BaseDbOperations {
     List<List<QueryParamValue>> paramSets = resolveParamSets(values);
 
     BulkUpdateExecutor bulkUpdateExecutor =
-        new BulkUpdateExecutor(getStatementFactory(null, false, query.getSettings()));
+        new BulkUpdateExecutor(getStatementFactory(null, false, query));
     return (int[]) bulkUpdateExecutor.execute(connection, resolvedQuery, paramSets);
   }
 

@@ -14,7 +14,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.time.TimeSupplier;
+import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
@@ -62,7 +62,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   @Override
-  public ConfigurationProvider getObject() throws Exception {
+  public ConfigurationProvider doGetObject() throws Exception {
     if (instance == null) {
       instance = createInnerInstance();
     }
@@ -70,7 +70,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
-    ResolverSet resolverSet = getParametersAsResolverSet(configurationModel);
+    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(configurationModel);
     final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
 
     ConfigurationProvider configurationProvider;

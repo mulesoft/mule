@@ -14,8 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.scheduler.Scheduler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -43,7 +43,7 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
     ScheduledFuture<?> scheduler = factory.schedule(schedulerService.ioScheduler(), () -> {
     });
 
-    Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleWithCronExpression(any(), eq("0 * * * ? *"), eq(getDefault()));
   }
 
@@ -56,7 +56,7 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
     ScheduledFuture<?> scheduler = factory.schedule(schedulerService.ioScheduler(), () -> {
     });
 
-    Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleWithCronExpression(any(), eq("0 * * * ? *"),
                                                         eq(getTimeZone("America/Argentina/Buenos_Aires")));
   }
@@ -70,7 +70,7 @@ public class CronScheduledPollFactoryTestCase extends AbstractMuleTestCase {
     ScheduledFuture<?> scheduler = factory.schedule(schedulerService.ioScheduler(), () -> {
     });
 
-    Scheduler createdScheduler = schedulerService.getCreatedSchedulers().get(0);
+    Scheduler createdScheduler = schedulerService.getSchedulers().get(0);
     verify(createdScheduler).scheduleWithCronExpression(any(), eq("0 * * * ? *"), eq(getTimeZone("Europe/London")));
   }
 

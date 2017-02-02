@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <jmsn:config name="config">
+        <jmsn:generic-connection>
+            <jmsn:connection-factory>
+                <jmsn:jndi-connection-factory connectionFactoryJndiName="ConnectionFactory"
+                                             lookupDestination="TRY_ALWAYS">
+                    <jmsn:name-resolver-builder
+                            jndiInitialContextFactory="org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                            jndiProviderUrl="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+                </jmsn:jndi-connection-factory>
+            </jmsn:connection-factory>
+        </jmsn:generic-connection>
+    </jmsn:config>
+
+</mule>

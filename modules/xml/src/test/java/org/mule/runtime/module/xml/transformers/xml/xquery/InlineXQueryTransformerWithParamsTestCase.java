@@ -42,8 +42,8 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
     transformer.setReturnDataType(DataType.STRING);
 
     Map<String, Object> params = new HashMap<>();
-    params.put("title", "#[message.outboundProperties.ListTitle]");
-    params.put("rating", "#[message.outboundProperties.ListRating]");
+    params.put("title", "#[mel:message.outboundProperties.ListTitle]");
+    params.put("rating", "#[mel:message.outboundProperties.ListRating]");
     transformer.setContextProperties(params);
 
     transformer.setMuleContext(muleContext);

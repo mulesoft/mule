@@ -7,36 +7,41 @@
 package org.mule.extension.db.internal.domain.connection;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
 import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
+import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.api.param.CustomDataType;
 import org.mule.extension.db.internal.domain.type.ArrayResolvedDbType;
+import org.mule.extension.db.internal.domain.type.ClobResolvedDataType;
 import org.mule.extension.db.internal.domain.type.DbType;
 import org.mule.extension.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.extension.db.internal.domain.type.ResolvedDbType;
-import org.mule.extension.db.internal.domain.type.StructuredDbType;
+import org.mule.extension.db.internal.domain.type.StructDbType;
 import org.mule.extension.db.internal.domain.xa.XADbConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -48,9 +53,7 @@ import javax.sql.DataSource;
 import javax.sql.XAConnection;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates a generic DB connection through an URL
@@ -59,13 +62,24 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DbConnectionProvider implements ConnectionProvider<DbConnection>, Initialisable, Disposable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DbConnectionProvider.class);
+  private static final Logger LOGGER = getLogger(DbConnectionProvider.class);
+  public static final String DRIVER_FILE_NAME_PATTERN = "(.*)\\.jar";
+  protected static final String CONNECTION_ERROR_MESSAGE = "Could not obtain connection from data source";
 
   @ConfigName
   private String configName;
 
   @Inject
   private MuleContext muleContext;
+
+  /**
+   * Provides a way to configure database connection pooling.
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED_TAB)
+  private DbPoolingProfile poolingProfile;
 
   /**
    * Specifies non-standard custom data types
@@ -75,34 +89,43 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   @Expression(NOT_SUPPORTED)
   private List<CustomDataType> customDataTypes = emptyList();
 
-  /**
-   * Provides a way to configure database connection pooling.
-   */
-  @Parameter
-  @Optional
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED)
-  private DbPoolingProfile poolingProfile;
 
   private DataSourceFactory dataSourceFactory;
   private List<DbType> resolvedCustomTypes = emptyList();
-  private JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory();
+  private JdbcConnectionFactory jdbcConnectionFactory = createJdbcConnectionFactory();
+
+  /**
+   * Creates the {@link JdbcConnectionFactory} to use on this provider
+   *
+   * @return a non null provider.
+   */
+  protected JdbcConnectionFactory createJdbcConnectionFactory() {
+    return new JdbcConnectionFactory();
+  }
+
   private DataSource dataSource;
+
+  public java.util.Optional<DbError> getDbErrorType(SQLException e) {
+    return empty();
+  }
 
   @Override
   public final DbConnection connect() throws ConnectionException {
     try {
       Connection jdbcConnection = jdbcConnectionFactory.createConnection(dataSource, resolvedCustomTypes);
+      java.util.Optional<XAConnection> optionalXaConnection = getXaConnection(jdbcConnection);
 
       DbConnection connection = createDbConnection(jdbcConnection);
 
-      if (jdbcConnection instanceof XAConnection) {
-        connection = new XADbConnection(connection, (XAConnection) jdbcConnection);
+      if (optionalXaConnection.isPresent()) {
+        connection = new XADbConnection(connection, optionalXaConnection.get());
       }
 
       return connection;
+    } catch (ConnectionException e) {
+      throw e;
     } catch (Exception e) {
-      throw new ConnectionCreationException(e);
+      throw handleSQLConnectionException(e);
     }
   }
 
@@ -209,8 +232,10 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
           }
           return new MappedStructResolvedDbType<>(id, name, mappedClass);
         } else {
-          return new StructuredDbType(id, name);
+          return new StructDbType(id, name);
         }
+      } else if (id == Types.CLOB) {
+        return new ClobResolvedDataType(id, name);
       } else {
         return new ResolvedDbType(id, name);
       }
@@ -224,5 +249,26 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   public DataSource getConfiguredDataSource() {
     return dataSource;
+  }
+
+  private boolean isXaConnection(Connection jdbcConnection) {
+    return jdbcConnection instanceof MuleXaObject && ((MuleXaObject) jdbcConnection).getTargetObject() instanceof XAConnection;
+  }
+
+  private java.util.Optional<XAConnection> getXaConnection(Connection jdbcConnection) {
+    return isXaConnection(jdbcConnection)
+        ? java.util.Optional.of((XAConnection) ((MuleXaObject) jdbcConnection).getTargetObject())
+        : empty();
+  }
+
+  private ConnectionException handleSQLConnectionException(Exception e) {
+    java.util.Optional<DbError> dbError = empty();
+    if (e instanceof SQLException) {
+      dbError = getDbErrorType((SQLException) e);
+    }
+
+    return dbError
+        .map(errorType -> new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e, errorType))
+        .orElse(new ConnectionCreationException(CONNECTION_ERROR_MESSAGE, e));
   }
 }

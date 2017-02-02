@@ -10,8 +10,8 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
-import org.mule.runtime.extension.xml.dsl.api.resources.spi.DslResourceFactory;
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
 
 import com.google.common.collect.ImmutableList;

@@ -20,10 +20,10 @@
                 <dbn:sql>select * from NOT_EXISTS order by ID</dbn:sql>
             </dbn:select>
         </block>
-        <set-payload value="#[true]"/>
+        <set-payload value="#[mel:true]"/>
         <error-handler>
             <on-error-continue>
-                <set-payload value="#[planets.payload.value.hasNext()]"/>
+                <set-payload value="#[mel:planets.payload.value.hasNext()]"/>
             </on-error-continue>
         </error-handler>
     </flow>

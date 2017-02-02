@@ -32,4 +32,9 @@ public class TestInputResolverWithKeyResolver implements TypeKeysResolver, Input
   public String getCategoryName() {
     return "MetadataExtensionResolver";
   }
+
+  @Override
+  public String getResolverName() {
+    return "TestInputResolverWithKeyResolver";
+  }
 }

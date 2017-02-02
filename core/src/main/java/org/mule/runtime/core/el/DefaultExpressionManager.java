@@ -13,48 +13,62 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
-import org.mule.runtime.core.metadata.DefaultTypedValue;
+
 import org.mule.runtime.core.util.TemplateParser;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class DefaultExpressionManager implements ExtendedExpressionManager {
+public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
-  public static final String DW_PREFIX = "dw:";
+  public static final String MEL_PREFIX = "mel:";
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
 
   private MuleContext muleContext;
-  //DW based expression language
-  private MuleExpressionLanguage muleExpressionLanguage = new MuleExpressionLanguage();
-  //MVEL based expression language
-  private MVELExpressionLanguage mvelExpressionLanguage;
+  private ExtendedExpressionLanguage expressionLanguage;
   // Default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
+  private boolean forceMel;
 
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
     this.muleContext = muleContext;
-    mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    DataWeaveExpressionLanguage dataWeaveExpressionLanguage =
+        new DataWeaveExpressionLanguage(muleContext.getExecutionClassLoader());
+    MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dataWeaveExpressionLanguage, mvelExpressionLanguage);
+    forceMel = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isForceMel();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    Collection<GlobalBindingContextProvider> contextProviders =
+        muleContext.getRegistry().lookupObjects(GlobalBindingContextProvider.class);
+    for (GlobalBindingContextProvider contextProvider : contextProviders) {
+      expressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
+    }
   }
 
   @Override
@@ -95,7 +109,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   @Override
   public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                              BindingContext context) {
-    return selectExpressionLanguage(expression).evaluate(expression, event, eventBuilder, flowConstruct, context);
+    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, context);
   }
 
   @Override
@@ -124,17 +138,17 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
     Object result = muleContext.getRegistry().lookupTransformer(sourceType, outputType).transform(target.getValue());
-    return new DefaultTypedValue(result, outputType);
+    return new TypedValue(result, outputType);
   }
 
   @Override
   public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, object);
+    expressionLanguage.enrich(expression, event, eventBuilder, flowConstruct, object);
   }
 
   @Override
   public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, TypedValue value) {
-    selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, value);
+    expressionLanguage.enrich(expression, event, eventBuilder, flowConstruct, value);
   }
 
   @Override
@@ -181,7 +195,17 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   @Override
   public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
-    if (isDwExpression(expression)) {
+    logger.warn("Expression parsing is deprecated, regular evaluations should be used instead.");
+    if (hasMelExpression(expression) || forceMel) {
+      return parser.parse(token -> {
+        Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
+        if (result instanceof InternalMessage) {
+          return ((InternalMessage) result).getPayload().getValue();
+        } else {
+          return result;
+        }
+      }, expression);
+    } else if (isExpression(expression)) {
       TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
       try {
         return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
@@ -191,14 +215,10 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
                                              e);
       }
     } else {
-      return parser.parse(token -> {
-        Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
-        if (result instanceof InternalMessage) {
-          return ((InternalMessage) result).getPayload().getValue();
-        } else {
-          return result;
-        }
-      }, expression);
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
+      }
+      return expression;
     }
   }
 
@@ -214,10 +234,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
 
   @Override
   public ValidationResult validate(String expression) {
-    return validateExpression(expression, selectExpressionLanguage(expression));
-  }
-
-  private ValidationResult validateExpression(String expression, ExpressionLanguage expressionLanguage) {
     if (!muleContext.getConfiguration().isValidateExpressions()) {
       if (logger.isDebugEnabled()) {
         logger.debug("Validate expressions is turned off, no checking done for: " + expression);
@@ -253,17 +269,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
     return success();
   }
 
-  private ExtendedExpressionLanguage selectExpressionLanguage(String expression) {
-    if (isDwExpression(expression)) {
-      return muleExpressionLanguage;
-    } else {
-      return mvelExpressionLanguage;
-    }
-  }
-
-  private boolean isDwExpression(String expression) {
-    //TODO: MULE-10410 - Remove once DW is the default language.
-    return expression.startsWith(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX) || expression.startsWith(DW_PREFIX);
+  private boolean hasMelExpression(String expression) {
+    return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX);
   }
 
 }

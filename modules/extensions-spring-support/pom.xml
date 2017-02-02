@@ -33,11 +33,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
-            <artifactId>mule-extensions-api-xml-dsl</artifactId>
-            <version>${muleExtensionsApiVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
@@ -59,7 +54,13 @@
             <groupId>jboss</groupId>
             <artifactId>javassist</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>${java.version}</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -95,6 +96,12 @@
             <groupId>com.google.testing.compile</groupId>
             <artifactId>compile-testing</artifactId>
             <version>0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -124,6 +131,12 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tx-extension</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-marvel-extension</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

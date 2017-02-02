@@ -15,6 +15,7 @@ import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,25 +73,24 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    * @return {@link File} that represents the {@link Artifact} passed or null
    */
   public static File findClassPathURL(final Artifact artifact, final File workspaceArtifactPath, final List<URL> classPath) {
-    final StringBuilder moduleFolder =
-        new StringBuilder(new File(workspaceArtifactPath.getAbsolutePath(), "target").toURI().getPath());
+    final Path moduleFolder = new File(workspaceArtifactPath.getAbsoluteFile(), "target").toPath();
 
     // Fix to handle when running test during an install phase due to maven builds the classPath pointing out to packaged files
     // instead of classes folders.
     final StringBuilder explodedUrlSuffix = new StringBuilder();
     final StringBuilder packagedUrlSuffix = new StringBuilder();
     if (isTestArtifact(artifact)) {
-      explodedUrlSuffix.append("test-classes/");
+      explodedUrlSuffix.append("test-classes");
       packagedUrlSuffix.append(".*-tests.jar");
     } else {
-      explodedUrlSuffix.append("classes/");
+      explodedUrlSuffix.append("classes");
       packagedUrlSuffix.append("^(?!.*?(?:-tests.jar)).*.jar");
     }
     final Optional<URL> localFile = classPath.stream().filter(url -> {
-      String path = url.getPath();
-      if (path.contains(moduleFolder)) {
-        String pathSuffix = path.substring(path.lastIndexOf(moduleFolder.toString()) + moduleFolder.length(), path.length());
-        return pathSuffix.matches(explodedUrlSuffix.toString()) || pathSuffix.matches(packagedUrlSuffix.toString());
+      Path path = toFile(url).toPath();
+      if (path.startsWith(moduleFolder)) {
+        String file = path.getFileName().toFile().getName();
+        return file.matches(explodedUrlSuffix.toString()) || file.matches(packagedUrlSuffix.toString());
       }
       return false;
     }).findFirst();
@@ -121,11 +121,6 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
 
   @Override
   public File findArtifact(Artifact artifact) {
-    if (!artifact.isSnapshot()) {
-      // Only snapshot artifacts would be found here...
-      return null;
-    }
-
     File workspaceArtifactPath = workspaceLocationResolver.resolvePath(artifact.getArtifactId());
     if (workspaceArtifactPath == null) {
       // Cannot be resolved in workspace so delegate its resolution to the Maven local repository

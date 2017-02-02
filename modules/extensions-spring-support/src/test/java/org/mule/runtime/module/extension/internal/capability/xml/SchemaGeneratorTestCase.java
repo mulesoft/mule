@@ -6,41 +6,38 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
+import static com.google.common.collect.ImmutableSet.copyOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.runtime.ExtensionFactory;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
-import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
-import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
-import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
-import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
-import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.GlobalInnerPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.GlobalPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ListConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.MapConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.StringListConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.TestConnector;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
+import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.IOException;
@@ -49,6 +46,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.junit.Before;
@@ -76,31 +74,30 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
   public static Collection<Object[]> data() {
     final ClassLoader classLoader = SchemaGeneratorTestCase.class.getClassLoader();
     final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
-    when(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader)).thenReturn(asList(new XmlModelEnricher()));
-
-    final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), classLoader);
+    when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
+        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
     final Map<Class<?>, String> extensions = new LinkedHashMap<Class<?>, String>() {
 
       {
-        put(HeisenbergExtension.class, "heisenberg.xsd");
-        put(TestConnector.class, "basic.xsd");
-        put(GlobalPojoConnector.class, "global-pojo.xsd");
-        put(GlobalInnerPojoConnector.class, "global-inner-pojo.xsd");
         put(MapConnector.class, "map.xsd");
         put(ListConnector.class, "list.xsd");
+        put(TestConnector.class, "basic.xsd");
         put(StringListConnector.class, "string-list.xsd");
+        put(GlobalPojoConnector.class, "global-pojo.xsd");
+        put(GlobalInnerPojoConnector.class, "global-inner-pojo.xsd");
         put(VeganExtension.class, "vegan.xsd");
-        put(SubTypesMappingConnector.class, "subtypes.xsd");
         put(PetStoreConnector.class, "petstore.xsd");
         put(MetadataExtension.class, "metadata.xsd");
+        put(HeisenbergExtension.class, "heisenberg.xsd");
+        put(TransactionalExtension.class, "tx-ext.xsd");
+        put(SubTypesMappingConnector.class, "subtypes.xsd");
+        put(MarvelExtension.class, "marvel.xsd");
       }
     };
 
     Function<Class<?>, ExtensionModel> createExtensionModel = extension -> {
-      ExtensionDeclarer declarer = new AnnotationsBasedDescriber(extension, new StaticVersionResolver(getProductVersion()))
-          .describe(new DefaultDescribingContext(extension.getClassLoader()));
-      ExtensionModel model = extensionFactory.createFrom(declarer, new DefaultDescribingContext(declarer, classLoader));
+      ExtensionModel model = MuleExtensionUtils.loadExtension(extension);
 
       if (extensionModels.put(model.getName(), model) != null) {
         throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
@@ -134,6 +131,16 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     @Override
     public Optional<ExtensionModel> getExtension(String name) {
       return ofNullable(extensionModels.get(name));
+    }
+
+    @Override
+    public Set<ExtensionModel> getExtensions() {
+      return copyOf(extensionModels.values());
+    }
+
+    @Override
+    public TypeCatalog getTypeCatalog() {
+      return TypeCatalog.getDefault(copyOf(extensionModels.values()));
     }
   }
 

@@ -8,6 +8,7 @@ package org.mule.functional.config;
 
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
@@ -20,7 +21,7 @@ import org.mule.runtime.core.component.DefaultJavaComponent;
  *
  * @since 4.0
  */
-public class FunctionalComponentObjectFactory implements ObjectFactory<Processor> {
+public class FunctionalComponentObjectFactory extends AbstractAnnotatedObjectFactory<Processor> {
 
   private FunctionalTestComponent component = newComponentInstance();
 
@@ -29,7 +30,7 @@ public class FunctionalComponentObjectFactory implements ObjectFactory<Processor
   }
 
   @Override
-  public Processor getObject() throws Exception {
+  public Processor doGetObject() throws Exception {
     return new DefaultJavaComponent(getFunctionalComponentObjectFactory());
   }
 

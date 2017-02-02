@@ -9,9 +9,11 @@ package org.mule.runtime.config.spring.dsl.model;
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
-import org.mule.runtime.core.api.processor.MessageRouter;
-import org.mule.runtime.dsl.api.component.ComponentIdentifier;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
+import org.mule.runtime.core.api.processor.MessageRouter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ import org.springframework.beans.factory.config.BeanReference;
  * <p/>
  * Every {@code ComponentModel} represents the configuration of a core configuration or an extension configuration. Which
  * configuration element this object represents is identified by a {@link ComponentIdentifier} that can be retrieved using
- * {@code #getIdentifier}.
+ * {@code #getName}.
  * <p/>
  * It may have simple configuration parameters which are retrieve by using {@code #getParameters} or complex parameters which are
  * retrieved using {@code #getInnerComponents}.
@@ -194,6 +196,21 @@ public class ComponentModel {
 
   public Map<String, Object> getAnnotations() {
     return unmodifiableMap(annotations);
+  }
+
+  // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
+  public ComponentConfiguration getConfiguration() {
+    ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
+        .withIdentifier(ComponentIdentifier.builder()
+            .withName(this.getIdentifier().getName())
+            .withNamespace((String) this.getCustomAttributes().get(XmlCustomAttributeHandler.NAMESPACE_URI))
+            .build())
+        .withValue(textContent);
+
+    parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
+    innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
+
+    return builder.build();
   }
 
   /**

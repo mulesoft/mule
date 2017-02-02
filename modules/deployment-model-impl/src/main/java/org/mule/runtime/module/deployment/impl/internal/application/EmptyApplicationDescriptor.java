@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.runtime.core.MuleServer.DEFAULT_CONFIGURATION;
-
-import org.mule.runtime.core.MuleServer;
+import static java.io.File.separator;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 
 import java.io.File;
@@ -25,8 +24,8 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor {
    */
   public EmptyApplicationDescriptor(File appLocation) {
     super(appLocation.getName());
-    setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
-    File configPathFile = new File(appLocation, DEFAULT_CONFIGURATION);
+    setConfigResources(new String[] {DEFAULT_CONFIGURATION_RESOURCE});
+    File configPathFile = new File(appLocation, DEFAULT_CONFIGURATION_RESOURCE);
     setArtifactLocation(appLocation);
     setRootFolder(appLocation.getParentFile());
     String configPath = String.format(configPathFile.getAbsolutePath());

@@ -9,8 +9,9 @@ package org.mule.extension.email.api;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,7 @@ public class EmailBuilder {
    */
   @Optional
   @Parameter
+  @NullSafe
   private EmailBody body;
 
   /**

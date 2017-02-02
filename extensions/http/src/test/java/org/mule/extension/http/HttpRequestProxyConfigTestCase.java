@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -11,14 +13,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
-import org.mule.extension.http.api.request.proxy.ProxyConfig;
-import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
+import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.service.http.api.client.proxy.NtlmProxyConfig;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -96,8 +99,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
 
   private void checkProxyConfig() throws Exception {
     ConfigurationInstance config = getConfigurationInstanceFromRegistry("config" + flowName, testEvent(), muleContext);
-    ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
-    HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
     ProxyConfig proxyConfig = provider.getProxyConfig();
 
     assertThat(proxyConfig.getHost(), is(PROXY_HOST));
@@ -116,14 +118,15 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
   private void ensureRequestGoesThroughProxy(String flowName) throws Exception {
     MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException();
     // Request should go through the proxy.
-    assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
-    assertThat(e.getCauseException().getMessage(), is("Remotely closed"));
+    assertThat(e.getRootCause(), is(instanceOf(IOException.class)));
+    assertThat(e.getRootCause().getMessage(), is("Remotely closed"));
     latch.await(1, SECONDS);
   }
 
   private enum ProxyType {
     ANONYMOUS, USER_PASS, NTLM
   }
+
 
   private class MockProxy extends Thread {
 

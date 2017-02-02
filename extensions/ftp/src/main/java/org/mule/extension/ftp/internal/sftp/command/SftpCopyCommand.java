@@ -6,15 +6,15 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
-import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CopyCommand;
+import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
+import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+import org.mule.runtime.core.api.Event;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +38,7 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
-                   boolean createParentDirectories, MuleEvent event) {
+                   boolean createParentDirectories, Event event) {
     copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new SftpCopyDelegate(this, fileSystem));
   }
 
@@ -50,7 +50,7 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand {
 
     @Override
     protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite,
-                                 FtpFileSystem writerConnection, MuleEvent event) {
+                                 FtpFileSystem writerConnection, Event event) {
       for (FileAttributes fileAttributes : client.list(sourcePath.toString())) {
         if (isVirtualDirectory(fileAttributes.getName())) {
           continue;

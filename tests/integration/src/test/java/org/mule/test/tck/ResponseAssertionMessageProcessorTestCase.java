@@ -11,7 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.processor.TestNonBlockingProcessor;
@@ -37,8 +36,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
 
   @Test
   public void responseProcess() throws Exception {
-    when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
-
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setListener(testNonBlockingProcessor);
     asp.setFlowConstruct(flowConstruct);
@@ -57,7 +54,6 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
 
   @Test
   public void responseProcessNonBlocking() throws Exception {
-    when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
     when(mockEvent.getError()).thenReturn(empty());
 
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();

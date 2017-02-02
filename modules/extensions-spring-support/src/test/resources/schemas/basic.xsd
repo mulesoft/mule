@@ -12,7 +12,7 @@
                     <xs:annotation>
                         <xs:documentation>Default configuration</xs:documentation>
                     </xs:annotation>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:sequence minOccurs="1" maxOccurs="1">
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
                         <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-default">
@@ -89,7 +89,7 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     </xs:sequence>
                     <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="connectionProviderRequiredFieldDefault"></xs:attribute>
@@ -104,10 +104,10 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/basic" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/basic" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-operator" name="foo"></xs:element>
     <xs:complexType name="FooType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType"></xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
 </xs:schema>

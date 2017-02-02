@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.dsl.processor;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.core.api.model.EntryPointResolver;
-import org.mule.runtime.core.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
 
 import java.util.ArrayList;
 import java.util.List;

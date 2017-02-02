@@ -11,9 +11,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -40,7 +40,7 @@ public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegra
     Processor mp1 = muleContext.getRegistry().lookupObject("idempotentFilter");
     assertTrue(mp1 instanceof IdempotentMessageFilter);
     IdempotentMessageFilter imf = (IdempotentMessageFilter) mp1;
-    assertEquals(imf.getIdExpression(), "#[payload:]");
+    assertEquals(imf.getIdExpression(), "#[mel:payload:]");
     assertMpPresent(mpList, mp1, IdempotentMessageFilter.class);
 
     Processor mp2 = muleContext.getRegistry().lookupObject("messageFilter");

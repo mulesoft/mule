@@ -9,12 +9,15 @@ package org.mule.test.module.http.functional.listener;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.CREATED;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-
+import static org.mule.service.http.api.HttpConstants.HttpStatus.CREATED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.test.module.http.functional.matcher.HttpResponseContentStringMatcher.body;
+import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.service.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -76,6 +79,10 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   public SystemProperty responseBuilderAndErrorResponseBuilderNotTheSamePath =
       new SystemProperty("responseBuilderAndErrorResponseBuilderNotTheSamePath",
                          "responseBuilderAndErrorResponseBuilderNotTheSamePath");
+  @Rule
+  public SystemProperty twoHeadersResponseBuilderPath =
+      new SystemProperty("twoHeadersResponseBuilderPath",
+                         "twoHeadersResponseBuilderFlow");
 
   @Override
   protected String getConfigFile() {
@@ -105,6 +112,17 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   public void headersResponseBuilder() throws Exception {
     final String url = getUrl(headersResponseBuilderPath);
     simpleHeaderTest(url);
+  }
+
+  @Test
+  public void twoHeadersResponseBuilder() throws Exception {
+    final String url = getUrl(twoHeadersResponseBuilderPath);
+    final Response response = Request.Get(url).connectTimeout(1000).execute();
+    final HttpResponse httpResponse = response.returnResponse();
+
+    assertThat(httpResponse, hasStatusCode(INTERNAL_SERVER_ERROR.getStatusCode()));
+    assertThat(httpResponse, hasReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase()));
+    assertThat(httpResponse, body(is("Header Content-Type does not support multiple values")));
   }
 
   @Test
@@ -194,7 +212,7 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   private void simpleHeaderTest(String url) throws IOException {
     final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
     final HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 3.6.0"));
+    assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.USER_AGENT).getValue(), is("Mule 4.0.0"));
     assertThat(httpResponse.getFirstHeader(HttpHeaders.Names.DATE).getValue(), new TypeSafeMatcher<String>() {
 
       private ParseException parseException;

@@ -10,15 +10,15 @@
     </file:config>
 
     <flow name="read">
-        <file:read path="#[path]" />
+        <file:read path="#[mel:path]" />
     </flow>
 
     <flow name="readWithLock">
-        <file:read path="#[path]" lock="true" />
+        <file:read path="#[mel:path]" lock="true" />
     </flow>
 
     <flow name="readWithForcedMimeType">
-        <file:read path="#[path]" outputMimeType="test/test"/>
+        <file:read path="#[mel:path]" outputMimeType="test/test"/>
     </flow>
 
 </mule>

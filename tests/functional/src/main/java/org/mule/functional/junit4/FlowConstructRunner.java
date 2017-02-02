@@ -6,12 +6,13 @@
  */
 package org.mule.functional.junit4;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -216,34 +217,6 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Configures this runner to run this flow as one-way.
-   *
-   * @return this {@link FlowRunner}
-   * @deprecated MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  public R asynchronously() {
-    eventBuilder.asynchronously();
-
-    return (R) this;
-  }
-
-  /**
-   * Configures this runner to run this flow as using the provided {@link MessageExchangePattern}. This is useful if the exchange
-   * pattern needs to be paramatized, otherwise {@link #asynchronously()} can be used.
-   *
-   * @return this {@link FlowRunner}
-   * @deprecated MULE-10445 Mule 4 - New Threading model
-   */
-  @Deprecated
-  public R withExchangePattern(MessageExchangePattern exchangePattern) {
-    eventBuilder.withExchangePattern(exchangePattern);
-
-    return (R) this;
-  }
-
-
-  /**
    * Will spy the built {@link Message} and {@link Event}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link FlowRunner}
@@ -291,7 +264,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   protected FlowConstruct getFlowConstruct() {
-    return muleContext.getRegistry().lookupFlowConstruct(getFlowConstructName());
+    final FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct(getFlowConstructName());
+    requireNonNull(flow, format("No flow with name '%s' found.", getFlowConstructName()));
+    return flow;
   }
 
   /**

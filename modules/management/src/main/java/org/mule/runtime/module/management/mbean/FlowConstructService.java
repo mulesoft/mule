@@ -7,7 +7,7 @@
 package org.mule.runtime.module.management.mbean;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.runtime.module.management.support.JmxSupport;
@@ -58,68 +58,74 @@ public class FlowConstructService implements FlowConstructServiceMBean, MBeanReg
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getType() {
     return type;
   }
 
+  @Override
   public ObjectName getStatistics() {
     return statsName;
   }
 
+  @Override
   public void clearStatistics() {
     statistics.clear();
   }
 
-  public long getAsyncEventsReceived() {
-    return statistics.getAsyncEventsReceived();
-  }
-
-  public long getSyncEventsReceived() {
-    return statistics.getSyncEventsReceived();
-  }
-
+  @Override
   public long getTotalEventsReceived() {
     return statistics.getTotalEventsReceived();
   }
 
+  @Override
   public long getAverageProcessingTime() {
     return statistics.getAverageProcessingTime();
   }
 
+  @Override
   public long getProcessedEvents() {
     return statistics.getProcessedEvents();
   }
 
+  @Override
   public long getMaxProcessingTime() {
     return statistics.getMaxProcessingTime();
   }
 
+  @Override
   public long getMinProcessingTime() {
     return statistics.getMinProcessingTime();
   }
 
+  @Override
   public long getTotalProcessingTime() {
     return statistics.getTotalProcessingTime();
   }
 
+  @Override
   public long getExecutionErrors() {
     return statistics.getExecutionErrors();
   }
 
+  @Override
   public long getFatalErrors() {
     return statistics.getFatalErrors();
   }
 
+  @Override
   public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
     this.server = server;
     this.objectName = name;
     return name;
   }
 
+  @Override
   public void postRegister(Boolean registrationDone) {
     AbstractFlowConstruct flow = muleContext.getRegistry().lookupObject(getName());
     try {
@@ -139,6 +145,7 @@ public class FlowConstructService implements FlowConstructServiceMBean, MBeanReg
     }
   }
 
+  @Override
   public void preDeregister() throws Exception {
     try {
       if (this.server.isRegistered(statsName)) {
@@ -149,6 +156,7 @@ public class FlowConstructService implements FlowConstructServiceMBean, MBeanReg
     }
   }
 
+  @Override
   public void postDeregister() {
     // nothing to do
   }

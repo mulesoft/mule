@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.tck.junit4.AbstractMuleTestCase;

@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
- * Extends the {@link ExpressionManager} supporting mutating operations and the propagation of more variables.
+ * Extends the {@link ExpressionEvaluator} supporting mutating operations and the propagation of more variables.
  * Only meant to distinguish the Mule 3 inherited behaviour from the current approach.
  *
  * @since 4.0
@@ -109,8 +109,8 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * {@link InternalMessage} mutation performed within the expression will impact within the context of
    * expression evaluation but will not mutated the {@code event} parameter.
    *
-   * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[xpath://foo] other value is
-   *        #[header:foo]."
+   * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[mel:xpath://foo] other value is
+   *        #[mel:header:foo]."
    * @param event The current event being processed
    * @param flowConstruct the flow where the event is being processed
    * @return the result of the evaluation
@@ -130,8 +130,8 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
    *
-   * @param expression one or more expressions embedded in a literal string i.e. "Value is #[xpath://foo] other value is
-   *        #[header:foo]."
+   * @param expression one or more expressions embedded in a literal string i.e. "Value is #[mel:xpath://foo] other value is
+   *        #[mel:header:foo]."
    * @param event The current event being processed
    * @param eventBuilder event builder instance used to mutate the current message or event.
    * @param flowConstruct the flow where the event is being processed

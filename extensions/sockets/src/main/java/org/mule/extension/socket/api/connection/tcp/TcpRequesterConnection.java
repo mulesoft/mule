@@ -11,11 +11,10 @@ import static org.mule.extension.socket.internal.SocketUtils.configureConnection
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.socket.factory.SimpleSocketFactory;
 import org.mule.extension.socket.api.client.TcpClient;
-import org.mule.extension.socket.api.ConnectionSettings;
+import org.mule.extension.socket.api.SocketConnectionSettings;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 
 import java.io.IOException;
@@ -30,10 +29,10 @@ public class TcpRequesterConnection extends AbstractTcpConnection implements Req
 
   private Socket socket;
   private final TcpClientSocketProperties socketProperties;
-  private final ConnectionSettings localAddressSettings;
+  private final SocketConnectionSettings localAddressSettings;
   private final SimpleSocketFactory socketFactory;
 
-  public TcpRequesterConnection(ConnectionSettings connectionSettings, ConnectionSettings localAddressSettings,
+  public TcpRequesterConnection(SocketConnectionSettings connectionSettings, SocketConnectionSettings localAddressSettings,
                                 TcpProtocol protocol, TcpClientSocketProperties socketProperties,
                                 SimpleSocketFactory socketFactory)
       throws ConnectionException {
@@ -86,12 +85,12 @@ public class TcpRequesterConnection extends AbstractTcpConnection implements Req
   public ConnectionValidationResult validate() {
 
     if (!socket.isBound()) {
-      return ConnectionValidationResult.failure("TCP client socket was not bounded", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("TCP client socket was not bounded", null);
 
     } else if (!socket.isConnected()) {
-      return ConnectionValidationResult.failure("TCP client socket was not connected", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("TCP client socket was not connected", null);
     } else if (socket.isClosed()) {
-      return ConnectionValidationResult.failure("TCP client socket was closed", ConnectionExceptionCode.UNKNOWN, null);
+      return ConnectionValidationResult.failure("TCP client socket was closed", null);
     }
 
     return ConnectionValidationResult.success();

@@ -7,8 +7,10 @@
 package org.mule.test.spring;
 
 import org.mule.functional.AbstractConfigBuilderTestCase;
+import org.mule.test.IntegrationTestCaseRunnerConfig;
 
-public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase {
+public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase implements
+    IntegrationTestCaseRunnerConfig {
 
   public SpringNamespaceConfigBuilderTestCase() {
     super(false);

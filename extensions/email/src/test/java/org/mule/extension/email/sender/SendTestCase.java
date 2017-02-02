@@ -7,11 +7,16 @@
 package org.mule.extension.email.sender;
 
 import static java.nio.charset.Charset.availableCharsets;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
+
+import org.mule.runtime.core.util.IOUtils;
+
+import java.io.InputStream;
 
 import javax.activation.DataHandler;
 import javax.mail.Message;
@@ -26,6 +31,7 @@ public class SendTestCase extends SMTPTestCase {
   private static final String SEND_EMAIL_CUSTOM_HEADERS = "sendEmailHeaders";
   private static final String SEND_EMAIL_WITH_ATTACHMENT = "sendEmailWithAttachment";
   private static final String SEND_ENCODED_MESSAGE = "sendEncodedMessage";
+  private static final String SEND_EMAIL_WITHOUT_BODY = "sendEmailWithoutBody";
 
   @Test
   public void sendEmail() throws Exception {
@@ -54,7 +60,7 @@ public class SendTestCase extends SMTPTestCase {
     Message[] messages = getReceivedMessagesAndAssertCount(4);
     for (Message message : messages) {
       Multipart content = (Multipart) message.getContent();
-      assertThat(content.getCount(), is(3));
+      assertThat(content.getCount(), is(4));
 
       Object body = content.getBodyPart(0).getContent();
       assertBodyContent((String) body);
@@ -64,6 +70,9 @@ public class SendTestCase extends SMTPTestCase {
 
       DataHandler jsonAttachment = content.getBodyPart(2).getDataHandler();
       assertJsonAttachment(jsonAttachment);
+
+      DataHandler streamAttachment = content.getBodyPart(3).getDataHandler();
+      assertThat(EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT, is(IOUtils.toString((InputStream) streamAttachment.getContent())));
     }
   }
 
@@ -82,5 +91,14 @@ public class SendTestCase extends SMTPTestCase {
     Message[] messages = getReceivedMessagesAndAssertCount(1);
     Object content = ((String) messages[0].getContent()).trim();
     assertThat(content, is(new String(WEIRD_CHAR_MESSAGE.getBytes(customEncoding), customEncoding)));
+  }
+
+  @Test
+  public void sendEmailWithoutBody() throws Exception {
+    flowRunner(SEND_EMAIL_WITHOUT_BODY).run();
+    Message[] messages = getReceivedMessagesAndAssertCount(1);
+    Message sentMessage = messages[0];
+    assertSubject(sentMessage.getSubject());
+    assertThat(sentMessage.getContent().toString().trim(), isEmptyString());
   }
 }

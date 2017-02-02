@@ -14,7 +14,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.module.http.api.requester.HttpSendBodyMode.ALWAYS;
 import static org.mule.runtime.module.http.internal.HttpParamType.QUERY_PARAM;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.AUTHENTICATION_TYPE_DEBUG;
@@ -41,7 +40,8 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParam;
 import org.mule.runtime.module.http.internal.HttpSingleParam;
-import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
+import org.mule.service.http.api.client.HttpAuthenticationType;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     requester.setRequestBuilder(createRequestBuilder());
 
     message = InternalMessage.builder().payload(TEST_MESSAGE).build();
-    event = eventBuilder().message(message).exchangePattern(REQUEST_RESPONSE).build();
+    event = eventBuilder().message(message).build();
   }
 
   @Test
@@ -188,7 +188,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
   }
 
   private String getExpression(String name) {
-    return String.format("#[%s]", name);
+    return String.format("#[mel:%s]", name);
   }
 
   private void configureRequesterExpressions() throws InitialisationException {

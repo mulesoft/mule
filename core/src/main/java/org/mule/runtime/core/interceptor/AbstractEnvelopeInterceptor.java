@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import org.mule.runtime.core.api.CoreEventContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -38,7 +37,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
   @Override
   public Event process(Event event) throws MuleException {
     long startTime = System.currentTimeMillis();
-    ProcessingTime time = ((CoreEventContext) event.getContext()).getProcessingTime();
+    ProcessingTime time = event.getContext().getProcessingTime();
     boolean exceptionWasThrown = true;
     Event resultEvent = event;
     try {

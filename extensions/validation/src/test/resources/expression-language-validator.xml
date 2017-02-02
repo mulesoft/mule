@@ -4,6 +4,6 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="validationExpressionLanguage">
-        <set-payload value="#[validator.validateEmail(payload)]"/>
+        <set-payload value="#[mel:validator.validateEmail(payload)]"/>
     </flow>
 </mule>

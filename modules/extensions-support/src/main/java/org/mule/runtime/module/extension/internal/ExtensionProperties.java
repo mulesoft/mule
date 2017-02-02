@@ -7,12 +7,10 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.config.ThreadingProfile;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
 /**
  * Constants for the Extensions Framework
@@ -32,6 +30,12 @@ public class ExtensionProperties {
   public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
 
   /**
+   * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking
+   * component will use to notify completion or failure
+   */
+  public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
+
+  /**
    * The key of an execution context variable on which the {@link InterceptingCallback} is stored
    */
   public static final String INTERCEPTING_CALLBACK_PARAM = PROPERTY_PREFIX + "INTERCEPTING_CALLBACK_PARAM";
@@ -47,21 +51,11 @@ public class ExtensionProperties {
   public static final String ENCODING_PARAMETER_NAME = "outputEncoding";
 
   /**
-   * The name of a synthetic parameter that's automatically added to all non void operations. The meaning of it is requesting the
-   * runtime to place the resulting {@link Message} on a flowVar pointed by this parameter instead of replacing the message
-   * carried by the {@link Event} that's travelling through the pipeline
+   * The name mask of a file which contains the {@link ExtensionModel} elements descriptions.
+   * <p>
+   * The final name of the file is formed like this: {extension-namespace}-extension-descriptions.xml.
    */
-  public static final String TARGET_ATTRIBUTE = "target";
-
-  /**
-   * The name of an attribute which allows referencing a {@link TlsContextFactory}
-   */
-  public static final String TLS_ATTRIBUTE_NAME = "tlsContext";
-
-  /**
-   * The name of an attribute which allows specifying a {@link ThreadingProfile}
-   */
-  public static final String THREADING_PROFILE_ATTRIBUTE_NAME = "threadingProfile";
+  public static final String EXTENSION_DESCRIPTIONS_FILE_NAME_MASK = "%s-extension-descriptions.xml";
 
   /**
    * The name of a file which contains each plugin's {@link ExtensionManifest}
@@ -74,25 +68,11 @@ public class ExtensionProperties {
   public static final String EXTENSION_MODEL_JSON_FILE_NAME = "extension-model.json";
 
   /**
-   * The name of a property which points to the {@link ClassLoader} that an extension should use
+   * The name of the tab in which advanced parameters should appear
    */
-  public static final String EXTENSION_CLASSLOADER = "extension_classloader";
+  public static final String ADVANCED_TAB_NAME = "Advanced";
 
-  /**
-   * The name of the parameter for configuring transactional actions
-   */
-  public static final String TRANSACTIONAL_ACTION_PARAMETER_NAME = "transactionalAction";
-
-  /**
-   * The name of the tab in which transaction parameters should appear
-   */
-  public static final String TRANSACTIONAL_TAB_NAME = "Transaction";
-
-  /**
-   * The description of the parameter for configuring transactional actions
-   */
-  public static final String TRANSACTIONAL_ACTION_PARAMETER_DESCRIPTION =
-      "The type of joining action that operations can take regarding transactions.";
+  public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
 
   private ExtensionProperties() {}
 }
