@@ -36,7 +36,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
   public AbstractExtensionObjectFactory(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.parametersResolver = new ParametersResolver(muleContext, parameters);
+    this.parametersResolver = ParametersResolver.fromValues(parameters, muleContext);
   }
 
   public Map<String, Object> getParameters() {
@@ -45,7 +45,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotate
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = normalize(parameters);
-    this.parametersResolver = new ParametersResolver(muleContext, this.parameters);
+    this.parametersResolver = ParametersResolver.fromValues(this.parameters, muleContext);
   }
 
   @Override

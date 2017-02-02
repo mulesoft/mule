@@ -36,7 +36,7 @@ public class ComplexExtensionLoadingTestCase extends AbstractJavaExtensionDeclar
   @Test
   public void extension() {
     assertThat(extensionDeclaration.getName(), is(VEGAN));
-    assertThat(extensionDeclaration.getConfigurations(), hasSize(5));
+    assertThat(extensionDeclaration.getConfigurations(), hasSize(6));
     assertOperation(APPLE, "eatApple");
     assertOperation(BANANA, "eatBanana");
     assertOperation(KIWI, "eatKiwi");

@@ -52,6 +52,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +70,23 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
 
-  public ParametersResolver(MuleContext muleContext, Map<String, ?> parameters) {
+  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters) {
     this.muleContext = muleContext;
     this.parameters = parameters;
+  }
+
+  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext) {
+    return new ParametersResolver(muleContext, parameters);
+  }
+
+  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel,
+                                                     MuleContext muleContext) {
+    Map<String, Object> parameterValues = new HashMap<>();
+    for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
+      parameterValues.put(model.getName(), model.getDefaultValue());
+    }
+
+    return new ParametersResolver(muleContext, parameterValues);
   }
 
   /**

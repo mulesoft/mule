@@ -349,6 +349,64 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="grape">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="grape-connection-connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="extension:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="vegan-policy">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="veganPolicy"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="500" name="maxCalories"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GrapeOperationType" substitutionGroup="mule:abstract-operator" name="grape-operation"></xs:element>
+    <xs:complexType name="GrapeOperationType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="kiwi-config">
         <xs:complexType>
             <xs:complexContent>
@@ -447,15 +505,6 @@
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
