@@ -10,9 +10,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.CREATED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-
+import static org.mule.test.module.http.functional.matcher.HttpResponseContentStringMatcher.body;
+import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.service.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -24,7 +27,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Description;
@@ -116,10 +118,11 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
   public void twoHeadersResponseBuilder() throws Exception {
     final String url = getUrl(twoHeadersResponseBuilderPath);
     final Response response = Request.Get(url).connectTimeout(1000).execute();
-    final StatusLine statusLine = response.returnResponse().getStatusLine();
+    final HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(statusLine.getStatusCode(), is(500));
-    assertThat(statusLine.getReasonPhrase(), is("Header Content-Type does not support multiple values"));
+    assertThat(httpResponse, hasStatusCode(INTERNAL_SERVER_ERROR.getStatusCode()));
+    assertThat(httpResponse, hasReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase()));
+    assertThat(httpResponse, body(is("Header Content-Type does not support multiple values")));
   }
 
   @Test

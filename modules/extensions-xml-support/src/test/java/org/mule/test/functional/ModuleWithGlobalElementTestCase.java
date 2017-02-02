@@ -7,6 +7,7 @@
 package org.mule.test.functional;
 
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
@@ -24,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +64,7 @@ public class ModuleWithGlobalElementTestCase extends AbstractXmlExtensionMuleArt
   @Test
   public void testHttpDoLogin() throws Exception {
     Event muleEvent = flowRunner("testHttpDoLogin").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("success with basic-authentication for user: userLP"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("success with basic-authentication for user: userLP"));
   }
 
   @Test
@@ -73,15 +73,16 @@ public class ModuleWithGlobalElementTestCase extends AbstractXmlExtensionMuleArt
       flowRunner("testHttpDontLogin").run();
       fail("Should not have reach here");
     } catch (MessagingException me) {
-      assertThat(me.getCause(), instanceOf(ResponseValidatorException.class));
-      assertThat(me.getCause().getMessage(), Is.is("Response code 401 mapped as failure"));
+      Throwable cause = me.getEvent().getError().get().getCause();
+      assertThat(cause, instanceOf(ResponseValidatorException.class));
+      assertThat(cause.getMessage(), is("Response code 401 mapped as failure"));
     }
   }
 
   @Test
   public void testHttpDoLoginGonnet() throws Exception {
     Event muleEvent = flowRunner("testHttpDoLoginGonnet").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("success with basic-authentication for user: userGonnet"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("success with basic-authentication for user: userGonnet"));
   }
 
   /**

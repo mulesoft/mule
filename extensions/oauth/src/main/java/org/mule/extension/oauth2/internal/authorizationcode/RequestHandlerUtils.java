@@ -10,11 +10,10 @@ import static java.lang.Thread.currentThread;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;

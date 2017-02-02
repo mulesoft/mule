@@ -9,18 +9,18 @@ package org.mule.test.oauth2.internal.authorizationcode.functional;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
+import org.mule.functional.junit4.rules.ExpectedError;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthorizationCodeRefreshTokenConfigTestCase {
 
-  public static final String SINGLE_TENANT_OAUTH_CONFIG = "oauthConfig";
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedError expectedError = ExpectedError.none();
+
+  public static final String SINGLE_TENANT_OAUTH_CONFIG = "oauthConfig";
 
   @Override
   protected String getConfigFile() {
@@ -35,12 +35,12 @@ public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthori
   /**
    * Refresh token is optional therefore this test will validate an scenario where the access_token is invalid and refresh_token
    * provided in previous token access has been revoked so a {@link ResponseValidatorException} should be thrown.
-   * 
+   *
    * @throws Exception
    */
   @Test
   public void afterFailureWithRefreshTokenNotIssuedThrowAuthenticationException() throws Exception {
-    expectedException.expectCause(is(instanceOf(ResponseValidatorException.class)));
+    expectedError.expectCause(is(instanceOf(ResponseValidatorException.class)));
     executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers("testFlow", SINGLE_TENANT_OAUTH_CONFIG,
                                                                         DEFAULT_RESOURCE_OWNER_ID, 403, 400);
   }

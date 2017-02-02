@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="simpleConfig">
+        <httpn:request-connection host="localhost"/>
+    </httpn:request-config>
+
+    <flow name="handled">
+        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="1000" port="#[port]"/>
+        <error-handler>
+            <on-error-continue type="HTTPN:BAD_REQUEST">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Bad Request']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:UNAUTHORIZED">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Unauthorized']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:FORBIDDEN">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Forbidden']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:NOT_FOUND">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Not Found']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:METHOD_NOT_ALLOWED">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Method Not Allowed']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:NOT_ACCEPTABLE">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Not Acceptable']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:UNSUPPORTED_MEDIA_TYPE">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Unsupported Media Type']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:TOO_MANY_REQUESTS">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Too Many Requests']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:INTERNAL_SERVER_ERROR">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Server Error']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:SERVICE_UNAVAILABLE">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Service Unavailable']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:RESPONSE_VALIDATION">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' not understood']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:TIMEOUT">
+                <set-payload value="#[error.cause.message ++ ' timeout']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:CONNECTIVITY">
+                <set-payload value="#[error.cause.message ++ ' connectivity']"/>
+            </on-error-continue>
+            <on-error-continue type="HTTPN:PARSING">
+                <set-payload value="#[error.cause.message ++ ' parsing']"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="unhandled">
+        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="500" port="#[port]"/>
+    </flow>
+
+</mule>

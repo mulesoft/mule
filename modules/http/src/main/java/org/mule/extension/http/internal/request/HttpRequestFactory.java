@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.extension.http.api.error.HttpError.SECURITY;
+import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
@@ -28,6 +30,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -93,8 +96,7 @@ public class HttpRequestFactory {
    * @throws MuleException if the request creation fails.
    */
   public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
-                            MuleContext muleContext)
-      throws MuleException {
+                            MuleContext muleContext) {
     HttpRequestBuilder builder = HttpRequest.builder();
 
     builder.setUri(this.uri);
@@ -125,10 +127,18 @@ public class HttpRequestFactory {
 
     }
 
-    builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody().getValue(), mediaType));
+    try {
+      builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody().getValue(), mediaType));
+    } catch (TransformerException e) {
+      throw new ModuleException(e, TRANSFORMATION);
+    }
 
     if (authentication != null) {
-      authentication.authenticate(builder);
+      try {
+        authentication.authenticate(builder);
+      } catch (MuleException e) {
+        throw new ModuleException(e, SECURITY);
+      }
     }
 
     return builder.build();

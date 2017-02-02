@@ -40,7 +40,7 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
     MessagingException e = flowRunner("limitedConnections").runExpectingException();
     // Max connections should be reached
     assertThat(e, instanceOf(MessagingException.class));
-    assertThat(e.getCause(), instanceOf(IOException.class));
+    assertThat(e.getEvent().getError().get().getCause(), instanceOf(IOException.class));
 
     messageHold.release();
     t1.join();

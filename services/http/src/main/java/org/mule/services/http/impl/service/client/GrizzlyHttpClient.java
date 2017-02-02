@@ -400,12 +400,12 @@ public class GrizzlyHttpClient implements HttpClient {
       }
       if (!handled.getAndSet(true)) {
         Exception exception;
-        if (t.getCause() instanceof TimeoutException) {
-          exception = (TimeoutException) t.getCause();
-        } else if (t.getCause() instanceof IOException) {
-          exception = (IOException) t.getCause();
+        if (t instanceof TimeoutException) {
+          exception = (TimeoutException) t;
+        } else if (t instanceof IOException) {
+          exception = (IOException) t;
         } else {
-          exception = t instanceof IOException ? (IOException) t : new IOException(t);
+          exception = new IOException(t);
         }
         responseHandler.onFailure(exception);
       }

@@ -11,8 +11,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -34,6 +33,9 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
 
+  @Rule
+  public ExpectedError expectedError = ExpectedError.none();
+
   @Override
   protected String getConfigFile() {
     return "http-listener-insecure-config.xml";
@@ -47,8 +49,8 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Test
   public void rejectsInvalidCertificateIfSecure() throws Exception {
-    MessagingException expecteException = flowRunner("testRequestToSecure").withPayload("data").runExpectingException();
-    assertThat(expecteException.getCause(), instanceOf(IOException.class));
-    assertThat(expecteException.getCause(), hasMessage(containsString("Remotely close")));
+    expectedError.expectCause(instanceOf(IOException.class));
+    expectedError.expectCause(hasMessage(containsString("Remotely close")));
+    flowRunner("testRequestToSecure").withPayload("data").run();
   }
 }

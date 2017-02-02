@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.request.validator;
 
+import static java.lang.String.format;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
@@ -52,4 +53,9 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
   public void setValues(String values) {
     this.values = values;
   }
+
+  protected String getExceptionMessage(int status) {
+    return format("Response code %d mapped as failure", status);
+  }
+
 }
