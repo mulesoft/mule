@@ -6,9 +6,15 @@
  */
 package org.mule.extension.http.internal;
 
+import static org.mule.extension.http.api.error.HttpError.FORBIDDEN;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
+import static org.mule.extension.http.api.error.HttpError.UNAUTHORIZED;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -30,7 +36,11 @@ public class HttpOperations {
                                   AuthenticationHandler authenticationHandler) {
     try {
       filter.authenticate(authenticationHandler);
-    } catch (Exception e) {
+    } catch (UnauthorisedException e) {
+      throw new ModuleException(e, UNAUTHORIZED);
+    } catch (SecurityException e) {
+      throw new ModuleException(e, FORBIDDEN);
+    } catch (SecurityProviderNotFoundException | UnknownAuthenticationTypeException e) {
       throw new ModuleException(e, SECURITY);
     }
   }

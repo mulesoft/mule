@@ -6,7 +6,9 @@
  */
 package org.mule.extension.http.internal;
 
+import static org.mule.extension.http.api.error.HttpError.FORBIDDEN;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
+import static org.mule.extension.http.api.error.HttpError.UNAUTHORIZED;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -26,7 +28,10 @@ public class BasicSecurityErrorTypeProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    //TODO: MULE-11469 - Throw UNAUTHORISED directly
-    return ImmutableSet.<ErrorTypeDefinition>builder().add(SECURITY).build();
+    return ImmutableSet.<ErrorTypeDefinition>builder()
+        .add(SECURITY)
+        .add(FORBIDDEN)
+        .add(UNAUTHORIZED)
+        .build();
   }
 }

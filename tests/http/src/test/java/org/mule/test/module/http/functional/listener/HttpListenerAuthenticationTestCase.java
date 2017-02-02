@@ -6,16 +6,19 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-
+import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
@@ -62,10 +65,11 @@ public class HttpListenerAuthenticationTestCase extends AbstractHttpTestCase {
     CredentialsProvider credsProvider = getCredentialsProvider(VALID_USER, INVALID_PASSWORD);
     getHttpResponse(credsProvider);
 
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_UNAUTHORIZED));
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(UNAUTHORIZED.getStatusCode()));
     Header authHeader = httpResponse.getFirstHeader(WWW_AUTHENTICATE);
     assertThat(authHeader, is(notNullValue()));
     assertThat(authHeader.getValue(), is(BASIC_REALM_MULE_REALM));
+    assertThat(muleContext.getClient().request("test://unauthorized", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
   }
 
   @Test
@@ -73,12 +77,26 @@ public class HttpListenerAuthenticationTestCase extends AbstractHttpTestCase {
     CredentialsProvider credsProvider = getCredentialsProvider(VALID_USER, VALID_PASSWORD);
     getHttpResponse(credsProvider);
 
-    assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_OK));
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(EXPECTED_PAYLOAD));
   }
 
+  @Test
+  public void noProvider() throws Exception {
+    CredentialsProvider credsProvider = getCredentialsProvider(VALID_USER, VALID_PASSWORD);
+    getHttpResponse(credsProvider, "zaraza");
+
+    assertThat(httpResponse, hasStatusCode(INTERNAL_SERVER_ERROR.getStatusCode()));
+    assertThat(httpResponse, hasReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase()));
+    assertThat(muleContext.getClient().request("test://security", RECEIVE_TIMEOUT).getRight().isPresent(), is(true));
+  }
+
   private void getHttpResponse(CredentialsProvider credsProvider) throws IOException {
-    HttpPost httpPost = new HttpPost(String.format("http://localhost:%s/basic", listenPort.getNumber()));
+    getHttpResponse(credsProvider, "memory-provider");
+  }
+
+  private void getHttpResponse(CredentialsProvider credsProvider, String provider) throws IOException {
+    HttpPost httpPost = new HttpPost(format("http://localhost:%s/basic?provider=%s", listenPort.getNumber(), provider));
     httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
     httpResponse = httpClient.execute(httpPost);
   }
@@ -88,4 +106,5 @@ public class HttpListenerAuthenticationTestCase extends AbstractHttpTestCase {
     credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, password));
     return credsProvider;
   }
+
 }
