@@ -16,6 +16,7 @@ import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeString;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
@@ -90,7 +90,7 @@ public class HttpResponseToMuleEvent {
           throw new MessagingException(muleEvent, e);
         }
       } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
-        payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
+        payload = decodeString(IOUtils.toString(responseInputStream), encoding);
       }
     }
 

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -78,7 +78,7 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
   public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -92,7 +92,7 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
   public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception {
     HttpRequest request = HttpRequest.builder()
         .setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown")
-        .setMethod(POST.name())
+        .setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -106,7 +106,7 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
   public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception {
     HttpRequest request = HttpRequest.builder()
         .setUri("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException")
-        .setMethod(POST.name())
+        .setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -144,7 +144,7 @@ public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCas
   public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception {
     HttpRequest request = HttpRequest.builder()
         .setUri("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy")
-        .setMethod(POST.name())
+        .setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

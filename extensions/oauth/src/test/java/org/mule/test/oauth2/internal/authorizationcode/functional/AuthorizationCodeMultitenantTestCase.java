@@ -20,15 +20,13 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
-import static org.mule.runtime.module.http.internal.HttpParser.encodeQueryString;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeQueryString;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 
@@ -36,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.ImmutableMap;
 
 public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthorizationTestCase {
 

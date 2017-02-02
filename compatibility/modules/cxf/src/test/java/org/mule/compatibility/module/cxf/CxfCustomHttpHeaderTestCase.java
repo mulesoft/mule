@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_IGNORE_METHOD_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.functional.FunctionalTestNotification;
@@ -83,7 +83,7 @@ public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTes
     headersMap.put(MULE_METHOD_PROPERTY, "onReceive");
     headersMap.put(myProperty, myProperty);
 
-    HttpRequest request = HttpRequest.builder().setUri(endpointAddress).setMethod(POST.name()).setHeaders(headersMap)
+    HttpRequest request = HttpRequest.builder().setUri(endpointAddress).setMethod(POST).setHeaders(headersMap)
         .setEntity(new ByteArrayHttpEntity(REQUEST_PAYLOAD.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

@@ -8,7 +8,7 @@
 package org.mule.compatibility.module.cxf;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
@@ -45,7 +45,7 @@ public class ProxyWSDLRewriteAddressTestCase extends AbstractCxfOverHttpExtensio
   @Test
   public void testProxyWSDLRewriteSinglePort() throws Exception {
     String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/single";
-    HttpRequest request = HttpRequest.builder().setUri(proxyAddress + "?wsdl").setMethod(POST.name()).build();
+    HttpRequest request = HttpRequest.builder().setUri(proxyAddress + "?wsdl").setMethod(POST).build();
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     for (Element port : getPorts(getWsdl(response))) {
@@ -63,7 +63,7 @@ public class ProxyWSDLRewriteAddressTestCase extends AbstractCxfOverHttpExtensio
   @Test
   public void testProxyWSDLRewriteAllPorts() throws Exception {
     String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/all";
-    HttpRequest request = HttpRequest.builder().setUri(proxyAddress + "?wsdl").setMethod(POST.name()).build();
+    HttpRequest request = HttpRequest.builder().setUri(proxyAddress + "?wsdl").setMethod(POST).build();
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     for (Element port : getPorts(getWsdl(response))) {

@@ -10,13 +10,17 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
+import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
@@ -90,8 +94,17 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(PathAndMethodRequestMatcher requestMatcher, RequestHandler requestHandler) {
-    return this.listenerRegistry.addRequestHandler(this, requestHandler, requestMatcher);
+  public RequestHandlerManager addRequestHandler(Collection<Method> methods, String path, RequestHandler requestHandler) {
+    return this.listenerRegistry.addRequestHandler(this, requestHandler,
+                                                   new ListenerRequestMatcher(new DefaultMethodRequestMatcher(methods
+                                                       .toArray(new Method[] {})),
+                                                                              path));
+  }
+
+  @Override
+  public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+    return this.listenerRegistry.addRequestHandler(this, requestHandler,
+                                                   new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), path));
   }
 
   @Override

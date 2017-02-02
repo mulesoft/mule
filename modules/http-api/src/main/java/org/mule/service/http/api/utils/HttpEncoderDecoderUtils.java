@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.service.http.api.utils;
+
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.service.http.api.domain.ParameterMap;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
+public class HttpEncoderDecoderUtils {
+
+  private static final String SPACE_ENTITY = "%20";
+
+  public static ParameterMap decodeQueryString(String queryString) {
+    return decodeUrlEncodedBody(queryString, UTF_8);
+  }
+
+  public static String encodeQueryString(Map parameters) {
+    return encodeString(UTF_8, parameters);
+  }
+
+  public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, Charset encoding) {
+    return decodeString(urlEncodedBody, encoding);
+  }
+
+  public static ParameterMap decodeString(String encodedString, Charset encoding) {
+    ParameterMap queryParams = new ParameterMap();
+    if (!StringUtils.isBlank(encodedString)) {
+      String[] pairs = encodedString.split("&");
+      for (String pair : pairs) {
+        int idx = pair.indexOf("=");
+
+        if (idx != -1) {
+          addParam(queryParams, pair.substring(0, idx), pair.substring(idx + 1), encoding);
+        } else {
+          addParam(queryParams, pair, null, encoding);
+
+        }
+      }
+    }
+    return queryParams;
+  }
+
+  /**
+   * Decodes uri params from a request path
+   *
+   * @param pathWithUriParams path with uri param place holders
+   * @param requestPath request path
+   * @return a map with the uri params present in the request path with the values decoded.
+   */
+  public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath) {
+    ParameterMap uriParams = new ParameterMap();
+    if (pathWithUriParams.contains("{")) {
+      final String[] requestPathParts = requestPath.split("/");
+      final String[] listenerPathParts = pathWithUriParams.split("/");
+      int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
+      // split will return an empty string as first path before /
+      for (int i = 1; i < longerPathSize; i++) {
+        final String listenerPart = listenerPathParts[i];
+        if (listenerPart.startsWith("{") && listenerPart.endsWith("}")) {
+          String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
+          String parameterValue = requestPathParts[i];
+          uriParams.put(parameterName, decode(parameterValue, UTF_8));
+        }
+      }
+    }
+    return uriParams;
+  }
+
+  private static void addParam(ParameterMap queryParams, String name, String value, Charset encoding) {
+    queryParams.put(decode(name, encoding), decode(value, encoding));
+  }
+
+  private static String decode(String text, Charset encoding) {
+    if (text == null) {
+      return null;
+    }
+    try {
+      return URLDecoder.decode(text, encoding.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  public static String encodeString(Charset encoding, Map parameters) {
+    String body;
+    StringBuilder result = new StringBuilder();
+    for (Map.Entry<?, ?> entry : (Set<Map.Entry<?, ?>>) ((parameters).entrySet())) {
+      String paramName = entry.getKey().toString();
+      Object paramValue = entry.getValue();
+
+      Iterable paramValues = paramValue instanceof Iterable ? (Iterable) paramValue : Arrays.asList(paramValue);
+      for (Object value : paramValues) {
+        try {
+          paramName = encode(paramName, encoding.name());
+          paramValue = value != null ? encode(value.toString(), encoding.name()) : null;
+        } catch (UnsupportedEncodingException e) {
+          throw new MuleRuntimeException(e);
+        }
+
+        if (result.length() > 0) {
+          result.append("&");
+        }
+        result.append(paramName);
+        if (paramValue != null) {
+          // Allowing parameters name with no value assigned
+          result.append("=");
+          result.append(paramValue);
+        }
+      }
+    }
+
+    body = result.toString();
+    return body;
+  }
+
+  /**
+   * Encodes spaces in a path, replacing them by %20.
+   *
+   * @param path Path that may contain spaces
+   * @return The path with all spaces replaced by %20.
+   */
+  public static String encodeSpaces(String path) {
+    return path.replaceAll(" ", SPACE_ENTITY);
+  }
+
+  /**
+   * Appends a query parameter to an URL that may or may not contain query parameters already.
+   *
+   * @param url base URL to apply the new query parameter
+   * @param queryParamName query parameter name
+   * @param queryParamValue query parameter value
+   * @return a new string with the query parameter appended
+   */
+  public static String appendQueryParam(String url, String queryParamName, String queryParamValue) {
+    try {
+      return (url.contains("?") ? url + "&" : url + "?")
+          + encode(queryParamName, UTF_8.name()) + "=" + encode(queryParamValue, UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+}

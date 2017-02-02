@@ -6,7 +6,10 @@
  */
 package org.mule.service.http.api.server;
 
+import org.mule.service.http.api.HttpConstants.Method;
+
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Represents a ServerSocket connection.
@@ -47,7 +50,8 @@ public interface HttpServer {
    */
   boolean isStopped();
 
-
-  RequestHandlerManager addRequestHandler(final PathAndMethodRequestMatcher pathAndMethodRequestMatcher,
+  RequestHandlerManager addRequestHandler(final Collection<Method> methods, final String path,
                                           final RequestHandler requestHandler);
+
+  RequestHandlerManager addRequestHandler(final String path, final RequestHandler requestHandler);
 }

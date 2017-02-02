@@ -8,7 +8,7 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -53,7 +53,7 @@ public class ProxyRPCBindingTestCase extends AbstractCxfOverHttpExtensionTestCas
   public void proxyRPCBodyPayload() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/body")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(getAllRequest.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -67,7 +67,7 @@ public class ProxyRPCBindingTestCase extends AbstractCxfOverHttpExtensionTestCas
   public void proxyRPCBodyEnvelope() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/envelope")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(getAllRequest.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

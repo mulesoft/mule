@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.RESPONSE_VALIDATION;
@@ -26,13 +27,13 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
+import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
@@ -64,20 +65,16 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
-import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
 import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.MethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
@@ -150,9 +147,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @Placement(tab = ADVANCED_TAB)
   private HttpStreamingType responseStreamingMode;
 
-  private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
   private HttpListenerResponseSender responseSender;
-  private String[] parsedAllowedMethods;
   private ListenerPath listenerPath;
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
@@ -160,7 +155,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private Boolean parseRequest;
   private Class interpretedAttributes;
 
-  //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
+  // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
   public void onSuccess(
                         @Optional @Placement(
@@ -172,7 +167,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     responseSender.sendResponse(context, response);
   }
 
-  //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
+  // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
   public void onError(
                       @Optional @Placement(
@@ -221,11 +216,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   @Override
   public void onStart(SourceCallback<Object, HttpRequestAttributes> sourceCallback) throws MuleException {
-    if (allowedMethods != null) {
-      parsedAllowedMethods = extractAllowedMethods();
-      methodRequestMatcher = new DefaultMethodRequestMatcher(parsedAllowedMethods);
-    }
-
     path = HttpParser.sanitizePathWithStartSlash(path);
     listenerPath = config.getFullListenerPath(path);
     path = listenerPath.getResolvedPath();
@@ -242,8 +232,13 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       interpretedAttributes = HttpListenerResponseAttributes.class;
     }
     try {
-      requestHandlerManager =
-          server.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler(sourceCallback));
+      if (allowedMethods != null) {
+        requestHandlerManager =
+            server.addRequestHandler(asList(extractAllowedMethods()), path, getRequestHandler(sourceCallback));
+      } else {
+        requestHandlerManager =
+            server.addRequestHandler(path, getRequestHandler(sourceCallback));
+      }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -339,7 +334,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       try {
         httpError = HttpError.valueOf(error.getErrorType().getIdentifier());
       } catch (Throwable t) {
-        //Do nothing
+        // Do nothing
       }
       if (httpError != null) {
         java.util.Optional<HttpStatus> status = HttpError.getHttpStatus(httpError);
@@ -411,12 +406,12 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
   }
 
-  private String[] extractAllowedMethods() throws InitialisationException {
+  private Method[] extractAllowedMethods() throws InitialisationException {
     final String[] values = this.allowedMethods.split(",");
-    final String[] normalizedValues = new String[values.length];
+    final Method[] normalizedValues = new Method[values.length];
     int normalizedValueIndex = 0;
     for (String value : values) {
-      normalizedValues[normalizedValueIndex] = value.trim().toUpperCase();
+      normalizedValues[normalizedValueIndex] = Method.valueOf(value.trim().toUpperCase());
       normalizedValueIndex++;
     }
     return normalizedValues;

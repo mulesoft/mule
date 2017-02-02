@@ -26,11 +26,11 @@ import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
@@ -38,6 +38,7 @@ import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -179,9 +180,15 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
     this.muleContext = muleContext;
   }
 
-  public RequestHandlerManager addRequestHandler(ListenerRequestMatcher requestMatcher, RequestHandler requestHandler)
+  public RequestHandlerManager addRequestHandler(final Collection<Method> methods, final String path,
+                                                 RequestHandler requestHandler)
       throws IOException {
-    return server.addRequestHandler(requestMatcher, requestHandler);
+    return server.addRequestHandler(methods, path, requestHandler);
+  }
+
+  public RequestHandlerManager addRequestHandler(final String path, RequestHandler requestHandler)
+      throws IOException {
+    return server.addRequestHandler(path, requestHandler);
   }
 
   public Boolean resolveParseRequest(Boolean listenerParseRequest) {

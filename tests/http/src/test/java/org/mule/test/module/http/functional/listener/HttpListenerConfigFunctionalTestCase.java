@@ -47,7 +47,7 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
       + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
   private static final int TIMEOUT = 1000;
   private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions()
-      .method(HttpConstants.Methods.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
+      .method(HttpConstants.Method.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
 
   @Rule
   public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");

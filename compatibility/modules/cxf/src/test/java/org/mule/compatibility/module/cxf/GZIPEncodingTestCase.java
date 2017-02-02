@@ -12,7 +12,7 @@ import static org.custommonkey.xmlunit.XMLUnit.compareXML;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_ENCODING;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -68,7 +68,7 @@ public class GZIPEncodingTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void proxyWithGZIPResponse() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(getAllRequest.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -83,7 +83,7 @@ public class GZIPEncodingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setHeaders(headersMap)
             .setEntity(new ByteArrayHttpEntity(gzip(getAllRequest))).build();
 

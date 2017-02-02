@@ -10,7 +10,7 @@ package org.mule.compatibility.module.cxf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
@@ -88,7 +88,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends AbstractCxfOverHttp
     String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
     HttpRequest request =
         HttpRequest.builder().setUri(proxyAddress + "?wsdl")
-            .setMethod(POST.name()).build();
+            .setMethod(POST).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 

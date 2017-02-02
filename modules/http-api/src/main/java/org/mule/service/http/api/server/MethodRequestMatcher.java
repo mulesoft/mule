@@ -6,6 +6,7 @@
  */
 package org.mule.service.http.api.server;
 
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 
 import java.util.List;
@@ -26,6 +27,6 @@ public interface MethodRequestMatcher extends RequestMatcher {
   /**
    * @return the list of methods to match.
    */
-  List<String> getMethods();
+  List<Method> getMethods();
 
 }

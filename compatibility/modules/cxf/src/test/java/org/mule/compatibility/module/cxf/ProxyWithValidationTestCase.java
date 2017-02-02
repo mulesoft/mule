@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -38,7 +38,7 @@ public class ProxyWithValidationTestCase extends AbstractCxfOverHttpExtensionTes
   @Test
   public void acceptsRequestWithCData() throws Exception {
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + httpPort.getNumber() + "/services/Echo")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(SAMPLE_REQUEST.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(SAMPLE_REQUEST.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());

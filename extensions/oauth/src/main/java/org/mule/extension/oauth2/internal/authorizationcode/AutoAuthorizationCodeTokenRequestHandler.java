@@ -9,7 +9,6 @@ package org.mule.extension.oauth2.internal.authorizationcode;
 import static java.lang.String.valueOf;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
-import static org.mule.service.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
@@ -20,11 +19,12 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PAR
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpHeaders.Names.LOCATION;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;

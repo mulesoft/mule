@@ -10,19 +10,15 @@ import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWith
 import static org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher.getMethodsListRepresentation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
-
-import com.google.common.base.Joiner;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +30,11 @@ import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class HttpListenerRegistry implements RequestHandlerProvider {
 
@@ -87,6 +88,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
     private LoadingCache<String, Stack<PathMap>> pathMapSearchCache =
         CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, Stack<PathMap>>() {
 
+          @Override
           public Stack<PathMap> load(String path) {
             return findPossibleRequestHandlers(path);
           }
@@ -99,7 +101,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER),
                                   "path parameter must start with /");
       validateCollision(requestMatcher);
-      List<String> matcherMethods = requestMatcher.getMethodRequestMatcher().getMethods();
+      List<Method> matcherMethods = requestMatcher.getMethodRequestMatcher().getMethods();
       paths.add(getMethodAndPath(getMethodsListRepresentation(matcherMethods), requestMatcherPath));
       PathMap currentPathMap = rootPathMap;
       final RequestHandlerMatcherPair addedRequestHandlerMatcherPair;

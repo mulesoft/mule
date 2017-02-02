@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -46,14 +46,14 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
 
     InputStream xml = getClass().getResourceAsStream("request.xml");
     HttpRequest request = HttpRequest.builder().setUri(url)
-        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
 
     HttpResponse httpResponse = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
 
     // This won't pass the filter
     xml = getClass().getResourceAsStream("validation1.xml");
-    request = HttpRequest.builder().setUri(url).setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+    request = HttpRequest.builder().setUri(url).setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
 
     httpResponse = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(httpResponse.getStatusCode(), equalTo(NOT_ACCEPTABLE.getStatusCode()));
@@ -65,7 +65,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     assertNotNull(xml);
 
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse")
-        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
 
     HttpResponse httpResponse = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
@@ -78,19 +78,19 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
 
     InputStream xml = getClass().getResourceAsStream("validation1.xml");
     HttpRequest httpRequest = HttpRequest.builder().setUri(url)
-        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
     assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
 
     xml = getClass().getResourceAsStream("validation2.xml");
     httpRequest = HttpRequest.builder().setUri(url)
-        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
     httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
     assertThat(httpResponse.getStatusCode(), equalTo(NOT_ACCEPTABLE.getStatusCode()));
 
     xml = getClass().getResourceAsStream("validation3.xml");
     httpRequest = HttpRequest.builder().setUri(url)
-        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
     httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
     assertThat(httpResponse.getStatusCode(), equalTo(OK.getStatusCode()));
   }
@@ -99,7 +99,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
   public void testExtractor() throws Exception {
     InputStream xml = getClass().getResourceAsStream("validation1.xml");
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/extract")
-        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST.name()).build();
+        .setEntity(new InputStreamHttpEntity(xml)).setMethod(POST).build();
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
     String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream(), UTF_8);

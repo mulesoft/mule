@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -47,7 +47,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   public void testClientEchoHolder() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echoClient")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -65,7 +65,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   public void testClientProxyEchoHolder() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echoClientProxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -82,7 +82,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   public void testClientEcho2Holder() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo2Client")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -99,7 +99,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   public void testClientProxyEcho2Holder() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo2ClientProxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -115,7 +115,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   public void testClientEcho3Holder() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo3Client")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -132,7 +132,7 @@ public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   public void testClientProxyEcho3Holder() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo3ClientProxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity("TEST".getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_VERSION_PROPERTY;
@@ -19,6 +21,8 @@ import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,11 +37,9 @@ import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.NumberUtils;
-import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.HttpMessageBuilder;
 import org.mule.runtime.module.http.internal.HttpParamType;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.service.http.api.HttpHeaders;
@@ -270,7 +272,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
   }
 
   private String createMultipartFormDataContentType() {
-    return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
+    return format("%s; boundary=%s", MULTIPART_FORM_DATA, getUUID());
   }
 
   private HttpEntity createUrlEncodedEntity(Event event, Map payload) {
@@ -280,9 +282,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       String encodedBody;
       final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
       if (mapPayload instanceof ParameterMap) {
-        encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
+        encodedBody = encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
       } else {
-        encodedBody = HttpParser.encodeString(encoding, mapPayload);
+        encodedBody = encodeString(encoding, mapPayload);
       }
       entity = new ByteArrayHttpEntity(encodedBody.getBytes());
     }
@@ -291,18 +293,18 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
   private void warnMapPayloadButNoUrlEncodedContentType(String contentType) {
     if (!mapPayloadButNoUrlEncodedContentyTypeWarned) {
-      logger.warn(String.format(
-                                "Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s",
-                                contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
+      logger
+          .warn(format("Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s",
+                       contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
       mapPayloadButNoUrlEncodedContentyTypeWarned = true;
     }
   }
 
   private void warnNoMultipartContentTypeButMultipartEntity(String contentType) {
     if (!multipartEntityWithNoMultipartContentyTypeWarned) {
-      logger.warn(String.format(
-                                "Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated",
-                                contentType));
+      logger
+          .warn(format("Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated",
+                       contentType));
       multipartEntityWithNoMultipartContentyTypeWarned = true;
     }
   }

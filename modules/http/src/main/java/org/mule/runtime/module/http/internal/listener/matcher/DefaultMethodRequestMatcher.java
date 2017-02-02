@@ -7,33 +7,33 @@
 package org.mule.runtime.module.http.internal.listener.matcher;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Request matcher for http methods.
  */
 public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
 
-  private final List<String> methods;
+  private final List<Method> methods;
 
   /**
    * The list of methods accepted by this matcher
    *
    * @param methods http request method allowed.
    */
-  public DefaultMethodRequestMatcher(final String... methods) {
+  public DefaultMethodRequestMatcher(final Method... methods) {
     checkArgument(methods != null, "methods attribute should not be null");
-    this.methods = (List<String>) collect(asList(methods), input -> ((String) input).toLowerCase());
+    this.methods = asList(methods);
   }
 
   /**
@@ -45,7 +45,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
   @Override
   public boolean intersectsWith(final MethodRequestMatcher matcher) {
     checkArgument(matcher != null, "matcher cannot be null");
-    for (String method : methods) {
+    for (Method method : methods) {
       if (matcher.getMethods().contains(method)) {
         return true;
       }
@@ -55,7 +55,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
 
   @Override
   public boolean matches(final HttpRequest httpRequest) {
-    return this.methods.contains(httpRequest.getMethod().toLowerCase());
+    return this.methods.contains(Method.valueOf(httpRequest.getMethod().toUpperCase()));
   }
 
   @Override
@@ -64,11 +64,11 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
   }
 
   @Override
-  public List<String> getMethods() {
+  public List<Method> getMethods() {
     return ImmutableList.copyOf(methods);
   }
 
-  public static String getMethodsListRepresentation(List<String> methods) {
+  public static String getMethodsListRepresentation(List<Method> methods) {
     return methods.isEmpty() ? "*" : Arrays.toString(methods.toArray());
   }
 

@@ -6,28 +6,18 @@
  */
 package org.mule.runtime.module.http.internal;
 
-import static com.google.common.base.Charsets.UTF_8;
 import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.service.http.api.domain.ParameterMap;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.mail.BodyPart;
 import javax.mail.Header;
@@ -115,110 +105,6 @@ public class HttpParser {
     return path.startsWith("/") ? path : "/" + path;
   }
 
-  public static ParameterMap decodeQueryString(String queryString) {
-    return decodeUrlEncodedBody(queryString, UTF_8);
-  }
-
-  public static String encodeQueryString(Map parameters) {
-    return encodeString(UTF_8, parameters);
-  }
-
-  public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, Charset encoding) {
-    return decodeString(urlEncodedBody, encoding);
-  }
-
-  public static ParameterMap decodeString(String encodedString, Charset encoding) {
-    ParameterMap queryParams = new ParameterMap();
-    if (!StringUtils.isBlank(encodedString)) {
-      String[] pairs = encodedString.split("&");
-      for (String pair : pairs) {
-        int idx = pair.indexOf("=");
-
-        if (idx != -1) {
-          addParam(queryParams, pair.substring(0, idx), pair.substring(idx + 1), encoding);
-        } else {
-          addParam(queryParams, pair, null, encoding);
-
-        }
-      }
-    }
-    return queryParams;
-  }
-
-  private static void addParam(ParameterMap queryParams, String name, String value, Charset encoding) {
-    queryParams.put(decode(name, encoding), decode(value, encoding));
-  }
-
-
-  public static String encodeString(Charset encoding, Map parameters) {
-    String body;
-    StringBuilder result = new StringBuilder();
-    for (Map.Entry<?, ?> entry : (Set<Map.Entry<?, ?>>) ((parameters).entrySet())) {
-      String paramName = entry.getKey().toString();
-      Object paramValue = entry.getValue();
-
-      Iterable paramValues = paramValue instanceof Iterable ? (Iterable) paramValue : Arrays.asList(paramValue);
-      for (Object value : paramValues) {
-        try {
-          paramName = URLEncoder.encode(paramName, encoding.name());
-          paramValue = value != null ? URLEncoder.encode(value.toString(), encoding.name()) : null;
-        } catch (UnsupportedEncodingException e) {
-          throw new MuleRuntimeException(e);
-        }
-
-        if (result.length() > 0) {
-          result.append("&");
-        }
-        result.append(paramName);
-        if (paramValue != null) {
-          // Allowing parameters name with no value assigned
-          result.append("=");
-          result.append(paramValue);
-        }
-      }
-    }
-
-    body = result.toString();
-    return body;
-  }
-
-  /**
-   * Decodes uri params from a request path
-   *
-   * @param pathWithUriParams path with uri param place holders
-   * @param requestPath request path
-   * @return a map with the uri params present in the request path with the values decoded.
-   */
-  public static ParameterMap decodeUriParams(String pathWithUriParams, String requestPath) {
-    ParameterMap uriParams = new ParameterMap();
-    if (pathWithUriParams.contains("{")) {
-      final String[] requestPathParts = requestPath.split("/");
-      final String[] listenerPathParts = pathWithUriParams.split("/");
-      int longerPathSize = Math.min(requestPathParts.length, listenerPathParts.length);
-      // split will return an empty string as first path before /
-      for (int i = 1; i < longerPathSize; i++) {
-        final String listenerPart = listenerPathParts[i];
-        if (listenerPart.startsWith("{") && listenerPart.endsWith("}")) {
-          String parameterName = listenerPart.substring(1, listenerPart.length() - 1);
-          String parameterValue = requestPathParts[i];
-          uriParams.put(parameterName, decode(parameterValue, UTF_8));
-        }
-      }
-    }
-    return uriParams;
-  }
-
-  private static String decode(String text, Charset encoding) {
-    if (text == null) {
-      return null;
-    }
-    try {
-      return URLDecoder.decode(text, encoding.name());
-    } catch (UnsupportedEncodingException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
   /**
    * Extracts the subtype from a content type
    *
@@ -243,33 +129,5 @@ public class HttpParser {
    */
   public static String normalizePathWithSpacesOrEncodedSpaces(String path) {
     return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
-  }
-
-  /**
-   * Encodes spaces in a path, replacing them by %20.
-   *
-   * @param path Path that may contain spaces
-   * @return The path with all spaces replaced by %20.
-   */
-  public static String encodeSpaces(String path) {
-    return path.replaceAll(WHITE_SPACE, SPACE_ENTITY);
-  }
-
-  /**
-   * Appends a query parameter to an URL that may or may not contain query parameters already.
-   *
-   * @param url base URL to apply the new query parameter
-   * @param queryParamName query parameter name
-   * @param queryParamValue query parameter value
-   * @return a new string with the query parameter appended
-   */
-  public static String appendQueryParam(String url, String queryParamName, String queryParamValue) {
-    try {
-      String urlPreparedForNewParameter = url.contains("?") ? url + "&" : url + "?";
-      return urlPreparedForNewParameter + URLEncoder.encode(queryParamName, UTF_8.name()) + "="
-          + URLEncoder.encode(queryParamValue, UTF_8.name());
-    } catch (UnsupportedEncodingException e) {
-      throw new MuleRuntimeException(e);
-    }
   }
 }

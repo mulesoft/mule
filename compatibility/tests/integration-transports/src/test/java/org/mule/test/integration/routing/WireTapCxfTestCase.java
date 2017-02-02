@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpService;
@@ -44,7 +44,7 @@ public class WireTapCxfTestCase extends CompatibilityFunctionalTestCase {
         + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
     HttpRequest httpRequest =
-        HttpRequest.builder().setUri(url).setEntity(new ByteArrayHttpEntity(msg.getBytes())).setMethod(POST.name()).build();
+        HttpRequest.builder().setUri(url).setEntity(new ByteArrayHttpEntity(msg.getBytes())).setMethod(POST).build();
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
     String responseString = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());

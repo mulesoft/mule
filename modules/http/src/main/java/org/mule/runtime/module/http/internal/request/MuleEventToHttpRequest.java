@@ -19,6 +19,7 @@ import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
@@ -197,7 +197,7 @@ public class MuleEventToHttpRequest {
       if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.get().startsWith(APPLICATION_JAVA)) {
         if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
-          String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
+          String body = encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());

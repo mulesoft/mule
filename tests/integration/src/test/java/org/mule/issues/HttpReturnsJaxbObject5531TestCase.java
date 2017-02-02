@@ -8,7 +8,7 @@ package org.mule.issues;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.IOUtils;
@@ -51,7 +51,7 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractIntegrationTestCa
   @Test
   public void testGetWeather() throws Exception {
     HttpRequest request =
-        HttpRequest.builder().setUri("http://localhost:" + port1.getNumber() + "/test").setMethod(POST.name()).build();
+        HttpRequest.builder().setUri("http://localhost:" + port1.getNumber() + "/test").setMethod(POST).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream(), UTF_8);

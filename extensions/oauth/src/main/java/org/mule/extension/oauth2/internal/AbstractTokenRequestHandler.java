@@ -18,7 +18,7 @@ import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.HttpResponseAttributes;

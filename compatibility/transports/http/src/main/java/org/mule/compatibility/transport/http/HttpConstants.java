@@ -32,13 +32,13 @@ public class HttpConstants {
   public static final int DEFAULT_HTTP_PORT = 80;
 
   // HTTP Methods
-  public static final String METHOD_OPTIONS = org.mule.service.http.api.HttpConstants.Methods.OPTIONS.name();
-  public static final String METHOD_GET = org.mule.service.http.api.HttpConstants.Methods.GET.name();
-  public static final String METHOD_HEAD = org.mule.service.http.api.HttpConstants.Methods.HEAD.name();
-  public static final String METHOD_PATCH = "PATCH";
-  public static final String METHOD_POST = org.mule.service.http.api.HttpConstants.Methods.POST.name();
-  public static final String METHOD_PUT = org.mule.service.http.api.HttpConstants.Methods.PUT.name();
-  public static final String METHOD_DELETE = org.mule.service.http.api.HttpConstants.Methods.DELETE.name();
+  public static final String METHOD_OPTIONS = org.mule.service.http.api.HttpConstants.Method.OPTIONS.name();
+  public static final String METHOD_GET = org.mule.service.http.api.HttpConstants.Method.GET.name();
+  public static final String METHOD_HEAD = org.mule.service.http.api.HttpConstants.Method.HEAD.name();
+  public static final String METHOD_PATCH = org.mule.service.http.api.HttpConstants.Method.PATCH.name();
+  public static final String METHOD_POST = org.mule.service.http.api.HttpConstants.Method.POST.name();
+  public static final String METHOD_PUT = org.mule.service.http.api.HttpConstants.Method.PUT.name();
+  public static final String METHOD_DELETE = org.mule.service.http.api.HttpConstants.Method.DELETE.name();
   public static final String METHOD_TRACE = "TRACE";
   public static final String METHOD_CONNECT = "CONNECT";
 

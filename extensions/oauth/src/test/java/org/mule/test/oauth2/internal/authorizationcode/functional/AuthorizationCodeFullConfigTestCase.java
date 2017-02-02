@@ -22,12 +22,12 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import static org.mule.runtime.module.http.internal.HttpParser.encodeQueryString;
-import static org.mule.runtime.module.http.internal.HttpParser.encodeString;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeQueryString;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -39,8 +39,6 @@ import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,6 +49,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+import com.google.common.collect.ImmutableMap;
 
 @RunnerDelegateTo(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase {

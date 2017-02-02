@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -48,7 +48,7 @@ public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestC
             + "<request xmlns=\"http://www.muleumo.org\">Bad Request</request>" + "</ssss>" + "</soap:Body>" + "</soap:Envelope>";
 
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(soapRequest.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(soapRequest.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 

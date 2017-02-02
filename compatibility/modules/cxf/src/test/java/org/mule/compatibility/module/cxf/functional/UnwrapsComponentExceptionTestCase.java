@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.cxf.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.compatibility.module.cxf.example.HelloWorld;
@@ -46,7 +46,7 @@ public class UnwrapsComponentExceptionTestCase extends AbstractCxfOverHttpExtens
   @Test
   public void testReceivesComponentExceptionMessage() throws Exception {
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/hello")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
