@@ -78,7 +78,7 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
           Configuration configurationAnnotation = element.getAnnotation(Configuration.class);
           String name = config.getName();
           String annotationName = configurationAnnotation != null ? configurationAnnotation.name() : "";
-          String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Configuration", "").replace("Config", ""));
+          String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Configuration", ""));
           return name.equals(defaultNaming) || name.equals(annotationName);
         })
         .findAny();
