@@ -88,8 +88,7 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
         .withParameter("port", "49020")
         .withParameter("authentication",
                        newObjectValue()
-                           .ofType(
-                                   "org.mule.extension.http.api.request.authentication.BasicAuthentication")
+                           .ofType("org.mule.extension.http.api.request.authentication.BasicAuthentication")
                            .withParameter("username", "user")
                            .withParameter("password", "pass")
                            .build())

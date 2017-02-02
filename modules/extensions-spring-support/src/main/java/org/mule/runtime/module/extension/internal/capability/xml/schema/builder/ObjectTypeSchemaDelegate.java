@@ -29,6 +29,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -345,6 +346,12 @@ final class ObjectTypeSchemaDelegate {
     ParameterModel parameter = asParameter(field);
     if (fieldDsl == null) {
       fieldDsl = dsl.resolve(parameter);
+    }
+
+    final String id = getId(field.getValue());
+    if (id.equals(TlsContextFactory.class.getName())) {
+      builder.addTlsSupport(extension, all);
+      return;
     }
 
     builder.declareAsParameter(field.getValue(), extension, parameter, fieldDsl, all);

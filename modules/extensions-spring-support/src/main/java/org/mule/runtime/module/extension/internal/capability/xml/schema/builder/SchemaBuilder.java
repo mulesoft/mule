@@ -60,7 +60,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -527,12 +526,6 @@ public final class SchemaBuilder {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        final String id = getId(objectType);
-        if (id.equals(TlsContextFactory.class.getName())) {
-          addTlsSupport(extensionType, childElements);
-          return;
-        }
-
         defaultVisit(objectType);
         if (isMap(objectType)) {
           if (paramDsl.supportsChildDeclaration()) {
@@ -581,22 +574,18 @@ public final class SchemaBuilder {
     return languageModel;
   }
 
-  private void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
+  void addTlsSupport(ExtensionType extensionType) {
     if (!requiresTls) {
       importTlsNamespace();
       requiresTls = true;
     }
-
-    addAttributeAndElement(extensionType, childElements, TLS_PARAMETER_NAME, TLS_CONTEXT_TYPE);
+    extensionType.getAttributeOrAttributeGroup()
+        .add(createAttribute(TLS_PARAMETER_NAME, load(String.class), false, NOT_SUPPORTED));
   }
 
-  private void addAttributeAndElement(ExtensionType extensionType, List<TopLevelElement> childElements,
-                                      String attributeName, QName elementRef) {
-
-    extensionType.getAttributeOrAttributeGroup()
-        .add(createAttribute(attributeName, load(String.class), false, NOT_SUPPORTED));
-
-    childElements.add(createRefElement(elementRef, false));
+  void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
+    addTlsSupport(extensionType);
+    childElements.add(createRefElement(TLS_CONTEXT_TYPE, false));
   }
 
   TopLevelElement createRefElement(QName elementRef, boolean isRequired) {
@@ -684,14 +673,29 @@ public final class SchemaBuilder {
     });
   }
 
-  void addInfrastructureParameters(ParameterizedModel model, ExplicitGroup sequence) {
+  void addInfrastructureParameters(ExtensionType extensionType, ParameterizedModel model, ExplicitGroup sequence) {
+    // TODO MULE-11608 (alegmarra): remove this TLS custom handling
     model.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-        .forEach(parameter -> parameter.getModelProperty(QNameModelProperty.class).map(QNameModelProperty::getValue)
-            .ifPresent(qName -> {
-              TopLevelElement refElement = createRefElement(qName, false);
-              sequence.getParticle().add(objectFactory.createElement(refElement));
-            }));
+        .filter(p -> !p.getName().equals(TLS_PARAMETER_NAME))
+        .forEach(parameter -> parameter.getModelProperty(QNameModelProperty.class)
+            .map(QNameModelProperty::getValue)
+            .ifPresent(qName -> sequence.getParticle()
+                .add(objectFactory.createElement(createRefElement(qName, false)))));
+
+
+    model.getAllParameterModels().stream()
+        .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
+        .filter(p -> p.getName().equals(TLS_PARAMETER_NAME))
+        .findFirst()
+        .ifPresent(p -> {
+          p.getModelProperty(QNameModelProperty.class).map(QNameModelProperty::getValue)
+              .ifPresent(qName -> sequence.getParticle()
+                  .add(objectFactory.createElement(createRefElement(qName, false))));
+
+          addTlsSupport(extensionType);
+        });
+
   }
 
   void addInlineParameterGroup(ParameterGroupModel group, ExplicitGroup parentSequence) {
