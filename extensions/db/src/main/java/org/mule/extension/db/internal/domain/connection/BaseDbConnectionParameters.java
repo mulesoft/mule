@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 public abstract class BaseDbConnectionParameters {
 
-  private static final String TRANSACTION_CONFIGURATION = "Transaction Configuration";
+  private static final String TRANSACTIONS = "Transactions";
 
   /**
    * The transaction isolation level to set on the driver when connecting the database.
@@ -25,7 +25,7 @@ public abstract class BaseDbConnectionParameters {
   @Parameter
   @Optional(defaultValue = "NOT_CONFIGURED")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = TRANSACTION_CONFIGURATION)
+  @Placement(tab = TRANSACTIONS)
   private TransactionIsolation transactionIsolation = NOT_CONFIGURED;
 
   /**
@@ -34,7 +34,7 @@ public abstract class BaseDbConnectionParameters {
   @Parameter
   @Optional(defaultValue = "false")
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = TRANSACTION_CONFIGURATION)
+  @Placement(tab = TRANSACTIONS)
   @DisplayName("Use XA Transactions")
   private boolean useXaTransactions = false;
 

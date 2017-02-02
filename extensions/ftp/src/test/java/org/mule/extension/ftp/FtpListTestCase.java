@@ -21,7 +21,6 @@ import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.IOUtils;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -101,15 +100,6 @@ public class FtpListTestCase extends FtpConnectorTestCase {
     FileAttributes file = (FileAttributes) messages.get(0).getAttributes();
     assertThat(file.isDirectory(), is(true));
     assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
-  }
-
-  @Test
-  public void listWithoutPath() throws Exception {
-    List<Message> messages = (List<Message>) flowRunner("listWithoutPath").run().getMessage().getPayload().getValue();
-
-    assertThat(messages, hasSize(6));
-    FileAttributes attributes = (FileAttributes) messages.get(0).getAttributes();
-    assertThat(new File(attributes.getPath()).getParent(), is(equalTo(testHarness.getWorkingDirectory())));
   }
 
   private boolean assertListedFiles(List<Message> messages) throws Exception {

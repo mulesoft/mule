@@ -350,7 +350,7 @@ public final class JavaModelLoaderDelegate {
     if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
                                                                 groupName,
-                                                                getComponentDeclarationTypeName(component),
+                                                                getComponentDeclarationTypeName(component.getDeclaration()),
                                                                 ((NamedDeclaration) component.getDeclaration()).getName()));
     } else {
       declarer.withModelProperty(new ParameterGroupModelProperty(

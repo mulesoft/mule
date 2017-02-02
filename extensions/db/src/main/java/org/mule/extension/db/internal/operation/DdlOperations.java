@@ -49,6 +49,6 @@ public class DdlOperations extends BaseDbOperations {
     query.copyInto(settings);
 
     final Query resolvedQuery = resolveQuery(query, connector, connection, DDL);
-    return executeUpdate(query, null, null, connection, resolvedQuery).getAffectedRows();
+    return executeUpdate(query, null, connection, resolvedQuery).getAffectedRows();
   }
 }
