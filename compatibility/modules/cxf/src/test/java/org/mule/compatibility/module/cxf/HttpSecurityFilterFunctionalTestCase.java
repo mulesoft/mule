@@ -12,8 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-
-import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -70,8 +68,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
       int status = client.executeMethod(get);
       assertEquals(UNAUTHORIZED.getStatusCode(), status);
       assertThat(get.getResponseBodyAsString(),
-                 startsWith("Registered authentication is set to " + HttpBasicAuthenticationFilter.class.getName()
-                     + " but there was no security context on the session. Authentication denied on connector"));
+                 startsWith("Registered authentication is set to HTTP basic authentication but there was no security context on"
+                     + " the session. Authentication denied on connector"));
     } finally {
       get.releaseConnection();
     }
@@ -92,8 +90,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
       int status = client.executeMethod(post);
       assertEquals(UNAUTHORIZED.getStatusCode(), status);
       assertThat(post.getResponseBodyAsString(),
-                 startsWith("Registered authentication is set to " + HttpBasicAuthenticationFilter.class.getName()
-                     + " but there was no security context on the session. Authentication denied on connector"));
+                 startsWith("Registered authentication is set to HTTP basic authentication but there was no security context on"
+                     + " the session. Authentication denied on connector"));
     } finally {
       post.releaseConnection();
     }
