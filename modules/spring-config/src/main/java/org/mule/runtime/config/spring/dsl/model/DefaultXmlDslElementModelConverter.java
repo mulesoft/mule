@@ -26,14 +26,12 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -173,8 +171,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private boolean isInfrastructure(DslElementModel elementModel) {
     Object model = elementModel.getModel();
-    if (model instanceof EnrichableModel) {
-      return ((EnrichableModel) model).getModelProperty(InfrastructureParameterModelProperty.class).isPresent();
+    if (model instanceof ParameterModel) {
+      return ExtensionModelUtils.isInfrastructure((ParameterModel) model);
     }
 
     return INFRASTRUCTURE_NAMES.contains(elementModel.getDsl().getAttributeName()) ||
