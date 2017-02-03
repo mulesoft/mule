@@ -13,12 +13,13 @@ import static java.util.Optional.of;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -51,11 +52,11 @@ public class ReactiveInterceptorAdapter
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
   private static final String AROUND_METHOD_NAME = "around";
 
-  private ProcessorInterceptor interceptor;
+  private ProcessorInterceptorFactory interceptorFactory;
   private FlowConstruct flowConstruct;
 
-  public ReactiveInterceptorAdapter(ProcessorInterceptor interceptor) {
-    this.interceptor = interceptor;
+  public ReactiveInterceptorAdapter(ProcessorInterceptorFactory interceptorFactory) {
+    this.interceptorFactory = interceptorFactory;
   }
 
   @Override
@@ -70,29 +71,30 @@ public class ReactiveInterceptorAdapter
       return next;
     }
 
-    ComponentLocation componentLocation = ((AnnotatedObject) component).getLocation();
-    TypedComponentIdentifier componentIdentifier = componentLocation.getComponentIdentifier();
-    Map<String, String> dslParameters = (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
-    LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptor, componentLocation.getLocation());
 
-    if (interceptor.intercept(componentIdentifier, componentLocation)) {
-      if (implementsAround()) {
+    // LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptor, componentLocation.getLocation());
+
+    if (interceptorFactory.intercept(((AnnotatedObject) component).getLocation())) {
+      final ProcessorInterceptor interceptor = interceptorFactory.get();
+      Map<String, String> dslParameters =
+          (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
+      if (implementsAround(interceptor)) {
         return publisher -> from(publisher)
-            .map(doBefore(component, dslParameters))
-            .flatMap(event -> fromFuture(doAround(event, component, dslParameters, next))
+            .map(doBefore(interceptor, component, dslParameters))
+            .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
                 .mapError(CompletionException.class, completionException -> completionException.getCause()))
             .doOnError(MessagingException.class, error -> {
               interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
             })
-            .map(doAfter());
+            .map(doAfter(interceptor));
       } else {
         return publisher -> from(publisher)
-            .map(doBefore(component, dslParameters))
+            .map(doBefore(interceptor, component, dslParameters))
             .transform(next)
             .doOnError(MessagingException.class, error -> {
               interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
             })
-            .map(doAfter());
+            .map(doAfter(interceptor));
       }
     } else {
       return next;
@@ -100,16 +102,17 @@ public class ReactiveInterceptorAdapter
 
   }
 
-  private boolean implementsAround() {
+  private boolean implementsAround(ProcessorInterceptor interceptor) {
     try {
-      return !interceptor.getClass()
-          .getMethod(AROUND_METHOD_NAME, Map.class, InterceptionEvent.class, InterceptionAction.class).isDefault();
+      return !interceptor.getClass().getMethod(AROUND_METHOD_NAME, Map.class, InterceptionEvent.class, InterceptionAction.class)
+          .isDefault();
     } catch (NoSuchMethodException | SecurityException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private Function<Event, Event> doBefore(Processor component, Map<String, String> dslParameters) {
+  private Function<Event, Event> doBefore(ProcessorInterceptor interceptor, Processor component,
+                                          Map<String, String> dslParameters) {
     return event -> {
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
       interceptor.before(resolveParameters(event, component, dslParameters), interceptionEvent);
@@ -117,7 +120,8 @@ public class ReactiveInterceptorAdapter
     };
   }
 
-  private CompletableFuture<Event> doAround(Event event, Processor component, Map<String, String> dslParameters,
+  private CompletableFuture<Event> doAround(Event event, ProcessorInterceptor interceptor, Processor component,
+                                            Map<String, String> dslParameters,
                                             Function<Publisher<Event>, Publisher<Event>> next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
@@ -126,7 +130,7 @@ public class ReactiveInterceptorAdapter
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }
 
-  private Function<Event, Event> doAfter() {
+  private Function<Event, Event> doAfter(ProcessorInterceptor interceptor) {
     return event -> {
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
       interceptor.after(interceptionEvent, empty());

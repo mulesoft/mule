@@ -24,16 +24,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -861,15 +862,20 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorDoesntApply() throws Exception {
-    ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
+    startFlowWithInterceptorFactories(new ProcessorInterceptorFactory() {
 
       @Override
-      public boolean intercept(TypedComponentIdentifier identifier, ComponentLocation location) {
+      public boolean intercept(ComponentLocation location) {
         return false;
       }
-    });
-    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
-    startFlowWithInterceptors(interceptor1, interceptor2);
+
+      @Override
+      public ProcessorInterceptor get() {
+        return interceptor1;
+      };
+    }, () -> interceptor2);
 
     Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
@@ -888,14 +894,19 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Test
   public void secondInterceptorDoesntApply() throws Exception {
     ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
+    startFlowWithInterceptorFactories(() -> interceptor1, new ProcessorInterceptorFactory() {
 
       @Override
-      public boolean intercept(TypedComponentIdentifier identifier, ComponentLocation location) {
+      public boolean intercept(ComponentLocation location) {
         return false;
       }
+
+      @Override
+      public ProcessorInterceptor get() {
+        return interceptor2;
+      };
     });
-    startFlowWithInterceptors(interceptor1, interceptor2);
 
     Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
@@ -913,7 +924,16 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private void startFlowWithInterceptors(ProcessorInterceptor... interceptors) throws Exception {
     for (ProcessorInterceptor interceptionHandler : interceptors) {
-      muleContext.getProcessorInterceptorManager().addInterceptor(interceptionHandler);
+      muleContext.getProcessorInterceptorManager().addInterceptor(() -> interceptionHandler);
+    }
+
+    flow.initialise();
+    flow.start();
+  }
+
+  private void startFlowWithInterceptorFactories(ProcessorInterceptorFactory... interceptorFactories) throws Exception {
+    for (ProcessorInterceptorFactory interceptionHandlerFactory : interceptorFactories) {
+      muleContext.getProcessorInterceptorManager().addInterceptor(interceptionHandlerFactory);
     }
 
     flow.initialise();
@@ -944,7 +964,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
   }
 
-  public static Map<String, Object> mapArgWithEntry(String key, Object value) {
+  private static Map<String, Object> mapArgWithEntry(String key, Object value) {
     return (Map<String, Object>) argThat(hasEntry(key, value));
   }
 

@@ -19,8 +19,9 @@ import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -52,6 +53,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 
 /**
@@ -140,13 +142,14 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .transform(next)
         .doOnNext(result -> setCurrentEvent(result)));
 
-    List<ProcessorInterceptor> interceptionHandlerChain = muleContext.getProcessorInterceptorManager().getInterceptors();
+    List<ProcessorInterceptorFactory> interceptionFactoriesChain =
+        muleContext.getProcessorInterceptorManager().getInterceptorFactories();
     List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptorsToBeExecuted =
         new LinkedList<>();
     // TODO MULE-11521 Review how interceptors are registered!
-    interceptionHandlerChain.stream()
-        .forEach(interceptionHandler -> {
-          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptionHandler);
+    interceptionFactoriesChain.stream()
+        .forEach(interceptorFactory -> {
+          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
           reactiveInterceptorAdapter.setFlowConstruct(flowConstruct);
           interceptorsToBeExecuted.add(0, reactiveInterceptorAdapter);
         });
