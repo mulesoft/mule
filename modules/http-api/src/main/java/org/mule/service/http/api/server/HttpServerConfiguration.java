@@ -131,7 +131,7 @@ public class HttpServerConfiguration {
 
     /**
      * Defines a {@link Supplier} for a {@link Scheduler} that will be used by the {@link HttpServer} to process requests. Must be
-     * specified.
+     * specified if the server won't be associated to a flow where a processing strategy will define the scheduling.
      *
      * @param schedulerSupplier
      * @return this builder
