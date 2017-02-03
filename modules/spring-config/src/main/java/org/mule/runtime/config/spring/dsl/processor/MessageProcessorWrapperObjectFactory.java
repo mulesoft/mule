@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 /**
  * {@link ObjectFactory} to be used when there's just a configuration element that is a wrapper for a single message processor.
@@ -16,16 +17,16 @@ import org.mule.runtime.core.api.processor.Processor;
  *
  * @since 4.0
  */
-public class MessageProcessorWrapperObjectFactory implements ObjectFactory<Processor> {
+public class MessageProcessorWrapperObjectFactory extends AbstractAnnotatedObjectFactory<Processor> {
 
   private Processor messageProcessor;
 
-  @Override
-  public Processor getObject() throws Exception {
-    return messageProcessor;
-  }
-
   public void setMessageProcessor(Processor messageProcessor) {
     this.messageProcessor = messageProcessor;
+  }
+
+  @Override
+  public Processor doGetObject() throws Exception {
+    return messageProcessor;
   }
 }

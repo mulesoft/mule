@@ -27,6 +27,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOW
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -65,7 +66,6 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -156,7 +156,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
-          //TODO MULE-9637 remove support for MuleContextAware injection.
+          // TODO MULE-9637 remove support for MuleContextAware injection.
           if (componentBuildingDefinitionProvider instanceof MuleContextAware) {
             ((MuleContextAware) componentBuildingDefinitionProvider).setMuleContext(muleContext);
           }
@@ -382,9 +382,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory) {
     if (artifactType.equals(ArtifactType.DOMAIN)) {
-      return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
+      return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser,
+                                                        componentBuildingDefinitionRegistry);
     }
-    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
+    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry);
   }
 
   protected MuleDocumentLoader createLoader() {

@@ -67,9 +67,12 @@ public abstract class AbstractNotificationTestCase extends AbstractIntegrationTe
    * @param notificationsLog
    */
   protected void assertExpectedNotifications(String notificationsLog, RestrictedNode spec) {
+    int i = 0;
     for (Iterator<?> iterator = notificationLogger.getNotifications().iterator(); iterator.hasNext();) {
       ServerNotification notification = (ServerNotification) iterator.next();
-      switch (spec.match(notification)) {
+      i++;
+      int match = spec.match(notification);
+      switch (match) {
         case Node.SUCCESS:
           break;
         case Node.FAILURE:

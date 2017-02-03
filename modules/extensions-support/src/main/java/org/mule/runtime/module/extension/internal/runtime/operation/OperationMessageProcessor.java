@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.api.component.ComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -19,7 +18,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -29,7 +27,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -51,7 +50,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -70,7 +68,6 @@ import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -105,7 +102,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
-  private final ComponentIdentifier operationIdentifier;
+  private final TypedComponentIdentifier operationIdentifier;
   private final ResolverSet resolverSet;
   private final String target;
   private final EntityMetadataMediator entityMetadataMediator;
@@ -129,10 +126,10 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     this.target = target;
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.policyManager = policyManager;
-    operationIdentifier = new ComponentIdentifier.Builder()
+    operationIdentifier = TypedComponentIdentifier.builder().withIdentifier(ComponentIdentifier.builder()
         .withName(operationModel.getName())
         .withNamespace(extensionModel.getName().toLowerCase())
-        .build();
+        .build()).withType(TypedComponentIdentifier.ComponentType.PROCESSOR).build();
   }
 
   @Override
@@ -157,7 +154,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
         };
 
         OperationPolicy policy =
-            policyManager.createOperationPolicy(operationIdentifier, event,
+            policyManager.createOperationPolicy(operationIdentifier.getIdentifier(), event,
                                                 operationParameters,
                                                 operationExecutionFunction);
         return policy.process(event);
@@ -300,25 +297,4 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     return asProcessingType(operationModel.getExecutionType());
   }
 
-  @Override
-  public org.mule.runtime.api.component.ComponentIdentifier getIdentifier() {
-    // TODO MULE-11572 set this data instead of building this object each time
-    return new org.mule.runtime.api.component.ComponentIdentifier() {
-
-      @Override
-      public String getNamespace() {
-        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getNamespace();
-      }
-
-      @Override
-      public String getName() {
-        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
-      }
-
-      @Override
-      public ComponentType getComponentType() {
-        return OPERATION;
-      }
-    };
-  }
 }

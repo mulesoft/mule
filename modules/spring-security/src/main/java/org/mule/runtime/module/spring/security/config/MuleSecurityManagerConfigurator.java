@@ -7,11 +7,11 @@
 package org.mule.runtime.module.spring.security.config;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class MuleSecurityManagerConfigurator implements ObjectFactory<SecurityManager> {
+public class MuleSecurityManagerConfigurator extends AbstractAnnotatedObjectFactory<SecurityManager> {
 
   private List<SecurityProvider> providers = new ArrayList<>();
   private MuleContext muleContext;
@@ -47,7 +47,7 @@ public class MuleSecurityManagerConfigurator implements ObjectFactory<SecurityMa
   }
 
   @Override
-  public SecurityManager getObject() throws Exception {
+  public SecurityManager doGetObject() throws Exception {
     List<SecurityManager> securityManagers = new ArrayList<>();
     securityManagers.add(muleContext.getSecurityManager());
     SecurityManager factorySecurityManager = muleContext.getSecurityManager();

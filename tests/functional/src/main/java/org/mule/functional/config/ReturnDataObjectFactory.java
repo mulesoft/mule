@@ -7,6 +7,7 @@
 package org.mule.functional.config;
 
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.BeanCreationException;
  *
  * @since 4.0
  */
-public class ReturnDataObjectFactory implements ObjectFactory<Object> {
+public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<Object> {
 
   private String file;
   private String content;
@@ -32,7 +33,7 @@ public class ReturnDataObjectFactory implements ObjectFactory<Object> {
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public Object doGetObject() throws Exception {
     String returnData = content;
     if (file != null) {
       try {

@@ -7,12 +7,12 @@
 package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.concurrent.Executor;
 
@@ -91,7 +91,8 @@ public class TransportMessageProcessContext implements MessageProcessContext {
 
   @Override
   public ComponentIdentifier getSourceIdentifier() {
-    //TODO Implement when MULE-10970 gets fixed. Even it's better to have it implemented we most likely won't use it in transport scenarios.
+    // TODO Implement when MULE-10970 gets fixed. Even it's better to have it implemented we most likely won't use it in transport
+    // scenarios.
     throw new UnsupportedOperationException("source identifier not supported for transports");
   }
 

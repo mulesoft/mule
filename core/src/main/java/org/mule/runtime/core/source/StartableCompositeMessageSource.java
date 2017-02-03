@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -44,7 +44,8 @@ import org.slf4j.LoggerFactory;
  * <li>If a {@link MessageSource} is started in isolation when composite is stopped then messages will be lost.
  * <li>Message will only be received from endpoints if the connector is also started.
  */
-public class StartableCompositeMessageSource implements CompositeMessageSource, Lifecycle, FlowConstructAware, MuleContextAware {
+public class StartableCompositeMessageSource extends AbstractAnnotatedObject
+    implements CompositeMessageSource, Lifecycle, FlowConstructAware, MuleContextAware {
 
   protected static final Logger logger = LoggerFactory.getLogger(StartableCompositeMessageSource.class);
 

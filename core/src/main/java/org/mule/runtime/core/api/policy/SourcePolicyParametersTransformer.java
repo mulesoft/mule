@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.Map;
 

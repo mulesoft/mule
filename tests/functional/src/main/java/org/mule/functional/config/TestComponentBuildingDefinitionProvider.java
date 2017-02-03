@@ -14,15 +14,16 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-
 import org.mule.functional.client.QueueWriterMessageProcessor;
 import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.InvocationCountMessageProcessor;
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
+import org.mule.functional.functional.SkeletonSource;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.tck.processor.TestNonBlockingProcessor;
@@ -70,7 +71,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseComponentDefinition.copy()
         .withIdentifier("component")
-        .withTypeDefinition(fromType(Processor.class))
+        .withTypeDefinition(fromType(AbstractComponent.class))
         .withObjectFactoryType(FunctionalComponentObjectFactory.class)
         .build());
 
@@ -122,6 +123,11 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("non-blocking-processor")
         .withTypeDefinition(fromType(TestNonBlockingProcessor.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("skeleton-source")
+        .withTypeDefinition(fromType(SkeletonSource.class))
         .build());
 
     return componentBuildingDefinitions;

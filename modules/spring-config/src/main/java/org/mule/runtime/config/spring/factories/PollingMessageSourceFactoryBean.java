@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -16,7 +17,8 @@ import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class PollingMessageSourceFactoryBean implements FactoryBean<PollingMessageSource>, MuleContextAware {
+public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObject
+    implements FactoryBean<PollingMessageSource>, MuleContextAware {
 
   protected PeriodicScheduler scheduler;
   protected Processor messageProcessor;

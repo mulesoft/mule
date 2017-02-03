@@ -50,7 +50,6 @@ public class MinimalApplicationModelGenerator {
   public MinimalApplicationModelGenerator(ApplicationModel applicationModel,
                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.applicationModel = applicationModel;
-    this.applicationModel.resolveComponentTypes();
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
 

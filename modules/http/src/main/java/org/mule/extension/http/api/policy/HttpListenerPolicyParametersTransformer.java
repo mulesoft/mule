@@ -6,13 +6,13 @@
  */
 package org.mule.extension.http.api.policy;
 
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.service.http.api.domain.ParameterMap;
 
 import com.google.common.collect.ImmutableMap;
@@ -29,7 +29,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {
-    return componentIdentifier.equals(parseComponentIdentifier("http:listener"));
+    return componentIdentifier.equals(buildFromStringRepresentation("http:listener"));
   }
 
   @Override

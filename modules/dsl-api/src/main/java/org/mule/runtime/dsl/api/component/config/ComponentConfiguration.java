@@ -8,6 +8,7 @@ package org.mule.runtime.dsl.api.component.config;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import org.mule.runtime.api.component.ComponentIdentifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,8 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-//TODO MULE-11496 Delete this configuration once everything has an ExtensionModel and can be represented with ComponentDeclaration
+// TODO MULE-11496 Delete this configuration once everything has an ExtensionModel and can be represented with
+// ComponentDeclaration
 public class ComponentConfiguration {
 
   private ComponentIdentifier identifier;

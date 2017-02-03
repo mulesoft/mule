@@ -15,6 +15,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -134,7 +135,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
     this.enrichExpressionPairs.add(pair);
   }
 
-  public static class EnrichExpressionPair {
+  public static class EnrichExpressionPair extends AbstractAnnotatedObject {
 
     private String source;
     private String target;

@@ -6,14 +6,15 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.SourcePolicyPointcutParametersFactory;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 /**
  * HTTP request operation policy pointcut parameters factory.
@@ -23,7 +24,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
 
   private final static ComponentIdentifier listenerIdentifier =
-      new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build();
+      builder().withNamespace("http").withName("listener").build();
 
   @Override
   public boolean supportsSourceIdentifier(ComponentIdentifier sourceIdentifier) {

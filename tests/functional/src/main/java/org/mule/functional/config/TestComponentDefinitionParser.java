@@ -47,6 +47,7 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser {
     addIgnored("enableMessageHistory");
     addIgnored("enableNotifications");
     addIgnored("throwException");
+    addIgnored("raiseError");
     addIgnored("exceptionToThrow");
     addIgnored("exceptionText");
     addIgnored("waitTime");

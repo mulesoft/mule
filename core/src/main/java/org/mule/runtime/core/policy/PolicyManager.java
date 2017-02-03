@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.policy;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.Map;
 

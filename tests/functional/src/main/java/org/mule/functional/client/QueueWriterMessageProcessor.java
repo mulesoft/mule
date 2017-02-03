@@ -9,6 +9,7 @@ package org.mule.functional.client;
 
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -19,7 +20,7 @@ import org.mule.runtime.core.session.DefaultMuleSession;
 /**
  * Writes {@link Event} to a test connector's queue.
  */
-public class QueueWriterMessageProcessor implements Processor, MuleContextAware {
+public class QueueWriterMessageProcessor extends AbstractAnnotatedObject implements Processor, MuleContextAware {
 
   private MuleContext muleContext;
   private String name;

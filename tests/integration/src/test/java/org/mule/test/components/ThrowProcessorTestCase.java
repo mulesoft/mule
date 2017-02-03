@@ -11,11 +11,11 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
 import org.mule.functional.functional.ThrowProcessor;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.TypedException;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;

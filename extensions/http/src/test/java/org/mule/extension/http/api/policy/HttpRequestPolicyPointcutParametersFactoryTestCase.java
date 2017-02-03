@@ -10,8 +10,8 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
-
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -23,7 +23,7 @@ import org.junit.Test;
 public class HttpRequestPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_REQUEST_COMPONENT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace("http").withName("request").build();
+      builder().withNamespace("http").withName("request").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
   private static final String FLOW_NAME = "flow-name";
@@ -40,7 +40,7 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
   @Test
   public void doesNotSupportHttpListener() {
     assertThat(factory
-        .supportsOperationIdentifier(new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build()),
+        .supportsOperationIdentifier(builder().withNamespace("http").withName("listener").build()),
                is(false));
   }
 

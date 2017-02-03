@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import javax.inject.Inject;
 
@@ -18,20 +19,13 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExpressionArgumentObjectFactory implements ObjectFactory<ExpressionArgument> {
+public class ExpressionArgumentObjectFactory extends AbstractAnnotatedObjectFactory<ExpressionArgument> {
 
   @Inject
   private MuleContext muleContext;
 
   private String expression;
   private boolean optional;
-
-  @Override
-  public ExpressionArgument getObject() throws Exception {
-    ExpressionArgument expressionArgument = new ExpressionArgument(null, new ExpressionConfig(expression), optional);
-    expressionArgument.setMuleContext(muleContext);
-    return expressionArgument;
-  }
 
   /**
    * @param expression the expression to retrieve the argument value.
@@ -45,5 +39,12 @@ public class ExpressionArgumentObjectFactory implements ObjectFactory<Expression
    */
   public void setOptional(boolean optional) {
     this.optional = optional;
+  }
+
+  @Override
+  public ExpressionArgument doGetObject() throws Exception {
+    ExpressionArgument expressionArgument = new ExpressionArgument(null, new ExpressionConfig(expression), optional);
+    expressionArgument.setMuleContext(muleContext);
+    return expressionArgument;
   }
 }

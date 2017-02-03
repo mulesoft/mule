@@ -9,8 +9,8 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -26,10 +26,11 @@ public abstract class AbstractErrorTypeMatcherTestCase extends AbstractMuleConte
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     anyErrorType = errorTypeRepository.getAnyErrorType();
     ComponentIdentifier transformationIdentifier =
-        new ComponentIdentifier.Builder().withName(TRANSFORMATION_ERROR_IDENTIFIER).withNamespace(CORE_NAMESPACE_NAME).build();
+        ComponentIdentifier.builder().withName(TRANSFORMATION_ERROR_IDENTIFIER).withNamespace(CORE_NAMESPACE_NAME)
+            .build();
     transformationErrorType = errorTypeRepository.lookupErrorType(transformationIdentifier).get();
     ComponentIdentifier expressionIdentifier =
-        new ComponentIdentifier.Builder().withName(EXPRESSION_ERROR_IDENTIFIER).withNamespace(CORE_NAMESPACE_NAME).build();
+        ComponentIdentifier.builder().withName(EXPRESSION_ERROR_IDENTIFIER).withNamespace(CORE_NAMESPACE_NAME).build();
     expressionErrorType = errorTypeRepository.lookupErrorType(expressionIdentifier).get();
   }
 

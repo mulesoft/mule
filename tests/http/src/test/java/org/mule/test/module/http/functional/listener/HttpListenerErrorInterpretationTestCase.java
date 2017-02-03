@@ -13,9 +13,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.util.http.SimpleHttpServer.DEFAULT_RESPONSE;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.CREATED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.FORBIDDEN;
@@ -34,13 +34,13 @@ import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhr
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -174,7 +174,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
   }
 
   void verifyStatusIsKnown(HttpStatus status) throws IOException {
-    ErrorType statusError = errorTypeRepository.lookupErrorType(parseComponentIdentifier(getErrorName(status))).get();
+    ErrorType statusError = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(getErrorName(status))).get();
     verifyStatus(status, statusError);
   }
 

@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.time.Time;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * An {@link ObjectFactory} which produces instances of {@link DynamicConfigurationExpiration}
  */
-public class DynamicConfigurationExpirationObjectFactory implements ObjectFactory<DynamicConfigurationExpiration> {
+public class DynamicConfigurationExpirationObjectFactory extends AbstractAnnotatedObjectFactory<DynamicConfigurationExpiration> {
 
   private final long frequency;
   private final TimeUnit timeUnit;
@@ -25,7 +26,7 @@ public class DynamicConfigurationExpirationObjectFactory implements ObjectFactor
   }
 
   @Override
-  public DynamicConfigurationExpiration getObject() throws Exception {
+  public DynamicConfigurationExpiration doGetObject() throws Exception {
     return new DynamicConfigurationExpiration(new Time(frequency, timeUnit));
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 
@@ -14,7 +15,7 @@ import org.mule.runtime.core.api.source.MessageSource;
  *
  * @since 4.0
  */
-public class SkeletonSource implements MessageSource {
+public class SkeletonSource extends AbstractAnnotatedObject implements MessageSource {
 
   private Processor listener;
 

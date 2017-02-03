@@ -40,7 +40,6 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
     assertThat(stb, not(nullValue()));
     assertThat(getDocName(stb), is("stb-transformer"));
     assertThat(getDocDescription(stb), is("Convert a String to a Byte Array"));
-    assertThat(getSourceFile(stb), is("annotations-config.xml"));
     assertThat(getSourceFileLine(stb), is(10));
     assertThat(getSourceElement(stb),
                is("<string-to-byte-array-transformer name=\"StringtoByteArray\" doc:name=\"stb-transformer\">"
@@ -55,7 +54,6 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
     assertThat(flow, not(nullValue()));
     assertThat(getDocName(flow), is("Bridge flow"));
     assertThat(getDocDescription(flow), is("Main flow"));
-    assertThat(getSourceFile(flow), is("annotations.xml"));
     assertThat(getSourceFileLine(flow), is(7));
     assertThat(getSourceElement(flow),
                is("<flow name=\"Bridge\" doc:name=\"Bridge flow\">" + SystemUtils.LINE_SEPARATOR + "<annotations>"
@@ -70,7 +68,6 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
     assertThat(flow, not(nullValue()));
     assertThat(getDocName(flow), is("With Referenced Exception Strategy"));
     assertThat(getDocDescription(flow), is(nullValue()));
-    assertThat(getSourceFile(flow), is("annotations.xml"));
     assertThat(getSourceFileLine(flow), is(18));
     assertThat(getSourceElement(flow),
                is("<flow name=\"WithRefExceptionStrategy\" doc:name=\"With Referenced Exception Strategy\">"
@@ -89,7 +86,6 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
     assertThat(flow, not(nullValue()));
     assertThat(getDocName(flow), is(nullValue()));
     assertThat(getDocDescription(flow), is(nullValue()));
-    assertThat(getSourceFile(flow), is("annotations.xml"));
     assertThat(getSourceFileLine(flow), is(14));
     assertThat(getSourceElement(flow), is("<flow name=\"NotAnnotatedBridge\">" + SystemUtils.LINE_SEPARATOR
         + "<echo-component></echo-component>" + SystemUtils.LINE_SEPARATOR + "</flow>"));
@@ -99,7 +95,6 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
   public void testJavaComponentAnnotations() {
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("Bridge");
     DefaultJavaComponent echo = (DefaultJavaComponent) flow.getMessageProcessors().get(0);
-    assertThat(getSourceFile(echo), is("annotations.xml"));
     assertThat(getSourceFileLine(echo), is(11));
     assertThat(getSourceElement(echo), is("<echo-component doc:name=\"echo\">" + "</echo-component>"));
   }
@@ -109,7 +104,6 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
     Transformer stb = muleContext.getRegistry().lookupTransformer("ManziTransformer");
     assertThat(stb, not(nullValue()));
     assertThat(getDocName(stb), is("manzi-transformer"));
-    assertThat(getSourceFile(stb), is("annotations-config.xml"));
     assertThat(getSourceFileLine(stb), is(16));
     assertThat(getSourceElement(stb),
                is("<append-string-transformer message=\"Manzi\" name=\"ManziTransformer\" doc:name=\"manzi-transformer\"></append-string-transformer>"));

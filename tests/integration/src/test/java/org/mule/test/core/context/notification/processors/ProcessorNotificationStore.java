@@ -10,11 +10,24 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.test.core.context.notification.AbstractNotificationLogger;
 
-public class MessageProcessorNotificationLogger extends AbstractNotificationLogger<MessageProcessorNotification>
+public class ProcessorNotificationStore extends AbstractNotificationLogger<MessageProcessorNotification>
     implements MessageProcessorNotificationListener<MessageProcessorNotification> {
+
+  boolean logSingleNotification = false;
 
   @Override
   public boolean isBlocking() {
     return false;
+  }
+
+  @Override
+  public synchronized void onNotification(MessageProcessorNotification notification) {
+    if (!logSingleNotification || notification.getAction() == MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE) {
+      super.onNotification(notification);
+    }
+  }
+
+  public void setLogSingleNotification(boolean logSingleNotification) {
+    this.logSingleNotification = logSingleNotification;
   }
 }

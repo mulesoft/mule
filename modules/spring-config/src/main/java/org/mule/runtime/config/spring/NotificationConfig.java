@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
 import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
@@ -54,7 +55,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class NotificationConfig {
+public class NotificationConfig extends AbstractAnnotatedObject {
 
   private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS =
       "org.mule.compatibility.core.context.notification.EndpointMessageNotification";

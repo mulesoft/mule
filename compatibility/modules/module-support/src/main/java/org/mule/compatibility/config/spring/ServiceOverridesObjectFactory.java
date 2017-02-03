@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_SESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS;
 import static org.mule.runtime.core.api.config.MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS;
 import static org.mule.runtime.core.api.config.MuleProperties.SERVICE_FINDER;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class ServiceOverridesObjectFactory implements ObjectFactory<Map<String, String>> {
+public class ServiceOverridesObjectFactory extends AbstractAnnotatedObjectFactory<Map<String, String>> {
 
   private String messageReceiver;
   private String transactedMessageReceiver;
@@ -106,7 +107,7 @@ public class ServiceOverridesObjectFactory implements ObjectFactory<Map<String, 
   }
 
   @Override
-  public Map<String, String> getObject() throws Exception {
+  public Map<String, String> doGetObject() throws Exception {
     HashMap<String, String> overrides = new HashMap<>();
     putIfHasValue(overrides, CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
     putIfHasValue(overrides, CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
