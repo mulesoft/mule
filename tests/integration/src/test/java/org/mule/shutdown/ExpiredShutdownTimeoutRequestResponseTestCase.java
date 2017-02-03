@@ -8,7 +8,7 @@ package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -59,7 +59,7 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
       public void run() {
         try {
           HttpRequest request = HttpRequest.builder().setUri(url).setEntity(new ByteArrayHttpEntity(TEST_MESSAGE.getBytes()))
-              .setMethod(POST.name()).build();
+              .setMethod(POST).build();
 
           HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 

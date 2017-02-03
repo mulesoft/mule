@@ -17,33 +17,32 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_1;
-import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
-import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.runtime.module.http.internal.domain.request.DefaultClientConnection;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.module.http.internal.domain.request.DefaultHttpRequestContext;
+import org.mule.service.http.api.domain.HttpProtocol;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
-import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -85,7 +84,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   @Test
   public void eventCreation() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
-    when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
+    when(mockHttpListenerConfig.addRequestHandler(any(String.class), any(RequestHandler.class)))
         .then(invocation -> {
           requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
           return null;
@@ -112,7 +111,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   @Test
   public void eventCreationWithInvalidPath() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
-    when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
+    when(mockHttpListenerConfig.addRequestHandler(any(String.class), any(RequestHandler.class)))
         .then(invocation -> {
           requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
           return null;
@@ -131,7 +130,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   @Test
   public void noHostHeaderOn10Request() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
-    when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
+    when(mockHttpListenerConfig.addRequestHandler(any(String.class), any(RequestHandler.class)))
         .then(invocation -> {
           requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
           return null;
@@ -149,7 +148,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   @Test
   public void noHostHeaderOn11Request() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
-    when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
+    when(mockHttpListenerConfig.addRequestHandler(any(String.class), any(RequestHandler.class)))
         .then(invocation -> {
           requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
           return null;

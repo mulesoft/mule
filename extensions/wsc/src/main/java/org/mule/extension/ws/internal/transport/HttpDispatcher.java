@@ -12,6 +12,8 @@ import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.mule.extension.ws.api.exception.WscErrors.CANNOT_DISPATCH;
 import static org.mule.extension.ws.api.exception.WscErrors.TIMEOUT;
 import static org.mule.extension.ws.internal.connection.WscClient.MULE_SOAP_ACTION;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
@@ -57,7 +59,7 @@ public final class HttpDispatcher implements WscDispatcher {
 
     HttpRequest request = HttpRequest.builder()
         .setUri(address)
-        .setMethod("POST")
+        .setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(os.toString().getBytes()))
         .setHeaders(buildHeaders(message))
         .build();

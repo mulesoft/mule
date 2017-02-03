@@ -22,12 +22,12 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
+import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import static org.mule.runtime.module.http.internal.HttpParser.encodeQueryString;
-import static org.mule.runtime.module.http.internal.HttpParser.encodeString;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeQueryString;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -130,9 +130,9 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse()
         .withHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
-        .withBody(encodeString(UTF_8, tokenUrlResponseParameters))));
+        .withBody(encodeString(tokenUrlResponseParameters, UTF_8))));
 
-    final ImmutableMap<Object, Object> redirectUrlQueryParams = ImmutableMap.builder()
+    final ImmutableMap<String, String> redirectUrlQueryParams = ImmutableMap.<String, String>builder()
         .put(CODE_PARAMETER, AUTHENTICATION_CODE).put(STATE_PARAMETER, state.getValue()).build();
 
     muleContext.getClient().send(localCallbackUrl.getValue() + "?" + encodeQueryString(redirectUrlQueryParams),

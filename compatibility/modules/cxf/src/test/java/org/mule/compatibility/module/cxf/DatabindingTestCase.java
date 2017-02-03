@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertNotNull;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
@@ -68,7 +68,7 @@ public class DatabindingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri(format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service))
-            .setMethod(POST.name()).build();
+            .setMethod(POST).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());

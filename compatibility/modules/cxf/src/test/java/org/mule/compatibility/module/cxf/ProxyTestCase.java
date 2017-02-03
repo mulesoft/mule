@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.compatibility.module.cxf.testmodels.AsyncService;
 import org.mule.compatibility.module.cxf.testmodels.AsyncServiceWithSoapAction;
 import org.mule.functional.functional.FunctionalTestComponent;
@@ -68,7 +68,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testServerWithEcho() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -84,7 +84,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -110,7 +110,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   }
 
   public void doTestProxyValidation(String url) throws Exception {
-    HttpRequest request = HttpRequest.builder().setUri(url).setMethod(POST.name())
+    HttpRequest request = HttpRequest.builder().setUri(url).setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -120,7 +120,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     String valid = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + "<soap:Body> "
         + "<echo xmlns=\"http://www.muleumo.org\">" + "  <echo>test</echo>" + "</echo>" + "</soap:Body>" + "</soap:Envelope>";
-    request = HttpRequest.builder().setUri(url).setMethod(POST.name())
+    request = HttpRequest.builder().setUri(url).setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(valid.getBytes())).build();
 
     response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -139,7 +139,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
     HttpRequest request = HttpRequest.builder()
-        .setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl").setMethod(POST.name())
+        .setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl").setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -160,7 +160,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl2")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -177,7 +177,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithTransform")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -194,7 +194,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-databinding-proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -212,7 +212,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -232,7 +232,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/transform-proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -334,7 +334,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + path)
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes()))
             .setHeaders(headersMap).build();
 
@@ -360,7 +360,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testOneWaySendWithSoapAction() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setHeaders(prepareOneWayWithSoapActionTestProperties())
             .setEntity(new ByteArrayHttpEntity(prepareOneWayTestMessage().getBytes())).build();
 
@@ -377,7 +377,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testOneWaySendWithSoapActionSpoofing() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setHeaders(prepareOneWaySpoofingTestProperties())
             .setEntity(new ByteArrayHttpEntity(prepareOneWayTestMessage().getBytes())).build();
 
@@ -391,7 +391,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testOneWaySendUnknownSoapAction() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/oneway")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setHeaders(prepareOneWayWithSoapActionTestProperties())
             .setEntity(new ByteArrayHttpEntity(prepareOneWayTestMessage().getBytes())).build();
 
@@ -405,7 +405,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testOneWaySend() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/oneway")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setHeaders(prepareOneWayTestProperties())
             .setEntity(new ByteArrayHttpEntity(prepareOneWayTestMessage().getBytes())).build();
 
@@ -424,7 +424,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testProxyWithCommentInRequest() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msgWithComment.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -442,7 +442,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
   public void testProxyEnvelopeWithXsltTransformation() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-xslt-proxy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -465,7 +465,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -483,7 +483,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/proxyFault")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(proxyFaultMsg.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -502,7 +502,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/proxyJms")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -520,7 +520,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWay")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -539,7 +539,7 @@ public class ProxyTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWayFault")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

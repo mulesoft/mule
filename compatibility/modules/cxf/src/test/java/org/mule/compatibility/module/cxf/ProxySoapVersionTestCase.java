@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -48,7 +48,7 @@ public class ProxySoapVersionTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testProxyWithCommentInRequest() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/proxy-soap-version")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(msgWithComment.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

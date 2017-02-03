@@ -7,16 +7,16 @@
 package org.mule.runtime.module.http.internal.listener;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.HttpMessageParsingException;
-import org.mule.service.http.api.HttpHeaders;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -72,12 +72,14 @@ public class HttpRequestToMuleEvent {
           }
         } else {
           if (mediaType != null) {
-            if (mediaType.matches(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED)) {
+            if (mediaType.matches(APPLICATION_X_WWW_FORM_URLENCODED)) {
               try {
                 payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
                                                mediaType.getCharset().get());
               } catch (IllegalArgumentException e) {
-                throw new HttpMessageParsingException(createStaticMessage("Cannot decode x-www-form-urlencoded payload"), e);
+                throw new HttpMessageParsingException(createStaticMessage("Cannot decode %s payload",
+                                                                          APPLICATION_X_WWW_FORM_URLENCODED.getSubType()),
+                                                      e);
               }
             } else if (entity instanceof InputStreamHttpEntity) {
               payload = ((InputStreamHttpEntity) entity).getInputStream();

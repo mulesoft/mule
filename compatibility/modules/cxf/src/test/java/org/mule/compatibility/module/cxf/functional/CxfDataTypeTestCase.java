@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
@@ -52,7 +52,7 @@ public class CxfDataTypeTestCase extends AbstractCxfOverHttpExtensionTestCase {
   @Test
   public void testCxfService() throws Exception {
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/hello")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
@@ -68,7 +68,7 @@ public class CxfDataTypeTestCase extends AbstractCxfOverHttpExtensionTestCase {
   @Test
   public void testCxfProxy() throws Exception {
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
@@ -83,7 +83,7 @@ public class CxfDataTypeTestCase extends AbstractCxfOverHttpExtensionTestCase {
     headersMap.put(CONTENT_TYPE, APP_SOAP_XML.toRfcString());
 
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/echo")
-        .setMethod(POST.name()).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();
+        .setMethod(POST).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 

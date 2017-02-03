@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -66,7 +66,7 @@ public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
     ParameterMap headersMap = new ParameterMap();
     headersMap.put(CONTENT_TYPE, APP_SOAP_XML.toRfcString());
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo")
-        .setMethod(POST.name()).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();
+        .setMethod(POST).setEntity(new InputStreamHttpEntity(xml)).setHeaders(headersMap).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -78,7 +78,7 @@ public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestC
   @Test
   public void backToBlockingWsdl() throws Exception {
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl")
-        .setMethod(POST.name()).build();
+        .setMethod(POST).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -70,7 +70,7 @@ public class ExceptionStrategyTestCase extends AbstractCxfOverHttpExtensionTestC
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -88,7 +88,7 @@ public class ExceptionStrategyTestCase extends AbstractCxfOverHttpExtensionTestC
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
@@ -121,7 +121,7 @@ public class ExceptionStrategyTestCase extends AbstractCxfOverHttpExtensionTestC
 
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy")
-            .setMethod(POST.name())
+            .setMethod(POST)
             .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);

@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static java.lang.String.format;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.IOUtils;
@@ -66,7 +66,7 @@ public class ProxyValidationComparisonTestCase extends AbstractCxfOverHttpExtens
 
   private HttpResponse getResponseFor(String path) throws MuleException, IOException, TimeoutException {
     HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%s/services/%s", httpPort.getNumber(), path))
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(ONE_LINER_REQUEST.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(ONE_LINER_REQUEST.getBytes())).build();
 
     return httpClient.send(request, RECEIVE_TIMEOUT, false, null);
   }

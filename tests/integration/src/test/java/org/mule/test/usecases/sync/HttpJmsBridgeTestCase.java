@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -45,7 +45,7 @@ public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
     headersMap.put(customHeader, "value");
 
     HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%d/in", httpPort.getNumber()))
-        .setEntity(new ByteArrayHttpEntity(payload.getBytes())).setHeaders(headersMap).setMethod(POST.name()).build();
+        .setEntity(new ByteArrayHttpEntity(payload.getBytes())).setHeaders(headersMap).setMethod(POST).build();
     httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     InternalMessage msg = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();

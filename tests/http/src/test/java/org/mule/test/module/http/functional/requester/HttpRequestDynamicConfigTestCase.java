@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.service.http.api.HttpConstants.Methods.GET;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
 import org.mule.runtime.core.api.Event;
 

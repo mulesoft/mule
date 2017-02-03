@@ -10,8 +10,8 @@ import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWith
 import static org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher.getMethodsListRepresentation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.HttpServer;
@@ -87,6 +87,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
     private LoadingCache<String, Stack<PathMap>> pathMapSearchCache =
         CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, Stack<PathMap>>() {
 
+          @Override
           public Stack<PathMap> load(String path) {
             return findPossibleRequestHandlers(path);
           }

@@ -9,7 +9,7 @@ package org.mule.compatibility.module.cxf.wssec;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.util.IOUtils;
@@ -71,7 +71,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase {
     assertNotNull(stream);
 
     HttpRequest httpRequest = HttpRequest.builder().setUri(url).setEntity(new InputStreamHttpEntity(stream))
-        .setMethod(POST.name()).build();
+        .setMethod(POST).build();
 
     return httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 

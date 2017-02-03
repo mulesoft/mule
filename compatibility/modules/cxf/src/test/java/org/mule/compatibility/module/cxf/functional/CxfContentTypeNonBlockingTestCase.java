@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
@@ -47,7 +47,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
     HttpRequest httpRequest =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/hello")
             .setEntity(new ByteArrayHttpEntity(requestPayload.getBytes()))
-            .setMethod(POST.name()).build();
+            .setMethod(POST).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
@@ -61,7 +61,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
     HttpRequest httpRequest =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/helloClient")
             .setEntity(new ByteArrayHttpEntity("hello".getBytes()))
-            .setMethod(POST.name()).build();
+            .setMethod(POST).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
@@ -76,7 +76,7 @@ public class CxfContentTypeNonBlockingTestCase extends AbstractCxfOverHttpExtens
     HttpRequest httpRequest =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy")
             .setEntity(new ByteArrayHttpEntity("hello".getBytes()))
-            .setMethod(POST.name()).build();
+            .setMethod(POST).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 

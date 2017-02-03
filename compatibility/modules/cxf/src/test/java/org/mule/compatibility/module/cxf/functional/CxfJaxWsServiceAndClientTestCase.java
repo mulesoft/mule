@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
@@ -53,7 +53,7 @@ public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensi
   @Test
   public void jaxWsClientReadsMuleMethodPropertySetByJaxWsService() throws Exception {
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + port.getNumber() + "/hello")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(REQUEST_PAYLOAD.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(REQUEST_PAYLOAD.getBytes())).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
@@ -64,7 +64,7 @@ public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensi
   @Test
   public void jaxWsServerWithMtoMServiceHasCorrectContentType() throws Exception {
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + port.getNumber() + "/helloMtoM")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(REQUEST_PAYLOAD.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(REQUEST_PAYLOAD.getBytes())).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 

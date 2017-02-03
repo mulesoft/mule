@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -91,7 +91,7 @@ public class CxfComponentExceptionStrategyTestCase extends AbstractCxfOverHttpEx
 
   private void doTest(String path, String soapMethod, String faultTemplate, String faultMessage) throws Exception {
     HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%d/services/%s", dynamicPort.getNumber(), path))
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(getRequestPayload(soapMethod).getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(getRequestPayload(soapMethod).getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());

@@ -18,19 +18,15 @@ import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
 import static org.mule.test.module.http.functional.matcher.ParamMapMatcher.isEqual;
+
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.internal.HttpParser;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -44,6 +40,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
 public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
 
@@ -167,7 +168,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
     final HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getFirstHeader(CONTENT_TYPE).getValue(), startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()));
     final String responseContent = IOUtils.toString(httpResponse.getEntity().getContent());
-    assertThat(payloadAsMap, isEqual(HttpParser.decodeUrlEncodedBody(responseContent, UTF_8).toListValuesMap()));
+    assertThat(payloadAsMap, isEqual(decodeUrlEncodedBody(responseContent, UTF_8).toListValuesMap()));
   }
 
   private String getListenerUrl(String path) {

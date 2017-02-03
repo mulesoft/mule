@@ -29,15 +29,13 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PA
 import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
 
@@ -46,6 +44,7 @@ import org.junit.Rule;
 
 import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.common.collect.ImmutableMap;
 
 @ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
@@ -165,7 +164,7 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
     for (Object customParameterName : customParameters.keySet()) {
       bodyParametersMapBuilder.put(customParameterName, customParameters.get(customParameterName));
     }
-    final String body = HttpParser.encodeString(UTF_8, bodyParametersMapBuilder.build());
+    final String body = encodeString(bodyParametersMapBuilder.build(), UTF_8);
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(body)
         .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())));
   }

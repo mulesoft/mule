@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -49,7 +49,7 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testSyncResponse() throws Exception {
     HttpRequest request = HttpRequest.builder().setUri(format("http://localhost:%s", port.getNumber()))
-        .setEntity(new ByteArrayHttpEntity("request".getBytes())).setMethod(POST.name()).build();
+        .setEntity(new ByteArrayHttpEntity("request".getBytes())).setMethod(POST).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 

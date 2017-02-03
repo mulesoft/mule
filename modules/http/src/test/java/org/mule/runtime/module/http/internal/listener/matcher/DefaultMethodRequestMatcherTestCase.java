@@ -8,6 +8,11 @@ package org.mule.runtime.module.http.internal.listener.matcher;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.api.HttpConstants.Method.OPTIONS;
+import static org.mule.service.http.api.HttpConstants.Method.PATCH;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.MethodRequestMatcher;
@@ -23,23 +28,23 @@ public class DefaultMethodRequestMatcherTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void doNotAcceptsNull() {
-    new DefaultMethodRequestMatcher(null);
+    new DefaultMethodRequestMatcher(new String[] {});
   }
 
   @Test
   public void onlyAcceptsOneMethod() {
 
-    final MethodRequestMatcher matcher = new DefaultMethodRequestMatcher("GET");
-    assertThat(matcher.matches(requestBuilder.setMethod("GET").build()), is(true));
-    assertThat(matcher.matches(requestBuilder.setMethod("POST").build()), is(false));
+    final MethodRequestMatcher matcher = new DefaultMethodRequestMatcher(GET);
+    assertThat(matcher.matches(requestBuilder.setMethod(GET).build()), is(true));
+    assertThat(matcher.matches(requestBuilder.setMethod(POST).build()), is(false));
   }
 
   @Test
   public void acceptSeveralMethods() {
-    final MethodRequestMatcher matcher = new DefaultMethodRequestMatcher("GET", "POST", "PATCH");
-    assertThat(matcher.matches(requestBuilder.setMethod("GET").build()), is(true));
-    assertThat(matcher.matches(requestBuilder.setMethod("POST").build()), is(true));
-    assertThat(matcher.matches(requestBuilder.setMethod("PATCH").build()), is(true));
-    assertThat(matcher.matches(requestBuilder.setMethod("OPTIONS").build()), is(false));
+    final MethodRequestMatcher matcher = new DefaultMethodRequestMatcher(GET, POST, PATCH);
+    assertThat(matcher.matches(requestBuilder.setMethod(GET).build()), is(true));
+    assertThat(matcher.matches(requestBuilder.setMethod(POST).build()), is(true));
+    assertThat(matcher.matches(requestBuilder.setMethod(PATCH).build()), is(true));
+    assertThat(matcher.matches(requestBuilder.setMethod(OPTIONS).build()), is(false));
   }
 }

@@ -8,10 +8,12 @@ package org.mule.test.oauth2.asserter;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 
 import org.mule.service.http.api.domain.ParameterMap;
-import org.mule.extension.oauth2.internal.OAuthConstants;
-import org.mule.runtime.module.http.internal.HttpParser;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
@@ -26,11 +28,11 @@ public class AuthorizationRequestAsserter {
 
   private AuthorizationRequestAsserter(LoggedRequest loggedRequest) {
     this.loggedRequest = loggedRequest;
-    queryParameters = HttpParser.decodeQueryString(HttpParser.extractQueryParams(loggedRequest.getUrl()));
+    queryParameters = decodeQueryString(extractQueryParams(loggedRequest.getUrl()));
   }
 
   public AuthorizationRequestAsserter assertMethodIsGet() {
-    assertThat(loggedRequest.getMethod().value(), is("GET"));
+    assertThat(loggedRequest.getMethod().value(), is(GET.name()));
     return this;
   }
 
@@ -45,7 +47,7 @@ public class AuthorizationRequestAsserter {
   }
 
   public AuthorizationRequestAsserter assertResponseTypeIsCode() {
-    assertThat(queryParameters.get("response_type"), is(OAuthConstants.CODE_PARAMETER));
+    assertThat(queryParameters.get("response_type"), is(CODE_PARAMETER));
     return this;
   }
 

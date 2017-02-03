@@ -26,6 +26,7 @@ public interface HttpListener extends NonBlockingMessageSource, Lifecycle {
    *
    * @throws MuleException if there's was a problem stopping the listener
    */
+  @Override
   public void stop() throws MuleException;
 
   /**
@@ -33,6 +34,7 @@ public interface HttpListener extends NonBlockingMessageSource, Lifecycle {
    *
    * @throws MuleException
    */
+  @Override
   public void start() throws MuleException;
 
   /**
@@ -40,16 +42,12 @@ public interface HttpListener extends NonBlockingMessageSource, Lifecycle {
    * {@link org.mule.runtime.module.http.internal.listener.NoListenerRequestHandler#RESOURCE_NOT_FOUND_STATUS_CODE} unless there's
    * another listener which path matches the request criteria.
    */
+  @Override
   public void dispose();
 
   /**
    * @return the path in which this listener is listening for incoming requests
    */
   public String getPath();
-
-  /**
-   * @return the http methods that this listener can process.
-   */
-  public String[] getAllowedMethods();
 
 }

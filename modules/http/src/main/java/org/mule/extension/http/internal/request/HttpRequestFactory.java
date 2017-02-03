@@ -17,6 +17,7 @@ import static org.mule.service.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -31,7 +32,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -203,8 +203,8 @@ public class HttpRequestFactory {
       if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.get().startsWith(APPLICATION_JAVA)) {
         if (payload instanceof Map) {
-          String body = HttpParser.encodeString(mediaType.getCharset()
-              .orElse(getDefaultEncoding(muleContext)), (Map) payload);
+          String body = encodeString((Map) payload, mediaType.getCharset()
+              .orElse(getDefaultEncoding(muleContext)));
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
         }

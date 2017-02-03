@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.compatibility.module.cxf.wssec.ClientPasswordCallback;
 import org.mule.runtime.core.util.IOUtils;
@@ -55,7 +55,7 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends AbstractCxf
     HttpRequest httpRequest =
         HttpRequest.builder().setUri("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope")
             .setEntity(new ByteArrayHttpEntity(request.getBytes()))
-            .setMethod(POST.name()).build();
+            .setMethod(POST).build();
 
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 

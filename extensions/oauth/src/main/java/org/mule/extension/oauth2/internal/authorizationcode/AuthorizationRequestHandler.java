@@ -7,11 +7,11 @@
 package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static java.util.Collections.singletonMap;
-import static org.mule.service.http.api.HttpHeaders.Names.LOCATION;
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
-import static org.mule.service.http.api.HttpConstants.Methods.GET;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.api.HttpHeaders.Names.LOCATION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -29,8 +29,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.server.RequestHandlerManager;
 
@@ -110,9 +108,7 @@ public class AuthorizationRequestHandler implements MuleContextAware, Startable,
     try {
       this.redirectUrlHandlerManager =
           addRequestHandler(getOauthConfig().getServer(),
-                            // TODO MULE-11283 improve this API
-                            new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()),
-                                                       new URL(localAuthorizationUrl).getPath()),
+                            GET, new URL(localAuthorizationUrl).getPath(),
                             getDefaultEncoding(muleContext),
                             createLocalAuthorizationUrlListener(),
                             LOGGER);

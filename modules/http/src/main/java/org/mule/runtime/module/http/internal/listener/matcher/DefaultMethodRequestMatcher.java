@@ -7,9 +7,10 @@
 package org.mule.runtime.module.http.internal.listener.matcher;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.collect;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 
@@ -31,9 +32,19 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
    *
    * @param methods http request method allowed.
    */
+  public DefaultMethodRequestMatcher(final Method... methods) {
+    checkArgument(methods != null, "methods attribute should not be null");
+    this.methods = asList(methods).stream().map(m -> m.name().toUpperCase()).collect(toList());
+  }
+
+  /**
+   * The list of methods accepted by this matcher
+   *
+   * @param methods http request method allowed.
+   */
   public DefaultMethodRequestMatcher(final String... methods) {
     checkArgument(methods != null, "methods attribute should not be null");
-    this.methods = (List<String>) collect(asList(methods), input -> ((String) input).toLowerCase());
+    this.methods = asList(methods);
   }
 
   /**
@@ -55,7 +66,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
 
   @Override
   public boolean matches(final HttpRequest httpRequest) {
-    return this.methods.contains(httpRequest.getMethod().toLowerCase());
+    return this.methods.contains(httpRequest.getMethod().toUpperCase());
   }
 
   @Override

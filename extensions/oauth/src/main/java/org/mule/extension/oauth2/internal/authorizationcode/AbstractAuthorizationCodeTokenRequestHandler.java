@@ -8,7 +8,7 @@ package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static org.mule.extension.oauth2.internal.authorizationcode.RequestHandlerUtils.addRequestHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-import static org.mule.service.http.api.HttpConstants.Methods.GET;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -18,9 +18,6 @@ import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerO
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandlerManager;
 
 import java.net.MalformedURLException;
@@ -98,27 +95,25 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
   public void init() throws MuleException {}
 
   protected void createListenerForCallbackUrl() throws MuleException {
-    final PathAndMethodRequestMatcher requestMatcher;
+    final String callbackPath;
 
     if (getOauthConfig().getLocalCallbackUrl() != null) {
       try {
         final URL localCallbackUrl = new URL(getOauthConfig().getLocalCallbackUrl());
-        // TODO MULE-11283 improve this API
-        requestMatcher = new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), localCallbackUrl.getPath());
+        callbackPath = localCallbackUrl.getPath();
       } catch (MalformedURLException e) {
         LOGGER.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
         throw new DefaultMuleException(e);
       }
     } else if (getOauthConfig().getLocalCallbackConfig() != null) {
       // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
-      requestMatcher =
-          new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET.name()), getOauthConfig().getLocalCallbackConfigPath());
+      callbackPath = getOauthConfig().getLocalCallbackConfigPath();
     } else {
       throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
     }
 
     this.redirectUrlHandlerManager =
-        addRequestHandler(getOauthConfig().getServer(), requestMatcher, getDefaultEncoding(muleContext),
+        addRequestHandler(getOauthConfig().getServer(), GET, callbackPath, getDefaultEncoding(muleContext),
                           createRedirectUrlProcessor(), LOGGER);
   }
 

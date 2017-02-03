@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -58,7 +58,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   @Test
   public void testFaultInCxfService() throws Exception {
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -71,7 +71,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testFaultInCxfSimpleService() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testSimpleServiceWithFault")
-            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+            .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -84,7 +84,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testExceptionThrownInTransformer() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testTransformerException")
-            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+            .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -97,7 +97,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testUnwrapException() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapException")
-            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+            .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -122,7 +122,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testServerClientProxyWithFault() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault")
-            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
+            .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestFaultPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -135,7 +135,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testServerClientProxyWithTransformerException() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException")
-            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+            .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
@@ -148,7 +148,7 @@ public class CxfErrorBehaviorTestCase extends AbstractCxfOverHttpExtensionTestCa
   public void testServerClientJaxwsWithUnwrapFault() throws Exception {
     HttpRequest request =
         HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault")
-            .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
+            .setMethod(POST).setEntity(new ByteArrayHttpEntity(requestPayload.getBytes())).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     String payload = IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());

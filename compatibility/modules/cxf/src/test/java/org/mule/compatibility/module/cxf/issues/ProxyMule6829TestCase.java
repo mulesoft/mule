@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.compatibility.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.functional.functional.EventCallback;
@@ -168,7 +168,7 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
     ParameterMap headersMap = new ParameterMap();
     headersMap.put("soapAction", soapAction);
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/EchoService11")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
 
     return httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
   }
@@ -179,7 +179,7 @@ public class ProxyMule6829TestCase extends AbstractCxfOverHttpExtensionTestCase 
     ParameterMap headersMap = new ParameterMap();
     headersMap.put(CONTENT_TYPE, contentType);
     HttpRequest httpRequest = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/EchoService12")
-        .setMethod(POST.name()).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
+        .setMethod(POST).setEntity(new ByteArrayHttpEntity(msgString.getBytes())).setHeaders(headersMap).build();
 
     return httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
   }

@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.module.http.internal.listener.HttpRequestToMuleEvent.transform;
 import static org.mule.service.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.module.http.internal.listener.HttpRequestToMuleEvent.transform;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_0;
 
@@ -31,21 +33,17 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.SystemUtils;
-import org.mule.service.http.api.HttpConstants;
-import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
-import org.mule.service.http.api.server.MethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
@@ -69,7 +67,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   private String allowedMethods;
   private Boolean parseRequest;
   private Processor messageProcessor;
-  private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
   private MuleContext muleContext;
   private FlowConstruct flowConstruct;
   private DefaultHttpListenerConfig config;
@@ -78,7 +75,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   private HttpStreamingType responseStreamingMode = HttpStreamingType.AUTO;
   private RequestHandlerManager requestHandlerManager;
   private MessageProcessingManager messageProcessingManager;
-  private String[] parsedAllowedMethods;
   private ListenerPath listenerPath;
 
   @Override
@@ -217,10 +213,6 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    if (allowedMethods != null) {
-      parsedAllowedMethods = extractAllowedMethods();
-      methodRequestMatcher = new DefaultMethodRequestMatcher(parsedAllowedMethods);
-    }
     if (responseBuilder == null) {
       responseBuilder = HttpResponseBuilder.emptyInstance(muleContext);
     }
@@ -241,8 +233,13 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     parseRequest = config.resolveParseRequest(parseRequest);
     try {
       messageProcessingManager = DefaultHttpListener.this.muleContext.getRegistry().lookupObject(MessageProcessingManager.class);
-      requestHandlerManager =
-          this.config.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler());
+      if (allowedMethods != null) {
+        requestHandlerManager =
+            this.config.addRequestHandler(asList(extractAllowedMethods()), path, getRequestHandler());
+      } else {
+        requestHandlerManager =
+            this.config.addRequestHandler(path, getRequestHandler());
+      }
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
@@ -256,15 +253,15 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         String uriParamName = pathPart.substring(1, pathPart.length() - 1);
         if (uriParamNames.contains(uriParamName)) {
           throw new InitialisationException(CoreMessages
-              .createStaticMessage(String.format("Http Listener with path %s contains duplicated uri param names", this.path)),
+              .createStaticMessage(format("Http Listener with path %s contains duplicated uri param names", this.path)),
                                             this);
         }
         uriParamNames.add(uriParamName);
       } else {
         if (pathPart.contains("*") && pathPart.length() > 1) {
-          throw new InitialisationException(CoreMessages.createStaticMessage(String.format(
-                                                                                           "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
-                                                                                           this.path)),
+          throw new InitialisationException(CoreMessages.createStaticMessage(format(
+                                                                                    "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
+                                                                                    this.path)),
                                             this);
         }
       }
@@ -305,10 +302,5 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   @Override
   public String getPath() {
     return path;
-  }
-
-  @Override
-  public String[] getAllowedMethods() {
-    return parsedAllowedMethods;
   }
 }
