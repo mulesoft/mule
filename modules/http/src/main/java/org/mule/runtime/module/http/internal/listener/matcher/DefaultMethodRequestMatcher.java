@@ -34,6 +34,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
    */
   public DefaultMethodRequestMatcher(final Method... methods) {
     checkArgument(methods != null, "methods attribute should not be null");
+    checkArgument(methods.length > 0, "methods attribute should not be empty");
     this.methods = asList(methods).stream().map(m -> m.name().toUpperCase()).collect(toList());
   }
 
@@ -44,6 +45,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
    */
   public DefaultMethodRequestMatcher(final String... methods) {
     checkArgument(methods != null, "methods attribute should not be null");
+    checkArgument(methods.length > 0, "methods attribute should not be empty");
     this.methods = asList(methods);
   }
 
