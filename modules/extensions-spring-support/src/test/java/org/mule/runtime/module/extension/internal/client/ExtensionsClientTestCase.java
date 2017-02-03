@@ -36,6 +36,7 @@ import org.mule.test.vegan.extension.VeganPolicy;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -60,6 +61,11 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
     HeisenbergOperations.disposed = false;
   }
 
+  @After
+  public void after() {
+    HeisenbergOperations.disposed = false;
+  }
+
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
     return new Class<?>[] {HeisenbergExtension.class, VeganExtension.class};
@@ -69,7 +75,6 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
   protected String[] getConfigFiles() {
     return new String[] {"vegan-config.xml", "heisenberg-config.xml"};
   }
-
 
   abstract <T, A extends Attributes> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
       throws Throwable;
@@ -116,6 +121,7 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
     assertThat(result.getOutput(), is("Killed with: You have been killed with Ricin , Type FIRE_WEAPON and attribute brand"));
   }
 
+
   @Test
   @Description("Executes an operation that has a parameter group using the client and checks the output")
   public void executeOperationWithParameterGroup() throws Throwable {
@@ -128,7 +134,6 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
     Result<String, Attributes> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
     assertThat(result.getOutput(), is(ALIAS_OUTPUT));
   }
-
 
   @Test
   @Description("Executes an operation that has a parameter with default value using the client and checks the output")
