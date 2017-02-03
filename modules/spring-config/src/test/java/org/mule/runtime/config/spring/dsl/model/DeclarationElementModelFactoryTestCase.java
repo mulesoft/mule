@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
@@ -16,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -113,28 +115,7 @@ public class DeclarationElementModelFactoryTestCase {
   public void before() {
     initMocks(this);
 
-    when(extension.getName()).thenReturn(EXTENSION_NAME);
-    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-        .setXsdFileName("mule-mockns.xsd")
-        .setNamespace(NAMESPACE)
-        .setNamespaceUri(NAMESPACE_URI)
-        .setSchemaLocation(SCHEMA_LOCATION)
-        .setSchemaVersion("4.0")
-        .build());
-    when(extension.getConfigurationModels()).thenReturn(asList(configuration));
-    when(extension.getOperationModels()).thenReturn(asList(operation));
-    when(extension.getSourceModels()).thenReturn(asList(source));
-    when(extension.getConnectionProviders()).thenReturn(asList(connectionProvider));
-
-    when(extension.getSubTypes()).thenReturn(emptySet());
-    when(extension.getImportedTypes()).thenReturn(emptySet());
-    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
-        .setXsdFileName(EMPTY)
-        .setNamespace(NAMESPACE)
-        .setNamespaceUri(NAMESPACE_URI)
-        .setSchemaLocation(SCHEMA_LOCATION)
-        .setSchemaVersion(EMPTY)
-        .build());
+    initializeExtensionMock(extension);
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
     when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
@@ -190,10 +171,34 @@ public class DeclarationElementModelFactoryTestCase {
     when(dslContext.getExtensions()).thenReturn(singleton(extension));
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
-    Stream.of(configuration, operation, connectionProvider, source).forEach(
-                                                                            model -> when(model.getAllParameterModels())
-                                                                                .thenReturn(asList(contentParameter,
-                                                                                                   behaviourParameter)));
+    Stream.of(configuration, operation, connectionProvider, source)
+        .forEach(model -> when(model.getAllParameterModels())
+            .thenReturn(asList(contentParameter, behaviourParameter)));
+  }
+
+  private void initializeExtensionMock(ExtensionModel extension) {
+    when(extension.getName()).thenReturn(EXTENSION_NAME);
+    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
+        .setXsdFileName("mule-mockns.xsd")
+        .setNamespace(NAMESPACE)
+        .setNamespaceUri(NAMESPACE_URI)
+        .setSchemaLocation(SCHEMA_LOCATION)
+        .setSchemaVersion("4.0")
+        .build());
+    when(extension.getSubTypes()).thenReturn(emptySet());
+    when(extension.getImportedTypes()).thenReturn(emptySet());
+    when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
+        .setXsdFileName(EMPTY)
+        .setNamespace(NAMESPACE)
+        .setNamespaceUri(NAMESPACE_URI)
+        .setSchemaLocation(SCHEMA_LOCATION)
+        .setSchemaVersion(EMPTY)
+        .build());
+
+    when(extension.getConfigurationModels()).thenReturn(asList(configuration));
+    when(extension.getOperationModels()).thenReturn(asList(operation));
+    when(extension.getSourceModels()).thenReturn(asList(source));
+    when(extension.getConnectionProviders()).thenReturn(asList(connectionProvider));
   }
 
   protected <T> DslElementModel<T> create(ElementDeclaration declaration) {
@@ -287,6 +292,44 @@ public class DeclarationElementModelFactoryTestCase {
         .getValue().get(), is("#[{field: value}]"));
     assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
   }
+
+  @Test
+  public void testConfigNoConnectionNoParams() {
+
+    ConfigurationModel emptyConfig = mock(ConfigurationModel.class);
+    when(emptyConfig.getName()).thenReturn(CONFIGURATION_NAME);
+    when(emptyConfig.getParameterGroupModels()).thenReturn(emptyList());
+    when(emptyConfig.getOperationModels()).thenReturn(emptyList());
+    when(emptyConfig.getSourceModels()).thenReturn(emptyList());
+    when(emptyConfig.getConnectionProviders()).thenReturn(emptyList());
+
+    ExtensionModel extensionModel = mock(ExtensionModel.class);
+    initializeExtensionMock(extensionModel);
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(emptyConfig));
+
+    ConfigurationElementDeclaration declaration =
+        ElementDeclarer.forExtension(EXTENSION_NAME).newConfiguration(CONFIGURATION_NAME)
+            .withRefName("sample")
+            .getDeclaration();
+
+    DslElementModel<ConfigurationModel> element = create(declaration);
+    assertThat(element.getModel(), is(configuration));
+    assertThat(element.getContainedElements().isEmpty(), is(true));
+  }
+
+  @Test
+  public void testConfigNoParams() {
+
+    ConfigurationElementDeclaration declaration = ElementDeclarer.forExtension(EXTENSION_NAME)
+        .newConfiguration(CONFIGURATION_NAME)
+        .withRefName("sample")
+        .getDeclaration();
+
+    DslElementModel<ConfigurationModel> element = create(declaration);
+    assertThat(element.getModel(), is(configuration));
+    assertThat(element.getContainedElements().isEmpty(), is(true));
+  }
+
 
   @XmlHints(allowTopLevelDefinition = true)
   public static class ComplexTypePojo {
