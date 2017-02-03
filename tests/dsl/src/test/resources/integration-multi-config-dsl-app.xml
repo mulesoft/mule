@@ -50,9 +50,6 @@
         </httpn:listener>
 
         <db:bulk-insert>
-            <db:parameter-values>
-                #[[{'position' : payload.position, 'name' : payload.name}]]
-            </db:parameter-values>
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
             <db:parameter-types>
                 <db:parameter-type key="name" type="VARCHAR" />

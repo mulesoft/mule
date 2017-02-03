@@ -133,7 +133,6 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                    .build())
                 .getDeclaration())
             .withComponent(db.newOperation("bulkInsert")
-                .withParameter("parameterValues", "#[[{'position' : payload.position, 'name' : payload.name}]]")
                 .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
                 .withParameter("parameterTypes",
                                newListValue()

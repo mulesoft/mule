@@ -246,6 +246,7 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     ComponentConfiguration sql = dbInsert.getNestedComponents().get(0);
     DslElementModel<ParameterModel> sqlElement = getChild(dbElement, sql);
     assertElementName(sqlElement, "sql");
+
     ComponentConfiguration parameterTypes = dbInsert.getNestedComponents().get(1);
     DslElementModel<ParameterModel> parameterTypesElement = getChild(dbElement, parameterTypes);
     assertElementName(parameterTypesElement, "parameter-types");
@@ -267,17 +268,19 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
   }
 
   protected void assertBulkInsertOperationWithNestedList(ComponentConfiguration dbInsert) {
-    DslElementModel<OperationModel> dbElement = resolve(dbInsert);
+    DslElementModel<OperationModel> bulkInsertElement = resolve(dbInsert);
 
-    assertThat(dbElement.getContainedElements().size(), is(6));
+    assertThat(bulkInsertElement.getContainedElements().size(), is(6));
 
-    ComponentConfiguration sql = dbInsert.getNestedComponents().get(1);
-    DslElementModel<ParameterModel> sqlElement = getChild(dbElement, sql);
+    assertValue(bulkInsertElement.findElement("parameterValues").get(), "#[payload]");
+
+    ComponentConfiguration sql = dbInsert.getNestedComponents().get(0);
+    DslElementModel<ParameterModel> sqlElement = getChild(bulkInsertElement, sql);
     assertElementName(sqlElement, "sql");
     assertValue(sqlElement, "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)");
 
-    ComponentConfiguration parameterTypes = dbInsert.getNestedComponents().get(2);
-    DslElementModel<ParameterModel> parameterTypesElement = getChild(dbElement, parameterTypes);
+    ComponentConfiguration parameterTypes = dbInsert.getNestedComponents().get(1);
+    DslElementModel<ParameterModel> parameterTypesElement = getChild(bulkInsertElement, parameterTypes);
     assertElementName(parameterTypesElement, "parameter-types");
 
     ComponentConfiguration parameterOne = parameterTypes.getNestedComponents().get(0);
