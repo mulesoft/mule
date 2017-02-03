@@ -23,7 +23,7 @@
     </sockets:listener-config>
 
     <flow name="tcp-reading-timeout">
-        <sockets:send config-ref="tcp-requester" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="tcp-requester"/>
         <set-payload value="Response"/>
     </flow>
 

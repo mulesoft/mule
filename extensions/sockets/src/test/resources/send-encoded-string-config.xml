@@ -21,7 +21,7 @@
     </sockets:listener-config>
 
     <flow name="tcp-send">
-        <sockets:send config-ref="tcp-requester" hasResponse="false" outputEncoding="#[mel:flowVars.encoding]"/>
+        <sockets:send config-ref="tcp-requester" outputEncoding="#[mel:flowVars.encoding]"/>
     </flow>
 
     <flow name="tcp-listen">

@@ -16,7 +16,7 @@
     </sockets:listener-config>
 
     <flow name="tcp-send-and-receive">
-        <sockets:send config-ref="tcp-requester" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="tcp-requester"/>
     </flow>
 
     <flow name="tcp-listen-and-modify-pojo">

@@ -16,7 +16,7 @@
     </sockets:request-config>
 
     <flow name="tcp-connection-timeout">
-        <sockets:send config-ref="tcp-requester" hasResponse="false"/>
+        <sockets:send config-ref="tcp-requester"/>
         <set-payload value="Response"/>
     </flow>
 

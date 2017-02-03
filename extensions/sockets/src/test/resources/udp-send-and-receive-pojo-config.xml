@@ -16,7 +16,7 @@
     </sockets:listener-config>
 
     <flow name="udp-send-and-receive">
-        <sockets:send config-ref="udp-requester" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="udp-requester"/>
     </flow>
 
     <flow name="udp-listen-and-modify-pojo">

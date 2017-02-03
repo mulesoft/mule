@@ -27,11 +27,11 @@
     </sockets:listener-config>
 
     <flow name="tcp-send-without-response">
-        <sockets:send config-ref="tcp-requester" hasResponse="false"/>
+        <sockets:send config-ref="tcp-requester"/>
     </flow>
 
     <flow name="tcp-send-with-response">
-        <sockets:send config-ref="tcp-requester" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="tcp-requester"/>
     </flow>
 
     <flow name="tcp-listen">
