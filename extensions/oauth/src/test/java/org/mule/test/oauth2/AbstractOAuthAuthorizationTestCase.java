@@ -27,24 +27,25 @@ import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAM
 import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
+import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
-
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.service.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.common.collect.ImmutableMap;
+
 import java.io.UnsupportedEncodingException;
 
 import org.junit.Before;
 import org.junit.Rule;
-
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.ImmutableMap;
 
 @ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
@@ -68,7 +69,8 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
 
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(oauthServerPort.getNumber())
-      .httpsPort(oauthHttpsServerPort.getNumber()).keystorePath(keyStorePath).keystorePassword(keyStorePassword));
+      .httpsPort(oauthHttpsServerPort.getNumber()).keystorePath(keyStorePath)
+      .keystorePassword(keyStorePassword));
 
   @Rule
   public SystemProperty clientId = new SystemProperty("client.id", "ndli93xdws2qoe6ms1d389vl6bxquv3e");
@@ -91,14 +93,14 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   @Rule
   public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
+  private ExtensionsClient client;
+
   @Before
   public void before() throws Exception {
     try {
-      // Force the initialization of the OAuth context
-      // TODO MULE-11405 switch to the client
-      // muleContext.getRegistry().lookupObject(ExtensionsClient.class).execute("HTTP", "request",
-      // builder().configName("requestConfig").build());
-      flowRunner("testFlow").runNoVerify();
+      //Force the initialization of the OAuth context
+      client = muleContext.getRegistry().lookupObject(ExtensionsClient.class);
+      client.execute("HTTP", "request", builder().configName("requestConfig").build());
     } catch (Exception e) {
       // Ignore
     }
