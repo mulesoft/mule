@@ -281,7 +281,7 @@ public class ApplicationModel {
    * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration) throws Exception {
-    this(artifactConfig, artifactDeclaration, empty(), empty());
+    this(artifactConfig, artifactDeclaration, empty(), of(new ComponentBuildingDefinitionRegistry()));
   }
 
   /**
