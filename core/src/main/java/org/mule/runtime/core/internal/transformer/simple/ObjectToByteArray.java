@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
@@ -29,6 +28,8 @@ public class ObjectToByteArray extends SerializableToByteArray {
     this.registerSourceType(DataType.INPUT_STREAM);
     this.registerSourceType(DataType.STRING);
     this.registerSourceType(DataType.fromType(OutputHandler.class));
+    this.registerSourceType(DataType.fromType(Byte.class));
+    this.registerSourceType(DataType.fromType(byte.class));
     setReturnDataType(DataType.BYTE_ARRAY);
   }
 
@@ -56,6 +57,8 @@ public class ObjectToByteArray extends SerializableToByteArray {
         } catch (IOException e) {
           throw new TransformerException(this, e);
         }
+      } else if (src instanceof Byte) {
+        return new byte[] {(byte) src};
       }
     } catch (Exception e) {
       throw new TransformerException(this, e);

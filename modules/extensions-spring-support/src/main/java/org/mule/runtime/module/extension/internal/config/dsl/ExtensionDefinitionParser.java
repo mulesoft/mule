@@ -34,6 +34,9 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import com.google.common.collect.ImmutableList;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -93,11 +96,12 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterReso
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticFunctionValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeStaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-
-import com.google.common.collect.ImmutableList;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -118,11 +122,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -651,7 +650,7 @@ public abstract class ExtensionDefinitionParser {
             .map(delegate -> delegate.parse(value.toString(), metadataType, null, muleContext))
             .orElseGet(() -> acceptsReferences
                 ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null, muleContext)
-                : new StaticValueResolver<>(value));
+                : new TypeSafeStaticValueResolver<>(value, expectedClass, muleContext));
 
         resolverValueHolder.set(delegateResolver);
       }

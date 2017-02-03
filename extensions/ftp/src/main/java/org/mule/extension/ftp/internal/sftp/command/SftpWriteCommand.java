@@ -8,22 +8,19 @@ package org.mule.extension.ftp.internal.sftp.command;
 
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
-import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.IOUtils;
+import org.slf4j.Logger;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
-
-import org.slf4j.Logger;
 
 /**
  * A {@link SftpCommand} which implements the {@link WriteCommand} contract
@@ -48,7 +45,7 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, Event event,
+  public void write(String filePath, InputStream content, FileWriteMode mode,
                     boolean lock, boolean createParentDirectory, String encoding) {
     Path path = resolvePath(filePath);
     FileAttributes file = getFile(filePath);
@@ -65,7 +62,7 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
     }
 
     try (OutputStream outputStream = getOutputStream(path, mode)) {
-      new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(outputStream, event, encoding));
+      IOUtils.copy(content, outputStream);
       LOGGER.debug("Successfully wrote to path {}", path.toString());
     } catch (Exception e) {
       throw exception(format("Exception was found writing to file '%s'", path), e);

@@ -7,7 +7,6 @@
 package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
-
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -19,18 +18,16 @@ import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileLockedException;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.inject.Inject;
 
 /**
  * Base class for implementations of {@link FileSystem}
@@ -115,9 +112,9 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, Event event,
+  public void write(String filePath, InputStream content, FileWriteMode mode,
                     boolean lock, boolean createParentDirectories, String encoding) {
-    getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectories, encoding);
+    getWriteCommand().write(filePath, content, mode, lock, createParentDirectories, encoding);
   }
 
   /**
@@ -125,8 +122,8 @@ public abstract class AbstractFileSystem implements FileSystem {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
-                   boolean createParentDirectories, Event event) {
-    getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories, event);
+                   boolean createParentDirectories) {
+    getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
   }
 
   /**

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
 import org.apache.commons.lang.StringUtils;
@@ -15,11 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transformer.MessageTransformer;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.function.BiConsumer;
@@ -39,9 +34,10 @@ import java.util.function.BiConsumer;
 public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
 
   final AttributeEvaluator evaluator;
+  final TypeSafeTransformer typeSafeTransformer;
+
   private final Class<?> expectedClass;
   private final MuleContext muleContext;
-
   private final DataType expectedDataType;
   private boolean evaluatorInitialized = false;
   private BiConsumer<AttributeEvaluator, MuleContext> evaluatorInitialiser = (evaluator, context) -> {
@@ -63,6 +59,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     this.expectedDataType = DataType.fromType(expectedType);
     this.evaluator = new AttributeEvaluator(expression);
     this.muleContext = muleContext;
+    this.typeSafeTransformer = new TypeSafeTransformer(muleContext);
   }
 
   @Override
@@ -79,33 +76,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
     if (isInstance(expectedClass, value)) {
       return (T) value;
     }
-    return (T) transform(typedValue, expectedDataType, event);
-  }
 
-  public Object transform(TypedValue value, DataType expectedDataType, Event event)
-      throws MessagingException, MessageTransformerException, TransformerException {
-    Transformer transformer;
-    if (value.getValue() != null) {
-      try {
-        transformer = muleContext.getRegistry().lookupTransformer(value.getDataType(), expectedDataType);
-      } catch (TransformerException e) {
-        throw new MessagingException(createStaticMessage(String.format(
-                                                                       "Expression '%s' was expected to return a value of type '%s' but a '%s' was found instead "
-                                                                           + "and no suitable transformer could be located",
-                                                                       evaluator.getRawValue(), expectedClass.getName(),
-                                                                       value.getValue().getClass().getName())),
-                                     event, e);
-      }
-
-      T result;
-      if (transformer instanceof MessageTransformer) {
-        result = (T) ((MessageTransformer) transformer).transform(value.getValue(), event);
-      } else {
-        result = (T) transformer.transform(value.getValue());
-      }
-      return result;
-    }
-    return value.getValue();
+    return (T) typeSafeTransformer.transform(value, typedValue.getDataType(), expectedDataType, event);
   }
 
   void initEvaluator() {
