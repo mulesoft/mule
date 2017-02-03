@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 @Deprecated
 public class LegacySynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static ProcessingStrategy LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE =
+  public static final ProcessingStrategy LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE =
       (flowConstruct, pipelineFunction) -> event -> {
         throw new IllegalStateException("Sink is not supported for "
             + LegacySynchronousProcessingStrategyFactory.class.getName());

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,8 +34,17 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive, scheduler -> {
-    }, Integer.MAX_VALUE, () -> blocking, DEFAULT_BUFFER_SIZE, DEFAULT_SUBSCRIBER_COUNT, DEFAULT_WAIT_STRATEGY, muleContext);
+    return new DefaultFlowProcessingStrategy(() -> cpuLight,
+                                             () -> blocking,
+                                             () -> cpuIntensive,
+                                             scheduler -> {
+                                             },
+                                             MAX_VALUE,
+                                             () -> blocking,
+                                             DEFAULT_BUFFER_SIZE,
+                                             DEFAULT_SUBSCRIBER_COUNT,
+                                             DEFAULT_WAIT_STRATEGY,
+                                             muleContext);
   }
 
   @Override

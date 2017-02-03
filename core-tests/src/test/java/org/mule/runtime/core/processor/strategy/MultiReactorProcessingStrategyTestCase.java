@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.RingBufferProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -39,10 +40,10 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new AbstractRingBufferProcessingStrategyFactory.RingBufferProcessingStrategy(() -> custom, DEFAULT_BUFFER_SIZE, 10,
-                                                                                        DEFAULT_WAIT_STRATEGY,
-                                                                                        muleContext);
-
+    return new RingBufferProcessingStrategy(() -> custom,
+                                            DEFAULT_BUFFER_SIZE, 10,
+                                            DEFAULT_WAIT_STRATEGY,
+                                            muleContext);
   }
 
   @Override

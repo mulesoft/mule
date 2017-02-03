@@ -6,8 +6,17 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.WaitStrategy.LITE_BLOCKING;
 import static reactor.core.publisher.WorkQueueProcessor.share;
+import static reactor.util.concurrent.QueueSupplier.SMALL_BUFFER_SIZE;
 import static reactor.util.concurrent.QueueSupplier.isPowerOfTwo;
+import static reactor.util.concurrent.WaitStrategy.blocking;
+import static reactor.util.concurrent.WaitStrategy.busySpin;
+import static reactor.util.concurrent.WaitStrategy.liteBlocking;
+import static reactor.util.concurrent.WaitStrategy.parking;
+import static reactor.util.concurrent.WaitStrategy.phasedOffLiteLock;
+import static reactor.util.concurrent.WaitStrategy.sleeping;
+import static reactor.util.concurrent.WaitStrategy.yielding;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
@@ -24,7 +33,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.WorkQueueProcessor;
-import reactor.util.concurrent.QueueSupplier;
 
 /**
  * Creates ring-buffer based processing strategy instances. These processing strategy de-multiplex incoming messages using a
@@ -38,9 +46,9 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
 
   protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
 
-  public static int DEFAULT_BUFFER_SIZE = QueueSupplier.SMALL_BUFFER_SIZE;
+  public static int DEFAULT_BUFFER_SIZE = SMALL_BUFFER_SIZE;
   public static int DEFAULT_SUBSCRIBER_COUNT = 1;
-  public static String DEFAULT_WAIT_STRATEGY = WaitStrategy.LITE_BLOCKING.name();
+  public static String DEFAULT_WAIT_STRATEGY = LITE_BLOCKING.name();
 
   private int bufferSize = DEFAULT_BUFFER_SIZE;
   private int subscriberCount = DEFAULT_SUBSCRIBER_COUNT;
@@ -48,6 +56,10 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
 
   /**
    * Configure the size of the ring-buffer size used to buffer and de-multiplex events from multiple source threads. This value
+   * must be a power-of two.
+   * <p/>
+   * Ring buffers typically use a power of two because it means that the rollover at the end of the buffer can be achieved using a
+   * bit mask rather than having to explicitly compare the head/tail pointer with the end of the buffer.
    *
    * @param bufferSize buffer size to use.
    */
@@ -128,11 +140,19 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
   }
 
   protected enum WaitStrategy {
-    BLOCKING(reactor.util.concurrent.WaitStrategy.blocking()), LITE_BLOCKING(
-        reactor.util.concurrent.WaitStrategy.blocking()), SLEEPING(reactor.util.concurrent.WaitStrategy.sleeping()), BUSY_SPIN(
-            reactor.util.concurrent.WaitStrategy.busySpin()), YIELDING(reactor.util.concurrent.WaitStrategy.yielding()), PARKING(
-                reactor.util.concurrent.WaitStrategy.parking()), PHASED(
-                    reactor.util.concurrent.WaitStrategy.phasedOffLiteLock(200, 100, TimeUnit.MILLISECONDS));
+    BLOCKING(blocking()),
+
+    LITE_BLOCKING(liteBlocking()),
+
+    SLEEPING(sleeping()),
+
+    BUSY_SPIN(busySpin()),
+
+    YIELDING(yielding()),
+
+    PARKING(parking()),
+
+    PHASED(phasedOffLiteLock(200, 100, TimeUnit.MILLISECONDS));
 
     private reactor.util.concurrent.WaitStrategy reactorWaitStrategy;
 

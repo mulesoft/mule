@@ -9,6 +9,7 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.hamcrest.Matchers;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -121,7 +123,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   protected void assertSynchronous(int concurrency) {
-    assertThat(threads.size(), equalTo(concurrency));
+    assertThat(threads, hasSize(concurrency));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));

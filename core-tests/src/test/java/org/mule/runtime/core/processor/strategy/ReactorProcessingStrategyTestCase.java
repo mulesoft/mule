@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
@@ -23,6 +24,7 @@ import org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStra
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.hamcrest.Matchers;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -37,7 +39,10 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new RingBufferProcessingStrategy(() -> custom, DEFAULT_BUFFER_SIZE, 1, DEFAULT_WAIT_STRATEGY,
+    return new RingBufferProcessingStrategy(() -> custom,
+                                            DEFAULT_BUFFER_SIZE,
+                                            1,
+                                            DEFAULT_WAIT_STRATEGY,
                                             muleContext);
   }
 
@@ -115,7 +120,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   }
 
   private void assertEverythingOnEventLoop() {
-    assertThat(threads.size(), equalTo(1));
+    assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
