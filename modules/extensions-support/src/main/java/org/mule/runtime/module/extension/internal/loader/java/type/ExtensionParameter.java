@@ -8,24 +8,20 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.assignableFromAny;
+import com.google.common.collect.ImmutableSet;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.security.AuthenticationHandler;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-
-import com.google.common.collect.ImmutableSet;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
@@ -38,9 +34,9 @@ import java.util.Set;
 public interface ExtensionParameter extends WithType, WithAnnotations, NamedObject, WithAlias, WithOwner {
 
   Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
-      .add(Event.class)
-      .add(Message.class)
-      .add(InternalMessage.class)
+      //      .add(Event.class)
+      //      .add(Message.class)
+      //      .add(InternalMessage.class)
       .add(Error.class)
       .add(SourceCallbackContext.class)
       .add(CompletionCallback.class)
