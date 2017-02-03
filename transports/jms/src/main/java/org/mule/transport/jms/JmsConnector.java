@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms;
 
+import static org.mule.transport.jms.JmsConstants.LDAP_URI_PROTOCOL;
+
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -37,6 +39,7 @@ import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.transport.jms.jndi.JndiNameResolver;
+import org.mule.transport.jms.jndi.LdapJndiNameResolver;
 import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
@@ -346,7 +349,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             logger.debug("Creating default JndiNameResolver");
         }
 
-        SimpleJndiNameResolver jndiContextFactory = new SimpleJndiNameResolver();
+        SimpleJndiNameResolver jndiContextFactory = getResolver(jndiProviderUrl);
         jndiContextFactory.setJndiProviderUrl(jndiProviderUrl);
         jndiContextFactory.setJndiInitialFactory(jndiInitialFactory);
         jndiContextFactory.setJndiProviderProperties(jndiProviderProperties);
@@ -1483,5 +1486,15 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public void scheduleTimeoutTask(TimerTask timerTask, int timeout)
     {
         responseTimeoutTimer.schedule(timerTask, timeout);
+    }
+    
+    private SimpleJndiNameResolver getResolver(String jndiProviderUrl2)
+    {
+        if (jndiProviderUrl.startsWith(LDAP_URI_PROTOCOL))
+        {
+            return new LdapJndiNameResolver();
+        }
+
+        return new SimpleJndiNameResolver();
     }
 }

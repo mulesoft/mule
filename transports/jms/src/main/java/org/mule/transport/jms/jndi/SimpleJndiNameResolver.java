@@ -20,7 +20,7 @@ public class SimpleJndiNameResolver extends AbstractJndiNameResolver
 {
 
     // @GuardedBy(this)
-    private Context jndiContext;
+    protected Context jndiContext;
 
     public synchronized Object lookup(String name) throws NamingException
     {

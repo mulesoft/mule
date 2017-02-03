@@ -43,6 +43,10 @@ public class JmsConstants
     public static final String CACHE_JMS_SESSIONS_PROPERTY = "cacheJmsSessions";
     public static final String DISABLE_TEMP_DESTINATIONS_PROPERTY = "disableTemporaryReplyToDestinations";
     public static final String RETURN_ORIGINAL_MESSAGE_PROPERTY = "returnOriginalMessageAsReply";
+    
+    public static final String LDAP = "ldap";
+    public static final String LDAP_URI_PROTOCOL = LDAP + "://";
+
 
     public static final Set JMS_PROPERTY_NAMES = Collections.unmodifiableSet(new HashSet(
         Arrays.asList(new String[]{JMS_SPECIFICATION_102B, JMS_SPECIFICATION_11, JMS_CORRELATION_ID,
