@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-public class HeisenbergOperations {
+public class HeisenbergOperations implements Disposable {
 
   public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
   public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
@@ -73,6 +74,8 @@ public class HeisenbergOperations {
   public static final String DOOR_PARAMETER = "doors";
   public static final String GREETING_PARAMETER = "greeting";
   public static final String OPERATION_PARAMETER_EXAMPLE = "Hello my friend!";
+
+  public static boolean disposed = false;
 
   @Inject
   private ExtensionManager extensionManager;
@@ -266,5 +269,10 @@ public class HeisenbergOperations {
   @Ignore
   public void ignoredOperation() {
 
+  }
+
+  @Override
+  public void dispose() {
+    disposed = true;
   }
 }

@@ -34,10 +34,4 @@
         <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
         <test:assert expression="#[mel:message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
     </flow>
-
-    <!-- TODO MULE-11405 remove this flow  -->
-    <flow name="testFlow">
-        <httpn:request host="localhost" port="${oauthServerHttpPort}" path="/resource" method="POST"
-                       config-ref="requestConfig"/>
-    </flow>
 </mule>

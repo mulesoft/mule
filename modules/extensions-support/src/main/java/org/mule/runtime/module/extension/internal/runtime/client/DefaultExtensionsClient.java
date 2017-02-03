@@ -12,11 +12,8 @@ import static org.mule.runtime.module.extension.internal.runtime.operation.Opera
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -57,7 +54,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public final class DefaultExtensionsClient implements ExtensionsClient, Initialisable {
+public final class DefaultExtensionsClient implements ExtensionsClient {
 
   @Inject
   private MuleContext muleContext;
@@ -65,20 +62,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Inject
   private PolicyManager policyManager;
 
-  private final Map<Pair<String, String>, OperationModel> operations = new LinkedHashMap<>();
-  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
-
+  @Inject
   private ExtensionManager extensionManager;
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Set's up the {@link PolicyManager} and the {@link ExtensionManager} used to execute the operations.
-   */
-  @Override
-  public void initialise() throws InitialisationException {
-    this.extensionManager = muleContext.getExtensionManager();
-  }
+  private final Map<Pair<String, String>, OperationModel> operations = new LinkedHashMap<>();
+  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
 
   /**
    * {@inheritDoc}
@@ -90,6 +78,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
     return from(processor.apply(just(getInitialiserEvent(muleContext))))
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
+        .doAfterTerminate((r, t) -> disposeProcessor(processor))
         .toFuture();
   }
 
@@ -100,8 +89,12 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public <T, A extends Attributes> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
     OperationMessageProcessor processor = createProcessor(extension, operation, params);
-    Event process = processor.process(getInitialiserEvent(muleContext));
-    return Result.<T, A>builder(process.getMessage()).build();
+    try {
+      Event process = processor.process(getInitialiserEvent(muleContext));
+      return Result.<T, A>builder(process.getMessage()).build();
+    } finally {
+      disposeProcessor(processor);
+    }
   }
 
   /**
@@ -176,5 +169,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private ExtensionModel findExtension(String extensionName) {
     return extensionManager.getExtension(extensionName)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No Extension [" + extensionName + "] Found")));
+  }
+
+  private void disposeProcessor(OperationMessageProcessor processor) {
+    try {
+      processor.stop();
+      processor.dispose();
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage("Error while disposing the executing operation"), e);
+    }
   }
 }
