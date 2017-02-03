@@ -68,7 +68,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
-import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
@@ -406,12 +405,12 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
   }
 
-  private Method[] extractAllowedMethods() throws InitialisationException {
+  private String[] extractAllowedMethods() throws InitialisationException {
     final String[] values = this.allowedMethods.split(",");
-    final Method[] normalizedValues = new Method[values.length];
+    final String[] normalizedValues = new String[values.length];
     int normalizedValueIndex = 0;
     for (String value : values) {
-      normalizedValues[normalizedValueIndex] = Method.valueOf(value.trim().toUpperCase());
+      normalizedValues[normalizedValueIndex] = value.trim().toUpperCase();
       normalizedValueIndex++;
     }
     return normalizedValues;

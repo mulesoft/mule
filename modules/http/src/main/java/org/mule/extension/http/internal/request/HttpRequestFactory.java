@@ -203,8 +203,8 @@ public class HttpRequestFactory {
       if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.get().startsWith(APPLICATION_JAVA)) {
         if (payload instanceof Map) {
-          String body = encodeString(mediaType.getCharset()
-              .orElse(getDefaultEncoding(muleContext)), (Map) payload);
+          String body = encodeString((Map) payload, mediaType.getCharset()
+              .orElse(getDefaultEncoding(muleContext)));
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
         }

@@ -6,8 +6,6 @@
  */
 package org.mule.service.http.api.server;
 
-import org.mule.service.http.api.HttpConstants.Method;
-
 import java.io.IOException;
 import java.util.Collection;
 
@@ -50,7 +48,7 @@ public interface HttpServer {
    */
   boolean isStopped();
 
-  RequestHandlerManager addRequestHandler(final Collection<Method> methods, final String path,
+  RequestHandlerManager addRequestHandler(final Collection<String> methods, final String path,
                                           final RequestHandler requestHandler);
 
   RequestHandlerManager addRequestHandler(final String path, final RequestHandler requestHandler);

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.service.http.api.HttpConstants.Method.PUT;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
@@ -128,11 +129,11 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase {
     final HttpListenerRegistry httpListenerRegister = new HttpListenerRegistry();
     httpListenerRegister
         .addRequestHandler(testServer, mock(RequestHandler.class),
-                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(Method.GET), SECOND_LEVEL_CATCH_ALL));
+                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET), SECOND_LEVEL_CATCH_ALL));
     expectedException.expect(MuleRuntimeException.class);
     httpListenerRegister
         .addRequestHandler(testServer, mock(RequestHandler.class),
-                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(Method.GET), SECOND_LEVEL_CATCH_ALL));
+                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET), SECOND_LEVEL_CATCH_ALL));
   }
 
   @Test
@@ -140,12 +141,12 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase {
     final HttpListenerRegistry httpListenerRegister = new HttpListenerRegistry();
     httpListenerRegister
         .addRequestHandler(testServer, mock(RequestHandler.class),
-                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(Method.GET, Method.POST),
+                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(GET, POST),
                                                       SECOND_LEVEL_CATCH_ALL));
     expectedException.expect(MuleRuntimeException.class);
     httpListenerRegister
         .addRequestHandler(testServer, mock(RequestHandler.class),
-                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(Method.PUT, Method.POST),
+                           new ListenerRequestMatcher(new DefaultMethodRequestMatcher(PUT, POST),
                                                       SECOND_LEVEL_CATCH_ALL));
   }
 

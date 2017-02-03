@@ -55,7 +55,7 @@ class RequestHandlerUtils {
                                                             Function<Result<Object, HttpRequestAttributes>, Result<T, HttpResponseAttributes>> callbackHandler,
                                                             Logger logger) {
     // MULE-11277 Support non-blocking in OAuth http listeners
-    return server.addRequestHandler(singleton(method), path, (requestContext, responseCallback) -> {
+    return server.addRequestHandler(singleton(method.toString()), path, (requestContext, responseCallback) -> {
       final ClassLoader previousCtxClassLoader = currentThread().getContextClassLoader();
       try {
         currentThread().setContextClassLoader(RequestHandlerUtils.class.getClassLoader());

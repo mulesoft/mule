@@ -164,7 +164,7 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
     for (Object customParameterName : customParameters.keySet()) {
       bodyParametersMapBuilder.put(customParameterName, customParameters.get(customParameterName));
     }
-    final String body = encodeString(UTF_8, bodyParametersMapBuilder.build());
+    final String body = encodeString(bodyParametersMapBuilder.build(), UTF_8);
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(body)
         .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())));
   }

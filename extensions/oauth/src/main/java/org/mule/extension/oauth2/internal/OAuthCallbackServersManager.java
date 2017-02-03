@@ -6,8 +6,9 @@
  */
 package org.mule.extension.oauth2.internal;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
@@ -109,39 +110,44 @@ public class OAuthCallbackServersManager {
     }
 
     @Override
-    public RequestHandlerManager addRequestHandler(Collection<Method> methods, String path, RequestHandler requestHandler) {
+    public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+      final String handlerKey = buildCompositeHandlerKey(methods, path);
       synchronized (registeredHandlerMatchers) {
-        if (!registeredHandlerMatchers.containsKey(methods.toString() + "-" + path)) {
+        if (!registeredHandlerMatchers.containsKey(handlerKey)) {
           registeredHandlerMatchers
-              .put(methods.toString() + "-" + path,
-                   new CountedRequestHandlerManager(methods, path,
-                                                    server.addRequestHandler(methods, path, requestHandler)));
+              .put(handlerKey,
+                   new CountedRequestHandlerManager(methods, path, server.addRequestHandler(methods, path, requestHandler)));
         }
-        return registeredHandlerMatchers.get(methods.toString() + "-" + path);
+        return registeredHandlerMatchers.get(handlerKey);
       }
+    }
+
+    private String buildCompositeHandlerKey(Collection<String> methods, String path) {
+      final String handlerKey = format("%s-%s", methods.toString(), path);
+      return handlerKey;
     }
 
     @Override
     public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+      final String handlerKey = path;
       synchronized (registeredHandlerMatchers) {
-        if (!registeredHandlerMatchers.containsKey(path)) {
+        if (!registeredHandlerMatchers.containsKey(handlerKey)) {
           registeredHandlerMatchers
-              .put(path,
-                   new CountedRequestHandlerManager(path,
-                                                    server.addRequestHandler(path, requestHandler)));
+              .put(handlerKey,
+                   new CountedRequestHandlerManager(handlerKey, server.addRequestHandler(handlerKey, requestHandler)));
         }
-        return registeredHandlerMatchers.get(path);
+        return registeredHandlerMatchers.get(handlerKey);
       }
     }
 
     private class CountedRequestHandlerManager implements RequestHandlerManager {
 
       private AtomicInteger count = new AtomicInteger(0);
-      private Collection<Method> methods;
+      private Collection<String> methods;
       private String path;
       private RequestHandlerManager requestHandler;
 
-      public CountedRequestHandlerManager(Collection<Method> methods, String path, RequestHandlerManager requestHandler) {
+      public CountedRequestHandlerManager(Collection<String> methods, String path, RequestHandlerManager requestHandler) {
         this.methods = methods;
         this.path = path;
         this.requestHandler = requestHandler;
@@ -171,7 +177,13 @@ public class OAuthCallbackServersManager {
       public void dispose() {
         if (count.get() == 0) {
           requestHandler.dispose();
-          registeredHandlerMatchers.remove((methods != null ? methods.toString() + "-" : "") + path);
+          String handlerKey;
+          if (methods != null) {
+            handlerKey = buildCompositeHandlerKey(methods, path);
+          } else {
+            handlerKey = path;
+          }
+          registeredHandlerMatchers.remove(handlerKey);
         }
       }
     }

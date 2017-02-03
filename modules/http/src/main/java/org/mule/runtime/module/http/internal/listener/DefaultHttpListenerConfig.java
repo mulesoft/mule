@@ -30,7 +30,6 @@ import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
 import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.HttpConstants;
-import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
@@ -180,7 +179,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
     this.muleContext = muleContext;
   }
 
-  public RequestHandlerManager addRequestHandler(final Collection<Method> methods, final String path,
+  public RequestHandlerManager addRequestHandler(final Collection<String> methods, final String path,
                                                  RequestHandler requestHandler)
       throws IOException {
     return server.addRequestHandler(methods, path, requestHandler);

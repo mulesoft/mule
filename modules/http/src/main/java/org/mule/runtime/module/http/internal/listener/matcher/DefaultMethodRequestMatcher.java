@@ -7,24 +7,25 @@
 package org.mule.runtime.module.http.internal.listener.matcher;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.MethodRequestMatcher;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Request matcher for http methods.
  */
 public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
 
-  private final List<Method> methods;
+  private final List<String> methods;
 
   /**
    * The list of methods accepted by this matcher
@@ -32,6 +33,16 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
    * @param methods http request method allowed.
    */
   public DefaultMethodRequestMatcher(final Method... methods) {
+    checkArgument(methods != null, "methods attribute should not be null");
+    this.methods = asList(methods).stream().map(m -> m.name().toUpperCase()).collect(toList());
+  }
+
+  /**
+   * The list of methods accepted by this matcher
+   *
+   * @param methods http request method allowed.
+   */
+  public DefaultMethodRequestMatcher(final String... methods) {
     checkArgument(methods != null, "methods attribute should not be null");
     this.methods = asList(methods);
   }
@@ -45,7 +56,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
   @Override
   public boolean intersectsWith(final MethodRequestMatcher matcher) {
     checkArgument(matcher != null, "matcher cannot be null");
-    for (Method method : methods) {
+    for (String method : methods) {
       if (matcher.getMethods().contains(method)) {
         return true;
       }
@@ -55,7 +66,7 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
 
   @Override
   public boolean matches(final HttpRequest httpRequest) {
-    return this.methods.contains(Method.valueOf(httpRequest.getMethod().toUpperCase()));
+    return this.methods.contains(httpRequest.getMethod().toUpperCase());
   }
 
   @Override
@@ -64,11 +75,11 @@ public class DefaultMethodRequestMatcher implements MethodRequestMatcher {
   }
 
   @Override
-  public List<Method> getMethods() {
+  public List<String> getMethods() {
     return ImmutableList.copyOf(methods);
   }
 
-  public static String getMethodsListRepresentation(List<Method> methods) {
+  public static String getMethodsListRepresentation(List<String> methods) {
     return methods.isEmpty() ? "*" : Arrays.toString(methods.toArray());
   }
 

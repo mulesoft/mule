@@ -282,9 +282,9 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       String encodedBody;
       final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
       if (mapPayload instanceof ParameterMap) {
-        encodedBody = encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
+        encodedBody = encodeString(((ParameterMap) mapPayload).toListValuesMap(), encoding);
       } else {
-        encodedBody = encodeString(encoding, mapPayload);
+        encodedBody = encodeString(mapPayload, encoding);
       }
       entity = new ByteArrayHttpEntity(encodedBody.getBytes());
     }

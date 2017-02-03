@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
@@ -39,7 +40,6 @@ import org.mule.runtime.module.http.internal.HttpMessageParsingException;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
-import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
@@ -253,27 +253,27 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
         String uriParamName = pathPart.substring(1, pathPart.length() - 1);
         if (uriParamNames.contains(uriParamName)) {
           throw new InitialisationException(CoreMessages
-              .createStaticMessage(String.format("Http Listener with path %s contains duplicated uri param names", this.path)),
+              .createStaticMessage(format("Http Listener with path %s contains duplicated uri param names", this.path)),
                                             this);
         }
         uriParamNames.add(uriParamName);
       } else {
         if (pathPart.contains("*") && pathPart.length() > 1) {
-          throw new InitialisationException(CoreMessages.createStaticMessage(String.format(
-                                                                                           "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
-                                                                                           this.path)),
+          throw new InitialisationException(CoreMessages.createStaticMessage(format(
+                                                                                    "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
+                                                                                    this.path)),
                                             this);
         }
       }
     }
   }
 
-  private Method[] extractAllowedMethods() throws InitialisationException {
+  private String[] extractAllowedMethods() throws InitialisationException {
     final String[] values = this.allowedMethods.split(",");
-    final Method[] normalizedValues = new Method[values.length];
+    final String[] normalizedValues = new String[values.length];
     int normalizedValueIndex = 0;
     for (String value : values) {
-      normalizedValues[normalizedValueIndex] = Method.valueOf(value.trim().toUpperCase());
+      normalizedValues[normalizedValueIndex] = value.trim().toUpperCase();
       normalizedValueIndex++;
     }
     return normalizedValues;

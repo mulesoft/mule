@@ -252,9 +252,9 @@ public class HttpResponseFactory {
       String encodedBody;
       final Charset encoding = mediaType.getCharset().get();
       if (mapPayload instanceof ParameterMap) {
-        encodedBody = encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
+        encodedBody = encodeString(((ParameterMap) mapPayload).toListValuesMap(), encoding);
       } else {
-        encodedBody = encodeString(encoding, mapPayload);
+        encodedBody = encodeString(mapPayload, encoding);
       }
       entity = new ByteArrayHttpEntity(encodedBody.getBytes());
     }

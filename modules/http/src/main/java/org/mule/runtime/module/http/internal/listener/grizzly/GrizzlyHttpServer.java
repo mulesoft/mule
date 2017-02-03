@@ -13,7 +13,6 @@ import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
 import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
@@ -94,10 +93,10 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(Collection<Method> methods, String path, RequestHandler requestHandler) {
+  public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
     return this.listenerRegistry.addRequestHandler(this, requestHandler,
                                                    new ListenerRequestMatcher(new DefaultMethodRequestMatcher(methods
-                                                       .toArray(new Method[] {})),
+                                                       .toArray(new String[methods.size()])),
                                                                               path));
   }
 

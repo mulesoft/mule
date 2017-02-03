@@ -43,6 +43,8 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
+   * Allows for using extension methods, as defined in the rfc. In general, {@link #setMethod(Method)} should be used.
+   * 
    * @param method the HTTP method of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */

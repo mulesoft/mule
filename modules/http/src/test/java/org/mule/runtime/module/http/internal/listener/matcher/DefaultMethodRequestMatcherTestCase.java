@@ -28,7 +28,7 @@ public class DefaultMethodRequestMatcherTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void doNotAcceptsNull() {
-    new DefaultMethodRequestMatcher(null);
+    new DefaultMethodRequestMatcher(new String[] {});
   }
 
   @Test

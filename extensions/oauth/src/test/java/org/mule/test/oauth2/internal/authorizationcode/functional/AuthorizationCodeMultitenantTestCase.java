@@ -28,13 +28,14 @@ import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.common.collect.ImmutableMap;
 
 public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthorizationTestCase {
 
@@ -106,7 +107,8 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
 
     final String expectedState = (state == null ? "" : state) + ":resourceOwnerId=" + userId;
 
-    final ImmutableMap.Builder localAuthorizationUrlParametersBuilder = new ImmutableMap.Builder().put("userId", userId);
+    final ImmutableMap.Builder<String, String> localAuthorizationUrlParametersBuilder =
+        ImmutableMap.<String, String>builder().put("userId", userId);
     if (state != NO_STATE) {
       localAuthorizationUrlParametersBuilder.put("state", state);
     }
@@ -121,8 +123,9 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
         .withBody("{" + "\"" + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER + "\":"
             + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + REFRESH_TOKEN + "\"}")));
 
-    final String redirectUrlQueryParams = encodeQueryString(new ImmutableMap.Builder().put(CODE_PARAMETER, AUTHENTICATION_CODE)
-        .put(STATE_PARAMETER, expectedState).build());
+    final String redirectUrlQueryParams =
+        encodeQueryString(ImmutableMap.<String, String>builder().put(CODE_PARAMETER, AUTHENTICATION_CODE)
+            .put(STATE_PARAMETER, expectedState).build());
     Get(localCallbackUrl.getValue() + "?" + redirectUrlQueryParams).connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT)
         .execute();
   }

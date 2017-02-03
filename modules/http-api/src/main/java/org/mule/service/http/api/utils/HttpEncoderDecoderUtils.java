@@ -19,28 +19,56 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
+/**
+ * Provides helper methods for encoding and decoding http request and response content.
+ * 
+ * @since 4.0
+ */
+public final class HttpEncoderDecoderUtils {
 
-public class HttpEncoderDecoderUtils {
+  private HttpEncoderDecoderUtils() {
+    // Nothing to do
+  }
 
   private static final String SPACE_ENTITY = "%20";
 
+  /**
+   * Converts a query-string from a request url into a {@link ParameterMap}.
+   * <p>
+   * This is the inverse of {@link #encodeQueryString(Map)}.
+   * 
+   * @param queryString the query string to parse
+   * @return a map representation of the {@code queryString}
+   */
   public static ParameterMap decodeQueryString(String queryString) {
     return decodeUrlEncodedBody(queryString, UTF_8);
   }
 
-  public static String encodeQueryString(Map parameters) {
-    return encodeString(UTF_8, parameters);
+  /**
+   * Converts a map to a request url query-string form.
+   * <p>
+   * This is the inverse of {@link #decodeQueryString(String)}.
+   * 
+   * @param parameters a map representation of the {@code queryString}
+   * @return the generated query string
+   */
+  public static String encodeQueryString(Map<String, String> parameters) {
+    return encodeString(parameters, UTF_8);
   }
 
-  public static ParameterMap decodeUrlEncodedBody(String urlEncodedBody, Charset encoding) {
-    return decodeString(urlEncodedBody, encoding);
-  }
-
-  public static ParameterMap decodeString(String encodedString, Charset encoding) {
+  /**
+   * Converts an url-encoded body into a {@link ParameterMap} with a given encoding.
+   * <p>
+   * This is the inverse of {@link #encodeString(String, Charset)}.
+   * 
+   * @param queryString the string to parse
+   * @param encoding {@link URLDecoder#decode(String, String)}.
+   * @return a map representation of the {@code queryString}
+   */
+  public static ParameterMap decodeUrlEncodedBody(String queryString, Charset encoding) {
     ParameterMap queryParams = new ParameterMap();
-    if (!StringUtils.isBlank(encodedString)) {
-      String[] pairs = encodedString.split("&");
+    if (queryString != null && queryString.trim().length() > 0) {
+      String[] pairs = queryString.split("&");
       for (String pair : pairs) {
         int idx = pair.indexOf("=");
 
@@ -96,7 +124,16 @@ public class HttpEncoderDecoderUtils {
     }
   }
 
-  public static String encodeString(Charset encoding, Map parameters) {
+  /**
+   * Converts a map to a request url query-string form.
+   * <p>
+   * This is the inverse of {@link #decodeUrlEncodedBody(String, Charset)}.
+   * 
+   * @param parameters a map representation of the {@code queryString}
+   * @param encoding {@link URLDecoder#decode(String, String)}.
+   * @return the generated query string
+   */
+  public static String encodeString(Map parameters, Charset encoding) {
     String body;
     StringBuilder result = new StringBuilder();
     for (Map.Entry<?, ?> entry : (Set<Map.Entry<?, ?>>) ((parameters).entrySet())) {

@@ -39,6 +39,8 @@ import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,7 +51,6 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-import com.google.common.collect.ImmutableMap;
 
 @RunnerDelegateTo(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase {
@@ -129,9 +130,9 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse()
         .withHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
-        .withBody(encodeString(UTF_8, tokenUrlResponseParameters))));
+        .withBody(encodeString(tokenUrlResponseParameters, UTF_8))));
 
-    final ImmutableMap<Object, Object> redirectUrlQueryParams = ImmutableMap.builder()
+    final ImmutableMap<String, String> redirectUrlQueryParams = ImmutableMap.<String, String>builder()
         .put(CODE_PARAMETER, AUTHENTICATION_CODE).put(STATE_PARAMETER, state.getValue()).build();
 
     muleContext.getClient().send(localCallbackUrl.getValue() + "?" + encodeQueryString(redirectUrlQueryParams),
