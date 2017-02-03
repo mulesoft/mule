@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 
-import java.util.Optional;
-
 /**
  * Provides a value which is dependant on a {@link Event}
  *
@@ -34,12 +32,4 @@ public interface ValueResolver<T> {
    * @return whether this resolve is dynamic
    */
   boolean isDynamic();
-
-  /**
-   * @return the {@link ResolverSet} that will be used to resolve the values from a given event if there is any.
-   */
-  default Optional<ResolverSet> getResolverSet() {
-    return Optional.empty();
-  }
-
 }

@@ -22,19 +22,20 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -60,10 +61,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private final ConfigurationInstanceFactory configurationInstanceFactory;
   private final ResolverSet resolverSet;
-  private final ValueResolver<ConnectionProvider> connectionProviderResolver;
+  private final ConnectionProviderValueResolver connectionProviderResolver;
   private final ExpirationPolicy expirationPolicy;
 
-  private final Map<ResolverSetKey, ConfigurationInstance> cache = new ConcurrentHashMap<>();
+  private final Map<Pair<ResolverSetResult, ResolverSetResult>, ConfigurationInstance> cache = new ConcurrentHashMap<>();
   private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
@@ -82,7 +83,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ExtensionModel extensionModel,
                                       ConfigurationModel configurationModel,
                                       ResolverSet resolverSet,
-                                      ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                      ConnectionProviderValueResolver connectionProviderResolver,
                                       ExpirationPolicy expirationPolicy) {
     super(name, extensionModel, configurationModel);
     configurationInstanceFactory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet);
@@ -104,13 +105,13 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       ResolverSetResult result = resolverSet.resolve((Event) event);
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {
-        providerResult = connectionProviderResolver.getResolverSet().get().resolve((Event) event);
+        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve((Event) event);
       }
-      return getConfiguration(new ResolverSetKey(result, providerResult), (Event) event);
+      return getConfiguration(new Pair<>(result, providerResult), (Event) event);
     });
   }
 
-  private ConfigurationInstance getConfiguration(ResolverSetKey resolverSetResult, Event event)
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, Event event)
       throws Exception {
     ConfigurationInstance configuration;
     cacheReadLock.lock();
@@ -130,7 +131,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       // re-check in case some other thread beat us to it...
       configuration = cache.get(resolverSetResult);
       if (configuration == null) {
-        configuration = createConfiguration(resolverSetResult.getConfigResolverSetResult(), event);
+        configuration = createConfiguration(resolverSetResult.getFirst(), event);
         cache.put(resolverSetResult, configuration);
       }
 
@@ -209,39 +210,5 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private boolean isExpired(ConfigurationInstance configuration) {
     ConfigurationStats stats = configuration.getStatistics();
     return stats.getInflightOperations() == 0 && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
-  }
-
-  private class ResolverSetKey {
-
-    private final ResolverSetResult configResolverSetResult;
-    private final ResolverSetResult providerResolverSetResult;
-
-    public ResolverSetKey(ResolverSetResult configResult, ResolverSetResult providerResult) {
-      this.configResolverSetResult = configResult;
-      this.providerResolverSetResult = providerResult;
-    }
-
-    public ResolverSetResult getConfigResolverSetResult() {
-      return configResolverSetResult;
-    }
-
-    public ResolverSetResult getProviderResult() {
-      return providerResolverSetResult;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      if (other instanceof ResolverSetKey) {
-        ResolverSetKey that = (ResolverSetKey) other;
-        return Objects.equals(configResolverSetResult, that.configResolverSetResult) &&
-            Objects.equals(providerResolverSetResult, that.providerResolverSetResult);
-      }
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(configResolverSetResult, providerResolverSetResult);
-    }
   }
 }

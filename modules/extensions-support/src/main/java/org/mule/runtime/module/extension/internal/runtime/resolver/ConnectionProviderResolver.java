@@ -10,7 +10,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
@@ -21,7 +20,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject implements ValueResolver<ConnectionProvider<C>> {
+public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject implements ConnectionProviderValueResolver<C> {
 
   private final ConnectionProviderObjectBuilder<C> objectBuilder;
   private final ObjectBuilderValueResolver<ConnectionProvider<C>> valueResolver;
@@ -38,16 +37,25 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject imple
     this.resolverSet = resolverSet;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ConnectionProvider<C> resolve(Event event) throws MuleException {
     return valueResolver.resolve(event);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isDynamic() {
     return valueResolver.isDynamic();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Optional<ResolverSet> getResolverSet() {
     return Optional.of(resolverSet);

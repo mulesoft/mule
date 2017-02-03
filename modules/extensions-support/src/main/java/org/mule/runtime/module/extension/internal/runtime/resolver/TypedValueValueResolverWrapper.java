@@ -11,8 +11,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 
-import java.util.Optional;
-
 /**
  * {@link ValueResolver} implementation for {@link TypedValue} that are not resolved from an
  * expression.
@@ -51,10 +49,5 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
   @Override
   public boolean isDynamic() {
     return resolver.isDynamic();
-  }
-
-  @Override
-  public Optional<ResolverSet> getResolverSet() {
-    return resolver.getResolverSet();
   }
 }

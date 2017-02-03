@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Optional.*;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -28,7 +30,7 @@ import java.util.function.Function;
  *
  * @since 4.0
  */
-public final class ImplicitConnectionProviderValueResolver implements ValueResolver<ConnectionProvider> {
+public final class ImplicitConnectionProviderValueResolver implements ConnectionProviderValueResolver {
 
   private ConnectionProvider connectionProvider = null;
   private Function<Event, ConnectionProvider> delegate;
@@ -70,5 +72,13 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
   @Override
   public boolean isDynamic() {
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<ResolverSet> getResolverSet() {
+    return empty();
   }
 }

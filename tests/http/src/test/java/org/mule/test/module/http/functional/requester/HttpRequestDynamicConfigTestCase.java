@@ -107,7 +107,6 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void requestWithDynamicConnectionParamUsesDifferentConfigs() throws Exception {
-    expectedError.expectError("HTTPN", HttpError.CONNECTIVITY, ConnectException.class, "Connection refused");
     Event result = flowRunner("client1")
         .withVariable("basePath", "api/v1")
         .withVariable("follow", true)
@@ -124,6 +123,7 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
     assertThat(headers.keys(), hasItem(HOST));
     assertThat(headers.get(HOST), hasItem(containsString("localhost:")));
 
+    expectedError.expectError("HTTPN", HttpError.CONNECTIVITY, ConnectException.class, "Connection refused");
     flowRunner("client1")
         .withVariable("basePath", "api/v1")
         .withVariable("follow", true)
