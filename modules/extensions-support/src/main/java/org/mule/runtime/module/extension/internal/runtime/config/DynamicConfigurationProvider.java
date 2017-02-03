@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -35,6 +34,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -63,7 +63,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final ValueResolver<ConnectionProvider> connectionProviderResolver;
   private final ExpirationPolicy expirationPolicy;
 
-  private final Map<ResolverSetResult, ConfigurationInstance> cache = new ConcurrentHashMap<>();
+  private final Map<ResolverSetKey, ConfigurationInstance> cache = new ConcurrentHashMap<>();
   private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
@@ -102,11 +102,16 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public ConfigurationInstance get(Object event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
       ResolverSetResult result = resolverSet.resolve((Event) event);
-      return getConfiguration(result, (Event) event);
+      ResolverSetResult providerResult = null;
+      if (connectionProviderResolver.getResolverSet().isPresent()) {
+        providerResult = connectionProviderResolver.getResolverSet().get().resolve((Event) event);
+      }
+      return getConfiguration(new ResolverSetKey(result, providerResult), (Event) event);
     });
   }
 
-  private ConfigurationInstance getConfiguration(ResolverSetResult resolverSetResult, Event event) throws Exception {
+  private ConfigurationInstance getConfiguration(ResolverSetKey resolverSetResult, Event event)
+      throws Exception {
     ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
@@ -125,7 +130,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       // re-check in case some other thread beat us to it...
       configuration = cache.get(resolverSetResult);
       if (configuration == null) {
-        configuration = createConfiguration(resolverSetResult, event);
+        configuration = createConfiguration(resolverSetResult.getConfigResolverSetResult(), event);
         cache.put(resolverSetResult, configuration);
       }
 
@@ -204,5 +209,39 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private boolean isExpired(ConfigurationInstance configuration) {
     ConfigurationStats stats = configuration.getStatistics();
     return stats.getInflightOperations() == 0 && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
+  }
+
+  private class ResolverSetKey {
+
+    private final ResolverSetResult configResolverSetResult;
+    private final ResolverSetResult providerResolverSetResult;
+
+    public ResolverSetKey(ResolverSetResult configResult, ResolverSetResult providerResult) {
+      this.configResolverSetResult = configResult;
+      this.providerResolverSetResult = providerResult;
+    }
+
+    public ResolverSetResult getConfigResolverSetResult() {
+      return configResolverSetResult;
+    }
+
+    public ResolverSetResult getProviderResult() {
+      return providerResolverSetResult;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof ResolverSetKey) {
+        ResolverSetKey that = (ResolverSetKey) other;
+        return Objects.equals(configResolverSetResult, that.configResolverSetResult) &&
+            Objects.equals(providerResolverSetResult, that.providerResolverSetResult);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(configResolverSetResult, providerResolverSetResult);
+    }
   }
 }

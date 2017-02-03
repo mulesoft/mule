@@ -10,7 +10,10 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+
+import java.util.Optional;
 
 /**
  * A {@link ValueResolver} specialization for producing {@link ConnectionProvider} instances through a
@@ -22,15 +25,17 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject imple
 
   private final ConnectionProviderObjectBuilder<C> objectBuilder;
   private final ObjectBuilderValueResolver<ConnectionProvider<C>> valueResolver;
+  private final ResolverSet resolverSet;
 
   /**
    * Creates a new instance
    *
    * @param objectBuilder an object builder to instantiate the {@link ConnectionProvider}
    */
-  public ConnectionProviderResolver(ConnectionProviderObjectBuilder<C> objectBuilder) {
+  public ConnectionProviderResolver(ConnectionProviderObjectBuilder<C> objectBuilder, ResolverSet resolverSet) {
     this.objectBuilder = objectBuilder;
     this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder);
+    this.resolverSet = resolverSet;
   }
 
   @Override
@@ -41,6 +46,11 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject imple
   @Override
   public boolean isDynamic() {
     return valueResolver.isDynamic();
+  }
+
+  @Override
+  public Optional<ResolverSet> getResolverSet() {
+    return Optional.of(resolverSet);
   }
 
   public void setOwnerConfigName(String ownerConfigName) {
