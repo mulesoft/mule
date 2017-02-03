@@ -9,6 +9,7 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -29,7 +30,7 @@ import javax.inject.Inject;
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
  */
-public abstract class AbstractMuleObjectOwner<T>
+public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
     implements Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage

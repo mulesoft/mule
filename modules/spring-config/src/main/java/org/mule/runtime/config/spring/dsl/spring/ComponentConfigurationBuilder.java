@@ -345,7 +345,8 @@ class ComponentConfigurationBuilder {
         AtomicReference<Boolean> matchesIdentifier = new AtomicReference<>(true);
         identifierOptional.ifPresent(wrapperIdentifier -> matchesIdentifier
             .set(wrapperIdentifier.equals(componentValue.getComponentModel().getIdentifier().getName())));
-        return matchesIdentifier.get() && areMatchingTypes(type, componentValue.getType());
+        return matchesIdentifier.get() && (areMatchingTypes(type, componentValue.getType())
+            || ((areMatchingTypes(Map.class, componentValue.getType()) && areMatchingTypes(MapFactoryBean.class, type))));
       };
     }
 

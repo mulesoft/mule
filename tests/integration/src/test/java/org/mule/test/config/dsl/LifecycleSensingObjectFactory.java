@@ -11,21 +11,23 @@ import static org.mule.test.config.dsl.LifecycleAction.GET_OBJECT;
 import static org.mule.test.config.dsl.LifecycleAction.INITIALISE;
 import static org.mule.test.config.dsl.LifecycleAction.START;
 import static org.mule.test.config.dsl.LifecycleAction.STOP;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingObjectFactory implements ObjectFactory<Processor>, Lifecycle {
+public class LifecycleSensingObjectFactory extends AbstractAnnotatedObjectFactory<Processor> implements Lifecycle
+
+{
 
   private List<LifecycleAction> lifecycleActions = new LinkedList<>();
 
   @Override
-  public Processor getObject() throws Exception {
+  public Processor doGetObject() throws Exception {
     lifecycleActions.add(GET_OBJECT);
     LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = new LifecycleSensingMessageProcessor();
     lifecycleSensingMessageProcessor.setObjectFactory(this);

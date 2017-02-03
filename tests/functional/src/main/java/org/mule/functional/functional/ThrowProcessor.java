@@ -6,6 +6,7 @@
  */
 package org.mule.functional.functional;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -15,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.TypedException;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import javax.inject.Inject;
 
@@ -40,7 +40,7 @@ public class ThrowProcessor implements Processor {
       Throwable instantiatedException = exception.newInstance();
       if (error != null) {
         ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-        ErrorType errorType = errorTypeRepository.lookupErrorType(ComponentIdentifier.parseComponentIdentifier(error))
+        ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(error))
             .orElseThrow(() -> new DefaultMuleException(String.format("Could not find error: %s", error)));
         throw new TypedException(instantiatedException, errorType);
       } else {

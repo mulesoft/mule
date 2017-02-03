@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.dsl.spring;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSOR_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -43,11 +43,12 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String REF_ATTRIBUTE = "ref";
-  private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers = new ImmutableMap.Builder()
-      .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
-      .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
-      .put(TRANSFORMER_IDENTIFIER, getConsumer())
-      .build();
+  private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers =
+      new ImmutableMap.Builder()
+          .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
+          .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
+          .put(TRANSFORMER_IDENTIFIER, getConsumer())
+          .build();
 
   private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
     return getFixedConsumer(Processor.class);

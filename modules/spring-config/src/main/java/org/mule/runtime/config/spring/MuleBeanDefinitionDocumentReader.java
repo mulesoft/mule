@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.getConfigFileIdentifier;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -18,6 +21,7 @@ import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
@@ -36,11 +40,14 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
   private final XmlApplicationParser xmlApplicationParser;
   // This same instance is called several time to parse different XML files so a stack is needed to save previous state.
   private final Stack<ApplicationModel> applicationModelStack = new Stack<>();
+  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
 
   public MuleBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory,
-                                          XmlApplicationParser xmlApplicationParser) {
+                                          XmlApplicationParser xmlApplicationParser,
+                                          ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.beanDefinitionFactory = beanDefinitionFactory;
     this.xmlApplicationParser = xmlApplicationParser;
+    this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
 
   @Override
@@ -79,7 +86,8 @@ public class MuleBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocum
       configLines.add(xmlApplicationParser.parse(root).get());
       ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
           .addConfigFile(new ConfigFile(getConfigFileIdentifier(getReaderContext().getResource()), configLines)).build();
-      applicationModelStack.push(new ApplicationModel(artifactConfig, new ArtifactDeclaration()));
+      applicationModelStack.push(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), empty(),
+                                                      of(componentBuildingDefinitionRegistry)));
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }

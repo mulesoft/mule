@@ -10,7 +10,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
@@ -94,7 +94,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
-               is(parseComponentIdentifier("mule:set-payload")));
+               is(buildFromStringRepresentation("mule:set-payload")));
   }
 
   @Test
@@ -104,7 +104,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
-               is(parseComponentIdentifier("mule:poll")));
+               is(buildFromStringRepresentation("mule:poll")));
   }
 
   private MinimalApplicationModelGenerator createGeneratorForConfig(String configFileName) throws Exception {

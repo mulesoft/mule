@@ -12,9 +12,11 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -28,7 +30,6 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.io.InputStream;
@@ -135,7 +136,7 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   }
 
   protected ComponentIdentifier newIdentifier(String name, String ns) {
-    return ComponentIdentifier.builder().withName(name).withNamespace(ns).build();
+    return builder().withName(name).withNamespace(ns).build();
   }
 
   protected void assertHasParameter(ParameterizedModel model, String name) {

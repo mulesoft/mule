@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
@@ -31,6 +32,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
@@ -45,7 +47,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -57,12 +58,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Implementation of {@link DslElementModelFactory} that creates
- * a {@link DslElementModel} based on its {@link ComponentConfiguration} representation.
+ * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its
+ * {@link ComponentConfiguration} representation.
  *
  * @since 4.0
  */
-//TODO MULE-11496 Delete this factory once everything has an ExtensionModel and can be represented with an ElementDeclaration
+// TODO MULE-11496 Delete this factory once everything has an ExtensionModel and can be represented with an ElementDeclaration
 class ConfigurationBasedElementModelFactory {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -411,7 +412,8 @@ class ConfigurationBasedElementModelFactory {
         .forEach(p -> addElementParameter(innerComponents, parameters, elementDsl, builder, p));
   }
 
-  private void addInlineGroup(DslElementSyntax elementDsl, Map<ComponentIdentifier, ComponentConfiguration> innerComponents,
+  private void addInlineGroup(DslElementSyntax elementDsl,
+                              Map<ComponentIdentifier, ComponentConfiguration> innerComponents,
                               Map<String, String> parameters, ParameterGroupModel group) {
     elementDsl.getChild(group.getName())
         .ifPresent(groupDsl -> {
@@ -527,7 +529,7 @@ class ConfigurationBasedElementModelFactory {
 
   private Optional<ComponentIdentifier> getIdentifier(DslElementSyntax dsl) {
     if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
-      return Optional.of(ComponentIdentifier.builder()
+      return Optional.of(builder()
           .withName(dsl.getElementName())
           .withNamespace(dsl.getNamespaceUri())
           .build());

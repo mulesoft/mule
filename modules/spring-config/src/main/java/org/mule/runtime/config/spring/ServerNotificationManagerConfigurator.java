@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
@@ -28,7 +29,7 @@ import javax.inject.Inject;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
-public class ServerNotificationManagerConfigurator implements Initialisable {
+public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObject implements Initialisable {
 
   @Inject
   private MuleContext muleContext;

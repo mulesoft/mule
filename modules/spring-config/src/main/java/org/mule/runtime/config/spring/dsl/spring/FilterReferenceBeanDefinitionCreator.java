@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_REFERENCE_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final ComponentIdentifier FILTER_REFERENCE_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(FILTER_REFERENCE_ELEMENT).build();
+      builder().withNamespace(CORE_NAMESPACE).withName(FILTER_REFERENCE_ELEMENT).build();
 
   @Override
   public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {

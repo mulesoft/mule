@@ -11,8 +11,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -44,7 +45,7 @@ public class SingleErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTest
   @Test
   public void matchChild() {
     ComponentIdentifier customTransformerIdentifier =
-        new ComponentIdentifier.Builder().withName("custom").withNamespace(CORE_NAMESPACE_NAME).build();
+        ComponentIdentifier.builder().withName("custom").withNamespace(CORE_NAMESPACE_NAME).build();
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     ErrorType customTransformerErrorType = errorTypeRepository.addErrorType(customTransformerIdentifier, transformationErrorType);
     ErrorTypeMatcher transformationMatcher = new SingleErrorTypeMatcher(transformationErrorType);

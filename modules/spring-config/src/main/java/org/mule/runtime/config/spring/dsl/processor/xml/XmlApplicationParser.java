@@ -15,6 +15,7 @@ import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLineProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
@@ -106,6 +107,11 @@ public class XmlApplicationParser {
 
     ConfigLine.Builder builder =
         new ConfigLine.Builder().setIdentifier(identifier).setNamespace(namespace).setNode(node).setParent(parentProvider);
+
+    XmlMetadataAnnotations userData = (XmlMetadataAnnotations) node.getUserData(XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY);
+    int lineNumber = userData.getLineNumber();
+    builder.setLineNumber(lineNumber);
+
     to(builder).addNode(node);
 
     Element element = (Element) node;

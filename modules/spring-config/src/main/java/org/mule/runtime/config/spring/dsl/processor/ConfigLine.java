@@ -52,6 +52,11 @@ public class ConfigLine {
    */
   private List<ConfigLine> childrenConfigLines = new LinkedList<>();
 
+  /**
+   * Line number within the config file in which this config was defined.
+   */
+  private int lineNumber;
+
   // TODO MULE-9638 remove once we don't need the old parsing mechanism anymore.
   private Node node;
   private String textContent;
@@ -90,6 +95,10 @@ public class ConfigLine {
     return textContent;
   }
 
+  public int getLineNumber() {
+    return lineNumber;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -123,41 +132,49 @@ public class ConfigLine {
 
   public static class Builder {
 
+    public static final String BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT =
+        "builder already build an object, you cannot modify it";
     private ConfigLine configLine = new ConfigLine();
     private boolean alreadyBuild;
 
     public Builder setNamespace(String namespace) {
-      checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.namespace = namespace;
       return this;
     }
 
     public Builder setIdentifier(String operation) {
-      checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.identifier = operation;
       return this;
     }
 
+    public Builder setLineNumber(int lineNumber) {
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
+      configLine.lineNumber = lineNumber;
+      return this;
+    }
+
     public Builder addConfigAttribute(String name, String value, boolean valueFromSchema) {
-      checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.configAttributes.put(name, new SimpleConfigAttribute(name, value, valueFromSchema));
       return this;
     }
 
     public Builder addCustomAttribute(String name, Object value) {
-      checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.customAttributes.put(name, value);
       return this;
     }
 
     public Builder addChild(ConfigLine line) {
-      checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.childrenConfigLines.add(line);
       return this;
     }
 
     public Builder setParent(ConfigLineProvider parent) {
-      checkState(!alreadyBuild, "builder already build an object, you cannot modify it");
+      checkState(!alreadyBuild, BUILDER_ALREADY_BUILD_AN_OBJECT_YOU_CANNOT_MODIFY_IT);
       configLine.parent = parent;
       return this;
     }

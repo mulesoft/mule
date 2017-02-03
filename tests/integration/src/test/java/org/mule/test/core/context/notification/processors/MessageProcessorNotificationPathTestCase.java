@@ -97,7 +97,6 @@ public class MessageProcessorNotificationPathTestCase extends MuleArtifactFuncti
   @Test
   public void collections() throws Exception {
     testFlowPaths("collectionAggregator", "/0", "/1", "/2");
-    testFlowPaths("customAggregator", "/0", "/1", "/2");
     testFlowPaths("chunkAggregator", "/0", "/1", "/2", "/3");
     testFlowPaths("combineCollections", "/0", "/1");
   }

@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.concurrent.Executor;
 
 public class HttpMessageProcessContext implements MessageProcessContext {
 
   private static final ComponentIdentifier COMPONENT_IDENTIFIER =
-      new ComponentIdentifier.Builder().withNamespace("http").withName("listener").build();
+      builder().withNamespace("http").withName("listener").build();
 
   private final DefaultHttpListener listener;
   private final FlowConstruct flowConstruct;

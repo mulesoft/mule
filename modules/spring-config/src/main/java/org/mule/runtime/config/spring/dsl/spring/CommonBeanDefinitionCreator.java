@@ -26,12 +26,12 @@ import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.g
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
@@ -70,17 +70,19 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS =
       "org.mule.compatibility.config.spring.parsers.specific.TransportElementBeanDefinitionPostProcessor";
-  private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS = new ImmutableSet.Builder<ComponentIdentifier>()
-      .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
-      .add(MULE_IDENTIFIER)
-      .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
-      .build();
+  private static final ImmutableSet<ComponentIdentifier> MESSAGE_FILTER_WRAPPERS =
+      new ImmutableSet.Builder<ComponentIdentifier>()
+          .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
+          .add(MULE_IDENTIFIER)
+          .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
+          .build();
 
-  private Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
-      .add(SINGLETON_OBJECT_IDENTIFIER)
-      .add(PROTOTYPE_OBJECT_IDENTIFIER)
-      .add(CUSTOM_TRANSFORMER_IDENTIFIER)
-      .build();
+  private Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(SINGLETON_OBJECT_IDENTIFIER)
+          .add(PROTOTYPE_OBJECT_IDENTIFIER)
+          .add(CUSTOM_TRANSFORMER_IDENTIFIER)
+          .build();
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private BeanDefinitionPostProcessor beanDefinitionPostProcessor;
@@ -147,8 +149,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     if (AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
       XmlCustomAttributeHandler.ComponentCustomAttributeRetrieve customAttributeRetrieve = from(componentModel);
       Map<QName, Object> annotations =
-          processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(),
-                                           customAttributeRetrieve.getConfigFileName(), beanDefinitionBuilder);
+          processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(), null, beanDefinitionBuilder);
       processAnnotationParameters(componentModel, annotations);
       processNestedAnnotations(componentModel, annotations);
       if (!annotations.isEmpty()) {

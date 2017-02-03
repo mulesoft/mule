@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -15,7 +17,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.TypedException;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
@@ -47,16 +48,12 @@ public class ModuleExceptionHandler {
   }
 
   /**
-   * Process a given {@link Throwable}, if this one is a {@link ModuleException}, a {@link TypedException} will be built
-   * and returned.
+   * Process a given {@link Throwable}, if this one is a {@link ModuleException}, a {@link TypedException} will be built and
+   * returned.
    * <ul>
-   * <li>
-   * The cause of the {@link TypedException} will be taken from the given {@code throwable} cause
-   * </li>
-   * <li>
-   * The {@link ErrorType} will be taken from the {@link ErrorTypeRepository} using the
-   * {@link ErrorTypeDefinition} from the {@link ModuleException}
-   * </li>
+   * <li>The cause of the {@link TypedException} will be taken from the given {@code throwable} cause</li>
+   * <li>The {@link ErrorType} will be taken from the {@link ErrorTypeRepository} using the {@link ErrorTypeDefinition} from the
+   * {@link ModuleException}</li>
    * </ul>
    *
    * @param throwable to process
@@ -77,7 +74,7 @@ public class ModuleExceptionHandler {
                                      exception.getCause());
     }
 
-    ErrorType errorType = typeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+    ErrorType errorType = typeRepository.lookupErrorType(builder()
         .withNamespace(extensionNamespace)
         .withName(errorDefinition.getType())
         .build())

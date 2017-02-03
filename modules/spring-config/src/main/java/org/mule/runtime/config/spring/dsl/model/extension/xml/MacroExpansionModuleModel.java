@@ -10,8 +10,10 @@ import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
@@ -21,7 +23,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,22 +39,21 @@ import java.util.stream.Collectors;
  * For every occurrence that happens, it will expand the operations.
  * <p/>
  * This object works by handling {@link ComponentModel}s directly, consuming the {@link GlobalElementComponentModelModelProperty}
- * for the "config" elements while the {@link OperationComponentModelModelProperty} for the operations
- * (aka: {@link Processor}s in the XML file).
+ * for the "config" elements while the {@link OperationComponentModelModelProperty} for the operations (aka: {@link Processor}s in
+ * the XML file).
  * <p/>
- * TODO(fernandezlautaro) MULE-10355: the following comment must be deleted once implemented.
- * Bear in mind that at the moment, the current implementation assumes there will not be dependencies among macro
- * expansions, the following example WONT work until MULE-10355 is done:
- * B depends on A, the application uses B, which means that the macro expanded app must expand B elements, discover
- * that are A ones, and expand A elements as well.
+ * TODO(fernandezlautaro) MULE-10355: the following comment must be deleted once implemented. Bear in mind that at the moment, the
+ * current implementation assumes there will not be dependencies among macro expansions, the following example WONT work until
+ * MULE-10355 is done: B depends on A, the application uses B, which means that the macro expanded app must expand B elements,
+ * discover that are A ones, and expand A elements as well.
  *
  * @since 4.0
  */
 public class MacroExpansionModuleModel {
 
   /**
-   * literal that represents the name of the global element for any given module. If the module's name is math, then
-   * the value of this field will name the global element as <math:config ../>
+   * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
+   * this field will name the global element as <math:config ../>
    */
   private static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
   private static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
@@ -62,14 +62,12 @@ public class MacroExpansionModuleModel {
   private final Map<String, ExtensionModel> extensions;
 
   /**
-   * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method
-   * is executed.
+   * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
    *
-   * @param applicationModel to modify given the usages of elements that belong to the {@link ExtensionModel}s contained
-   *                         in the {@code extensions} map.
-   * @param extensions set with all the loaded {@link ExtensionModel}s from the deployment that will be filtered by
-   *                   looking up only those that are coming from an XML context through the {@link XmlExtensionModelProperty}
-   *                   property.
+   * @param applicationModel to modify given the usages of elements that belong to the {@link ExtensionModel}s contained in the
+   *        {@code extensions} map.
+   * @param extensions set with all the loaded {@link ExtensionModel}s from the deployment that will be filtered by looking up
+   *        only those that are coming from an XML context through the {@link XmlExtensionModelProperty} property.
    */
   public MacroExpansionModuleModel(ApplicationModel applicationModel, Set<ExtensionModel> extensions) {
     this.applicationModel = applicationModel;
@@ -79,8 +77,8 @@ public class MacroExpansionModuleModel {
   }
 
   /**
-   * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes
-   * care of the global elements.
+   * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
+   * the global elements.
    * <p/>
    * TODO(fernandezlautaro) MULE-10355: current implementation does not plays at all with <module/> within <module/>
    */
@@ -101,7 +99,7 @@ public class MacroExpansionModuleModel {
         ComponentIdentifier identifier = operationRefModel.getIdentifier();
         String identifierName = identifier.getName();
         if (identifierName.equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)) {
-          //config elements will be worked later on, that's why we are skipping this element
+          // config elements will be worked later on, that's why we are skipping this element
           continue;
         }
         ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
@@ -119,7 +117,7 @@ public class MacroExpansionModuleModel {
             ComponentModel replacementModel = createOperationInstance(operationRefModel, extensionModel, operationModel.get());
             componentModelsToReplaceByIndex.put(i, replacementModel);
           } else {
-            //as the #executeOnEveryMuleComponentTree goes from bottom to top, before throwing an exception we need to check if
+            // as the #executeOnEveryMuleComponentTree goes from bottom to top, before throwing an exception we need to check if
             // the current operationRefModel's parent is an operation of the current ExtensionModel, meaning that the role of the
             // parameter is either CONTENT or PRIMARY_CONTENT
             final ComponentIdentifier parentIdentifier = operationRefModel.getParent().getIdentifier();
@@ -185,8 +183,8 @@ public class MacroExpansionModuleModel {
   }
 
   /**
-   * Takes a one liner call to any given message processor, expand it to creating a "module-operation-chain" scope which
-   * has the set of properties, the set of parameters and the list of message processors to execute.
+   * Takes a one liner call to any given message processor, expand it to creating a "module-operation-chain" scope which has the
+   * set of properties, the set of parameters and the list of message processors to execute.
    *
    * @param operationRefModel message processor that will be replaced by a scope element named "module-operation-chain".
    * @param extensionModel extension that holds a possible set of <property/>s that has to be parametrized to the new scope.
@@ -202,7 +200,7 @@ public class MacroExpansionModuleModel {
 
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
-        .setIdentifier(new ComponentIdentifier.Builder().withNamespace("mule").withName("module-operation-chain").build());
+        .setIdentifier(builder().withNamespace("mule").withName("module-operation-chain").build());
 
 
     processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
@@ -231,10 +229,10 @@ public class MacroExpansionModuleModel {
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
     ComponentModel.Builder parametersBuilder = new ComponentModel.Builder();
     parametersBuilder
-        .setIdentifier(new ComponentIdentifier.Builder().withNamespace("mule").withName(wrapperParameters).build());
+        .setIdentifier(builder().withNamespace("mule").withName(wrapperParameters).build());
     parameters.forEach((paramName, paramValue) -> {
       ComponentModel.Builder parameterBuilder = new ComponentModel.Builder();
-      parameterBuilder.setIdentifier(new ComponentIdentifier.Builder().withNamespace("mule")
+      parameterBuilder.setIdentifier(builder().withNamespace("mule")
           .withName(entryParameter).build());
 
       parameterBuilder.addParameter("key", paramName, false);
@@ -251,7 +249,7 @@ public class MacroExpansionModuleModel {
 
   private Map<String, String> extractProperties(ComponentModel operationRefModel, ExtensionModel extensionModel) {
     Map<String, String> valuesMap = new HashMap<>();
-    //extract the <properties>
+    // extract the <properties>
     String configParameter = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
     if (configParameter != null) {
       ComponentModel configRefComponentModel = applicationModel.getRootComponentModel().getInnerComponents().stream()
@@ -275,7 +273,8 @@ public class MacroExpansionModuleModel {
    * and {@link ParameterRole#CONTENT} or {@link ParameterRole#PRIMARY_CONTENT} roles, where the former maps to simple attributes
    * while the latter are child elements.
    * <p/>
-   * If the value of the parameter is missing, then it will try to pick up a default value (also from the {@link ParameterModel#getDefaultValue()})
+   * If the value of the parameter is missing, then it will try to pick up a default value (also from the
+   * {@link ParameterModel#getDefaultValue()})
    *
    * @param componentModel to look for the values
    * @param parameters collection of parameters to look for in the parametrized {@link ComponentModel}

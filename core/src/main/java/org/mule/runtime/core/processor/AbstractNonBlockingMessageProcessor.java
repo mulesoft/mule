@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor;
 
 import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.execution.ExceptionCallback;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;

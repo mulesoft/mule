@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.specific.DomainElementsValidator;
@@ -19,8 +20,9 @@ import org.mule.runtime.config.spring.parsers.specific.DomainElementsValidator;
 public class MuleDomainBeanDefinitionDocumentReader extends MuleBeanDefinitionDocumentReader {
 
   public MuleDomainBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory,
-                                                XmlApplicationParser xmlApplicationParser) {
-    super(beanDefinitionFactory, xmlApplicationParser);
+                                                XmlApplicationParser xmlApplicationParser,
+                                                ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+    super(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry);
   }
 
   @Override

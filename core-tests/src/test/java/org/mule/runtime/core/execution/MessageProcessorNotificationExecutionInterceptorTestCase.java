@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -13,21 +15,22 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -49,7 +52,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
   private ServerNotificationManager mockNotificationManager;
   @Mock
   private MessageProcessorExecutionInterceptor mockNextInterceptor;
-  @Mock
+  @Mock(extraInterfaces = AnnotatedObject.class)
   private Processor mockMessageProcessor;
   @Mock
   private MuleContext mockMuleContext;
@@ -78,6 +81,10 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     when(mockPipeline.getName()).thenReturn("flow");
     messageProcessorNotificationExecutionInterceptor.setFlowConstruct(mockPipeline);
     when(mockMuleContext.getNotificationManager()).thenReturn(mockNotificationManager);
+    when(((AnnotatedObject) mockMessageProcessor).getAnnotation(LOCATION_KEY))
+        .thenReturn(new DefaultComponentLocation(empty(),
+                                                 asList(new DefaultComponentLocation.DefaultLocationPart("path", empty(), empty(),
+                                                                                                         empty()))));
   }
 
   @Test

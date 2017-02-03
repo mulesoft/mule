@@ -7,10 +7,17 @@
 
 package org.mule.compatibility.transport.jms.config;
 
+import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import org.mule.compatibility.transport.jms.CustomCachingConnectionFactory;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.jms.ConnectionFactory;
+import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
@@ -24,12 +31,34 @@ public class CachingConnectionFactoryFactoryBean extends AbstractFactoryBean<Cus
 
   public static final int DEFAULT_SESSION_CACHE_SIZE = 1;
 
+  private final Map<QName, Object> annotations = new ConcurrentHashMap<>();
   private String name;
   private boolean cacheProducers;
   private ConnectionFactory connectionFactory;
   private int sessionCacheSize = DEFAULT_SESSION_CACHE_SIZE;
   private String username;
+
   private String password;
+
+  @Override
+  public final Object getAnnotation(QName qName) {
+    return annotations.get(qName);
+  }
+
+  @Override
+  public final Map<QName, Object> getAnnotations() {
+    return unmodifiableMap(annotations);
+  }
+
+  @Override
+  public void setAnnotations(Map<QName, Object> annotations) {
+    this.annotations.putAll(annotations);
+  }
+
+  @Override
+  public ComponentLocation getLocation() {
+    return (ComponentLocation) getAnnotation(LOCATION_KEY);
+  }
 
   @Override
   public Class<?> getObjectType() {

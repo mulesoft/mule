@@ -7,15 +7,11 @@
 package org.mule.runtime.dsl.api.component;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.of;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
-
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.ComponentLocation;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
@@ -41,50 +37,8 @@ public abstract class AbstractAnnotatedObjectFactory<T> implements AnnotatedObje
   }
 
   @Override
-  public ComponentIdentifier getIdentifier() {
-    // TODO MULE-11572 set this data instead of building this object each time
-    return new ComponentIdentifier() {
-
-      @Override
-      public String getNamespace() {
-        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getNamespace();
-      }
-
-      @Override
-      public String getName() {
-        return ((org.mule.runtime.dsl.api.component.config.ComponentIdentifier) getAnnotation(ANNOTATION_NAME)).getName();
-      }
-
-      @Override
-      public ComponentType getComponentType() {
-        return null;
-      }
-    };
-  }
-
-  @Override
-  public ComponentLocation getLocation(String flowPath) {
-    if (flowPath == null) {
-      return null;
-    } else {
-      return new ComponentLocation() {
-
-        @Override
-        public String getPath() {
-          return flowPath;
-        }
-
-        @Override
-        public Optional<String> getFileName() {
-          return of((String) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileName")));
-        }
-
-        @Override
-        public Optional<Integer> getLineInFile() {
-          return of((int) getAnnotation(new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine")));
-        }
-      };
-    }
+  public ComponentLocation getLocation() {
+    return (ComponentLocation) getAnnotation(LOCATION_KEY);
   }
 
   @Override

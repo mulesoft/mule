@@ -14,6 +14,7 @@ import static org.mule.extension.http.api.error.HttpError.RESPONSE_VALIDATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
@@ -26,7 +27,6 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -48,7 +48,6 @@ import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -248,7 +247,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private List<ErrorTypeMatcher> createErrorMatcherList(ErrorTypeRepository errorTypeRepository) {
     List<ErrorTypeMatcher> matchers = new LinkedList<>();
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(SECURITY).get()));
-    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(ComponentIdentifier.builder()
+    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(builder()
         .withNamespace(HTTP_NAMESPACE.toUpperCase())
         .withName(RESPONSE_VALIDATION.name())
         .build()).get()));

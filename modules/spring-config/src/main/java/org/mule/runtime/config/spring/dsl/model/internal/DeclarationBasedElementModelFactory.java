@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -41,6 +42,7 @@ import org.mule.runtime.api.app.declaration.SourceElementDeclaration;
 import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ParameterListValue;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -59,7 +61,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -71,8 +72,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Implementation of {@link DslElementModelFactory} that creates
- * a {@link DslElementModel} based on its {@link ElementDeclaration} representation.
+ * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its {@link ElementDeclaration}
+ * representation.
  *
  * @since 4.0
  */
@@ -692,7 +693,7 @@ class DeclarationBasedElementModelFactory {
     checkArgument(fieldDsl.supportsTopLevelDeclaration() || fieldDsl.supportsChildDeclaration(),
                   format("The given component '%s' does not support element-like declaration", fieldDsl.getAttributeName()));
 
-    return ComponentIdentifier.builder()
+    return builder()
         .withName(fieldDsl.getElementName())
         .withNamespace(fieldDsl.getNamespaceUri())
         .build();

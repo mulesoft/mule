@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring.dsl.processor.xml;
 
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
+import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 
 import org.w3c.dom.Node;
 
@@ -20,6 +21,7 @@ public class XmlCustomAttributeHandler {
 
   public static final String NAMESPACE_URI = "NAMESPACE_URI";
   public static final String XML_NODE = "XML_NODE";
+  public static final String LINE_NUMBER = "LINE_NUMBER";
   public static final String CONFIG_FILE_NAME = "CONFIG_FILE_NAME";
 
   /**
@@ -82,6 +84,7 @@ public class XmlCustomAttributeHandler {
     public Node getNode() {
       return (Node) this.configLine.getCustomAttributes().get(XML_NODE);
     }
+
   }
 
   public static class ComponentCustomAttributeStore {
@@ -102,14 +105,6 @@ public class XmlCustomAttributeHandler {
       return this;
     }
 
-    /**
-     * @param configFileName the config file name in which the model was defined.
-     * @return the store.
-     */
-    public ComponentCustomAttributeStore addConfigFileName(String configFileName) {
-      this.builder.addCustomAttribute(CONFIG_FILE_NAME, configFileName);
-      return this;
-    }
   }
 
   public static class ComponentCustomAttributeRetrieve {

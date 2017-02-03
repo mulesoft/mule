@@ -23,12 +23,32 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.interception.InterceptionAction;
+import org.mule.runtime.api.interception.InterceptionEvent;
+import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import javax.xml.namespace.QName;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -39,18 +59,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.ProcessorInterceptor;
-import org.mule.runtime.api.interception.InterceptionAction;
-import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestCase {
 
@@ -856,7 +864,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {
 
       @Override
-      public boolean intercept(ComponentIdentifier identifier, ComponentLocation location) {
+      public boolean intercept(TypedComponentIdentifier identifier, ComponentLocation location) {
         return false;
       }
     });
@@ -883,7 +891,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {
 
       @Override
-      public boolean intercept(ComponentIdentifier identifier, ComponentLocation location) {
+      public boolean intercept(TypedComponentIdentifier identifier, ComponentLocation location) {
         return false;
       }
     });
@@ -915,7 +923,19 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   private static class ProcessorInApp extends AbstractAnnotatedObject implements Processor {
 
     public ProcessorInApp() {
-      setAnnotations(singletonMap(ANNOTATION_PARAMETERS, singletonMap("param", "#[payload]")));
+      setAnnotations(ImmutableMap.<QName, Object>builder()
+          .put(ANNOTATION_PARAMETERS, singletonMap("param", "#[payload]"))
+          .put(LOCATION_KEY,
+               new DefaultComponentLocation(of("flowName"),
+                                            singletonList(new DefaultComponentLocation.DefaultLocationPart("0",
+                                                                                                           of(
+                                                                                                              builder()
+                                                                                                                  .withIdentifier(
+                                                                                                                                  buildFromStringRepresentation("test:processor"))
+                                                                                                                  .withType(PROCESSOR)
+                                                                                                                  .build()),
+                                                                                                           empty(), empty()))))
+          .build());
     }
 
     @Override

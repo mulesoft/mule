@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 /**
  * {@link ObjectFactory} for reconnection configuration.
@@ -21,22 +22,13 @@ import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
  *
  * @since 4.0
  */
-public class RetryPolicyTemplateObjectFactory implements ObjectFactory<RetryPolicyTemplate>, MuleContextAware {
+public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFactory<RetryPolicyTemplate>
+    implements MuleContextAware {
 
   private boolean blocking;
   private Integer count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
   private Integer frequency = SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
   private MuleContext muleContext;
-
-  @Override
-  public RetryPolicyTemplate getObject() throws Exception {
-    SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
-    retryPolicyTemplate.setMuleContext(muleContext);
-    if (!blocking) {
-      return new AsynchronousRetryTemplate(retryPolicyTemplate);
-    }
-    return retryPolicyTemplate;
-  }
 
   /**
    * @param blocking true if the policy must run synchronously when invoked, false if it must run asynchronously.
@@ -62,5 +54,15 @@ public class RetryPolicyTemplateObjectFactory implements ObjectFactory<RetryPoli
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public RetryPolicyTemplate doGetObject() throws Exception {
+    SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
+    retryPolicyTemplate.setMuleContext(muleContext);
+    if (!blocking) {
+      return new AsynchronousRetryTemplate(retryPolicyTemplate);
+    }
+    return retryPolicyTemplate;
   }
 }

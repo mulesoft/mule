@@ -20,7 +20,7 @@
         <httpn:request-connection host="localhost"/>
     </httpn:request-config>
 
-    <spring:bean name="notificationLogger" class="org.mule.test.core.context.notification.processors.MessageProcessorNotificationLogger"/>
+    <spring:bean name="notificationLogger" class="org.mule.test.core.context.notification.processors.ProcessorNotificationStore"/>
 
     <notifications>
         <notification-listener ref="notificationLogger"/>
@@ -326,13 +326,6 @@
         <collection-splitter/>
         <logger level="INFO"/>
         <collection-aggregator failOnTimeout="false" timeout="3600"/>
-    </flow>
-
-    <flow name="customAggregator">
-        <collection-splitter/>
-        <custom-aggregator class="org.mule.test.core.routing.outbound.AggregationTestCase$Aggregator" timeout="2000"
-                           failOnTimeout="false"/>
-        <logger level="INFO"/>
     </flow>
 
     <flow name="chunkAggregator">

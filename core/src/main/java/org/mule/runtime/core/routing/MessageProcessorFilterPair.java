@@ -9,6 +9,8 @@ package org.mule.runtime.core.routing;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -26,7 +28,8 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 /**
  * A holder for a pair of MessageProcessor and Filter.
  */
-public class MessageProcessorFilterPair implements FlowConstructAware, MuleContextAware, Lifecycle {
+public class MessageProcessorFilterPair extends AbstractAnnotatedObject
+    implements FlowConstructAware, MuleContextAware, Lifecycle {
 
   private final Processor messageProcessor;
   private final Filter filter;

@@ -7,7 +7,7 @@
 package org.mule.compatibility.module.cxf.builder;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.compatibility.module.cxf.CxfConfiguration;
 import org.mule.compatibility.module.cxf.CxfInboundMessageProcessor;

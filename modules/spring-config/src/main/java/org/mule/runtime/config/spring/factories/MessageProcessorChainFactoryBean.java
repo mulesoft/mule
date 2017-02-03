@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 
 import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class MessageProcessorChainFactoryBean implements FactoryBean, MuleContextAware {
+public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware {
 
   protected List processors;
   protected String name;
@@ -45,7 +46,9 @@ public class MessageProcessorChainFactoryBean implements FactoryBean, MuleContex
         throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
     }
-    return builder.build();
+    MessageProcessorChain messageProcessorChain = builder.build();
+    messageProcessorChain.setAnnotations(getAnnotations());
+    return messageProcessorChain;
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {

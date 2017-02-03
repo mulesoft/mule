@@ -14,6 +14,7 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
@@ -26,7 +27,6 @@ import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDEN
 import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
@@ -79,7 +79,6 @@ import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
-import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
@@ -89,11 +88,19 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -123,13 +130,6 @@ import org.mule.runtime.core.interceptor.TimerInterceptor;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
@@ -144,12 +144,16 @@ import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
+import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
+import org.mule.runtime.core.routing.MessageChunkAggregator;
+import org.mule.runtime.core.routing.MessageChunkSplitter;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.MessageProcessorFilterPair;
 import org.mule.runtime.core.routing.RoundRobin;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
+import org.mule.runtime.core.routing.SimpleCollectionAggregator;
 import org.mule.runtime.core.routing.UntilSuccessful;
 import org.mule.runtime.core.routing.WireTap;
 import org.mule.runtime.core.routing.filters.NotWildcardFilter;
@@ -474,12 +478,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.copy().withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
             .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore-ref").build())
             .withSetterParameterDefinition("deadLetterQueue", fromSimpleReferenceParameter("deadLetterQueue-ref").build())
-            .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").build())
+            .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
             .withSetterParameterDefinition("millisBetweenRetries", fromSimpleParameter("millisBetweenRetries").build())
             .withSetterParameterDefinition("secondsBetweenRetries", fromSimpleParameter("secondsBetweenRetries").build())
             .withSetterParameterDefinition("failureExpression", fromSimpleParameter("failureExpression").build())
             .withSetterParameterDefinition("ackExpression", fromSimpleParameter("ackExpression").build())
-            .withSetterParameterDefinition("synchronous", fromSimpleParameter("synchronous").build())
+            .withSetterParameterDefinition("synchronous", fromSimpleParameter("synchronous").withDefaultValue(false).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FOREACH).withTypeDefinition(fromType(Foreach.class))
@@ -516,6 +520,29 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.copy().withIdentifier(ALL).withTypeDefinition(fromType(MulticastingRouter.class))
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("message-chunk-splitter")
+        .withTypeDefinition(fromType(MessageChunkSplitter.class))
+        .withSetterParameterDefinition("messageSize", fromSimpleParameter("messageSize").build()).build());
+    ComponentBuildingDefinition.Builder baseAggregatorDefinition = baseDefinition.copy()
+        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+        .withSetterParameterDefinition("failOnTimeout", fromSimpleParameter("failOnTimeout").build())
+        .withSetterParameterDefinition("processedGroupsObjectStore",
+                                       fromSimpleReferenceParameter("processed-groups-object-store-ref").build())
+        .withSetterParameterDefinition("eventGroupsObjectStore",
+                                       fromSimpleReferenceParameter("event-groups-object-store-ref").build())
+        .withSetterParameterDefinition("persistentStores", fromSimpleParameter("persistentStores").build())
+        .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build());
+
+    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("message-chunk-aggregator")
+        .withTypeDefinition(fromType(MessageChunkAggregator.class)).build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("collection-splitter")
+        .withTypeDefinition(fromType(CollectionSplitter.class)).build());
+
+    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("collection-aggregator")
+        .withTypeDefinition(fromType(SimpleCollectionAggregator.class))
+        .build());
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REQUEST_REPLY)
         .withTypeDefinition(fromType(SimpleAsyncRequestReplyRequester.class))
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
@@ -642,7 +669,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
         String parsedIdentifier = identifier.trim();
         Optional<ErrorType> optional =
-            muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
+            muleContext.getErrorTypeRepository().lookupErrorType(buildFromStringRepresentation(parsedIdentifier));
         ErrorType errorType = optional
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
                                                                             parsedIdentifier)));
@@ -1258,6 +1285,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   /**
    * Parser for the expanded operations, generated dynamically by the {@link ApplicationModel} by reading the extensions
+   * 
    * @param componentBuildingDefinitions
    */
   private void addModuleOperationChainParser(LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions) {

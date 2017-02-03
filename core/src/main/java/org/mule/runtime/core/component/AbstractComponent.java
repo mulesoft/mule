@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -188,7 +188,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
       for (Interceptor interceptor : interceptors) {
         chainBuilder.chain(interceptor);
       }
-      chainBuilder.chain((Processor) event -> invokeInternal(event));
+      chainBuilder.chain(new AnnotatedProcessor(event -> invokeInternal(event)));
       interceptorChain = chainBuilder.build();
       applyLifecycleAndDependencyInjection(interceptorChain);
       doInitialise();
@@ -274,5 +274,22 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
     this.messagingExceptionHandler = messagingExceptionHandler;
+  }
+
+  /**
+   * Annotated processor only meant to be used internal for the creation of the processors inside the component chain.
+   */
+  public static class AnnotatedProcessor extends AbstractAnnotatedObject implements Processor {
+
+    private Processor processor;
+
+    public AnnotatedProcessor(Processor processor) {
+      this.processor = processor;
+    }
+
+    @Override
+    public Event process(Event event) throws MuleException {
+      return processor.process(event);
+    }
   }
 }

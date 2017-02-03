@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +21,13 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class NoArgumentsEntryPointResolverObjectFactory implements ObjectFactory<EntryPointResolver> {
+public class NoArgumentsEntryPointResolverObjectFactory extends AbstractAnnotatedObjectFactory<EntryPointResolver> {
 
   private ExcludeDefaultObjectMethods excludeDefaultObjectMethods;
   private List<MethodEntryPoint> methodEntryPoints = new ArrayList<>();
 
   @Override
-  public EntryPointResolver getObject() throws Exception {
+  public EntryPointResolver doGetObject() throws Exception {
     NoArgumentsEntryPointResolver noArgumentsEntryPointResolver = new NoArgumentsEntryPointResolver();
     if (excludeDefaultObjectMethods != null) {
       noArgumentsEntryPointResolver.setIgnoredMethods(excludeDefaultObjectMethods.getExcludedMethods());

@@ -7,12 +7,12 @@
 package org.mule.extension.http.api.policy;
 
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.core.policy.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   protected static final String PATH_PARAMETER_NAME = "path";
   protected static final String METHOD_PARAMETER_NAME = "method";
   private final static ComponentIdentifier requestIdentifier =
-      new ComponentIdentifier.Builder().withNamespace("http").withName("request").build();
+      builder().withNamespace("http").withName("request").build();
 
   @Override
   public boolean supportsOperationIdentifier(ComponentIdentifier operationIdentifier) {

@@ -18,10 +18,9 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
-import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -44,12 +43,12 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelP
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-import org.w3c.dom.Document;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URL;
@@ -61,6 +60,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
+import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -114,19 +115,19 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
   private static final ComponentIdentifier OPERATION_BODY_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
           .build();
   private static final String SEPARATOR = "/";
   public static final String XSD_SUFFIX = ".xsd";
@@ -145,7 +146,8 @@ final class XmlExtensionLoaderDelegate {
   }
 
   public void declare(ExtensionLoadingContext context) {
-    // We will assume the context classLoader of the current thread will be the one defined for the plugin (which is not filtered and will allow us to access any resource in it
+    // We will assume the context classLoader of the current thread will be the one defined for the plugin (which is not filtered
+    // and will allow us to access any resource in it
     URL resource = getResource(modulePath);
     if (resource == null) {
       throw new IllegalArgumentException(format("There's no reachable XML in the path '%s'", modulePath));
@@ -227,7 +229,8 @@ final class XmlExtensionLoaderDelegate {
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
-        .withMinMuleVersion(new MuleVersion("4.0.0")) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from ExtensionModel
+        .withMinMuleVersion(new MuleVersion("4.0.0")) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from
+        // ExtensionModel
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
         .withXmlDsl(XmlDslModel.builder()

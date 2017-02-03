@@ -10,12 +10,11 @@ package org.mule.runtime.core.processor.interceptor;
 import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
-
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.ComponentLocation;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
@@ -25,7 +24,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
@@ -72,11 +70,10 @@ public class ReactiveInterceptorAdapter
       return next;
     }
 
-    ComponentIdentifier componentIdentifier = ((AnnotatedObject) component).getIdentifier();
-    ComponentLocation componentLocation =
-        ((AnnotatedObject) component).getLocation(((MessageProcessorPathResolver) flowConstruct).getProcessorPath(component));
+    ComponentLocation componentLocation = ((AnnotatedObject) component).getLocation();
+    TypedComponentIdentifier componentIdentifier = componentLocation.getComponentIdentifier();
     Map<String, String> dslParameters = (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
-    LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptor, componentLocation.getPath());
+    LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptor, componentLocation.getLocation());
 
     if (interceptor.intercept(componentIdentifier, componentLocation)) {
       if (implementsAround()) {
@@ -140,7 +137,7 @@ public class ReactiveInterceptorAdapter
   private boolean isInterceptable(Processor component) {
     if (component instanceof AnnotatedObject) {
       ComponentLocation componentLocation =
-          ((AnnotatedObject) component).getLocation(((MessageProcessorPathResolver) flowConstruct).getProcessorPath(component));
+          ((AnnotatedObject) component).getLocation();
       if (componentLocation != null) {
         return true;
       }

@@ -7,6 +7,8 @@
 
 package org.mule.runtime.dsl.api.component;
 
+import org.mule.runtime.api.meta.AnnotatedObject;
+
 /**
  * Interface that must be implemented by those classes that are meant to be used as a factory to create complex domain objects.
  *
@@ -17,7 +19,7 @@ package org.mule.runtime.dsl.api.component;
  *
  * @since 4.0
  */
-public interface ObjectFactory<T> {
+public interface ObjectFactory<T> extends AnnotatedObject {
 
   /**
    * @return the domain object
