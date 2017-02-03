@@ -48,7 +48,7 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
 
   @Override
   public synchronized void start() throws IOException {
-    this.scheduler = schedulerSource.get();
+    this.scheduler = schedulerSource != null ? schedulerSource.get() : null;
     serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
     stopped = false;
   }
@@ -61,11 +61,12 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
     } finally {
       stopping = false;
     }
-    try {
-      // TODO - MULE-11115: Get rid of muleContext once we have a stop() method
-      scheduler.stop(5000, MILLISECONDS);
-    } finally {
-      scheduler = null;
+    if (scheduler != null) {
+      try {
+        scheduler.stop(5000, MILLISECONDS);
+      } finally {
+        scheduler = null;
+      }
     }
   }
 
