@@ -13,6 +13,7 @@ import static org.mule.service.http.api.HttpConstants.Method.OPTIONS;
 import static org.mule.service.http.api.HttpConstants.Method.PATCH;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.MethodRequestMatcher;
@@ -27,8 +28,13 @@ public class DefaultMethodRequestMatcherTestCase extends AbstractMuleTestCase {
   private HttpRequestBuilder requestBuilder = HttpRequest.builder().setUri("uri");
 
   @Test(expected = IllegalArgumentException.class)
-  public void doNotAcceptsNull() {
+  public void doNotAcceptsEmptyString() {
     new DefaultMethodRequestMatcher(new String[] {});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotAcceptsEmptyMethod() {
+    new DefaultMethodRequestMatcher(new Method[] {});
   }
 
   @Test
