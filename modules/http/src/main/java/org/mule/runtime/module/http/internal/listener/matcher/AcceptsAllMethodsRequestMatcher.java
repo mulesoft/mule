@@ -19,7 +19,7 @@ public class AcceptsAllMethodsRequestMatcher extends DefaultMethodRequestMatcher
   private static AcceptsAllMethodsRequestMatcher instance = new AcceptsAllMethodsRequestMatcher();
 
   private AcceptsAllMethodsRequestMatcher() {
-    super(new String[] {});
+    super(new String[] {"*"});
   }
 
   @Override
