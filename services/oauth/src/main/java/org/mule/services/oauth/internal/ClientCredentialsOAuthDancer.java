@@ -20,14 +20,14 @@ import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.oauth.api.ClientCredentialsConfig;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
-import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
 import org.mule.services.oauth.internal.state.TokenResponse;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,20 +41,17 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
 
   private static final Logger LOGGER = getLogger(ClientCredentialsOAuthDancer.class);
 
-  private final ClientCredentialsConfig config;
+  private final boolean encodeClientCredentialsInBody;
 
-  public ClientCredentialsOAuthDancer(ClientCredentialsConfig config, Function<String, Lock> lockProvider,
-                                      Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
+  public ClientCredentialsOAuthDancer(String clientId, String clientSecret, String tokenUrl, String scopes,
+                                      boolean encodeClientCredentialsInBody, Charset encoding, String responseAccessTokenExpr,
+                                      String responseRefreshTokenExpr, String responseExpiresInExpr,
+                                      Map<String, String> customParametersExprs, Function<String, Lock> lockProvider,
+                                      Map<String, ResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
                                       ExpressionEvaluator expressionEvaluator) {
-    super(lockProvider, tokensStore,
-          buildHttpClient(httpService, format("%s.oauthToken.requester", config.toString()), config.getTlsContextFactory()),
-          expressionEvaluator);
-    this.config = config;
-  }
-
-  @Override
-  public ClientCredentialsConfig getConfig() {
-    return config;
+    super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
+          responseExpiresInExpr, customParametersExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
+    this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;
   }
 
   @Override
@@ -68,19 +65,19 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
     final Map<String, String> formData = new HashMap<>();
 
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);
-    if (config.getScopes() != null) {
-      formData.put(SCOPE_PARAMETER, config.getScopes());
+    if (scopes != null) {
+      formData.put(SCOPE_PARAMETER, scopes);
     }
     String authorization = null;
-    if (config.isEncodeClientCredentialsInBody()) {
-      formData.put(CLIENT_ID_PARAMETER, config.getClientId());
-      formData.put(CLIENT_SECRET_PARAMETER, config.getClientSecret());
+    if (encodeClientCredentialsInBody) {
+      formData.put(CLIENT_ID_PARAMETER, clientId);
+      formData.put(CLIENT_SECRET_PARAMETER, clientSecret);
     } else {
-      authorization = "Basic " + encodeBase64String(format("%s:%s", config.getClientId(), config.getClientSecret()).getBytes());
+      authorization = "Basic " + encodeBase64String(format("%s:%s", clientId, clientSecret).getBytes());
     }
 
     try {
-      TokenResponse tokenResponse = invokeTokenUrl(config.getTokenUrl(), formData, authorization, false, config.getEncoding());
+      TokenResponse tokenResponse = invokeTokenUrl(tokenUrl, formData, authorization, false, encoding);
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Retrieved access token, refresh token and expires from token url are: %s, %s, %s",

@@ -7,18 +7,26 @@
 package org.mule.extension.oauth2.internal;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -26,8 +34,13 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.OAuthService;
+import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 
 import java.util.List;
+
+import org.slf4j.Logger;
 
 /**
  * Common interface for all grant types must extend this interface.
@@ -35,7 +48,9 @@ import java.util.List;
  * @since 4.0
  */
 // TODO MULE-11412 Remove MuleContextAware
-public abstract class AbstractGrantType implements HttpAuthentication, MuleContextAware, Initialisable {
+public abstract class AbstractGrantType implements HttpAuthentication, MuleContextAware, Lifecycle {
+
+  private static final Logger LOGGER = getLogger(AbstractGrantType.class);
 
   // Expressions to extract parameters from standard token url response.
   private static final String ACCESS_TOKEN_EXPRESSION = "#[(payload match /.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
@@ -58,6 +73,13 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
    */
   @Parameter
   private String clientSecret;
+
+  /**
+   * Scope required by this application to execute. Scopes define permissions over resources.
+   */
+  @Parameter
+  @Optional
+  private String scopes;
 
   /**
    * The token manager configuration to use for this grant type.
@@ -117,8 +139,10 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   @Placement(tab = SECURITY_TAB)
   private TlsContextFactory tlsContextFactory;
 
+  protected OAuthDancer dancer;
+
   @Override
-  public void initialise() throws InitialisationException {
+  public final void initialise() throws InitialisationException {
     if (tokenManager == null) {
       this.tokenManager = TokenManagerConfig.createDefault(muleContext);
     }
@@ -127,6 +151,42 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
     if (getTlsContextFactory() != null) {
       initialiseIfNeeded(getTlsContextFactory());
     }
+
+    try {
+      dancer = configDancer(muleContext.getRegistry().lookupObject(OAuthService.class))
+          .clientCredentials(getClientId(), getClientSecret())
+          .tokenUrl(getTokenUrl())
+          .scopes(getScopes())
+          .encoding(getDefaultEncoding(muleContext))
+          .tlsContextFactory(getTlsContextFactory())
+          .responseAccessTokenExpr(resolver.getExpression(getResponseAccessToken()))
+          .responseRefreshTokenExpr(resolver.getExpression(getResponseRefreshToken()))
+          .responseExpiresInExpr(resolver.getExpression(getResponseExpiresIn()))
+          .customParametersExtractorsExprs(getCustomParameterExtractors().stream()
+              .collect(toMap(extractor -> extractor.getParamName(),
+                             extractor -> resolver.getExpression(extractor.getValue()))))
+          .build();
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
+    initialiseIfNeeded(dancer);
+  }
+
+  protected abstract OAuthDancerBuilder configDancer(OAuthService oauthService) throws InitialisationException;
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(dancer);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(dancer);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(dancer, LOGGER);
   }
 
   /**
@@ -149,6 +209,10 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
 
   public String getClientId() {
     return clientId;
+  }
+
+  public String getScopes() {
+    return scopes;
   }
 
   public String getTokenUrl() {

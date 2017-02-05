@@ -8,12 +8,13 @@ package org.mule.services.oauth.internal;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.oauth.api.AuthorizationCodeOAuthConfig;
-import org.mule.runtime.oauth.api.ClientCredentialsConfig;
-import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
+import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
+import org.mule.services.oauth.internal.builder.DefaultOAuthAuthorizationCodeDancerBuilder;
+import org.mule.services.oauth.internal.builder.DefaultOAuthClientCredentialsDancerBuilder;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -38,22 +39,19 @@ public final class DefaultOAuthService implements OAuthService {
   }
 
   @Override
-  public <T> OAuthDancer createClientCredentialsGrantTypeDancer(ClientCredentialsConfig config,
-                                                                Function<String, Lock> lockProvider,
-                                                                Map<String, T> tokensStore,
-                                                                ExpressionEvaluator expressionEvaluator) {
-    return new ClientCredentialsOAuthDancer(config, lockProvider, (Map<String, ResourceOwnerOAuthContext>) tokensStore,
-                                            httpService, expressionEvaluator);
+  public <T> OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(Function<String, Lock> lockProvider,
+                                                                                         Map<String, T> tokensStore,
+                                                                                         ExpressionEvaluator expressionEvaluator) {
+    return new DefaultOAuthClientCredentialsDancerBuilder(lockProvider, (Map<String, ResourceOwnerOAuthContext>) tokensStore,
+                                                          httpService, expressionEvaluator);
   }
 
   @Override
-  public <T> OAuthDancer createAuthorizationCodeGrantTypeDancer(AuthorizationCodeOAuthConfig config,
-                                                                Function<String, Lock> lockProvider,
-                                                                Map<String, T> tokensStore,
-                                                                ExpressionEvaluator expressionEvaluator) {
-    return new AuthorizationCodeOAuthDancer(httpServersManager, config, schedulerService, lockProvider,
-                                            (Map<String, ResourceOwnerOAuthContext>) tokensStore,
-                                            httpService, expressionEvaluator);
+  public <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(Function<String, Lock> lockProvider,
+                                                                                         Map<String, T> tokensStore,
+                                                                                         ExpressionEvaluator expressionEvaluator) {
+    return new DefaultOAuthAuthorizationCodeDancerBuilder(httpServersManager, schedulerService, lockProvider,
+                                                          (Map<String, ResourceOwnerOAuthContext>) tokensStore,
+                                                          httpService, expressionEvaluator);
   }
-
 }

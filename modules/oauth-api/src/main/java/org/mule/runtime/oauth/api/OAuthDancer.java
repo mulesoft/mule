@@ -9,9 +9,7 @@ package org.mule.runtime.oauth.api;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 
 /**
- * Implementations provide OAuth dance implementations for a specific grant types:
- * <p>
- * Also allows for a limited tokens management.
+ * Implementations provide OAuth dance support for a specific grant-type.
  *
  * @since 4.0
  */
@@ -31,11 +29,6 @@ public interface OAuthDancer {
    * @param callback
    */
   void refreshToken(String resourceOwner, TokenRefreshCallback callback);
-
-  // /**
-  // * Creates the HTTP authorization and callback listeners used in the dance for the Authorization Code Grant Type.
-  // */
-  // void createAuthorizationGrantTypeListener();
 
   interface TokenRefreshCallback {
 

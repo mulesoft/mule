@@ -6,17 +6,8 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.oauth.api.AuthorizationCodeOAuthConfig.builder;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
@@ -24,8 +15,6 @@ import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -33,9 +22,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.oauth.api.AuthorizationCodeOAuthConfig.AuthorizationCodeOAuthConfigBuilder;
-import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
+import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
 
@@ -43,8 +32,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
 
 /**
  * Represents the config element for {@code oauth:authentication-code-config}.
@@ -54,9 +41,7 @@ import org.slf4j.Logger;
  * authentication code and retrieve the access token
  */
 @Alias("authorization-code-grant-type")
-public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Lifecycle {
-
-  private static final Logger LOGGER = getLogger(DefaultAuthorizationCodeGrantType.class);
+public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
 
   /**
    * Listener configuration to be used instead of localCallbackUrl. Note that if using this you must also provide a
@@ -89,13 +74,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
    */
   @Parameter
   private String externalCallbackUrl;
-
-  /**
-   * Scope required by this application to execute. Scopes define permissions over resources.
-   */
-  @Parameter
-  @Optional
-  private String scopes;
 
   /**
    * State parameter for holding state between the authentication request and the callback done by the oauth authorization server
@@ -136,8 +114,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @Alias("custom-parameters")
   private Map<String, String> customParameters = new HashMap<>();
 
-  private OAuthDancer dancer;
-
   /**
    * Identifier under which the oauth authentication attributes are stored (accessToken, refreshToken, etc).
    * <p>
@@ -169,9 +145,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   }
 
   @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-
+  protected OAuthDancerBuilder configDancer(OAuthService oauthService)
+      throws InitialisationException {
+    OAuthAuthorizationCodeDancerBuilder dancerBuilder =
+        oauthService.authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
+                                                             new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                             muleContext.getExpressionManager());
     try {
       if (localCallbackConfig != null && localCallbackUrl != null) {
         throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackUrl are mutually exclusive");
@@ -184,61 +163,29 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     }
 
     try {
-      OAuthService oauthService = muleContext.getRegistry().lookupObject(OAuthService.class);
-
-      AuthorizationCodeOAuthConfigBuilder configBuilder = builder(getClientId(), getClientSecret(), getTokenUrl())
-          .externalCallbackUrl(externalCallbackUrl);
-
       if (localCallbackUrl != null) {
-        configBuilder.localCallback(new URL(localCallbackUrl), ofNullable(getTlsContextFactory()));
+        if (getTlsContextFactory() != null) {
+          dancerBuilder = dancerBuilder.localCallback(new URL(localCallbackUrl), getTlsContextFactory());
+        } else {
+          dancerBuilder = dancerBuilder.localCallback(new URL(localCallbackUrl));
+        }
       } else if (localCallbackConfig != null) {
         // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
         HttpServer server = null;
-        configBuilder.localCallback(server, localCallbackConfigPath);
+        dancerBuilder = dancerBuilder.localCallback(server, localCallbackConfigPath);
         throw new UnsupportedOperationException("Not implemented yet.");
       }
-
-      dancer =
-          oauthService
-              .createAuthorizationCodeGrantTypeDancer(configBuilder
-                  .localAuthorizationUrlPath(new URL(localAuthorizationUrl).getPath())
-                  .localAuthorizationUrlResourceOwnerId(resolver
-                      .getExpression(localAuthorizationUrlResourceOwnerId))
-                  .customParameters(customParameters)
-                  .state(resolver.getExpression(state))
-                  .authorizationUrl(authorizationUrl)
-                  .encoding(getDefaultEncoding(muleContext))
-                  .tlsContextFactory(getTlsContextFactory())
-                  .responseAccessTokenExpr(resolver.getExpression(getResponseAccessToken()))
-                  .responseRefreshTokenExpr(resolver.getExpression(getResponseRefreshToken()))
-                  .responseExpiresInExpr(resolver.getExpression(getResponseExpiresIn()))
-                  .customParametersExtractorsExprs(getCustomParameterExtractors().stream()
-                      .collect(toMap(extractor -> extractor.getParamName(),
-                                     extractor -> resolver.getExpression(extractor.getValue()))))
-                  .scopes(scopes)
-                  .build(),
-                                                      lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                      new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
-                                                      muleContext.getExpressionManager());
-    } catch (RegistrationException | MalformedURLException e) {
+      dancerBuilder = dancerBuilder
+          .localAuthorizationUrlPath(new URL(localAuthorizationUrl).getPath())
+          .localAuthorizationUrlResourceOwnerId(resolver.getExpression(localAuthorizationUrlResourceOwnerId))
+          .customParameters(customParameters)
+          .state(resolver.getExpression(state))
+          .authorizationUrl(authorizationUrl)
+          .externalCallbackUrl(externalCallbackUrl);
+      return dancerBuilder;
+    } catch (MalformedURLException e) {
       throw new InitialisationException(e, this);
     }
-    initialiseIfNeeded(dancer);
-  }
-
-  @Override
-  public void start() throws MuleException {
-    startIfNeeded(dancer);
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    stopIfNeeded(dancer);
-  }
-
-  @Override
-  public void dispose() {
-    disposeIfNeeded(dancer, LOGGER);
   }
 
   @Override

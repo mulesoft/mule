@@ -14,7 +14,7 @@ import java.util.concurrent.locks.Lock;
 /**
  * OAuth state for a particular resource owner which typically represents an user.
  */
-public class ResourceOwnerOAuthContext implements Serializable {
+public final class ResourceOwnerOAuthContext implements Serializable {
 
   private static final long serialVersionUID = -4260965520423792113L;
 

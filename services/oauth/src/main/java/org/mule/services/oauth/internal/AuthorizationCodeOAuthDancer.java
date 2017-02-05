@@ -46,9 +46,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.oauth.api.AuthorizationCodeOAuthConfig;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
@@ -56,7 +54,7 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.service.http.api.HttpConstants.Method;
-import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
@@ -75,6 +73,7 @@ import org.mule.services.oauth.internal.state.StateEncoder;
 import org.mule.services.oauth.internal.state.TokenResponse;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -88,43 +87,50 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
 
   private static final Logger LOGGER = getLogger(AuthorizationCodeOAuthDancer.class);
 
-  private final AuthorizationCodeOAuthConfig config;
+  private final HttpServer httpServer;
 
-  private DefaultOAuthCallbackServersManager httpServersManager;
-  private SchedulerService schedulerService;
-  private HttpServer httpServer;
+  private final String localCallbackUrlPath;
+
+  private final String localAuthorizationUrlPath;
+  private final String localAuthorizationUrlResourceOwnerId;
+
+  private final String externalCallbackUrl;
+
+  private final String state;
+  private final String authorizationUrl;
+  private final Map<String, String> customParameters;
+
   private RequestHandlerManager redirectUrlHandlerManager;
   private RequestHandlerManager localAuthorizationUrlHandlerManager;
 
 
-  public AuthorizationCodeOAuthDancer(DefaultOAuthCallbackServersManager httpServersManager, AuthorizationCodeOAuthConfig config,
-                                      SchedulerService schedulerService, Function<String, Lock> lockProvider,
-                                      Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
-                                      ExpressionEvaluator expressionEvaluator) {
-    super(lockProvider, tokensStore,
-          buildHttpClient(httpService, format("%s.oauthToken.requester", config.toString()), config.getTlsContextFactory()),
-          expressionEvaluator);
-    this.httpServersManager = httpServersManager;
-    this.config = config;
-    this.schedulerService = schedulerService;
-  }
+  public AuthorizationCodeOAuthDancer(HttpServer httpServer, String clientId, String clientSecret,
+                                      String tokenUrl, String scopes, String externalCallbackUrl, Charset encoding,
+                                      String localCallbackUrlPath, String localAuthorizationUrlPath,
+                                      String localAuthorizationUrlResourceOwnerId, String state, String authorizationUrl,
+                                      String responseAccessTokenExpr, String responseRefreshTokenExpr,
+                                      String responseExpiresInExpr, Map<String, String> customParameters,
+                                      Map<String, String> customParametersExtractorsExprs,
+                                      Function<String, Lock> lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
+                                      HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
+    super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
+          responseExpiresInExpr, customParametersExtractorsExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
 
-  @Override
-  public AuthorizationCodeOAuthConfig getConfig() {
-    return config;
+    this.httpServer = httpServer;
+    this.localCallbackUrlPath = localCallbackUrlPath;
+    this.localAuthorizationUrlPath = localAuthorizationUrlPath;
+    this.localAuthorizationUrlResourceOwnerId = localAuthorizationUrlResourceOwnerId;
+    this.externalCallbackUrl = externalCallbackUrl;
+    this.state = state;
+    this.authorizationUrl = authorizationUrl;
+    this.customParameters = customParameters;
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    try {
-      httpServer = config.getHttpServer(httpServersManager, () -> schedulerService.ioScheduler());
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
-    }
-
     redirectUrlHandlerManager =
-        addRequestHandler(httpServer, GET, config.getLocalCallbackUrlPath(), createRedirectUrlProcessor());
-    localAuthorizationUrlHandlerManager = addRequestHandler(httpServer, GET, config.getLocalAuthorizationUrlPath(),
+        addRequestHandler(httpServer, GET, localCallbackUrlPath, createRedirectUrlListener());
+    localAuthorizationUrlHandlerManager = addRequestHandler(httpServer, GET, localAuthorizationUrlPath,
                                                             createLocalAuthorizationUrlListener());
   }
 
@@ -168,7 +174,7 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
         });
   }
 
-  private RequestHandler createRedirectUrlProcessor() {
+  private RequestHandler createRedirectUrlListener() {
     return (requestContext, responseCallback) -> {
       final HttpRequest request = requestContext.getRequest();
       final ParameterMap queryParams = request.getQueryParams();
@@ -194,13 +200,13 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
 
       final Map<String, String> formData = new HashMap<>();
       formData.put(CODE_PARAMETER, authorizationCode);
-      formData.put(CLIENT_ID_PARAMETER, config.getClientId());
-      formData.put(CLIENT_SECRET_PARAMETER, config.getClientSecret());
+      formData.put(CLIENT_ID_PARAMETER, clientId);
+      formData.put(CLIENT_SECRET_PARAMETER, clientSecret);
       formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
-      formData.put(REDIRECT_URI_PARAMETER, config.getExternalCallbackUrl());
+      formData.put(REDIRECT_URI_PARAMETER, externalCallbackUrl);
 
       try {
-        TokenResponse tokenResponse = invokeTokenUrl(config.getTokenUrl(), formData, null, true, config.getEncoding());
+        TokenResponse tokenResponse = invokeTokenUrl(tokenUrl, formData, null, true, encoding);
 
         String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
         final ResourceOwnerOAuthContext resourceOwnerOAuthContext =
@@ -222,7 +228,7 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
         LOGGER.error(e.getMessage());
 
         sendResponse(stateDecoder, responseCallback, INTERNAL_SERVER_ERROR,
-                     format("Failure calling token url %s. Exception message is %s", config.getTokenUrl(), e.getMessage()),
+                     format("Failure calling token url %s. Exception message is %s", tokenUrl, e.getMessage()),
                      TOKEN_URL_CALL_FAILED_STATUS);
         return;
       } catch (TokenNotFoundException e) {
@@ -305,11 +311,11 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
       final MediaType mediaType = getMediaType(request);
       final ParameterMap queryParams = request.getQueryParams();
 
-      final String originalState = resolveExpression(config.getState(), body, headers, queryParams, mediaType);
+      final String originalState = resolveExpression(state, body, headers, queryParams, mediaType);
       final StateEncoder stateEncoder = new StateEncoder(originalState);
 
       final String resourceOwnerId =
-          resolveExpression(config.getLocalAuthorizationUrlResourceOwnerId(), body, headers, queryParams, mediaType);
+          resolveExpression(localAuthorizationUrlResourceOwnerId, body, headers, queryParams, mediaType);
       if (resourceOwnerId != null) {
         stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
       }
@@ -320,14 +326,14 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
       }
 
       final String authorizationUrlWithParams = new AuthorizationRequestUrlBuilder()
-          .setAuthorizationUrl(config.getAuthorizationUrl())
-          .setClientId(config.getClientId())
-          .setClientSecret(config.getClientSecret())
-          .setCustomParameters(config.getCustomParameters())
-          .setRedirectUrl(config.getExternalCallbackUrl())
+          .setAuthorizationUrl(authorizationUrl)
+          .setClientId(clientId)
+          .setClientSecret(clientSecret)
+          .setCustomParameters(customParameters)
+          .setRedirectUrl(externalCallbackUrl)
           .setState(stateEncoder.getEncodedState())
-          .setScope(config.getScopes())
-          .setEncoding(config.getEncoding())
+          .setScope(scopes)
+          .setEncoding(encoding)
           .buildUrl();
 
       sendResponse(responseCallback, MOVED_TEMPORARILY, body, authorizationUrlWithParams);
@@ -400,13 +406,13 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
 
         final Map<String, String> formData = new HashMap<>();
         formData.put(REFRESH_TOKEN_PARAMETER, userRefreshToken);
-        formData.put(CLIENT_ID_PARAMETER, config.getClientId());
-        formData.put(CLIENT_SECRET_PARAMETER, config.getClientSecret());
+        formData.put(CLIENT_ID_PARAMETER, clientId);
+        formData.put(CLIENT_SECRET_PARAMETER, clientSecret);
         formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_REFRESH_TOKEN);
-        formData.put(REDIRECT_URI_PARAMETER, config.getExternalCallbackUrl());
+        formData.put(REDIRECT_URI_PARAMETER, externalCallbackUrl);
 
         try {
-          TokenResponse tokenResponse = invokeTokenUrl(config.getTokenUrl(), formData, null, true, config.getEncoding());
+          TokenResponse tokenResponse = invokeTokenUrl(tokenUrl, formData, null, true, encoding);
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Update OAuth Context for resourceOwnerId %s", resourceOwnerOAuthContext.getResourceOwnerId());
           }

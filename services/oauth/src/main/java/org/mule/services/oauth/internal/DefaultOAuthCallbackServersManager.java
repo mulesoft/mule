@@ -9,10 +9,10 @@ package org.mule.services.oauth.internal;
 import static java.lang.String.format;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.oauth.api.OAuthHttpListenersServersManager;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
+import org.mule.service.http.api.server.HttpServerFactory;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.ServerAddress;
@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @since 4.0
  */
-public class DefaultOAuthCallbackServersManager implements OAuthHttpListenersServersManager {
+public class DefaultOAuthCallbackServersManager {
 
   private HttpService httpService;
 
@@ -45,13 +45,14 @@ public class DefaultOAuthCallbackServersManager implements OAuthHttpListenersSer
     this.httpService = httpService;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Builds or returns an already built {@link HttpServer} wrapper.
    * 
-   * @see org.mule.services.oauth.internal.OAuthCallbackServersManager#getServer(org.mule.service.http.api.server.
-   * HttpServerConfiguration)
+   * @param serverConfiguration the configuration for the new server. Its port will be used to determine if a new one must be
+   *        created or an existing one returned.
+   * @return the corresponding server wrapper.
+   * @throws ConnectionException See {@link HttpServerFactory#create(HttpServerConfiguration)}
    */
-  @Override
   public synchronized HttpServer getServer(HttpServerConfiguration serverConfiguration) throws ConnectionException {
     if (!serversByPort.containsKey(serverConfiguration.getPort())) {
       serversByPort.put(serverConfiguration.getPort(),

@@ -26,18 +26,13 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.MapUtils;
-import org.mule.runtime.oauth.api.AbstractOAuthConfig;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
-import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
-import org.mule.service.http.api.client.HttpClientConfiguration.Builder;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -52,7 +47,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -61,28 +55,42 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
 
   private static final int TOKEN_REQUEST_TIMEOUT_MILLIS = 60000;
 
+  protected final String clientId;
+  protected final String clientSecret;
+  protected final String tokenUrl;
+  protected final Charset encoding;
+  protected final String scopes;
+
+  protected final String responseAccessTokenExpr;
+  protected final String responseRefreshTokenExpr;
+  protected final String responseExpiresInExpr;
+  protected final Map<String, String> customParametersExtractorsExprs;
+
   private final Function<String, Lock> lockProvider;
   private final Map<String, ResourceOwnerOAuthContext> tokensStore;
   private final HttpClient httpClient;
   private final ExpressionEvaluator expressionEvaluator;
 
-  protected AbstractOAuthDancer(Function<String, Lock> lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
+  protected AbstractOAuthDancer(String clientId, String clientSecret, String tokenUrl, Charset encoding, String scopes,
+                                String responseAccessTokenExpr, String responseRefreshTokenExpr, String responseExpiresInExpr,
+                                Map<String, String> customParametersExtractorsExprs, Function<String, Lock> lockProvider,
+                                Map<String, ResourceOwnerOAuthContext> tokensStore,
                                 HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.tokenUrl = tokenUrl;
+    this.encoding = encoding;
+    this.scopes = scopes;
+    this.responseAccessTokenExpr = responseAccessTokenExpr;
+    this.responseRefreshTokenExpr = responseRefreshTokenExpr;
+    this.responseExpiresInExpr = responseExpiresInExpr;
+    this.customParametersExtractorsExprs = customParametersExtractorsExprs;
+
     this.lockProvider = lockProvider;
     this.tokensStore = tokensStore;
     this.httpClient = httpClient;
     this.expressionEvaluator = expressionEvaluator;
   }
-
-  protected static final HttpClient buildHttpClient(HttpService httpService, String threadNamePrefix,
-                                                    Optional<TlsContextFactory> tlsContextFactory) {
-    final Builder clientConfigBuilder = new HttpClientConfiguration.Builder().setThreadNamePrefix(threadNamePrefix);
-    tlsContextFactory.ifPresent(tcf -> clientConfigBuilder.setTlsContextFactory(tcf));
-    return httpService.getClientFactory().create(clientConfigBuilder.build());
-
-  }
-
-  protected abstract AbstractOAuthConfig getConfig();
 
   @Override
   public void start() throws MuleException {
@@ -140,19 +148,19 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
       TokenResponse tokenResponse = new TokenResponse();
 
       tokenResponse
-          .setAccessToken(resolveExpression(getConfig().getResponseAccessTokenExpr(), body, headers, responseContentType));
+          .setAccessToken(resolveExpression(responseAccessTokenExpr, body, headers, responseContentType));
       if (tokenResponse.getAccessToken() == null) {
         throw new TokenNotFoundException(body);
       }
       if (retrieveRefreshToken) {
         tokenResponse
-            .setRefreshToken(resolveExpression(getConfig().getResponseRefreshTokenExpr(), body, headers, responseContentType));
+            .setRefreshToken(resolveExpression(responseRefreshTokenExpr, body, headers, responseContentType));
       }
-      tokenResponse.setExpiresIn(resolveExpression(getConfig().getResponseExpiresInExpr(), body, headers, responseContentType));
+      tokenResponse.setExpiresIn(resolveExpression(responseExpiresInExpr, body, headers, responseContentType));
 
-      if (!MapUtils.isEmpty(getConfig().getCustomParametersExtractorsExprs())) {
+      if (!MapUtils.isEmpty(customParametersExtractorsExprs)) {
         Map<String, Object> customParams = new HashMap<>();
-        for (Entry<String, String> customParamExpr : getConfig().getCustomParametersExtractorsExprs().entrySet()) {
+        for (Entry<String, String> customParamExpr : customParametersExtractorsExprs.entrySet()) {
           customParams.put(customParamExpr.getKey(),
                            resolveExpression(customParamExpr.getValue(), body, headers, responseContentType));
         }
