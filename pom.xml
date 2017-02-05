@@ -257,7 +257,10 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
         <mule.module.maven.plugin.version>1.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <!-- v1.1.0 has an issue with Optional dependencies, when resolving the graph it overrides the optionality of a transitive
+        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+
+        <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
              dependency with the one define in the dependency management (which is mostly in all the cases "false")
              https://bugs.eclipse.org/bugs/show_bug.cgi?id=501019 -->
         <aetherVersion>1.0.2.v20150114</aetherVersion>
@@ -1818,6 +1821,18 @@
                     <version>${mule.module.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
+                <plugin>
+                    <groupId>org.mule.plugins</groupId>
+                    <artifactId>mule-app-plugins-maven-plugin</artifactId>
+                    <version>${mule.app.plugins.maven.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.mule.extensions</groupId>
+                    <artifactId>mule-extensions-maven-plugin</artifactId>
+                    <version>${mule.extensions.maven.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -2200,6 +2215,7 @@
                 <skipTests>true</skipTests>
                 <skipSystemTests>true</skipSystemTests>
                 <skipGpg>false</skipGpg>
+                <skipNoSnapshotsEnforcerPluginRule>false</skipNoSnapshotsEnforcerPluginRule>
             </properties>
             <build>
                 <defaultGoal>deploy</defaultGoal>
@@ -2247,6 +2263,27 @@
                         <configuration>
                             <skip>${skipGpg}</skip>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed!</message>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
