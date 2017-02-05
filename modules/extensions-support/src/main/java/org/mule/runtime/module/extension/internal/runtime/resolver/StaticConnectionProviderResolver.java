@@ -9,13 +9,11 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
 
 /**
- * A {@link ValueResolver} specialization for producing {@link ConnectionProvider} instances through a
- * {@link ConnectionProviderObjectBuilder}
+ * An implementation of {@link ConnectionProviderValueResolver} that wraps a {@link StaticValueResolver}
  *
  * @since 4.0
  */
