@@ -7,13 +7,11 @@
 package org.mule.extension.oauth2.internal.clientcredentials;
 
 import static java.util.stream.Collectors.toMap;
-import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.oauth.api.ClientCredentialsConfig.builder;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
@@ -21,23 +19,13 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
-import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
@@ -48,44 +36,54 @@ import org.slf4j.Logger;
 /**
  * Authorization element for client credentials oauth grant type
  */
-public class ClientCredentialsGrantType extends AbstractGrantType implements Initialisable, Startable, Stoppable, Disposable {
+public class ClientCredentialsGrantType extends AbstractGrantType implements Lifecycle {
 
   private static final Logger LOGGER = getLogger(ClientCredentialsGrantType.class);
 
   /**
-   * Application identifier as defined in the oauth authentication server.
-   */
-  @Parameter
-  private String clientId;
-
-  /**
-   * Application secret as defined in the oauth authentication server.
-   */
-  @Parameter
-  private String clientSecret;
-
-  /**
-   * This element configures an automatic flow created by mule that listens in the configured url by the redirectUrl attribute and
-   * process the request to retrieve an access token from the oauth authentication server.
-   */
-  @Parameter
-  @ParameterGroup(name = "Token Request")
-  private ClientCredentialsTokenRequestHandler tokenRequestHandler;
-
-  /**
-   * References a TLS config that will be used to receive incoming HTTP request and do HTTP request during the OAuth dance.
+   * Scope required by this application to execute. Scopes define permissions over resources.
    */
   @Parameter
   @Optional
-  @Expression(NOT_SUPPORTED)
-  @DisplayName(TLS_CONFIGURATION)
-  @Placement(tab = SECURITY_TAB)
-  private TlsContextFactory tlsContextFactory;
+  private String scopes;
+
+  /**
+   * If true, the client id and client secret will be sent in the request body. Otherwise, they will be sent as basic
+   * authentication.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  private boolean encodeClientCredentialsInBody;
 
   private OAuthDancer dancer;
 
-  public TlsContextFactory getTlsContext() {
-    return tlsContextFactory;
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+
+    try {
+      OAuthService oauthService = muleContext.getRegistry().lookupObject(OAuthService.class);
+
+      dancer =
+          oauthService.createClientCredentialsGrantTypeDancer(builder(getClientId(), getClientSecret(), getTokenUrl())
+              .encodeClientCredentialsInBody(encodeClientCredentialsInBody)
+              .scopes(scopes)
+              .encoding(getDefaultEncoding(muleContext))
+              .tlsContextFactory(getTlsContextFactory())
+              .responseAccessTokenExpr(resolver.getExpression(getResponseAccessToken()))
+              .responseRefreshTokenExpr(resolver.getExpression(getResponseRefreshToken()))
+              .responseExpiresInExpr(resolver.getExpression(getResponseExpiresIn()))
+              .customParametersExtractorsExprs(getCustomParameterExtractors().stream()
+                  .collect(toMap(extractor -> extractor.getParamName(),
+                                 extractor -> resolver.getExpression(extractor.getValue()))))
+              .build(),
+                                                              lockId -> muleContext.getLockFactory().createLock(lockId),
+                                                              new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                              muleContext.getExpressionManager());
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
+    initialiseIfNeeded(dancer);
   }
 
   @Override
@@ -100,53 +98,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
   @Override
   public void dispose() {
-    LifecycleUtils.disposeIfNeeded(dancer, LOGGER);
-  }
-
-  @Override
-  public String getClientSecret() {
-    return clientSecret;
-  }
-
-  @Override
-  public String getClientId() {
-    return clientId;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    if (tokenManager == null) {
-      this.tokenManager = TokenManagerConfig.createDefault(muleContext);
-    }
-    initialiseIfNeeded(tokenManager, muleContext);
-
-    if (tlsContextFactory != null) {
-      initialiseIfNeeded(tlsContextFactory);
-    }
-
-    try {
-      OAuthService oauthService = muleContext.getRegistry().lookupObject(OAuthService.class);
-
-      dancer =
-          oauthService.createClientCredentialsGrantTypeDancer(builder(clientId, clientSecret, tokenRequestHandler.getTokenUrl())
-              .encodeClientCredentialsInBody(tokenRequestHandler.isEncodeClientCredentialsInBody())
-              .scopes(tokenRequestHandler.getScopes())
-              .encoding(getDefaultEncoding(muleContext))
-              .tlsContextFactory(tlsContextFactory)
-              .responseAccessTokenExpr(resolver.getExpression(tokenRequestHandler.getResponseAccessToken()))
-              .responseRefreshTokenExpr(resolver.getExpression(tokenRequestHandler.getResponseRefreshToken()))
-              .responseExpiresInExpr(resolver.getExpression(tokenRequestHandler.getResponseExpiresIn()))
-              .customParametersExtractorsExprs(tokenRequestHandler.getCustomParameterExtractors().stream()
-                  .collect(toMap(extractor -> extractor.getParamName(),
-                                 extractor -> resolver.getExpression(extractor.getValue()))))
-              .build(),
-                                                              lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                              new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
-                                                              muleContext.getExpressionManager());
-    } catch (RegistrationException e) {
-      throw new InitialisationException(e, this);
-    }
-    initialiseIfNeeded(dancer);
+    disposeIfNeeded(dancer, LOGGER);
   }
 
   @Override
@@ -156,15 +108,10 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
 
   @Override
   public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) {
-    final Boolean shouldRetryRequest =
-        resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResult);
+    final Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
       dancer.refreshToken(DEFAULT_RESOURCE_OWNER_ID, null);
     }
     return shouldRetryRequest;
-  }
-
-  public void setTokenManager(TokenManagerConfig tokenManager) {
-    this.tokenManager = tokenManager;
   }
 }
