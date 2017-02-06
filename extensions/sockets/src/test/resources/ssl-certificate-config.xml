@@ -33,7 +33,7 @@
     </sockets:listener-config>
 
     <flow name="ssl-send-and-receive">
-        <sockets:send config-ref="ssl-request" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="ssl-request"/>
     </flow>
 
     <flow name="ssl-listen">

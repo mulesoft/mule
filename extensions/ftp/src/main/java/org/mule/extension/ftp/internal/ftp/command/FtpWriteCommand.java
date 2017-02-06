@@ -7,23 +7,20 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-
+import org.apache.commons.net.ftp.FTPClient;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
-import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-
-import java.io.OutputStream;
-import java.nio.file.Path;
-
-import org.apache.commons.net.ftp.FTPClient;
+import org.mule.runtime.core.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
 
 /**
  * A {@link ClassicFtpCommand} which implements the {@link WriteCommand} contract
@@ -48,7 +45,7 @@ public final class FtpWriteCommand extends ClassicFtpCommand implements WriteCom
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, Event event, boolean lock, boolean createParentDirectory,
+  public void write(String filePath, InputStream content, FileWriteMode mode, boolean lock, boolean createParentDirectory,
                     String encoding) {
     Path path = resolvePath(filePath);
     FileAttributes file = getFile(filePath);
@@ -67,7 +64,7 @@ public final class FtpWriteCommand extends ClassicFtpCommand implements WriteCom
     }
 
     try (OutputStream outputStream = getOutputStream(path.toString(), mode)) {
-      new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(outputStream, event, encoding));
+      IOUtils.copy(content, outputStream);
       LOGGER.debug("Successfully wrote to path {}", path.toString());
     } catch (Exception e) {
       throw exception(format("Exception was found writing to file '%s'", path), e);

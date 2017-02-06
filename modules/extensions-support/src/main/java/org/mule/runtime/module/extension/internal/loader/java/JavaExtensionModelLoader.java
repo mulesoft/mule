@@ -36,6 +36,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.ExportedType
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.OperationParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
@@ -61,6 +62,7 @@ public class JavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new MetadataComponentModelValidator(),
                                                                                          new NullSafeModelValidator(),
                                                                                          new OperationReturnTypeModelValidator(),
+                                                                                         new OperationParametersTypeModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new ParameterTypeModelValidator()));
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(

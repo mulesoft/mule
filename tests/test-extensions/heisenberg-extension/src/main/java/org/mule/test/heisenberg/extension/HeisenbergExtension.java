@@ -12,7 +12,6 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -46,15 +45,12 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-
-import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT,
     minMuleVersion = "4.1")
@@ -135,10 +131,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Parameter
   @Optional
   private Weapon weapon = new Ricin();
-
-  @Parameter
-  @Optional
-  private Function<Event, WeaponType> weaponTypeFunction;
 
   @Parameter
   @Optional
@@ -293,10 +285,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public String getFirstEndevour() {
     return firstEndevour;
-  }
-
-  public Function<Event, WeaponType> getWeaponTypeFunction() {
-    return weaponTypeFunction;
   }
 
   @Override

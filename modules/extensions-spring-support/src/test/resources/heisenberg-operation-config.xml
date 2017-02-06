@@ -75,14 +75,6 @@
         <heisenberg:get-enemy index="#[mel:flowVars['enemy']]"/>
     </flow>
 
-    <flow name="collectFromEvent">
-        <heisenberg:get-payment-from-event/>
-    </flow>
-
-    <flow name="collectFromMessage">
-        <heisenberg:get-payment-from-message/>
-    </flow>
-
     <flow name="getInlineInfo">
         <heisenberg:get-inline-info>
             <heisenberg:personal-barber beardTrimming="MUSTACHE" fullyBald="true"/>

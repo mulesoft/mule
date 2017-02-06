@@ -7,7 +7,7 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-
+import org.apache.commons.net.ftp.FTPClient;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
@@ -15,17 +15,13 @@ import org.mule.extension.file.common.api.command.FileCommand;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
-import org.mule.runtime.core.api.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import org.apache.commons.net.ftp.FTPClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for {@link FileCommand} implementations that target a FTP/SFTP server
@@ -178,18 +174,16 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
 
   /**
    * Performs the base logic and delegates into
-   * {@link AbstractFtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean, Event)} to perform the actual
+   * {@link FtpCopyDelegate#doCopy(FileConnectorConfig, FileAttributes, Path, boolean)} to perform the actual
    * copying logic
-   *
-   * @param config the config that is parameterizing this operation
+   *  @param config the config that is parameterizing this operation
    * @param source the path to be copied
    * @param target the path to the target destination
    * @param overwrite whether to overwrite existing target paths
    * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
-   * @param event the {@link Event} which triggered this operation
    */
   protected final void copy(FileConnectorConfig config, String source, String target, boolean overwrite,
-                            boolean createParentDirectory, Event event, FtpCopyDelegate delegate) {
+                            boolean createParentDirectory, FtpCopyDelegate delegate) {
     FileAttributes sourceFile = getExistingFile(source);
     Path targetPath = resolvePath(target);
     FileAttributes targetFile = getFile(targetPath.toString());
@@ -221,7 +215,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
     }
 
     final String cwd = getCurrentWorkingDirectory();
-    delegate.doCopy(config, sourceFile, targetPath, overwrite, event);
+    delegate.doCopy(config, sourceFile, targetPath, overwrite);
     LOGGER.debug("Copied '{}' to '{}'", sourceFile, targetPath);
     changeWorkingDirectory(cwd);
   }

@@ -82,22 +82,9 @@
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="parameterized-functions">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="parameterized-function">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="parameterizedFunction"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

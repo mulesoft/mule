@@ -18,7 +18,7 @@
     </sockets:listener-config>
 
     <flow name="udp-send">
-        <sockets:send config-ref="udp-requester" hasResponse="false"/>
+        <sockets:send config-ref="udp-requester"/>
     </flow>
 
     <flow name="udp-listen">

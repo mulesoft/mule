@@ -10,19 +10,17 @@ import static java.lang.String.format;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
-
-import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
-import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
@@ -52,7 +50,7 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
    * {@inheritDoc}
    */
   @Override
-  public void write(String filePath, Object content, FileWriteMode mode, Event event,
+  public void write(String filePath, InputStream content, FileWriteMode mode,
                     boolean lock, boolean createParentDirectory, String encoding) {
     Path path = resolvePath(filePath);
     assureParentFolderExists(path, createParentDirectory);
@@ -61,7 +59,7 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
     PathLock pathLock = lock ? fileSystem.lock(path, openOptions) : new NullPathLock();
 
     try (OutputStream out = getOutputStream(path, openOptions, mode)) {
-      new FileContentWrapper(content, event, muleContext).accept(new FileWriterVisitor(out, event, encoding));
+      IOUtils.copy(content, out);
     } catch (AccessDeniedException e) {
       throw new FileAccessDeniedException(format("Could not write to file '%s' because access was denied by the operating system",
                                                  path),

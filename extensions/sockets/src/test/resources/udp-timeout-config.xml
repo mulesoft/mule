@@ -18,7 +18,7 @@
     </sockets:listener-config>
 
     <flow name="udp-send-with-timeout">
-        <sockets:send config-ref="udp-requester-with-timeout" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="udp-requester-with-timeout"/>
     </flow>
 
     <flow name="udp-listen">

@@ -22,7 +22,6 @@ import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider
 import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -35,11 +34,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.activation.MimetypesFileTypeMap;
 
 /**
  * File connector operations.
@@ -150,20 +148,18 @@ public final class FileOperations extends BaseFileSystemOperations {
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param lock                    whether or not to lock the file. Defaults to false
    * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
   @Throws(FileWriteErrorTypeProvider.class)
   public void write(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
-                    @Content @Summary("Content to be written into the file") Object content,
+                    @Content @Summary("Content to be written into the file") InputStream content,
                     @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") @Placement(
                         tab = ADVANCED_TAB) String encoding,
                     @Optional(defaultValue = "true") boolean createParentDirectories,
                     @Optional(defaultValue = "false") @Placement(tab = ADVANCED_TAB) boolean lock, @Optional(
-                        defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
-                    Event event) {
-    super.doWrite(config, fileSystem, path, content, encoding, createParentDirectories, lock, mode, event);
+                        defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode) {
+    super.doWrite(config, fileSystem, path, content, encoding, createParentDirectories, lock, mode);
   }
 
   /**
@@ -194,15 +190,14 @@ public final class FileOperations extends BaseFileSystemOperations {
    * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param event                   the {@link Event} which triggered this operation
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Copies a file in another directory")
   @Throws(FileCopyErrorTypeProvider.class)
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite, Event event) {
-    super.doCopy(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, event);
+                   @Optional(defaultValue = "false") boolean overwrite) {
+    super.doCopy(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite);
   }
 
   /**
@@ -233,15 +228,14 @@ public final class FileOperations extends BaseFileSystemOperations {
    * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Moves a file to another directory")
   @Throws(FileCopyErrorTypeProvider.class)
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite, Event event) {
-    super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, event);
+                   @Optional(defaultValue = "false") boolean overwrite) {
+    super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite);
   }
 
 
@@ -255,13 +249,12 @@ public final class FileOperations extends BaseFileSystemOperations {
    *
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be deleted
-   * @param event      The current {@link Event}
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
   @Summary("Deletes a file")
   @Throws(FileDeleteErrorTypeProvider.class)
-  public void delete(@Connection FileSystem fileSystem, String path, Event event) {
-    super.doDelete(fileSystem, path, event);
+  public void delete(@Connection FileSystem fileSystem, String path) {
+    super.doDelete(fileSystem, path);
   }
 
   /**
@@ -274,18 +267,16 @@ public final class FileOperations extends BaseFileSystemOperations {
    * <p>
    * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will be thrown if this
    * precondition is not honored.
-   *
-   * @param fileSystem a reference to the host {@link FileSystem}
+   *  @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be renamed
    * @param to         the file's new name
    * @param overwrite  whether or not overwrite the file if the target destination already exists.
-   * @param event      The current {@link Event}
    */
   @Summary("Renames a file")
   @Throws(FileRenameErrorTypeProvider.class)
   public void rename(@Connection FileSystem fileSystem, String path,
-                     @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
-    super.doRename(fileSystem, path, to, overwrite, event);
+                     @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite) {
+    super.doRename(fileSystem, path, to, overwrite);
   }
 
   /**

@@ -10,18 +10,16 @@ import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
-
-import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Represents an abstract file system and the operations which can be performed on it.
@@ -107,14 +105,13 @@ public interface FileSystem {
    * @param filePath the path of the file to be written
    * @param content the content to be written into the file
    * @param mode a {@link FileWriteMode}
-   * @param event the {@link Event} which processing triggers this operation
    * @param lock whether or not to lock the file
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param encoding when {@@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
    *        not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void write(String filePath, Object content, FileWriteMode mode, Event event, boolean lock, boolean createParentDirectories,
+  void write(String filePath, InputStream content, FileWriteMode mode, boolean lock, boolean createParentDirectories,
              String encoding);
 
   /**
@@ -139,11 +136,9 @@ public interface FileSystem {
    * @param targetPath              the target directory
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param event                   whether or not to attempt creating the parent directory if it doesn't exists.
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories,
-            Event event);
+  void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
 
   /**
    * Moves the file at the {@code sourcePath} into the {@code targetPath}.
