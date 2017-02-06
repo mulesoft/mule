@@ -17,4 +17,29 @@
         <module>transports</module>
         <module>tests</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <executions>
+                    <execution>
+                        <id>replace-plugin-properties-deps-version</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>${project.build.directory}/classes/plugin.properties</include>
+                    </includes>
+                    <token>%PROJECT_VERSION%</token>
+                    <value>${project.version}</value>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -15,10 +15,6 @@
     <packaging>pom</packaging>
     <name>Parent Pom for Mule Test Extension</name>
 
-    <properties>
-        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-    </properties>
-
     <modules>
         <module>petstore-extension</module>
         <module>heisenberg-extension</module>

@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-module-dsl-api</artifactId>
-    <version>1.0.0-M5-RC-SNAPSHOT</version>
+    <version>${muleDslApiVersion}</version>
     <name>Mule module DSL API</name>
     <description>Module with the API to define how to build runtime objects from configuration files</description>
 

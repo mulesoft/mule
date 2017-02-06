@@ -40,7 +40,6 @@
             <plugin>
                 <groupId>org.mule.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
                 <extensions>true</extensions>
             </plugin>
 
