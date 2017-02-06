@@ -7,8 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import org.mule.metadata.api.model.MetadataFormat;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import com.google.common.collect.ImmutableSet;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -17,6 +21,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+
+import java.util.Set;
 
 /**
  * Validates that all {@link OperationModel operations} parameters are from a valid type.
@@ -27,6 +33,13 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
  */
 public class OperationParametersTypeModelValidator implements ExtensionModelValidator {
 
+
+  private final ClassTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
+  private final Set<String> forbiddenTypes = ImmutableSet.<String>builder()
+      .add(getTypeId(typeLoader.load(Event.class)).get())
+      .add(getTypeId(typeLoader.load(Message.class)).get())
+      .build();
+
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     new IdempotentExtensionWalker() {
@@ -34,19 +47,22 @@ public class OperationParametersTypeModelValidator implements ExtensionModelVali
       @Override
       protected void onOperation(OperationModel model) {
         model.getAllParameterModels().forEach(parameterModel -> {
-          if (parameterModel.getType().getMetadataFormat().equals(MetadataFormat.JAVA)) {
-            Class<?> type = getType(parameterModel.getType());
-            if (isForbiddenType(type)) {
+          MetadataType parameterType = parameterModel.getType();
+          if (parameterType.getMetadataFormat().equals(JAVA)) {
+            if (isForbiddenType(parameterType)) {
               problemsReporter
                   .addError(new Problem(model, format("Operation '%s' contains parameter '%s' of type '%s' which is forbidden",
-                                                      model.getName(), parameterModel.getName(), type.getName())));
+                                                      model.getName(), parameterModel.getName(),
+                                                      getTypeId(parameterType).get())));
             }
           }
         });
       }
 
-      private boolean isForbiddenType(Class<?> parameterClass) {
-        return parameterClass.equals(Event.class) || parameterClass.equals(Message.class);
+      private boolean isForbiddenType(MetadataType parameterType) {
+        return getTypeId(parameterType)
+            .filter(forbiddenTypes::contains)
+            .isPresent();
       }
 
     }.walk(extensionModel);
