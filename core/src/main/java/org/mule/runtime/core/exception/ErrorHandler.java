@@ -24,8 +24,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
@@ -37,7 +35,7 @@ import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
  * @since 4.0
  */
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
-    implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject {
+    implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, GlobalNameableObject {
 
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
@@ -127,19 +125,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
                                        createStaticMessage("Only last exception strategy inside <error-handler> can accept any message. Maybe expression attribute is empty."));
       }
     }
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    int idx = 0;
-    for (MessagingExceptionHandlerAcceptor listener : exceptionListeners) {
-      if (listener instanceof MessageProcessorContainer) {
-        MessageProcessorPathElement exceptionListener = pathElement.addChild(String.valueOf(idx));
-        ((MessageProcessorContainer) listener).addMessageProcessorPathElements(exceptionListener);
-      }
-      idx++;
-    }
-
   }
 
   @Override

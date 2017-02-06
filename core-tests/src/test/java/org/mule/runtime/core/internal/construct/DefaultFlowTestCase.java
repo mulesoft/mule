@@ -9,24 +9,18 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -34,22 +28,18 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.test.core.lifecycle.LifecycleTrackerProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -58,7 +48,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Publisher;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -66,7 +55,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private static final String FLOW_NAME = "test-flow";
 
   private DefaultFlowBuilder.DefaultFlow flow;
-  private DynamicMessageProcessorContainer dynamicProcessorContainer;
   private SensingNullMessageProcessor sensingMessageProcessor;
   private BiFunction<Processor, Event, Event> triggerFunction;
 
@@ -96,18 +84,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow = new DefaultFlowBuilder.DefaultFlow(FLOW_NAME, muleContext);
     flow.setMessageSource(directInboundMessageSource);
 
-    dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);
-    when(dynamicProcessorContainer.process(any(Event.class))).then(invocation -> {
-      Object[] args = invocation.getArguments();
-      return args[0];
-    });
-    when(dynamicProcessorContainer.apply(any(Publisher.class))).then(invocation -> {
-      Object[] args = invocation.getArguments();
-      return args[0];
-    });
-
-    doAnswer(invocation -> ((MessageProcessorPathElement) invocation.getArguments()[0]).addChild(dynamicProcessorContainer))
-        .when(dynamicProcessorContainer).addMessageProcessorPathElements(any(MessageProcessorPathElement.class));
     List<Processor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
@@ -115,7 +91,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(new StringAppendTransformer("a"));
     processors.add(new StringAppendTransformer("b"));
     processors.add(new StringAppendTransformer("c"));
-    processors.add(dynamicProcessorContainer);
     processors.add(event -> Event.builder(event).addVariable("thread", currentThread()).build());
     processors.add(sensingMessageProcessor);
     flow.setMessageProcessors(processors);
@@ -164,31 +139,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
     assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
     assertThat(sensingMessageProcessor.event.getVariable("thread").getValue(), not(sameInstance(currentThread())));
-  }
-
-  @Test
-  public void processorPath() throws MuleException {
-    flow.initialise();
-    flow.start();
-
-    Processor processorInSubflow = event -> event;
-
-    assertThat(flow.getProcessorPath(sensingMessageProcessor), is("/test-flow/processors/8"));
-    assertThat(flow.getProcessorPath(dynamicProcessorContainer), is("/test-flow/processors/6"));
-    assertThat(flow.getProcessorPath(processorInSubflow), is(nullValue()));
-
-    reset(dynamicProcessorContainer);
-    FlowMap dynamicContainerFlowMap = mock(FlowMap.class);
-    when(dynamicContainerFlowMap.resolvePath(processorInSubflow)).thenReturn("/sub_dyn/subprocessors/0");
-    when(dynamicContainerFlowMap.getFlowMap())
-        .thenReturn(Collections.singletonMap(processorInSubflow, "/sub_dyn/subprocessors/0"));
-    when(dynamicProcessorContainer.buildInnerPaths()).thenReturn(dynamicContainerFlowMap);
-    assertThat(flow.getProcessorPath(processorInSubflow), is("/sub_dyn/subprocessors/0"));
-    verify(dynamicProcessorContainer, times(1)).buildInnerPaths();
-
-    flow.getProcessorPath(processorInSubflow);
-    // No new invocation, the dynamic container reference was initialized and removed from the pending dynamic containers list.
-    verify(dynamicProcessorContainer, times(1)).buildInnerPaths();
   }
 
   @Test

@@ -15,16 +15,6 @@
         <httpn:request-connection host="localhost" port="${port}"/>
     </httpn:request-config>
 
-    <spring:bean name="ProcessorPathAssertingProcessor" class="org.mule.test.construct.FlowRefTestCase$ProcessorPathAssertingProcessor" scope="prototype" />
-    <spring:bean name="NonBlockingFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingToQueuedAsyncFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingToQueuedAsyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingToAsyncFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingToAsyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingToSyncFlow1SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-    <spring:bean name="NonBlockingToSyncFlow2SensingProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
-
     <flow name="flow1">
         <flow-ref name="sub-flow" />
         <flow-ref name="sub-flow" />
@@ -77,15 +67,6 @@
             <append-string-transformer message="A" />
             <append-string-transformer message="B" />
         </scatter-gather>
-    </sub-flow>
-
-    <flow name="flow3">
-        <flow-ref name="sub-flow-#[mel:letter]" />
-        <flow-ref name="sub-flow-#[mel:letter]" />
-    </flow>
-
-    <sub-flow name="sub-flow-J">
-        <processor ref="ProcessorPathAssertingProcessor" />
     </sub-flow>
 
     <!-- TODO MULE-10618 -->

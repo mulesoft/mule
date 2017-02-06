@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 
 import java.util.HashMap;
@@ -115,13 +116,13 @@ public class ComponentModelHelper {
   }
 
   public static void addAnnotation(QName annotationKey, Object annotationValue, ComponentModel componentModel) {
-    //TODO MULE-10970 - remove condition once everything is AnnotatedObject.
+    // TODO MULE-10970 - remove condition once everything is AnnotatedObject.
     if (!ComponentModelHelper.isAnnotatedObject(componentModel) && !componentModel.getIdentifier().getName().equals("flow-ref")) {
       return;
     }
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     if (beanDefinition == null) {
-      //This is the case of components that are references
+      // This is the case of components that are references
       return;
     }
     PropertyValue propertyValue =
@@ -152,4 +153,7 @@ public class ComponentModelHelper {
     }
   }
 
+  public static boolean isRouter(ComponentModel componentModel) {
+    return isOfType(componentModel, MessageRouter.class) || isOfType(componentModel, AbstractSelectiveRouter.class);
+  }
 }

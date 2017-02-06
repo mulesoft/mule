@@ -22,7 +22,7 @@ import java.util.List;
  * adding the correct {@link MessageProcessorPathElement}'s to their parent {@link MessageProcessorPathElement}.
  */
 public interface MessageProcessorChain
-    extends Processor, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer,
+    extends Processor, Lifecycle, FlowConstructAware, MuleContextAware,
     MessagingExceptionHandlerAware, AnnotatedObject {
 
   /**

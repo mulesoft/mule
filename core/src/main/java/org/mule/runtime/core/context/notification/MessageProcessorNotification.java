@@ -10,16 +10,13 @@ import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 public class MessageProcessorNotification extends ServerNotification implements SynchronousServerEvent {
@@ -31,7 +28,6 @@ public class MessageProcessorNotification extends ServerNotification implements 
 
   private final transient Processor processor;
   private final transient FlowConstruct flowConstruct;
-  private final String processorPath;
   private final DefaultComponentLocation componentLocation;
 
   static {
@@ -48,12 +44,6 @@ public class MessageProcessorNotification extends ServerNotification implements 
     super(produceEvent(event, flowConstruct), action, flowConstruct.getName());
     this.exceptionThrown = exceptionThrown;
     this.processor = processor;
-
-    if (flowConstruct instanceof MessageProcessorPathResolver) {
-      this.processorPath = ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(processor);
-    } else {
-      this.processorPath = null;
-    }
     this.componentLocation = ((DefaultComponentLocation) ((AnnotatedObject) processor).getAnnotation(LOCATION_KEY));
     this.flowConstruct = flowConstruct;
   }
@@ -68,20 +58,6 @@ public class MessageProcessorNotification extends ServerNotification implements 
 
   public Processor getProcessor() {
     return processor;
-  }
-
-  protected String processorToString() {
-    if (processor == null) {
-      return "";
-    }
-
-    String name;
-    if (processor instanceof NameableObject) {
-      name = String.format("%s '%s'", processor.getClass().getName(), ((NameableObject) processor).getName());
-    } else {
-      name = ObjectUtils.identityToString(processor);
-    }
-    return name;
   }
 
   /**
@@ -109,17 +85,14 @@ public class MessageProcessorNotification extends ServerNotification implements 
     return componentLocation;
   }
 
-  public String getProcessorPath() {
-    return processorPath;
-  }
-
   public FlowConstruct getFlowConstruct() {
     return flowConstruct;
   }
 
   @Override
   public String toString() {
-    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + processorPath + ", resourceId="
+    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + componentLocation.getLocation()
+        + ", resourceId="
         + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
   }
 

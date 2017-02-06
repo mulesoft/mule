@@ -10,16 +10,14 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
@@ -27,7 +25,6 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -142,11 +139,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return singletonList(ownedMessageProcessor);
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement.addChild(this));
   }
 
   public void setMessageProcessors(List<Processor> messageProcessors) throws MuleException {

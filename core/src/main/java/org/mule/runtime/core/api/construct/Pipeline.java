@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.construct;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -22,7 +21,7 @@ import java.util.Map;
  * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
  * {@link MessageSource}
  */
-public interface Pipeline extends FlowConstruct, MessageProcessorContainer, ProcessingDescriptor, MessageProcessorPathResolver {
+public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
 
   void setMessageSource(MessageSource messageSource);
 
