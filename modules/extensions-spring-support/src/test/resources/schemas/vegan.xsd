@@ -604,6 +604,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:attribute type="xs:string" use="required" name="food"></xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="menu"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
