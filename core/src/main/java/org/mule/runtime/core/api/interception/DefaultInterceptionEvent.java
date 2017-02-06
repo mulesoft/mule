@@ -12,6 +12,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.Map;
 import java.util.Optional;
@@ -52,6 +54,13 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
     return interceptedInput.getError();
   }
 
+  /**
+   * @return the context applicable to all events created from the same root {@link Event} from a {@link MessageSource}.
+   */
+  public EventContext getContext() {
+    return interceptedInput.getContext();
+  }
+
   @Override
   public DefaultInterceptionEvent message(Message message) {
     interceptedOutput = interceptedOutput.message(message);
@@ -83,8 +92,8 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
   }
 
   /**
-   * Updates the state of this object, overriding the {@link #interceptedInput} with the result of
-   * {@link #interceptedOutput#build()} and resetting {@link #interceptedOutput}.
+   * Updates the state of this object, overriding the {@code interceptedInput} with the result built from
+   * {@code interceptedOutput} and resetting {@codeinterceptedOutput}.
    *
    * @return {@link Event} with the result.
    */

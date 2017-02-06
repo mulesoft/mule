@@ -6,34 +6,39 @@
  */
 package org.mule.runtime.core.processor.interceptor;
 
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
+import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.Matchers.sameInstance;
+
+import static org.junit.Assert.assertThat;
+
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -60,6 +65,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
+/*
+ * The test methods with 'noMock' suffix exercise the optimized interception path when 'around' is not implemented.
+ * This is needed because Mockito mocks override the methods.
+ */
 public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestCase {
 
   private Flow flow;
@@ -97,6 +106,15 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  public void interceptorAppliedNoMock() throws Exception {
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {};
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(""));
+  }
+
+  @Test
   public void interceptorMutatesEventBefore() throws Exception {
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
 
@@ -120,6 +138,21 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  public void interceptorMutatesEventBeforeNoMock() throws Exception {
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {
+
+      @Override
+      public void before(Map<String, Object> parameters, InterceptionEvent event) {
+        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+      }
+    };
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+  }
+
+  @Test
   public void interceptorMutatesEventAfter() throws Exception {
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
 
@@ -139,6 +172,21 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
     inOrder.verify(processor).process(argThat(hasPayloadValue("")));
     inOrder.verify(interceptor).after(any(), eq(empty()));
+  }
+
+  @Test
+  public void interceptorMutatesEventAfterNoMock() throws Exception {
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {
+
+      @Override
+      public void after(InterceptionEvent event, Optional<Throwable> thrown) {
+        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+      }
+    };
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
   @Test
@@ -218,6 +266,22 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  public void interceptorThrowsExceptionBeforeNoMock() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public void before(Map<String, Object> parameters, InterceptionEvent event) {
+        throw expectedException;
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expectCause(sameInstance(expectedException));
+    process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+  }
+
+  @Test
   public void interceptorThrowsExceptionAfter() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
@@ -240,6 +304,22 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor).after(any(), eq(empty()));
     }
+  }
+
+  @Test
+  public void interceptorThrowsExceptionAfterNoMock() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public void after(InterceptionEvent event, Optional<Throwable> thrown) {
+        throw expectedException;
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expectCause(sameInstance(expectedException));
+    process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
   }
 
   @Test
@@ -861,15 +941,20 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void firstInterceptorDoesntApply() throws Exception {
-    ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {});
+    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
+    startFlowWithInterceptorFactories(new ProcessorInterceptorFactory() {
 
       @Override
-      public boolean intercept(TypedComponentIdentifier identifier, ComponentLocation location) {
+      public boolean intercept(ComponentLocation location) {
         return false;
       }
-    });
-    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
-    startFlowWithInterceptors(interceptor1, interceptor2);
+
+      @Override
+      public ProcessorInterceptor get() {
+        return interceptor1;
+      };
+    }, () -> interceptor2);
 
     Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
@@ -888,14 +973,19 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Test
   public void secondInterceptorDoesntApply() throws Exception {
     ProcessorInterceptor interceptor1 = spy(new ProcessorInterceptor() {});
-    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
+    startFlowWithInterceptorFactories(() -> interceptor1, new ProcessorInterceptorFactory() {
 
       @Override
-      public boolean intercept(TypedComponentIdentifier identifier, ComponentLocation location) {
+      public boolean intercept(ComponentLocation location) {
         return false;
       }
+
+      @Override
+      public ProcessorInterceptor get() {
+        return interceptor2;
+      };
     });
-    startFlowWithInterceptors(interceptor1, interceptor2);
 
     Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
@@ -913,7 +1003,16 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private void startFlowWithInterceptors(ProcessorInterceptor... interceptors) throws Exception {
     for (ProcessorInterceptor interceptionHandler : interceptors) {
-      muleContext.getProcessorInterceptorManager().addInterceptor(interceptionHandler);
+      muleContext.getProcessorInterceptorManager().addInterceptorFactory(() -> interceptionHandler);
+    }
+
+    flow.initialise();
+    flow.start();
+  }
+
+  private void startFlowWithInterceptorFactories(ProcessorInterceptorFactory... interceptorFactories) throws Exception {
+    for (ProcessorInterceptorFactory interceptionHandlerFactory : interceptorFactories) {
+      muleContext.getProcessorInterceptorManager().addInterceptorFactory(interceptionHandlerFactory);
     }
 
     flow.initialise();
@@ -944,7 +1043,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
   }
 
-  public static Map<String, Object> mapArgWithEntry(String key, Object value) {
+  private static Map<String, Object> mapArgWithEntry(String key, Object value) {
     return (Map<String, Object>) argThat(hasEntry(key, value));
   }
 
