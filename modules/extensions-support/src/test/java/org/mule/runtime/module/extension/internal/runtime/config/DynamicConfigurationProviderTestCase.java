@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,15 +35,16 @@ import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,7 +72,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   private ResolverSetResult resolverSetResult;
 
   @Mock
-  private StaticValueResolver<ConnectionProvider> connectionProviderResolver;
+  private ConnectionProviderResolver connectionProviderResolver;
 
   private ExpirationPolicy expirationPolicy;
 
@@ -92,6 +93,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
 
+    when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                                 connectionProviderResolver, expirationPolicy);
@@ -116,6 +118,37 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     }
 
     verify(resolverSet, times(count)).resolve(event);
+  }
+
+  @Test
+  public void resolveCachedWithProviderParams() throws Exception {
+    ResolverSet providerResolverSet = mock(ResolverSet.class);
+    when(connectionProviderResolver.getResolverSet()).thenReturn(Optional.of(providerResolverSet));
+    when(providerResolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
+
+    final int count = 10;
+    HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
+    for (int i = 1; i < count; i++) {
+      assertThat(provider.get(event).getValue(), is(sameInstance(config)));
+    }
+
+    verify(providerResolverSet, times(count)).resolve(event);
+    verify(resolverSet, times(count)).resolve(event);
+  }
+
+  @Test
+  public void resolveProviderParamsDifferentInstance() throws Exception {
+    HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
+    mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
+
+    ResolverSet providerResolverSet = mock(ResolverSet.class);
+    when(connectionProviderResolver.getResolverSet()).thenReturn(Optional.of(providerResolverSet));
+    when(providerResolverSet.resolve(event)).thenReturn(mock(ResolverSetResult.class));
+    assertThat(provider.get(event).getValue(), is(not(sameInstance(config))));
+
+    verify(resolverSet, times(2)).resolve(event);
+    verify(providerResolverSet, times(1)).resolve(event);
+    verify(connectionProviderResolver, times(2)).resolve(event);
   }
 
   @Test

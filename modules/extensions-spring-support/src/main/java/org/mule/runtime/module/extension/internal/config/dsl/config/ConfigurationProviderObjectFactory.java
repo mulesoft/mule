@@ -8,23 +8,23 @@ package org.mule.runtime.module.extension.internal.config.dsl.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
 
   private DynamicConfigPolicy dynamicConfigPolicy;
-  private Optional<ValueResolver<ConnectionProvider>> connectionProviderResolver = empty();
+  private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
   private ConfigurationProvider instance;
   private boolean requiresConnection = false;
 
@@ -71,7 +71,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
     ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(configurationModel);
-    final ValueResolver<ConnectionProvider> connectionProviderResolver = getConnectionProviderResolver();
+    final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
 
     ConfigurationProvider configurationProvider;
     try {
@@ -108,12 +108,12 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     return dynamicConfigPolicy;
   }
 
-  private ValueResolver<ConnectionProvider> getConnectionProviderResolver() {
+  private ConnectionProviderValueResolver getConnectionProviderResolver() {
     return connectionProviderResolver.orElseGet(() -> {
       if (requiresConnection) {
         return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, muleContext);
       }
-      return new StaticValueResolver<>(null);
+      return new StaticConnectionProviderResolver(new StaticValueResolver<>(null));
     });
   }
 
