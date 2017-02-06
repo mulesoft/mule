@@ -48,11 +48,10 @@ public class TypeSafeTransformer {
       try {
         transformer = muleContext.getRegistry().lookupTransformer(valueDataType, expectedDataType);
       } catch (TransformerException e) {
-        throw new MessagingException(createStaticMessage(String.format(
-                                                                       "Expression '%s' was expected to return a value of type '%s' but a '%s' was found instead "
-                                                                           + "and no suitable transformer could be located",
-                                                                       value.toString(), expectedDataType.getType().getName(),
-                                                                       value.getClass().getName())),
+        throw new MessagingException(createStaticMessage(String
+            .format("The value '%s' of type %s could not be transformed to the desired type %s",
+                    value.toString(), expectedDataType.getType().getName(),
+                    value.getClass().getName())),
                                      event, e);
       }
 

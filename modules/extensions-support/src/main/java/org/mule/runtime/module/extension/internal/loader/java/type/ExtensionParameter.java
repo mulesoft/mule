@@ -34,9 +34,6 @@ import java.util.Set;
 public interface ExtensionParameter extends WithType, WithAnnotations, NamedObject, WithAlias, WithOwner {
 
   Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()
-      //      .add(Event.class)
-      //      .add(Message.class)
-      //      .add(InternalMessage.class)
       .add(Error.class)
       .add(SourceCallbackContext.class)
       .add(CompletionCallback.class)
