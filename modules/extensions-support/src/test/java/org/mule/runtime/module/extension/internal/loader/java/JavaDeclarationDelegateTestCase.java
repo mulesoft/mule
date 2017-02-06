@@ -38,6 +38,11 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+import com.google.common.reflect.TypeToken;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -80,7 +85,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.PagedOper
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -95,13 +99,12 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
-
-import com.google.common.reflect.TypeToken;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -112,11 +115,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -213,7 +211,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getAllParameters(), hasSize(31));
+    assertThat(configuration.getAllParameters(), hasSize(30));
     assertParameter(configuration.getAllParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED,
                     null);
   }
@@ -377,7 +375,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getAllParameters();
-    assertThat(parameters, hasSize(30));
+    assertThat(parameters, hasSize(29));
 
     assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -413,7 +411,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, "labAddress", "", toMetadataType(String.class), false, REQUIRED, null);
     assertParameter(parameters, "firstEndevour", "", toMetadataType(String.class), false, NOT_SUPPORTED, null);
     assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
-    assertParameter(parameters, "weaponTypeFunction", "", toMetadataType(WeaponType.class), false, SUPPORTED, null);
     assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED,
                     null);
     assertParameter(parameters, "wildCards", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
@@ -459,7 +456,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(31));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(10));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(8));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
     assertOperation(withOperationsDeclaration, GET_ALL_ENEMIES_OPERATION, "");
@@ -469,8 +466,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, KILL_WITH_RICINS, "");
     assertOperation(extensionDeclaration, KILL_WITH_MULTIPLES_WEAPONS, "");
     assertOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS, "");
-    assertOperation(withOperationsDeclaration, GET_PAYMENT_FROM_EVENT_OPERATION, "");
-    assertOperation(withOperationsDeclaration, GET_PAYMENT_FROM_MESSAGE_OPERATION, "");
     assertOperation(withOperationsDeclaration, DIE, "");
     assertOperation(extensionDeclaration, KILL_MANY, "");
     assertOperation(extensionDeclaration, KILL_ONE, "");
@@ -566,20 +561,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getAllParameters(), hasSize(2));
     assertParameter(operation.getAllParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
     assertParameter(operation.getAllParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
-    assertConnected(operation, false);
-    assertTransactional(operation, false);
-
-    operation = getOperation(withOperationsDeclaration, GET_PAYMENT_FROM_EVENT_OPERATION);
-    assertThat(operation, is(notNullValue()));
-    assertThat(operation.getAllParameters().isEmpty(), is(true));
-    assertConnected(operation, false);
-    assertTransactional(operation, false);
-
-    operation = getOperation(withOperationsDeclaration, GET_PAYMENT_FROM_MESSAGE_OPERATION);
-    assertThat(operation, is(notNullValue()));
-    assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
-    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
-    assertThat(operation.getAllParameters().isEmpty(), is(true));
     assertConnected(operation, false);
     assertTransactional(operation, false);
 

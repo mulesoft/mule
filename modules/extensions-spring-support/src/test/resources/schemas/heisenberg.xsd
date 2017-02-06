@@ -461,7 +461,6 @@
                     <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="weapon"></xs:attribute>
-                    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType" use="optional" name="weaponTypeFunction"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCardWeapons"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="wildCards"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="weaponValueMap"></xs:attribute>
@@ -692,30 +691,6 @@
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPaymentFromEventType" substitutionGroup="heisenberg-empire" name="get-payment-from-event"></xs:element>
-    <xs:complexType name="GetPaymentFromEventType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="GetPaymentFromMessageType" substitutionGroup="heisenberg-empire" name="get-payment-from-message"></xs:element>
-    <xs:complexType name="GetPaymentFromMessageType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
             </xs:extension>
@@ -1508,19 +1483,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:simpleType name="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType">
-        <xs:union>
-            <xs:simpleType>
-                <xs:restriction base="xs:string">
-                    <xs:enumeration value="FIRE_WEAPON"></xs:enumeration>
-                    <xs:enumeration value="MELEE_WEAPON"></xs:enumeration>
-                </xs:restriction>
-            </xs:simpleType>
-            <xs:simpleType>
-                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-            </xs:simpleType>
-        </xs:union>
-    </xs:simpleType>
     <xs:simpleType name="org.mule.test.heisenberg.extension.model.HealthStatusEnumType">
         <xs:union>
             <xs:simpleType>
@@ -1541,6 +1503,19 @@
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="GOATIE"></xs:enumeration>
                     <xs:enumeration value="MUSTACHE"></xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
+    <xs:simpleType name="org.mule.test.heisenberg.extension.model.types.WeaponTypeEnumType">
+        <xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="FIRE_WEAPON"></xs:enumeration>
+                    <xs:enumeration value="MELEE_WEAPON"></xs:enumeration>
                 </xs:restriction>
             </xs:simpleType>
             <xs:simpleType>

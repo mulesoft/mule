@@ -24,7 +24,6 @@
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
                        labAddress="#[mel:'Pollos Hermanos']"
-                       weaponTypeFunction="#[mel:weaponType]"
                        knownAddresses="#[mel:[]]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
@@ -152,7 +151,6 @@
                        recipe="#[mel:app.registry.recipes]"
                        candidateDoors="#[mel:app.registry.candidateDoors]"
                        labAddress="#[mel:'Pollos Hermanos']"
-                       weaponTypeFunction="#[mel:weaponType]"
                        monthlyIncomes="#[mel:[12000L, 500L]]"
                        deathsBySeasons="#[mel:['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
                        labeledRicin="#[mel:app.registry.labeledRicins]"

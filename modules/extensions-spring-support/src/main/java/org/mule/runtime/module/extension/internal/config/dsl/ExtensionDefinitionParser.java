@@ -83,17 +83,14 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.loader.java.FunctionParameterTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticFunctionValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeStaticValueResolver;
@@ -562,9 +559,7 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
                                                         Set<ModelProperty> modelProperties, Class<Object> expectedClass) {
     ValueResolver resolver;
-    if (isExpressionFunction(modelProperties)) {
-      resolver = new ExpressionFunctionValueResolver<>(value, expectedType, muleContext);
-    } else if (isParameterResolver(modelProperties, expectedType)) {
+    if (isParameterResolver(modelProperties, expectedType)) {
       resolver = new ExpressionBasedParameterResolverValueResolver(value, expectedType, muleContext);
     } else if (isTypedValue(modelProperties, expectedType)) {
       resolver = new ExpressionTypedValueValueResolver(value, expectedClass, muleContext);
@@ -585,9 +580,7 @@ public abstract class ExtensionDefinitionParser {
         ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
         : new StaticValueResolver<>(defaultValue);
 
-    if (isExpressionFunction(modelProperties)) {
-      resolver = new StaticFunctionValueResolverWrapper(resolver);
-    } else if (isParameterResolver(modelProperties, expectedType)) {
+    if (isParameterResolver(modelProperties, expectedType)) {
       resolver = new ParameterResolverValueResolverWrapper(resolver);
     } else if (isTypedValue(modelProperties, expectedType)) {
       resolver = new TypedValueValueResolverWrapper(resolver);
@@ -599,7 +592,6 @@ public abstract class ExtensionDefinitionParser {
                                                          final Object value,
                                                          final Object defaultValue, final boolean acceptsReferences,
                                                          final Class<Object> expectedClass) {
-    ValueResolver resolver;
     final Reference<ValueResolver> resolverValueHolder = new Reference<>();
     expectedType.accept(new BasicTypeMetadataVisitor() {
 
@@ -836,10 +828,6 @@ public abstract class ExtensionDefinitionParser {
         .withTypeDefinition(fromType(NestedProcessorListValueResolver.class))
         .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
         .build());
-  }
-
-  private boolean isExpressionFunction(Set<ModelProperty> modelProperties) {
-    return modelProperties.stream().anyMatch(property -> property instanceof FunctionParameterTypeModelProperty);
   }
 
   private boolean isParameterResolver(Set<ModelProperty> modelProperties, MetadataType expectedType) {

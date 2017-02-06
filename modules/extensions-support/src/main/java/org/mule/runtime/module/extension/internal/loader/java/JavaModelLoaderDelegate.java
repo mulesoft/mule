@@ -26,6 +26,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTyp
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -68,7 +69,6 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.FunctionParameterTypeContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
@@ -89,8 +89,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotatio
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -130,14 +128,13 @@ public final class JavaModelLoaderDelegate {
     typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(extensionType.getClassLoader());
 
     fieldParameterContributors =
-        ImmutableList.of(new InfrastructureFieldContributor(), new FunctionParameterTypeContributor(typeLoader),
+        ImmutableList.of(new InfrastructureFieldContributor(),
                          new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class,
                                                                new TypedValueTypeModelProperty()),
                          new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class,
                                                                new ParameterResolverTypeModelProperty()));
 
     methodParameterContributors = ImmutableList.of(
-                                                   new FunctionParameterTypeContributor(typeLoader),
                                                    new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class,
                                                                                          new TypedValueTypeModelProperty()),
                                                    new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class,
