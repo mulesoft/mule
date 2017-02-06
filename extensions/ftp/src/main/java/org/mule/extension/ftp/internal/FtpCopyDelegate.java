@@ -21,7 +21,7 @@ public interface FtpCopyDelegate {
 
   /**
    * Performs the copy operation
-   *  @param config the config which is parameterizing this operation
+   * @param config the config which is parameterizing this operation
    * @param source the attributes which describes the source file
    * @param targetPath the target path
    * @param overwrite whether to overwrite the target file if it already exists

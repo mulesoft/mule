@@ -13,8 +13,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
- * An extended {@link StaticValueResolver} which always returns the same value but if it is required
- * it will be converted to the required type using the mule transformation service.
+ * {@link ValueResolver} implementation which always returns the same value, but if it is required,
+ * the value will be converted to the required type using the mule transformers.
  *
  * @param <T> Type of the value to resolver
  * @since 4.0
@@ -59,7 +59,7 @@ public class TypeSafeStaticValueResolver<T> implements ValueResolver<T> {
 
   /**
    * {@link Resolver} implementation which caches the value of the resolution of the given {@param resolver} so
-   * the resolution logic is executed only one time
+   * the resolution logic is executed once.
    */
   private class CachedResolver implements Resolver<T> {
 
