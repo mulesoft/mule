@@ -9,6 +9,7 @@ package org.mule.runtime.module.http.internal.listener.grizzly;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandler<WriteResult> {
 
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final Logger logger = getLogger(BaseResponseCompletionHandler.class);
 
   protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse) {
     final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
