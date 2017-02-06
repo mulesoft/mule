@@ -60,7 +60,6 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.MultiReactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
@@ -114,7 +113,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     return Arrays.asList(new Object[][] {
         {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
-        {new MultiReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorProcessingStrategyFactory(), BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
         {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
@@ -125,7 +123,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new LegacyAsynchronousProcessingStrategyFactory(), BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
-        {new MultiReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
