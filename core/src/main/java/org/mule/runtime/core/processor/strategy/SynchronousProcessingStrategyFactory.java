@@ -49,7 +49,7 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
 
         @Override
         public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-          return new SinkPerThreadSink(() -> new DirectSink(function, event -> {
+          return new PerThreadSink(() -> new DirectSink(function, event -> {
           }));
         }
       };
@@ -59,19 +59,19 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
     return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 
-  static class SinkPerThreadSink implements Sink, Disposable {
+  static class PerThreadSink implements Sink, Disposable {
 
     private Supplier<Sink> sinkSupplier;
     private Cache<Thread, Sink> sinkCache =
         newBuilder().weakValues().removalListener(notification -> disposeIfNeeded(notification.getValue(), NOP_LOGGER)).build();
 
     /**
-     * Create a {@link org.mule.runtime.core.processor.strategy.sink.SinkPerThreadSink} that will create and use a given
+     * Create a {@link PerThreadSink} that will create and use a given
      * {@link Sink} for each distinct caller {@link Thread}.
      *
      * @param sinkSupplier {@link Supplier} for the {@link Sink} that sould be used for each thread.
      */
-    public SinkPerThreadSink(Supplier<Sink> sinkSupplier) {
+    public PerThreadSink(Supplier<Sink> sinkSupplier) {
       this.sinkSupplier = sinkSupplier;
     }
 
