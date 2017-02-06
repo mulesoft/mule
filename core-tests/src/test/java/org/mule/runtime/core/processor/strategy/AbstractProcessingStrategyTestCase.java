@@ -9,8 +9,6 @@ package org.mule.runtime.core.processor.strategy;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -81,6 +79,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   protected Scheduler cpuLight;
   protected Scheduler blocking;
   protected Scheduler cpuIntensive;
+  protected Scheduler custom;
   private ExecutorService asyncExecutor;
 
   @Rule
@@ -95,6 +94,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     cpuLight = new TestScheduler(3, CPU_LIGHT);
     blocking = new TestScheduler(3, IO);
     cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
+    custom = new TestScheduler(10, CPU_LIGHT);
     asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flow = builder("test", muleContext)
@@ -122,7 +122,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleCpuLightConcurrent() throws Exception {
-    internalSingleCpuLightConcurrent(true);
+    internalSingleCpuLightConcurrent(false);
   }
 
   protected void internalSingleCpuLightConcurrent(boolean blocks) throws MuleException, InterruptedException {

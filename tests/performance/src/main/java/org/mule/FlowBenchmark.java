@@ -24,11 +24,15 @@ import org.mule.tck.TriggerableMessageSource;
 import java.util.concurrent.CountDownLatch;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
 import reactor.core.publisher.Mono;
 
+@Warmup(iterations = 10)
+@Measurement(iterations = 10)
 public class FlowBenchmark extends AbstractBenchmark {
 
   public static final String TEST_PAYLOAD = "test";
@@ -44,7 +48,8 @@ public class FlowBenchmark extends AbstractBenchmark {
       "org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.MultiReactorProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory"
+      "org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory",
+      "org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory"
   })
   public String processingStrategyFactory;
 

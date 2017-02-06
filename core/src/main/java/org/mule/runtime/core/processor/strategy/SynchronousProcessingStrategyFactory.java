@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  */
 public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static ProcessingStrategy SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE =
+  public static final ProcessingStrategy SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE =
       new AbstractStreamPerEventProcessingStrategyFactory() {
 
         @Override
