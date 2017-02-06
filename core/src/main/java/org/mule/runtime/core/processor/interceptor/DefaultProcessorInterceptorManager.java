@@ -30,10 +30,10 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorP
   }
 
   @Override
-  public void addInterceptorFactory(ProcessorInterceptorFactory interceptor) {
-    checkNotNull(interceptor, "interceptor cannot be null");
+  public void addInterceptorFactory(ProcessorInterceptorFactory interceptorFactory) {
+    checkNotNull(interceptorFactory, "interceptorFactory cannot be null");
 
-    this.interceptorFactories.add(interceptor);
+    this.interceptorFactories.add(interceptorFactory);
   }
 
   @Override
