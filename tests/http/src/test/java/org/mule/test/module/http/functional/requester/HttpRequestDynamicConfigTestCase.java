@@ -11,19 +11,28 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpHeaders.Names.HOST;
-import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.HOST;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
+import org.mule.extension.http.api.error.HttpError;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
 
+import java.net.ConnectException;
+
+import org.junit.Rule;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(HTTP_CONNECTOR_FEATURE)
 public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public ExpectedError expectedError = none();
 
   @Override
   protected String getConfigFile() {
@@ -94,6 +103,36 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
     assertThat(uri, is("/testPath"));
     assertThat(body, is(TEST_PAYLOAD));
     assertThat(headers.keys(), hasItem(TRANSFER_ENCODING));
+  }
+
+  @Test
+  public void requestWithDynamicConnectionParamUsesDifferentConfigs() throws Exception {
+    Event result = flowRunner("client1")
+        .withVariable("basePath", "api/v1")
+        .withVariable("follow", true)
+        .withVariable("send", "AUTO")
+        .withVariable("host", "localhost")
+        .withVariable("path", "clients")
+        .withVariable("method", GET)
+        .withPayload(TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(GET.toString()));
+    assertThat(uri, is("/api/v1/clients"));
+    assertThat(body, is(""));
+    assertThat(headers.keys(), hasItem(HOST));
+    assertThat(headers.get(HOST), hasItem(containsString("localhost:")));
+
+    expectedError.expectError("HTTPN", HttpError.CONNECTIVITY, ConnectException.class, "Connection refused");
+    flowRunner("client1")
+        .withVariable("basePath", "api/v1")
+        .withVariable("follow", true)
+        .withVariable("send", "AUTO")
+        .withVariable("host", "1.1.1.1")
+        .withVariable("path", "clients")
+        .withVariable("method", GET)
+        .withPayload(TEST_MESSAGE)
+        .run();
   }
 
 }

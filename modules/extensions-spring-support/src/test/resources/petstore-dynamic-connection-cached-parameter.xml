@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <petstore:config name="petstore" cashierName="jim">
+        <petstore:connection username="#[username]" password="#[password]" openingDate="#[date]"/>
+        <petstore:pets>
+            <petstore:pet value="Lassie" />
+            <petstore:pet value="Sapo Pepe" />
+            <petstore:pet value="My mother's parrot" />
+        </petstore:pets>
+    </petstore:config>
+    
+    <flow name="getClient">
+        <petstore:get-client config-ref="petstore"/>
+    </flow>
+</mule>

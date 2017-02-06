@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 
 /**
  * Provides a value which is dependant on a {@link Event}
@@ -32,5 +32,4 @@ public interface ValueResolver<T> {
    * @return whether this resolve is dynamic
    */
   boolean isDynamic();
-
 }

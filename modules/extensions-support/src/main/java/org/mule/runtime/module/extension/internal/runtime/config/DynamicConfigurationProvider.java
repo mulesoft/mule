@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,12 +22,14 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -60,10 +61,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private final ConfigurationInstanceFactory configurationInstanceFactory;
   private final ResolverSet resolverSet;
-  private final ValueResolver<ConnectionProvider> connectionProviderResolver;
+  private final ConnectionProviderValueResolver connectionProviderResolver;
   private final ExpirationPolicy expirationPolicy;
 
-  private final Map<ResolverSetResult, ConfigurationInstance> cache = new ConcurrentHashMap<>();
+  private final Map<Pair<ResolverSetResult, ResolverSetResult>, ConfigurationInstance> cache = new ConcurrentHashMap<>();
   private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
@@ -82,7 +83,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ExtensionModel extensionModel,
                                       ConfigurationModel configurationModel,
                                       ResolverSet resolverSet,
-                                      ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                      ConnectionProviderValueResolver connectionProviderResolver,
                                       ExpirationPolicy expirationPolicy) {
     super(name, extensionModel, configurationModel);
     configurationInstanceFactory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet);
@@ -102,11 +103,16 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public ConfigurationInstance get(Object event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
       ResolverSetResult result = resolverSet.resolve((Event) event);
-      return getConfiguration(result, (Event) event);
+      ResolverSetResult providerResult = null;
+      if (connectionProviderResolver.getResolverSet().isPresent()) {
+        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve((Event) event);
+      }
+      return getConfiguration(new Pair<>(result, providerResult), (Event) event);
     });
   }
 
-  private ConfigurationInstance getConfiguration(ResolverSetResult resolverSetResult, Event event) throws Exception {
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, Event event)
+      throws Exception {
     ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
@@ -125,7 +131,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       // re-check in case some other thread beat us to it...
       configuration = cache.get(resolverSetResult);
       if (configuration == null) {
-        configuration = createConfiguration(resolverSetResult, event);
+        configuration = createConfiguration(resolverSetResult.getFirst(), event);
         cache.put(resolverSetResult, configuration);
       }
 
