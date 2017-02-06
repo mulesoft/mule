@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  */
 public class SynchronousStreamProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static ProcessingStrategy SYNCHRONOUS_STREAM_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
+  public static final ProcessingStrategy SYNCHRONOUS_STREAM_PROCESSING_STRATEGY_INSTANCE = new AbstractProcessingStrategy() {
 
     @Override
     public boolean isSynchronous() {

@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 
 /**
- * Creates {@link ReactorProcessingStrategy} instances. This processing strategy demultiplexes incoming messages using the
- * cpu-light scheduler.
+ * Creates {@link RingBufferProcessingStrategy} instance that implements a modified reactor pattern by de-multiplexing incoming
+ * messages onto {@code n} event-loop's, defined via the {@code subscriberCount} configuration using a ring-buffer.
  *
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
@@ -24,11 +22,12 @@ public class MultiReactorProcessingStrategyFactory extends ReactorProcessingStra
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(config().withName(schedulersNamePrefix + ".event-loop")),
-                                         scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                     MILLISECONDS),
-                                         muleContext);
+    return new RingBufferProcessingStrategy(() -> muleContext.getSchedulerService()
+        .customScheduler(SchedulerConfig.config().withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
+            .withMaxConcurrentTasks(getSubscriberCount() + 1)),
+                                            getBufferSize(),
+                                            getSubscriberCount(),
+                                            getWaitStrategy(),
+                                            muleContext);
   }
-
 }

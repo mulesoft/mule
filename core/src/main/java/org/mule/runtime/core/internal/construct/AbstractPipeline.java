@@ -9,10 +9,13 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory.LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
@@ -258,10 +261,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher)
-              .doOnNext(assertStarted())
-              .doOnNext(event -> sink.accept(event))
-              .flatMap(event -> Mono.from(event.getContext()));
+          if (processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE) {
+            return from(publisher).handle(nullSafeMap(checkedFunction(request -> pipeline.process(request))));
+          } else {
+            return from(publisher)
+                .doOnNext(assertStarted())
+                .doOnNext(event -> sink.accept(event))
+                .flatMap(event -> Mono.from(event.getContext()));
+          }
         }
       });
     }
@@ -452,7 +459,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         (processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory
             || processingStrategyFactory instanceof LegacyDefaultFlowProcessingStrategyFactory
             || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory))
-        || processingStrategyFactory instanceof LegacySynchronousProcessingStrategyFactory;
+        || processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 
   @Override
