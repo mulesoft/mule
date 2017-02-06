@@ -100,7 +100,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    */
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
     String resolveProcessorRepresentation =
-        resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getProcessorPath(),
+        resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getComponentLocation().getLocation(),
                                        notification.getProcessor());
     if (notification.getSource().getContext().getProcessorsTrace() instanceof DefaultProcessorsTrace) {
       ((DefaultProcessorsTrace) notification.getSource().getContext().getProcessorsTrace())

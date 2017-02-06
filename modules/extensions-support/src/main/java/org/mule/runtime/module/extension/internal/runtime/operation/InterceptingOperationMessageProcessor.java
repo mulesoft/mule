@@ -11,22 +11,16 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -34,7 +28,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -45,7 +38,7 @@ import reactor.core.publisher.Mono;
  * @since 4.0
  */
 public class InterceptingOperationMessageProcessor extends OperationMessageProcessor
-    implements InterceptingMessageProcessor, MessageProcessorContainer {
+    implements InterceptingMessageProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InterceptingOperationMessageProcessor.class);
 
@@ -188,16 +181,4 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
     next = listener;
   }
 
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    if (next instanceof InternalMessageProcessor) {
-      return;
-    }
-    if (next instanceof MessageProcessorChain) {
-      NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(),
-                                                        pathElement.getParent());
-    } else if (next != null) {
-      NotificationUtils.addMessageProcessorPathElements(next, pathElement.getParent());
-    }
-  }
 }

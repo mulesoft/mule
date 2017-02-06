@@ -8,12 +8,10 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_SOURCE_XML_KEY;
-
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
@@ -39,7 +37,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
 
     contextInfo.put(INFO_LOCATION_KEY,
                     resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
-                                                   getProcessorPath(event, lastProcessed, flowConstruct), lastProcessed));
+                                                   getProcessorPath(lastProcessed), lastProcessed));
     if (lastProcessed instanceof AnnotatedObject) {
       String sourceXML = getSourceXML((AnnotatedObject) lastProcessed);
       if (sourceXML != null) {
@@ -50,9 +48,9 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
     return contextInfo;
   }
 
-  protected String getProcessorPath(Event event, Processor lastProcessed, FlowConstruct flowConstruct) {
-    if (flowConstruct instanceof MessageProcessorPathResolver) {
-      return ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(lastProcessed);
+  protected String getProcessorPath(Processor lastProcessed) {
+    if (lastProcessed instanceof AnnotatedObject && ((AnnotatedObject) lastProcessed).getLocation() != null) {
+      return ((AnnotatedObject) lastProcessed).getLocation().getLocation();
     } else {
       return lastProcessed.toString();
     }

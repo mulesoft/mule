@@ -20,14 +20,12 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 
 /**
  * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can be injected with the {@link FlowConstruct}.
  */
 public class FlowConfiguringMessageProcessor extends AbstractAnnotatedObject
-    implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer {
+    implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor {
 
   private MessageProcessorBuilder builder;
   private Processor messageProcessor;
@@ -100,12 +98,4 @@ public class FlowConfiguringMessageProcessor extends AbstractAnnotatedObject
     return builder;
   }
 
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    pathElement = pathElement.addChild(getWrappedMessageProcessor());
-    if (getWrappedMessageProcessor() instanceof MessageProcessorContainer) {
-      ((MessageProcessorContainer) getWrappedMessageProcessor())
-          .addMessageProcessorPathElements(pathElement.addChild(getWrappedMessageProcessor()));
-    }
-  }
 }

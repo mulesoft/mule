@@ -11,21 +11,19 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
-import static org.mule.runtime.core.config.i18n.CoreMessages.noEndpointsForRouter;
-import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.AggregationContext;
@@ -33,7 +31,6 @@ import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +40,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -204,14 +200,6 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   public void setRoutes(List<Processor> routes) {
     this.routes = routes;
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    pathElement = pathElement.addChild(this);
-    for (Processor route : routeChains) {
-      NotificationUtils.addMessageProcessorPathElements(route, pathElement);
-    }
   }
 
 }

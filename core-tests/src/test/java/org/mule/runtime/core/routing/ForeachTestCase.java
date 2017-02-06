@@ -8,18 +8,10 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -197,28 +189,6 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
 
     nestedForeach.process(eventBuilder().message(InternalMessage.of(iterable.iterator())).build());
     assertNestedProcessedMessages();
-  }
-
-  @Test
-  public void addProcessorPathElementsBeforeInit() throws MuleException {
-    Foreach foreachMp = new Foreach();
-    foreachMp.setMuleContext(muleContext);
-    foreachMp.setFlowConstruct(mock(DefaultFlowBuilder.DefaultFlow.class));
-    List<Processor> processors = getSimpleMessageProcessors();
-    foreachMp.setMessageProcessors(processors);
-
-    MessageProcessorPathElement parentElement = mock(MessageProcessorPathElement.class);
-    MessageProcessorPathElement foreachElement = mock(MessageProcessorPathElement.class);
-    when(parentElement.addChild(any(Processor.class))).thenReturn(foreachElement);
-    foreachMp.addMessageProcessorPathElements(parentElement);
-
-    assertAddedPathElements(processors, foreachElement);
-  }
-
-  protected void assertAddedPathElements(List<Processor> processors, MessageProcessorPathElement mpPathElement) {
-    verify(mpPathElement, times(processors.size())).addChild(any(Processor.class));
-    verify(mpPathElement).addChild(processors.get(0));
-    verify(mpPathElement).addChild(processors.get(1));
   }
 
   private void assertSimpleProcessedMessages() {

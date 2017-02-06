@@ -11,16 +11,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -44,12 +41,6 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
                                  List<Processor> processorsForLifecycle) {
       super(name, head, processors, processorsForLifecycle);
       this.subFlowName = name;
-    }
-
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      MessageProcessorPathElement subprocessors = pathElement.addChild(name).addChild("subprocessors");
-      NotificationUtils.addMessageProcessorPathElements(processors, subprocessors);
     }
 
     @Override

@@ -13,15 +13,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.util.NotificationUtils;
-import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -77,7 +75,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
    * Generates message processor for a specific set of parameters & properties to be added in a new event.
    */
   static class ModuleOperationProcessorChain extends ExplicitMessageProcessorChain
-      implements Processor, MessageProcessorContainer {
+      implements Processor {
 
     private Map<String, String> properties;
     private Map<String, String> parameters;
@@ -94,12 +92,6 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       this.parameters = parameters;
       this.returnsVoid = returnsVoid;
       this.expressionManager = expressionManager;
-    }
-
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      MessageProcessorPathElement subprocessors = pathElement.addChild(name).addChild("subprocessorsModuleOperations");
-      NotificationUtils.addMessageProcessorPathElements(processors, subprocessors);
     }
 
     /**

@@ -333,7 +333,6 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
                                                                     String processorPath) {
     MessageProcessorNotification processorNotification = mock(MessageProcessorNotification.class);
     when(processorNotification.getProcessor()).thenReturn(processor);
-    when(processorNotification.getProcessorPath()).thenReturn(processorPath);
     when(processorNotification.getSource()).thenReturn(event);
     return processorNotification;
   }
