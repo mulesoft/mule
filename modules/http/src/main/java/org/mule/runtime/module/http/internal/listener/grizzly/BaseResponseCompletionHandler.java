@@ -20,11 +20,10 @@ import org.glassfish.grizzly.WriteResult;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandler<WriteResult> {
 
-  private static final Logger logger = getLogger(BaseResponseCompletionHandler.class);
+  private static final Logger LOGGER = getLogger(BaseResponseCompletionHandler.class);
 
   protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse) {
     final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(sourceRequest)
@@ -51,13 +50,13 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
 
   @Override
   public void cancelled() {
-    logger.warn("HTTP response sending task was cancelled");
+    LOGGER.warn("HTTP response sending task was cancelled");
   }
 
   @Override
   public void failed(Throwable throwable) {
-    if (logger.isWarnEnabled()) {
-      logger.warn(String.format("HTTP response sending task failed with error: %s", throwable.getMessage()));
+    if (LOGGER.isWarnEnabled()) {
+      LOGGER.warn(String.format("HTTP response sending task failed with error: %s", throwable.getMessage()));
     }
   }
 
