@@ -14,7 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.runtime.core.processor.strategy.AbstractSchedulingProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
+import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -38,8 +41,8 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new WorkQueueProcessingStrategy(() -> blocking, scheduler -> {
-    }, muleContext);
+    return new WorkQueueProcessingStrategy(() -> blocking, 2, scheduler -> {
+    }, () -> custom, DEFAULT_BUFFER_SIZE, DEFAULT_SUBSCRIBER_COUNT, DEFAULT_WAIT_STRATEGY, muleContext);
   }
 
   @Override

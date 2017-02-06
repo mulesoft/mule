@@ -7,12 +7,9 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
@@ -22,6 +19,7 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.RingBufferProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -31,18 +29,16 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Processing Strategies")
 @Stories("MultiReactor Processing Strategy")
-public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
+public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public MultiReactorProcessingStrategyTestCase(Mode mode) {
+  public ReactorProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new AbstractRingBufferProcessingStrategyFactory.RingBufferProcessingStrategy(() -> custom, DEFAULT_BUFFER_SIZE, 10,
-                                                                                        DEFAULT_WAIT_STRATEGY,
-                                                                                        muleContext);
-
+    return new RingBufferProcessingStrategy(() -> custom, DEFAULT_BUFFER_SIZE, 1, DEFAULT_WAIT_STRATEGY,
+                                            muleContext);
   }
 
   @Override
@@ -58,13 +54,8 @@ public class MultiReactorProcessingStrategyTestCase extends AbstractProcessingSt
       + " cpu light threads.  This is why this strategy is called 'MultiReactor' and not 'Reactor`.  MULE-11132 is needed for "
       + "true reactor behaviour.")
   public void singleCpuLightConcurrent() throws Exception {
-    super.singleCpuLightConcurrent();
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(2)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), allOf(
-                                                                                          greaterThanOrEqualTo(1l),
-                                                                                          lessThanOrEqualTo(2l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    super.internalSingleCpuLightConcurrent(true);
+    assertEverythingOnEventLoop();
   }
 
   @Override

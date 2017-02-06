@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory.LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
@@ -452,7 +453,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         (processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory
             || processingStrategyFactory instanceof LegacyDefaultFlowProcessingStrategyFactory
             || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory))
-        || processingStrategyFactory instanceof LegacySynchronousProcessingStrategyFactory;
+        || processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
   }
 
   @Override

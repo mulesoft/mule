@@ -9,11 +9,8 @@ package org.mule.runtime.core.processor.strategy;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Sink;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
