@@ -14,7 +14,6 @@ import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.runtime.core.api.Event;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,8 +37,8 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
-                   boolean createParentDirectories, Event event) {
-    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event, new SftpCopyDelegate(this, fileSystem));
+                   boolean createParentDirectories) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, new SftpCopyDelegate(this, fileSystem));
   }
 
   private class SftpCopyDelegate extends AbstractFtpCopyDelegate {
@@ -50,7 +49,7 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand {
 
     @Override
     protected void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite,
-                                 FtpFileSystem writerConnection, Event event) {
+                                 FtpFileSystem writerConnection) {
       for (FileAttributes fileAttributes : client.list(sourcePath.toString())) {
         if (isVirtualDirectory(fileAttributes.getName())) {
           continue;
@@ -58,9 +57,9 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand {
 
         if (fileAttributes.isDirectory()) {
           Path targetPath = target.resolve(fileAttributes.getName());
-          copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection, event);
+          copyDirectory(config, Paths.get(fileAttributes.getPath()), targetPath, overwrite, writerConnection);
         } else {
-          copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection, event);
+          copyFile(config, fileAttributes, target.resolve(fileAttributes.getName()), overwrite, writerConnection);
         }
       }
     }

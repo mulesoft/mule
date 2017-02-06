@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -23,13 +22,15 @@ import org.mule.runtime.core.api.MuleContext;
  * @param <T>
  * @since 4.0
  */
-public class ExpressionTypedValueValueResolver<T> extends TypeSafeExpressionValueResolver<TypedValue<T>> {
+public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolver<TypedValue<T>> {
 
-  private final Class<Object> expectedClass;
+  private final Class<T> expectedClass;
+  private TypeSafeTransformer typeSafeTransformer;
 
-  public ExpressionTypedValueValueResolver(String expression, Class<Object> expectedClass, MuleContext muleContext) {
-    super(expression, expectedClass, muleContext);
+  public ExpressionTypedValueValueResolver(String expression, Class<T> expectedClass, MuleContext muleContext) {
+    super(expression, muleContext);
     this.expectedClass = expectedClass;
+    this.typeSafeTransformer = new TypeSafeTransformer(muleContext);
   }
 
   @Override
@@ -42,7 +43,9 @@ public class ExpressionTypedValueValueResolver<T> extends TypeSafeExpressionValu
     } else {
       DataType expectedDataType =
           DataType.builder().type(expectedClass).mediaType(typedValue.getDataType().getMediaType()).build();
-      return new TypedValue<>((T) transform(typedValue, expectedDataType, event), expectedDataType);
+      return new TypedValue<>((T) typeSafeTransformer.transform(typedValue.getValue(), typedValue.getDataType(), expectedDataType,
+                                                                event),
+                              expectedDataType);
     }
   }
 }

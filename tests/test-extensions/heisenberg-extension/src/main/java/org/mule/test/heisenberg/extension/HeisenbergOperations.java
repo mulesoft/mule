@@ -11,9 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
@@ -50,14 +48,13 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
-import java.math.BigDecimal;
+import javax.inject.Inject;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 
 public class HeisenbergOperations implements Disposable {
 
@@ -162,19 +159,9 @@ public class HeisenbergOperations implements Disposable {
     return extensionManager;
   }
 
-  public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, Event event) {
-    Long payment = (Long) event.getMessage().getPayload().getValue();
-    config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
-  }
-
   public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting,
                       @ParameterGroup(name = "Personal Info") PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
-  }
-
-  public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, Message message) {
-    Long payment = (Long) message.getPayload().getValue();
-    config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
   public BarberPreferences getBarberPreferences(@UseConfig HeisenbergExtension config) {

@@ -59,11 +59,11 @@
 
 
     <flow name="ssl-send-and-receive-global-tls">
-        <sockets:send config-ref="ssl-request-global-tls" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="ssl-request-global-tls"/>
     </flow>
 
     <flow name="ssl-send-and-receive">
-        <sockets:send config-ref="ssl-request" hasResponse="true"/>
+        <sockets:send-and-receive config-ref="ssl-request"/>
     </flow>
 
     <flow name="ssl-listen-global-tls">

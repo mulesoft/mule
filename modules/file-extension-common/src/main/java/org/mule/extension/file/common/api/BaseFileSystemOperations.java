@@ -15,7 +15,6 @@ import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -24,12 +23,11 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
-
-import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Basic set of operations and templates for extensions which perform operations over a generic file system
@@ -136,11 +134,10 @@ public abstract class BaseFileSystemOperations {
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param lock                    whether or not to lock the file. Defaults to false
    * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  protected void doWrite(FileConnectorConfig config, FileSystem fileSystem, String path, Object content, String encoding,
-                         boolean createParentDirectories, boolean lock, FileWriteMode mode, Event event) {
+  protected void doWrite(FileConnectorConfig config, FileSystem fileSystem, String path, InputStream content, String encoding,
+                         boolean createParentDirectories, boolean lock, FileWriteMode mode) {
     if (content == null) {
       throw new IllegalContentException("Cannot write a null content");
     }
@@ -152,7 +149,7 @@ public abstract class BaseFileSystemOperations {
       encoding = config.getDefaultWriteEncoding();
     }
 
-    fileSystem.write(path, content, mode, event, lock, createParentDirectories, encoding);
+    fileSystem.write(path, content, mode, lock, createParentDirectories, encoding);
   }
 
   /**
@@ -183,15 +180,14 @@ public abstract class BaseFileSystemOperations {
    * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param event                   the {@link Event} which triggered this operation
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   protected void doCopy(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
-                        String targetPath, boolean createParentDirectories, boolean overwrite, Event event) {
+                        String targetPath, boolean createParentDirectories, boolean overwrite) {
     fileSystem.changeToBaseDir();
     validatePath(targetPath, "target path");
     validatePath(sourcePath, "source path");
-    fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event);
+    fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories);
   }
 
   /**
@@ -225,7 +221,7 @@ public abstract class BaseFileSystemOperations {
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   protected void doMove(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
-                        String targetPath, boolean createParentDirectories, boolean overwrite, Event event) {
+                        String targetPath, boolean createParentDirectories, boolean overwrite) {
     fileSystem.changeToBaseDir();
     validatePath(targetPath, "target path");
     validatePath(sourcePath, "source path");
@@ -244,7 +240,7 @@ public abstract class BaseFileSystemOperations {
    * @param path       the path to the file to be deleted
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
-  protected void doDelete(FileSystem fileSystem, @Optional String path, Event event) {
+  protected void doDelete(FileSystem fileSystem, @Optional String path) {
     fileSystem.changeToBaseDir();
     fileSystem.delete(path);
   }
@@ -259,14 +255,13 @@ public abstract class BaseFileSystemOperations {
    * <p>
    * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will be thrown if this
    * precondition is not honored.
-   *
-   * @param fileSystem a reference to the host {@link FileSystem}
+   *  @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be renamed
    * @param to         the file's new name
    * @param overwrite  whether or not overwrite the file if the target destination already exists.
    */
   protected void doRename(@Connection FileSystem fileSystem, @Optional String path,
-                          @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
+                          @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite) {
     if (get(to).getNameCount() != 1) {
       throw new IllegalPathException(
                                      format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",

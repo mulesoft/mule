@@ -25,6 +25,10 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -60,11 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -202,18 +201,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void operationWithTransformedParameter() throws Exception {
     doTestExpressionEnemy("0");
-  }
-
-  @Test
-  public void operationWithInjectedEvent() throws Exception {
-    flowRunner("collectFromEvent").withPayload(Long.valueOf(PAYMENT)).run();
-    assertThat(getConfig(HEISENBERG).getMoney(), is(MONEY.add(BigDecimal.valueOf(PAYMENT))));
-  }
-
-  @Test
-  public void operationWithInjectedMessage() throws Exception {
-    flowRunner("collectFromMessage").withPayload(Long.valueOf(PAYMENT)).run();
-    assertThat(getConfig(HEISENBERG).getMoney(), is(MONEY.add(BigDecimal.valueOf(PAYMENT))));
   }
 
   @Test

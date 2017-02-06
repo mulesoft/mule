@@ -15,7 +15,6 @@ import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.core.api.Event;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,15 +45,13 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
 
   /**
    * Performs a recursive copy
-   *
-   * @param config the config which is parameterizing this operation
+   *  @param config the config which is parameterizing this operation
    * @param source the {@link FileAttributes} for the file to be copied
    * @param targetPath the {@link Path} to the target destination
    * @param overwrite whether to overwrite existing target paths
-   * @param event the {@link Event} which triggered this operation
    */
   @Override
-  public void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite, Event event) {
+  public void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite) {
     ConnectionHandler<FtpFileSystem> writerConnectionHandler;
     final FtpFileSystem writerConnection;
     try {
@@ -67,9 +64,9 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
     }
     try {
       if (source.isDirectory()) {
-        copyDirectory(config, Paths.get(source.getPath()), targetPath, overwrite, writerConnection, event);
+        copyDirectory(config, Paths.get(source.getPath()), targetPath, overwrite, writerConnection);
       } else {
-        copyFile(config, source, targetPath, overwrite, writerConnection, event);
+        copyFile(config, source, targetPath, overwrite, writerConnection);
       }
     } catch (Exception e) {
       throw command.exception(format("Found exception copying file '%s' to '%s'", source, targetPath), e);
@@ -80,29 +77,25 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
 
   /**
    * Performs a recursive copy of a directory
-   *
-   * @param config the config which is parameterizing this operation
+   *  @param config the config which is parameterizing this operation
    * @param sourcePath the path to the directory to be copied
    * @param target the target path
    * @param overwrite whether to overwrite the target files if they already exists
    * @param writerConnection the {@link FtpFileSystem} which connects to the target endpoint
-   * @param event the {@link Event} which triggered this operation
    */
   protected abstract void copyDirectory(FileConnectorConfig config, Path sourcePath, Path target, boolean overwrite,
-                                        FtpFileSystem writerConnection, Event event);
+                                        FtpFileSystem writerConnection);
 
   /**
    * Copies one individual file
-   *
-   * @param config the config which is parameterizing this operation
+   *  @param config the config which is parameterizing this operation
    * @param source the {@link FileAttributes} for the file to be copied
    * @param target the target path
    * @param overwrite whether to overwrite the target files if they already exists
    * @param writerConnection the {@link FtpFileSystem} which connects to the target endpoint
-   * @param event the {@link Event} which triggered this operation
    */
   protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite,
-                          FtpFileSystem writerConnection, Event event) {
+                          FtpFileSystem writerConnection) {
     FileAttributes targetFile = command.getFile(target.toString());
     if (targetFile != null) {
       if (overwrite) {
@@ -118,7 +111,7 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
             .exception(format("Could not read file '%s' while trying to copy it to remote path '%s'", source.getPath(), target));
       }
 
-      writeCopy(config, target.toString(), inputStream, overwrite, writerConnection, event);
+      writeCopy(config, target.toString(), inputStream, overwrite, writerConnection);
     } catch (Exception e) {
       throw command
           .exception(format("Found exception while trying to copy file '%s' to remote path '%s'", source.getPath(), target), e);
@@ -126,10 +119,10 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
   }
 
   private void writeCopy(FileConnectorConfig config, String targetPath, InputStream inputStream, boolean overwrite,
-                         FtpFileSystem writerConnection, Event event)
+                         FtpFileSystem writerConnection)
       throws IOException {
     final FileWriteMode mode = overwrite ? FileWriteMode.OVERWRITE : FileWriteMode.CREATE_NEW;
-    writerConnection.write(targetPath, inputStream, mode, event, false, true, config.getDefaultWriteEncoding());
+    writerConnection.write(targetPath, inputStream, mode, false, true, config.getDefaultWriteEncoding());
   }
 
   private ConnectionHandler<FtpFileSystem> getWriterConnection(FileConnectorConfig config) throws ConnectionException {
