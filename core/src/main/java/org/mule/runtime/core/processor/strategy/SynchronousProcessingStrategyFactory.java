@@ -101,7 +101,7 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
     private AbstractProcessingStrategy.ReactorSink reactorSink;
 
     /**
-     * Create new {@link org.mule.runtime.core.processor.strategy.sink.DirectSink}.
+     * Create new {@link DirectSink}.
      *
      * @param function the processor to process events emitted onto stream, typically this processor will represent the flow
      *        pipeline.
