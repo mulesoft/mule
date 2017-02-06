@@ -415,14 +415,22 @@ public interface Event extends Serializable {
 
   }
 
+  /**
+   * Helper method to get the value of a given variable in a null-safe manner such that {@code null} is returned for non-existent
+   * variables rather than a {@link NoSuchElementException} exception being thrown.
+   * 
+   * @param key the key of the variable to retrieve.
+   * @param event the event from which to retrieve a variable with the given key.
+   * @param <T> the variable type
+   * @return the value of the variables if it exists otherwise {@code null}.
+   * @see Event#getVariable(String)
+   */
   static <T> T getVariableValueOrNull(String key, Event event) {
-    TypedValue<T> value = null;
-    try {
-      value = event.getVariable(key);
-    } catch (NoSuchElementException nsse) {
-      // Ignore
+    if (event.getVariableNames().contains(key)) {
+      return (T) event.getVariable(key).getValue();
+    } else {
+      return null;
     }
-    return value != null ? value.getValue() : null;
   }
 
   /**
