@@ -141,7 +141,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     LoggerContext parentCtx = selector.getContext("", regionClassLoader, true);
     LoggerContext childCtx = selector.getContext("", childClassLoader, true);
     assertThat(childCtx, instanceOf(MuleLoggerContext.class));
-    assertThat(childCtx, is(parentCtx));
+    assertThat(childCtx, sameInstance(parentCtx));
   }
 
   @Test
@@ -152,7 +152,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     LoggerContext systemContext = selector.getContext("", this.getClass().getClassLoader(), true);
     LoggerContext serviceCtx = selector.getContext("", serviceClassLoader.getClassLoader(), true);
     assertThat(serviceCtx, instanceOf(MuleLoggerContext.class));
-    assertThat(serviceCtx, is(systemContext));
+    assertThat(serviceCtx, sameInstance(systemContext));
   }
 
   private void assertReaperThreadNotRunning() {
