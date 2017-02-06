@@ -17,15 +17,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.exception.MuleException;
+import org.junit.Test;
+import org.mockito.verification.VerificationMode;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-import org.mockito.verification.VerificationMode;
 
 public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContextTestCase {
 
@@ -39,15 +37,6 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
     expressionManager = spy(muleContext.getExpressionManager());
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-  }
-
-  @Test
-  public void test() throws MuleException {
-    TypeSafeStaticValueResolver<Integer> integerTypeSafeStaticValueResolver =
-        new TypeSafeStaticValueResolver<>("1", Integer.class, muleContext);
-    Integer resolve = integerTypeSafeStaticValueResolver.resolve(testEvent());
-    resolve = integerTypeSafeStaticValueResolver.resolve(testEvent());
-    resolve = integerTypeSafeStaticValueResolver.resolve(testEvent());
   }
 
   @Test

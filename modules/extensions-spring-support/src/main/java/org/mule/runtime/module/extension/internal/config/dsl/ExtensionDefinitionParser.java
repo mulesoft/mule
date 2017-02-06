@@ -93,7 +93,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcess
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeStaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -642,7 +642,7 @@ public abstract class ExtensionDefinitionParser {
             .map(delegate -> delegate.parse(value.toString(), metadataType, null, muleContext))
             .orElseGet(() -> acceptsReferences
                 ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null, muleContext)
-                : new TypeSafeStaticValueResolver<>(value, expectedClass, muleContext));
+                : new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(value), expectedClass, muleContext));
 
         resolverValueHolder.set(delegateResolver);
       }

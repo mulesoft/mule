@@ -12,12 +12,12 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import com.google.common.collect.ImmutableSet;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -33,11 +33,10 @@ import java.util.Set;
  */
 public class OperationParametersTypeModelValidator implements ExtensionModelValidator {
 
-
-  private final ClassTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
-  private final Set<String> forbiddenTypes = ImmutableSet.<String>builder()
-      .add(getTypeId(typeLoader.load(Event.class)).get())
-      .add(getTypeId(typeLoader.load(Message.class)).get())
+  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final Set<MetadataType> forbiddenTypes = ImmutableSet.<MetadataType>builder()
+      .add(typeLoader.load(Event.class))
+      .add(typeLoader.load(Message.class))
       .build();
 
   @Override
@@ -60,9 +59,7 @@ public class OperationParametersTypeModelValidator implements ExtensionModelVali
       }
 
       private boolean isForbiddenType(MetadataType parameterType) {
-        return getTypeId(parameterType)
-            .filter(forbiddenTypes::contains)
-            .isPresent();
+        return forbiddenTypes.contains(parameterType);
       }
 
     }.walk(extensionModel);

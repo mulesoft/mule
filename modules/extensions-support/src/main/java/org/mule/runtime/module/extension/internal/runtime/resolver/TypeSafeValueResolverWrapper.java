@@ -11,35 +11,40 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 /**
- * {@link ValueResolver} implementation which always returns the same value, but if it is required,
- * the value will be converted to the required type using the mule transformers.
+ * {@link ValueResolver} wrapper implementation which wraps another {@link ValueResolver} and ensures that the output
+ * is always of a certain type.
+ * <p>
+ * If the returned value of the {@link this#valueResolverDelegate} is not of the desired type, it tries to locate a
+ * {@link Transformer} which can do the transformation from the obtained type to the expected one.
  *
- * @param <T> Type of the value to resolver
+ * @param <T>
  * @since 4.0
  */
-public class TypeSafeStaticValueResolver<T> implements ValueResolver<T> {
+public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T> {
 
+  private ValueResolver valueResolverDelegate;
   private Resolver<T> resolver;
 
-  public TypeSafeStaticValueResolver(Object value, Class<T> expectedType, MuleContext muleContext) {
+  public TypeSafeValueResolverWrapper(ValueResolver valueResolverDelegate, Class<T> expectedType, MuleContext muleContext) {
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(muleContext);
-    if (isInstance(ValueResolver.class, value)) {
-      resolver = (event) -> (T) ((ValueResolver) value).resolve(event);
-    } else {
-      if (isInstance(expectedType, value)) {
-        resolver = (event) -> (T) value;
-      } else {
-        resolver = new CachedResolver(event -> (T) typeSafeTransformer.transform(value, DataType.fromObject(value),
-                                                                                 DataType.fromType(expectedType), event));
-      }
+    this.valueResolverDelegate = valueResolverDelegate;
+
+    resolver = (event -> {
+      Object resolvedValue = valueResolverDelegate.resolve(event);
+      return isInstance(expectedType, resolvedValue)
+          ? (T) resolvedValue
+          : (T) typeSafeTransformer.transform(resolvedValue, DataType.fromObject(resolvedValue), DataType.fromType(expectedType),
+                                              event);
+    });
+
+    if (!valueResolverDelegate.isDynamic()) {
+      resolver = new CachedResolver(resolver);
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public T resolve(Event event) throws MuleException {
     return resolver.resolve(event);
@@ -47,14 +52,13 @@ public class TypeSafeStaticValueResolver<T> implements ValueResolver<T> {
 
   @Override
   public boolean isDynamic() {
-    return false;
+    return valueResolverDelegate.isDynamic();
   }
 
   @FunctionalInterface
   private interface Resolver<T> {
 
     T resolve(Event event) throws MuleException;
-
   }
 
   /**

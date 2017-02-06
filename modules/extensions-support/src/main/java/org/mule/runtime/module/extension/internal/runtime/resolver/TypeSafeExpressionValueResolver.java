@@ -7,17 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.isInstance;
-import org.apache.commons.lang.StringUtils;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
-
-import java.util.function.BiConsumer;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions and tries to ensure that the output is always of a certain type.
@@ -33,55 +27,17 @@ import java.util.function.BiConsumer;
  */
 public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
 
-  final AttributeEvaluator evaluator;
-  final TypeSafeTransformer typeSafeTransformer;
+  private final ValueResolver<T> delegate;
 
-  private final Class<?> expectedClass;
-  private final MuleContext muleContext;
-  private final DataType expectedDataType;
-  private boolean evaluatorInitialized = false;
-  private BiConsumer<AttributeEvaluator, MuleContext> evaluatorInitialiser = (evaluator, context) -> {
-    synchronized (context) {
-      if (!evaluatorInitialized) {
-        evaluator.initialize(context.getExpressionManager());
-        evaluatorInitialiser = (e, c) -> {
-        };
-        evaluatorInitialized = true;
-      }
-    }
-  };
-
-  public TypeSafeExpressionValueResolver(String expression, Class<?> expectedType, MuleContext muleContext) {
-    checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
+  public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType, MuleContext muleContext) {
     checkArgument(expectedType != null, "expected type cannot be null");
-
-    this.expectedClass = expectedType;
-    this.expectedDataType = DataType.fromType(expectedType);
-    this.evaluator = new AttributeEvaluator(expression);
-    this.muleContext = muleContext;
-    this.typeSafeTransformer = new TypeSafeTransformer(muleContext);
+    delegate =
+        new TypeSafeValueResolverWrapper<>(new ExpressionValueResolver(expression, muleContext), expectedType, muleContext);
   }
 
   @Override
   public T resolve(Event event) throws MuleException {
-    initEvaluator();
-    TypedValue typedValue = evaluator.resolveTypedValue(event, Event.builder(event));
-
-    Object value = typedValue.getValue();
-
-    if (isInstance(ValueResolver.class, value)) {
-      value = ((ValueResolver) value).resolve(event);
-    }
-
-    if (isInstance(expectedClass, value)) {
-      return (T) value;
-    }
-
-    return (T) typeSafeTransformer.transform(value, typedValue.getDataType(), expectedDataType, event);
-  }
-
-  void initEvaluator() {
-    evaluatorInitialiser.accept(evaluator, muleContext);
+    return delegate.resolve(event);
   }
 
   /**
