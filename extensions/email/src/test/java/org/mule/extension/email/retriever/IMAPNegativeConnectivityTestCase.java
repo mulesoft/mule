@@ -9,7 +9,6 @@ package org.mule.extension.email.retriever;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mule.extension.email.api.exception.EmailError.CONNECTION_TIMEOUT;
 import static org.mule.extension.email.api.exception.EmailError.INVALID_CREDENTIALS;
 import static org.mule.extension.email.api.exception.EmailError.UNKNOWN_HOST;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
@@ -80,12 +79,5 @@ public class IMAPNegativeConnectivityTestCase extends EmailConnectorTestCase {
     Matcher<Exception> exceptionMatcher =
         is(allOf(instanceOf(ConnectionException.class), hasCause(instanceOf(EmailConnectionException.class))));
     connectivityUtils.assertFailedConnection("configCannotReach", exceptionMatcher, is(errorType(UNKNOWN_HOST)));
-  }
-
-  @Test
-  public void configSocketTimeout() {
-    Matcher<Exception> exceptionMatcher =
-        is(allOf(instanceOf(ConnectionException.class), hasCause(instanceOf(EmailConnectionException.class))));
-    connectivityUtils.assertFailedConnection("configSocketTimeout", exceptionMatcher, is(errorType(CONNECTION_TIMEOUT)));
   }
 }
