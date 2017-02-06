@@ -41,8 +41,17 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ProactorProcessingStrategy(() -> cpuLight, () -> blocking, () -> cpuIntensive, scheduler -> {
-    }, Integer.MAX_VALUE, () -> blocking, DEFAULT_BUFFER_SIZE, DEFAULT_SUBSCRIBER_COUNT, DEFAULT_WAIT_STRATEGY, muleContext);
+    return new ProactorProcessingStrategy(() -> cpuLight,
+                                          () -> blocking,
+                                          () -> cpuIntensive,
+                                          scheduler -> {
+                                          },
+                                          Integer.MAX_VALUE,
+                                          () -> blocking,
+                                          DEFAULT_BUFFER_SIZE,
+                                          DEFAULT_SUBSCRIBER_COUNT,
+                                          DEFAULT_WAIT_STRATEGY,
+                                          muleContext);
   }
 
   @Override

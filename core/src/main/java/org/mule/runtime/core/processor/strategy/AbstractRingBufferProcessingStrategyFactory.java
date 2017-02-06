@@ -37,7 +37,7 @@ import reactor.core.publisher.WorkQueueProcessor;
 /**
  * Creates ring-buffer based processing strategy instances. These processing strategy de-multiplex incoming messages using a
  * ring-buffer which can then be subscribed to n times.
- *
+ * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0
@@ -55,7 +55,7 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
   private String waitStrategy;
 
   /**
-   * Configure the size of the ring-buffer size used to buffer and de-multiplex events from multiple source threads. This value
+   * Configure the size of the ring-buffer size used to buffer and de-multiplexes events from multiple source threads. This value
    * must be a power-of two.
    * <p/>
    * Ring buffers typically use a power of two because it means that the rollover at the end of the buffer can be achieved using a

@@ -45,7 +45,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
 
   /**
    * Configures the maximum concurrency permitted. This will typically be used to limit the number of concurrent blocking tasks
-   * using the IO pool, but will also limit the number of CPU_LIGHT threads in used concurrently.
+   * using the IO pool, but will also limit the number of CPU_LIGHT threads in use concurrently.
    *
    * @param maxConcurrency
    */

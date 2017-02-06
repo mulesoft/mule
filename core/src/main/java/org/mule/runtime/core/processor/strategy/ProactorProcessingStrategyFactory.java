@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.lang.Math.min;
+import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -147,9 +148,8 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      return publisher -> from(publisher).parallel(min(Runtime.getRuntime()
-          .availableProcessors(), maxConcurrency)).runOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
-          .composeGroup(pipelineFunction);
+      return publisher -> from(publisher).parallel(min(getRuntime().availableProcessors(), maxConcurrency))
+          .runOn(fromExecutorService(getExecutorService(cpuLightScheduler))).composeGroup(pipelineFunction);
     }
 
     @Override
