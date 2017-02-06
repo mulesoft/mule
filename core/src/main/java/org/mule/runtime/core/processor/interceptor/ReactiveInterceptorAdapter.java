@@ -37,8 +37,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -49,7 +47,6 @@ public class ReactiveInterceptorAdapter
     implements BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>,
     FlowConstructAware {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
   private static final String AROUND_METHOD_NAME = "around";
 
   private ProcessorInterceptorFactory interceptorFactory;
@@ -67,39 +64,31 @@ public class ReactiveInterceptorAdapter
   @Override
   public Function<Publisher<Event>, Publisher<Event>> apply(Processor component,
                                                             Function<Publisher<Event>, Publisher<Event>> next) {
-    if (!isInterceptable(component)) {
+    if (!isInterceptable(component) || !interceptorFactory.intercept(((AnnotatedObject) component).getLocation())) {
       return next;
     }
 
-
-    // LOGGER.debug("Applying interceptor: {} for componentLocation: {}", interceptor, componentLocation.getLocation());
-
-    if (interceptorFactory.intercept(((AnnotatedObject) component).getLocation())) {
-      final ProcessorInterceptor interceptor = interceptorFactory.get();
-      Map<String, String> dslParameters =
-          (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
-      if (implementsAround(interceptor)) {
-        return publisher -> from(publisher)
-            .map(doBefore(interceptor, component, dslParameters))
-            .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
-                .mapError(CompletionException.class, completionException -> completionException.getCause()))
-            .doOnError(MessagingException.class, error -> {
-              interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
-            })
-            .map(doAfter(interceptor));
-      } else {
-        return publisher -> from(publisher)
-            .map(doBefore(interceptor, component, dslParameters))
-            .transform(next)
-            .doOnError(MessagingException.class, error -> {
-              interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
-            })
-            .map(doAfter(interceptor));
-      }
+    final ProcessorInterceptor interceptor = interceptorFactory.get();
+    Map<String, String> dslParameters =
+        (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
+    if (implementsAround(interceptor)) {
+      return publisher -> from(publisher)
+          .map(doBefore(interceptor, component, dslParameters))
+          .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
+              .mapError(CompletionException.class, completionException -> completionException.getCause()))
+          .doOnError(MessagingException.class, error -> {
+            interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
+          })
+          .map(doAfter(interceptor));
     } else {
-      return next;
+      return publisher -> from(publisher)
+          .map(doBefore(interceptor, component, dslParameters))
+          .transform(next)
+          .doOnError(MessagingException.class, error -> {
+            interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
+          })
+          .map(doAfter(interceptor));
     }
-
   }
 
   private boolean implementsAround(ProcessorInterceptor interceptor) {

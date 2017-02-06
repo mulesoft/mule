@@ -142,12 +142,10 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .transform(next)
         .doOnNext(result -> setCurrentEvent(result)));
 
-    List<ProcessorInterceptorFactory> interceptionFactoriesChain =
-        muleContext.getProcessorInterceptorManager().getInterceptorFactories();
     List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptorsToBeExecuted =
         new LinkedList<>();
     // TODO MULE-11521 Review how interceptors are registered!
-    interceptionFactoriesChain.stream()
+    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
         .forEach(interceptorFactory -> {
           ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
           reactiveInterceptorAdapter.setFlowConstruct(flowConstruct);
