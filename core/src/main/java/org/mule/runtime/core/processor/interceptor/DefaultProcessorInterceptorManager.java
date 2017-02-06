@@ -9,9 +9,8 @@ package org.mule.runtime.core.processor.interceptor;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.Arrays.asList;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-
 import static java.util.Collections.unmodifiableList;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
@@ -22,7 +21,7 @@ import java.util.List;
 //TODO MULE-11521 Define if this will remain here
 public class DefaultProcessorInterceptorManager implements ProcessorInterceptorProvider {
 
-  private List<ProcessorInterceptorFactory> interceptors = new ArrayList<>();
+  private List<ProcessorInterceptorFactory> interceptorFactories = new ArrayList<>();
   private List<String> interceptorsOrder = new ArrayList<>();
 
   @Override
@@ -31,15 +30,15 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorP
   }
 
   @Override
-  public void addInterceptor(ProcessorInterceptorFactory interceptor) {
-    checkNotNull(interceptor, "interceptionHandler cannot be null");
+  public void addInterceptorFactory(ProcessorInterceptorFactory interceptor) {
+    checkNotNull(interceptor, "interceptor cannot be null");
 
-    this.interceptors.add(interceptor);
+    this.interceptorFactories.add(interceptor);
   }
 
   @Override
   public List<ProcessorInterceptorFactory> getInterceptorFactories() {
-    final List<ProcessorInterceptorFactory> sortedInterceptors = new ArrayList<>(interceptors);
+    final List<ProcessorInterceptorFactory> sortedInterceptors = new ArrayList<>(interceptorFactories);
 
     sortedInterceptors.sort((o1, o2) -> orderIndexOf(o1) - orderIndexOf(o2));
 

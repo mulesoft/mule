@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.core.processor.interceptor;
 
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-
 import static org.hamcrest.Matchers.contains;
-
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
@@ -35,9 +39,9 @@ public class DefaultProcessorInterceptorManagerTestCase extends AbstractMuleTest
     final ProcessorInterceptorFactoryA intFactoryA = new ProcessorInterceptorFactoryA();
     final ProcessorInterceptorFactoryB intFactoryB = new ProcessorInterceptorFactoryB();
     final ProcessorInterceptorFactoryC intFactoryC = new ProcessorInterceptorFactoryC();
-    manager.addInterceptor(intFactoryA);
-    manager.addInterceptor(intFactoryB);
-    manager.addInterceptor(intFactoryC);
+    manager.addInterceptorFactory(intFactoryA);
+    manager.addInterceptorFactory(intFactoryB);
+    manager.addInterceptorFactory(intFactoryC);
 
     assertThat(manager.getInterceptorFactories(), contains(intFactoryA, intFactoryB, intFactoryC));
   }
@@ -47,9 +51,9 @@ public class DefaultProcessorInterceptorManagerTestCase extends AbstractMuleTest
     final ProcessorInterceptorFactoryA intFactoryA = new ProcessorInterceptorFactoryA();
     final ProcessorInterceptorFactoryB intFactoryB = new ProcessorInterceptorFactoryB();
     final ProcessorInterceptorFactoryC intFactoryC = new ProcessorInterceptorFactoryC();
-    manager.addInterceptor(intFactoryA);
-    manager.addInterceptor(intFactoryB);
-    manager.addInterceptor(intFactoryC);
+    manager.addInterceptorFactory(intFactoryA);
+    manager.addInterceptorFactory(intFactoryB);
+    manager.addInterceptorFactory(intFactoryC);
 
     manager.setInterceptorsOrder("org.mule.runtime.core.processor.interceptor.c",
                                  "org.mule.runtime.core.processor.interceptor.b");
@@ -77,23 +81,23 @@ public class DefaultProcessorInterceptorManagerTestCase extends AbstractMuleTest
     final ProcessorInterceptorFactoryC intFactoryC4 = new ProcessorInterceptorFactoryC();
     final ProcessorInterceptorFactoryC intFactoryC5 = new ProcessorInterceptorFactoryC();
 
-    manager.addInterceptor(intFactoryA1);
-    manager.addInterceptor(intFactoryA2);
-    manager.addInterceptor(intFactoryA3);
-    manager.addInterceptor(intFactoryA4);
-    manager.addInterceptor(intFactoryA5);
+    manager.addInterceptorFactory(intFactoryA1);
+    manager.addInterceptorFactory(intFactoryA2);
+    manager.addInterceptorFactory(intFactoryA3);
+    manager.addInterceptorFactory(intFactoryA4);
+    manager.addInterceptorFactory(intFactoryA5);
 
-    manager.addInterceptor(intFactoryB1);
-    manager.addInterceptor(intFactoryB2);
-    manager.addInterceptor(intFactoryB3);
-    manager.addInterceptor(intFactoryB4);
-    manager.addInterceptor(intFactoryB5);
+    manager.addInterceptorFactory(intFactoryB1);
+    manager.addInterceptorFactory(intFactoryB2);
+    manager.addInterceptorFactory(intFactoryB3);
+    manager.addInterceptorFactory(intFactoryB4);
+    manager.addInterceptorFactory(intFactoryB5);
 
-    manager.addInterceptor(intFactoryC1);
-    manager.addInterceptor(intFactoryC2);
-    manager.addInterceptor(intFactoryC3);
-    manager.addInterceptor(intFactoryC4);
-    manager.addInterceptor(intFactoryC5);
+    manager.addInterceptorFactory(intFactoryC1);
+    manager.addInterceptorFactory(intFactoryC2);
+    manager.addInterceptorFactory(intFactoryC3);
+    manager.addInterceptorFactory(intFactoryC4);
+    manager.addInterceptorFactory(intFactoryC5);
 
     manager.setInterceptorsOrder("org.mule.runtime.core.processor.interceptor.c",
                                  "org.mule.runtime.core.processor.interceptor.b");

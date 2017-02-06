@@ -1003,7 +1003,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private void startFlowWithInterceptors(ProcessorInterceptor... interceptors) throws Exception {
     for (ProcessorInterceptor interceptionHandler : interceptors) {
-      muleContext.getProcessorInterceptorManager().addInterceptor(() -> interceptionHandler);
+      muleContext.getProcessorInterceptorManager().addInterceptorFactory(() -> interceptionHandler);
     }
 
     flow.initialise();
@@ -1012,7 +1012,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private void startFlowWithInterceptorFactories(ProcessorInterceptorFactory... interceptorFactories) throws Exception {
     for (ProcessorInterceptorFactory interceptionHandlerFactory : interceptorFactories) {
-      muleContext.getProcessorInterceptorManager().addInterceptor(interceptionHandlerFactory);
+      muleContext.getProcessorInterceptorManager().addInterceptorFactory(interceptionHandlerFactory);
     }
 
     flow.initialise();

@@ -16,17 +16,17 @@ import java.util.List;
 public interface ProcessorInterceptorProvider {
 
   /**
-   * Determines the order in which the {@link ProcessorInterceptorFactory ProcessorInterceptorFactories} will be applied to the
-   * applicable components.
+   * Determines the order in which the {@link ProcessorInterceptorFactory ProcessorInterceptorFactories} products will be applied
+   * to the applicable components.
    * <p>
    * For each {@link ProcessorInterceptorFactory factory}, its fully qualified class name will be obtained and matched against the
    * passed {@code packagesOrder} to sort the factories. In the case there is more than one {@link ProcessorInterceptorFactory
-   * factory} with a package name prefix, the order in which they were {@link #addInterceptor(ProcessorInterceptorFactory) added}
-   * will be kept.
+   * factory} with a package name prefix, the order in which they were {@link #addInterceptorFactory(ProcessorInterceptorFactory)
+   * added} will be kept.
    * <p>
    * Assuming this is called with parameters {@code ("org.package", "com.plugin")}, and the following
-   * {@link ProcessorInterceptorFactory factories} have been added through {@link #addInterceptor(ProcessorInterceptorFactory)}
-   * (in this order):
+   * {@link ProcessorInterceptorFactory factories} have been added through
+   * {@link #addInterceptorFactory(ProcessorInterceptorFactory)} (in this order):
    * <ol>
    * <li>{@code com.plugin.SomeInterceptor}</li>
    * <li>{@code org.mule.MuleInterceptor}</li>
@@ -34,7 +34,7 @@ public interface ProcessorInterceptorProvider {
    * <li>{@code com.plugin.SomeOtherInterceptor}</li>
    * <li>{@code org.mule.OtherMuleInterceptor}</li>
    * </ol>
-   * Those {@link ProcessorInterceptorFactory factories} will be sorted, when obtained thorugh {@link #getInterceptorFactories()}
+   * Those {@link ProcessorInterceptorFactory factories} will be sorted, when obtained through {@link #getInterceptorFactories()}
    * like this:
    * <ol>
    * <li>{@code org.package.logging.LoggerInterceptor}</li>
@@ -56,15 +56,15 @@ public interface ProcessorInterceptorProvider {
    * 
    * @param interceptorFactory the factory of {@link ProcessorInterceptor}s to add.
    */
-  void addInterceptor(ProcessorInterceptorFactory interceptorFactory);
+  void addInterceptorFactory(ProcessorInterceptorFactory interceptorFactory);
 
   /**
    * Provides the {@link ProcessorInterceptorFactory ProcessorInterceptorFactories} that were registered by calling
-   * {@link #addInterceptor(ProcessorInterceptorFactory)}, in the order defined by {@link #setInterceptorsOrder(String...)} if
-   * defined.
+   * {@link #addInterceptorFactory(ProcessorInterceptorFactory)}, in the order defined by {@link #setInterceptorsOrder(String...)}
+   * if defined.
    * 
    * @return the {@link ProcessorInterceptorFactory ProcessorInterceptorFactories} that will yield the
-   *         {@link ProcessorInterceptor}s to be applied on each compoennt of a flow.
+   *         {@link ProcessorInterceptor}s to be applied on each component of a flow.
    */
   List<ProcessorInterceptorFactory> getInterceptorFactories();
 }
