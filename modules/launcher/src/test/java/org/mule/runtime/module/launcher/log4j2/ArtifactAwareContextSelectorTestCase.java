@@ -23,6 +23,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_D
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
@@ -34,6 +38,8 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -60,23 +66,23 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   private ArtifactAwareContextSelector selector;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private RegionClassLoader classLoader;
+  private RegionClassLoader regionClassLoader;
 
   @Before
   public void before() throws Exception {
     selector = new ArtifactAwareContextSelector();
-    when(classLoader.getArtifactId()).thenReturn(getClass().getName());
-    when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
+    when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
+    when(regionClassLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
   }
 
   @Test
   public void classLoaderToContext() {
-    MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, classLoader, true);
-    assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
+    MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, regionClassLoader, true);
+    assertThat(context, is(sameInstance(selector.getContext(EMPTY, regionClassLoader, true))));
 
-    classLoader = mock(RegionClassLoader.class, RETURNS_DEEP_STUBS);
-    when(classLoader.getArtifactId()).thenReturn(getClass().getName());
-    assertThat(context, not(sameInstance(selector.getContext(EMPTY, classLoader, true))));
+    regionClassLoader = mock(RegionClassLoader.class, RETURNS_DEEP_STUBS);
+    when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
+    assertThat(context, not(sameInstance(selector.getContext(EMPTY, regionClassLoader, true))));
   }
 
   @Test
@@ -84,11 +90,11 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     MuleLoggerContext context = getContext();
 
     ArgumentCaptor<ShutdownListener> captor = ArgumentCaptor.forClass(ShutdownListener.class);
-    verify(classLoader).addShutdownListener(captor.capture());
+    verify(regionClassLoader).addShutdownListener(captor.capture());
     ShutdownListener listener = captor.getValue();
     assertThat(listener, notNullValue());
 
-    assertThat(context, is(selector.getContext(EMPTY, classLoader, true)));
+    assertThat(context, is(selector.getContext(EMPTY, regionClassLoader, true)));
     listener.execute();
 
     assertStopped(context);
@@ -104,17 +110,17 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void returnsMuleLoggerContext() {
-    LoggerContext ctx = selector.getContext("", classLoader, true);
+    LoggerContext ctx = selector.getContext("", regionClassLoader, true);
     assertThat(ctx, instanceOf(MuleLoggerContext.class));
     assertConfigurationLocation(ctx);
   }
 
   @Test
   public void defaultToConfWhenNoConfigFound() {
-    when(classLoader.findLocalResource(anyString())).thenReturn(null);
+    when(regionClassLoader.findLocalResource(anyString())).thenReturn(null);
     File expected = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
     expected = new File(expected, "log4j2.xml");
-    LoggerContext ctx = selector.getContext("", classLoader, true);
+    LoggerContext ctx = selector.getContext("", regionClassLoader, true);
     assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
   }
 
@@ -127,6 +133,26 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
     Thread thread = getReaperThread();
     assertThat(thread, is(notNullValue()));
+  }
+
+  @Test
+  public void returnsMuleLoggerContextForArtifactClassLoaderChild() {
+    ClassLoader childClassLoader = new URLClassLoader(new URL[0], regionClassLoader);
+    LoggerContext parentCtx = selector.getContext("", regionClassLoader, true);
+    LoggerContext childCtx = selector.getContext("", childClassLoader, true);
+    assertThat(childCtx, instanceOf(MuleLoggerContext.class));
+    assertThat(childCtx, is(parentCtx));
+  }
+
+  @Test
+  public void returnsMuleLoggerContextForInternalArtifactClassLoader() {
+    ArtifactClassLoader serviceClassLoader =
+        new MuleArtifactClassLoader("test", new ApplicationDescriptor("test"), new URL[0], this.getClass().getClassLoader(),
+                                    mock(ClassLoaderLookupPolicy.class));
+    LoggerContext systemContext = selector.getContext("", this.getClass().getClassLoader(), true);
+    LoggerContext serviceCtx = selector.getContext("", serviceClassLoader.getClassLoader(), true);
+    assertThat(serviceCtx, instanceOf(MuleLoggerContext.class));
+    assertThat(serviceCtx, is(systemContext));
   }
 
   private void assertReaperThreadNotRunning() {
@@ -150,7 +176,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   }
 
   private MuleLoggerContext getContext() {
-    return (MuleLoggerContext) selector.getContext("", classLoader, true);
+    return (MuleLoggerContext) selector.getContext("", regionClassLoader, true);
   }
 
   private void assertConfigurationLocation(LoggerContext ctx) {
