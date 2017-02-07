@@ -20,7 +20,7 @@ import org.reactivestreams.Publisher;
 /**
  * Abstract processing strategy that, rather than using a single shared stream, creates a stream per {@link Event}.
  */
-abstract class AbstractStreamPerEventProcessingStrategyFactory extends AbstractProcessingStrategy {
+abstract class AbstractStreamPerEventProcessingStrategy extends AbstractProcessingStrategy {
 
   @Override
   public final Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {

@@ -21,18 +21,13 @@ import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessingStrategyFactory {
 
   @Override
-  public void setSubscriberCount(int subscriberCount) {
-    throw new UnsupportedOperationException("ReactorProcessingStrategy does not support more than 1 subscriber event-loop");
-  }
-
-  @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new RingBufferProcessingStrategy(() -> muleContext.getSchedulerService()
         .customScheduler(SchedulerConfig.config().withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
             .withMaxConcurrentTasks(getSubscriberCount() + 1)),
 
                                             getBufferSize(),
-                                            1,
+                                            getSubscriberCount(),
                                             getWaitStrategy(),
                                             muleContext);
   }
