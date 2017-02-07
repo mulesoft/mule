@@ -32,6 +32,7 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
   private final Supplier<RunnableFuture<V>> taskSupplier;
   private final Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback;
+  private final ClassLoader classLoader;
 
   private final DefaultScheduler scheduler;
 
@@ -46,16 +47,18 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
    * 
    * @param taskSupplier the supplier for tasks to be decorated
    * @param wrapUpCallback the callback to execute after the task is done
+   * @param classLoader the context {@link ClassLoader} on which the {@code task} should be executed
    * @param scheduler the owner {@link Executor} of this task
    * @param taskAsString a {@link String} representation of the task, used for logging and troubleshooting.
    * @param id a unique it for this task.
    */
   RunnableRepeatableFutureDecorator(Supplier<RunnableFuture<V>> taskSupplier,
                                     Consumer<RunnableRepeatableFutureDecorator<V>> wrapUpCallback,
-                                    DefaultScheduler scheduler, String taskAsString, Integer id) {
+                                    ClassLoader classLoader, DefaultScheduler scheduler, String taskAsString, Integer id) {
     super(id);
     this.taskSupplier = taskSupplier;
     this.wrapUpCallback = wrapUpCallback;
+    this.classLoader = classLoader;
     this.scheduler = scheduler;
     this.taskAsString = taskAsString;
   }
@@ -75,6 +78,10 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
 
     long startTime = beforeRun();
     task = taskSupplier.get();
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(classLoader);
+
     try {
       running = true;
       task.run();
@@ -90,6 +97,8 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
       if (logger.isTraceEnabled()) {
         logger.trace("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
       }
+
+      currentThread.setContextClassLoader(currentClassLoader);
     }
   }
 
