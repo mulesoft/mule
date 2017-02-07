@@ -78,10 +78,10 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
       return new ProactorProcessingStrategy(() -> muleContext.getSchedulerService()
           .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                             () -> muleContext.getSchedulerService()
+                                                .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                            () -> muleContext.getSchedulerService()
                                                 .cpuIntensiveScheduler(config()
                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                            () -> muleContext.getSchedulerService()
-                                                .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                             scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
                                                                         MILLISECONDS),
                                             maxConcurrency,
@@ -90,7 +90,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
                                                     .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
                                                     .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                             getBufferSize(),
-                                            1,
+                                            getSubscriberCount(),
                                             getWaitStrategy(),
                                             muleContext);
     }

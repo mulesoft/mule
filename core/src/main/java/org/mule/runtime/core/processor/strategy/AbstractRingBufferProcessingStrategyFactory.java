@@ -92,8 +92,8 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
     return bufferSize;
   }
 
-  protected static int getSubscriberCount() {
-    return DEFAULT_SUBSCRIBER_COUNT;
+  protected int getSubscriberCount() {
+    return subscriberCount;
   }
 
   protected String getWaitStrategy() {
@@ -128,8 +128,7 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
       for (int i = 0; i < subscribers; i++) {
         disposables.add(processor.transform(function).retry().subscribe());
       }
-      return new ReactorSink(processor.connectSink(), flowConstruct,
-                             () -> disposables.forEach(disposable -> disposable.dispose()),
+      return new ReactorSink(processor.connectSink(), () -> disposables.forEach(disposable -> disposable.dispose()),
                              createOnEventConsumer());
     }
 

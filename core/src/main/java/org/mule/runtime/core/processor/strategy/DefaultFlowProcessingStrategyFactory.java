@@ -54,7 +54,7 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
                                                      .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
                                                      .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                              getBufferSize(),
-                                             1,
+                                             getSubscriberCount(),
                                              getWaitStrategy(),
                                              muleContext);
   }
