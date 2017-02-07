@@ -116,7 +116,7 @@ public class ReactiveInterceptorAdapter
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
                               reactiveInterceptionAction)
         .exceptionally(t -> {
-          throw new CompletionException(new MessagingException(event, t.getCause()));
+          throw new CompletionException(new MessagingException(event, t.getCause(), component));
         })
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }
