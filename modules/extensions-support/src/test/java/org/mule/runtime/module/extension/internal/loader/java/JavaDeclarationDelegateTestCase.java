@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -158,7 +159,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
   private static final String APPROVE_INVESTMENT = "approve";
   private static final String IGNORED_OPERATION = "ignoredOperation";
-  private static final String EXTENSION_VERSION = "4.0-SNAPSHOT";
+  private static final String EXTENSION_VERSION = getProperty("maven_project_version");
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
   private static final String PROCESS_WEAPON = "processWeapon";
   private static final String PROCESS_WEAPON_LIST = "processWeaponList";

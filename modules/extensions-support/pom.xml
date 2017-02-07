@@ -174,6 +174,36 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <maven_project_version>${project.version}</maven_project_version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+                <plugin>
+                    <groupId>com.google.code.maven-replacer-plugin</groupId>
+                    <artifactId>replacer</artifactId>
+                    <executions>
+                        <execution>
+                            <id>replace-plugin-properties-deps-version</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>replace</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <include>${project.build.directory}/test-classes/heisenberg-test-manifest.xml</include>
+                            <include>${project.build.directory}/test-classes/heisenberg-test-mule-plugin.json</include>
+                        </includes>
+                        <token>%PROJECT_VERSION_MAVEN_REPLACER_PLUGIN_TOKEN%</token>
+                        <value>${project.version}</value>
+                    </configuration>
+                </plugin>
         </plugins>
     </build>
 </project>
