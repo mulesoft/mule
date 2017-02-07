@@ -6,32 +6,28 @@
  */
 package org.mule.runtime.core.processor.interceptor;
 
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-
-import static org.hamcrest.Matchers.sameInstance;
-
-import static org.junit.Assert.assertThat;
-
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -241,6 +237,57 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  public void interceptorMutatesEventAroundBeforeSkip() throws Exception {
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        return action.skip();
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+
+    InOrder inOrder = inOrder(processor, interceptor);
+
+    inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
+    inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
+    inOrder.verify(processor, never()).process(any());
+    inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+  }
+
+  @Test
+  public void interceptorMutatesEventAroundAfterSkip() throws Exception {
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        action.skip();
+        return supplyAsync(() -> {
+          event.message(Message.builder().payload(TEST_PAYLOAD).build());
+          return event;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+
+    InOrder inOrder = inOrder(processor, interceptor);
+
+    inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
+    inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
+    inOrder.verify(processor, never()).process(any());
+    inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+  }
+
+  @Test
   public void interceptorThrowsExceptionBefore() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
@@ -371,6 +418,64 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor).before(any(), any());
       inOrder.verify(interceptor).around(any(), any(), any());
       inOrder.verify(processor).process(any());
+      inOrder.verify(interceptor).after(any(), eq(of(expectedException)));
+    }
+  }
+
+  @Test
+  public void interceptorThrowsExceptionAroundAfterProceedInCallback() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        action.proceed();
+        return supplyAsync(() -> {
+          throw expectedException;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    } finally {
+      InOrder inOrder = inOrder(processor, interceptor);
+
+      inOrder.verify(interceptor).before(any(), any());
+      inOrder.verify(interceptor).around(any(), any(), any());
+      inOrder.verify(processor).process(any());
+      inOrder.verify(interceptor).after(any(), eq(of(expectedException)));
+    }
+  }
+
+  @Test
+  public void interceptorThrowsExceptionAroundAfterSkipInCallback() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        action.skip();
+        return supplyAsync(() -> {
+          throw expectedException;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    } finally {
+      InOrder inOrder = inOrder(processor, interceptor);
+
+      inOrder.verify(interceptor).before(any(), any());
+      inOrder.verify(interceptor).around(any(), any(), any());
+      inOrder.verify(processor, never()).process(any());
       inOrder.verify(interceptor).after(any(), eq(of(expectedException)));
     }
   }

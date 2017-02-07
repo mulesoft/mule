@@ -69,8 +69,7 @@ public class ReactiveInterceptorAdapter
     }
 
     final ProcessorInterceptor interceptor = interceptorFactory.get();
-    Map<String, String> dslParameters =
-        (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
+    Map<String, String> dslParameters = (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
     if (implementsAround(interceptor)) {
       return publisher -> from(publisher)
           .map(doBefore(interceptor, component, dslParameters))
@@ -116,6 +115,9 @@ public class ReactiveInterceptorAdapter
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
                               reactiveInterceptionAction)
+        .exceptionally(t -> {
+          throw new CompletionException(new MessagingException(event, t.getCause(), component));
+        })
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }
 
