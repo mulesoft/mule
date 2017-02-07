@@ -8,6 +8,7 @@ package org.mule.transport.jms.jndi;
 
 import org.mule.api.lifecycle.InitialisationException;
 
+import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -24,7 +25,15 @@ public class SimpleJndiNameResolver extends AbstractJndiNameResolver
 
     public synchronized Object lookup(String name) throws NamingException
     {
-        return jndiContext.lookup(name);
+        try
+        {
+            return doLookUp(name);
+        }
+        catch (CommunicationException e)
+        {
+            jndiContext = this.createInitialContext();
+            return doLookUp(name);
+        }
     }
 
     public void initialise() throws InitialisationException
@@ -61,4 +70,10 @@ public class SimpleJndiNameResolver extends AbstractJndiNameResolver
             }
         }
     }
+    
+    private Object doLookUp(String name) throws NamingException
+    {
+        return jndiContext.lookup(name);
+    }
+
 }

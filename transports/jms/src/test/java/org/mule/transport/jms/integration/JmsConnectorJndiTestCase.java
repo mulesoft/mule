@@ -9,9 +9,24 @@ package org.mule.transport.jms.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
+
+import java.util.Hashtable;
+
+import javax.naming.CommunicationException;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
 
 import org.junit.Test;
 
@@ -34,6 +49,9 @@ import org.junit.Test;
  */
 public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
 {
+
+    private static final String RESOLVED_NAME = "resolvedName";
+    private static final String NAME = "name";
 
     @Override
     protected String getConfigFile()
@@ -183,4 +201,38 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNull("Attempt to look up a non-existant JNDI Destination should have failed", result);
     }
+
+    @Test
+    public void whenJndiResolverAndCommunicationExceptionContextIsRecreated() throws NamingException, MuleException
+    {
+        Context context = mock(Context.class);
+        when(context.lookup(NAME)).thenThrow(new CommunicationException()).thenReturn(RESOLVED_NAME);
+
+        verifyNumberOfJndiLookupTries(context, 2);
+    }
+
+    @Test
+    public void whenJndiResolverAndNoCommunicationExceptionContextIsNotRecreated() throws NamingException, MuleException
+    {
+        Context context = mock(Context.class);
+        when(context.lookup(NAME)).thenReturn(RESOLVED_NAME);
+
+        verifyNumberOfJndiLookupTries(context, 1);
+    }
+
+    private void verifyNumberOfJndiLookupTries(Context context, int numberOfTries) throws NamingException, InitialisationException
+    {
+        InitialContextFactory jndiContextFactory = mock(InitialContextFactory.class);
+        when(jndiContextFactory.getInitialContext(any(Hashtable.class))).thenReturn(context);
+
+        SimpleJndiNameResolver jndiNameResolver = new SimpleJndiNameResolver();
+        jndiNameResolver.setContextFactory(jndiContextFactory);
+        jndiNameResolver.setJndiInitialFactory("initialFactory");
+        jndiNameResolver.initialise();
+
+        assertEquals(RESOLVED_NAME, jndiNameResolver.lookup(NAME));
+
+        verify(context, times(numberOfTries)).lookup(NAME);
+    }
+
 }
