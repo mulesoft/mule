@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms.integration;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -230,7 +232,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
         jndiNameResolver.setJndiInitialFactory("initialFactory");
         jndiNameResolver.initialise();
 
-        assertEquals(RESOLVED_NAME, jndiNameResolver.lookup(NAME));
+        assertThat(RESOLVED_NAME, equalTo(jndiNameResolver.lookup(NAME)));
 
         verify(context, times(numberOfTries)).lookup(NAME);
     }
