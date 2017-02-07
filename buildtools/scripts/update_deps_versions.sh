@@ -26,7 +26,7 @@ propertiesDeps=("mule.module.maven.plugin.version"
                 "mule.extensions.maven.plugin.version"
                 "mule.app.plugins.maven.plugin.version")
 
-updatePropertiesVersion "$VERSION_TO" ../../pom.xml propertiesDeps[@]
+updatePropertiesVersion "$VERSION_TO" pom.xml propertiesDeps[@]
 
 
 

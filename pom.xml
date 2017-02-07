@@ -256,9 +256,9 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
-        <mule.module.maven.plugin.version>1.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-M5-RC-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.0.0-M5-RC-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-M5-RC-SNAPSHOT</mule.app.plugins.maven.plugin.version>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
              dependency with the one define in the dependency management (which is mostly in all the cases "false")
