@@ -16,7 +16,8 @@
         <collection-aggregator/>
     </flow>
 
-    <flow name="splitterFlow">
+    <!-- TODO MULE-10617 Migrate Error Handling API to use Non-Blocking API. Remove sync processing strategy. -->
+    <flow name="splitterFlow" processingStrategy="synchronous">
         <test:component throwException="true"/>
 
         <error-handler>
