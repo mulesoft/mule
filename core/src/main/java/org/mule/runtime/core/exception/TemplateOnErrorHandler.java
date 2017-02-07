@@ -7,8 +7,14 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
+import static reactor.core.publisher.Flux.error;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -19,13 +25,18 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.rx.Exceptions;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+
+import org.reactivestreams.Publisher;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -46,7 +57,18 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-
+  @Override
+  public Publisher<Event> apply(final MessagingException exception) {
+    Publisher<Event> publisher =
+        new ExceptionMessageProcessor(exception, muleContext, flowConstruct).apply(just(exception.getEvent()));
+    return from(publisher).handle((event, sink) -> {
+      if (exception.handled()) {
+        sink.next(event);
+      } else {
+        sink.error(exception);
+      }
+    });
+  }
 
   private class ExceptionMessageProcessor extends AbstractRequestResponseMessageProcessor {
 
@@ -57,6 +79,19 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       this.exception = exception;
       setMuleContext(muleContext);
       setFlowConstruct(flowConstruct);
+      next = new Processor() {
+
+        @Override
+        public Event process(Event event) throws MuleException {
+          return processToApply(event, this);
+        }
+
+        @Override
+        public Publisher<Event> apply(Publisher<Event> publisher) {
+          return from(publisher).then(event -> from(routeAsync(event, exception)));
+        }
+      };
+
     }
 
     @Override
@@ -80,11 +115,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         return nullifyExceptionPayloadIfRequired(response);
       }
       return response;
-    }
-
-    @Override
-    protected Event processNext(Event event) throws MuleException {
-      return route(event, exception);
     }
 
     @Override
@@ -145,21 +175,14 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  protected Event route(Event event, MessagingException t) throws MessagingException {
+  protected Publisher<Event> routeAsync(Event event, MessagingException t) {
     if (!getMessageProcessors().isEmpty()) {
-      try {
-        event = Event.builder(event)
-            .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(t)).build())
-            .build();
-        Event result = configuredMessageProcessors.process(event);
-        return result;
-      } catch (MessagingException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new MessagingException(event, e);
-      }
+      event = Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(t)).build())
+          .build();
+      return configuredMessageProcessors.apply(just(event));
     }
-    return event;
+    return just(event);
   }
 
   @Override

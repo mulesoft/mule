@@ -164,10 +164,15 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
   }
 
   @Test
-  @Ignore("MULE-10617")
   public void catchExceptionStrategy() throws Exception {
     flowRunner("catchExceptionStrategy").withPayload(TEST_MESSAGE).run();
     verify("catchExceptionStrategyChild");
+  }
+
+  @Test
+  public void rollbackExceptionStrategy() throws Exception {
+    flowRunner("rollbackExceptionStrategy").withPayload(TEST_MESSAGE).run();
+    verify("rollbackExceptionStrategyChild");
   }
 }
 

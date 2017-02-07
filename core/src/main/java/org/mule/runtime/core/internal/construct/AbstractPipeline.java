@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
@@ -15,7 +15,6 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -220,11 +219,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           if (useBlockingCodePath()) {
             return pipeline.process(event);
           } else {
-            try {
-              return just(event).transform(this).block();
-            } catch (Exception e) {
-              throw rxExceptionToMuleException(e);
-            }
+            return processToApply(event, this);
           }
         }
 

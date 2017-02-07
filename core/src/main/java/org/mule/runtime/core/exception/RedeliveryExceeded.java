@@ -16,12 +16,16 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+
+public class RedeliveryExceeded implements FlowConstructAware, Initialisable, ReactiveProcessor {
 
   private List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
   private MessageProcessorChain configuredMessageProcessors;
@@ -51,10 +55,23 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
       result = configuredMessageProcessors.process(event);
     }
     if (result != null) {
-      result = Event.builder(result).error(null)
-          .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
+      result = removeErrorFromEvent(result);
     }
     return result;
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> eventPublisher) {
+    if (!messageProcessors.isEmpty()) {
+      return Flux.from(eventPublisher).transform(configuredMessageProcessors);
+    } else {
+      return Flux.from(eventPublisher).map(event -> removeErrorFromEvent(event));
+    }
+  }
+
+  private Event removeErrorFromEvent(Event result) {
+    return Event.builder(result).error(null)
+        .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
   }
 
   @Override

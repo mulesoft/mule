@@ -116,6 +116,16 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
+  public MessagingException(Event event, MessagingException original) {
+    super(original.getI18nMessage(), original.getCause());
+    this.event = event;
+    this.failingMessageProcessor = original.getFailingMessageProcessor();
+    this.causeRollback = original.causedRollback();
+    this.handled = original.handled();
+    extractMuleMessage(event);
+    setMessage(original.getMessage());
+  }
+
   public MessagingException(Event event, Throwable cause, Processor failingMessageProcessor) {
     super(cause);
     this.event = event;

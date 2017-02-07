@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
+import org.reactivestreams.Publisher;
+
 /**
  * Allows to use {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} as
  * {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor}.
@@ -46,6 +48,11 @@ public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObje
   @Override
   public Event handleException(MessagingException exception, Event event) {
     return delegate.handleException(exception, event);
+  }
+
+  @Override
+  public Publisher<Event> apply(MessagingException exception) {
+    return delegate.apply(exception);
   }
 
   @Override
