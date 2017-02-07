@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -39,11 +38,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -107,6 +102,8 @@ import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import com.google.common.reflect.TypeToken;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -116,6 +113,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -159,7 +161,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String GET_MEDICAL_HISTORY = "getMedicalHistory";
   private static final String APPROVE_INVESTMENT = "approve";
   private static final String IGNORED_OPERATION = "ignoredOperation";
-  private static final String EXTENSION_VERSION = getProperty("maven_project_version");
+  private static final String EXTENSION_VERSION = getMavenProjectVersionProperty();
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
   private static final String PROCESS_WEAPON = "processWeapon";
   private static final String PROCESS_WEAPON_LIST = "processWeaponList";
