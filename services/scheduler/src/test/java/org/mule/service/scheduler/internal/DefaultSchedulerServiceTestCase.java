@@ -35,6 +35,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
@@ -124,6 +125,56 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
     });
 
     submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+  }
+
+  @Test
+  @Description("Tests that a scheduled task has inherited the context classloader.")
+  public void classLoaderPropagatesScheduled() throws Exception {
+    final Scheduler scheduler = service.cpuLightScheduler();
+
+    final ClassLoader contextClassLoader = mock(ClassLoader.class);
+    currentThread().setContextClassLoader(contextClassLoader);
+
+    Latch latch = new Latch();
+    ScheduledFuture<?> submit = null;
+    try {
+      submit = scheduler.scheduleWithFixedDelay(() -> {
+        assertThat(currentThread().getContextClassLoader(), sameInstance(contextClassLoader));
+        latch.countDown();
+      }, 0, 60, SECONDS);
+
+      latch.await(10, SECONDS);
+      submit.get(10, SECONDS);
+    } finally {
+      if (submit != null) {
+        submit.cancel(false);
+      }
+    }
+  }
+
+  @Test
+  @Description("Tests that a cron-scheduled task has inherited the context classloader.")
+  public void classLoaderPropagatesCron() throws Exception {
+    final Scheduler scheduler = service.cpuLightScheduler();
+
+    final ClassLoader contextClassLoader = mock(ClassLoader.class);
+    currentThread().setContextClassLoader(contextClassLoader);
+
+    Latch latch = new Latch();
+    ScheduledFuture<?> submit = null;
+    try {
+      submit = scheduler.scheduleWithCronExpression(() -> {
+        assertThat(currentThread().getContextClassLoader(), sameInstance(contextClassLoader));
+        latch.countDown();
+      }, "*/1 * * ? * *");
+
+      latch.await(10, SECONDS);
+      submit.get(10, SECONDS);
+    } finally {
+      if (submit != null) {
+        submit.cancel(false);
+      }
+    }
   }
 
   @Test
