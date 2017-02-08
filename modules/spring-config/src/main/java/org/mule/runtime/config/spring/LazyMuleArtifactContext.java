@@ -10,8 +10,10 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleException;
@@ -28,6 +30,8 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -43,6 +47,8 @@ import org.xml.sax.SAXParseException;
  * @since 4.0
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 
   private ConnectivityTestingService lazyConnectivityTestingService;
   private MetadataService metadataService;
@@ -97,12 +103,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     }
   }
 
+  /**
+   * During a lazy intialization of an artifact the components should not be created.
+   */
   @Override
   protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory,
                                                     BeanDefinitionReader beanDefinitionReader) {
-    if (useNewParsingMechanism) {
-      createComponents(beanFactory, applicationModel, true);
-    } else {
+    if (!useNewParsingMechanism) {
       throw new MuleRuntimeException(createStaticMessage("Could not create mule application since lazy init is enabled but there are component in the configuration "
           +
           "that are not parsed with the new mechanism " + getOldParsingMechanismComponentIdentifiers()));
@@ -115,6 +122,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       if (muleContext.getRegistry().get(componentName) != null) {
         return;
       }
+      // First dispose any already initialized component
+      disposeComponents(this.applicationModel);
+
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
       ApplicationModel minimalApplicationModel;
@@ -125,6 +135,26 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       }
       createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
     });
+  }
+
+  private void disposeComponents(ApplicationModel applicationModel) {
+    if (muleContext.isStarted()) {
+      applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
+        final String nameAttribute = componentModel.getNameAttribute();
+        if (nameAttribute != null) {
+          if (componentModel.isEnabled()) {
+            Object object = muleContext.getRegistry().get(nameAttribute);
+            try {
+              stopIfNeeded(object);
+            } catch (MuleException e) {
+              throw new RuntimeException(e);
+            }
+            disposeIfNeeded(object, LOGGER);
+          }
+        }
+        componentModel.setEnabled(true);
+      });
+    }
   }
 
   @Override

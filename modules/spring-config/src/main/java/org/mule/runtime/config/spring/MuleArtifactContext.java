@@ -314,7 +314,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     List<String> createdComponentModels = new ArrayList<>();
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (!mustBeRoot || componentModel.isRoot()) {
-        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER)) {
+        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER) || !componentModel.isEnabled()) {
           return;
         }
         if (componentModel.getNameAttribute() != null) {

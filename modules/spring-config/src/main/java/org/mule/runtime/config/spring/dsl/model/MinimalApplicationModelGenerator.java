@@ -84,7 +84,7 @@ public class MinimalApplicationModelGenerator {
     while (iterator.hasNext()) {
       ComponentModel componentModel = iterator.next();
       if (componentModel.getNameAttribute() == null || !allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
-        iterator.remove();
+        componentModel.setEnabled(false);
       }
     }
     return applicationModel;
@@ -106,8 +106,8 @@ public class MinimalApplicationModelGenerator {
           // Just keep the first element that it's the source.
           iterator.next();
           while (iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
+            ComponentModel componentModel = iterator.next();
+            componentModel.setEnabled(false);
           }
         }
           break;
@@ -121,13 +121,13 @@ public class MinimalApplicationModelGenerator {
             if (childComponentModel.getType() != null
                 && areMatchingTypes(Processor.class, childComponentModel.getType())) {
               if (currentElement != selectedPath) {
-                iterator.remove();
+                childComponentModel.setEnabled(false);
               } else {
                 currentLevelModel = childComponentModel;
               }
               currentElement++;
             } else {
-              iterator.remove();
+              childComponentModel.setEnabled(false);
             }
           }
         }
