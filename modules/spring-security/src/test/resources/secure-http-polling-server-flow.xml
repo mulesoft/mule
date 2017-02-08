@@ -33,8 +33,7 @@
         <httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
 
-    <!-- TODO MULE-11651 HTTP request lost when a failing one is processed first. Remove sync processing strategy. -->
-    <flow name="SecureUMO" processingStrategy="synchronous">
+    <flow name="SecureUMO">
         <httpn:listener path="*" config-ref="listenerConfig"/>
         <httpn:basic-security-filter realm="mule-realm" />
         <test:component>
