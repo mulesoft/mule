@@ -21,22 +21,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 public final class ConfigurationOverrides {
 
   /**
-   * Host where the requests will be sent.
-   */
-  @Parameter
-  @Optional
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 1)
-  private String host;
-
-  /**
-   * Port where the requests will be sent.
-   */
-  @Parameter
-  @Optional
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 2)
-  private Integer port;
-
-  /**
    * Specifies whether to follow redirects or not.
    */
   @Parameter
@@ -75,14 +59,6 @@ public final class ConfigurationOverrides {
   @Optional
   @Placement(tab = CONFIGURATION_OVERRIDES, order = 7)
   private Integer responseTimeout;
-
-  public String getHost() {
-    return host;
-  }
-
-  public Integer getPort() {
-    return port;
-  }
 
   public Boolean getFollowRedirects() {
     return followRedirects;

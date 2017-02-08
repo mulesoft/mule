@@ -34,13 +34,19 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 
   @Test
   public void customTlsGlobalContext() throws Exception {
-    final Event res = flowRunner("testFlowGlobalContextClient").withPayload("data").run();
+    final Event res = flowRunner("testFlowGlobalContextClient")
+        .withVariable("port", port1.getNumber())
+        .withPayload("data")
+        .run();
     assertThat(res.getMessage().getPayload().getValue(), is("ok"));
   }
 
   @Test
   public void customTlsNestedContext() throws Exception {
-    final Event res = flowRunner("testFlowNestedContextClient").withPayload("data").run();
+    final Event res = flowRunner("testFlowNestedContextClient")
+        .withVariable("port", port2.getNumber())
+        .withPayload("data")
+        .run();
     assertThat(res.getMessage().getPayload().getValue(), is("all right"));
   }
 

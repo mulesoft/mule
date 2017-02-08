@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -54,7 +55,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   /**
    * Consumes an HTTP service.
    *
-   * @param path Path where the request will be sent.
+   * @param uriSettings URI settings parameter group
    * @param method The HTTP method for the request.
    * @param overrides configuration overrides parameter group
    * @param responseValidationSettings response validation parameter group
@@ -67,26 +68,29 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpRequestMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
-  public void request(@Optional(defaultValue = "/") String path,
-                      @Optional(defaultValue = "GET") String method,
+  public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
+                      @Placement(order = 2) @Optional(defaultValue = "GET") String method,
                       @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
                       @ParameterGroup(
                           name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
-                      @ParameterGroup(name = REQUEST_SETTINGS) HttpRequesterRequestBuilder requestBuilder,
+                      @Placement(order = 3) @ParameterGroup(name = REQUEST_SETTINGS) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @UseConfig HttpRequesterConfig config,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
-      UriParameters uriParameters = client.getDefaultUriParameters();
 
-      String resolvedHost = resolveIfNecessary(overrides.getHost(), uriParameters.getHost());
-      Integer resolvedPort = resolveIfNecessary(overrides.getPort(), uriParameters.getPort());
-      String resolvedBasePath = config.getBasePath();
-      String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, path));
+      String resolvedUri;
+      if (uriSettings.getUrl() == null) {
+        UriParameters uriParameters = client.getDefaultUriParameters();
+        String resolvedBasePath = config.getBasePath();
+        String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, uriSettings.getPath()));
+        resolvedUri = resolveUri(uriParameters.getScheme(), uriParameters.getHost(), uriParameters.getPort(), resolvedPath);
+      } else {
+        resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
+      }
 
-      String resolvedUri = resolveUri(uriParameters.getScheme(), resolvedHost, resolvedPort, resolvedPath);
       Boolean resolvedFollowRedirects =
           resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects());
       HttpStreamingType resolvedStreamingMode =

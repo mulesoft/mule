@@ -18,7 +18,7 @@
     </flow>
 
     <flow name="requestWithoutBasePath">
-        <httpn:request config-ref="configWithoutBasePath" host="localhost" port="${httpPort}" path="#[mel:requestPath]"/>
+        <httpn:request config-ref="configWithoutBasePath" path="#[mel:requestPath]"/>
     </flow>
 
 </mule>

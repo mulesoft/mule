@@ -306,9 +306,9 @@
     <flow name="first-successful">
         <logger level="INFO"/>
         <first-successful>
-            <httpn:request path="weather-forecast" port="6080" config-ref="requestConfig"/>
-            <httpn:request path="weather-forecast" port="6091" config-ref="requestConfig"/>
-            <httpn:request path="weather-forecast" port="6092" config-ref="requestConfig"/>
+            <httpn:request path="weather-forecast" config-ref="requestConfig"/>
+            <httpn:request path="weather-forecast" config-ref="requestConfig"/>
+            <httpn:request path="weather-forecast" config-ref="requestConfig"/>
             <test:queue name="dead-letter-queue"/>
         </first-successful>
     </flow>

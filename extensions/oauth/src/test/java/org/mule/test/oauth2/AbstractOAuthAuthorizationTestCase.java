@@ -102,7 +102,10 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
     try {
       // Force the initialization of the OAuth context
       client = muleContext.getRegistry().lookupObject(ExtensionsClient.class);
-      client.execute("HTTP", "request", builder().configName("requestConfig").build());
+      client.execute("HTTP", "request", builder()
+          .configName("requestConfig")
+          .addParameter("path", "/")
+          .build());
     } catch (Exception e) {
       // Ignore
     }

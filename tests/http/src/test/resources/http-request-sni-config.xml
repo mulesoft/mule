@@ -12,12 +12,16 @@
         <tls:trust-store path="tls/sni-client-truststore.jks" password="changeit"/>
     </tls:context>
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection protocol="HTTPS" port="${httpsPort}" tlsContext="tlsContext"/>
+    <httpn:request-config name="requestConfig1">
+        <httpn:request-connection protocol="HTTPS" host="127.0.0.1" port="${httpsPort}" tlsContext="tlsContext"/>
+    </httpn:request-config>
+
+    <httpn:request-config name="requestConfig2">
+        <httpn:request-connection protocol="HTTPS" host="localhost.localdomain" port="${httpsPort}" tlsContext="tlsContext"/>
     </httpn:request-config>
 
     <flow name="requestFlowLocalhost">
-        <httpn:request config-ref="requestConfig" host="127.0.0.1" path="/"  method="POST">
+        <httpn:request config-ref="requestConfig1" path="/"  method="POST">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="200,201,404"/>
             </httpn:response-validator>
@@ -25,7 +29,7 @@
     </flow>
 
     <flow name="requestFlowFQDN">
-        <httpn:request config-ref="requestConfig" host="localhost.localdomain" path="/"  method="POST">
+        <httpn:request config-ref="requestConfig2" path="/"  method="POST">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="200,201,404"/>
             </httpn:response-validator>
