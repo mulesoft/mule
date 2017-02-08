@@ -101,7 +101,6 @@ public abstract class StatementDefinition<T extends StatementDefinition> extends
     return (T) copy;
   }
 
-
   /**
    * Returns the type for a given parameter
    *
@@ -111,6 +110,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> extends
   public java.util.Optional<ParameterType> getParameterType(String paramName) {
     return parameterTypes.stream().filter(p -> p.getKey().equals(paramName)).findFirst();
   }
+
 
   public List<ParameterType> getParameterTypes() {
     return parameterTypes;
@@ -122,5 +122,9 @@ public abstract class StatementDefinition<T extends StatementDefinition> extends
 
   public void setSql(String sql) {
     this.sql = sql;
+  }
+
+  public void setParameterTypes(List<ParameterType> parameterTypes) {
+    this.parameterTypes = parameterTypes;
   }
 }

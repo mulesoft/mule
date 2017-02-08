@@ -25,7 +25,6 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forType;
-import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -74,7 +73,8 @@ import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverT
 import org.mule.runtime.module.extension.internal.loader.java.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-import org.springframework.core.ResolvableType;
+
+import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -97,6 +97,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -584,11 +586,11 @@ public final class IntrospectionUtils {
     if (!allFields.isEmpty()) {
       return allFields;
     }
-    return getFieldsWithGetters(extensionType);
+    return getFieldsWithGettersAndSetters(extensionType);
   }
 
-  public static Set<Field> getFieldsWithGetters(Class<?> extensionType) {
-    return getPropertyDescriptors(extensionType).stream().filter(p -> p.getReadMethod() != null)
+  public static Set<Field> getFieldsWithGettersAndSetters(Class<?> extensionType) {
+    return getPropertyDescriptors(extensionType).stream().filter(p -> p.getReadMethod() != null && p.getWriteMethod() != null)
         .map(p -> getField(extensionType, p.getName())).filter(Optional::isPresent).map(Optional::get)
         .collect(toSet());
   }

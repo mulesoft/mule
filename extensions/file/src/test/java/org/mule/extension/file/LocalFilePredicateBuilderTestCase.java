@@ -44,11 +44,19 @@ public class LocalFilePredicateBuilderTestCase
 
   @Test
   public void matchesAll() {
-    builder.setFilenamePattern("glob:*.{java, js}").setPathPattern("glob:**.{java, js}")
-        .setCreatedSince(LocalDateTime.of(1980, 1, 1, 0, 0)).setCreatedUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
-        .setUpdatedSince(LocalDateTime.of(2010, 9, 24, 0, 0)).setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0))
-        .setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0)).setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0))
-        .setRegularFile(true).setDirectory(false).setSymbolicLink(false).setMinSize(1L).setMaxSize(1024L);
+    builder.setFilenamePattern("glob:*.{java, js}");
+    builder.setPathPattern("glob:**.{java, js}");
+    builder.setCreatedSince(LocalDateTime.of(1980, 1, 1, 0, 0));
+    builder.setCreatedUntil(LocalDateTime.of(1990, 1, 1, 0, 0));
+    builder.setUpdatedSince(LocalDateTime.of(2010, 9, 24, 0, 0));
+    builder.setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0));
+    builder.setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0));
+    builder.setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0));
+    builder.setRegularFile(true);
+    builder.setDirectory(false);
+    builder.setSymbolicLink(false);
+    builder.setMinSize(1L);
+    builder.setMaxSize(1024L);
 
     assertMatch();
   }

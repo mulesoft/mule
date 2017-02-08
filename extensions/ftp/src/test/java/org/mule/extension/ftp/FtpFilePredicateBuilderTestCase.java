@@ -40,9 +40,15 @@ public class FtpFilePredicateBuilderTestCase
 
   @Test
   public void matchesAll() {
-    builder.setFilenamePattern("glob:*.{java, js}").setPathPattern("glob:**.{java, js}")
-        .setTimestampSince(LocalDateTime.of(1980, 1, 1, 0, 0)).setTimestampUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
-        .setRegularFile(true).setDirectory(false).setSymbolicLink(false).setMinSize(1L).setMaxSize(1024L);
+    builder.setFilenamePattern("glob:*.{java, js}");
+    builder.setPathPattern("glob:**.{java, js}");
+    builder.setTimestampSince(LocalDateTime.of(1980, 1, 1, 0, 0));
+    builder.setTimestampUntil(LocalDateTime.of(1990, 1, 1, 0, 0));
+    builder.setRegularFile(true);
+    builder.setDirectory(false);
+    builder.setSymbolicLink(false);
+    builder.setMinSize(1L);
+    builder.setMaxSize(1024L);
 
     assertMatch();
   }

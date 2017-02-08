@@ -24,6 +24,10 @@ public class HealthyFood implements FarmedFood {
     return true;
   }
 
+  public void setTasteProfile(TasteProfile tasteProfile) {
+    this.tasteProfile = tasteProfile;
+  }
+
   public TasteProfile getTasteProfile() {
     return tasteProfile;
   }

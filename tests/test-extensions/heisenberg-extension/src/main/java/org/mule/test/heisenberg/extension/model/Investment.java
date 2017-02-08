@@ -54,4 +54,24 @@ public abstract class Investment {
   public Map<String, Investment> getInvestmentSpinOffs() {
     return investmentSpinOffs;
   }
+
+  public void setApproved(boolean approved) {
+    this.approved = approved;
+  }
+
+  public void setCommercialName(String commercialName) {
+    this.commercialName = commercialName;
+  }
+
+  public void setDiscardedInvestments(List<Investment> discardedInvestments) {
+    this.discardedInvestments = discardedInvestments;
+  }
+
+  public void setInvestmentSpinOffs(Map<String, Investment> investmentSpinOffs) {
+    this.investmentSpinOffs = investmentSpinOffs;
+  }
+
+  public void setInvestmentInfo(InvestmentInfo investmentInfo) {
+    this.investmentInfo = investmentInfo;
+  }
 }

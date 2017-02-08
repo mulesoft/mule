@@ -64,4 +64,16 @@ public class KnockeableDoor {
   public int hashCode() {
     return victim.hashCode();
   }
+
+  public void setVictim(String victim) {
+    this.victim = victim;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public void setPrevious(KnockeableDoor previous) {
+    this.previous = previous;
+  }
 }

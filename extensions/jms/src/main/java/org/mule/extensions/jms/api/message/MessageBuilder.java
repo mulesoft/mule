@@ -198,7 +198,6 @@ public class MessageBuilder {
         .forEach(key -> setJmsPropertySanitizeKeyIfNecessary(message, key, properties.get(key)));
   }
 
-
   private void setJmsPropertySanitizeKeyIfNecessary(Message msg, String key, Object value) {
     try {
       // sanitize key as JMS Property Name
@@ -228,6 +227,7 @@ public class MessageBuilder {
       LOGGER.error("An error occurred while setting the JMSType property: %s", e);
     }
   }
+
 
   private void setJmsCorrelationIdHeader(Message message) {
     try {
@@ -277,5 +277,45 @@ public class MessageBuilder {
 
   public String getEncoding() {
     return encoding;
+  }
+
+  public void setBody(Object body) {
+    this.body = body;
+  }
+
+  public void setJmsType(String jmsType) {
+    this.jmsType = jmsType;
+  }
+
+  public void setCorrelationId(String correlationId) {
+    this.correlationId = correlationId;
+  }
+
+  public void setSendContentType(boolean sendContentType) {
+    this.sendContentType = sendContentType;
+  }
+
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
+  }
+
+  public void setSendEncoding(boolean sendEncoding) {
+    this.sendEncoding = sendEncoding;
+  }
+
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
+  }
+
+  public void setReplyTo(JmsDestination replyTo) {
+    this.replyTo = replyTo;
+  }
+
+  public void setProperties(Map<String, Object> properties) {
+    this.properties = properties;
+  }
+
+  public void setJmsxProperties(JmsxProperties jmsxProperties) {
+    this.jmsxProperties = jmsxProperties;
   }
 }

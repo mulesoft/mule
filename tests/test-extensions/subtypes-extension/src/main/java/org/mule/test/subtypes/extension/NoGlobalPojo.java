@@ -31,4 +31,15 @@ public class NoGlobalPojo {
     return name;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setNumber(int number) {
+    this.number = number;
+  }
+
+  public void setString(String string) {
+    this.string = string;
+  }
 }

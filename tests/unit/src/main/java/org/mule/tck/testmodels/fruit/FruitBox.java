@@ -14,11 +14,12 @@ import java.util.Map;
 public class FruitBox {
 
   private List<? extends Fruit> fruitLikeList = new ArrayList<>();
+
   private List<Fruit> fruitList = new ArrayList<>();
   private List<?> wildCardList = new ArrayList<>();
   private List rawList = new ArrayList<>();
-
   private Map<?, ?> wildCardMap = new HashMap<>();
+
   private Map<?, ? extends Fruit> fruitLikeMap = new HashMap<>();
   private Map rawMap = new HashMap<>();
 
@@ -44,6 +45,34 @@ public class FruitBox {
 
   public Map getRawMap() {
     return rawMap;
+  }
+
+  public void setFruitLikeList(List<? extends Fruit> fruitLikeList) {
+    this.fruitLikeList = fruitLikeList;
+  }
+
+  public void setFruitList(List<Fruit> fruitList) {
+    this.fruitList = fruitList;
+  }
+
+  public void setWildCardList(List<?> wildCardList) {
+    this.wildCardList = wildCardList;
+  }
+
+  public void setRawList(List rawList) {
+    this.rawList = rawList;
+  }
+
+  public void setWildCardMap(Map<?, ?> wildCardMap) {
+    this.wildCardMap = wildCardMap;
+  }
+
+  public void setFruitLikeMap(Map<?, ? extends Fruit> fruitLikeMap) {
+    this.fruitLikeMap = fruitLikeMap;
+  }
+
+  public void setRawMap(Map rawMap) {
+    this.rawMap = rawMap;
   }
 
 }

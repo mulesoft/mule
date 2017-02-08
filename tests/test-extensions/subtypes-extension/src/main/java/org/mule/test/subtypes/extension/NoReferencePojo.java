@@ -23,4 +23,13 @@ public class NoReferencePojo {
   public String getString() {
     return string;
   }
+
+  public void setNumber(int number) {
+    this.number = number;
+  }
+
+  public void setString(String string) {
+    this.string = string;
+  }
+
 }
