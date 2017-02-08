@@ -144,7 +144,7 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
         }
     }
 
-    private void attemptToCreateImplicitConfigurationInstance(Extension extension, OperationContext operationContext)
+    private synchronized void attemptToCreateImplicitConfigurationInstance(Extension extension, OperationContext operationContext)
     {
         ConfigurationInstanceHolder configurationInstanceHolder = implicitConfigurationFactory.createImplicitConfigurationInstance(extension, operationContext, this);
         if (configurationInstanceHolder != null)
