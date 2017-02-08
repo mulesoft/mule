@@ -69,7 +69,7 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
     configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
 
     final Event result = flowRunner(flowName).withPayload("message").withVariable("userId", userId).run();
-    assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
+    assertThat(result.getMessage().getPayload().getValue(), is(RESOURCE_RESULT));
 
     wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
         .withRequestBody(containing(CLIENT_ID_PARAMETER + "=" + encode(clientId.getValue(), UTF_8.name())))
