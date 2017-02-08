@@ -50,7 +50,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
    * @param maxConcurrency
    */
   public void setMaxConcurrency(int maxConcurrency) {
-    if (maxConcurrency > 1) {
+    if (maxConcurrency < 1) {
       throw new IllegalArgumentException("maxConcurrency must be at least 1");
     }
     this.maxConcurrency = maxConcurrency;
