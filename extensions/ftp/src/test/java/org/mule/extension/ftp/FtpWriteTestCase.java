@@ -130,7 +130,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
     String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
     doWrite("writeStaticContent", path, "", CREATE_NEW, false);
 
-    String content = getPayloadAsString(readPath(path));
+    String content = toString(readPath(path).getPayload().getValue());
     assertThat(content, is(HELLO_WORLD));
   }
 
@@ -146,8 +146,8 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
     final String filename = "encoding.txt";
 
     doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
-    InputStream content =
-        (InputStream) readPath(Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString()).getPayload().getValue();
+    String path = Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString();
+    InputStream content = (InputStream) readPath(path, false).getPayload().getValue();
 
     assertThat(Arrays.equals(toByteArray(content), HELLO_WORLD.getBytes(customEncoding)), is(true));
   }
@@ -158,7 +158,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
     doWrite(path, HELLO_WORLD, mode, true);
 
-    String content = getPayloadAsString(readPath(path));
+    String content = toString(readPath(path).getPayload().getValue());
     assertThat(content, is(HELLO_WORLD));
   }
 
@@ -168,7 +168,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
     String path = Paths.get(testHarness.getWorkingDirectory(), TEMP_DIRECTORY, "test.txt").toString();
     doWrite(path, HELLO_WORLD, mode, false);
 
-    String content = getPayloadAsString(readPath(path));
+    String content = toString(readPath(path));
     assertThat(content, is(HELLO_WORLD));
   }
 
@@ -183,6 +183,6 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
     testHarness.write(filePath, HELLO_WORLD);
 
     doWrite(filePath, HELLO_WORLD, mode, false);
-    return getPayloadAsString(readPath(filePath));
+    return toString(readPath(filePath).getPayload().getValue());
   }
 }

@@ -95,7 +95,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
     assertThat(requestPayload, equalTo(TEST_MESSAGE));
     assertThat(requestURI, equalTo(PATH));
     assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(OK_RESPONSE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(OK_RESPONSE));
 
     proxyServer.stop();
   }

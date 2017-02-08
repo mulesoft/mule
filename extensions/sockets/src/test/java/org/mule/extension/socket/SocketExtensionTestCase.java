@@ -16,7 +16,6 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -26,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -106,13 +104,12 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
   }
 
   protected void assertEvent(Message message, Object expectedContent) throws Exception {
-    String payload = IOUtils.toString((InputStream) message.getPayload().getValue());
+    String payload = getPayloadAsString(message);
     assertEquals(expectedContent, payload);
   }
 
   protected Object deserializeMessage(Message message) throws Exception {
-    return muleContext.getObjectSerializer().getExternalProtocol()
-        .deserialize(IOUtils.toByteArray((InputStream) message.getPayload().getValue()));
+    return muleContext.getObjectSerializer().getExternalProtocol().deserialize((byte[]) message.getPayload().getValue());
   }
 
   protected Message receiveConnection() {
@@ -148,7 +145,7 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
     DataInputStream expectedData = new DataInputStream(expectedByteArray);
 
     // received byte array
-    byte[] bytesReceived = IOUtils.toByteArray((InputStream) message.getPayload().getValue());
+    byte[] bytesReceived = (byte[]) message.getPayload().getValue();
 
     ByteArrayInputStream bytesIn = new ByteArrayInputStream(bytesReceived);
     DataInputStream dataIn = new DataInputStream(bytesIn);

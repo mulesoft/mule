@@ -48,9 +48,13 @@ import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newB
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_DATA_UNIT;
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_INCREMENT_SIZE;
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_SIZE;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
@@ -78,6 +82,9 @@ import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactory
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
+import org.mule.runtime.config.spring.factories.streaming.FileStoreCursorStreamProviderObjectFactory;
+import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
+import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
@@ -103,6 +110,7 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
@@ -655,6 +663,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
     componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
+    componentBuildingDefinitions.addAll(getStreamingDefinitions());
 
     return componentBuildingDefinitions;
   }
@@ -1169,6 +1178,50 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  private List<ComponentBuildingDefinition> getStreamingDefinitions() {
+    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
+
+    buildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("repeatable-in-memory-stream")
+        .withTypeDefinition(fromType(CursorStreamProviderFactory.class))
+        .withObjectFactoryType(InMemoryCursorStreamProviderObjectFactory.class)
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("initialBufferSize")
+                                                .withDefaultValue(DEFAULT_STREAMING_BUFFER_SIZE)
+                                                .build())
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("bufferSizeIncrement")
+                                                .withDefaultValue(DEFAULT_STREAMING_BUFFER_INCREMENT_SIZE)
+                                                .build())
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("maxInMemorySize")
+                                                .withDefaultValue(0)
+                                                .build())
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("bufferUnit", value -> DataUnit.valueOf((String) value))
+                                                .withDefaultValue(DEFAULT_STREAMING_BUFFER_DATA_UNIT).build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("repeatable-file-store-stream")
+        .withTypeDefinition(fromType(CursorStreamProviderFactory.class))
+        .withObjectFactoryType(FileStoreCursorStreamProviderObjectFactory.class)
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("maxInMemorySize").withDefaultValue(DEFAULT_STREAMING_BUFFER_SIZE)
+                                                .build())
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("bufferUnit", value -> DataUnit.valueOf((String) value))
+                                                .withDefaultValue(DEFAULT_STREAMING_BUFFER_DATA_UNIT).build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("in-memory-stream")
+        .withTypeDefinition(fromType(CursorStreamProviderFactory.class))
+        .withObjectFactoryType(NullCursorStreamProviderObjectFactory.class)
+        .build());
+    return buildingDefinitions;
+  }
+
   private List<ComponentBuildingDefinition> getEntryPointResolversDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
     buildingDefinitions.add(baseDefinition
@@ -1285,7 +1338,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   /**
    * Parser for the expanded operations, generated dynamically by the {@link ApplicationModel} by reading the extensions
-   * 
+   *
    * @param componentBuildingDefinitions
    */
   private void addModuleOperationChainParser(LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions) {

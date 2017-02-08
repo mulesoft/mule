@@ -15,6 +15,7 @@ import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.extension.socket.internal.TcpInputStream;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 import java.io.IOException;
@@ -50,14 +51,21 @@ public class StreamingProtocol extends EOFProtocol {
 
   @Override
   public void write(OutputStream os, Object data, String encoding) throws IOException {
-    if (data instanceof InputStream) {
-      InputStream is = (InputStream) data;
-      copyLarge(is, os);
+    if (data instanceof CursorStreamProvider) {
+      data = ((CursorStreamProvider) data).openCursor();
+    }
+
+    try {
+      if (data instanceof InputStream) {
+        InputStream is = (InputStream) data;
+        copyLarge(is, os);
+        is.close();
+      } else {
+        this.writeByteArray(os, getByteArray(data, true, encoding, objectSerializer));
+      }
+    } finally {
       os.flush();
       os.close();
-      is.close();
-    } else {
-      this.writeByteArray(os, getByteArray(data, true, encoding, objectSerializer));
     }
   }
 }

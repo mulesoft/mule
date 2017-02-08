@@ -7,12 +7,14 @@
 package org.mule.runtime.core.transformer.codec;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.Base64;
 import org.mule.runtime.core.util.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -25,6 +27,7 @@ public class Base64Decoder extends AbstractTransformer {
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     setReturnDataType(DataType.BYTE_ARRAY);
   }
 
@@ -35,13 +38,10 @@ public class Base64Decoder extends AbstractTransformer {
 
       if (src instanceof byte[]) {
         data = new String((byte[]) src, outputEncoding);
+      } else if (src instanceof CursorStreamProvider) {
+        data = handleStream(((CursorStreamProvider) src).openCursor(), outputEncoding);
       } else if (src instanceof InputStream) {
-        InputStream input = (InputStream) src;
-        try {
-          data = IOUtils.toString(input, outputEncoding);
-        } finally {
-          input.close();
-        }
+        data = handleStream((InputStream) src, outputEncoding);
       } else {
         data = (String) src;
       }
@@ -56,6 +56,16 @@ public class Base64Decoder extends AbstractTransformer {
     } catch (Exception ex) {
       throw new TransformerException(CoreMessages.transformFailed("base64", getReturnDataType()), this, ex);
     }
+  }
+
+  private String handleStream(InputStream input, Charset outputEncoding) throws IOException {
+    String data;
+    try {
+      data = IOUtils.toString(input, outputEncoding);
+    } finally {
+      input.close();
+    }
+    return data;
   }
 
 }

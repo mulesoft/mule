@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;
@@ -89,6 +90,10 @@ public class ResolverSet implements ValueResolver<ResolverSetResult> {
     Object value = resolver.resolve(event);
     if (value instanceof ValueResolver) {
       return resolveValue((ValueResolver<?>) value, event);
+    }
+
+    if (value instanceof CursorStreamProvider) {
+      value = ((CursorStreamProvider) value).openCursor();
     }
 
     return value;

@@ -16,6 +16,7 @@
 
     <flow name="ntlmAuthRequestWithDomain">
         <httpn:request config-ref="ntlmConfigWithDomain" path="/" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
     <httpn:request-config name="ntlmConfigWithoutDomain">
@@ -28,6 +29,7 @@
 
     <flow name="ntlmAuthRequestWithoutDomain">
         <httpn:request config-ref="ntlmConfigWithoutDomain" path="/" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
     <httpn:request-config name="ntlmConfigWithWorkstation">
@@ -40,6 +42,7 @@
 
     <flow name="ntlmAuthRequestWithWorkstation">
         <httpn:request config-ref="ntlmConfigWithWorkstation" path="/" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

@@ -40,6 +40,6 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
   @Test
   public void acceptsValidCertificate() throws Exception {
     Event result = flowRunner("validCertFlow").withPayload(TEST_MESSAGE).run();
-    assertThat(getPayloadAsString(result.getMessage()), equalTo(DEFAULT_RESPONSE));
+    assertThat(result.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 }

@@ -17,6 +17,7 @@
 
     <flow name="udp-send-and-receive">
         <sockets:send-and-receive config-ref="udp-requester"/>
+        <object-to-string-transformer mimeType="text/plain"/>
     </flow>
 
     <flow name="udp-listen-and-modify-string">

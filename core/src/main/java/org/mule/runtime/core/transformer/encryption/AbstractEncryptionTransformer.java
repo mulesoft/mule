@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.encryption;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,6 +34,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     setReturnDataType(DataType.INPUT_STREAM);
   }
 
@@ -53,6 +55,8 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
     InputStream input;
     if (src instanceof String) {
       input = new ByteArrayInputStream(src.toString().getBytes());
+    } else if (src instanceof CursorStreamProvider) {
+      input = ((CursorStreamProvider) src).openCursor();
     } else if (src instanceof InputStream) {
       input = (InputStream) src;
     } else {

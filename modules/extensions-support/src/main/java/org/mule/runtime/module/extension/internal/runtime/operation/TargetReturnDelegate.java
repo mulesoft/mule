@@ -10,6 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
@@ -27,14 +28,15 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   private final String target;
 
   /**
-   * Creates a new instance
+   * {@inheritDoc}
    *
-   * @param componentModel the component which produces the return value
-   * @param target         the name of the variable in which the output message will be set
-   * @param muleContext    the current {@link MuleContext}
+   * @param target the name of the variable in which the output message will be set
    */
-  TargetReturnDelegate(String target, ComponentModel componentModel, MuleContext muleContext) {
-    super(componentModel, muleContext);
+  TargetReturnDelegate(String target,
+                       ComponentModel componentModel,
+                       CursorStreamProviderFactory cursorStreamProviderFactory,
+                       MuleContext muleContext) {
+    super(componentModel, cursorStreamProviderFactory, muleContext);
     this.target = target;
   }
 

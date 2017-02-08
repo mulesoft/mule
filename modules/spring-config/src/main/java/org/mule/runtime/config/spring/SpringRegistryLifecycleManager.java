@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
@@ -80,6 +81,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExtendedExpressionLanguage.class));
       initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));
+      initOrderedObjects.add(new NotificationLifecycleObject(StreamingManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
       initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));

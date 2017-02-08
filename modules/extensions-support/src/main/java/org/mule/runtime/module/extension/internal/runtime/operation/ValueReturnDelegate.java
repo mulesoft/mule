@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
@@ -24,8 +24,9 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
   /**
    * {@inheritDoc}
    */
-  ValueReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
-    super(componentModel, muleContext);
+  ValueReturnDelegate(ComponentModel componentModel, CursorStreamProviderFactory cursorStreamProviderFactory,
+                      MuleContext muleContext) {
+    super(componentModel, cursorStreamProviderFactory, muleContext);
   }
 
   /**
@@ -46,6 +47,6 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
   @Override
   public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return Event.builder(operationContext.getEvent())
-        .message((InternalMessage) toMessage(value, operationContext)).build();
+        .message(toMessage(value, operationContext)).build();
   }
 }

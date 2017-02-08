@@ -8,33 +8,35 @@ package org.mule.runtime.core.component;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.internal.streaming.bytes.CursorStreamUtils.withCursoredEvent;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.interceptor.Interceptor;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
 import org.mule.runtime.core.context.notification.OptimisedNotificationHandler;
+import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.TransformerTemplate;
@@ -127,11 +129,13 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (interceptorChain == null) {
-      return invokeInternal(event);
-    } else {
-      return interceptorChain.process(event);
-    }
+    return withCursoredEvent(event, cursoredEvent -> {
+      if (interceptorChain == null) {
+        return invokeInternal(cursoredEvent);
+      } else {
+        return interceptorChain.process(cursoredEvent);
+      }
+    });
   }
 
   protected Event createResultEvent(Event event, Event.Builder resultEventBuilder, Object result)

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
 import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -18,6 +19,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -60,7 +62,9 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
         .withSetterParameterDefinition(TARGET_PARAMETER_NAME, fromSimpleParameter(TARGET_PARAMETER_NAME).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
-                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build());
+                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
+        .withSetterParameterDefinition(CURSOR_STREAM_PROVIDER_FACTORY_FIELD_NAME,
+                                       fromChildConfiguration(CursorStreamProviderFactory.class).build());
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(operationModel);
 

@@ -7,10 +7,6 @@
 package org.mule.extension.socket;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.extension.socket.TcpSendAndReceiveStringTestCase.RESPONSE_TEST_STRING;
-import org.mule.runtime.core.util.IOUtils;
-
-import java.io.InputStream;
 
 import org.junit.Test;
 
@@ -23,10 +19,8 @@ public class UdpSendAndReceiveStringTestCase extends SocketExtensionTestCase {
 
   @Test
   public void sendStringAndReceiveModifiedString() throws Exception {
-    InputStream inputStream =
-        (InputStream) flowRunner("udp-send-and-receive").withPayload(TEST_STRING).run().getMessage().getPayload().getValue();
-
-    String response = IOUtils.toString(inputStream);
+    String response =
+        (String) flowRunner("udp-send-and-receive").withPayload(TEST_STRING).run().getMessage().getPayload().getValue();
     assertEquals(response, RESPONSE_TEST_STRING);
   }
 }

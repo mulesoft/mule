@@ -68,6 +68,7 @@ import reactor.core.publisher.Mono;
 public final class DefaultExecutionMediator implements ExecutionMediator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
+
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final ConnectionManagerAdapter connectionManager;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();

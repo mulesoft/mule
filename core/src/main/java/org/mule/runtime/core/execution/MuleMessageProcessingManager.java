@@ -10,12 +10,12 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.policy.PolicyManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,6 +31,9 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
 
   @Inject
   private PolicyManager policyManager;
+
+  @Inject
+  private StreamingManagerAdapter streamingManager;
 
   @Override
   public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {
@@ -53,20 +56,16 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
     messageProcessPhaseList.add(new ValidationPhase());
     messageProcessPhaseList.add(new FlowProcessingPhase());
     messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
-    messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager));
-    Collections.sort(messageProcessPhaseList, new Comparator<MessageProcessPhase>() {
-
-      @Override
-      public int compare(MessageProcessPhase messageProcessPhase, MessageProcessPhase messageProcessPhase2) {
-        int compareValue = 0;
-        if (messageProcessPhase instanceof Comparable) {
-          compareValue = ((Comparable) messageProcessPhase).compareTo(messageProcessPhase2);
-        }
-        if (compareValue == 0 && messageProcessPhase2 instanceof Comparable) {
-          compareValue = ((Comparable) messageProcessPhase2).compareTo(messageProcessPhase) * -1;
-        }
-        return compareValue;
+    messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager, streamingManager));
+    Collections.sort(messageProcessPhaseList, (messageProcessPhase, messageProcessPhase2) -> {
+      int compareValue = 0;
+      if (messageProcessPhase instanceof Comparable) {
+        compareValue = ((Comparable) messageProcessPhase).compareTo(messageProcessPhase2);
       }
+      if (compareValue == 0 && messageProcessPhase2 instanceof Comparable) {
+        compareValue = ((Comparable) messageProcessPhase2).compareTo(messageProcessPhase) * -1;
+      }
+      return compareValue;
     });
 
     for (MessageProcessPhase messageProcessPhase : messageProcessPhaseList) {

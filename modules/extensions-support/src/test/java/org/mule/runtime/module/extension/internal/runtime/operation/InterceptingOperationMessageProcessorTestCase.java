@@ -50,7 +50,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
   protected OperationMessageProcessor createOperationMessageProcessor() {
     InterceptingOperationMessageProcessor messageProcessor =
         new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                  extensionManager, mockPolicyManager);
+                                                  cursorStreamProviderFactory, extensionManager, mockPolicyManager);
 
     messageProcessor.setListener(next);
 

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
 import org.mule.runtime.core.source.polling.watermark.WatermarkPollingInterceptor;
-import org.mule.runtime.core.streaming.ProvidesTotalHint;
+import org.mule.runtime.core.internal.streaming.object.ProvidesTotalHint;
 
 import java.io.Serializable;
 import java.util.Iterator;

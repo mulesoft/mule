@@ -17,30 +17,35 @@
 
     <flow name="testFlow1">
         <httpn:listener path="${path}" allowedMethods="GET" config-ref="listenerConfig"/>
+        <object-to-string-transformer />
         <test:queue name="out"/>
         <set-payload value="GET"/>
     </flow>
 
     <flow name="testFlow2">
         <httpn:listener path="${path}" allowedMethods="POST" config-ref="listenerConfig"/>
+        <object-to-string-transformer />
         <test:queue name="out"/>
         <set-payload value="POST"/>
     </flow>
 
     <flow name="testFlow3">
         <httpn:listener path="${path}" allowedMethods="OPTIONS, DELETE" config-ref="listenerConfig"/>
+        <object-to-string-transformer />
         <test:queue name="out"/>
         <set-payload value="OPTIONS-DELETE"/>
     </flow>
 
     <flow name="testFlow4">
         <httpn:listener path="${path}" config-ref="listenerConfig" />
+        <object-to-string-transformer />
         <test:queue name="out"/>
         <set-payload value="ALL"/>
     </flow>
 
     <flow name="requestFlow">
         <httpn:request path="${path}" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS"/>
+        <object-to-string-transformer />
     </flow>
 
 

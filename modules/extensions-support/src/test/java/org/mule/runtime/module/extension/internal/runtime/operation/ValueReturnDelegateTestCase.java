@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.size.SmallTest;
@@ -23,7 +23,7 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new ValueReturnDelegate(componentModel, muleContext);
+    return new ValueReturnDelegate(componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
   }
 
   @Override

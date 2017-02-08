@@ -30,6 +30,7 @@
 
     <flow name="tcp-send">
         <sockets:send-and-receive config-ref="tcp-requester"/>
+        <object-to-string-transformer mimeType="text/plain"/>
     </flow>
 
     <flow name="tcp-listen">

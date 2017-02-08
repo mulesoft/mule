@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.compression;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
@@ -25,6 +26,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer {
     this.registerSourceType(DataType.fromType(Serializable.class));
     this.registerSourceType(DataType.BYTE_ARRAY);
     this.registerSourceType(DataType.INPUT_STREAM);
+    this.registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     // No type checking for the return type by default. It could either be a byte array or an input stream.
     this.setReturnDataType(DataType.OBJECT);
   }
@@ -32,6 +34,9 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer {
   @Override
   public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
     try {
+      if (src instanceof CursorStreamProvider) {
+        return getStrategy().compressInputStream(((CursorStreamProvider) src).openCursor());
+      }
       if (src instanceof InputStream) {
         return getStrategy().compressInputStream((InputStream) src);
       } else {

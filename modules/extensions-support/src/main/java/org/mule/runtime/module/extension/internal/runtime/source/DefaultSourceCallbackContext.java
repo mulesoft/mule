@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Default implementation of {@link SourceCallbackContext}
@@ -24,7 +22,6 @@ class DefaultSourceCallbackContext implements SourceCallbackContext {
 
   private final SourceCallback sourceCallback;
   private final Map<String, Object> variables = new HashMap<>();
-  private Object messagePolicyDescriptor;
 
   /**
    * Creates a new instance
