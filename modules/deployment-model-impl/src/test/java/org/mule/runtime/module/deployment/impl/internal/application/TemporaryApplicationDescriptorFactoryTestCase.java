@@ -8,10 +8,12 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
@@ -65,20 +67,30 @@ public class TemporaryApplicationDescriptorFactoryTestCase extends AbstractMuleT
 
   @Test
   public void relativeAppClassesFolder() throws Exception {
-    File appClassesFolder = this.temporaryApplicationDescriptorFactory.getAppClassesFolder(applicationDescriptor);
-    assertThat(appClassesFolder.getParentFile().getParentFile(), equalTo(rootArtifactFolder));
+    File folder = this.temporaryApplicationDescriptorFactory.getAppClassesFolder(applicationDescriptor);
+    assertThat(folder.getParentFile().getParentFile(), equalTo(rootArtifactFolder));
+    File standaloneAppClassFolder = MuleFoldersUtil.getAppClassesFolder(APP_NAME);
+    assertRelativeFolder(folder, standaloneAppClassFolder);
+  }
+
+  private void assertRelativeFolder(File folder, File standaloneAppClassFolder) {
+    assertThat(standaloneAppClassFolder.toPath().endsWith(rootArtifactFolder.toPath().relativize(folder.toPath())), is(true));
   }
 
   @Test
   public void relativeAppLibFolder() throws Exception {
-    File appClassesFolder = this.temporaryApplicationDescriptorFactory.getAppLibFolder(applicationDescriptor);
-    assertThat(appClassesFolder.getParentFile().getParentFile(), equalTo(rootArtifactFolder));
+    File folder = this.temporaryApplicationDescriptorFactory.getAppLibFolder(applicationDescriptor);
+    assertThat(folder.getParentFile().getParentFile(), equalTo(rootArtifactFolder));
+    File standaloneAppLibFolder = MuleFoldersUtil.getAppLibFolder(APP_NAME);
+    assertRelativeFolder(folder, standaloneAppLibFolder);
   }
 
   @Test
   public void relativeAppSharedPluginLibsFolder() throws Exception {
-    File appClassesFolder = this.temporaryApplicationDescriptorFactory.getAppSharedLibsFolder(applicationDescriptor);
-    assertThat(appClassesFolder.getParentFile().getParentFile().getParentFile(), equalTo(rootArtifactFolder));
+    File folder = this.temporaryApplicationDescriptorFactory.getAppSharedLibsFolder(applicationDescriptor);
+    assertThat(folder.getParentFile().getParentFile().getParentFile(), equalTo(rootArtifactFolder));
+    File standaloneAppSharedLibsFolder = MuleFoldersUtil.getAppSharedLibsFolder(APP_NAME);
+    assertRelativeFolder(folder, standaloneAppSharedLibsFolder);
   }
 
 }
