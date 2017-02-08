@@ -90,13 +90,13 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     private final FlowConstruct flowConstruct;
 
     public EventCorrelator(EventCorrelatorCallback callback,
-            MessageProcessor timeoutMessageProcessor,
-            MessageInfoMapping messageInfoMapping,
-            MuleContext muleContext,
-            FlowConstruct flowConstruct,
-            PartitionableObjectStore correlatorStore,
-            String storePrefix,
-            ObjectStore<Long> processedGroups)
+                           MessageProcessor timeoutMessageProcessor,
+                           MessageInfoMapping messageInfoMapping,
+                           MuleContext muleContext,
+                           FlowConstruct flowConstruct,
+                           PartitionableObjectStore correlatorStore,
+                           String storePrefix,
+                           ObjectStore<Long> processedGroups)
     {
         if (callback == null)
         {
@@ -242,7 +242,25 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 if (callback.shouldAggregateEvents(group))
                 {
                     // create the response event
-                    MuleEvent returnEvent = callback.aggregateEvents(group);
+                    MuleEvent returnEvent = null;
+                    try
+                    {
+                        returnEvent = callback.aggregateEvents(group);
+                    }
+                    catch (RoutingException routingException)
+                    {
+                        try
+                        {
+                            this.removeEventGroup(group);
+                            group.clear();
+                        }
+                        catch (ObjectStoreException objectStoreException)
+                        {
+                            throw new RoutingException(event, timeoutMessageProcessor, objectStoreException);
+                        }
+
+                        throw routingException;
+                    }
                     returnEvent.getMessage().setCorrelationId(groupId);
                     String rootId = group.getCommonRootId();
                     if (rootId != null)
@@ -585,7 +603,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         return storePrefix + ".expiredAndDispatchedGroups";
     }
-    
+
     protected String getEventGroupsPartitionKey()
     {
         return storePrefix + ".eventGroups";
