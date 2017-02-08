@@ -31,6 +31,7 @@
     <flow name="testFlow">
         <httpn:request host="localhost" port="${oauth.server.port}" path="/resource" method="POST"
                       config-ref="requestConfig"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>
