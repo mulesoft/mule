@@ -15,13 +15,12 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+
 import org.mule.extension.oauth2.api.exception.TokenNotFoundException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,6 +33,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorizationTestCase {
@@ -64,9 +65,6 @@ public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorization
   @Before
   public void before() throws Exception {
     // Force the initialization of the OAuth context
-    // TODO MULE-11405 switch to the client
-    // muleContext.getRegistry().lookupObject(ExtensionsClient.class).execute("HTTP", "request",
-    // builder().configName("requestConfig").build());
     flowRunner("testFlow").runNoVerify();
   }
 

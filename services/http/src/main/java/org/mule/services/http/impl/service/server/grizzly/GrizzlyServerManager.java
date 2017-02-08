@@ -7,6 +7,7 @@
 package org.mule.services.http.impl.service.server.grizzly;
 
 import static java.lang.Integer.valueOf;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
@@ -14,6 +15,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -32,6 +34,7 @@ import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
@@ -43,7 +46,6 @@ import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
-import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,21 +54,20 @@ public class GrizzlyServerManager implements HttpServerManager {
   // Defines the maximum size in bytes accepted for the http request header section (request line + headers)
   public static final String MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY = SYSTEM_PROPERTY_PREFIX + "http.headerSectionSize";
   private static final int MAX_KEEP_ALIVE_REQUESTS = -1;
-  private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
-  private static final String LISTENER_WORKER_THREAD_NAME_SUFFIX = ".worker";
   private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
   private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
   private final TCPNIOTransport transport;
   private final GrizzlyRequestDispatcherFilter requestHandlerFilter;
   private final HttpListenerRegistry httpListenerRegistry;
   private final WorkManagerSourceExecutorProvider executorProvider;
-  private final String threadNamePrefix;
+  private final ExecutorService idleTimeoutExecutorService;
   private Logger logger = LoggerFactory.getLogger(GrizzlyServerManager.class);
   private Map<ServerAddress, GrizzlyHttpServer> servers = new ConcurrentHashMap<>();
   private Map<ServerAddress, IdleExecutor> idleExecutorPerServerAddressMap = new ConcurrentHashMap<>();
   private boolean transportStarted;
 
-  public GrizzlyServerManager(String threadNamePrefix, HttpListenerRegistry httpListenerRegistry,
+  public GrizzlyServerManager(ExecutorService selectorPool, ExecutorService workerPool,
+                              ExecutorService idleTimeoutExecutorService, HttpListenerRegistry httpListenerRegistry,
                               TcpServerSocketProperties serverSocketProperties)
       throws IOException {
     this.httpListenerRegistry = httpListenerRegistry;
@@ -91,16 +92,13 @@ public class GrizzlyServerManager implements HttpServerManager {
 
     transport.setNIOChannelDistributor(new RoundRobinConnectionDistributor(transport, true, true));
 
-    transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + LISTENER_WORKER_THREAD_NAME_SUFFIX);
-
-    // No kernel thread pool config is set in the transport at this point. Need to set one to define the pool name.
-    transport.setKernelThreadPoolConfig(ThreadPoolConfig.defaultConfig().setCorePoolSize(transport.getSelectorRunnersCount())
-        .setMaxPoolSize(transport.getSelectorRunnersCount()).setPoolName(threadNamePrefix));
+    transport.setWorkerThreadPool(workerPool);
+    transport.setKernelThreadPool(selectorPool);
 
     // Set filterchain as a Transport Processor
     transport.setProcessor(serverFilterChainBuilder.build());
 
-    this.threadNamePrefix = threadNamePrefix;
+    this.idleTimeoutExecutorService = idleTimeoutExecutorService;
   }
 
   private void configureServerSocketProperties(TCPNIOTransportBuilder transportBuilder,
@@ -163,6 +161,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     return false;
   }
 
+  @Override
   public HttpServer createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<Scheduler> schedulerSupplier,
                                        final ServerAddress serverAddress, boolean usePersistentConnections,
                                        int connectionIdleTimeout)
@@ -186,6 +185,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     return grizzlyServer;
   }
 
+  @Override
   public HttpServer createServerFor(ServerAddress serverAddress, Supplier<Scheduler> schedulerSupplier,
                                     boolean usePersistentConnections, int connectionIdleTimeout)
       throws IOException {
@@ -243,7 +243,7 @@ public class GrizzlyServerManager implements HttpServerManager {
       ka.setMaxRequestsCount(MAX_KEEP_ALIVE_REQUESTS);
       ka.setIdleTimeoutInSeconds((int) MILLISECONDS.toSeconds(connectionIdleTimeout));
     }
-    IdleExecutor idleExecutor = new IdleExecutor(threadNamePrefix);
+    IdleExecutor idleExecutor = new IdleExecutor(idleTimeoutExecutorService);
     idleExecutorPerServerAddressMap.put(serverAddress, idleExecutor);
     HttpServerFilter httpServerFilter =
         new HttpServerFilter(true, retrieveMaximumHeaderSectionSize(), ka, idleExecutor.getIdleTimeoutDelayedExecutor());
@@ -256,9 +256,9 @@ public class GrizzlyServerManager implements HttpServerManager {
     try {
       return valueOf(getProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY, String.valueOf(DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE)));
     } catch (NumberFormatException e) {
-      throw new MuleRuntimeException(createStaticMessage(String.format("Invalid value %s for %s configuration",
-                                                                       getProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY),
-                                                                       MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY)),
+      throw new MuleRuntimeException(createStaticMessage(format("Invalid value %s for %s configuration",
+                                                                getProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY),
+                                                                MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY)),
                                      e);
     }
   }
@@ -268,7 +268,7 @@ public class GrizzlyServerManager implements HttpServerManager {
    */
   private class GrizzlyHttpServerWrapper extends GrizzlyHttpServer {
 
-    //TODO - MULE-11117: Cleanup GrizzlyServerManager server specific data
+    // TODO - MULE-11117: Cleanup GrizzlyServerManager server specific data
 
     public GrizzlyHttpServerWrapper(ServerAddress serverAddress, TCPNIOTransport transport,
                                     HttpListenerRegistry listenerRegistry, Supplier<Scheduler> schedulerSupplier) {

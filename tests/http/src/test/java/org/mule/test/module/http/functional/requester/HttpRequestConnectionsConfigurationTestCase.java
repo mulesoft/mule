@@ -11,11 +11,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig.OBJECT_HTTP_CLIENT_FACTORY;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -61,6 +62,7 @@ public class HttpRequestConnectionsConfigurationTestCase extends AbstractMuleTes
   private DefaultHttpRequesterConfig createRequesterConfig() {
     DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
     requesterConfig.setMuleContext(mockMuleContext);
+    requesterConfig.setSchedulerService(new SimpleUnitTestSupportSchedulerService());
     requesterConfig.setName("TestConfig");
     return requesterConfig;
   }

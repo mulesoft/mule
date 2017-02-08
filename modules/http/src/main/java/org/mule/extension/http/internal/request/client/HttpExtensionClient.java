@@ -20,8 +20,8 @@ import org.mule.service.http.api.client.async.ResponseHandler;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 
 /**
- * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection
- * default values for them.
+ * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection default
+ * values for them.
  *
  * @since 4.0
  */
@@ -51,7 +51,12 @@ public class HttpExtensionClient implements Startable, Stoppable {
   @Override
   public void start() throws MuleException {
     httpClient.start();
-    startIfNeeded(authentication);
+    try {
+      startIfNeeded(authentication);
+    } catch (Exception e) {
+      httpClient.stop();
+      throw e;
+    }
   }
 
   @Override

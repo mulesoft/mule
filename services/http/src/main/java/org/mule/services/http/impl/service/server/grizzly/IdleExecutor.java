@@ -6,9 +6,6 @@
  */
 package org.mule.services.http.impl.service.server.grizzly;
 
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
-
 import java.util.concurrent.ExecutorService;
 
 import org.glassfish.grizzly.utils.DelayedExecutor;
@@ -18,14 +15,11 @@ import org.glassfish.grizzly.utils.DelayedExecutor;
  */
 public class IdleExecutor {
 
-  private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
+  public static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
 
-  private ExecutorService idleTimeoutExecutorService;
   private DelayedExecutor idleTimeoutDelayedExecutor;
 
-  public IdleExecutor(String prefix) {
-    //TODO - MULE-10545: Change http selectors to use a connector pool from the service
-    this.idleTimeoutExecutorService = newCachedThreadPool(new NamedThreadFactory(prefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+  public IdleExecutor(ExecutorService idleTimeoutExecutorService) {
     this.idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
   }
 
@@ -39,7 +33,6 @@ public class IdleExecutor {
 
   public void dispose() {
     idleTimeoutDelayedExecutor.destroy();
-    idleTimeoutExecutorService.shutdown();
   }
 
 }
