@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.transformer.codec;
 
+import static org.apache.commons.io.IOUtils.toByteArray;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.Base64;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,7 +62,7 @@ public class Base64Encoder extends AbstractTransformer {
   private byte[] handleStream(InputStream src, Charset encoding) throws IOException {
     InputStreamReader input = new InputStreamReader(src);
     try {
-      return IOUtils.toByteArray(input, encoding);
+      return toByteArray(input, encoding);
     } finally {
       input.close();
     }

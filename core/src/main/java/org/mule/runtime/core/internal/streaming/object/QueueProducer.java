@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.streaming;
+package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.core.util.queue.Queue;
 

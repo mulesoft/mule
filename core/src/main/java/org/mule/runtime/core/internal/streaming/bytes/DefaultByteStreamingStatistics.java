@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.core.api.streaming.bytes.ByteStreamingStatistics;
+import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

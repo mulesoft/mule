@@ -14,7 +14,7 @@ import static java.nio.ByteBuffer.allocate;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;

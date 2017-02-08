@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.api.streaming.CursorStream;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.InputStream;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.streaming.bytes;
+package org.mule.runtime.core.streaming.bytes;
 
 import org.mule.runtime.api.streaming.CursorStream;
 import org.mule.runtime.api.streaming.CursorStreamProvider;
@@ -17,12 +17,12 @@ import org.mule.runtime.api.streaming.CursorStreamProvider;
 public interface ByteStreamingStatistics {
 
   /**
-   * @return How many {@link CursorStreamProvider} instances are currently opened
+   * @return How many {@link CursorStreamProvider} instances are currently open
    */
   int getOpenCursorProvidersCount();
 
   /**
-   * @return How many {@link CursorStream} instances are currently opened
+   * @return How many {@link CursorStream} instances are currently open
    */
   int getOpenCursorsCount();
 }

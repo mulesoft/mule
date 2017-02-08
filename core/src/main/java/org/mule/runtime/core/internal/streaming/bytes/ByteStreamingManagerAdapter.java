@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 
 /**
  * Adapter interface to expand the {@link ByteStreamingManager} API with behavior which

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.streaming;
+package org.mule.runtime.core.internal.streaming.object;
 
 import java.io.IOException;
 import java.util.List;

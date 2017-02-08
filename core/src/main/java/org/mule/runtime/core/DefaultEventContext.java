@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.core.api.Event;
@@ -264,7 +265,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public List<EventContext> getChildContexts() {
-      return null;
+      return emptyList();
     }
 
     @Override

@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.IOException;
 import java.io.InputStream;

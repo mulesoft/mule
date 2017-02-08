@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.streaming.bytes.factory;
 import static org.mule.runtime.core.api.functional.Either.left;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.CursorStreamProviderAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryCursorStreamProvider;

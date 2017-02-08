@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.util.UUID;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;

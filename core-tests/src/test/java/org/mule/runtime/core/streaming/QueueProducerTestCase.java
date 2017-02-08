@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.streaming;
 
+import org.mule.runtime.core.internal.streaming.object.QueueProducer;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.queue.Queue;
 

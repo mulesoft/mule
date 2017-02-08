@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -326,14 +326,14 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
 
   public static <T> T ifInputStream(Object value, CheckedFunction<InputStream, T> function) throws NotAnInputStreamException {
     boolean shouldCloseStream = false;
-    InputStream stream;
+    InputStream stream = null;
     if (value instanceof CursorStreamProvider) {
       stream = ((CursorStreamProvider) value).openCursor();
       shouldCloseStream = true;
     } else if (value instanceof InputStream) {
       stream = (InputStream) value;
     } else {
-      throw new NotAnInputStreamException();
+      throw new NotAnInputStreamException(stream);
     }
 
     try {

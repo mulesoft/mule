@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.streaming;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 
 /**
  * Adapter interface which extends the {@link StreamingManager} contract with behavior

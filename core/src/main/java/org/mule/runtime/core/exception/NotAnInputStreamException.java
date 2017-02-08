@@ -20,7 +20,9 @@ import java.io.InputStream;
  */
 public class NotAnInputStreamException extends MuleException {
 
-  public NotAnInputStreamException() {
-    super(createStaticMessage("Was expecting an InputStream or a stream provider"));
+  public NotAnInputStreamException(Object value) {
+    super(createStaticMessage("Was expecting an InputStream or a stream provider but " +
+        (value != null ? value.getClass().getName() : "null") +
+        " was found instead"));
   }
 }

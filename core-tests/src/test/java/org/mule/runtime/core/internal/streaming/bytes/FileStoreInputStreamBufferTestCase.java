@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig;
+import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
