@@ -6,7 +6,6 @@
  */
 package org.mule.tck.junit4;
 
-import static java.lang.System.getProperty;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -164,15 +163,6 @@ public abstract class AbstractMuleTestCase {
     return testTimeoutSecs;
   }
 
-  /**
-   * Could be useful to use it in place of hardcoding the pom project version in the tests.
-   *
-   * @return the "project.version" maven property.
-   */
-  protected static String getMavenProjectVersionProperty() {
-    return getProperty("maven.projectVersion");
-  }
-
   @Before
   public final void initializeMuleTest() {
     skipTestWhenDisabledInCurrentEnvironment();
@@ -230,7 +220,6 @@ public abstract class AbstractMuleTestCase {
     }
     Collections.sort(threadNames);
     return threadNames;
-
   }
 
 
