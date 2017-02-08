@@ -95,6 +95,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
   @Test
   public void onFileUpdated() throws Exception {
     onFileCreated();
+    receivedMessages.clear();
 
     final String appendedContent = "\nNOBODY";
     final File file = new File(listenerFolder, WATCH_FILE);
