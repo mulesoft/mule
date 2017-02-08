@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.el;
 
+import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
@@ -14,25 +16,31 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-
+import static org.mule.runtime.api.metadata.DataType.fromFunction;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -51,6 +59,46 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Before
   public void setUp() {
     expressionManager = new DefaultExpressionManager(muleContext);
+  }
+
+  @Test
+  @Description("Verifies that global bindings can be added.")
+  public void globals() {
+    DataType integerType = fromType(Integer.class);
+
+    ExpressionFunction multiply = new ExpressionFunction() {
+
+      @Override
+      public Object call(Object[] objects, BindingContext bindingContext) {
+        return ((Integer) objects[0]) * ((Integer) objects[1]);
+      }
+
+      @Override
+      public Optional<DataType> returnType() {
+        return of(integerType);
+      }
+
+      @Override
+      public List<FunctionParameter> parameters() {
+        return asList(new FunctionParameter("x", integerType),
+                      new FunctionParameter("y", integerType));
+      }
+    };
+
+    BindingContext globalContext = builder()
+        .addBinding("aNum", new TypedValue(4, fromType(Integer.class)))
+        .addBinding("times", new TypedValue(multiply, fromFunction(multiply)))
+        .build();
+
+    expressionManager.addGlobalContext(globalContext);
+
+    TypedValue result = expressionManager.evaluate("aNum times 5");
+    assertThat(result.getValue(), is(20));
+
+    expressionManager.addGlobalContext(builder().addBinding("otherNum", new TypedValue(3, integerType)).build());
+
+    result = expressionManager.evaluate("(times(7, 3) + otherNum) / aNum");
+    assertThat(result.getValue(), is(6));
   }
 
   @Test
@@ -84,7 +132,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that custom variables are considered.")
   public void simpleCustomVariable() {
     Object object = new Object();
-    BindingContext context = BindingContext.builder().addBinding(MY_VAR, new TypedValue(object, OBJECT)).build();
+    BindingContext context = builder().addBinding(MY_VAR, new TypedValue(object, OBJECT)).build();
     assertThat(expressionManager.evaluate("#[myVar]", context).getValue(), equalTo(object));
   }
 
@@ -119,7 +167,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that a simple transformation works.")
   public void transformation() throws MuleException {
     String expression = "payload";
-    TypedValue result = expressionManager.evaluate(expression, BYTE_ARRAY, BindingContext.builder().build(), testEvent());
+    TypedValue result = expressionManager.evaluate(expression, BYTE_ARRAY, builder().build(), testEvent());
     assertThat(result.getValue(), is(TEST_PAYLOAD.getBytes()));
     assertThat(result.getDataType(), is(BYTE_ARRAY));
   }
@@ -128,7 +176,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Description("Verifies that a simple transformation works even when it's not required.")
   public void transformationNotNeeded() throws MuleException {
     String expression = "payload";
-    TypedValue result = expressionManager.evaluate(expression, STRING, BindingContext.builder().build(), testEvent());
+    TypedValue result = expressionManager.evaluate(expression, STRING, builder().build(), testEvent());
     assertThat(result.getValue(), is(TEST_PAYLOAD));
     assertThat(result.getDataType(), is(STRING));
   }
