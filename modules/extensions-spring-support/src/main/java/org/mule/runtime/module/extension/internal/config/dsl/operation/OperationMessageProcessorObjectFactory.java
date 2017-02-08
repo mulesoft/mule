@@ -7,14 +7,15 @@
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorFactory.getOperationMessageProcessor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
@@ -28,9 +29,12 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private final PolicyManager policyManager;
   private ConfigurationProvider configuration;
   private String target = EMPTY;
+  private CursorStreamProviderFactory cursorStreamProviderFactory;
 
-  public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel, OperationModel operationModel,
-                                                MuleContext muleContext, PolicyManager policyManager) {
+  public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
+                                                OperationModel operationModel,
+                                                MuleContext muleContext,
+                                                PolicyManager policyManager) {
     super(muleContext);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
@@ -39,8 +43,12 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
 
   @Override
   public OperationMessageProcessor doGetObject() throws Exception {
-    return getOperationMessageProcessor(extensionModel, operationModel, configuration, policyManager, parameters, muleContext,
-                                        target);
+    return new OperationMessageProcessorBuilder(extensionModel, operationModel, policyManager, muleContext)
+        .setConfigurationProvider(configuration)
+        .setParameters(parameters)
+        .setTarget(target)
+        .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+        .build();
   }
 
   public void setConfigurationProvider(ConfigurationProvider configuration) {
@@ -49,5 +57,9 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
 
   public void setTarget(String target) {
     this.target = target;
+  }
+
+  public void setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
+    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
   }
 }

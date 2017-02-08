@@ -15,6 +15,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -260,6 +262,19 @@ public class DefaultEventBuilder implements Event.Builder {
       this.legacyCorrelationId = legacyCorrelationId;
 
       this.notificationsEnabled = notificationsEnabled;
+
+      resolveStreaming();
+    }
+
+    private void resolveStreaming() {
+      if (message == null || message.getPayload() == null) {
+        return;
+      }
+
+      Object payload = message.getPayload().getValue();
+      if (payload instanceof CursorStreamProvider || payload instanceof InputStream) {
+        context.streaming();
+      }
     }
 
     @Override

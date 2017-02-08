@@ -15,10 +15,10 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,7 +46,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void responseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload().getValue() instanceof InputStream);
+    assertTrue(event.getMessage().getPayload().getValue() instanceof CursorStreamProvider);
     assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 

@@ -9,6 +9,7 @@ package org.mule.functional.junit4.matchers;
 import static java.lang.String.format;
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
@@ -54,6 +55,8 @@ public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
   private String getString(Object payload) {
     if (payload instanceof String) {
       return (String) payload;
+    } else if (payload instanceof CursorStreamProvider) {
+      return IOUtils.toString((CursorStreamProvider) payload);
     } else if (payload instanceof InputStream) {
       return IOUtils.toString((InputStream) payload);
     } else {

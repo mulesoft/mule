@@ -9,6 +9,7 @@ package org.mule.runtime.core.streaming;
 
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.internal.streaming.object.ListableObjectStoreProducer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;

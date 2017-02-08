@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.codec;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -25,6 +26,7 @@ public class XmlEntityDecoder extends AbstractTransformer {
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     setReturnDataType(DataType.STRING);
   }
 
@@ -35,6 +37,10 @@ public class XmlEntityDecoder extends AbstractTransformer {
 
       if (src instanceof byte[]) {
         data = new String((byte[]) src, encoding);
+      } else if (src instanceof CursorStreamProvider) {
+        try (InputStream in = ((CursorStreamProvider) src).openCursor()) {
+          data = IOUtils.toString(in, encoding);
+        }
       } else if (src instanceof InputStream) {
         data = IOUtils.toString((InputStream) src, encoding);
       } else {

@@ -188,7 +188,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   /**
    * Uses the {@link ParameterGroupModelProperty} obtain the resolvers.
    *
-   * @param model operation model
+   * @param parameterGroupModels the parameter groups
    * @return mapping between the {@link Method}'s arguments which are parameters groups and their respective resolvers
    */
   private Map<Parameter, ParameterGroupArgumentResolver<? extends Object>> getParameterGroupResolvers(List<ParameterGroupModel> parameterGroupModels) {

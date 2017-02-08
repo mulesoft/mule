@@ -15,16 +15,19 @@
 
     <flow name="streamingAutoConfigMode">
         <httpn:request config-ref="requestConfigMode" method="POST" path="path" />
+        <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAlwaysConfigMode">
         <httpn:request config-ref="requestConfigMode" method="POST" path="path" requestStreamingMode="ALWAYS" />
+        <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAuto">
         <httpn:request config-ref="requestConfig"  method="POST" path="path">
             <httpn:headers>#[headers]</httpn:headers>
         </httpn:request>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAutoBothHeaders">
@@ -33,17 +36,20 @@
                 #[mel:['Transfer-Encoding' : 'chunked' , 'Content-Length' : '12']]
             </httpn:headers>
         </httpn:request>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAlways">
         <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS">
             <httpn:headers>#[headers]</httpn:headers>
         </httpn:request>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="streamingNever">
         <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER">
             <httpn:headers>#[headers]</httpn:headers>
         </httpn:request>
+        <object-to-string-transformer />
     </flow>
 </mule>

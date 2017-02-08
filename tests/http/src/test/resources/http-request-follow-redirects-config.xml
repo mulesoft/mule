@@ -31,33 +31,41 @@
 
     <flow name="default">
         <httpn:request config-ref="noFollowRedirects" path="testPath"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="followRedirects">
         <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="true"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="dontFollowRedirects">
         <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="false"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="followRedirectsExpression">
         <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[mel:redirect]"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="fromConfig">
         <httpn:request config-ref="withFollowRedirects" path="testPath"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="overrideConfig">
         <httpn:request config-ref="withFollowRedirects" path="testPath" followRedirects="true"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="fromConfigExpression">
         <httpn:request config-ref="withFollowRedirectsExpression" path="testPath"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="followRedirectsHttps">
         <httpn:request config-ref="httpsConfig" path="testPath" followRedirects="true"/>
+        <object-to-string-transformer />
     </flow>
 </mule>

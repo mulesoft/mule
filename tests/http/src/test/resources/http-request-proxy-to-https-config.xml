@@ -23,6 +23,7 @@
 
     <flow name="httpFlow">
         <httpn:request config-ref="httpProxy" path="testPath"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

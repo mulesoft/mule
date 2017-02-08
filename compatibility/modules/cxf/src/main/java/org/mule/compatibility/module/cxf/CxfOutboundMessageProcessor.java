@@ -22,6 +22,7 @@ import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -394,6 +395,10 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       payload = response[0];
     } else {
       payload = response;
+    }
+
+    if (payload instanceof CursorStreamProvider) {
+      payload = ((CursorStreamProvider) payload).openCursor();
     }
 
     InternalMessage.Builder builder = InternalMessage.builder(transportResponse.getMessage());

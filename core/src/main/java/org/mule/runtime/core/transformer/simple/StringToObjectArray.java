@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
@@ -29,6 +30,7 @@ public class StringToObjectArray extends AbstractTransformer {
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     setReturnDataType(DataType.fromType(Object[].class));
   }
 
@@ -38,6 +40,8 @@ public class StringToObjectArray extends AbstractTransformer {
 
     if (src instanceof byte[]) {
       in = createStringFromByteArray((byte[]) src, outputEncoding);
+    } else if (src instanceof CursorStreamProvider) {
+      in = createStringFromInputStream(((CursorStreamProvider) src).openCursor());
     } else if (src instanceof InputStream) {
       in = createStringFromInputStream((InputStream) src);
     } else {

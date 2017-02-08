@@ -6,18 +6,16 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
@@ -31,6 +29,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     registerSourceType(DataType.fromType(Serializable.class));
     setReturnDataType(DataType.fromType(OutputHandler.class));
   }
@@ -38,46 +37,29 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
   @Override
   public Object doTransform(final Object src, final Charset encoding) throws TransformerException {
     if (src instanceof String) {
-      return new OutputHandler() {
-
-        @Override
-        public void write(Event event, OutputStream out) throws IOException {
-          out.write(((String) src).getBytes(encoding));
-        }
-      };
+      return (OutputHandler) (event, out) -> out.write(((String) src).getBytes(encoding));
     } else if (src instanceof byte[]) {
-      return new OutputHandler() {
-
-        @Override
-        public void write(Event event, OutputStream out) throws IOException {
-          out.write((byte[]) src);
-        }
-      };
+      return (OutputHandler) (event, out) -> out.write((byte[]) src);
+    } else if (src instanceof CursorStreamProvider) {
+      return handleInputStream(((CursorStreamProvider) src).openCursor());
     } else if (src instanceof InputStream) {
-      return new OutputHandler() {
-
-        @Override
-        public void write(Event event, OutputStream out) throws IOException {
-          InputStream is = (InputStream) src;
-          try {
-            IOUtils.copyLarge(is, out);
-          } finally {
-            is.close();
-          }
-        }
-      };
+      return handleInputStream((InputStream) src);
     } else if (src instanceof Serializable) {
-      return new OutputHandler() {
-
-        @Override
-        public void write(Event event, OutputStream out) throws IOException {
-          muleContext.getObjectSerializer().getExternalProtocol().serialize(src, out);
-        }
-      };
+      return (OutputHandler) (event, out) -> muleContext.getObjectSerializer().getExternalProtocol().serialize(src, out);
     } else {
       throw new TransformerException(I18nMessageFactory
           .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
     }
+  }
+
+  private OutputHandler handleInputStream(InputStream is) {
+    return (event, out) -> {
+      try {
+        IOUtils.copyLarge(is, out);
+      } finally {
+        is.close();
+      }
+    };
   }
 
   @Override

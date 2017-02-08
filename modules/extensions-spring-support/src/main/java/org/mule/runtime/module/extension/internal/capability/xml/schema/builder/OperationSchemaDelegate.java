@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
@@ -53,6 +54,9 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
 
   private void registerOperationType(String name, OperationModel operationModel, DslElementSyntax dslSyntax) {
     ExtensionType operationType = createExecutableType(name, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax);
+    initialiseSequence(operationType);
+    ExplicitGroup sequence = operationType.getSequence();
+    builder.addInfrastructureParameters(operationType, operationModel, sequence);
 
     List<ParameterModel> inlineGroupedParameters = operationModel.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)

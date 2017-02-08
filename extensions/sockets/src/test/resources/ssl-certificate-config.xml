@@ -34,6 +34,7 @@
 
     <flow name="ssl-send-and-receive">
         <sockets:send-and-receive config-ref="ssl-request"/>
+        <object-to-string-transformer mimeType="text/plain"/>
     </flow>
 
     <flow name="ssl-listen">

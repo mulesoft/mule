@@ -9,7 +9,6 @@ package org.mule.functional.functional;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.functional.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;

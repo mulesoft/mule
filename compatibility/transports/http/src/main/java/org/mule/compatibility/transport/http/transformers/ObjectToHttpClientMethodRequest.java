@@ -22,6 +22,7 @@ import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -82,6 +83,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.STRING);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     registerSourceType(DataType.fromType(OutputHandler.class));
     registerSourceType(DataType.fromType(Map.class));
   }
@@ -320,7 +322,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
         return;
       }
 
-      if (src instanceof InputStream) {
+      if (src instanceof CursorStreamProvider) {
+        postMethod.setRequestEntity(new InputStreamRequestEntity(((CursorStreamProvider) src).openCursor(), outboundMimeType));
+      } else if (src instanceof InputStream) {
         postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src, outboundMimeType));
       } else if (src instanceof byte[]) {
         postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[]) src, outboundMimeType));

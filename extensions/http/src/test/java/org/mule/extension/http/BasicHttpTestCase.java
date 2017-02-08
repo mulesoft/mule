@@ -12,15 +12,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -121,7 +121,7 @@ public class BasicHttpTestCase extends AbstractHttpTestCase {
   @Test
   public void sendsRequest() throws Exception {
     Event response = flowRunner("client").withPayload("PEPE").run();
-    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload().getValue()), is("WOW"));
+    assertThat(IOUtils.toString((CursorStreamProvider) response.getMessage().getPayload().getValue()), is("WOW"));
     assertThat(method, is("GET"));
     assertThat(headers, hasEntry("X-Custom", "custom-value"));
     assertThat(query, is("query=param"));

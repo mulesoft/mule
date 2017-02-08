@@ -13,10 +13,12 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELI
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
@@ -56,6 +58,8 @@ public class ErrorTypeLocatorFactory {
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
             .addExceptionMapping(Exception.class, errorTypeRepository.getErrorType(UNKNOWN).get())
             .addExceptionMapping(Error.class, errorTypeRepository.getCriticalErrorType())
+            .addExceptionMapping(StreamingBufferSizeExceededException.class,
+                                 errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
             .build())
         .build();
   }

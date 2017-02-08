@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ftp;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 
 import org.mule.extension.FtpTestHarness;
@@ -16,9 +17,12 @@ import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -51,7 +55,11 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
   }
 
   protected Message readPath(String path) throws Exception {
-    return getPath(path).getMessage();
+    return readPath(path, true);
+  }
+
+  protected Message readPath(String path, boolean streaming) throws Exception {
+    return getPath(path, streaming).getMessage();
   }
 
   protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {
@@ -69,14 +77,51 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
   }
 
   private Event getPath(String path) throws Exception {
-    return flowRunner("read").withVariable("path", path).run();
+    return getPath(path, true);
+  }
+
+  private Event getPath(String path, boolean streaming) throws Exception {
+    return flowRunner("read")
+        .withVariable("path", path)
+        .withVariable("streaming", streaming)
+        .run();
   }
 
   protected String readPathAsString(String path) throws Exception {
-    return getPayloadAsString(readPath(path));
+    return toString(readPath(path).getPayload().getValue());
   }
 
   protected boolean isLocked(Message message) {
     return ((AbstractFileInputStream) message.getPayload().getValue()).isLocked();
   }
+
+  protected String toString(Object value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value instanceof Message) {
+      value = ((Message) value).getPayload().getValue();
+    }
+
+    if (value instanceof String) {
+      return (String) value;
+    }
+
+    InputStream inputStream;
+    if (value instanceof CursorStreamProvider) {
+      inputStream = ((CursorStreamProvider) value).openCursor();
+    } else if (value instanceof InputStream) {
+      inputStream = (InputStream) value;
+    } else {
+      throw new IllegalArgumentException("Result was not of expected type");
+    }
+
+    try {
+      return IOUtils.toString(inputStream);
+    } finally {
+      closeQuietly(inputStream);
+    }
+  }
+
 }

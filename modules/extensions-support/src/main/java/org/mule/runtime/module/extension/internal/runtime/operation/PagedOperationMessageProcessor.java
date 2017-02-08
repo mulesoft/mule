@@ -14,11 +14,12 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.streaming.Consumer;
-import org.mule.runtime.core.streaming.ConsumerIterator;
-import org.mule.runtime.core.streaming.ListConsumer;
-import org.mule.runtime.core.streaming.Producer;
+import org.mule.runtime.core.internal.streaming.object.Consumer;
+import org.mule.runtime.core.internal.streaming.object.ConsumerIterator;
+import org.mule.runtime.core.internal.streaming.object.ListConsumer;
+import org.mule.runtime.core.internal.streaming.object.Producer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -40,9 +41,11 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         ConfigurationProvider configurationProvider,
                                         String target,
                                         ResolverSet resolverSet,
+                                        CursorStreamProviderFactory cursorStreamProviderFactory,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager) {
-    super(extensionModel, operationModel, configurationProvider, target, resolverSet, extensionManager, policyManager);
+    super(extensionModel, operationModel, configurationProvider, target, resolverSet, cursorStreamProviderFactory,
+          extensionManager, policyManager);
   }
 
   @Override

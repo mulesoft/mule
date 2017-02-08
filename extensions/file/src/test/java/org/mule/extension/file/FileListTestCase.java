@@ -19,11 +19,10 @@ import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class FileListTestCase extends FileConnectorTestCase {
@@ -117,7 +116,7 @@ public class FileListTestCase extends FileConnectorTestCase {
         assertThat(attributes.getName(), equalTo(SUB_DIRECTORY_NAME));
       } else {
         assertThat(attributes.getName(), endsWith(".html"));
-        assertThat(IOUtils.toString((InputStream) message.getPayload().getValue()), equalTo(CONTENT));
+        assertThat(toString(message.getPayload().getValue()), equalTo(CONTENT));
         assertThat(attributes.getSize(), is(new Long(CONTENT.length())));
       }
     }

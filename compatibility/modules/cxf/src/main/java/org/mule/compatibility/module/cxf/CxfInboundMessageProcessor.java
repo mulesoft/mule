@@ -30,6 +30,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -482,7 +483,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         m.put(Message.ENCODING, encoding.name());
       });
 
-      if (payload instanceof InputStream) {
+      if (payload instanceof CursorStreamProvider) {
+        m.setContent(InputStream.class, ((CursorStreamProvider) payload).openCursor());
+      } else if (payload instanceof InputStream) {
         m.setContent(InputStream.class, payload);
       } else {
         InputStream is = (InputStream) ctx.transformMessage(DataType.INPUT_STREAM, muleContext);

@@ -19,6 +19,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
     Event response = flowRunner("client").run();
     stop.set(true);
     assertThat(response.getMessage(), hasAttributes(instanceOf(HttpResponseAttributes.class)));
-    assertThat(response.getMessage().getPayload().getValue(), instanceOf(InputStream.class));
+    assertThat(response.getMessage().getPayload().getValue(), instanceOf(CursorStreamProvider.class));
   }
 
   @Test

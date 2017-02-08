@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
@@ -15,10 +18,7 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_I
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
-
+import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.builder;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 /**
@@ -90,6 +90,8 @@ public abstract class Errors {
      */
     public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
 
+    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
+
   }
 
   public static final class ComponentIdentifiers {
@@ -113,8 +115,8 @@ public abstract class Errors {
     public static final ComponentIdentifier SECURITY =
         new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier UNKNOWN =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
   }
 }

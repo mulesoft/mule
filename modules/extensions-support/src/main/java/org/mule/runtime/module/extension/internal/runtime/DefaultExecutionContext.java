@@ -112,24 +112,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
-  public <T> T getTypeSafeParameter(String parameterName, Class<? extends T> expectedType) {
-    Object value = getParameter(parameterName);
-    if (value == null) {
-      return null;
-    }
-
-    if (!expectedType.isInstance(value)) {
-      throw new IllegalArgumentException(String.format("'%s' was expected to be of type '%s' but type '%s' was found instead",
-                                                       parameterName, expectedType.getName(), value.getClass().getName()));
-    }
-
-    return (T) value;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public <T> T getVariable(String key) {
     return (T) variables.get(key);
   }
@@ -203,8 +185,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   }
 
   private OperationTransactionalAction getTransactionalAction() {
-    OperationTransactionalAction action =
-        getTypeSafeParameter(TRANSACTIONAL_ACTION_PARAMETER_NAME, OperationTransactionalAction.class);
+    OperationTransactionalAction action = getParameter(TRANSACTIONAL_ACTION_PARAMETER_NAME);
     if (action == null) {
       throw new IllegalArgumentException(format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
                                                 componentModel.getName(),

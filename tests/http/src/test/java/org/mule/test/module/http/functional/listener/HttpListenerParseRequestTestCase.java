@@ -9,11 +9,11 @@ package org.mule.test.module.http.functional.listener;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.http.client.fluent.Request;
@@ -36,13 +36,13 @@ public class HttpListenerParseRequestTestCase extends AbstractHttpTestCase {
   @Test
   public void parseRequestListenerAttributeWithConfigWithoutParseRequestAttribute() throws Exception {
     sendUrlEncodedPost("listenerWithConfigWithParseRequestNoValue", listenPort.getNumber());
-    assertMessageContains(InputStream.class);
+    assertMessageContains(CursorStreamProvider.class);
   }
 
   @Test
   public void parseRequestListenerConfigWithParseRequestAttribute() throws Exception {
     sendUrlEncodedPost("listenerWithConfigWithParseRequestValue", listenPort2.getNumber());
-    assertMessageContains(InputStream.class);
+    assertMessageContains(CursorStreamProvider.class);
   }
 
   @Test

@@ -8,10 +8,11 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.time.OffsetTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -70,7 +71,7 @@ public interface EventContext extends Publisher<Event> {
   void success();
 
   /**
-   * Complete this {@link EventContext} successfully with a resut {@link Event}.
+   * Complete this {@link EventContext} successfully with a result {@link Event}.
    *
    * @param event the result event.
    */
@@ -107,4 +108,30 @@ public interface EventContext extends Publisher<Event> {
    * @return {@code true} if the source system provided a correlation id, {@code false otherwise}.
    */
   boolean isCorrelationIdFromSource();
+
+  /**
+   * @return An immutable list with all the child context which were produced from {@code this} instance
+   */
+  List<EventContext> getChildContexts();
+
+  /**
+   * Returns {@code this} context's parent if it has one
+   * @return {@code this} context's parent or {@link Optional#empty()} if it doesn't have one
+   */
+  Optional<EventContext> getParentContext();
+
+  /**
+   * @return Whether {@code this} context and all its childs have been completed
+   */
+  boolean isTerminated();
+
+  /**
+   * Indicates that the owning {@link Event} is involved in at least one streaming operation
+   */
+  void streaming();
+
+  /**
+   * @return Whether {@code this} context or any of its childs is taking part in a streaming operation
+   */
+  boolean isStreaming();
 }

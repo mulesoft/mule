@@ -47,10 +47,12 @@
 
     <flow name="testRequestToInsecure">
         <httpn:request config-ref="clientGlobalConfig" port="${port1}" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="testRequestToSecure">
         <httpn:request config-ref="clientGlobalConfig" port="${port2}" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

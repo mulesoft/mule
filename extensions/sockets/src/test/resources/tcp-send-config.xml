@@ -30,6 +30,7 @@
 
     <flow name="tcp-send">
         <sockets:send config-ref="tcp-requester"/>
+        <object-to-byte-array-transformer />
     </flow>
 
     <flow name="tcp-listen">
@@ -39,7 +40,7 @@
     </flow>
 
     <sub-flow name="onIncomingConnection">
-        <expression-component>mel:new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
-        </expression-component>
+        <object-to-byte-array-transformer />
+        <expression-component>mel:new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)</expression-component>
     </sub-flow>
 </mule>

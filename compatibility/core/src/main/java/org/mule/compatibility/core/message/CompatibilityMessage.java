@@ -7,6 +7,7 @@
 package org.mule.compatibility.core.message;
 
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.ExceptionPayload;

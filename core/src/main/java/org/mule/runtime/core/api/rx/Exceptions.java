@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.core.api.rx;
 
-import static reactor.core.Exceptions.propagate;
 import static reactor.core.Exceptions.unwrap;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.util.func.CheckedBiConsumer;
+import org.mule.runtime.core.util.func.CheckedBiFunction;
+import org.mule.runtime.core.util.func.CheckedBiPredicate;
+import org.mule.runtime.core.util.func.CheckedConsumer;
+import org.mule.runtime.core.util.func.CheckedFunction;
+import org.mule.runtime.core.util.func.CheckedPredicate;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -128,96 +133,6 @@ public class Exceptions {
    */
   public static <T, U> BiPredicate<T, U> checkedPredicate(CheckedBiPredicate<T, U> checkedBiPredicate) {
     return (t, u) -> checkedBiPredicate.test(t, u);
-  }
-
-  @FunctionalInterface
-  public interface CheckedConsumer<T> extends Consumer<T> {
-
-    @Override
-    default void accept(T t) {
-      try {
-        acceptChecked(t);
-      } catch (Throwable throwable) {
-        throw propagate(throwable);
-      }
-    }
-
-    void acceptChecked(T t) throws Throwable;
-  }
-
-  @FunctionalInterface
-  public interface CheckedBiConsumer<T, U> extends BiConsumer<T, U> {
-
-    @Override
-    default void accept(T t, U u) {
-      try {
-        acceptChecked(t, u);
-      } catch (Throwable throwable) {
-        throw propagate(throwable);
-      }
-    }
-
-    void acceptChecked(T t, U u) throws Throwable;
-  }
-
-  @FunctionalInterface
-  public interface CheckedFunction<T, R> extends Function<T, R> {
-
-    @Override
-    default R apply(T t) {
-      try {
-        return applyChecked(t);
-      } catch (Throwable throwable) {
-        throw propagate(throwable);
-      }
-    }
-
-    R applyChecked(T t) throws Throwable;
-  }
-
-  @FunctionalInterface
-  public interface CheckedBiFunction<T, U, R> extends BiFunction<T, U, R> {
-
-    @Override
-    default R apply(T t, U u) {
-      try {
-        return applyChecked(t, u);
-      } catch (Throwable throwable) {
-        throw propagate(throwable);
-      }
-    }
-
-    R applyChecked(T t, U u) throws Throwable;
-  }
-
-  @FunctionalInterface
-  public interface CheckedPredicate<T> extends Predicate<T> {
-
-    @Override
-    default boolean test(T t) {
-      try {
-        return testChecked(t);
-      } catch (Throwable throwable) {
-        throw propagate(throwable);
-      }
-    }
-
-    boolean testChecked(T t) throws Throwable;
-  }
-
-  @FunctionalInterface
-  public interface CheckedBiPredicate<T, U> extends BiPredicate<T, U> {
-
-    @Override
-    default boolean test(T t, U u) {
-      try {
-        return testChecked(t, u);
-      } catch (Throwable throwable) {
-        throw propagate(throwable);
-      }
-    }
-
-    boolean testChecked(T t, U u) throws Throwable;
   }
 
   /**

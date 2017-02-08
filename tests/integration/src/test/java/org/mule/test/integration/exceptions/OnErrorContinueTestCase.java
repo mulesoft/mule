@@ -10,10 +10,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -168,11 +169,10 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
       try {
         Object payload = event.getMessage().getPayload().getValue();
-        if (payload instanceof InputStream) {
-          InputStreamReader inputStreamReader =
-              new InputStreamReader((InputStream) payload, "UTF-8");
-
-          newsRequest = new ObjectMapper().readValue(inputStreamReader, NewsRequest.class);
+        if (payload instanceof CursorStreamProvider) {
+          newsRequest = handleInputStream(((CursorStreamProvider) payload).openCursor());
+        } else if (payload instanceof InputStream) {
+          newsRequest = handleInputStream((InputStream) payload);
         } else if (payload instanceof String) {
           newsRequest = new ObjectMapper().readValue((String) payload, NewsRequest.class);
         } else {
@@ -186,6 +186,15 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
+    }
+
+    private NewsRequest handleInputStream(InputStream payload) throws IOException {
+      NewsRequest newsRequest;
+      InputStreamReader inputStreamReader =
+          new InputStreamReader(payload, "UTF-8");
+
+      newsRequest = new ObjectMapper().readValue(inputStreamReader, NewsRequest.class);
+      return newsRequest;
     }
   }
 
