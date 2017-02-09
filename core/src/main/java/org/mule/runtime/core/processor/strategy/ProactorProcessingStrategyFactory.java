@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
@@ -148,10 +149,8 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
-      //return publisher -> from(publisher).parallel(min(getRuntime().availableProcessors(), maxConcurrency))
-      //    .runOn(fromExecutorService(getExecutorService(cpuLightScheduler))).composeGroup(pipelineFunction);
-      return super.onPipeline(flowConstruct, pipelineFunction);
+      return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
+          .transform(pipelineFunction);
     }
 
     @Override
@@ -168,9 +167,8 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
 
     private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
                                                                   Scheduler scheduler) {
-      return publisher -> from(publisher).flatMap(event -> just(event).transform(processorFunction)
-          .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
-          .subscribeOn(fromExecutorService(getExecutorService(scheduler))), maxConcurrency);
+      return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(scheduler)))
+          .transform(processorFunction).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)));
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {
@@ -186,6 +184,11 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
       return scheduler -> false;
     }
 
+
+    @Override
+    public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+      return new StreamPerEventSink(function, createOnEventConsumer());
+    }
   }
 
 }
