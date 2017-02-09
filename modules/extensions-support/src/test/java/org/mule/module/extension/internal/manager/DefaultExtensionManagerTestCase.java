@@ -100,6 +100,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
 
     private final Object configInstance = new Object();
 
+    private boolean threadsTestOk = true;
+
     @Before
     public void before()
     {
@@ -319,7 +321,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
                     public void run()
                     {
                         testLatch.release();
-                        extensionsManager.getConfigurationInstance(extension1, extension1OperationContext);
+                        try
+                        {
+                            extensionsManager.getConfigurationInstance(extension1, extension1OperationContext);
+                        }
+                        catch (IllegalStateException e)
+                        {
+                            DefaultExtensionManagerTestCase.this.threadsTestOk = false;
+                        }
                     }
                 }.start();
 
@@ -330,8 +339,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase
         });
 
         Object configurationInstance = extensionsManager.getConfigurationInstance(extension1, extension1OperationContext);
-        assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
+        assertThat(joinerLatch.await(10, TimeUnit.SECONDS), is(true));
         assertThat(configurationInstance, is(sameInstance(configInstance)));
+        assertThat(threadsTestOk, is(true));
     }
 
     @Test(expected = IllegalStateException.class)

@@ -200,15 +200,15 @@ public final class DefaultExtensionManager implements ExtensionManagerAdapter, M
 
     private void attemptToCreateImplicitConfigurationInstance(Extension extension, OperationContext operationContext)
     {
-        Configuration implicitConfiguration = getImplicitConfiguration(extension);
-
-        if (implicitConfiguration == null)
+        synchronized (extension)
         {
-            throw new IllegalStateException(String.format("Could not find a config for extension '%s' and none can be created automatically. Please define one", extension.getName()));
-        }
+            Configuration implicitConfiguration = getImplicitConfiguration(extension);
 
-        synchronized (implicitConfiguration)
-        {
+            if (implicitConfiguration == null)
+            {
+                throw new IllegalStateException(String.format("Could not find a config for extension '%s' and none can be created automatically. Please define one", extension.getName()));
+            }
+
             //check that another thread didn't beat us to create the instance
             if (!extensionRegistry.getExtensionState(extension).getConfigurationInstanceProviders().isEmpty())
             {
