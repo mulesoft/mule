@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.lock;
 
+import org.mule.runtime.api.lock.LockFactory;
+
 import java.util.concurrent.locks.Lock;
 
 /**

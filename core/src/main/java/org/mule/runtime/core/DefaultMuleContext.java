@@ -48,6 +48,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.TransformationService;
@@ -113,7 +114,6 @@ import org.mule.runtime.core.util.ServerStartupSplashScreen;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 

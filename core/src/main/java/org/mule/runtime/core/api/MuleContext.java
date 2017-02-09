@@ -8,6 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -41,7 +42,6 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.queue.QueueManager;
 
 import java.io.Serializable;

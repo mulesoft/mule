@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.lock;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lock.LockFactory;
+import org.mule.runtime.api.lock.LockFactory;
 
 import java.util.concurrent.TimeUnit;
 
