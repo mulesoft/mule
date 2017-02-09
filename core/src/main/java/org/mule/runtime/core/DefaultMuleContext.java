@@ -37,6 +37,7 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -145,7 +146,7 @@ public class DefaultMuleContext implements MuleContext {
   /**
    * logger used by this class
    */
-  private transient Logger logger = LoggerFactory.getLogger(DefaultMuleContext.class);
+  private static Logger logger = getLogger(DefaultMuleContext.class);
 
   private CustomizationService customizationService = new DefaultCustomizationService();
 
@@ -255,6 +256,10 @@ public class DefaultMuleContext implements MuleContext {
         return throwable;
       }
     });
+
+    // Log dropped events/errors rather than blow up which causes cryptic timeouts and stack traces.
+    Hooks.onErrorDropped(error -> logger.error("ERROR DROPPED UNEXPECTEDLY" + error));
+    Hooks.onNextDropped(event -> logger.error("EVENT DROPPED UNEXPECTEDLY" + event));
   }
 
   /**
