@@ -149,6 +149,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
+      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
           .transform(pipelineFunction);
     }
@@ -167,6 +168,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
 
     private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
                                                                   Scheduler scheduler) {
+      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(scheduler)))
           .transform(processorFunction).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)));
     }
@@ -187,6 +189,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
       return new StreamPerEventSink(function, createOnEventConsumer());
     }
   }
