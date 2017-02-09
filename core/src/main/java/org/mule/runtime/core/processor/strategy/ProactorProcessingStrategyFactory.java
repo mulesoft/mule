@@ -148,8 +148,10 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     @Override
     public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      return publisher -> from(publisher).parallel(min(getRuntime().availableProcessors(), maxConcurrency))
-          .runOn(fromExecutorService(getExecutorService(cpuLightScheduler))).composeGroup(pipelineFunction);
+      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
+      //return publisher -> from(publisher).parallel(min(getRuntime().availableProcessors(), maxConcurrency))
+      //    .runOn(fromExecutorService(getExecutorService(cpuLightScheduler))).composeGroup(pipelineFunction);
+      return super.onPipeline(flowConstruct, pipelineFunction);
     }
 
     @Override
