@@ -7,15 +7,16 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -44,10 +45,10 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), is(PARENT_ONLY));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), is(PARENT_ONLY));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), is(PARENT_ONLY));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), is(CHILD_FIRST));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), sameInstance(CHILD_FIRST));
   }
 
   @Test

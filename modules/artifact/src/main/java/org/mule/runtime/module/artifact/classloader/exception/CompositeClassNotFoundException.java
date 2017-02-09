@@ -10,8 +10,7 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.toList;
-
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 
 import java.util.List;
 
@@ -23,9 +22,9 @@ public class CompositeClassNotFoundException extends ClassNotFoundException {
 
   private static final long serialVersionUID = -6941980241656380059L;
 
-  private String className;
-  private ClassLoaderLookupStrategy lookupStrategy;
-  private List<ClassNotFoundException> exceptions;
+  private final String className;
+  private final LookupStrategy lookupStrategy;
+  private final List<ClassNotFoundException> exceptions;
 
   /**
    * Builds the exception.
@@ -34,7 +33,7 @@ public class CompositeClassNotFoundException extends ClassNotFoundException {
    * @param lookupStrategy the lookupStrategy that was used to load the class.
    * @param exceptions the exceptions thrown by each individual classloader that was used for the loading.
    */
-  public CompositeClassNotFoundException(String className, ClassLoaderLookupStrategy lookupStrategy,
+  public CompositeClassNotFoundException(String className, LookupStrategy lookupStrategy,
                                          List<ClassNotFoundException> exceptions) {
     super(format("Cannot load class '%s': %s", className,
                  exceptions.stream().map((e) -> lineSeparator() + "\t" + e.getMessage()).collect(toList())),
@@ -54,7 +53,7 @@ public class CompositeClassNotFoundException extends ClassNotFoundException {
   /**
    * @return the lookupStrategy that was used to load the class.
    */
-  public ClassLoaderLookupStrategy getLookupStrategy() {
+  public LookupStrategy getLookupStrategy() {
     return lookupStrategy;
   }
 

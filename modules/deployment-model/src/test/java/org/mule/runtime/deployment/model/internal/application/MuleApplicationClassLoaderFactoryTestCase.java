@@ -20,7 +20,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;

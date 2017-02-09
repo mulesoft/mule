@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -45,7 +45,8 @@ public class ToolingPluginArtifactClassLoaderTestCase extends AbstractMuleTestCa
     when(classLoaderLookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     regionClassLoader =
-        new RegionClassLoader(TEST_REGION, new ArtifactDescriptor(REGION_NAME), null, classLoaderLookupPolicy);
+        new RegionClassLoader(TEST_REGION, new ArtifactDescriptor(REGION_NAME), getClass().getClassLoader(),
+                              classLoaderLookupPolicy);
     // Loading the additional classloader as the ToolingPluginClassLoaderBuilder does
     regionClassLoader.addClassLoader(mock(ArtifactClassLoader.class), mock(ArtifactClassLoaderFilter.class));
     artifactPluginDescriptor = new ArtifactPluginDescriptor(PLUGIN_NAME);

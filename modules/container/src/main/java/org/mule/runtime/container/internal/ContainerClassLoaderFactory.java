@@ -7,16 +7,14 @@
 
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
-
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import com.google.common.collect.ImmutableSet;
@@ -95,7 +93,7 @@ public class ContainerClassLoaderFactory {
    */
   public ArtifactClassLoader createContainerClassLoader(final ClassLoader parentClassLoader) {
     final List<MuleModule> muleModules = moduleDiscoverer.discover();
-    final ClassLoaderLookupPolicy containerLookupPolicy = getContainerClassLoaderLookupPolicy(muleModules);
+    final ClassLoaderLookupPolicy containerLookupPolicy = getContainerClassLoaderLookupPolicy(parentClassLoader, muleModules);
 
     return createArtifactClassLoader(parentClassLoader, muleModules, containerLookupPolicy, new ArtifactDescriptor("mule"));
   }
@@ -103,14 +101,16 @@ public class ContainerClassLoaderFactory {
   /**
    * Creates the container lookup policy to be used by child class loaders.
    *
+   * @param parentClassLoader classloader used as parent of the container's. Is the classLoader that will load Mule classes.  
    * @param muleModules list of modules that would be used to register in the filter based of the class loader.
    * @return a non null {@link ClassLoaderLookupPolicy} that contains the lookup policies for boot, system packages. plus exported
    *         packages by the given list of {@link MuleModule}.
    */
-  protected ClassLoaderLookupPolicy getContainerClassLoaderLookupPolicy(List<MuleModule> muleModules) {
+  protected ClassLoaderLookupPolicy getContainerClassLoaderLookupPolicy(ClassLoader parentClassLoader,
+                                                                        List<MuleModule> muleModules) {
     final Set<String> parentOnlyPackages = new HashSet<>(getBootPackages());
     parentOnlyPackages.addAll(SYSTEM_PACKAGES);
-    final Map<String, ClassLoaderLookupStrategy> lookupStrategies = buildClassLoaderLookupStrategy(muleModules);
+    final Map<String, LookupStrategy> lookupStrategies = buildClassLoaderLookupStrategy(parentClassLoader, muleModules);
     return new MuleClassLoaderLookupPolicy(lookupStrategies, parentOnlyPackages);
   }
 
@@ -136,26 +136,29 @@ public class ContainerClassLoaderFactory {
   }
 
   /**
-   * Creates a {@link Map<String, ClassLoaderLookupStrategy>} with PARENT_ONLY strategy for the packages exported by the mule
-   * modules.
+   * Creates a {@link Map<String, LookupStrategy>} for the packages exported on the container.
    *
-   * @param muleModules to be used for collecting the exported packages
-   * @return a {@link Map<String, ClassLoaderLookupStrategy>} for the exported packages as PARENT_ONLY
+   * @param containerClassLoader class loader containing container's classes. Non null.
+   * @param modules to be used for collecting the exported packages. Non null
+   * @return a {@link Map<String, LookupStrategy>} for the packages exported on the container
    */
-  private Map<String, ClassLoaderLookupStrategy> buildClassLoaderLookupStrategy(List<MuleModule> muleModules) {
-    final Map<String, ClassLoaderLookupStrategy> result = new HashMap<>();
-    for (MuleModule muleModule : muleModules) {
+  private Map<String, LookupStrategy> buildClassLoaderLookupStrategy(ClassLoader containerClassLoader,
+                                                                     List<MuleModule> modules) {
+    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
+    checkArgument(modules != null, "modules cannot be null");
+
+    ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(containerClassLoader);
+
+    final Map<String, LookupStrategy> result = new HashMap<>();
+    for (MuleModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
-        result.put(exportedPackage, getLookupStrategyFor(exportedPackage));
+        // Lets artifacts to extend javax packages
+        result.put(exportedPackage, exportedPackage.startsWith("javax.") ? PARENT_FIRST
+            : containerOnlyLookupStrategy);
       }
     }
 
     return result;
-  }
-
-  private ClassLoaderLookupStrategy getLookupStrategyFor(String exportedPackage) {
-    // Lets artifacts to extend javax package
-    return exportedPackage.startsWith("javax.") ? PARENT_FIRST : PARENT_ONLY;
   }
 
   /**

@@ -15,9 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.TestClassLoader.TestClassNotFoundException;
@@ -95,8 +95,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
 
     final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
-    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(PARENT_ONLY);
-    when(lookupPolicy.getLookupStrategy(String.class.getName())).thenReturn(PARENT_ONLY);
+    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getLookupStrategy(String.class.getName())).thenReturn(PARENT_FIRST);
 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);

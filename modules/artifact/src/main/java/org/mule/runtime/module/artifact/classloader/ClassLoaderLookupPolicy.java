@@ -18,13 +18,13 @@ import java.util.Map;
 public interface ClassLoaderLookupPolicy {
 
   /**
-   * Returns the classloader lookup strategy to use for a given class.
+   * Returns the lookup strategy to use for a given class.
    *
    * @param className class to lookup.
-   * @return the configured lookup strategy for the class's package or {@link ClassLoaderLookupStrategy#CHILD_FIRST} if not
+   * @return the configured lookup strategy for the class's package or {@link ChildFirstLookupStrategy#CHILD_FIRST} if not
    *         explicit configuration was defined for the package.
    */
-  ClassLoaderLookupStrategy getLookupStrategy(String className);
+  LookupStrategy getLookupStrategy(String className);
 
   /**
    * Creates a new instance extending the original poclicy configuration
@@ -33,6 +33,6 @@ public interface ClassLoaderLookupPolicy {
    * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
    *         parameter.
    */
-  ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies);
+  ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies);
 
 }
