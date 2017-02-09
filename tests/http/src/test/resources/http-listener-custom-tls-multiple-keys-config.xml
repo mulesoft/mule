@@ -46,10 +46,12 @@
 
     <flow name="testFlowClientWithCertificate">
         <httpn:request config-ref="requestConfigWithCertificate" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="testFlowClientWithoutCertificate">
         <httpn:request config-ref="requestConfigWithoutCertificate" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
 
