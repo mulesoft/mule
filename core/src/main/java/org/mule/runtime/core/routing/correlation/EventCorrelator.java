@@ -190,8 +190,18 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         // check to see if the event group is ready to be aggregated
         if (callback.shouldAggregateEvents(group)) {
           // create the response event
-          Event returnEvent = callback.aggregateEvents(group);
-
+          Event returnEvent = null;
+          try {
+            returnEvent = callback.aggregateEvents(group);
+          } catch (RoutingException routingException) {
+            try {
+              this.removeEventGroup(group);
+              group.clear();
+            } catch (ObjectStoreException objectStoreException) {
+              throw new RoutingException(timeoutMessageProcessor, objectStoreException);
+            }
+            throw routingException;
+          }
           // remove the eventGroup as no further message will be received
           // for this group once we aggregate
           try {

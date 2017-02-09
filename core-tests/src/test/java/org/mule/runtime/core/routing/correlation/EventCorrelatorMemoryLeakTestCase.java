@@ -17,6 +17,19 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.routing.EventGroup;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.Serializable;
 
 import org.junit.Before;
@@ -25,83 +38,71 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 
-public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase
-{
+public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
 
-    private EventCorrelator eventCorrelator;
-    private final EventCorrelatorCallback eventCorrelatorCallback = mock(EventCorrelatorCallback.class);
-    private final MessageProcessor messageProcessor = mock(MessageProcessor.class);
-    private final MessageInfoMapping messageInfoMapping = mock(MessageInfoMapping.class);
-    private final FlowConstruct flowConstruct = mock(FlowConstruct.class);
-    private PartitionableObjectStore<EventGroup> partitionableObjectStore = mock(PartitionableObjectStore.class);
-    private ObjectStore<Long> objectStore =  mock(ObjectStore.class);
-    private MuleEvent event = mock(MuleEvent.class);
-    private MuleContext muleContext = mock(MuleContext.class);
-    private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-    private EventGroup eventGroup = mock(EventGroup.class);
-    private int countOfEventGroups = 0;
-    private boolean eventGroupWasSaved = false;
+  private EventCorrelator eventCorrelator;
+  private final EventCorrelatorCallback eventCorrelatorCallback = mock(EventCorrelatorCallback.class);
+  private final Processor messageProcessor = mock(Processor.class);
+  private PartitionableObjectStore<EventGroup> partitionableObjectStore = mock(PartitionableObjectStore.class);
+  private ObjectStore<Long> objectStore = mock(ObjectStore.class);
+  private Event event = mock(Event.class);
+  private final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+  private MuleContext muleContext = mock(MuleContext.class);
+  private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+  private EventGroup eventGroup = mock(EventGroup.class);
+  private int countOfEventGroups = 0;
+  private boolean eventGroupWasSaved = false;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        setReturnsAndExceptions();
-        setAnswers();
-        eventCorrelator = new EventCorrelator(eventCorrelatorCallback, messageProcessor, messageInfoMapping,
-                                              muleContext, flowConstruct, partitionableObjectStore, "prefix", objectStore);
+  @Before
+  public void setUp() throws Exception {
+    setReturnsAndExceptions();
+    setAnswers();
+    eventCorrelator = new EventCorrelator(eventCorrelatorCallback, messageProcessor,
+                                          muleContext, flowConstruct, partitionableObjectStore, "prefix", objectStore);
+  }
+
+  @Test
+  public void testEventGroupFreedInRoutingException() throws Exception {
+    Event event = mock(Event.class);
+    try {
+      eventCorrelator.process(event);
+      fail("Routing Exception must be catched.");
+    } catch (RoutingException e) {
+      assertTrue("Event Group wasn't saved", eventGroupWasSaved);
+      assertThat(countOfEventGroups, is(0));
     }
 
-    @Test
-    public void testEventGroupFreedInRoutingException() throws Exception
-    {
-        MuleEvent event = mock(MuleEvent.class);
-        try
-        {
-            eventCorrelator.process(event);
-            fail("Routing Exception must be catched.");
-        }
-        catch (RoutingException e)
-        {
-            assertTrue("Event Group wasn't saved", eventGroupWasSaved);
-            assertThat(countOfEventGroups, is(0));
-        }
+  }
 
-    }
+  private void setReturnsAndExceptions() throws Exception {
+    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+    when(partitionableObjectStore.retrieve(any(Serializable.class), any(String.class)))
+        .thenThrow(ObjectDoesNotExistException.class);
+    when(eventCorrelatorCallback.createEventGroup(any(Event.class), any(Object.class))).thenReturn(eventGroup);
+    when(eventCorrelatorCallback.aggregateEvents(any(EventGroup.class))).thenThrow(RoutingException.class);
+    when(eventCorrelatorCallback.shouldAggregateEvents(any(EventGroup.class))).thenReturn(true);
+  }
 
-    private void setReturnsAndExceptions() throws Exception
-    {
-        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-        when(messageInfoMapping.getCorrelationId(any(MuleMessage.class))).thenReturn("id");
-        when(partitionableObjectStore.retrieve(any(Serializable.class), any(String.class))).thenThrow(ObjectDoesNotExistException.class);
-        when(eventCorrelatorCallback.createEventGroup(any(MuleEvent.class), any(Object.class))).thenReturn(eventGroup);
-        when(eventCorrelatorCallback.aggregateEvents(any(EventGroup.class))).thenThrow(RoutingException.class);
-        when(eventCorrelatorCallback.shouldAggregateEvents(any(EventGroup.class))).thenReturn(true);
-    }
+  private void setAnswers() throws ObjectStoreException {
+    doAnswer(new Answer<Void>() {
 
-    private void setAnswers() throws ObjectStoreException
-    {
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                countOfEventGroups++;
-                eventGroupWasSaved = true;
-                return null;
-            }
-        }).when(partitionableObjectStore).store(any(Serializable.class), any(EventGroup.class), any(String.class));
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        countOfEventGroups++;
+        eventGroupWasSaved = true;
+        return null;
+      }
+    }).when(partitionableObjectStore).store(any(Serializable.class), any(EventGroup.class), any(String.class));
 
-        doAnswer(new Answer<Void>()
-        {
+    doAnswer(new Answer<Void>() {
 
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                countOfEventGroups--;
-                return null;
-            }
-        }).when(partitionableObjectStore).remove(any(Serializable.class), any(String.class));
-    }
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        countOfEventGroups--;
+        return null;
+      }
+    }).when(partitionableObjectStore).remove(any(Serializable.class), any(String.class));
+  }
 }
 
 
