@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+
 import org.mule.compatibility.core.api.config.ThreadingProfile;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
@@ -18,6 +19,7 @@ import org.mule.compatibility.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestConnector;
@@ -27,6 +29,7 @@ import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -109,6 +112,8 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextEndpo
   }
 
   @Test
+  @FlakyTest
+  @Ignore("MULE-7211 - This seems to be wrong, it does the same as testDiscardExhaustedAction()")
   public void testAbortExhaustedAction() throws Exception {
     // Second job is aborted
     latch = new CountDownLatch(1);
