@@ -16,6 +16,7 @@
 
     <flow name="basicAuthRequest">
         <httpn:request config-ref="basicConfig" path="/basic" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
     <httpn:request-config name="digestConfig">
@@ -28,6 +29,7 @@
 
     <flow name="digestAuthRequest">
         <httpn:request config-ref="digestConfig" path="/digest" method="GET"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

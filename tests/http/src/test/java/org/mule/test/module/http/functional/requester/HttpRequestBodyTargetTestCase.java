@@ -47,7 +47,7 @@ public class HttpRequestBodyTargetTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void responseBodyToPayloadTarget() throws Exception {
     Event event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 
   @Test
@@ -56,7 +56,7 @@ public class HttpRequestBodyTargetTestCase extends AbstractHttpRequestTestCase {
     InternalMessage customTarget = (InternalMessage) event.getVariable("customTarget").getValue();
     assertThat(customTarget, notNullValue());
     assertThat(customTarget, hasPayload(equalTo(DEFAULT_RESPONSE)));
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_MESSAGE));
   }
 
 }

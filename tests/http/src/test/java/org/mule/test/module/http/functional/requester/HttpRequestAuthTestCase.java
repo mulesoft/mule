@@ -64,7 +64,7 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
     Event event = flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("user", user)
         .withVariable("password", password).withVariable("preemptive", preemptive).run();
 
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 
   @Override

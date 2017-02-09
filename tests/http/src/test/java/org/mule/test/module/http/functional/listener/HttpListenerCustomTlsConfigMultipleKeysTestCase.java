@@ -30,7 +30,7 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
   @Test
   public void acceptsConnectionWithValidCertificate() throws Exception {
     Event event = flowRunner("testFlowClientWithCertificate").withPayload(TEST_MESSAGE).run();
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_MESSAGE));
   }
 
   @Test(expected = MessagingException.class)
