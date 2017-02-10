@@ -79,5 +79,6 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
   protected void doTearDown() throws Exception {
     super.doTearDown();
     stopIfNeeded(httpService);
+    stopIfNeeded(schedulerService);
   }
 }
