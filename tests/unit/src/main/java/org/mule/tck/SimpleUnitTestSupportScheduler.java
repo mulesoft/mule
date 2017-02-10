@@ -38,7 +38,7 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
 
   @Override
   public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
-    // Nothing to do. The lifecycle of this pool is managed by the UnitTestSchedulerService that instantiated this
+    shutdownNow();
   }
 
   @Override
