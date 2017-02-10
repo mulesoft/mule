@@ -21,6 +21,7 @@
 
     <flow name="requestFlow">
         <httpn:request config-ref="requestConfig" method="POST" path="requestPath"/>
+        <object-to-string-transformer />
     </flow>
 
     <!-- MULE-8956 -->
@@ -41,7 +42,8 @@
     <flow name="blockingRequest">
         <httpn:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
         <set-variable variableName="remotePayload" value="#[mel:xpath3('/root/node/text()')]"/>
-        <set-payload value="#[mel:remotePayload]"/>
+        <set-payload value="#[remotePayload]"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

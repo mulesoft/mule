@@ -7,6 +7,7 @@
 package org.mule.test.usecases.sync;
 
 import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -82,10 +83,6 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     Object payload = Arrays.asList(42);
     InternalMessage message = flowRunner("LocalService").withPayload(payload).run().getMessage();
     assertNotNull(message);
-    ByteArrayToSerializable bas = new ByteArrayToSerializable();
-    bas.setMuleContext(muleContext);
-    assertNotNull(message.getPayload().getValue());
-    Object result = bas.transform(message.getPayload().getValue());
-    assertThat(result, is(payload));
+    assertThat(message.getPayload().getValue(), equalTo(payload));
   }
 }
