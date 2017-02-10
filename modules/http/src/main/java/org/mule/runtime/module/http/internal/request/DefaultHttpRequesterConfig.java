@@ -121,7 +121,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
     if (httpClientFactory == null) {
       httpClient = new GrizzlyHttpClient(configuration, schedulerService);
     } else {
-      httpClient = httpClientFactory.create(configuration);
+      httpClient = httpClientFactory.create(configuration, schedulerService);
     }
     initialised = true;
   }
