@@ -8,15 +8,18 @@ package org.mule.compatibility.module.cxf;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
@@ -35,8 +38,9 @@ public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunc
   @Rule
   public SystemProperty melDefault = new SystemProperty("mule.test.mel.default", "true");
 
-  //TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
-  private HttpService httpService = new HttpServiceImplementation();
+  // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
+  private SchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+  private HttpService httpService = new HttpServiceImplementation(schedulerService);
 
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
@@ -44,7 +48,7 @@ public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunc
     try {
       startIfNeeded(httpService);
     } catch (MuleException e) {
-      //do nothing
+      // do nothing
     }
     builders.add(new AbstractConfigurationBuilder() {
 

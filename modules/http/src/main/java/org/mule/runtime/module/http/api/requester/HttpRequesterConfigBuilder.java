@@ -7,18 +7,19 @@
 package org.mule.runtime.module.http.api.requester;
 
 import static java.lang.String.valueOf;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.util.ObjectNameHelper;
 import org.mule.runtime.module.http.api.HttpAuthentication;
+import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.client.proxy.NtlmProxyConfigBuilder;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
-import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
-import org.mule.runtime.core.util.ObjectNameHelper;
 import org.mule.service.http.api.client.proxy.ProxyConfigBuilder;
 
 /**
@@ -34,6 +35,7 @@ public class HttpRequesterConfigBuilder {
 
   public HttpRequesterConfigBuilder(MuleContext muleContext) {
     this.muleContext = muleContext;
+    defaultHttpRequesterConfig.setSchedulerService(muleContext.getSchedulerService());
     defaultHttpRequesterConfig.setMuleContext(muleContext);
   }
 
@@ -61,9 +63,7 @@ public class HttpRequesterConfigBuilder {
   }
 
   /**
-   * To create instances of {@link ProxyConfig} use
-   * {@link NtlmProxyConfigBuilder} or
-   * {@link ProxyConfigBuilder}
+   * To create instances of {@link ProxyConfig} use {@link NtlmProxyConfigBuilder} or {@link ProxyConfigBuilder}
    *
    * @param proxyConfig proxy configuration for outgoing HTTP request
    * @return the builder

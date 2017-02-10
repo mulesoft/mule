@@ -7,20 +7,26 @@
 package org.mule.services.http.impl.provider;
 
 import static java.util.Collections.singletonList;
+
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class HttpServiceProvider implements ServiceProvider {
 
-  private HttpServiceImplementation service = new HttpServiceImplementation();
-  private ServiceDefinition serviceDefinition = new ServiceDefinition(HttpService.class, service);
+  @Inject
+  private SchedulerService schedulerService;
 
   @Override
   public List<ServiceDefinition> providedServices() {
+    HttpServiceImplementation service = new HttpServiceImplementation(schedulerService);
+    ServiceDefinition serviceDefinition = new ServiceDefinition(HttpService.class, service);
     return singletonList(serviceDefinition);
   }
 }

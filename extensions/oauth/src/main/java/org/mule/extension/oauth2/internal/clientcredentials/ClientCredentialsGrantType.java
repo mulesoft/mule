@@ -7,13 +7,13 @@
 package org.mule.extension.oauth2.internal.clientcredentials;
 
 import static java.lang.String.format;
-import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
+import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.api.RequestAuthenticationException;
@@ -77,7 +77,12 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
   @Override
   public void start() throws MuleException {
     tokenRequestHandler.start();
-    tokenRequestHandler.refreshAccessToken();
+    try {
+      tokenRequestHandler.refreshAccessToken();
+    } catch (Exception e) {
+      tokenRequestHandler.stop();
+      throw e;
+    }
   }
 
   @Override

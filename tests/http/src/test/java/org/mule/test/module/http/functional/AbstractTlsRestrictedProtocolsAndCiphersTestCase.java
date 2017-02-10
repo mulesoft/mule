@@ -8,15 +8,18 @@ package org.mule.test.module.http.functional;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.List;
 
@@ -24,14 +27,15 @@ import java.util.List;
  * Needs to access resources for validating different TLS scenarios and it cannot be done with
  * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase}. Therefore this one has to be a
  * {@link ExtensionFunctionalTestCase}.
- * <p/>
+ * <p>
  * Mostly these scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an
  * isolated class loader.
  */
 public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
 
-  //TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
-  private HttpService httpService = new HttpServiceImplementation();
+  // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
+  private SchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+  private HttpService httpService = new HttpServiceImplementation(schedulerService);
 
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
@@ -39,7 +43,7 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
     try {
       startIfNeeded(httpService);
     } catch (MuleException e) {
-      //do nothing
+      // do nothing
     }
     builders.add(new AbstractConfigurationBuilder() {
 

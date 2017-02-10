@@ -8,9 +8,11 @@ package org.mule.services.http.impl.service;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientFactory;
@@ -30,18 +32,25 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   private static final Logger logger = LoggerFactory.getLogger(HttpServiceImplementation.class);
 
-  private final HttpListenerConnectionManager connectionManager = new HttpListenerConnectionManager();
+  private final SchedulerService schedulerService;
+
+  private HttpListenerConnectionManager connectionManager;
+
+  public HttpServiceImplementation(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+    connectionManager = new HttpListenerConnectionManager(schedulerService);
+  }
 
   @Override
   public HttpServerFactory getServerFactory() {
-    //TODO: Create logic to make the manager able to distinguish apps (muleContext.getId() for now?)
+    // TODO: Create logic to make the manager able to distinguish apps (muleContext.getId() for now?)
     return connectionManager;
   }
 
   @Override
   public HttpClientFactory getClientFactory() {
-    //DNS round robin should be achieve by using another client
-    return GrizzlyHttpClient::new;
+    // DNS round robin should be achieve by using another client
+    return config -> new GrizzlyHttpClient(config, schedulerService);
   }
 
   @Override

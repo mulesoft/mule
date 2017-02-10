@@ -6,33 +6,32 @@
  */
 package org.mule.runtime.module.http.internal.request.grizzly;
 
-import com.ning.http.client.providers.grizzly.TransportCustomizer;
+import java.util.concurrent.ExecutorService;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
-import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
+
+import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 /**
- * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and sets appropriate names for the threads that
- * are used.
+ * Transport customizer that sets the IO strategy to {@code SameThreadIOStrategy} and the thread pool for the NIO transport
+ * selector.
  */
 public class IOStrategyTransportCustomizer implements TransportCustomizer {
 
-  private static final String REQUESTER_WORKER_THREAD_NAME_SUFFIX = ".worker";
+  private ExecutorService selectorPool;
+  private ExecutorService workerPool;
 
-  private final String threadNamePrefix;
-
-  public IOStrategyTransportCustomizer(String threadNamePrefix) {
-    this.threadNamePrefix = threadNamePrefix;
+  public IOStrategyTransportCustomizer(ExecutorService selectorPool, ExecutorService workerPool) {
+    this.selectorPool = selectorPool;
+    this.workerPool = workerPool;
   }
 
   @Override
   public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder) {
     transport.setIOStrategy(SameThreadIOStrategy.getInstance());
-    transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
-
-    transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);
-    transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + REQUESTER_WORKER_THREAD_NAME_SUFFIX);
+    transport.setKernelThreadPool(selectorPool);
+    transport.setWorkerThreadPool(workerPool);
   }
 }

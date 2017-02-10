@@ -11,15 +11,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig.OBJECT_HTTP_CLIENT_FACTORY;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig.OBJECT_HTTP_CLIENT_FACTORY;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.api.tls.TlsContextFactory;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,6 +72,7 @@ public class DefaultHttpRequesterConfigTestCase extends AbstractMuleTestCase {
   private DefaultHttpRequesterConfig createBaseRequester() {
     DefaultHttpRequesterConfig requestConfig = new DefaultHttpRequesterConfig();
     requestConfig.setHost(LOCALHOST);
+    requestConfig.setSchedulerService(new SimpleUnitTestSupportSchedulerService());
     requestConfig.setMuleContext(mockMuleContext);
     return requestConfig;
   }
