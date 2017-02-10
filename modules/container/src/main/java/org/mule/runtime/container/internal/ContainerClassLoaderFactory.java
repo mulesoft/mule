@@ -9,6 +9,8 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
@@ -82,7 +84,25 @@ public class ContainerClassLoaderFactory {
                       // mule-module.properties (fails ClassInterceptorTestCase)
                       "org.aopalliance.aop");
 
-  private ModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer(this.getClass().getClassLoader());
+  private final ModuleRepository moduleRepository;
+
+  /**
+   * Creates a custom factory
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non null.
+   */
+  public ContainerClassLoaderFactory(ModuleRepository moduleRepository) {
+    checkArgument(moduleRepository != null, "moduleRepository cannot be null");
+
+    this.moduleRepository = moduleRepository;
+  }
+
+  /**
+   * Creates a default factory
+   */
+  public ContainerClassLoaderFactory() {
+    this(new DefaultModuleRepository(new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class.getClassLoader())));
+  }
 
   /**
    * Creates the classLoader to represent the Mule container.
@@ -92,7 +112,8 @@ public class ContainerClassLoaderFactory {
    *         mule artifacts.
    */
   public ArtifactClassLoader createContainerClassLoader(final ClassLoader parentClassLoader) {
-    final List<MuleModule> muleModules = moduleDiscoverer.discover();
+    final List<MuleModule> muleModules = moduleRepository.getModules();
+
     final ClassLoaderLookupPolicy containerLookupPolicy = getContainerClassLoaderLookupPolicy(parentClassLoader, muleModules);
 
     return createArtifactClassLoader(parentClassLoader, muleModules, containerLookupPolicy, new ArtifactDescriptor("mule"));
@@ -129,10 +150,6 @@ public class ContainerClassLoaderFactory {
     return createContainerFilteringClassLoader(muleModules,
                                                new MuleContainerClassLoader(artifactDescriptor, new URL[0], parentClassLoader,
                                                                             containerLookupPolicy));
-  }
-
-  public void setModuleDiscoverer(ModuleDiscoverer moduleDiscoverer) {
-    this.moduleDiscoverer = moduleDiscoverer;
   }
 
   /**

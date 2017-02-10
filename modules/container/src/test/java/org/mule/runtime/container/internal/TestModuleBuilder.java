@@ -7,7 +7,10 @@
 
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.runtime.container.api.MuleModule;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,6 +72,6 @@ public class TestModuleBuilder {
    * @return a new {@link MuleModule} with the configured state.
    */
   public MuleModule build() {
-    return new MuleModule(name, packages, resources);
+    return new MuleModule(name, packages, resources, emptySet(), emptySet());
   }
 }

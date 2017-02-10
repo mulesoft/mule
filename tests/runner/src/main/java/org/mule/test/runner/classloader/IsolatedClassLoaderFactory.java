@@ -14,9 +14,12 @@ import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
-import org.mule.runtime.container.internal.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
@@ -82,9 +85,11 @@ public class IsolatedClassLoaderFactory {
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
     ArtifactClassLoader containerClassLoader;
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
+    DefaultModuleRepository moduleRepository =
+        new DefaultModuleRepository(new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class.getClassLoader()));
     try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
-        new TestContainerClassLoaderFactory(extraBootPackages,
-                                            artifactsUrlClassification.getContainerUrls().toArray(new URL[0]))) {
+        new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),
+                                            moduleRepository)) {
 
       containerClassLoader =
           createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);

@@ -7,9 +7,13 @@
 
 package org.mule.runtime.deployment.model.api.plugin;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -25,6 +29,20 @@ import java.util.Set;
  * Creates {@link ArtifactClassLoader} for application or domain plugin descriptors.
  */
 public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
+
+
+  private final ModuleRepository moduleRepository;
+
+  /**
+   * Creates a new factory
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non null.
+   */
+  public ArtifactPluginClassLoaderFactory(ModuleRepository moduleRepository) {
+    checkArgument(moduleRepository != null, "moduleRepository cannot be null");
+
+    this.moduleRepository = moduleRepository;
+  }
 
   /**
    * @param artifactId artifact unique ID. Non empty.
@@ -44,6 +62,16 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
 
       for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getExportedPackages()) {
         pluginsLookupPolicies.put(exportedPackage, parentFirst);
+      }
+    }
+
+    ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
+
+    for (MuleModule module : moduleRepository.getModules()) {
+      if (module.getPrivilegedArtifacts().contains(descriptor.getName())) {
+        for (String packageName : module.getPrivilegedExportedPackages()) {
+          pluginsLookupPolicies.put(packageName, containerOnlyLookupStrategy);
+        }
       }
     }
 

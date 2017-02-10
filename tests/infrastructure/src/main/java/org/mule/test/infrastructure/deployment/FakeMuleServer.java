@@ -88,7 +88,7 @@ public class FakeMuleServer {
   }
 
   public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
-    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();

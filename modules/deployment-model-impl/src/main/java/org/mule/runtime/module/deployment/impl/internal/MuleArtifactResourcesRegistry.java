@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -37,11 +41,11 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPluginRepository;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.temporary.TemporaryArtifactClassLoaderBuilderFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.MuleServiceManager;
@@ -70,19 +74,59 @@ public class MuleArtifactResourcesRegistry {
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private final DefaultClassLoaderManager artifactClassLoaderManager;
+  private final ModuleRepository moduleRepository;
+
+  /**
+   * Builds a {@link MuleArtifactResourcesRegistry} instance
+   */
+  public static class Builder {
+
+    private ModuleRepository moduleRepository;
+
+    /**
+     * Configures the {@link ModuleRepository} to use
+     *
+     * @param moduleRepository provides access to the modules available on the container. Non null.
+     * @return same builder instance
+     */
+    public Builder moduleRepository(ModuleRepository moduleRepository) {
+      checkArgument(moduleRepository != null, "moduleRepository cannot be null");
+
+      this.moduleRepository = moduleRepository;
+      return this;
+    }
+
+    /**
+     * Builds the desired instance
+     *
+     * @return a new {@link MuleArtifactResourcesRegistry} with the provided configuration.
+     */
+    public MuleArtifactResourcesRegistry build() {
+      if (moduleRepository == null) {
+        moduleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(this.getClass().getClassLoader()));
+      }
+
+      return new MuleArtifactResourcesRegistry(moduleRepository);
+    }
+  }
 
   /**
    * Creates a repository for resources required for mule artifacts.
    */
-  public MuleArtifactResourcesRegistry() {
-    containerClassLoader = new ContainerClassLoaderFactory().createContainerClassLoader(getClass().getClassLoader());
+  private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) {
+    this.moduleRepository = moduleRepository;
+
+    containerClassLoader =
+        new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(getClass().getClassLoader());
     artifactClassLoaderManager = new DefaultClassLoaderManager();
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory = trackDeployableArtifactClassLoaderFactory(
                                                                               new DomainClassLoaderFactory(containerClassLoader
                                                                                   .getClassLoader()));
-    this.artifactPluginClassLoaderFactory = trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory());
+
+    this.artifactPluginClassLoaderFactory =
+        trackArtifactClassLoaderFactory(new ArtifactPluginClassLoaderFactory(moduleRepository));
     final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory();
     artifactPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
@@ -183,7 +227,6 @@ public class MuleArtifactResourcesRegistry {
   public DeployableArtifactClassLoaderFactory<DomainDescriptor> getDomainClassLoaderFactory() {
     return domainClassLoaderFactory;
   }
-
 
   /**
    * @return factory for creating artifact plugin class loaders
