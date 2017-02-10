@@ -20,6 +20,7 @@ import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
@@ -31,8 +32,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -46,7 +45,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   public ClientCredentialsOAuthDancer(String clientId, String clientSecret, String tokenUrl, String scopes,
                                       boolean encodeClientCredentialsInBody, Charset encoding, String responseAccessTokenExpr,
                                       String responseRefreshTokenExpr, String responseExpiresInExpr,
-                                      Map<String, String> customParametersExprs, Function<String, Lock> lockProvider,
+                                      Map<String, String> customParametersExprs, LockFactory lockProvider,
                                       Map<String, ResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
                                       ExpressionEvaluator expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
@@ -57,7 +56,12 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   @Override
   public void start() throws MuleException {
     super.start();
-    refreshToken(null, null);
+    try {
+      refreshToken(null, null);
+    } catch (Exception e) {
+      super.stop();
+      throw e;
+    }
   }
 
   @Override

@@ -23,6 +23,7 @@ import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -49,7 +50,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 
 public abstract class AbstractOAuthDancer implements Startable, Stoppable {
 
@@ -66,14 +66,14 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
   protected final String responseExpiresInExpr;
   protected final Map<String, String> customParametersExtractorsExprs;
 
-  private final Function<String, Lock> lockProvider;
+  private final LockFactory lockProvider;
   private final Map<String, ResourceOwnerOAuthContext> tokensStore;
   private final HttpClient httpClient;
   private final ExpressionEvaluator expressionEvaluator;
 
   protected AbstractOAuthDancer(String clientId, String clientSecret, String tokenUrl, Charset encoding, String scopes,
                                 String responseAccessTokenExpr, String responseRefreshTokenExpr, String responseExpiresInExpr,
-                                Map<String, String> customParametersExtractorsExprs, Function<String, Lock> lockProvider,
+                                Map<String, String> customParametersExtractorsExprs, LockFactory lockProvider,
                                 Map<String, ResourceOwnerOAuthContext> tokensStore,
                                 HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
     this.clientId = clientId;
@@ -233,7 +233,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
   protected ResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId) {
     ResourceOwnerOAuthContext resourceOwnerOAuthContext = null;
     if (!tokensStore.containsKey(resourceOwnerId)) {
-      final Lock lock = lockProvider.apply(toString() + "-config-oauth-context");
+      final Lock lock = lockProvider.createLock(toString() + "-config-oauth-context");
       lock.lock();
       try {
         if (!tokensStore.containsKey(resourceOwnerId)) {
@@ -252,7 +252,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
   }
 
   private Lock createLockForResourceOwner(String resourceOwnerId) {
-    return lockProvider.apply(toString() + "-" + resourceOwnerId);
+    return lockProvider.createLock(toString() + "-" + resourceOwnerId);
   }
 
   /**

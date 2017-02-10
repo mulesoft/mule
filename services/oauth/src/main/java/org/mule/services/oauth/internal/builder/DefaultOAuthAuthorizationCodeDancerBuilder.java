@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -25,7 +26,6 @@ import org.mule.services.oauth.internal.DefaultOAuthCallbackServersManager;
 
 import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 
@@ -45,7 +45,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   private Map<String, String> customParameters;
 
   public DefaultOAuthAuthorizationCodeDancerBuilder(DefaultOAuthCallbackServersManager httpServersManager,
-                                                    SchedulerService schedulerService, Function<String, Lock> lockProvider,
+                                                    SchedulerService schedulerService, LockFactory lockProvider,
                                                     Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
                                                     ExpressionEvaluator expressionEvaluator) {
     super(lockProvider, tokensStore, httpService, expressionEvaluator);

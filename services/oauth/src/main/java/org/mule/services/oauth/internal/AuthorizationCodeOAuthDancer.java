@@ -44,6 +44,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.StringUtils;
@@ -76,8 +77,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -111,7 +110,7 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
                                       String responseAccessTokenExpr, String responseRefreshTokenExpr,
                                       String responseExpiresInExpr, Map<String, String> customParameters,
                                       Map<String, String> customParametersExtractorsExprs,
-                                      Function<String, Lock> lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
+                                      LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
                                       HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExtractorsExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);

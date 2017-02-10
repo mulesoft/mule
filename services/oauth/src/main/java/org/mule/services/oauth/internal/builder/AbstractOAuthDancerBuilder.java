@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -22,12 +23,10 @@ import org.mule.service.http.api.client.HttpClientConfiguration.Builder;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 
 public abstract class AbstractOAuthDancerBuilder implements OAuthDancerBuilder {
 
-  protected final Function<String, Lock> lockProvider;
+  protected final LockFactory lockProvider;
   protected final Map<String, ResourceOwnerOAuthContext> tokensStore;
   protected final HttpService httpService;
   protected final ExpressionEvaluator expressionEvaluator;
@@ -44,7 +43,7 @@ public abstract class AbstractOAuthDancerBuilder implements OAuthDancerBuilder {
   protected String scopes = null;
   protected Map<String, String> customParametersExtractorsExprs;
 
-  public AbstractOAuthDancerBuilder(Function<String, Lock> lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
+  public AbstractOAuthDancerBuilder(LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
                                     HttpService httpService, ExpressionEvaluator expressionEvaluator) {
     this.lockProvider = lockProvider;
     this.tokensStore = tokensStore;

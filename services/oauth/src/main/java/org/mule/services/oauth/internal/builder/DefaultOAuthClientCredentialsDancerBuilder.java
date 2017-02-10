@@ -9,6 +9,7 @@ package org.mule.services.oauth.internal.builder;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
@@ -17,8 +18,6 @@ import org.mule.service.http.api.HttpService;
 import org.mule.services.oauth.internal.ClientCredentialsOAuthDancer;
 
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 
 
 public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDancerBuilder
@@ -26,7 +25,7 @@ public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDan
 
   private boolean encodeClientCredentialsInBody = false;
 
-  public DefaultOAuthClientCredentialsDancerBuilder(Function<String, Lock> lockProvider,
+  public DefaultOAuthClientCredentialsDancerBuilder(LockFactory lockProvider,
                                                     Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
                                                     ExpressionEvaluator expressionEvaluator) {
     super(lockProvider, tokensStore, httpService, expressionEvaluator);

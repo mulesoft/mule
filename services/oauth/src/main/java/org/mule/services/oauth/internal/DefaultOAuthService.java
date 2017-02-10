@@ -7,6 +7,7 @@
 package org.mule.services.oauth.internal;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -17,8 +18,6 @@ import org.mule.services.oauth.internal.builder.DefaultOAuthAuthorizationCodeDan
 import org.mule.services.oauth.internal.builder.DefaultOAuthClientCredentialsDancerBuilder;
 
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 
 
 public final class DefaultOAuthService implements OAuthService {
@@ -39,7 +38,7 @@ public final class DefaultOAuthService implements OAuthService {
   }
 
   @Override
-  public <T> OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(Function<String, Lock> lockProvider,
+  public <T> OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                          Map<String, T> tokensStore,
                                                                                          ExpressionEvaluator expressionEvaluator) {
     return new DefaultOAuthClientCredentialsDancerBuilder(lockProvider, (Map<String, ResourceOwnerOAuthContext>) tokensStore,
@@ -47,7 +46,7 @@ public final class DefaultOAuthService implements OAuthService {
   }
 
   @Override
-  public <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(Function<String, Lock> lockProvider,
+  public <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                          Map<String, T> tokensStore,
                                                                                          ExpressionEvaluator expressionEvaluator) {
     return new DefaultOAuthAuthorizationCodeDancerBuilder(httpServersManager, schedulerService, lockProvider,
