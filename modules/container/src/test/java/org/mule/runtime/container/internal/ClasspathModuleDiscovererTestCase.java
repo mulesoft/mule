@@ -10,8 +10,8 @@ package org.mule.runtime.container.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,7 +56,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
         .thenReturn(new EnumerationAdapter(moduleProperties));
 
     List<MuleModule> muleModules = moduleDiscoverer.discover();
-    assertThat(muleModules.size(), equalTo(1));
+    assertThat(muleModules, hasSize(1));
     MuleModule muleModule = muleModules.get(0);
     assertThat(muleModule.getName(), is("moduleJavaPackages"));
     assertThat(muleModule.getExportedPackages(), contains("org.foo", "org.bar"));
@@ -73,7 +73,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
         .thenReturn(new EnumerationAdapter(moduleProperties));
 
     List<MuleModule> muleModules = moduleDiscoverer.discover();
-    assertThat(muleModules.size(), equalTo(1));
+    assertThat(muleModules, hasSize(1));
     MuleModule muleModule = muleModules.get(0);
     assertThat(muleModule.getName(), is("moduleResourcePackages"));
     assertThat(muleModule.getExportedPackages(), is(empty()));
@@ -90,7 +90,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
         .thenReturn(new EnumerationAdapter(moduleProperties));
 
     List<MuleModule> muleModules = moduleDiscoverer.discover();
-    assertThat(muleModules.size(), equalTo(1));
+    assertThat(muleModules, hasSize(1));
     MuleModule muleModule = muleModules.get(0);
     assertThat(muleModule.getName(), is("moduleJavaPrivilegedApi"));
     assertThat(muleModule.getExportedPackages(), is(empty()));

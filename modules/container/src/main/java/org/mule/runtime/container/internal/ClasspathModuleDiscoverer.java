@@ -59,10 +59,10 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   private MuleModule createModule(Properties moduleProperties) {
     final String moduleName = (String) moduleProperties.get("module.name");
-    Set<String> modulePackages = getPrivilegedExportedPackages(moduleProperties, EXPORTED_CLASS_PACKAGES_PROPERTY);
+    Set<String> modulePackages = getExportedPackageByProperty(moduleProperties, EXPORTED_CLASS_PACKAGES_PROPERTY);
     Set<String> modulePaths = getExportedResourcePaths(moduleProperties);
     Set<String> modulePrivilegedPackages =
-        getPrivilegedExportedPackages(moduleProperties, PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY);
+        getExportedPackageByProperty(moduleProperties, PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY);
     Set<String> privilegedArtifacts = getPrivilegedArtifactIds(moduleProperties);
 
     return new MuleModule(moduleName, modulePackages, modulePaths, modulePrivilegedPackages, privilegedArtifacts);
@@ -83,7 +83,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     return privilegedArtifacts;
   }
 
-  private Set<String> getPrivilegedExportedPackages(Properties moduleProperties, String privilegedExportedClassPackagesProperty) {
+  private Set<String> getExportedPackageByProperty(Properties moduleProperties, String privilegedExportedClassPackagesProperty) {
     final String privilegedExportedPackagesProperty = (String) moduleProperties.get(privilegedExportedClassPackagesProperty);
     Set<String> modulePrivilegedPackages;
     if (!isEmpty(privilegedExportedPackagesProperty)) {

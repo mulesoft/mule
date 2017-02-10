@@ -8,14 +8,15 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.ModuleDiscoverer;
-import org.mule.runtime.container.api.MuleModule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A {@link ModuleDiscoverer} that enables to change discovered modules to enable testing privileged
@@ -54,7 +55,7 @@ public class TestContainerModuleDiscoverer implements ModuleDiscoverer {
   }
 
   private MuleModule updateModuleForTests(MuleModule discoveredModule) {
-    HashSet<String> privilegedArtifacts = new HashSet<>(discoveredModule.getPrivilegedArtifacts());
+    Set<String> privilegedArtifacts = new HashSet<>(discoveredModule.getPrivilegedArtifacts());
     privilegedArtifacts.addAll(privilegedArtifactIds);
 
     return new MuleModule(discoveredModule.getName(), discoveredModule.getExportedPackages(),
