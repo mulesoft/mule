@@ -15,6 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy.invalidLookupPolicyOverrideError;
 import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
@@ -23,22 +25,31 @@ import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTestCase {
 
   private static final String FOO_PACKAGE = "org.foo";
-  private static final String FOO_CLASS = "org.foo.Object";
-  private static final String FOO_PACKAGE_PREFIX = "org.foo.";
-  private static final String JAVA_PACKAGE = "java.lang";
-  private static final String JAVA_PACKAGE_PREFIX = "java.lang.";
+  private static final String FOO_PACKAGE_PREFIX = FOO_PACKAGE + ".";
+  private static final String FOO_CLASS = FOO_PACKAGE_PREFIX + "Object";
   private static final String SYSTEM_PACKAGE = "java";
+  private static final String JAVA_PACKAGE = SYSTEM_PACKAGE + ".lang";
+  private static final String JAVA_PACKAGE_PREFIX = JAVA_PACKAGE + ".";
 
-  @Test(expected = IllegalArgumentException.class)
+  @Rule
+  public ExpectedException expectedException = none();
+
+  @Test
   public void extendingCustomLookupStrategyForSystemPackage() throws Exception {
+    final String overrideClassName = Object.class.getName();
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName));
+
     new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE))
-        .extend(singletonMap(Object.class.getName(), CHILD_FIRST));
+        .extend(singletonMap(overrideClassName, CHILD_FIRST));
   }
 
   @Test
@@ -114,10 +125,14 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
                contains(getClass().getClassLoader()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void cannotExtendPolicyWithSystemPackage() throws Exception {
     ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE));
 
-    lookupPolicy.extend(singletonMap(Object.class.getName(), PARENT_FIRST));
+    final String overrideClassName = Object.class.getName();
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName));
+
+    lookupPolicy.extend(singletonMap(overrideClassName, PARENT_FIRST));
   }
 }

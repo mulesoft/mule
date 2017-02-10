@@ -78,10 +78,9 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
     // Gather information about the exceptions in each of the searched class loaders to provide
     // troubleshooting information in case of throwing a ClassNotFoundException.
-    List<ClassLoader> classLoaders = lookupStrategy.getClassLoaders(this);
 
     List<ClassNotFoundException> exceptions = new ArrayList<>();
-    for (ClassLoader classLoader : classLoaders) {
+    for (ClassLoader classLoader : lookupStrategy.getClassLoaders(this)) {
       try {
         if (classLoader == this) {
           result = findLocalClass(name);

@@ -61,9 +61,13 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   private void validateLookupPolicies(Map<String, LookupStrategy> lookupStrategies) {
     for (String packageName : lookupStrategies.keySet()) {
       if (isSystemPackage(packageName) && !(lookupStrategies.get(packageName) instanceof ContainerOnlyLookupStrategy)) {
-        throw new IllegalArgumentException("Attempt to override lookup strategy for system package: " + packageName);
+        throw new IllegalArgumentException(invalidLookupPolicyOverrideError(packageName));
       }
     }
+  }
+
+  protected static String invalidLookupPolicyOverrideError(String packageName) {
+    return "Attempt to override lookup strategy for system package: " + packageName;
   }
 
   private String normalizePackageName(String packageName) {
@@ -111,7 +115,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   @Override
   public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
     validateLookupPolicies(lookupStrategies);
-    final HashMap<String, LookupStrategy> newLookupStrategies = new HashMap<>(this.configuredLookupStrategies);
+    final Map<String, LookupStrategy> newLookupStrategies = new HashMap<>(this.configuredLookupStrategies);
 
     for (String packageName : lookupStrategies.keySet()) {
       if (!newLookupStrategies.containsKey(normalizePackageName(packageName))) {
