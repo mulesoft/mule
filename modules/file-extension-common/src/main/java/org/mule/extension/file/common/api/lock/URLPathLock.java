@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.common.api.lock;
 
-import org.mule.runtime.core.api.lock.LockFactory;
+import org.mule.runtime.api.lock.LockFactory;
 
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
