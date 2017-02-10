@@ -72,6 +72,7 @@ public abstract class AbstractCxfOverHttpExtensionTestCase extends ExtensionFunc
   @Override
   protected void doTearDown() throws Exception {
     stopIfNeeded(httpService);
+    stopIfNeeded(schedulerService);
     super.doTearDown();
   }
 }
