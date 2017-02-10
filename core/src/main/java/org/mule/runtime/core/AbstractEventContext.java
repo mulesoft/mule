@@ -80,15 +80,7 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public boolean isTerminated() {
-    if (completed) {
-      if (!childContexts.isEmpty()) {
-        return childContexts.stream().filter(c -> !c.isTerminated()).count() == 0;
-      }
-
-      return true;
-    }
-
-    return false;
+    return completed ? childContexts.stream().allMatch(EventContext::isTerminated) : false;
   }
 
   /**
