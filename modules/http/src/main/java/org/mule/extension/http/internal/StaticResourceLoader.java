@@ -13,7 +13,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -50,7 +49,7 @@ public class StaticResourceLoader {
   private String defaultFile;
 
   /**
-   * The {@link Attributes} coming from an HTTP listener source to check the required resources.
+   * The {@link HttpRequestAttributes} coming from an HTTP listener source to check the required resources.
    */
   @Parameter
   @Optional(defaultValue = "#[attributes]")

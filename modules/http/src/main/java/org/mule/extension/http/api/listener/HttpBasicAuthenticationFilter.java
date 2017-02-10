@@ -57,6 +57,9 @@ public class HttpBasicAuthenticationFilter {
   @NullSafe
   private List<String> securityProviders;
 
+  /**
+   * The {@link HttpRequestAttributes} coming from an HTTP listener source to check the 'Authorization' header.
+   */
   @Parameter
   @Optional(defaultValue = "#[attributes]")
   HttpRequestAttributes attributes;
