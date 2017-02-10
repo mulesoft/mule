@@ -13,8 +13,9 @@ import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
+import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.container.internal.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -22,11 +23,10 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFac
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
@@ -90,7 +90,7 @@ public class IsolatedClassLoaderFactory {
           createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
 
       childClassLoaderLookupPolicy =
-          testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy();
+          testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
 
     }
     List<ArtifactClassLoader> serviceArtifactClassLoaders =
@@ -128,7 +128,7 @@ public class IsolatedClassLoaderFactory {
       }
     }
 
-    final Map<String, ClassLoaderLookupStrategy> pluginsLookupStrategies = new HashMap<>();
+    final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
     for (int i = 0; i < filteredPluginsArtifactClassLoaders.size(); i++) {
       final ArtifactClassLoaderFilter classLoaderFilter = pluginArtifactClassLoaderFilters.get(i);
       classLoaderFilter.getExportedClassPackages()

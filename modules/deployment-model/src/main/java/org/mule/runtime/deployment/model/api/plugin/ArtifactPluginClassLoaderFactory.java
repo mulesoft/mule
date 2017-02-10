@@ -8,10 +8,12 @@
 package org.mule.runtime.deployment.model.api.plugin;
 
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 
@@ -32,13 +34,13 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
    */
   @Override
   public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
-    Map<String, ClassLoaderLookupStrategy> pluginsLookupPolicies = new HashMap<>();
+    Map<String, LookupStrategy> pluginsLookupPolicies = new HashMap<>();
     for (ArtifactPluginDescriptor dependencyPluginDescriptor : descriptor.getArtifactPluginDescriptors()) {
       if (dependencyPluginDescriptor.getName().equals(descriptor.getName())) {
         continue;
       }
 
-      final ClassLoaderLookupStrategy parentFirst = getClassLoaderLookupStrategy(descriptor, dependencyPluginDescriptor);
+      final LookupStrategy parentFirst = getClassLoaderLookupStrategy(descriptor, dependencyPluginDescriptor);
 
       for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getExportedPackages()) {
         pluginsLookupPolicies.put(exportedPackage, parentFirst);
@@ -51,13 +53,13 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
                                        parent.getClassLoader(), lookupPolicy);
   }
 
-  private ClassLoaderLookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
-                                                                 ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    final ClassLoaderLookupStrategy parentFirst;
+  private LookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
+                                                      ArtifactPluginDescriptor dependencyPluginDescriptor) {
+    final LookupStrategy parentFirst;
     if (isDependencyPlugin(descriptor.getClassLoaderModel().getDependencies(), dependencyPluginDescriptor)) {
-      parentFirst = ClassLoaderLookupStrategy.PARENT_FIRST;
+      parentFirst = PARENT_FIRST;
     } else {
-      parentFirst = ClassLoaderLookupStrategy.CHILD_ONLY;
+      parentFirst = CHILD_ONLY;
     }
     return parentFirst;
   }

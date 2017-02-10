@@ -9,21 +9,21 @@ package org.mule.test.runner.classloader;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static org.hamcrest.Matchers.is;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_ONLY;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.runner.api.PluginUrlClassification;
 
-import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,35 +45,32 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     factory = new PluginLookPolicyFactory();
-    fooPluginClassification = new PluginUrlClassification(FOO_PLUGIN_ID, Collections.<URL>emptyList(),
-                                                          Collections.<Class>emptyList(), Collections.<String>emptyList(),
-                                                          newHashSet(FOO_PACKAGE), Collections.<String>emptySet());
+    fooPluginClassification =
+        new PluginUrlClassification(FOO_PLUGIN_ID, emptyList(), emptyList(), emptyList(), newHashSet(FOO_PACKAGE), emptySet());
   }
 
   @Test
   public void lookupPoliciesForPluginThatDeclaresDependency() {
     PluginUrlClassification barPluginClassification =
-        new PluginUrlClassification(BAR_PLUGIN_ID, Collections.<URL>emptyList(), Collections.<Class>emptyList(),
-                                    newArrayList(FOO_PLUGIN_ID));
+        new PluginUrlClassification(BAR_PLUGIN_ID, emptyList(), emptyList(), newArrayList(FOO_PLUGIN_ID));
     List<PluginUrlClassification> pluginClassifications = newArrayList(barPluginClassification, fooPluginClassification);
     ClassLoaderLookupPolicy parentLookupPolicies = getParentClassLoaderLookupPolicy();
 
     ClassLoaderLookupPolicy pluginPolicy =
         factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
-    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), is(PARENT_FIRST));
+    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), sameInstance(PARENT_FIRST));
   }
 
   @Test
   public void lookupPoliciesForPluginThatDoesNotDeclareDependency() {
     PluginUrlClassification barPluginClassification =
-        new PluginUrlClassification(BAR_PLUGIN_ID, Collections.<URL>emptyList(), Collections.<Class>emptyList(),
-                                    Collections.<String>emptyList());
+        new PluginUrlClassification(BAR_PLUGIN_ID, emptyList(), emptyList(), emptyList());
     List<PluginUrlClassification> pluginClassifications = newArrayList(barPluginClassification, fooPluginClassification);
     ClassLoaderLookupPolicy parentLookupPolicies = getParentClassLoaderLookupPolicy();
 
     ClassLoaderLookupPolicy pluginPolicy =
         factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
-    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), is(CHILD_ONLY));
+    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), sameInstance(CHILD_ONLY));
   }
 
   private ClassLoaderLookupPolicy getParentClassLoaderLookupPolicy() {
@@ -84,19 +81,18 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
     return parentLookupPolicies;
   }
 
-  private ClassLoaderLookupPolicy getClassLoaderLookupPolicyByPackage(Map<String, ClassLoaderLookupStrategy> delegate) {
+  private ClassLoaderLookupPolicy getClassLoaderLookupPolicyByPackage(Map<String, LookupStrategy> delegate) {
     return new ClassLoaderLookupPolicy() {
 
       @Override
-      public ClassLoaderLookupStrategy getLookupStrategy(String className) {
+      public LookupStrategy getLookupStrategy(String className) {
         return delegate.get(className);
       }
 
       @Override
-      public ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies) {
+      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
         throw new UnsupportedOperationException("Cannot be extended");
       }
-
     };
   }
 

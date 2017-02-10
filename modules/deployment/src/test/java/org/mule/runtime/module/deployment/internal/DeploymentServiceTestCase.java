@@ -233,7 +233,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                  getResourceFile("/org/foo/hello/HelloOperation.java"))
       .compile("mule-module-hello-2.0.jar", "2.0");
 
-
   private static final File simpleExtensionJarFile = new CompilerUtils.ExtensionCompiler()
       .compiling(
                  getResourceFile("/org/foo/simple/SimpleExtension.java"),
@@ -1868,7 +1867,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
             .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class");
 
     final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
-        .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(echoPlugin).containingPlugin(dependantPlugin);
+        .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(dependantPlugin);
     addPackedAppFromBuilder(artifactFileBuilder);
 
     startDeployment();

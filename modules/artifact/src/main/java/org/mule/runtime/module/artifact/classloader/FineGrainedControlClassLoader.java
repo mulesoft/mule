@@ -9,12 +9,8 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.Arrays.asList;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 
@@ -25,7 +21,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +67,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
       return result;
     }
 
-    final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
+    final LookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
     if (lookupStrategy == null) {
       throw new NullPointerException(format("Unable to find a lookup strategy for '%s' from %s", name, this));
     }
@@ -78,33 +76,26 @@ public class FineGrainedControlClassLoader extends URLClassLoader
       logLoadingClass(name, lookupStrategy, "Loading class '%s' with '%s' on '%s'", this);
     }
 
-    // Gather information about the exceptions in each of the searched classloaders to provide
+    // Gather information about the exceptions in each of the searched class loaders to provide
     // troubleshooting information in case of throwing a ClassNotFoundException.
-    ClassNotFoundException firstException = null;
 
-    try {
-      if (lookupStrategy == PARENT_ONLY) {
-        result = findParentClass(name);
-      } else if (lookupStrategy == PARENT_FIRST) {
-        try {
-          result = findParentClass(name);
-        } catch (ClassNotFoundException e) {
-          firstException = e;
+    List<ClassNotFoundException> exceptions = new ArrayList<>();
+    for (ClassLoader classLoader : lookupStrategy.getClassLoaders(this)) {
+      try {
+        if (classLoader == this) {
           result = findLocalClass(name);
+          break;
+        } else {
+          result = findParentClass(name, classLoader);
+          break;
         }
-      } else if (lookupStrategy == CHILD_FIRST) {
-        try {
-          result = findLocalClass(name);
-        } catch (ClassNotFoundException e) {
-          firstException = e;
-          result = findParentClass(name);
-        }
-      } else {
-        result = findLocalClass(name);
+      } catch (ClassNotFoundException e) {
+        exceptions.add(e);
       }
-    } catch (ClassNotFoundException e) {
-      throw new CompositeClassNotFoundException(name, lookupStrategy,
-                                                firstException != null ? asList(firstException, e) : asList(e));
+    }
+
+    if (result == null) {
+      throw new CompositeClassNotFoundException(name, lookupStrategy, exceptions);
     }
 
     if (verboseLogging) {
@@ -118,7 +109,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     return result;
   }
 
-  private void logLoadingClass(String name, ClassLoaderLookupStrategy lookupStrategy, String format,
+  private void logLoadingClass(String name, LookupStrategy lookupStrategy, String format,
                                FineGrainedControlClassLoader fineGrainedControlClassLoader) {
     final String message = format(format, name, lookupStrategy, fineGrainedControlClassLoader);
     doVerboseLogging(message);
@@ -139,9 +130,9 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
   }
 
-  protected Class<?> findParentClass(String name) throws ClassNotFoundException {
-    if (getParent() != null) {
-      return getParent().loadClass(name);
+  protected Class<?> findParentClass(String name, ClassLoader classLoader) throws ClassNotFoundException {
+    if (classLoader != null) {
+      return classLoader.loadClass(name);
     } else {
       return findSystemClass(name);
     }
