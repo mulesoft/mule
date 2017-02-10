@@ -11,19 +11,20 @@ import static org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamin
 import static org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager.Status.NORMAL;
 import static org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager.Status.SURVIVOR;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.CursorStream;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.streaming.bytes.factory.FileStoreCursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
-import org.mule.runtime.core.internal.streaming.bytes.factory.FileStoreCursorStreamProviderFactory;
-import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
-import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -41,7 +42,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter, Disposable {
+public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter, Stoppable {
 
   private static final Logger LOGGER = getLogger(DefaultByteStreamingManager.class);
 
@@ -69,7 +70,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
    * {@inheritDoc}
    */
   @Override
-  public void dispose() {
+  public void stop() throws MuleException {
     executorService.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
 
@@ -268,7 +269,6 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
         try {
           closeProvider(provider);
           closeAll(cursors);
-          statistics.decrementOpenCursors(cursors.size());
         } finally {
           provider.releaseResources();
         }
@@ -281,6 +281,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
       cursors.forEach(cursor -> {
         try {
           cursor.close();
+          statistics.decrementOpenCursors();
         } catch (Exception e) {
           LOGGER.warn("Exception was found trying to close cursor. Execution will continue", e);
         }

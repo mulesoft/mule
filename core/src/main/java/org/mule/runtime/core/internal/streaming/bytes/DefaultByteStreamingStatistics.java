@@ -36,10 +36,6 @@ public class DefaultByteStreamingStatistics implements ByteStreamingStatistics {
     openCursors.decrementAndGet();
   }
 
-  void decrementOpenCursors(int delta) {
-    openCursors.getAndAdd(-delta);
-  }
-
   /**
    * {@inheritDoc}
    */

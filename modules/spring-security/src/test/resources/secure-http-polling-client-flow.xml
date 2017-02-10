@@ -46,8 +46,8 @@
                     <httpn:success-status-code-validator values="0..599"/>
                 </httpn:response-validator>
             </httpn:request>
-            <object-to-string-transformer />
         </poll>
+        <object-to-string-transformer />
         <test:queue name="toclient2"/>
     </flow>
 
