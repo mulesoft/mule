@@ -15,7 +15,6 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -46,8 +45,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void responseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload().getValue() instanceof CursorStreamProvider);
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 
   @Rule
@@ -57,7 +55,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   public void blockingResponseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
     assertTrue(event.getMessage().getPayload().getValue() instanceof String);
-    assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo("value"));
   }
 
   @Test

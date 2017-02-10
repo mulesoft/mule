@@ -48,6 +48,7 @@
     <flow name="LocalService">
         <transformer ref="SerializableToByteArray"/>
         <httpn:request path="RemoteService" config-ref="requestConfig" method="POST"/>
+        <byte-array-to-serializable-transformer />
     </flow>
 
 </mule>
