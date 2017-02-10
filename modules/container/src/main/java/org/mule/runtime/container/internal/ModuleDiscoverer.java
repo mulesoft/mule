@@ -7,6 +7,8 @@
 
 package org.mule.runtime.container.internal;
 
+import org.mule.runtime.container.api.MuleModule;
+
 import java.util.List;
 
 /**

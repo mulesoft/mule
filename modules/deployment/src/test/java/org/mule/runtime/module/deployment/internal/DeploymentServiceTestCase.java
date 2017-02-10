@@ -13,6 +13,7 @@ import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -50,6 +51,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderP
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -60,8 +63,6 @@ import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_BUNDLE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
@@ -83,6 +84,8 @@ import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuild
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -180,6 +183,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
   private static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
   private static final String APP_WITH_EXTENSION_PLUGIN_CONFIG = "app-with-extension-plugin-config.xml";
+  private static final String APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG = "app-with-privileged-extension-plugin-config.xml";
   private static final String FOO_POLICY_NAME = "fooPolicy";
   private static final String BAR_POLICY_NAME = "barPolicy";
   private static final String BAZ_POLICY_NAME = "bazPolicy";
@@ -189,8 +193,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String MIN_MULE_VERSION = "4.0.0";
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
   private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
+  public static final String PRIVILEGED_EXTENSION_PLUGIN_NAME = "privilegedExtensionPlugin";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
+  private ModuleRepository moduleRepository;
+  private TestContainerModuleDiscoverer moduleDiscoverer;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Object[]> parameters() {
@@ -238,6 +245,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                  getResourceFile("/org/foo/simple/SimpleExtension.java"),
                  getResourceFile("/org/foo/simple/SimpleOperation.java"))
       .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0");
+
+  private static final File privilegedExtensionV1JarFile = new CompilerUtils.ExtensionCompiler()
+      .compiling(
+                 getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
+                 getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
+      .compile("mule-module-privileged-1.0.jar", "1.0");
 
   private static final File echoTestClassFile = new SingleClassCompiler()
       .compile(getResourceFile("/org/foo/EchoTest.java"));
@@ -296,6 +309,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new ArtifactPluginFileBuilder("simpleExtensionPlugin").usingLibrary(simpleExtensionJarFile.getAbsolutePath())
           .configuredWith(EXPORTED_RESOURCE_PROPERTY,
                           "/,  META-INF/mule-simple.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+
+  private final ArtifactPluginFileBuilder privilegedExtensionPlugin =
+      new ArtifactPluginFileBuilder(PRIVILEGED_EXTENSION_PLUGIN_NAME).usingLibrary(privilegedExtensionV1JarFile.getAbsolutePath())
+          .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                          "/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
 
   // Application file builders
   private final ApplicationFileBuilder emptyAppFileBuilder =
@@ -451,7 +469,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);
-    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
+    moduleDiscoverer = new TestContainerModuleDiscoverer(singletonList(PRIVILEGED_EXTENSION_PLUGIN_NAME));
+    moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
+    MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
+        new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
@@ -1276,7 +1297,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager);
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnStopApplication(true);
 
     deploymentService.setAppFactory(appFactory);
@@ -1302,7 +1323,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager);
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1584,6 +1605,33 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void deploysAppZipWithPrivilegedExtensionPlugin() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("privilegedPluginApp")
+        .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG).containingPlugin(privilegedExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void failsToDeploysAppZipWithInvalidPrivilegedExtensionPlugin() throws Exception {
+    ArtifactPluginFileBuilder invalidPrivilegedPlugin =
+        new ArtifactPluginFileBuilder("invalidPrivilegedPlugin").usingLibrary(privilegedExtensionV1JarFile.getAbsolutePath())
+            .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                            "/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("invalidPrivilegedPluginApp")
+        .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG).containingPlugin(invalidPrivilegedPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
   public void deploysWithExtensionXmlPlugin() throws Exception {
     String moduleFileName = "module-bye.xml";
     String extensionName = "bye-extension";
@@ -1608,7 +1656,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager);
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1645,7 +1693,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager);
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();

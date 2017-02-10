@@ -17,6 +17,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,13 +36,12 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createsClassLoaderLookupPolicy() throws Exception {
-    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
-    final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final List<MuleModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar").build());
     modules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").build());
-    when(moduleDiscoverer.discover()).thenReturn(modules);
-    factory.setModuleDiscoverer(moduleDiscoverer);
+    when(moduleRepository.getModules()).thenReturn(modules);
 
     final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
@@ -92,12 +93,11 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   }
 
   private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
-    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
-    final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final List<MuleModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("module1").exportingResources(BOOTSTRAP_PROPERTIES).build());
-    when(moduleDiscoverer.discover()).thenReturn(modules);
-    factory.setModuleDiscoverer(moduleDiscoverer);
+    when(moduleRepository.getModules()).thenReturn(modules);
     return factory;
   }
 }

@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.mock;
+import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -15,7 +17,6 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
@@ -27,12 +28,12 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
+import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -58,7 +59,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
                                                                     DomainManager domainManager,
                                                                     ServiceRepository serviceRepository,
-                                                                    ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+                                                                    ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                                                    ModuleRepository moduleRepository) {
     ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory();
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
@@ -73,7 +75,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository,
                                                  new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager,
-                                                                                          new ArtifactPluginClassLoaderFactory()),
+                                                                                          new ArtifactPluginClassLoaderFactory(moduleRepository)),
                                                  pluginDependenciesResolver);
 
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
@@ -105,7 +107,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   private static class TestEmptyApplicationPluginRepository implements ArtifactPluginRepository {
 
     public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors() {
-      return Collections.emptyList();
+      return emptyList();
     }
   }
 }

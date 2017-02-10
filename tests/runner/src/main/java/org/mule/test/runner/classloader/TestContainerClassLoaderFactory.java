@@ -10,8 +10,9 @@ package org.mule.test.runner.classloader;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
-import org.mule.runtime.container.internal.MuleModule;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
@@ -48,8 +49,12 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * @param extraBootPackages {@link List} of {@link String}s extra boot packages that need to be appended to the container (junit
    *        for instance)
    * @param urls {@link URL}s that were classified to be added to the container {@link ClassLoader}
+   * @param moduleRepository provides access to the modules available on the container. Non null.
    */
-  public TestContainerClassLoaderFactory(final List<String> extraBootPackages, final URL[] urls) {
+  public TestContainerClassLoaderFactory(final List<String> extraBootPackages, final URL[] urls,
+                                         DefaultModuleRepository moduleRepository) {
+    super(moduleRepository);
+
     this.extraBootPackages = ImmutableSet.<String>builder().addAll(super.getBootPackages()).addAll(extraBootPackages)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     this.urls = urls;

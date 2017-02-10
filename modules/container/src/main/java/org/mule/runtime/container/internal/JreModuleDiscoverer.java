@@ -12,6 +12,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.CollectionUtils.singletonList;
 import static org.mule.runtime.core.util.JdkVersionUtils.getJdkVersion;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.util.JdkVersionUtils.JdkVersion;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
 
   @Override
   public List<MuleModule> discover() {
-    return singletonList(new MuleModule(JRE_MODULE_NAME, loadJrePackages(), emptySet()));
+    return singletonList(new MuleModule(JRE_MODULE_NAME, loadJrePackages(), emptySet(), emptySet(), emptySet()));
   }
 
   private HashSet<String> loadJrePackages() {
