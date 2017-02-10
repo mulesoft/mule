@@ -140,7 +140,9 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public void stop() throws MuleException {
-    scheduler.shutdownNow();
+    if (!scheduler.isShutdown()) {
+      scheduler.shutdownNow();
+    }
   }
 
   @Override
