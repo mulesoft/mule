@@ -6,21 +6,25 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import org.mule.runtime.api.exception.MuleException;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
-import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 
 import javax.inject.Inject;
 
-public class DefaultStreamingManager implements StreamingManagerAdapter, Initialisable, Stoppable {
+import org.slf4j.Logger;
+
+public class DefaultStreamingManager implements StreamingManagerAdapter, Initialisable, Disposable {
+
+  private static final Logger LOGGER = getLogger(DefaultStreamingManager.class);
 
   @Inject
   private SchedulerService schedulerService;
@@ -46,8 +50,8 @@ public class DefaultStreamingManager implements StreamingManagerAdapter, Initial
    * {@inheritDoc}
    */
   @Override
-  public void stop() throws MuleException {
-    stopIfNeeded(byteStreamingManager);
+  public void dispose() {
+    disposeIfNeeded(byteStreamingManager, LOGGER);
   }
 
   /**
