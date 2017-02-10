@@ -89,7 +89,9 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public Scheduler customScheduler(SchedulerConfig config) {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
         decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
-                                                             new NamedThreadFactory(config.getSchedulerName()),
+                                                             new NamedThreadFactory(config.getSchedulerName() != null
+                                                                 ? config.getSchedulerName()
+                                                                 : "SimpleUnitTestSupportSchedulerService_custom"),
                                                              new AbortPolicy()));
     decorators.add(decorator);
     return decorator;
@@ -99,7 +101,9 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
         decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
-                                                             new NamedThreadFactory(config.getSchedulerName()),
+                                                             new NamedThreadFactory(config.getSchedulerName() != null
+                                                                 ? config.getSchedulerName()
+                                                                 : "SimpleUnitTestSupportSchedulerService_custom"),
                                                              new AbortPolicy()));
     decorators.add(decorator);
     return decorator;
