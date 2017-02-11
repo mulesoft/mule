@@ -18,10 +18,12 @@
 
     <flow name="attachmentFromBytes">
         <httpn:request config-ref="requesterConfig" path="reqWithAttachment" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="attachmentFromStream">
         <httpn:request config-ref="requesterConfig" path="reqWithAttachment" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="reqWithAttachment">
