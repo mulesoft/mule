@@ -64,7 +64,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Test
   public void worksWithProtocolAndCipherSuiteMatch() throws Exception {
     Event response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
-    assertThat(response.getMessageAsString(muleContext), is(TEST_PAYLOAD));
+    assertThat(response.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
   @Test
