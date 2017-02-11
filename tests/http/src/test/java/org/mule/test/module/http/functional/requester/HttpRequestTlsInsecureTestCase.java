@@ -58,7 +58,7 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
   @Test
   public void insecureRequest() throws Exception {
     final Event res = flowRunner("testInsecureRequest").withPayload(TEST_PAYLOAD).run();
-    assertThat(res.getMessageAsString(muleContext), is(TEST_PAYLOAD));
+    assertThat(res.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
   @Test
