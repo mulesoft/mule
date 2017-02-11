@@ -374,7 +374,7 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
   @Test
   public void flowWithAsync() throws Exception {
     flowRunner("flowWithAsync").run();
-    waitUntilNotificationsArrived(2);
+    waitUntilNotificationsArrived(3);
     DefaultComponentLocation flowWithAsyncLocation = FLOW_WITH_ASYNC.appendLocationPart("processors", empty(), empty(), empty());
     DefaultComponentLocation asyncLocation = flowWithAsyncLocation
         .appendLocationPart("0", ASYNC, CONFIG_FILE_NAME, of(117));

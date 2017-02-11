@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,11 @@ public class ReferenceProcessor extends AbstractProcessor
   @Override
   public Event process(Event event) throws MuleException {
     return referencedProcessor.process(event);
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return referencedProcessor.apply(publisher);
   }
 
   public Processor getReferencedProcessor() {
