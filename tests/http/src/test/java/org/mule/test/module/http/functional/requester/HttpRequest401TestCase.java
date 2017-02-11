@@ -40,7 +40,7 @@ public class HttpRequest401TestCase extends AbstractHttpRequestTestCase {
   public void returns401Response() throws Exception {
     InternalMessage response = runFlow("executeRequest").getMessage();
     assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_UNAUTHORIZED));
-    assertThat(getPayloadAsString(response), is(UNAUTHORIZED_MESSAGE));
+    assertThat(response.getPayload().getValue(), is(UNAUTHORIZED_MESSAGE));
   }
 
 }
