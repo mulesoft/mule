@@ -9,11 +9,12 @@ package org.mule.runtime.config.spring.dsl.spring;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSOR_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.processor.ReferenceProcessor;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -51,7 +52,14 @@ public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
           .build();
 
   private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
-    return getFixedConsumer(Processor.class);
+    return (beanDefinitionRequest) -> {
+      ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
+      componentModel.setBeanDefinition(rootBeanDefinition(ReferenceProcessor.class)
+          .addConstructorArgReference(componentModel.getParameters().get(REF_ATTRIBUTE)).getBeanDefinition());
+      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+      beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
+      componentModel.setType(objectTypeVisitor.getType());
+    };
   }
 
   private Consumer<CreateBeanDefinitionRequest> getQueueStoreConsumer() {
@@ -85,4 +93,5 @@ public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
     }
     return false;
   }
+
 }

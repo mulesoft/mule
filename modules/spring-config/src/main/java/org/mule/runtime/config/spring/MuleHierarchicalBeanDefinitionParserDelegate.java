@@ -51,6 +51,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -176,8 +177,10 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                   adaptFilterBeanDefinitions(parentComponentModel,
                                              (org.springframework.beans.factory.support.AbstractBeanDefinition) finalChild);
             }
-            if (componentModel != null && componentModel.getIdentifier().getName().equals("flow-ref")) {
+            Optional<Class> beanDefinitionType = getBeanDefinitionType(currentDefinition);
+            if (componentModel != null && beanDefinitionType.isPresent()) {
               // This is required until flow-ref is migrated to the new parsing mechanism.
+              componentModel.setType(beanDefinitionType.get());
               componentModel.setBeanDefinition(currentDefinition);
               ComponentModelHelper.addAnnotation(LOCATION_KEY, componentModel.getComponentLocation(),
                                                  componentModel);
@@ -230,6 +233,20 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
       }
 
       return finalChild;
+    }
+  }
+
+  private Optional<Class> getBeanDefinitionType(BeanDefinition currentDefinition) {
+    try {
+      if (currentDefinition == null) {
+        return empty();
+      }
+      if (currentDefinition instanceof AbstractBeanDefinition) {
+        return of(((AbstractBeanDefinition) currentDefinition).getBeanClass());
+      }
+      return of(ClassUtils.getClass(currentDefinition.getBeanClassName()));
+    } catch (Exception e) {
+      return empty();
     }
   }
 

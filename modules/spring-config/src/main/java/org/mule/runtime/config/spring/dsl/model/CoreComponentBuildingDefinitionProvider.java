@@ -103,6 +103,7 @@ import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointR
 import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -408,7 +409,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(createTransactionManagerDefinitionBuilder("websphere-transaction-manager",
                                                        WebsphereTransactionManagerLookupFactory.class).build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(PROCESSOR).withTypeDefinition(fromType(Object.class)).build());
+        .add(baseDefinition.copy().withIdentifier(PROCESSOR).withTypeDefinition(fromType(AbstractProcessor.class)).build());
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(TRANSFORMER).withTypeDefinition(fromType(Transformer.class)).build());
     componentBuildingDefinitions
