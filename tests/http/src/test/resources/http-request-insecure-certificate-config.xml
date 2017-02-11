@@ -41,9 +41,11 @@
 
     <flow name="testInsecureRequest">
         <httpn:request config-ref="insecureClient" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="testSecureRequest">
         <httpn:request config-ref="secureClient" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 </mule>

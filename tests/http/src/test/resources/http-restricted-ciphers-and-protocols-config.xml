@@ -62,27 +62,31 @@
     <flow name="1Server">
         <httpn:listener config-ref="listenerConfig1" path="/" allowedMethods="POST"/>
         <echo-component/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="12Client1Server">
         <httpn:request config-ref="requestConfig1" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="12Server">
         <httpn:listener config-ref="listenerConfig2" path="/" allowedMethods="POST"/>
-        <echo-component/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="12Client12Server">
         <httpn:request config-ref="requestConfig2" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="serverFlow3">
         <httpn:listener config-ref="listenerConfig3" path="/" allowedMethods="POST"/>
-        <echo-component/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="12CipherClient1CipherServer">
         <httpn:request config-ref="requestConfig3" path="/" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 </mule>
