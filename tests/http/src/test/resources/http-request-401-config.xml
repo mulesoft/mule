@@ -20,6 +20,7 @@
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>
         </httpn:request>
+        <object-to-string-transformer />
     </flow>
 
 </mule>
