@@ -12,13 +12,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.processor.ReferenceProcessor;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.List;
 
@@ -69,6 +70,9 @@ public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegra
     assertFalse(mpList.contains(mp));
 
     for (Processor theMp : mpList) {
+      if (theMp instanceof ReferenceProcessor) {
+        theMp = ((ReferenceProcessor) theMp).getReferencedProcessor();
+      }
       if (clazz.isInstance(theMp)) {
         return;
       }
