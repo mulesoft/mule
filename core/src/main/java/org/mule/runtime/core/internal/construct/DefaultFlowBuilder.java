@@ -240,8 +240,6 @@ public class DefaultFlowBuilder implements Builder {
                     return me;
                   })
                   .otherwiseIfEmpty(fromCallable(() -> {
-                    event.getContext().success();
-                    streamingManager.success(event);
                     throw newEventDroppedException(event);
                   }));
             }
