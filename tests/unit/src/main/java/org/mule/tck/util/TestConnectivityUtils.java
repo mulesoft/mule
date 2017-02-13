@@ -9,8 +9,11 @@ package org.mule.tck.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import org.hamcrest.Matcher;
+
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
@@ -62,7 +65,7 @@ public class TestConnectivityUtils {
   private void assertConnection(String configName, boolean isSuccess, Matcher<Exception> exceptionMatcher,
                                 Matcher<ErrorType> codeMatcher) {
     ConnectivityTestingService testingService = muleContext.getRegistry().get(OBJECT_CONNECTIVITY_TESTING_SERVICE);
-    ConnectionValidationResult validationResult = testingService.testConnection(configName);
+    ConnectionValidationResult validationResult = testingService.testConnection(builder().globalName(configName).build());
     assertThat(validationResult.isValid(), is(isSuccess));
     if (!isSuccess) {
       assertThat(validationResult.getException(), exceptionMatcher);

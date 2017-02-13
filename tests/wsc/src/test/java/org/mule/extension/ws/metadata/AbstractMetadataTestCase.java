@@ -9,13 +9,14 @@ package org.mule.extension.ws.metadata;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -47,7 +48,7 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
   @Step("Retrieve Dynamic Metadata")
   protected MetadataResult<ComponentMetadataDescriptor<OperationModel>> getMetadata(String flow, String key) {
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result =
-        service.getOperationMetadata(id(flow), newKey(key).build());
+        service.getOperationMetadata(location(flow), newKey(key).build());
     assertThat(result.isSuccess(), is(true));
     return result;
   }
@@ -60,8 +61,8 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
         .findFirst().get().getType());
   }
 
-  protected ProcessorId id(String flow) {
-    return new ProcessorId(flow, "0");
+  protected Location location(String flow) {
+    return builder().globalName(flow).addProcessorsPart().addIndexPart(0).build();
   }
 
   protected ObjectType toObjectType(MetadataType type) {

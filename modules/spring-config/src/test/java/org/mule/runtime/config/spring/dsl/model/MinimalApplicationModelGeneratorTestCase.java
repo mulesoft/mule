@@ -14,7 +14,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.location.Location.builder;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
@@ -40,30 +42,27 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void noElements() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flow").build());
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
   }
 
-  @Test
+  @Test(expected = IllegalArgumentException.class)
   public void wrongElementIndexOnMinimalModelByPath() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flow/3");
-    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("flow").get().getInnerComponents(), hasSize(1));
-    assertThat(minimalModel.findNamedComponent("flow").get().getInnerComponents().get(0).isEnabled(), is(false));
+    generator.getMinimalModel(builder().globalName("flow").addProcessorsPart().addIndexPart(3).build());
   }
 
   @Test
   public void singleElement() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("single-element-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByName("errorHandler");
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("errorHandler").build());
     assertThat(minimalModel.findNamedComponent("errorHandler").isPresent(), is(true));
   }
 
   @Test
   public void twoElements() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("two-elements-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flow").build());
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("errorHandler").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("errorHandler").get().isEnabled(), is(false));
@@ -72,7 +71,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void dependencyBetweenElements() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flow").build());
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
   }
@@ -80,7 +79,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void resolveDependencies() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("resolve-dependencies-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flow/0");
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("flow").addProcessorsPart().addIndexPart(0).build());
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
 
@@ -94,7 +94,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void resolveCyclicDependencies() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("resolve-dependencies-cyclic-dependency-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowA");
+    ApplicationModel minimalModel = generator.getMinimalModel(Location.builder().globalName("flowA").build());
     assertThat(minimalModel.findNamedComponent("flowA").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowB").isPresent(), is(true));
 
@@ -108,7 +108,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void dependencyBetweenElementsReferencingMp() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flow/0");
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("flow").addProcessorsPart().addIndexPart(0).build());
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
   }
@@ -116,9 +117,9 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void noDependencyBetweenElementsReferencingMp() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("deadLetterQueueFlow/0");
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("deadLetterQueueFlow").addProcessorsPart().addIndexPart(0).build());
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("flow").get().isEnabled(), is(false));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").get().isEnabled(), is(true));
   }
@@ -126,7 +127,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void flowWithSourcePathToMp() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/0");
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("flowWithSource").addProcessorsPart().addIndexPart(0).build());
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(1).getIdentifier(),
@@ -138,7 +140,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void flowWithSourcePathToSource() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/-1");
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flowWithSource").addPart("source").build());
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),

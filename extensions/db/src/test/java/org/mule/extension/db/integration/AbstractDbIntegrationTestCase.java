@@ -19,10 +19,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
-import org.junit.Before;
-import org.junit.runners.Parameterized;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
@@ -40,7 +39,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
@@ -51,12 +49,16 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase
@@ -205,7 +207,8 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
   protected MetadataResult<ComponentMetadataDescriptor<OperationModel>> getMetadata(String flow, String query)
       throws RegistrationException {
     MetadataService metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
-    return metadataService.getOperationMetadata(new ProcessorId(flow, "0"), newKey(query).build());
+    return metadataService.getOperationMetadata(builder().globalName(flow).addProcessorsPart().addIndexPart(0).build(),
+                                                newKey(query).build());
   }
 
   protected MetadataType getInputMetadata(String flow, String query) throws RegistrationException {

@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,8 +40,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * Implementation of {@link MuleArtifactContext} that allows to create configuration components
- * lazily.
+ * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
  * <p/>
  * Components will be created upon request to use the from the exposed services.
  *
@@ -57,10 +57,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext               the {@link MuleContext} that own this context
-   * @param artifactDeclaration       the mule configuration defined programmatically
+   * @param muleContext the {@link MuleContext} that own this context
+   * @param artifactDeclaration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                  org.mule.runtime.config.spring.SpringRegistry
+   *        org.mule.runtime.config.spring.SpringRegistry
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -117,9 +117,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   }
 
   @Override
-  public void initializeComponent(String componentName) {
+  public void initializeComponent(Location location) {
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
-      if (muleContext.getRegistry().get(componentName) != null) {
+      if (muleContext.getConfigurationComponentLocator().find(location).isPresent()) {
         return;
       }
 
@@ -129,12 +129,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       // First unregister any already initialized/started component
       unregisterComponents(minimalApplicationModelGenerator.resolveComponentModelDependencies());
 
-      ApplicationModel minimalApplicationModel;
-      if (!componentName.contains("/")) {
-        minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByName(componentName);
-      } else {
-        minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByPath(componentName);
-      }
+      ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
       createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
     });
   }

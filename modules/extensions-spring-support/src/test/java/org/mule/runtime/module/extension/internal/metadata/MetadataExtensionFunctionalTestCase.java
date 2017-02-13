@@ -24,11 +24,11 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -121,7 +121,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
       (metadataService, componentId, key) -> metadataService.getOperationMetadata(componentId);
 
   protected MetadataType personType;
-  protected ComponentId componentId;
+  protected Location location;
   protected Event event;
   protected MetadataService metadataService;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -158,8 +158,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   }
 
   <T extends ComponentModel<T>> MetadataResult<ComponentMetadataDescriptor<T>> getComponentDynamicMetadata(MetadataKey key) {
-    checkArgument(componentId != null, "Unable to resolve Metadata. The Component ID has not been configured.");
-    return provider.resolveDynamicMetadata(metadataService, componentId, key);
+    checkArgument(location != null, "Unable to resolve Metadata. The location has not been configured.");
+    return provider.resolveDynamicMetadata(metadataService, location, key);
   }
 
   ComponentMetadataDescriptor getSuccessComponentDynamicMetadata() {
@@ -250,6 +250,6 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   interface MetadataComponentDescriptorProvider<T extends ComponentModel<T>> {
 
     MetadataResult<ComponentMetadataDescriptor<T>> resolveDynamicMetadata(MetadataService metadataService,
-                                                                          ComponentId componentId, MetadataKey key);
+                                                                          Location location, MetadataKey key);
   }
 }

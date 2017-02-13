@@ -39,7 +39,7 @@ public class KeysMetadataTestCase extends AbstractMetadataTestCase {
   @Test
   @Description("Checks the MetadataKeys for the WSC")
   public void getOperationKeys() {
-    MetadataResult<MetadataKeysContainer> result = service.getMetadataKeys(id(ECHO_ACCOUNT_FLOW));
+    MetadataResult<MetadataKeysContainer> result = service.getMetadataKeys(location(ECHO_ACCOUNT_FLOW));
     assertThat(result.isSuccess(), is(true));
     Set<MetadataKey> keys = result.get().getKeys("WebServiceConsumerCategory").get();
     assertThat(keys, hasSize(OPERATIONS.length));

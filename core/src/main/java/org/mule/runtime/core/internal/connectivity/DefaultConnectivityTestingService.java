@@ -9,27 +9,29 @@ package org.mule.runtime.core.internal.connectivity;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ConnectivityTestingService}.
  * <p>
- * It searchs for the {@link ConnectivityTestingStrategy} instances registered in
- * mule to find the possible strategies to do connection testing over mule component instances
+ * It searchs for the {@link ConnectivityTestingStrategy} instances registered in mule to find the possible strategies to do
+ * connection testing over mule component instances
  *
  * @since 4.0
  */
@@ -71,11 +73,10 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
    * {@inheritDoc}
    */
   @Override
-  public ConnectionValidationResult testConnection(String identifier) {
-    Object connectivityTestingObject = muleContext.getRegistry().get(identifier);
-    if (connectivityTestingObject == null) {
-      throw new ObjectNotFoundException(identifier);
-    }
+  public ConnectionValidationResult testConnection(Location location) {
+    Optional<Object> foundObjectOptional = muleContext.getConfigurationComponentLocator().find(location);
+    Object connectivityTestingObject =
+        foundObjectOptional.orElseThrow((() -> new ObjectNotFoundException("No object found with path: " + location)));
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       if (connectivityTestingStrategy.accepts(connectivityTestingObject)) {
         try {
