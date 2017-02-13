@@ -14,6 +14,8 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
 
     private final Object value;
 
+    private boolean isDbParam = false;
+
     public DefaultInputQueryParam(int index, DbType type, Object value)
     {
         this(index, type, value, null);
@@ -29,5 +31,19 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
     public Object getValue()
     {
         return value;
+    }
+
+    /**
+     * @return true if the InputQueryParam references a param that must be defined through a <db:in-param> element in the configuration file.
+     * false if the InputQueryParam is defined through a literal or a MEL expression
+     */
+    public boolean isDbInParam()
+    {
+        return isDbParam;
+    }
+
+    public void setDbParam(boolean dbParam)
+    {
+        isDbParam = dbParam;
     }
 }
