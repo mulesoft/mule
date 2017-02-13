@@ -23,7 +23,7 @@ import java.util.List;
  * It is expected that the string representation of the object defined the serialized for of the location which consist of the
  * global element name and the parts separated by an slash character.
  * 
- * @since 1.0
+ * @since 4.0
  */
 public interface Location {
 

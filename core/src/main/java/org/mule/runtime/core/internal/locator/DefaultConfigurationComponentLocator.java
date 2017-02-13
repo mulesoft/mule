@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.locator;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.locator.Location;
@@ -30,12 +28,10 @@ public class DefaultConfigurationComponentLocator implements ConfigurationCompon
   private Map<ComponentLocation, Object> componentMap = new HashedMap();
 
   public Optional<Object> find(Location location) {
-    for (ComponentLocation componentLocation : componentMap.keySet()) {
-      if (componentLocation.getLocation().equals(location.toString())) {
-        return of(componentMap.get(componentLocation));
-      }
-    }
-    return empty();
+    return componentMap.entrySet().stream()
+        .filter(entry -> entry.getKey().getLocation().equals(location.toString()))
+        .map(entry -> entry.getValue())
+        .findAny();
   }
 
   public void setComponentMap(Map<ComponentLocation, Object> componentMap) {
