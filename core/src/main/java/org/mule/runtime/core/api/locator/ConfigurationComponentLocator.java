@@ -6,40 +6,37 @@
  */
 package org.mule.runtime.core.api.locator;
 
+import java.util.Optional;
+
 /**
  * Locator to access runtime objects created from the configuration of the artifact.
+ *
+ * The location can be composed by many parts, each part separated by an slash.
+ *
+ * The first part must be the name of the global element that contains the location. Location "myflow" indicates the global
+ * element with name myFlow.
+ *
+ * Global elements that do not have a name cannot be referenced.
+ *
+ * The following parts must be components contained within the global element. Location "myFlow/processors" indicates the
+ * processors part of the global element with name "myFlow"
+ *
+ * Each part must be contained in the preceded component in the location. Location "myFlow/errorHandler/onErrors" indicates the
+ * onErrors components that are part of the errorHandler component which is also part of the "myFlow" global element.
+ *
+ * When a component part has a collection of components, each component can be referenced individually with an index. THe first
+ * index is 0. Location "myFlow/processors/4" refers to the fifth processors inside the flow with name "myFlow"
  * 
  * @since 4.0
  */
 public interface ConfigurationComponentLocator {
 
   /**
-   * Finds the component created from the configuration with the provided global name.
+   * Finds a component in the configuration with the specified location. Only simple objects locations are accepted.
    *
-   * @param componentName name configured in the global component.
-   * @return the component with the provided global name.
-   * @throws org.mule.runtime.core.api.exception.ObjectNotFoundException if the component is not present in the configuration.
+   * @param location the location of the component.
+   * @return the found component or empty if there's no such component.
    */
-  Object findByName(String componentName);
-
-  /**
-   * Finds the component created from the configuration with the given path.
-   *
-   * The path has the following syntax containerType/containerName/[containerPart]/[componentIndexLocation] where:
-   * <ul>
-   *     <li>
-   *         containerType: can by one of flow or batch
-   *         containerName: name of the container component in the configuration
-   *         containerPart: part of the container. For flow it can be source, processors or errorHandler. For batch it can be inputPhase, processingPhase or onComplete.
-   *         componentIndexLocation: index of the component within the container. When there's a component that can have other components as child then all the indexes must be provided
-   *         separated by a '/' character
-   *     </li>
-   * </ul>
-   * 
-   * @param componentPath path to the component
-   * @return component with the given path.
-   * @throws org.mule.runtime.core.api.exception.ObjectNotFoundException if the component is not present in the configuration.
-   */
-  Object findByPath(String componentPath);
+  Optional<Object> find(Location location);
 
 }

@@ -16,6 +16,7 @@ import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -58,17 +59,22 @@ public class LazyMetadataService implements MetadataService {
   @Override
   public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId) {
     return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getOperationMetadata(componentId));
+        .orElseGet(() -> metadataService.getOperationMetadata(adjustProcessorId(componentId)));
+  }
+
+  //TODO PABLO LG remove adjustProcessor when component model has component id inside
+  private ProcessorId adjustProcessorId(ComponentId componentId) {
+    return new ProcessorId(componentId.getFlowName().get(), "0");
   }
 
   /**
-   * {@inheritDoc}
-   */
+  * {@inheritDoc}
+  */
   @Override
   public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId,
                                                                                           MetadataKey key) {
     return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getOperationMetadata(componentId, key));
+        .orElseGet(() -> metadataService.getOperationMetadata(adjustProcessorId(componentId), key));
   }
 
   /**

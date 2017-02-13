@@ -258,7 +258,7 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
     assertNextProcessorLocationIs(blockLocation
         .appendProcessorsPart()
         .appendLocationPart("0", TEST_COMPONENT, CONFIG_FILE_NAME, of(60)));
-    DefaultComponentLocation blockOnErrorContinueLocation = blockLocation
+    DefaultComponentLocation blockOnErrorContinueProcessorsLocation = blockLocation
         .appendLocationPart("errorHandler", ERROR_HANDLER, CONFIG_FILE_NAME, of(61))
         .appendLocationPart("0", ON_ERROR_CONTINUE, CONFIG_FILE_NAME,
                             of(62));
