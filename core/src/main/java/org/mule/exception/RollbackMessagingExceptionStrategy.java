@@ -47,7 +47,7 @@ public class RollbackMessagingExceptionStrategy extends TemplateMessagingExcepti
 
     public boolean hasMaxRedeliveryAttempts()
     {
-        return this.maxRedeliveryAttempts != null;
+        return this.maxRedeliveryAttempts != null && this.maxRedeliveryAttempts != 0;
     }
 
     @Override

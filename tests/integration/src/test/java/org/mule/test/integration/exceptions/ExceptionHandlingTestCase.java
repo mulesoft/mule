@@ -11,6 +11,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.equalTo;
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.FALSE;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -113,6 +118,42 @@ public class ExceptionHandlingTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertTrue((Boolean) response.getProperty("expectedHandler", PropertyScope.SESSION));
         assertTrue(injectedMessagingExceptionHandler instanceof RollbackMessagingExceptionStrategy);
+    }
+
+    @Test
+    public void testHasMaxDeliveryAttempts() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        LinkedList<String> list = new LinkedList<String>();
+        list.add(MESSAGE);
+        MuleMessage response = client.send("vm://hasMaxRedeliveryAttempts", list, null);
+
+        assertThat(injectedMessagingExceptionHandler, instanceOf(RollbackMessagingExceptionStrategy.class));
+        assertThat(((RollbackMessagingExceptionStrategy) injectedMessagingExceptionHandler).hasMaxRedeliveryAttempts(), equalTo(TRUE));
+    }
+
+    @Test
+    public void testNoMaxRedeliveryAttemptsWithoutAttributeInTag() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        LinkedList<String> list = new LinkedList<String>();
+        list.add(MESSAGE);
+        MuleMessage response = client.send("vm://hasNoMaxRedeliveryAttemptsWithoutAttributeInTag", list, null);
+
+        assertThat(injectedMessagingExceptionHandler, instanceOf(RollbackMessagingExceptionStrategy.class));
+        assertThat(((RollbackMessagingExceptionStrategy) injectedMessagingExceptionHandler).hasMaxRedeliveryAttempts(), equalTo(FALSE));
+    }
+
+    @Test
+    public void hasNoMaxRedeliveryAttempts() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        LinkedList<String> list = new LinkedList<String>();
+        list.add(MESSAGE);
+        MuleMessage response = client.send("vm://hasNoMaxRedeliveryAttempts", list, null);
+
+        assertThat(injectedMessagingExceptionHandler, instanceOf(RollbackMessagingExceptionStrategy.class));
+        assertThat(((RollbackMessagingExceptionStrategy) injectedMessagingExceptionHandler).hasMaxRedeliveryAttempts(), equalTo(FALSE));
     }
 
     @Test
