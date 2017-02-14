@@ -82,7 +82,9 @@ public class ContainerClassLoaderFactory {
                       "org.codehaus.groovy",
                       // TODO(gfernandes): MULE-10194: review why this is required as it is exported on scripting
                       // mule-module.properties (fails ClassInterceptorTestCase)
-                      "org.aopalliance.aop");
+                      "org.aopalliance.aop",
+                      // MULE-10194 Mechanism to add custom boot packages to be exported by the container
+                      "com.yourkit");
 
   private ModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer(this.getClass().getClassLoader());
 
