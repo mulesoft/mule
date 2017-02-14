@@ -59,7 +59,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public boolean isSingleton() {
-    return false;
+    return true;
   }
 
   @Override

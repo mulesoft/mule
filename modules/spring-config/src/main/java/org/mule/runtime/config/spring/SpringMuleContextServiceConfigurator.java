@@ -28,7 +28,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
@@ -37,6 +36,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_OBJECT_NAME
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERIALIZER;
@@ -86,7 +86,6 @@ import org.mule.runtime.core.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
-import org.mule.runtime.core.internal.locator.DefaultConfigurationComponentLocator;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -97,7 +96,6 @@ import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
-import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
@@ -212,20 +210,24 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(OBJECT_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class))
-      .put(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getBeanDefinition(DefaultConfigurationComponentLocator.class))
       .build();
+
+  private final SpringConfigurationComponentLocator componentLocator;
 
   public SpringMuleContextServiceConfigurator(MuleContext muleContext, ArtifactType artifactType,
                                               OptionalObjectsController optionalObjectsController,
-                                              BeanDefinitionRegistry beanDefinitionRegistry) {
+                                              BeanDefinitionRegistry beanDefinitionRegistry,
+                                              SpringConfigurationComponentLocator componentLocator) {
     this.muleContext = muleContext;
     this.customizationService = muleContext.getCustomizationService();
     this.artifactType = artifactType;
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
+    this.componentLocator = componentLocator;
   }
 
   void createArtifactServices() {
+    registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
     defaultContextServices.entrySet().stream()
         .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)).forEach(service -> {
           registerBeanDefinition(service.getKey(), service.getValue());

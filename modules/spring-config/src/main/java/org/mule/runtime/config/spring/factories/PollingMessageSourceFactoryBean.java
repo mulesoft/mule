@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -14,11 +13,10 @@ import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
-import org.springframework.beans.factory.FactoryBean;
-
-public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean<PollingMessageSource>, MuleContextAware {
+public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<PollingMessageSource>
+    implements MuleContextAware {
 
   protected PeriodicScheduler scheduler;
   protected Processor messageProcessor;
@@ -50,20 +48,10 @@ public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObject
 
 
   @Override
-  public PollingMessageSource getObject() throws Exception {
+  public PollingMessageSource doGetObject() throws Exception {
     scheduler = scheduler == null ? defaultScheduler() : scheduler;
     override = override != null ? this.override : new MessageProcessorPollingOverride.NullOverride();
     return new PollingMessageSource(muleContext, messageProcessor, override, scheduler);
-  }
-
-  @Override
-  public Class<?> getObjectType() {
-    return PollingMessageSource.class;
-  }
-
-  @Override
-  public boolean isSingleton() {
-    return true;
   }
 
   @Override
