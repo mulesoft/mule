@@ -28,7 +28,6 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.CONFI
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -44,6 +43,7 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.processors.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
@@ -51,7 +51,6 @@ import org.mule.runtime.config.spring.processors.MuleInjectorProcessor;
 import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProcessor;
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -91,7 +90,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
@@ -109,7 +107,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
-  private static final String COMPONENT_SERVICE_LOCATION_MAP_ATTRIBUTE = "componentMap";
 
   protected final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
       new ComponentBuildingDefinitionRegistry();
@@ -127,6 +124,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
+  private SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -240,7 +238,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
                           new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
                                                                  (DefaultListableBeanFactory) beanFactory),
-                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()));
+                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
+                          new ComponentLocatorCreatePostProcessor(componentLocator));
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
   }
@@ -321,13 +320,9 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         if (componentModel.getNameAttribute() != null) {
           createdComponentModels.add(componentModel.getNameAttribute());
         }
-        final BeanDefinition configurationComponentLocatorBeanDefinition =
-            beanFactory.getBeanDefinition(MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR);
         beanDefinitionFactory.resolveComponentRecursively(applicationModel.getRootComponentModel(), componentModel,
                                                           beanFactory,
                                                           (resolvedComponentModel, registry) -> {
-                                                            addBeanDefinitionToComponentLocatorServiceIfRequired(configurationComponentLocatorBeanDefinition,
-                                                                                                                 resolvedComponentModel);
                                                             if (resolvedComponentModel.isRoot()) {
                                                               String nameAttribute =
                                                                   resolvedComponentModel.getNameAttribute();
@@ -351,23 +346,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return createdComponentModels;
   }
 
-  private void addBeanDefinitionToComponentLocatorServiceIfRequired(BeanDefinition configurationComponentLocatorBeanDefinition,
-                                                                    ComponentModel resolvedComponentModel) {
-    if (resolvedComponentModel.getBeanDefinition() != null
-        && resolvedComponentModel.getComponentLocation() != null) {
-      ComponentLocation location = resolvedComponentModel.getComponentLocation();
-      ManagedMap componentMap = (ManagedMap) configurationComponentLocatorBeanDefinition
-          .getPropertyValues().get(COMPONENT_SERVICE_LOCATION_MAP_ATTRIBUTE);
-      if (componentMap == null) {
-        componentMap = new ManagedMap();
-      }
-      componentMap.put(location,
-                       resolvedComponentModel.getBeanDefinition());
-      configurationComponentLocatorBeanDefinition.getPropertyValues()
-          .add(COMPONENT_SERVICE_LOCATION_MAP_ATTRIBUTE, componentMap);
-    }
-  }
-
   protected String getOldParsingMechanismComponentIdentifiers() {
     return join(componentNotSupportedByNewParsers.toArray(), ",");
   }
@@ -375,7 +353,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory)
+    new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory, componentLocator)
         .createArtifactServices();
   }
 
