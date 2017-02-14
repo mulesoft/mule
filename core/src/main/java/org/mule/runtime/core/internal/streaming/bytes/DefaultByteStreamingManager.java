@@ -228,7 +228,10 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
         } else {
           for (Map.Entry<CursorStreamProviderAdapter, List<CursorStreamAdapter>> entry : cursors.asMap().entrySet()) {
             closeProvider(entry.getKey());
-            allCursorsClosed = allCursorsClosed && entry.getValue().stream().anyMatch(CursorStream::isClosed);
+            final List<CursorStreamAdapter> cursors = entry.getValue();
+            if (!cursors.isEmpty()) {
+              allCursorsClosed = allCursorsClosed && cursors.stream().anyMatch(CursorStream::isClosed);
+            }
           }
         }
 
