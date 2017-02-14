@@ -42,7 +42,6 @@ public final class RequestConnectionParams {
    * Host where the requests will be sent.
    */
   @Parameter
-  @Optional
   @Example("www.somehost.com")
   @Placement(order = 2)
   private String host;

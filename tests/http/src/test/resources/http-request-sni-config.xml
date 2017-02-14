@@ -13,7 +13,7 @@
     </tls:context>
 
     <httpn:request-config name="requestConfig">
-        <httpn:request-connection protocol="HTTPS" port="${httpsPort}" tlsContext="tlsContext"/>
+        <httpn:request-connection host="somehost" protocol="HTTPS" port="${httpsPort}" tlsContext="tlsContext"/>
     </httpn:request-config>
 
     <flow name="requestFlowLocalhost">
