@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.execution.ExecutionTemplate;
 import org.mule.api.lifecycle.CreateException;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
+
+import javax.resource.spi.work.Work;
 
 /**
  * <code>VMMessageReceiver</code> is a listener for events from a Mule service which then simply passes
@@ -96,6 +99,72 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // Rewrite the message to treat it as a new message
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, endpoint.getMuleContext());
         routeMessage(newMessage);
+    }
+    
+    @Override
+    protected void pollNotIsReceiveMessagesInTransaction() throws Exception 
+    {
+        ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
+        List messages = getMessages();
+        if (messages != null && messages.size() > 0)
+        {
+            for (Object message : messages)
+            {
+                try
+                {
+                    this.getWorkManager().scheduleWork(
+                            new MessageProcessorWorker(pt, endpoint.getMuleContext().getExceptionListener(), message));
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+    }
+    
+    protected class MessageProcessorWorker implements Work, ExecutionCallback<MuleEvent>
+    {
+        private final ExecutionTemplate<MuleEvent> pt;
+        private final Object message;
+        private final SystemExceptionHandler exceptionHandler;
+
+        public MessageProcessorWorker(ExecutionTemplate<MuleEvent> pt, SystemExceptionHandler exceptionHandler, Object message)
+        {
+            this.pt = pt;
+            this.message = message;
+            this.exceptionHandler = exceptionHandler;
+        }
+
+        @Override
+        public void release()
+        {
+            // nothing to do
+        }
+
+        @Override
+        public void run()
+        {
+            try
+            {
+                pt.execute(this);
+            }
+            catch (MessagingException e)
+            {
+                // already managed by TransactionTemplate
+            }
+            catch (Exception e)
+            {
+                exceptionHandler.handleException(e);
+            }
+        }
+
+        @Override
+        public MuleEvent process() throws Exception
+        {
+            processMessage(message);
+            return null;
+        }
     }
 
     public MuleMessage onCall(final MuleMessage message) throws MuleException
