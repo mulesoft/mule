@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.config.domain.query;
 
+import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.find;
 import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
@@ -100,16 +101,16 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         DbType paramType = templateParam.getType();
         if (!(queryParam.getType() instanceof UnknownDbType))
         {
-           paramType = queryParam.getType();
+            paramType = queryParam.getType();
         }
 
         if (queryParam instanceof InOutQueryParam)
         {
-            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), ((InOutQueryParam) queryParam).getValue());
+            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), checkNullValue(((InOutQueryParam) queryParam).getValue()));
         }
         else if (queryParam instanceof InputQueryParam)
         {
-            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, ((InputQueryParam) queryParam).getValue(), templateParam.getName());
+            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, checkNullValue(((InputQueryParam) queryParam).getValue()), templateParam.getName());
         }
         else
         {
@@ -136,6 +137,16 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         return null;
     }
 
+    private Object checkNullValue(Object value)
+    {
+        if (value instanceof String && ("null".equals(value) || "NULL".equals(value)))
+        {
+            return null;
+        }
+
+        return value;
+    }
+
     @Override
     public Class<?> getObjectType()
     {
@@ -150,7 +161,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
     private String buildNotDefinedInParamErrorMessage(String name)
     {
-        return "Parameter with name " + name + ", used in the query text, does not match any defined query parameter name.";
+        return format("Parameter with name %s, used in the query text, does not match any defined query parameter name.", name);
     }
 
 }

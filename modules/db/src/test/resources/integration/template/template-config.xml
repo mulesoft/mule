@@ -55,6 +55,11 @@
         <db:dynamic-query>${dynamicQuery}</db:dynamic-query>
     </db:template-query>
 
+    <db:template-query name="testNullParamsQuery">
+        <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = :position</db:parameterized-query>
+        <db:in-param name="position" defaultValue="null"/>
+    </db:template-query>
+
     <db:template-query name="disorderedParams">
         <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = :position AND NAME = :name</db:parameterized-query>
         <db:in-param name="name" defaultValue="mars"/>

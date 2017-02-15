@@ -14,17 +14,23 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
 
     private final Object value;
 
-    private boolean isDbParam = false;
+    private final boolean isDbParam;
 
     public DefaultInputQueryParam(int index, DbType type, Object value)
     {
-        this(index, type, value, null);
+        this(index, type, value, null, false);
     }
 
     public DefaultInputQueryParam(int index, DbType type, Object value, String name)
     {
+        this(index, type, value, name, false);
+    }
+
+    public DefaultInputQueryParam(int index, DbType type, Object value, String name, boolean isDbParam)
+    {
         super(index, type, name);
         this.value = value;
+        this.isDbParam = isDbParam;
     }
 
     @Override
@@ -42,8 +48,4 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
         return isDbParam;
     }
 
-    public void setDbParam(boolean dbParam)
-    {
-        isDbParam = dbParam;
-    }
 }

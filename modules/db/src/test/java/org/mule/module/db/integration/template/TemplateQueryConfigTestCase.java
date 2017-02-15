@@ -132,6 +132,23 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void usesNullDefaultParamValue() throws Exception
+    {
+        Object queryTemplateBean = muleContext.getRegistry().get("testNullParamsQuery");
+
+        QueryTemplate queryTemplate = (QueryTemplate) queryTemplateBean;
+
+        assertFalse(queryTemplate.isDynamic());
+        assertEquals("SELECT * FROM PLANET WHERE POSITION = ?", queryTemplate.getSqlText());
+        assertEquals(1, queryTemplate.getInputParams().size());
+        InputQueryParam param1 = queryTemplate.getInputParams().get(0);
+        assertEquals(UnknownDbType.getInstance(), param1.getType());
+        assertEquals("position", param1.getName());
+        assertEquals(null, param1.getValue());
+        assertEquals(1, param1.getIndex());
+    }
+
+    @Test
     public void overridesDisorderedParams() throws Exception
     {
         Object queryTemplateBean = muleContext.getRegistry().get("disorderedParams");

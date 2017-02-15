@@ -11,7 +11,7 @@ import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 
-public class SelectUnresolvedTextQueryParam extends AbstractConfigurationErrorTestCase
+public class SelectUnresolvedTextQueryParamTestCase extends AbstractConfigurationErrorTestCase
 {
 
     @Override
