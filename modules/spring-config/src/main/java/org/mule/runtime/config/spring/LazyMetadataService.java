@@ -50,7 +50,7 @@ public class LazyMetadataService implements MetadataService {
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentId componentId) {
     return (MetadataResult<MetadataKeysContainer>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getMetadataKeys(componentId));
+        .orElseGet(() -> metadataService.getMetadataKeys(adjustProcessorId(componentId)));
   }
 
   /**
@@ -68,8 +68,8 @@ public class LazyMetadataService implements MetadataService {
   }
 
   /**
-  * {@inheritDoc}
-  */
+   * {@inheritDoc}
+   */
   @Override
   public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId,
                                                                                           MetadataKey key) {
