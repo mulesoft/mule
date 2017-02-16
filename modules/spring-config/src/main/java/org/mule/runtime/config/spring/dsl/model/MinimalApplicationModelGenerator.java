@@ -97,7 +97,7 @@ public class MinimalApplicationModelGenerator {
     for (int i = 1; i < parts.length; i++) {
       String part = parts[i];
       switch (part) {
-        case "source": {
+        case "-1": {
           ComponentModel sourceComponentModel = flowModel.getInnerComponents().get(0);
           checkState(areMatchingTypes(MessageSource.class, sourceComponentModel.getType()),
                      format(
