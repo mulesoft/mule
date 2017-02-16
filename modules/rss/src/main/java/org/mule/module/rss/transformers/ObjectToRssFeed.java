@@ -10,9 +10,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractDiscoverableTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
+
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
