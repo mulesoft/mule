@@ -63,8 +63,11 @@ public class LazyMetadataService implements MetadataService {
   }
 
   //TODO PABLO LG remove adjustProcessor when component model has component id inside
-  private ProcessorId adjustProcessorId(ComponentId componentId) {
-    return new ProcessorId(componentId.getFlowName().get(), "0");
+  private ComponentId adjustProcessorId(ComponentId componentId) {
+    if (componentId instanceof ProcessorId) {
+      return new ProcessorId(componentId.getFlowName().get(), "0");
+    }
+    return componentId;
   }
 
   /**
