@@ -59,6 +59,7 @@ public class ComponentModel {
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
   private Class<?> type;
+  private boolean enabled = true;
 
   /**
    * @return the configuration identifier.
@@ -211,6 +212,22 @@ public class ComponentModel {
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
 
     return builder.build();
+  }
+
+  /**
+   * Sets the component as enabled, meaning that it should be created and the beanDefinition associated with created too.
+   *
+   * @param enabled if this component is enabled and has to be created.
+   */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  /**
+   * @return {@code true} if this component is enabled and has to be created.
+   */
+  public boolean isEnabled() {
+    return this.enabled;
   }
 
   /**

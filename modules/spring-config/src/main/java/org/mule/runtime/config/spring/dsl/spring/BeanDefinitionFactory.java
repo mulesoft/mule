@@ -166,7 +166,7 @@ public class BeanDefinitionFactory {
   private BeanDefinition resolveComponent(ComponentModel parentComponentModel, ComponentModel componentModel,
                                           BeanDefinitionRegistry registry,
                                           BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor) {
-    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier())) {
+    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier()) || !componentModel.isEnabled()) {
       return null;
     }
     resolveComponentBeanDefinition(parentComponentModel, componentModel);

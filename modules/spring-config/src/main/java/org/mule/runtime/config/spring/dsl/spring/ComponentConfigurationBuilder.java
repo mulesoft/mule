@@ -81,7 +81,7 @@ class ComponentConfigurationBuilder {
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return componentModel.getInnerComponents().stream().map(cdm -> {
+    return componentModel.getInnerComponents().stream().filter(child -> child.isEnabled()).map(cdm -> {
       // When it comes from old model it does not have the type set
       Class<?> beanDefinitionType = cdm.getType();
       if (beanDefinitionType == null) {
