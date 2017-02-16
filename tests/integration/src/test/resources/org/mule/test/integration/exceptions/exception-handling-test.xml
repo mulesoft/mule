@@ -69,30 +69,6 @@
         </foreach>
         <rollback-exception-strategy/>
     </flow>
-    
-    <flow name="hasNoMaxRedeliveryAttempts">
-        <vm:inbound-endpoint path="hasNoMaxRedeliveryAttempts" exchange-pattern="request-response"/>
-        <foreach>
-            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
-        </foreach>
-        <rollback-exception-strategy maxRedeliveryAttempts="0"/>
-    </flow>
-    
-    <flow name="hasNoMaxRedeliveryAttemptsWithoutAttributeInTag">
-        <vm:inbound-endpoint path="hasNoMaxRedeliveryAttemptsWithoutAttributeInTag" exchange-pattern="request-response"/>
-        <foreach>
-            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
-        </foreach>
-        <rollback-exception-strategy/>
-    </flow>
-    
-    <flow name="hasMaxRedeliveryAttempts">
-        <vm:inbound-endpoint path="hasMaxRedeliveryAttempts" exchange-pattern="request-response"/>
-        <foreach>
-            <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
-        </foreach>
-        <rollback-exception-strategy maxRedeliveryAttempts="1"/>
-    </flow>
 
     <flow name="outboundEndpointInScope">
         <vm:inbound-endpoint path="inScope2"/>
