@@ -45,7 +45,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByPath("flow/3");
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("flow").get().getInnerComponents(), hasSize(0));
+    assertThat(minimalModel.findNamedComponent("flow").get().getInnerComponents(), hasSize(1));
+    assertThat(minimalModel.findNamedComponent("flow").get().getInnerComponents().get(0).isEnabled(), is(false));
   }
 
   @Test
@@ -60,7 +61,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("two-elements-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("errorHandler").isPresent(), is(false));
+    assertThat(minimalModel.findNamedComponent("errorHandler").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("errorHandler").get().isEnabled(), is(false));
   }
 
   @Test
@@ -83,8 +85,10 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   public void noDependencyBetweenElementsReferencingMp() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByPath("deadLetterQueueFlow/0");
-    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(false));
+    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flow").get().isEnabled(), is(false));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").get().isEnabled(), is(true));
   }
 
   @Test
@@ -92,9 +96,11 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/0");
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
-    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(1).getIdentifier(),
                is(buildFromStringRepresentation("mule:set-payload")));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).isEnabled(), is(false));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(1).isEnabled(), is(true));
   }
 
   @Test
@@ -102,9 +108,10 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
     ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/source");
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(1));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
                is(buildFromStringRepresentation("mule:poll")));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).isEnabled(), is(true));
   }
 
   private MinimalApplicationModelGenerator createGeneratorForConfig(String configFileName) throws Exception {

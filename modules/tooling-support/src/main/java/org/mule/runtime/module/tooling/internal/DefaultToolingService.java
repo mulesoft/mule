@@ -57,8 +57,7 @@ public class DefaultToolingService implements ToolingService {
     Application application = applicationFactory.createArtifact(applicationLocation);
     application.install();
     application.lazyInit();
-    //TODO (MULE-10668) Add support for lazy start when creating Tooling Applications from ToolingService
-    //application.start();
+    application.start();
     return application;
   }
 
