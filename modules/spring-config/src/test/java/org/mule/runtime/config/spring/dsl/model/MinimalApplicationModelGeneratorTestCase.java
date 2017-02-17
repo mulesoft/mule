@@ -106,7 +106,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void flowWithSourcePathToSource() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/source");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowWithSource/-1");
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
