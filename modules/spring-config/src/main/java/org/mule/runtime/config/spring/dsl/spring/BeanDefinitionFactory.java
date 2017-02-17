@@ -150,13 +150,16 @@ public class BeanDefinitionFactory {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
-        if (hasDefinition(innerComponent.getIdentifier(), of(innerComponent.getParent().getIdentifier()))) {
-          resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor, oldParsingMechanism);
-        } else {
-          AbstractBeanDefinition oldBeanDefinition =
-              (AbstractBeanDefinition) oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
-          oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
-          innerComponent.setBeanDefinition(oldBeanDefinition);
+        if (innerComponent.isEnabled()) {
+          if (hasDefinition(innerComponent.getIdentifier(), of(innerComponent.getParent().getIdentifier()))) {
+            resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor,
+                                        oldParsingMechanism);
+          } else {
+            AbstractBeanDefinition oldBeanDefinition =
+                (AbstractBeanDefinition) oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
+            oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
+            innerComponent.setBeanDefinition(oldBeanDefinition);
+          }
         }
       }
     }
