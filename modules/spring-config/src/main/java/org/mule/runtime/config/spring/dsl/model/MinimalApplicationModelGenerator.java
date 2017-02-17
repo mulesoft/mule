@@ -117,14 +117,14 @@ public class MinimalApplicationModelGenerator {
   }
 
   private void resolveDependency(Map<ComponentModel, List<ComponentModel>> allDependencies, List<ComponentModel> used,
-                                 List<ComponentModel> res, ComponentModel componentModel) {
+                                 List<ComponentModel> sortedComponentModel, ComponentModel componentModel) {
     used.add(componentModel);
     for (ComponentModel dependency : allDependencies.get(componentModel)) {
       if (!used.contains(componentModel)) {
-        resolveDependency(allDependencies, used, res, dependency);
+        resolveDependency(allDependencies, used, sortedComponentModel, dependency);
       }
     }
-    res.add(componentModel);
+    sortedComponentModel.add(componentModel);
   }
 
   private Set<String> resolveComponentModelDependencies(String name, ComponentModel componentModel) {
