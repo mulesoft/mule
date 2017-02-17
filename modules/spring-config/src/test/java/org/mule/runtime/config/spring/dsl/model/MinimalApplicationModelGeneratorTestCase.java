@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -87,6 +89,20 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
 
     assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flow"));
     assertThat(componentModelList.get(1).getNameAttribute(), equalTo("deadLetterQueueFlow"));
+  }
+
+  @Test
+  public void resolveCyclicDependencies() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("resolve-dependencies-cyclic-dependency-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flowA");
+    assertThat(minimalModel.findNamedComponent("flowA").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowB").isPresent(), is(true));
+
+    List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
+    assertThat(componentModelList, hasSize(2));
+
+    assertThat(componentModelList, containsInAnyOrder(hasProperty("nameAttribute", equalTo("flowB")),
+                                                      hasProperty("nameAttribute", equalTo("flowA"))));
   }
 
   @Test
