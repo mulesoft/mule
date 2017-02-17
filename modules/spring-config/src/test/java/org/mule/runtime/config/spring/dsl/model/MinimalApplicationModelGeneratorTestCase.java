@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -71,6 +73,20 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     ApplicationModel minimalModel = generator.getMinimalModelByName("flow");
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+  }
+
+  @Test
+  public void resolveDependencies() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("resolve-dependencies-config.xml");
+    ApplicationModel minimalModel = generator.getMinimalModelByPath("flow/0");
+    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+
+    List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
+    assertThat(componentModelList, hasSize(2));
+
+    assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flow"));
+    assertThat(componentModelList.get(1).getNameAttribute(), equalTo("deadLetterQueueFlow"));
   }
 
   @Test

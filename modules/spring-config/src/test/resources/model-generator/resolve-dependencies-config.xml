@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <flow name="deadLetterQueueFlow">
+        <set-payload value="lalala"/>
+    </flow>
+
+    <flow name="flow">
+        <until-successful deadLetterQueue-ref="deadLetterQueueFlow">
+            <set-payload value="lalala"/>
+        </until-successful>
+    </flow>
+
+    <flow name="flowWithSource">
+        <poll>
+            <logger/>
+        </poll>
+        <set-payload value="a value"/>
+    </flow>
+
+</mule>

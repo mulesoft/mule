@@ -221,6 +221,7 @@ public class ComponentModel {
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+    this.getInnerComponents().stream().forEach(innerComponent -> innerComponent.setEnabled(enabled));
   }
 
   /**

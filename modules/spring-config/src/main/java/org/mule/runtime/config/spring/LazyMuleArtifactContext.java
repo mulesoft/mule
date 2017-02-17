@@ -10,10 +10,8 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,9 +19,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 
@@ -122,11 +122,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       if (muleContext.getRegistry().get(componentName) != null) {
         return;
       }
-      // First dispose any already initialized component
-      disposeComponents(this.applicationModel);
 
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
+
+      // First unregister any already initialized/started component
+      unregisterComponents(minimalApplicationModelGenerator.resolveComponentModelDependencies());
+
       ApplicationModel minimalApplicationModel;
       if (!componentName.contains("/")) {
         minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByName(componentName);
@@ -137,24 +139,20 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     });
   }
 
-  private void disposeComponents(ApplicationModel applicationModel) {
+  private void unregisterComponents(List<ComponentModel> componentModels) {
     if (muleContext.isStarted()) {
-      applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
+      componentModels.stream().forEach(componentModel -> {
         final String nameAttribute = componentModel.getNameAttribute();
         if (nameAttribute != null) {
-          if (componentModel.isEnabled()) {
-            Object object = muleContext.getRegistry().get(nameAttribute);
-            try {
-              stopIfNeeded(object);
-            } catch (MuleException e) {
-              throw new RuntimeException(e);
-            }
-            disposeIfNeeded(object, LOGGER);
+          try {
+            muleContext.getRegistry().unregisterObject(nameAttribute);
+          } catch (RegistrationException e) {
+            throw new RuntimeException(e);
           }
         }
-        componentModel.setEnabled(true);
       });
     }
+    applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(true));
   }
 
   @Override
