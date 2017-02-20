@@ -9,12 +9,19 @@ package org.mule.runtime.core.processor.interceptor;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.reflections.ReflectionUtils.getFields;
+import static org.reflections.ReflectionUtils.withType;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
 import org.mule.runtime.core.processor.interceptor.a.ProcessorInterceptorFactoryA;
 import org.mule.runtime.core.processor.interceptor.b.ProcessorInterceptorFactoryB;
 import org.mule.runtime.core.processor.interceptor.c.ProcessorInterceptorFactoryC;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.lang.reflect.Field;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +32,15 @@ public class DefaultProcessorInterceptorManagerTestCase extends AbstractMuleTest
   private ProcessorInterceptorProvider manager;
 
   @Before
-  public void before() {
+  public void before() throws IllegalArgumentException, IllegalAccessException {
     manager = new DefaultProcessorInterceptorManager();
+    injectMockMuleContext(manager);
+  }
+
+  private void injectMockMuleContext(Object injectionTarget) throws IllegalAccessException {
+    final Field contextField = getFields(DefaultProcessorInterceptorManager.class, withType(MuleContext.class)).iterator().next();
+    contextField.setAccessible(true);
+    contextField.set(injectionTarget, mock(MuleContext.class, RETURNS_DEEP_STUBS));
   }
 
   @Test
