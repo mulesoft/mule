@@ -23,9 +23,6 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
-import org.glassfish.grizzly.CloseListener;
-import org.glassfish.grizzly.Closeable;
-import org.glassfish.grizzly.ICloseType;
 import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 
@@ -58,8 +55,9 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   public synchronized void start() throws IOException {
     this.scheduler = schedulerSource != null ? schedulerSource.get() : null;
     serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
-    serverConnection.addCloseListener((CloseListener<Closeable, ICloseType>) (closeable, type) -> {
+    serverConnection.addCloseListener((closeable, type) -> {
       try {
+        // TODO MULE-11115 Add a stop() method to Scheduler
         scheduler.stop(5000, MILLISECONDS);
       } finally {
         scheduler = null;
