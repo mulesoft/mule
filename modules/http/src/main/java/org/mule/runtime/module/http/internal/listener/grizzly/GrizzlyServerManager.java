@@ -12,6 +12,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
+
 import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -178,7 +179,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     httpServerFilterDelegate.addFilterForAddress(serverAddress,
                                                  createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
     final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServer(serverAddress, transport, httpListenerRegistry,
-                                                                  schedulerSupplier);
+                                                                  schedulerSupplier, () -> {
+                                                                  });
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
@@ -199,7 +201,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     httpServerFilterDelegate.addFilterForAddress(serverAddress,
                                                  createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
     final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServer(serverAddress, transport, httpListenerRegistry,
-                                                                  schedulerSupplier);
+                                                                  schedulerSupplier, () -> {
+                                                                  });
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;

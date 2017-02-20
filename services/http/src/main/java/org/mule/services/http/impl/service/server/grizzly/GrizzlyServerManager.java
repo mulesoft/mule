@@ -179,7 +179,8 @@ public class GrizzlyServerManager implements HttpServerManager {
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
     final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
-                                                                         schedulerSupplier);
+                                                                         schedulerSupplier,
+                                                                         () -> executorProvider.removeExecutor(serverAddress));
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
@@ -201,7 +202,8 @@ public class GrizzlyServerManager implements HttpServerManager {
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
     final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
-                                                                         schedulerSupplier);
+                                                                         schedulerSupplier,
+                                                                         () -> executorProvider.removeExecutor(serverAddress));
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
     return grizzlyServer;
@@ -271,8 +273,9 @@ public class GrizzlyServerManager implements HttpServerManager {
     // TODO - MULE-11117: Cleanup GrizzlyServerManager server specific data
 
     public GrizzlyHttpServerWrapper(ServerAddress serverAddress, TCPNIOTransport transport,
-                                    HttpListenerRegistry listenerRegistry, Supplier<Scheduler> schedulerSupplier) {
-      super(serverAddress, transport, listenerRegistry, schedulerSupplier);
+                                    HttpListenerRegistry listenerRegistry, Supplier<Scheduler> schedulerSupplier,
+                                    Runnable schedulerDisposer) {
+      super(serverAddress, transport, listenerRegistry, schedulerSupplier, schedulerDisposer);
     }
 
     @Override
@@ -286,7 +289,6 @@ public class GrizzlyServerManager implements HttpServerManager {
       super.dispose();
       ServerAddress serverAddress = this.getServerAddress();
       servers.remove(serverAddress);
-      executorProvider.removeExecutor(serverAddress);
       httpListenerRegistry.removeHandlersFor(this);
       httpServerFilterDelegate.removeFilterForAddress(serverAddress);
       idleExecutorPerServerAddressMap.get(serverAddress).dispose();
