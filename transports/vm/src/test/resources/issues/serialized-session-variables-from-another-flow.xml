@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:test="http://www.mulesoft.org/schema/mule/test"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+	<vm:connector name="VM" validateConnections="true">
+		<service-overrides sessionHandler="org.mule.session.SerializeAndEncodeSessionHandler" />
+	</vm:connector>
+
+	<flow name="mainFlow">
+		<vm:inbound-endpoint path="main" exchange-pattern="request-response"
+			connector-ref="VM" />
+		<set-session-variable variableName="sessionVar"
+			value="Outer Flow" />
+		<vm:outbound-endpoint path="in" exchange-pattern="request-response" />
+	</flow>
+
+	<flow name="secondaryFlow">
+		<vm:inbound-endpoint path="in" exchange-pattern="request-response"
+			connector-ref="VM" />
+		<test:component throwException="true" />
+		<catch-exception-strategy>
+			<set-session-variable variableName="sessionVar"
+				value="Inner Flow" />
+		</catch-exception-strategy>
+	</flow>
+
+</mule>

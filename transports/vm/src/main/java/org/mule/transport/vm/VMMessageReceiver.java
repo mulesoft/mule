@@ -131,6 +131,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             {
                 DefaultMuleMessage resultMessage = (DefaultMuleMessage) resultEvent.getMessage();
                 resultMessage.setMuleContext(originaMuleContext);
+                connector.getSessionHandler().storeSessionInfoToMessage(resultEvent.getSession(), resultMessage);
                 return resultMessage;
             }
             else
