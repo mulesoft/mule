@@ -7,6 +7,7 @@
 package org.mule.services.oauth.internal.builder;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
@@ -36,10 +37,10 @@ public abstract class AbstractOAuthDancerBuilder implements OAuthDancerBuilder {
   protected String tokenUrl;
   protected Optional<TlsContextFactory> tlsContextFactory = empty();
 
-  protected Charset encoding;
-  protected String responseAccessTokenExpr;
-  protected String responseRefreshTokenExpr;
-  protected String responseExpiresInExpr;
+  protected Charset encoding = UTF_8;
+  protected String responseAccessTokenExpr = "#[(payload match /.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
+  protected String responseRefreshTokenExpr = "#[(payload match /.*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
+  protected String responseExpiresInExpr = "#[(payload match /.*\"expires_in\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
   protected String scopes = null;
   protected Map<String, String> customParametersExtractorsExprs;
 

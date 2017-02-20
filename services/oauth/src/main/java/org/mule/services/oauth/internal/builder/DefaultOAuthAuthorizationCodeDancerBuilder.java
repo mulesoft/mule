@@ -6,14 +6,16 @@
  */
 package org.mule.services.oauth.internal.builder;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -42,7 +44,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   private String state;
   private String authorizationUrl;
 
-  private Map<String, String> customParameters;
+  private Map<String, String> customParameters = emptyMap();
 
   public DefaultOAuthAuthorizationCodeDancerBuilder(DefaultOAuthCallbackServersManager httpServersManager,
                                                     SchedulerService schedulerService, LockFactory lockProvider,
@@ -107,6 +109,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   @Override
   public OAuthAuthorizationCodeDancerBuilder customParameters(Map<String, String> customParameters) {
+    requireNonNull(customParameters, "customParameters cannot be null");
     this.customParameters = customParameters;
     return this;
   }
@@ -131,10 +134,11 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   @Override
   public OAuthDancer build() {
-    Preconditions.checkArgument(isNotBlank(clientId), "clientId cannot be blank");
-    Preconditions.checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
-    Preconditions.checkArgument(isNotBlank(authorizationUrl), "authorizationUrl cannot be blank");
-    Preconditions.checkArgument(customParameters != null, "customParameters cannot be null");
+    checkArgument(isNotBlank(clientId), "clientId cannot be blank");
+    checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
+    checkArgument(isNotBlank(tokenUrl), "tokenUrl cannot be blank");
+    checkArgument(isNotBlank(authorizationUrl), "authorizationUrl cannot be blank");
+    requireNonNull(localCallbackServerFactory, "localCallback must be configured");
 
     return new AuthorizationCodeOAuthDancer(localCallbackServerFactory.apply(httpServersManager), clientId, clientSecret,
                                             tokenUrl, scopes, externalCallbackUrl, encoding, localCallbackUrlPath,
