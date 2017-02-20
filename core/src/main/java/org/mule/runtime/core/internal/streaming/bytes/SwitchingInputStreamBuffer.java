@@ -30,28 +30,42 @@ public class SwitchingInputStreamBuffer extends AbstractInputStreamBuffer {
   private final FileStoreCursorStreamConfig config;
   private final ScheduledExecutorService executorService;
 
+  /**
+   * Creates a new instance
+   *
+   * @param stream          the stream to buffer from
+   * @param config          this buffer's configuration
+   * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param executorService a {@link ScheduledExecutorService} for performing asynchronous tasks
+   * @return a new {@link SwitchingInputStreamBuffer}
+   */
   public static SwitchingInputStreamBuffer of(InputStream stream,
                                               FileStoreCursorStreamConfig config,
+                                              ByteBufferManager bufferManager,
                                               ScheduledExecutorService executorService) {
     InMemoryStreamBuffer delegate =
-        new InMemoryStreamBuffer(stream, new InMemoryCursorStreamConfig(config.getMaxInMemorySize(), null, null));
+        new InMemoryStreamBuffer(stream,
+                                 new InMemoryCursorStreamConfig(config.getMaxInMemorySize(), null, null),
+                                 bufferManager);
 
-    return new SwitchingInputStreamBuffer(stream, delegate, config, executorService);
+    return new SwitchingInputStreamBuffer(stream, delegate, config, bufferManager, executorService);
   }
 
   /**
    * Creates a new instance
    *
-   * @param stream           the stream to buffer
-   * @param delegate         the delegate for the initial buffering
-   * @param config           the config of the {@link FileStoreCursorStreamConfig} in case of the delegate been exhausted.
+   * @param stream          the stream to buffer
+   * @param delegate        the delegate for the initial buffering
+   * @param config          the config of the {@link FileStoreCursorStreamConfig} in case of the delegate been exhausted.
+   * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param executorService a {@link ScheduledExecutorService} for performing asynchronous tasks
    */
   private SwitchingInputStreamBuffer(InputStream stream,
                                      AbstractInputStreamBuffer delegate,
                                      FileStoreCursorStreamConfig config,
+                                     ByteBufferManager bufferManager,
                                      ScheduledExecutorService executorService) {
-    super(stream, openStreamChannel(stream), delegate.getBuffer());
+    super(stream, openStreamChannel(stream), bufferManager, delegate.getBuffer());
     this.delegate = delegate;
     this.config = config;
     this.executorService = executorService;
@@ -102,7 +116,7 @@ public class SwitchingInputStreamBuffer extends AbstractInputStreamBuffer {
       delegate.acquireBufferLock();
     } catch (Exception e) {
       super.releaseBufferLock();
-      throw new RuntimeException(e);
+      throw new MuleRuntimeException(e);
     }
   }
 
@@ -126,13 +140,14 @@ public class SwitchingInputStreamBuffer extends AbstractInputStreamBuffer {
                                                                            getStreamChannel(),
                                                                            config,
                                                                            buffer,
+                                                                           getBufferManager(),
                                                                            executorService);
     AbstractInputStreamBuffer oldDelegate = delegate;
     delegate = newDelegate;
 
     try {
       oldDelegate.releaseBufferLock();
-      oldDelegate.yieldStream();
+      oldDelegate.yield();
       oldDelegate.close();
     } catch (Exception e) {
       newDelegate.close();

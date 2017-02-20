@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
-import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.func.CheckedRunnable;
 
@@ -24,7 +24,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for implementations of {@link InputStreamBuffer}.
@@ -35,11 +34,12 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(AbstractInputStreamBuffer.class);
+  private static Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
 
   private final Lock bufferLock = new ReentrantLock();
 
   private InputStream stream;
+  private final ByteBufferManager bufferManager;
   private ReadableByteChannel streamChannel;
   private ByteBuffer buffer;
   private boolean closed = false;
@@ -49,11 +49,12 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   /**
    * Creates a new instance
    *
-   * @param stream     The stream being buffered. This is the original data source
-   * @param bufferSize the buffer size
+   * @param stream        The stream being buffered. This is the original data source
+   * @param bufferSize    the buffer size
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  public AbstractInputStreamBuffer(InputStream stream, int bufferSize) {
-    this(stream, openStreamChannel(stream), allocateDirect(bufferSize));
+  public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager, int bufferSize) {
+    this(stream, openStreamChannel(stream), bufferManager, bufferSize);
   }
 
   /**
@@ -61,22 +62,27 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    *
    * @param stream        The stream being buffered. This is the original data source
    * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param bufferSize    the buffer size
    */
-  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, int bufferSize) {
-    this(stream, streamChannel, allocateDirect(bufferSize));
+  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager,
+                                   int bufferSize) {
+    this(stream, streamChannel, bufferManager, bufferManager.allocate(bufferSize));
   }
 
   /**
    * Creates a new instance
    *
    * @param stream        The stream being buffered. This is the original data source
-   * @param streamChannel        a {@link ReadableByteChannel} used to read from the {@code stream}
+   * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param buffer        the buffer to use
    */
-  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBuffer buffer) {
+  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager,
+                                   ByteBuffer buffer) {
     this.stream = stream;
     this.streamChannel = streamChannel;
+    this.bufferManager = bufferManager;
     this.buffer = buffer;
 
     bufferRange = new Range(0, 0);
@@ -92,6 +98,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
 
   /**
    * Consumes the stream in order to obtain data that has not been read yet.
+   *
    * @param buffer the buffer in which the data is to be loaded. The buffer must be in the correct position to receive the data
    *               and have enough space remaining
    * @return the amount of bytes read
@@ -103,10 +110,10 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    * Re obtains information which has already been consumed and this buffer is keeping somehow. This method will be invoked
    * when the cursor is rewind.
    *
-   * @param dest the buffer in which the data is to be loaded. The buffer must be in the correct position to receive the data
-   *               and have enough space remaining
+   * @param dest          the buffer in which the data is to be loaded. The buffer must be in the correct position to receive the data
+   *                      and have enough space remaining
    * @param requiredRange the range of required information
-   * @param length the amount of information to read
+   * @param length        the amount of information to read
    * @return the amount of bytes actually read
    */
   protected abstract int getBackwardsData(ByteBuffer dest, Range requiredRange, int length);
@@ -115,6 +122,13 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    * @return Whether this buffer can be expanded
    */
   protected abstract boolean canBeExpanded();
+
+  /**
+   * @return the {@link ByteBufferManager} that <b>has</b> to be used to allocate byte buffers
+   */
+  protected ByteBufferManager getBufferManager() {
+    return bufferManager;
+  }
 
   /**
    * {@inheritDoc}
@@ -132,6 +146,8 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
     if (stream != null) {
       safely(stream::close);
     }
+
+    deallocate(buffer);
   }
 
   /**
@@ -140,13 +156,14 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   protected abstract void doClose();
 
   /**
-   * Looses the reference to the {@link #stream} and {@link #streamChannel} so that invoking the
-   * {@link #close()} method does not close them. This is useful when the stream is going to continue
+   * Looses the reference to the {@link #stream}, {@link #streamChannel} and {@link #buffer} so that invoking
+   * the {@link #close()} method does not close them. This is useful when the stream is going to continue
    * buffering through a different instance.
    */
-  protected void yieldStream() {
+  protected void yield() {
     streamChannel = null;
     stream = null;
+    buffer = null;
   }
 
   /**
@@ -264,18 +281,25 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
 
   /**
    * Expands the size of the buffer by {@code bytesIncrement}
+   *
    * @param bytesIncrement how many bytes to gain
    * @return a new, expanded {@link ByteBuffer}
    */
   protected ByteBuffer expandBuffer(int bytesIncrement) {
-    ByteBuffer newBuffer = allocateDirect(getExpandedBufferSize(bytesIncrement));
+    ByteBuffer newBuffer = bufferManager.allocate(getExpandedBufferSize(bytesIncrement));
     buffer.position(0);
     newBuffer.put(buffer);
     ByteBuffer oldBuffer = buffer;
     buffer = newBuffer;
-    oldBuffer.clear();
+    deallocate(oldBuffer);
 
     return buffer;
+  }
+
+  protected void deallocate(ByteBuffer byteBuffer) {
+    if (byteBuffer != null) {
+      safely(() -> bufferManager.deallocate(byteBuffer));
+    }
   }
 
   /**

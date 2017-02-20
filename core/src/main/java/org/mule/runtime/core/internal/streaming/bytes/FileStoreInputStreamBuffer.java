@@ -10,7 +10,6 @@ import static java.lang.Long.MIN_VALUE;
 import static java.lang.Math.abs;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.nio.ByteBuffer.allocate;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -70,15 +69,17 @@ public final class FileStoreInputStreamBuffer extends AbstractInputStreamBuffer 
    * @param config          this buffer's configuration
    * @param alreadyFetched  a buffer with information which has already been buffered from the stream. It will be added to this
    *                        buffer's contents
+   * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param executorService a {@link ScheduledExecutorService} for performing asynchronous tasks
    */
   public FileStoreInputStreamBuffer(InputStream stream,
                                     ReadableByteChannel streamChannel,
                                     FileStoreCursorStreamConfig config,
                                     ByteBuffer alreadyFetched,
+                                    ByteBufferManager bufferManager,
                                     ScheduledExecutorService executorService) {
 
-    super(stream, streamChannel, config.getMaxInMemorySize().toBytes());
+    super(stream, streamChannel, bufferManager, config.getMaxInMemorySize().toBytes());
     this.executorService = executorService;
     bufferFile = createBufferFile("stream-buffer");
     try {
@@ -101,18 +102,7 @@ public final class FileStoreInputStreamBuffer extends AbstractInputStreamBuffer 
   @Override
   protected int getBackwardsData(ByteBuffer dest, Range requiredRange, int length) {
     releaseBufferLock();
-    return checked(() -> {
-      // why did I need this buffer?
-      ByteBuffer buffer = allocate(length);
-      return withFileLock(() -> {
-        int read = fileStore.getChannel().read(buffer, requiredRange.start);
-        if (read > 0) {
-          buffer.flip();
-          dest.put(buffer);
-        }
-        return read;
-      });
-    });
+    return checked(() -> withFileLock(() -> fileStore.getChannel().read(dest, requiredRange.start)));
   }
 
   /**
@@ -209,9 +199,10 @@ public final class FileStoreInputStreamBuffer extends AbstractInputStreamBuffer 
     }
 
     if (!TEMP_DIR.exists()) {
-      throw new RuntimeException(format("Temp directory '%s' does not exits. Please check the value of the '%s' system property.",
-                                        TEMP_DIR.getAbsolutePath(),
-                                        TEMP_DIR_SYSTEM_PROPERTY));
+      throw new MuleRuntimeException(
+                                     createStaticMessage(format("Temp directory '%s' does not exits. Please check the value of the '%s' system property.",
+                                                                TEMP_DIR.getAbsolutePath(),
+                                                                TEMP_DIR_SYSTEM_PROPERTY)));
     }
     return new File(TEMP_DIR, prefix + n + suffix);
   }

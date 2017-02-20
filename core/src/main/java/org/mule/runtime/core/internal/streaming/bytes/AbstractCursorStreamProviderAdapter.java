@@ -19,14 +19,18 @@ public abstract class AbstractCursorStreamProviderAdapter implements CursorStrea
 
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final Event creatorEvent;
+  private final ByteBufferManager bufferManager;
 
   /**
    * Creates a new instance
    *
    * @param wrappedStream the original stream to be decorated
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param event         the {@link Event} in which streaming is taking place
    */
-  public AbstractCursorStreamProviderAdapter(InputStream wrappedStream, Event event) {
+  public AbstractCursorStreamProviderAdapter(InputStream wrappedStream, ByteBufferManager bufferManager, Event event) {
     this.wrappedStream = wrappedStream;
+    this.bufferManager = bufferManager;
     this.creatorEvent = event;
   }
 
@@ -61,6 +65,13 @@ public abstract class AbstractCursorStreamProviderAdapter implements CursorStrea
   @Override
   public Event getCreatorEvent() {
     return creatorEvent;
+  }
+
+  /**
+   * @return the {@link ByteBufferManager} that <b>has</b> to be used to allocate byte buffers
+   */
+  protected ByteBufferManager getBufferManager() {
+    return bufferManager;
   }
 
   protected abstract CursorStream doOpenCursor();

@@ -11,10 +11,11 @@ import org.mule.runtime.api.streaming.CursorStream;
 import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.CursorStreamAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.CursorStreamProviderAdapter;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,7 @@ import java.io.InputStream;
 /**
  * Base implementation of {@link CursorStreamProviderFactory} which contains all the base behaviour and template
  * methods.
- *
+ * <p>
  * It interacts with the {@link ByteStreamingManagerAdapter} in order to track all allocated resources and make
  * sure they're properly disposed of once they're no longer necessary.
  *
@@ -31,13 +32,17 @@ import java.io.InputStream;
 abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
 
   private final ByteStreamingManagerAdapter streamingManager;
+  private final ByteBufferManager bufferManager;
 
   /**
    * Creates a new instance
+   *
    * @param streamingManager the manager which will track the produced providers.
+   * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  AbstractCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager) {
+  AbstractCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager, ByteBufferManager bufferManager) {
     this.streamingManager = streamingManager;
+    this.bufferManager = bufferManager;
   }
 
   /**
@@ -57,7 +62,15 @@ abstract class AbstractCursorStreamProviderFactory implements CursorStreamProvid
   }
 
   /**
+   * @return the {@link ByteBufferManager} that <b>has</b> to be used to allocate byte buffers
+   */
+  protected ByteBufferManager getBufferManager() {
+    return bufferManager;
+  }
+
+  /**
    * Implementations should use this method to actually create the output value
+   *
    * @param inputStream
    * @param event
    * @return
@@ -90,6 +103,7 @@ abstract class AbstractCursorStreamProviderFactory implements CursorStreamProvid
       return delegate.isClosed();
     }
   }
+
 
   private class ManagedCursorStreamDecorator extends CursorStream {
 

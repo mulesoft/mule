@@ -9,11 +9,12 @@ package org.mule.runtime.core.internal.streaming.bytes.factory;
 import static org.mule.runtime.core.api.functional.Either.left;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
+import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.CursorStreamProviderAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.FileStoreCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
 
 import java.io.InputStream;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,12 +36,14 @@ public class FileStoreCursorStreamProviderFactory extends AbstractCursorStreamPr
    *
    * @param streamingManager the manager which will track the produced providers.
    * @param config           the config for the generated providers
-   * @param executorService a {@link ScheduledExecutorService} for executing asynchronous tasks
+   * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param executorService  a {@link ScheduledExecutorService} for executing asynchronous tasks
    */
   public FileStoreCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager,
                                               FileStoreCursorStreamConfig config,
+                                              ByteBufferManager bufferManager,
                                               ScheduledExecutorService executorService) {
-    super(streamingManager);
+    super(streamingManager, bufferManager);
     this.config = config;
     this.executorService = executorService;
   }
@@ -52,6 +55,6 @@ public class FileStoreCursorStreamProviderFactory extends AbstractCursorStreamPr
    */
   @Override
   protected Either<CursorStreamProviderAdapter, InputStream> resolve(InputStream inputStream, Event event) {
-    return left(new FileStoreCursorStreamProvider(inputStream, config, event, executorService));
+    return left(new FileStoreCursorStreamProvider(inputStream, config, event, getBufferManager(), executorService));
   }
 }

@@ -14,6 +14,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
@@ -32,6 +34,7 @@ public class DefaultStreamingManager implements StreamingManagerAdapter, Initial
   @Inject
   private MuleContext muleContext;
 
+  private ByteBufferManager bufferFactory;
   private ByteStreamingManagerAdapter byteStreamingManager;
   private boolean initialised = false;
 
@@ -41,7 +44,8 @@ public class DefaultStreamingManager implements StreamingManagerAdapter, Initial
   @Override
   public void initialise() throws InitialisationException {
     if (!initialised) {
-      byteStreamingManager = new DefaultByteStreamingManager(schedulerService.ioScheduler(), muleContext);
+      bufferFactory = new PoolingByteBufferManager();
+      byteStreamingManager = new DefaultByteStreamingManager(bufferFactory, schedulerService.ioScheduler(), muleContext);
       initialised = true;
     }
   }
@@ -52,6 +56,7 @@ public class DefaultStreamingManager implements StreamingManagerAdapter, Initial
   @Override
   public void dispose() {
     disposeIfNeeded(byteStreamingManager, LOGGER);
+    disposeIfNeeded(bufferFactory, LOGGER);
   }
 
   /**
