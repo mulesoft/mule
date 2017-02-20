@@ -244,8 +244,8 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private XmlDslModel getXmlDslModel(ComponentModel moduleModel, String name, String version) {
-    final Optional<String> prefix = Optional.ofNullable(moduleModel.getParameters().get(MODULE_PREFIX_ATTRIBUTE));
-    final Optional<String> namespace = Optional.ofNullable(moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
+    final Optional<String> prefix = ofNullable(moduleModel.getParameters().get(MODULE_PREFIX_ATTRIBUTE));
+    final Optional<String> namespace = ofNullable(moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
     return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
