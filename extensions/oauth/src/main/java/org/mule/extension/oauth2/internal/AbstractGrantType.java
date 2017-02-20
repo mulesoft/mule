@@ -96,7 +96,7 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   private String tokenUrl;
 
   /**
-   * MEL expression to extract the access token parameter from the response of the call to tokenUrl.
+   * Expression to extract the access token parameter from the response of the call to tokenUrl.
    */
   @Parameter
   @Optional(defaultValue = ACCESS_TOKEN_EXPRESSION)
@@ -107,7 +107,7 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   protected ParameterResolver<String> responseRefreshToken;
 
   /**
-   * MEL expression to extract the expiresIn parameter from the response of the call to tokenUrl.
+   * Expression to extract the expiresIn parameter from the response of the call to tokenUrl.
    */
   @Parameter
   @Optional(defaultValue = EXPIRATION_TIME_EXPRESSION)

@@ -51,6 +51,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
+/**
+ * Base implementations with behavior common to all grant-types.
+ *
+ * @since 4.0
+ */
 public abstract class AbstractOAuthDancer implements Startable, Stoppable {
 
   private static final int TOKEN_REQUEST_TIMEOUT_MILLIS = 60000;

@@ -8,8 +8,10 @@ package org.mule.runtime.oauth.api;
 
 /**
  * General purpose OAuth constants
+ * 
+ * @since 4.0
  */
-public class OAuthAuthorizationStatusCode {
+public final class OAuthAuthorizationStatusCode {
 
   public static final String AUTHORIZATION_STATUS_QUERY_PARAM_KEY = "authorizationStatus";
 

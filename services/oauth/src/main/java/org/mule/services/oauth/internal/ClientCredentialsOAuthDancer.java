@@ -35,7 +35,11 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 
-
+/**
+ * Provides OAuth dance support for client-credentials grant-type.
+ * 
+ * @since 4.0
+ */
 public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements OAuthDancer, Startable {
 
   private static final Logger LOGGER = getLogger(ClientCredentialsOAuthDancer.class);

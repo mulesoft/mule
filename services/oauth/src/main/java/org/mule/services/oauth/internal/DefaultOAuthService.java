@@ -23,12 +23,12 @@ import java.util.Map;
 public final class DefaultOAuthService implements OAuthService {
 
   private final HttpService httpService;
-  private final DefaultOAuthCallbackServersManager httpServersManager;
+  private final OAuthCallbackServersManager httpServersManager;
   private final SchedulerService schedulerService;
 
   public DefaultOAuthService(HttpService httpService, SchedulerService schedulerService) {
     this.httpService = httpService;
-    httpServersManager = new DefaultOAuthCallbackServersManager(httpService);
+    httpServersManager = new OAuthCallbackServersManager(httpService);
     this.schedulerService = schedulerService;
   }
 

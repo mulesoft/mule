@@ -72,13 +72,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-oauth</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <classifier>mule-service</classifier>
-        </dependency>
 
         <!--TODO: MULE-10837 remove dependency-->
         <dependency>
@@ -117,6 +110,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-oauth</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>mule-service</classifier>
+        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>

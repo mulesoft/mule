@@ -24,7 +24,7 @@ import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
 import org.mule.services.oauth.internal.AuthorizationCodeOAuthDancer;
-import org.mule.services.oauth.internal.DefaultOAuthCallbackServersManager;
+import org.mule.services.oauth.internal.OAuthCallbackServersManager;
 
 import java.net.URL;
 import java.util.Map;
@@ -34,8 +34,8 @@ import java.util.function.Function;
 public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDancerBuilder
     implements OAuthAuthorizationCodeDancerBuilder {
 
-  private DefaultOAuthCallbackServersManager httpServersManager;
-  private Function<DefaultOAuthCallbackServersManager, HttpServer> localCallbackServerFactory;
+  private OAuthCallbackServersManager httpServersManager;
+  private Function<OAuthCallbackServersManager, HttpServer> localCallbackServerFactory;
   private String localCallbackUrlPath;
   private String localAuthorizationUrlPath;
   private String localAuthorizationUrlResourceOwnerId;
@@ -46,7 +46,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   private Map<String, String> customParameters = emptyMap();
 
-  public DefaultOAuthAuthorizationCodeDancerBuilder(DefaultOAuthCallbackServersManager httpServersManager,
+  public DefaultOAuthAuthorizationCodeDancerBuilder(OAuthCallbackServersManager httpServersManager,
                                                     SchedulerService schedulerService, LockFactory lockProvider,
                                                     Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
                                                     ExpressionEvaluator expressionEvaluator) {

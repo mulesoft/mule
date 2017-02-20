@@ -69,7 +69,6 @@ public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorization
     // Force the initialization of the OAuth context
     muleContext.getRegistry().lookupObject(ExtensionsClient.class).execute("HTTP", "request",
                                                                            builder().configName("requestConfig").build());
-    // flowRunner("testFlow").runNoVerify();
   }
 
   @Parameterized.Parameters(name = "{0}")

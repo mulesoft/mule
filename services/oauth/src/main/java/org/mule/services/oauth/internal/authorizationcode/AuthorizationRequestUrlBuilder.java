@@ -9,13 +9,12 @@ package org.mule.services.oauth.internal.authorizationcode;
 import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_ID_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import org.mule.runtime.api.util.Preconditions;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -82,10 +81,10 @@ public class AuthorizationRequestUrlBuilder {
    * @return the authorization url with all the query parameters from the config.
    */
   public String buildUrl() {
-    Preconditions.checkArgument(isNotBlank(clientId), "clientId cannot be blank");
-    Preconditions.checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
-    Preconditions.checkArgument(isNotBlank(authorizationUrl), "authorizationUrl cannot be blank");
-    Preconditions.checkArgument(customParameters != null, "customParameters cannot be null");
+    checkArgument(isNotBlank(clientId), "clientId cannot be blank");
+    checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
+    checkArgument(isNotBlank(authorizationUrl), "authorizationUrl cannot be blank");
+    checkArgument(customParameters != null, "customParameters cannot be null");
     return buildAuthorizeUrl();
   }
 

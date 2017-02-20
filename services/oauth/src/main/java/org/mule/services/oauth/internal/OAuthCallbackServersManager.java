@@ -35,13 +35,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @since 4.0
  */
-public class DefaultOAuthCallbackServersManager {
+public class OAuthCallbackServersManager {
 
   private HttpService httpService;
 
   private Map<Integer, CountedHttpServer> serversByPort = new HashMap<>();
 
-  public DefaultOAuthCallbackServersManager(HttpService httpService) {
+  public OAuthCallbackServersManager(HttpService httpService) {
     this.httpService = httpService;
   }
 
