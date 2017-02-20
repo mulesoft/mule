@@ -36,23 +36,34 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   private final HttpListenerRegistry listenerRegistry;
   private TCPNIOServerConnection serverConnection;
   private Supplier<Scheduler> schedulerSource;
+  private Runnable schedulerDisposer;
   private Scheduler scheduler;
   private boolean stopped = true;
   private boolean stopping;
   private String ownerName;
 
   public GrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry,
-                           Supplier<Scheduler> schedulerSource) {
+                           Supplier<Scheduler> schedulerSource, Runnable schedulerDisposer) {
     this.serverAddress = serverAddress;
     this.transport = transport;
     this.listenerRegistry = listenerRegistry;
     this.schedulerSource = schedulerSource;
+    this.schedulerDisposer = schedulerDisposer;
   }
 
   @Override
   public synchronized void start() throws IOException {
     this.scheduler = schedulerSource != null ? schedulerSource.get() : null;
     serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
+    serverConnection.addCloseListener((closeable, type) -> {
+      try {
+        // TODO MULE-11115 Add a stop() method to Scheduler
+        scheduler.stop(5000, MILLISECONDS);
+      } finally {
+        scheduler = null;
+      }
+      schedulerDisposer.run();
+    });
     stopped = false;
   }
 
@@ -63,13 +74,6 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
       transport.unbind(serverConnection);
     } finally {
       stopping = false;
-    }
-    if (scheduler != null) {
-      try {
-        scheduler.stop(5000, MILLISECONDS);
-      } finally {
-        scheduler = null;
-      }
     }
   }
 
