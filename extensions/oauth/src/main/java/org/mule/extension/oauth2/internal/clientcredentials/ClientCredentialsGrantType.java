@@ -52,7 +52,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType {
   public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) {
     final Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
-      dancer.refreshToken(DEFAULT_RESOURCE_OWNER_ID, null);
+      dancer.refreshToken(DEFAULT_RESOURCE_OWNER_ID);
     }
     return shouldRetryRequest;
   }

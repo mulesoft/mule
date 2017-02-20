@@ -11,7 +11,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleException;
 
-
+/**
+ * There was a problem with the call to the tokenUrl.
+ */
 public class TokenUrlResponseException extends MuleException {
 
   private static final long serialVersionUID = 201036315336735350L;

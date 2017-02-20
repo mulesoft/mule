@@ -13,12 +13,19 @@ import org.mule.service.http.api.server.HttpServer;
 import java.net.URL;
 import java.util.Map;
 
+/**
+ * Builder that allows to configure the attributes for the authorization code grant type.
+ *
+ * @since 4.0
+ */
 public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder {
 
   /**
    * The produced {@link OAuthDancer} will create an {@link HttpServer} to listen on the provided {@code localCallbackUrl}.
    * 
-   * @param localCallbackUrl
+   * @param localCallbackUrl the url to listen on
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl);
 
@@ -26,8 +33,10 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder 
    * The produced {@link OAuthDancer} will create an {@link HttpServer} with the provided {@code tlsContextFactory} to listen on
    * the provided {@code localCallbackUrl}.
    * 
-   * @param localCallbackUrl
-   * @param tlsContextFactory
+   * @param localCallbackUrl the url to listen on
+   * @param tlsContextFactory the TLS context to use for the listener
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl, TlsContextFactory tlsContextFactory);
 
@@ -35,7 +44,10 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder 
    * The produced {@link OAuthDancer} will use an existing {@link HttpServer} to listen on the provided
    * {@code localCallbackConfigPath}.
    * 
-   * @param localCallbackConfigPath
+   * @param server a server listening on a specifi host and port
+   * @param localCallbackConfigPath the path on the {@code server} to listen on
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder localCallback(HttpServer server, String localCallbackConfigPath);
 
@@ -44,6 +56,8 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder 
    * authenticate and grant access to the application for his account.
    * 
    * @param path the path to listen for the callback
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder localAuthorizationUrlPath(String path);
 
@@ -53,22 +67,33 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder 
    * 
    * @param localAuthorizationUrlResourceOwnerIdExpr expression to get the identifier under which the oauth authentication
    *        attributes are stored (accessToken, refreshToken, etc).
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder localAuthorizationUrlResourceOwnerId(String localAuthorizationUrlResourceOwnerIdExpr);
 
   /**
-   * @param customParameters
+   * There are OAuth implementations that require or allow extra query parameters to be sent when calling the Authentication URL
+   * of the OAS.
+   * 
+   * @param customParameters the extra parameters to be sent with the authorization request to {@link #authorizationUrl(String)}.
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder customParameters(Map<String, String> customParameters);
 
   /**
    * @param stateExpr parameter for holding state between the authentication request and the callback done by the OAuth
    *        authorization server to the {@code redirectUrl}.
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder state(String stateExpr);
 
   /**
    * @param authorizationUrl The OAuth authentication server url to authorize the app for a certain user.
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder authorizationUrl(String authorizationUrl);
 
@@ -79,9 +104,9 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder 
    * Note that this must be the externally visible address of the callback, not the local one.
    * 
    * @param externalCallbackUrl the callback url where the authorization code will be received.
+   * 
+   * @return this builder
    */
   OAuthAuthorizationCodeDancerBuilder externalCallbackUrl(String externalCallbackUrl);
-
-
 
 }

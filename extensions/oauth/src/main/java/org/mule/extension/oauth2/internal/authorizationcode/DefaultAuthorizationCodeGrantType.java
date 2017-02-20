@@ -197,7 +197,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
   public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
     Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
-      dancer.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult), null);
+      dancer.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult));
     }
     return shouldRetryRequest;
   }

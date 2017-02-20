@@ -389,7 +389,7 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
   }
 
   @Override
-  public void refreshToken(String resourceOwner, TokenRefreshCallback callback) {
+  public void refreshToken(String resourceOwner) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Executing refresh token for user " + resourceOwner);
     }

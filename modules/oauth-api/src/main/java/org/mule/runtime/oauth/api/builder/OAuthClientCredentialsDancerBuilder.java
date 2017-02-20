@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
+/**
+ * Builder that allows to configure the attributes for the client credentials grant type.
+ *
+ * @since 4.0
+ */
 public interface OAuthClientCredentialsDancerBuilder extends OAuthDancerBuilder {
 
   /**
    * @param encodeClientCredentialsInBody If @{code true}, the client id and client secret will be sent in the request body.
    *        Otherwise, they will be sent as basic authentication.
+   * 
+   * @return this builder
    */
   OAuthClientCredentialsDancerBuilder encodeClientCredentialsInBody(boolean encodeClientCredentialsInBody);
 

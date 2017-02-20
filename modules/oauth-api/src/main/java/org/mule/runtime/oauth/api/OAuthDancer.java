@@ -23,17 +23,9 @@ public interface OAuthDancer {
   String accessToken(String resourceOwner) throws RequestAuthenticationException;
 
   /**
-   * Performs the refresh of the access token in an non-blocking way, calling the corresponding method in the {@code callback}
-   * (?)when {@code refreshCondition} returns {@code true}.
+   * Performs the refresh of the access token.
    * 
-   * @param callback
+   * @param resourceOwner The resource owner to get the token for.
    */
-  void refreshToken(String resourceOwner, TokenRefreshCallback callback);
-
-  interface TokenRefreshCallback {
-
-    void onSuccess();
-
-    void onError();
-  }
+  void refreshToken(String resourceOwner);
 }

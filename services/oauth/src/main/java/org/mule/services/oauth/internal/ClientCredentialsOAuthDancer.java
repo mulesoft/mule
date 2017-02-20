@@ -57,7 +57,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   public void start() throws MuleException {
     super.start();
     try {
-      refreshToken(null, null);
+      refreshToken(null);
     } catch (Exception e) {
       super.stop();
       throw e;
@@ -65,7 +65,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   }
 
   @Override
-  public void refreshToken(String resourceOwner, TokenRefreshCallback callback) {
+  public void refreshToken(String resourceOwner) {
     final Map<String, String> formData = new HashMap<>();
 
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);

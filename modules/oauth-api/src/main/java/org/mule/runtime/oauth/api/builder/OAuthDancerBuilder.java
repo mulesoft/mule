@@ -12,12 +12,18 @@ import org.mule.runtime.oauth.api.OAuthDancer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-
+/**
+ * Builder that allows to configure the common attributes for any grant type.
+ *
+ * @since 4.0
+ */
 public interface OAuthDancerBuilder {
 
   /**
    * @param clientId the application identifier as defined in the OAuth authentication server.
    * @param clientSecret the application secret as defined in the OAuth authentication server.
+   * 
+   * @return this builder
    */
   OAuthDancerBuilder clientCredentials(String clientId, String clientSecret);
 
@@ -26,6 +32,8 @@ public interface OAuthDancerBuilder {
    * access token.
    * 
    * @param tokenUrl The OAuth authentication server url to get access to the token.
+   * 
+   * @return this builder
    */
   OAuthDancerBuilder tokenUrl(String tokenUrl);
 
@@ -33,33 +41,64 @@ public interface OAuthDancerBuilder {
    * Scopes define permissions over resources.
    * 
    * @param scopes required by this application to execute.
+   * 
+   * @return this builder
    */
   OAuthDancerBuilder scopes(String scopes);
 
+  /**
+   * @param encoding the encoding to use when processing the incoming requests and responses of the OAuth dance.
+   * 
+   * @return this builder
+   */
   OAuthDancerBuilder encoding(Charset encoding);
 
   /**
    * @param tlsContextFactory References a TLS config that will be used to receive incoming HTTP request and do HTTP request
    *        during the OAuth dance.
+   * 
+   * @return this builder
    */
   OAuthDancerBuilder tlsContextFactory(TlsContextFactory tlsContextFactory);
 
   /**
    * @param responseAccessTokenExpr an expression to extract the {@code access token} parameter from the response of the call to
-   *        {@link #getTokenUrl() token-url}.
+   *        {@link #tokenUrl(String) token-url}.
+   * 
+   * @return this builder
    */
   OAuthDancerBuilder responseAccessTokenExpr(String responseAccessTokenExpr);
 
+  /**
+   * @param responseRefreshTokenExpr an expression to extract the {@code refresh token} parameter from the response of the call to
+   *        {@link #tokenUrl(String) token-url}.
+   * 
+   * @return this builder
+   */
   OAuthDancerBuilder responseRefreshTokenExpr(String responseRefreshTokenExpr);
 
   /**
    * @param responseExpiresInExpr an expression to extract the {@code expiresIn} parameter from the response of the call to
-   *        {@link #getTokenUrl() token-url}.
+   *        {@link #tokenUrl(String) token-url}.
+   * 
+   * @return this builder
    */
   OAuthDancerBuilder responseExpiresInExpr(String responseExpiresInExpr);
 
+
+  /**
+   * @param customParamsExtractorsExprs a map of {@code paramName} to an expression to extract the custom parameters from the
+   *        response of the call to {@link #tokenUrl(String) token-url}.
+   * 
+   * @return this builder
+   */
   OAuthDancerBuilder customParametersExtractorsExprs(Map<String, String> customParamsExtractorsExprs);
 
+  /**
+   * Uses the configuration provided to this builder to create a new {@link OAuthDancer dancer}.
+   * 
+   * @return a fresh instance of a dancer.
+   */
   OAuthDancer build();
 
 }

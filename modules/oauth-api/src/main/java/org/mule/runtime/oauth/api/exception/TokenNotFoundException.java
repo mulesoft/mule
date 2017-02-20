@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
  */
 public class TokenNotFoundException extends MuleException {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -4527896867466127563L;
 
   public TokenNotFoundException(Object tokenUrlResponseBody) {
     super(createStaticMessage(format("Could not extract access token or refresh token from token URL response: %s",
