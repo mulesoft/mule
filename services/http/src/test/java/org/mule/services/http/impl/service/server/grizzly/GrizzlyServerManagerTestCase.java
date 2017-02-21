@@ -9,6 +9,7 @@ package org.mule.services.http.impl.service.server.grizzly;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 
@@ -59,8 +60,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void managerDisposeClosesServerOpenConnections() throws IOException {
     final GrizzlyServerManager serverManager =
-        new GrizzlyServerManager(selectorPool, workerPool, idleTimeoutExecutorService, new HttpListenerRegistry(),
-                                 new DefaultTcpServerSocketProperties());
+        new GrizzlyServerManager("prefix", new HttpListenerRegistry(), new DefaultTcpServerSocketProperties());
 
     final HttpServer server = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
                                                             () -> muleContext.getSchedulerService().ioScheduler(), true,
@@ -87,7 +87,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
         }
       }
 
-      verify(responseStatusCallback).responseSendSuccessfully();
+      verify(responseStatusCallback, timeout(1000)).responseSendSuccessfully();
       server.stop();
       serverManager.dispose();
 
