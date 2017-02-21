@@ -24,6 +24,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import com.google.common.base.Joiner;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -98,7 +103,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       pathMapSearchCache.invalidateAll();
       String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
       Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER),
-                                  "path parameter must start with /");
+                                  "path parameter must start with / (received '" + requestMatcherPath + "')");
       validateCollision(requestMatcher);
       List<String> matcherMethods = requestMatcher.getMethodRequestMatcher().getMethods();
       paths.add(getMethodAndPath(getMethodsListRepresentation(matcherMethods), requestMatcherPath));

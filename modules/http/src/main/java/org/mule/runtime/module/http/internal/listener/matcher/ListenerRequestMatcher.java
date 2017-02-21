@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * {@link RequestMatcher} for an HTTP listener that accepts request based on a path and a group of allowed methods.
  */
-public class ListenerRequestMatcher implements PathAndMethodRequestMatcher {
+public final class ListenerRequestMatcher implements PathAndMethodRequestMatcher {
 
   private final String path;
   private final MethodRequestMatcher methodRequestMatcher;

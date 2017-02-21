@@ -7,7 +7,7 @@
 package org.mule.extension.oauth2.internal;
 
 import static java.util.Objects.requireNonNull;
-import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.extension.api.annotation.param.Optional;

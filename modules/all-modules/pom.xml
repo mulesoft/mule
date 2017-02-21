@@ -97,5 +97,18 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <!-- Services APIs -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-service-http-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-service-oauth-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
     </dependencies>
 </project>

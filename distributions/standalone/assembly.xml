@@ -133,6 +133,7 @@
                 <include>org.mule:mule-core</include>
                 <!--Services-->
                 <include>org.mule.modules:mule-service-http-api</include>
+                <include>org.mule.modules:mule-service-oauth-api</include>
                 <!-- Modules -->
                 <include>org.mule.modules:mule-module-artifact</include>
                 <include>org.mule.modules:mule-module-launcher</include>
@@ -175,6 +176,7 @@
             <includes>
                 <include>org.mule.services:mule-service-scheduler</include>
                 <include>org.mule.services:mule-service-http</include>
+                <include>org.mule.services:mule-service-oauth</include>
             </includes>
         </dependencySet>
         
@@ -202,6 +204,7 @@
                 <exclude>org.mule.extensions:mule-extensions-api-dsql</exclude>
                 <!--Services-->
                 <exclude>org.mule.modules:mule-service-http-api</exclude>
+                <exclude>org.mule.modules:mule-service-oauth-api</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule:mule-core</exclude>

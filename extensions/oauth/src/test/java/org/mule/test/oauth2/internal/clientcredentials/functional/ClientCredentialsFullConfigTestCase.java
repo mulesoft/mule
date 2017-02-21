@@ -16,13 +16,13 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;

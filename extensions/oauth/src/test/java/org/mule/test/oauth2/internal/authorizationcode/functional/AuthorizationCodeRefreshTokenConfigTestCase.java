@@ -8,7 +8,7 @@ package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.functional.junit4.rules.ExpectedError;
 

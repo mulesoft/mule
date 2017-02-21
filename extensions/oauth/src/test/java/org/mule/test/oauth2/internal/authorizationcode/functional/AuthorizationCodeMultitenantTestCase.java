@@ -15,18 +15,20 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.lang.String.format;
 import static org.apache.http.client.fluent.Request.Get;
-import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeQueryString;
+import static org.mule.services.oauth.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
+
+import com.google.common.collect.ImmutableMap;
 
 import com.google.common.collect.ImmutableMap;
 

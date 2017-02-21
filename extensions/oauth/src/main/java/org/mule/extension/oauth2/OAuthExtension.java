@@ -8,10 +8,9 @@ package org.mule.extension.oauth2;
 
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.oauth2.api.exception.OAuthErrors;
-import org.mule.extension.oauth2.api.exception.TokenNotFoundException;
 import org.mule.extension.oauth2.internal.OAuthOperations;
 import org.mule.extension.oauth2.internal.authorizationcode.DefaultAuthorizationCodeGrantType;
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.clientcredentials.ClientCredentialsGrantType;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.extension.api.annotation.Export;
@@ -34,7 +33,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
     subTypes = {DefaultAuthorizationCodeGrantType.class, ClientCredentialsGrantType.class})
 @ErrorTypes(OAuthErrors.class)
 @Xml(namespace = "oauth")
-@Export(classes = {TokenManagerConfig.class, ResourceOwnerOAuthContext.class, TokenNotFoundException.class})
+@Export(classes = {TokenManagerConfig.class, ConfigOAuthContext.class})
 public class OAuthExtension {
 
 }
