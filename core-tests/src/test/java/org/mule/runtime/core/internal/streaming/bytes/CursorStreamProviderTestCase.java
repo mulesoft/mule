@@ -59,6 +59,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private CursorStreamProvider streamProvider;
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
+  private ByteBufferManager bufferManager = new PoolingByteBufferManager();
 
   public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
     super(dataSize);
@@ -73,11 +74,12 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
                                          new DataSize(bufferSize / 2, BYTE),
                                          new DataSize(maxBufferSize, BYTE));
 
-      streamProvider = new InMemoryCursorStreamProvider(dataStream, config, mock(Event.class));
+      streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager, mock(Event.class));
     } else {
       streamProvider = new FileStoreCursorStreamProvider(dataStream,
                                                          new FileStoreCursorStreamConfig(new DataSize(maxBufferSize, BYTE)),
                                                          mock(Event.class),
+                                                         bufferManager,
                                                          executorService);
     }
 
@@ -133,7 +135,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
       // read fully
       assertThat(IOUtils.toString(cursor), equalTo(data));
 
-      System.out.println(data);
       // go back and read first 10 bytes
       seekAndAssert(cursor, 0, 10);
 

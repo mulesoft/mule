@@ -57,10 +57,12 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
           });
 
   private final DefaultByteStreamingStatistics statistics = new DefaultByteStreamingStatistics();
+  private final ByteBufferManager bufferFactory;
   private final Scheduler executorService;
   private final MuleContext muleContext;
 
-  public DefaultByteStreamingManager(Scheduler executorService, MuleContext muleContext) {
+  public DefaultByteStreamingManager(ByteBufferManager bufferFactory, Scheduler executorService, MuleContext muleContext) {
+    this.bufferFactory = bufferFactory;
     this.executorService = executorService;
     this.muleContext = muleContext;
   }
@@ -78,7 +80,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
    */
   @Override
   public CursorStreamProviderFactory getInMemoryCursorStreamProviderFactory(InMemoryCursorStreamConfig config) {
-    return new InMemoryCursorStreamProviderFactory(this, config);
+    return new InMemoryCursorStreamProviderFactory(this, config, bufferFactory);
   }
 
   /**
@@ -86,7 +88,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
    */
   @Override
   public CursorStreamProviderFactory getFileStoreCursorStreamProviderFactory(FileStoreCursorStreamConfig config) {
-    return new FileStoreCursorStreamProviderFactory(this, config, executorService);
+    return new FileStoreCursorStreamProviderFactory(this, config, bufferFactory, executorService);
   }
 
   /**
@@ -102,7 +104,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
    */
   @Override
   public CursorStreamProviderFactory getDefaultCursorStreamProviderFactory() {
-    return new InMemoryCursorStreamProviderFactory(this, InMemoryCursorStreamConfig.getDefault());
+    return new InMemoryCursorStreamProviderFactory(this, InMemoryCursorStreamConfig.getDefault(), bufferFactory);
   }
 
   @Override
@@ -230,7 +232,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
             closeProvider(entry.getKey());
             final List<CursorStreamAdapter> cursors = entry.getValue();
             if (!cursors.isEmpty()) {
-              allCursorsClosed = allCursorsClosed && cursors.stream().anyMatch(CursorStream::isClosed);
+              allCursorsClosed = allCursorsClosed && cursors.stream().allMatch(CursorStream::isClosed);
             }
           }
         }
