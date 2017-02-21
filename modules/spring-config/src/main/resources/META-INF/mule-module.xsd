@@ -176,7 +176,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Expected namespace of the module to look for when generating the schemas. If left empty it will
-                            default to http://www.mulesoft.org/schema/mule/[prefix], where [prefix] is the attribute defined below.
+                            default to http://www.mulesoft.org/schema/mule/[prefix], where [prefix] is the attribute prefix attribute value.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
