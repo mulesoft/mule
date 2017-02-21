@@ -63,6 +63,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
     final List<String> extensions = new ArrayList<String>() {
 
       {
+        add("module-namespace-custom");
         add("module-param-default-types");
         add("module-param-custom-types");
         add("module-param-role");

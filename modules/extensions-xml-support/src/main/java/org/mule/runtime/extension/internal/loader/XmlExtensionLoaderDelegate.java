@@ -18,6 +18,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -47,8 +49,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-
-import com.google.common.collect.ImmutableMap;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.net.URL;
@@ -61,8 +62,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.w3c.dom.Document;
-
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
  *
@@ -74,6 +73,7 @@ final class XmlExtensionLoaderDelegate {
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
   private static final String TYPE_ATTRIBUTE = "type";
   private static final String MODULE_NAME = "name";
+  private static final String MODULE_PREFIX_ATTRIBUTE = "prefix";
   private static final String MODULE_NAMESPACE_ATTRIBUTE = "namespace";
   private static final String MODULE_NAMESPACE_NAME = "module";
   protected static final String CONFIG_NAME = "config";
@@ -92,6 +92,7 @@ final class XmlExtensionLoaderDelegate {
 
   private static final String CATEGORY = "category";
   private static final String VENDOR = "vendor";
+  private static final String MIN_MULE_VERSION = "minMuleVersion";
   private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
   private static final String ROLE = "role";
@@ -221,25 +222,18 @@ final class XmlExtensionLoaderDelegate {
                                                 MODULE_IDENTIFIER.toString(), moduleModel.getIdentifier().toString()));
     }
     String name = moduleModel.getParameters().get(MODULE_NAME);
-    String namespace = moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE);
 
     String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
+    final String minMuleVersion = moduleModel.getParameters().get(MIN_MULE_VERSION);
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
-        .withMinMuleVersion(new MuleVersion("4.0.0")) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from
-        // ExtensionModel
+        .withMinMuleVersion(new MuleVersion(minMuleVersion)) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
-        .withXmlDsl(XmlDslModel.builder()
-            .setSchemaVersion(version)
-            .setNamespace(name)
-            .setNamespaceUri(namespace)
-            .setSchemaLocation(namespace.concat(SEPARATOR).concat("current").concat(SEPARATOR).concat(name).concat(XSD_SUFFIX))
-            .setXsdFileName(name.concat(XSD_SUFFIX))
-            .build());
+        .withXmlDsl(getXmlDslModel(moduleModel, name, version));
     declarer.withModelProperty(new XmlExtensionModelProperty());
     final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel);
     if (configurationDeclarer.isPresent()) {
@@ -247,6 +241,12 @@ final class XmlExtensionLoaderDelegate {
     } else {
       loadOperationsFrom(declarer, moduleModel);
     }
+  }
+
+  private XmlDslModel getXmlDslModel(ComponentModel moduleModel, String name, String version) {
+    final Optional<String> prefix = ofNullable(moduleModel.getParameters().get(MODULE_PREFIX_ATTRIBUTE));
+    final Optional<String> namespace = ofNullable(moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
+    return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
   private String getDescription(ComponentModel componentModel) {

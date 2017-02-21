@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module name="module-param-custom-types"
+<module name="module-custom-namespace"
+        prefix="simple-prefix"
+        namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -7,13 +9,11 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <operation name="operation-with-custom-types">
-        <parameters>
-            <parameter name="value" type="Person"/>
-        </parameters>
+    <operation name="some-operation">
         <body>
-            <mule:set-payload value="#[param.value]"/>
+            <mule:set-payload value="hardcoded value"/>
         </body>
-        <output type="Cat"/>
+        <output type="string"/>
     </operation>
+
 </module>
