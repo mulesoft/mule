@@ -14,22 +14,16 @@ import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
-
+import static org.mule.services.http.impl.service.client.HttpMessageLogger.LoggerType.LISTENER;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.module.http.internal.HttpMessageLogger;
-import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
-import org.mule.runtime.module.http.internal.listener.HttpServerManager;
-import org.mule.runtime.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy;
-import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyAddressDelegateFilter;
-import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyHttpServer;
-import org.mule.runtime.module.http.internal.listener.grizzly.MuleSslFilter;
-import org.mule.runtime.module.http.internal.listener.grizzly.WorkManagerSourceExecutorProvider;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.ServerAddress;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
+import org.mule.services.http.impl.service.client.HttpMessageLogger;
+import org.mule.services.http.impl.service.server.HttpListenerRegistry;
+import org.mule.services.http.impl.service.server.HttpServerManager;
 
 import java.io.IOException;
 import java.util.Map;
