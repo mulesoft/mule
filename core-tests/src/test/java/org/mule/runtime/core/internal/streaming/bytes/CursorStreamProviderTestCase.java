@@ -135,7 +135,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
       // read fully
       assertThat(IOUtils.toString(cursor), equalTo(data));
 
-      System.out.println(data);
       // go back and read first 10 bytes
       seekAndAssert(cursor, 0, 10);
 

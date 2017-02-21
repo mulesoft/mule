@@ -124,7 +124,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   protected abstract boolean canBeExpanded();
 
   /**
-   * @return the {@link ByteBufferManager} that <b>has</b> to be used to allocate byte buffers
+   * @return the {@link ByteBufferManager} that <b>MUST</b> to be used to allocate byte buffers
    */
   protected ByteBufferManager getBufferManager() {
     return bufferManager;

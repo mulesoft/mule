@@ -200,7 +200,7 @@ public final class FileStoreInputStreamBuffer extends AbstractInputStreamBuffer 
 
     if (!TEMP_DIR.exists()) {
       throw new MuleRuntimeException(
-                                     createStaticMessage(format("Temp directory '%s' does not exits. Please check the value of the '%s' system property.",
+                                     createStaticMessage(format("Temp directory '%s' does not exist. Please check the value of the '%s' system property.",
                                                                 TEMP_DIR.getAbsolutePath(),
                                                                 TEMP_DIR_SYSTEM_PROPERTY)));
     }
