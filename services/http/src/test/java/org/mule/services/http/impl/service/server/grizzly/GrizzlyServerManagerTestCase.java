@@ -9,6 +9,7 @@ package org.mule.services.http.impl.service.server.grizzly;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
@@ -86,7 +87,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
         }
       }
 
-      verify(responseStatusCallback).responseSendSuccessfully();
+      verify(responseStatusCallback, timeout(1000)).responseSendSuccessfully();
       server.stop();
       serverManager.dispose();
 
