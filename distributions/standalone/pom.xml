@@ -28,7 +28,6 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <skip>${skipDistributions}</skip>
                             <outputDirectory>${project.build.directory}/plugins</outputDirectory>
                             <includeTypes>zip</includeTypes>
                             <includeGroupIds>
@@ -45,7 +44,6 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <skip>${skipDistributions}</skip>
                             <outputDirectory>${project.build.directory}/plugins</outputDirectory>
                             <includeTypes>jar</includeTypes>
                             <includeGroupIds>
@@ -92,7 +90,6 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <skip>${skipDistributions}</skip>
                             <tasks>
                                 <mkdir dir="../../../target/site/apidocs"/>
                             </tasks>
@@ -120,8 +117,6 @@
                         </goals>
                         <configuration>
                             <source>
-                                if (project.properties.skipDistributions == "true") return
-
                                 // splash
                                 log.info '*' * 80
                                 log.info('Repackaging sources'.center(80))

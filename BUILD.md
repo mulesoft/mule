@@ -50,9 +50,8 @@ In addition to the standard properties, the following ones can change the behavi
 | `skipVerifications`       | `false`      | Skip flag for the license check, version enforce, style checks, etc.|
 | `skipInstalls`            | `false`      | Disable installation of artifacts in the local maven repository|
 | `skipGpg`                 | `true`       | Skip artifact signing, as it does require special setup|
-| `skipDistributions`       | `true`      | Skip flag for the distribution files creation |
 
-To set these properties, it's necessary to pass them in the maven command line as `-DPropertyName=value` where value is optional for `true`. Therefore, to disable the distribution creation skip we could use `-DskipDistributions=false` while to skip the integration tests we can `-DskipIntegrationTests`.
+To set these properties, it's necessary to pass them in the maven command line as `-DPropertyName=value` where value is optional for `true`. Therefore, to skip the integration tests we can `-DskipIntegrationTests`.
 
 It is important to remember that the rest of the maven plugins flags are still applicable, for instance to disable tests in the surefire plugin we could do: `-DskipTests`.
 
@@ -70,13 +69,13 @@ The following list shows the Mule's build profiles:
 | `system`                  | Will just run system tests. |
 | `release`                 | Won't execute any tests and will create the distributable files.|
 
-To set these profiles,  we should pass them in the maven command line as `-PprofileName`. Therefore, to disable the distribution creation skip we could use `-DskipDistributions=false` while to skip the integration tests we can `-DskipIntegrationTests`.
+To set these profiles,  we should pass them in the maven command line as `-PprofileName`. Therefore, to skip the integration tests we can `-DskipIntegrationTests`.
 
 #### Distributions
 
 When you package Mule for distribution, all distributions and related resources are located in the distributions sub-project. 
 
-For performance's sake, the distributions are *not* built from the project's top-level directory by default. You may either build a distribution from its own directory, or disable the `distributions` skip flag  by adding `-DskipDistributions=false` to your Maven command line.
+For performance's sake, the distributions are *not* built from the project's top-level directory by default. To build distributions include appropriate profile `-P distributionsYou` to your Maven command line or may either build a distribution from its own directory.
 
 The table below offers a brief description of each type distribution.
 
