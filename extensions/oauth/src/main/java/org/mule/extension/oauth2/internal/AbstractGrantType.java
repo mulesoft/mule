@@ -200,7 +200,7 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.resolver = new DeferredExpressionResolver(muleContext);
+    this.resolver = new DeferredExpressionResolver(muleContext.getExpressionManager());
   }
 
   public String getClientSecret() {

@@ -9,26 +9,25 @@ package org.mule.extension.oauth2.internal;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 public class DeferredExpressionResolver {
 
-  private final MuleContext muleContext;
+  private final ExpressionEvaluator evaluator;
 
-  public DeferredExpressionResolver(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public DeferredExpressionResolver(ExpressionEvaluator evaluator) {
+    this.evaluator = evaluator;
   }
 
   public <T> T resolveExpression(ParameterResolver<T> expr, Result<Object, ? extends Attributes> result) {
     if (expr == null) {
       return null;
-    } else if (!expr.getExpression().isPresent()
-        || !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+    } else if (!expr.getExpression().isPresent()) {
       return expr.resolve();
     } else {
       BindingContext resultContext = BindingContext.builder()
@@ -42,15 +41,14 @@ public class DeferredExpressionResolver {
                           .build(), DataType.fromType(DataType.class)))
           .build();
 
-      return (T) muleContext.getExpressionManager().evaluate(expr.getExpression().get(), resultContext).getValue();
+      return (T) evaluator.evaluate(expr.getExpression().get(), resultContext).getValue();
     }
   }
 
   public <T> String getExpression(ParameterResolver<T> expr) {
     if (expr == null) {
       return null;
-    } else if (!expr.getExpression().isPresent()
-        || !muleContext.getExpressionManager().isExpression(expr.getExpression().get())) {
+    } else if (!expr.getExpression().isPresent()) {
       return (String) expr.resolve();
     } else {
       return expr.getExpression().get();

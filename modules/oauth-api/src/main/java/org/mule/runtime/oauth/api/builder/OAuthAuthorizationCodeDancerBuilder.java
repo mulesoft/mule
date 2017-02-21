@@ -7,6 +7,7 @@
 package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.service.http.api.server.HttpServer;
 
@@ -18,7 +19,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder {
+public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<AuthorizationCodeOAuthDancer> {
 
   /**
    * The produced {@link OAuthDancer} will create an {@link HttpServer} to listen on the provided {@code localCallbackUrl}.

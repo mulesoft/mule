@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public interface OAuthDancerBuilder {
+public interface OAuthDancerBuilder<D extends OAuthDancer> {
 
   /**
    * @param clientId the application identifier as defined in the OAuth authentication server.
@@ -25,7 +25,7 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder clientCredentials(String clientId, String clientSecret);
+  OAuthDancerBuilder<D> clientCredentials(String clientId, String clientSecret);
 
   /**
    * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
@@ -35,7 +35,7 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder tokenUrl(String tokenUrl);
+  OAuthDancerBuilder<D> tokenUrl(String tokenUrl);
 
   /**
    * Scopes define permissions over resources.
@@ -44,14 +44,14 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder scopes(String scopes);
+  OAuthDancerBuilder<D> scopes(String scopes);
 
   /**
    * @param encoding the encoding to use when processing the incoming requests and responses of the OAuth dance.
    * 
    * @return this builder
    */
-  OAuthDancerBuilder encoding(Charset encoding);
+  OAuthDancerBuilder<D> encoding(Charset encoding);
 
   /**
    * @param tlsContextFactory References a TLS config that will be used to receive incoming HTTP request and do HTTP request
@@ -59,7 +59,7 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder tlsContextFactory(TlsContextFactory tlsContextFactory);
+  OAuthDancerBuilder<D> tlsContextFactory(TlsContextFactory tlsContextFactory);
 
   /**
    * @param responseAccessTokenExpr an expression to extract the {@code access token} parameter from the response of the call to
@@ -67,7 +67,7 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder responseAccessTokenExpr(String responseAccessTokenExpr);
+  OAuthDancerBuilder<D> responseAccessTokenExpr(String responseAccessTokenExpr);
 
   /**
    * @param responseRefreshTokenExpr an expression to extract the {@code refresh token} parameter from the response of the call to
@@ -75,7 +75,7 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder responseRefreshTokenExpr(String responseRefreshTokenExpr);
+  OAuthDancerBuilder<D> responseRefreshTokenExpr(String responseRefreshTokenExpr);
 
   /**
    * @param responseExpiresInExpr an expression to extract the {@code expiresIn} parameter from the response of the call to
@@ -83,7 +83,7 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder responseExpiresInExpr(String responseExpiresInExpr);
+  OAuthDancerBuilder<D> responseExpiresInExpr(String responseExpiresInExpr);
 
 
   /**
@@ -92,13 +92,13 @@ public interface OAuthDancerBuilder {
    * 
    * @return this builder
    */
-  OAuthDancerBuilder customParametersExtractorsExprs(Map<String, String> customParamsExtractorsExprs);
+  OAuthDancerBuilder<D> customParametersExtractorsExprs(Map<String, String> customParamsExtractorsExprs);
 
   /**
    * Uses the configuration provided to this builder to create a new {@link OAuthDancer dancer}.
    * 
    * @return a fresh instance of a dancer.
    */
-  OAuthDancer build();
+  D build();
 
 }

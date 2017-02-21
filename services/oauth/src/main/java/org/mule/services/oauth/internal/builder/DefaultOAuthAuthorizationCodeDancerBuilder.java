@@ -17,13 +17,13 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
-import org.mule.services.oauth.internal.AuthorizationCodeOAuthDancer;
+import org.mule.services.oauth.internal.DefaultAuthorizationCodeOAuthDancer;
 import org.mule.services.oauth.internal.OAuthCallbackServersManager;
 
 import java.net.URL;
@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 
-public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDancerBuilder
+public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDancerBuilder<AuthorizationCodeOAuthDancer>
     implements OAuthAuthorizationCodeDancerBuilder {
 
   private OAuthCallbackServersManager httpServersManager;
@@ -133,20 +133,20 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   }
 
   @Override
-  public OAuthDancer build() {
+  public AuthorizationCodeOAuthDancer build() {
     checkArgument(isNotBlank(clientId), "clientId cannot be blank");
     checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
     checkArgument(isNotBlank(tokenUrl), "tokenUrl cannot be blank");
     checkArgument(isNotBlank(authorizationUrl), "authorizationUrl cannot be blank");
     requireNonNull(localCallbackServerFactory, "localCallback must be configured");
 
-    return new AuthorizationCodeOAuthDancer(localCallbackServerFactory.apply(httpServersManager), clientId, clientSecret,
-                                            tokenUrl, scopes, externalCallbackUrl, encoding, localCallbackUrlPath,
-                                            localAuthorizationUrlPath, localAuthorizationUrlResourceOwnerId, state,
-                                            authorizationUrl, responseAccessTokenExpr, responseRefreshTokenExpr,
-                                            responseExpiresInExpr, customParameters, customParametersExtractorsExprs,
-                                            lockProvider, tokensStore,
-                                            createHttpClient(httpService, tlsContextFactory), expressionEvaluator);
+    return new DefaultAuthorizationCodeOAuthDancer(localCallbackServerFactory.apply(httpServersManager), clientId, clientSecret,
+                                                   tokenUrl, scopes, externalCallbackUrl, encoding, localCallbackUrlPath,
+                                                   localAuthorizationUrlPath, localAuthorizationUrlResourceOwnerId, state,
+                                                   authorizationUrl, responseAccessTokenExpr, responseRefreshTokenExpr,
+                                                   responseExpiresInExpr, customParameters, customParametersExtractorsExprs,
+                                                   lockProvider, tokensStore, createHttpClient(httpService, tlsContextFactory),
+                                                   expressionEvaluator);
   }
 
 }

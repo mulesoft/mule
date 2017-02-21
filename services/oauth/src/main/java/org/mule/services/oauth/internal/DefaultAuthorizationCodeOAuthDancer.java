@@ -48,7 +48,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -82,13 +82,13 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 /**
- * Provides OAuth dance support for client-credentials grant-type.
+ * Provides OAuth dance support for authorization-code grant-type.
  * 
  * @since 4.0
  */
-public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements OAuthDancer, Lifecycle {
+public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements AuthorizationCodeOAuthDancer, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(AuthorizationCodeOAuthDancer.class);
+  private static final Logger LOGGER = getLogger(DefaultAuthorizationCodeOAuthDancer.class);
 
   private final HttpServer httpServer;
 
@@ -107,15 +107,15 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
   private RequestHandlerManager localAuthorizationUrlHandlerManager;
 
 
-  public AuthorizationCodeOAuthDancer(HttpServer httpServer, String clientId, String clientSecret,
-                                      String tokenUrl, String scopes, String externalCallbackUrl, Charset encoding,
-                                      String localCallbackUrlPath, String localAuthorizationUrlPath,
-                                      String localAuthorizationUrlResourceOwnerId, String state, String authorizationUrl,
-                                      String responseAccessTokenExpr, String responseRefreshTokenExpr,
-                                      String responseExpiresInExpr, Map<String, String> customParameters,
-                                      Map<String, String> customParametersExtractorsExprs,
-                                      LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
-                                      HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
+  public DefaultAuthorizationCodeOAuthDancer(HttpServer httpServer, String clientId, String clientSecret,
+                                             String tokenUrl, String scopes, String externalCallbackUrl, Charset encoding,
+                                             String localCallbackUrlPath, String localAuthorizationUrlPath,
+                                             String localAuthorizationUrlResourceOwnerId, String state, String authorizationUrl,
+                                             String responseAccessTokenExpr, String responseRefreshTokenExpr,
+                                             String responseExpiresInExpr, Map<String, String> customParameters,
+                                             Map<String, String> customParametersExtractorsExprs,
+                                             LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
+                                             HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExtractorsExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
 
@@ -143,7 +143,7 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
     return server.addRequestHandler(singleton(method.name()), path, (requestContext, responseCallback) -> {
       final ClassLoader previousCtxClassLoader = currentThread().getContextClassLoader();
       try {
-        currentThread().setContextClassLoader(AuthorizationCodeOAuthDancer.class.getClassLoader());
+        currentThread().setContextClassLoader(DefaultAuthorizationCodeOAuthDancer.class.getClassLoader());
 
         callbackHandler.handleRequest(requestContext, responseCallback);
       } catch (Exception e) {
@@ -246,8 +246,7 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
   }
 
   private static void sendResponse(StateDecoder stateDecoder, HttpResponseReadyCallback responseCallback,
-                                   HttpStatus statusEmptyState,
-                                   String message, int authorizationStatus) {
+                                   HttpStatus statusEmptyState, String message, int authorizationStatus) {
     String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
     if (!isEmpty(onCompleteRedirectToValue)) {
       sendResponse(responseCallback, MOVED_TEMPORARILY, message, appendQueryParam(onCompleteRedirectToValue,
@@ -308,39 +307,43 @@ public class AuthorizationCodeOAuthDancer extends AbstractOAuthDancer implements
 
   private RequestHandler createLocalAuthorizationUrlListener() {
     return (requestContext, responseCallback) -> {
-      final HttpRequest request = requestContext.getRequest();
-      final String body = readBody(request);
-      final ParameterMap headers = readHeaders(request);
-      final MediaType mediaType = getMediaType(request);
-      final ParameterMap queryParams = request.getQueryParams();
-
-      final String originalState = resolveExpression(state, body, headers, queryParams, mediaType);
-      final StateEncoder stateEncoder = new StateEncoder(originalState);
-
-      final String resourceOwnerId =
-          resolveExpression(localAuthorizationUrlResourceOwnerId, body, headers, queryParams, mediaType);
-      if (resourceOwnerId != null) {
-        stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
-      }
-
-      final String onCompleteRedirectToValue = queryParams.get("onCompleteRedirectTo");
-      if (onCompleteRedirectToValue != null) {
-        stateEncoder.encodeOnCompleteRedirectToInState(onCompleteRedirectToValue);
-      }
-
-      final String authorizationUrlWithParams = new AuthorizationRequestUrlBuilder()
-          .setAuthorizationUrl(authorizationUrl)
-          .setClientId(clientId)
-          .setClientSecret(clientSecret)
-          .setCustomParameters(customParameters)
-          .setRedirectUrl(externalCallbackUrl)
-          .setState(stateEncoder.getEncodedState())
-          .setScope(scopes)
-          .setEncoding(encoding)
-          .buildUrl();
-
-      sendResponse(responseCallback, MOVED_TEMPORARILY, body, authorizationUrlWithParams);
+      handleLocalAuthorizationRequest(requestContext.getRequest(), responseCallback);
     };
+  }
+
+  @Override
+  public void handleLocalAuthorizationRequest(HttpRequest request, HttpResponseReadyCallback responseCallback) {
+    final String body = readBody(request);
+    final ParameterMap headers = readHeaders(request);
+    final MediaType mediaType = getMediaType(request);
+    final ParameterMap queryParams = request.getQueryParams();
+
+    final String originalState = resolveExpression(state, body, headers, queryParams, mediaType);
+    final StateEncoder stateEncoder = new StateEncoder(originalState);
+
+    final String resourceOwnerId =
+        resolveExpression(localAuthorizationUrlResourceOwnerId, body, headers, queryParams, mediaType);
+    if (resourceOwnerId != null) {
+      stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
+    }
+
+    final String onCompleteRedirectToValue = queryParams.get("onCompleteRedirectTo");
+    if (onCompleteRedirectToValue != null) {
+      stateEncoder.encodeOnCompleteRedirectToInState(onCompleteRedirectToValue);
+    }
+
+    final String authorizationUrlWithParams = new AuthorizationRequestUrlBuilder()
+        .setAuthorizationUrl(authorizationUrl)
+        .setClientId(clientId)
+        .setClientSecret(clientSecret)
+        .setCustomParameters(customParameters)
+        .setRedirectUrl(externalCallbackUrl)
+        .setState(stateEncoder.getEncodedState())
+        .setScope(scopes)
+        .setEncoding(encoding)
+        .buildUrl();
+
+    sendResponse(responseCallback, MOVED_TEMPORARILY, body, authorizationUrlWithParams);
   }
 
   private String readBody(final HttpRequest request) {
