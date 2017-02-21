@@ -27,18 +27,20 @@ public class FileStoreCursorStreamProvider extends AbstractCursorStreamProviderA
   /**
    * Creates a new instance
    *
-   * @param wrappedStream    the stream to buffer from
-   * @param config           the config for the file store buffer
-   * @param event            the {@link Event} on which buffering is taking place
+   * @param wrappedStream   the stream to buffer from
+   * @param config          the config for the file store buffer
+   * @param event           the {@link Event} on which buffering is taking place
+   * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param executorService a {@link ScheduledExecutorService} for performing async tasks
    */
   public FileStoreCursorStreamProvider(InputStream wrappedStream,
                                        FileStoreCursorStreamConfig config,
                                        Event event,
+                                       ByteBufferManager bufferManager,
                                        ScheduledExecutorService executorService) {
-    super(wrappedStream, event);
+    super(wrappedStream, bufferManager, event);
     this.bufferSize = config.getMaxInMemorySize().toBytes();
-    buffer = SwitchingInputStreamBuffer.of(wrappedStream, config, executorService);
+    buffer = SwitchingInputStreamBuffer.of(wrappedStream, config, bufferManager, executorService);
   }
 
   /**
@@ -46,7 +48,7 @@ public class FileStoreCursorStreamProvider extends AbstractCursorStreamProviderA
    */
   @Override
   protected CursorStream doOpenCursor() {
-    return new BufferedCursorStream(buffer, bufferSize, this);
+    return new BufferedCursorStream(buffer, getBufferManager(), bufferSize, this);
   }
 
   /**

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.nio.ByteBuffer.allocateDirect;
 import org.mule.runtime.api.streaming.CursorStream;
 
 import java.io.IOException;
@@ -31,19 +30,25 @@ public final class BufferedCursorStream extends BaseCursorStream {
    * on the {@code traversableBuffer}
    */
   private final ByteBuffer memoryBuffer;
+  private final ByteBufferManager bufferManager;
 
   /**
    * Creates a new instance
    *
    * @param streamBuffer    the buffer which provides data
+   * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param localBufferSize The size of the intermediate buffer
    * @param provider        the {@link CursorStreamProviderAdapter} which opened this cursor
    */
-  public BufferedCursorStream(InputStreamBuffer streamBuffer, int localBufferSize, CursorStreamProviderAdapter provider) {
+  public BufferedCursorStream(InputStreamBuffer streamBuffer,
+                              ByteBufferManager bufferManager,
+                              int localBufferSize,
+                              CursorStreamProviderAdapter provider) {
     super(provider);
     this.streamBuffer = streamBuffer;
     this.localBufferSize = localBufferSize;
-    memoryBuffer = allocateDirect(localBufferSize);
+    this.bufferManager = bufferManager;
+    memoryBuffer = bufferManager.allocate(localBufferSize);
     memoryBuffer.flip();
   }
 
@@ -119,6 +124,6 @@ public final class BufferedCursorStream extends BaseCursorStream {
    */
   @Override
   protected void dispose() {
-    memoryBuffer.clear();
+    bufferManager.deallocate(memoryBuffer);
   }
 }

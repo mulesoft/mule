@@ -28,11 +28,15 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProviderAd
    *
    * @param wrappedStream the stream to buffer from
    * @param config        the config of the generated buffer
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param event         the {@link Event} in which streaming is taking place
    */
-  public InMemoryCursorStreamProvider(InputStream wrappedStream, InMemoryCursorStreamConfig config, Event event) {
-    super(wrappedStream, event);
-    buffer = new InMemoryStreamBuffer(wrappedStream, config);
+  public InMemoryCursorStreamProvider(InputStream wrappedStream,
+                                      InMemoryCursorStreamConfig config,
+                                      ByteBufferManager bufferManager,
+                                      Event event) {
+    super(wrappedStream, bufferManager, event);
+    buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
     bufferSize = config.getInitialBufferSize().toBytes();
   }
 
@@ -41,7 +45,7 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProviderAd
    */
   @Override
   protected CursorStream doOpenCursor() {
-    return new BufferedCursorStream(buffer, bufferSize, this);
+    return new BufferedCursorStream(buffer, getBufferManager(), bufferSize, this);
   }
 
   /**

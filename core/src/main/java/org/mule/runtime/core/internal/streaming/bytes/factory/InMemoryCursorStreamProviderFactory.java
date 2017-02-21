@@ -9,10 +9,11 @@ package org.mule.runtime.core.internal.streaming.bytes.factory;
 import static org.mule.runtime.core.api.functional.Either.left;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.CursorStreamProviderAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.InputStream;
 
@@ -32,18 +33,22 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    *
    * @param streamingManager the manager which will track the produced providers.
    * @param config           the config for the generated providers
+   * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  public InMemoryCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager, InMemoryCursorStreamConfig config) {
-    super(streamingManager);
+  public InMemoryCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager,
+                                             InMemoryCursorStreamConfig config,
+                                             ByteBufferManager bufferManager) {
+    super(streamingManager, bufferManager);
     this.config = config;
   }
 
   /**
    * {@inheritDoc}
+   *
    * @return a new {@link InMemoryCursorStreamProvider} wrapped in an {@link Either}
    */
   @Override
   protected Either<CursorStreamProviderAdapter, InputStream> resolve(InputStream inputStream, Event event) {
-    return left(new InMemoryCursorStreamProvider(inputStream, config, event));
+    return left(new InMemoryCursorStreamProvider(inputStream, config, getBufferManager(), event));
   }
 }

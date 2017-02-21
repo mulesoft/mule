@@ -133,8 +133,8 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   private void assertAllStreamingResourcesClosed() {
     ByteStreamingStatistics stats = streamingManagerAdapter.forBytes().getByteStreamingStatistics();
     new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
-      assertThat(stats.getOpenCursorProvidersCount(), is(0));
-      assertThat(stats.getOpenCursorsCount(), is(0));
+      assertThat("There're still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
+      assertThat("There're still open cursors", stats.getOpenCursorsCount(), is(0));
       return true;
     }));
   }

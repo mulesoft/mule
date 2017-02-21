@@ -32,12 +32,13 @@ public class FileStoreInputStreamBufferTestCase extends AbstractByteStreamingTes
   private final ScheduledExecutorService executorService = newSingleThreadScheduledExecutor();
 
   private FileStoreInputStreamBuffer buffer;
+  private ByteBufferManager bufferManager = new PoolingByteBufferManager();
 
   public FileStoreInputStreamBufferTestCase() {
     super(MB_2);
     FileStoreCursorStreamConfig config = new FileStoreCursorStreamConfig(new DataSize(bufferSize, BYTE));
     InputStream stream = new ByteArrayInputStream(data.getBytes());
-    buffer = new FileStoreInputStreamBuffer(stream, newChannel(stream), config, null, executorService);
+    buffer = new FileStoreInputStreamBuffer(stream, newChannel(stream), config, null, bufferManager, executorService);
   }
 
   @After

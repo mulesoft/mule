@@ -36,8 +36,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    * @param stream the stream to be buffered
    * @param config this buffer's configuration.
    */
-  public InMemoryStreamBuffer(InputStream stream, InMemoryCursorStreamConfig config) {
-    super(stream, config.getInitialBufferSize().toBytes());
+  public InMemoryStreamBuffer(InputStream stream, InMemoryCursorStreamConfig config, ByteBufferManager bufferManager) {
+    super(stream, bufferManager, config.getInitialBufferSize().toBytes());
 
     this.bufferSizeIncrement = config.getBufferSizeIncrement() != null
         ? config.getBufferSizeIncrement()
