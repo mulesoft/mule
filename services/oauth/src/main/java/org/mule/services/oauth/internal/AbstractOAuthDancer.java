@@ -7,6 +7,7 @@
 package org.mule.services.oauth.internal;
 
 import static java.lang.String.format;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
@@ -48,6 +49,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
@@ -107,14 +109,15 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
     httpClient.stop();
   }
 
-  public String accessToken(String resourceOwner) throws RequestAuthenticationException {
+  public CompletableFuture<String> accessToken(String resourceOwner) throws RequestAuthenticationException {
     final String accessToken = getContextForResourceOwner(resourceOwner).getAccessToken();
     if (accessToken == null) {
       throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
           + "Verify that you have authenticated before trying to execute an operation to the API.")));
     }
 
-    return accessToken;
+    // TODO MULE-11858 proactively refresh if the token has already expired based on its 'expiresIn' parameter
+    return completedFuture(accessToken);
   }
 
   protected TokenResponse invokeTokenUrl(String tokenUrl, Map<String, String> tokenRequestFormToSend, String authorization,

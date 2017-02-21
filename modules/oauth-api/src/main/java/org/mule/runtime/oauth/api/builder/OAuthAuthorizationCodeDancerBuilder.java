@@ -45,7 +45,7 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    * The produced {@link OAuthDancer} will use an existing {@link HttpServer} to listen on the provided
    * {@code localCallbackConfigPath}.
    * 
-   * @param server a server listening on a specifi host and port
+   * @param server a server listening on a specific host and port
    * @param localCallbackConfigPath the path on the {@code server} to listen on
    * 
    * @return this builder
@@ -53,8 +53,8 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
   OAuthAuthorizationCodeDancerBuilder localCallback(HttpServer server, String localCallbackConfigPath);
 
   /**
-   * If this attribute is provided mule will automatically create and endpoint in the host server that the user can hit to
-   * authenticate and grant access to the application for his account.
+   * If this attribute is provided mule will automatically create and endpoint in the host server (the same configured for
+   * {@link #localCallback}) that the user can hit to authenticate and grant access to the application for his account.
    * 
    * @param path the path to listen for the callback
    * 
@@ -84,8 +84,11 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
   OAuthAuthorizationCodeDancerBuilder customParameters(Map<String, String> customParameters);
 
   /**
+   * Mule will add some internal stuff to the state that is sent to the Authorization server. When the callback is received, those
+   * will be removed to be processed, and the {@code state} as specified in this method will be honored.
+   * 
    * @param stateExpr parameter for holding state between the authentication request and the callback done by the OAuth
-   *        authorization server to the {@code redirectUrl}.
+   *        authorization server to the {@link #externalCallbackUrl(String)}.
    * 
    * @return this builder
    */
@@ -102,7 +105,9 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    * The oauth authentication server will use this url to provide the authentication code to the Mule server so the mule server
    * can retrieve the access token.
    * <p>
-   * Note that this must be the externally visible address of the callback, not the local one.
+   * Note: this must be the externally visible address of the {@link #localCallback}.
+   * <p>
+   * TODO MULE-11861: Allow to infer the localCallback url based on the externalCallbackUrl for Auth-code grant-type
    * 
    * @param externalCallbackUrl the callback url where the authorization code will be received.
    * 

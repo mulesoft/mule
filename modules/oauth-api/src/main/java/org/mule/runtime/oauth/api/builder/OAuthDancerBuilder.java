@@ -8,6 +8,7 @@ package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.service.http.api.client.HttpClient;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -38,6 +39,28 @@ public interface OAuthDancerBuilder<D extends OAuthDancer> {
   OAuthDancerBuilder<D> tokenUrl(String tokenUrl);
 
   /**
+   * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
+   * access token.
+   * 
+   * @param httpClient the {@link HttpClient} that will be used to do the HTTP request for the token during the OAuth dance.
+   * @param tokenUrl The OAuth authentication server url to get access to the token.
+   * 
+   * @return this builder
+   */
+  OAuthDancerBuilder<D> tokenUrl(HttpClient httpClient, String tokenUrl);
+
+  /**
+   * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
+   * access token.
+   * 
+   * @param tokenUrl The OAuth authentication server url to get access to the token.
+   * @param tlsContextFactory References a TLS config that will be used to do HTTP request during the OAuth dance.
+   * 
+   * @return this builder
+   */
+  OAuthDancerBuilder<D> tokenUrl(String tokenUrl, TlsContextFactory tlsContextFactory);
+
+  /**
    * Scopes define permissions over resources.
    * 
    * @param scopes required by this application to execute.
@@ -52,14 +75,6 @@ public interface OAuthDancerBuilder<D extends OAuthDancer> {
    * @return this builder
    */
   OAuthDancerBuilder<D> encoding(Charset encoding);
-
-  /**
-   * @param tlsContextFactory References a TLS config that will be used to receive incoming HTTP request and do HTTP request
-   *        during the OAuth dance.
-   * 
-   * @return this builder
-   */
-  OAuthDancerBuilder<D> tlsContextFactory(TlsContextFactory tlsContextFactory);
 
   /**
    * @param responseAccessTokenExpr an expression to extract the {@code access token} parameter from the response of the call to

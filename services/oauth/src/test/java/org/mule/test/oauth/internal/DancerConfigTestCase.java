@@ -11,9 +11,12 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.el.ExpressionEvaluator;
@@ -37,6 +40,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
@@ -45,13 +49,14 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DancerMinimalConfigTestCase extends AbstractMuleContextTestCase {
+public class DancerConfigTestCase extends AbstractMuleContextTestCase {
 
   private OAuthService service;
   private HttpClient httpClient;
+  private HttpServer httpServer;
 
   @Before
-  public void before() throws ConnectionException {
+  public void before() throws ConnectionException, IOException, TimeoutException {
     final HttpService httpService = mock(HttpService.class);
     final HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
     httpClient = mock(HttpClient.class);
@@ -59,23 +64,23 @@ public class DancerMinimalConfigTestCase extends AbstractMuleContextTestCase {
     when(httpService.getClientFactory()).thenReturn(httpClientFactory);
 
     final HttpServerFactory httpServerFactory = mock(HttpServerFactory.class);
-    final HttpServer httpServer = mock(HttpServer.class);
+    httpServer = mock(HttpServer.class);
     when(httpServer.addRequestHandler(anyString(), any())).thenReturn(mock(RequestHandlerManager.class));
     when(httpServer.addRequestHandler(any(), anyString(), any())).thenReturn(mock(RequestHandlerManager.class));
     when(httpServerFactory.create(any())).thenReturn(httpServer);
     when(httpService.getServerFactory()).thenReturn(httpServerFactory);
 
     service = new DefaultOAuthService(httpService, mock(SchedulerService.class));
-  }
 
-  @Test
-  public void clientCredentials() throws MuleException, IOException, TimeoutException {
     final HttpResponse httpResponse = mock(HttpResponse.class);
     final InputStreamHttpEntity httpEntity = mock(InputStreamHttpEntity.class);
     when(httpEntity.getInputStream()).thenReturn(new ReaderInputStream(new StringReader("")));
     when(httpResponse.getEntity()).thenReturn(httpEntity);
     when(httpClient.send(any(), anyInt(), anyBoolean(), any())).thenReturn(httpResponse);
+  }
 
+  @Test
+  public void clientCredentialsMinimal() throws MuleException {
     final OAuthClientCredentialsDancerBuilder builder =
         service.clientCredentialsGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
                                                         new HashMap<>(), mock(ExpressionEvaluator.class));
@@ -86,16 +91,14 @@ public class DancerMinimalConfigTestCase extends AbstractMuleContextTestCase {
     final OAuthDancer minimalDancer = builder.build();
     initialiseIfNeeded(minimalDancer);
     startIfNeeded(minimalDancer);
+    verify(httpClient).start();
+
+    stopIfNeeded(minimalDancer);
+    verify(httpClient).stop();
   }
 
   @Test
-  public void authorizationCode() throws MuleException, IOException, TimeoutException {
-    final HttpResponse httpResponse = mock(HttpResponse.class);
-    final InputStreamHttpEntity httpEntity = mock(InputStreamHttpEntity.class);
-    when(httpEntity.getInputStream()).thenReturn(new ReaderInputStream(new StringReader("")));
-    when(httpResponse.getEntity()).thenReturn(httpEntity);
-    when(httpClient.send(any(), anyInt(), anyBoolean(), any())).thenReturn(httpResponse);
-
+  public void authorizationCodeMinimal() throws MuleException, MalformedURLException {
     final OAuthAuthorizationCodeDancerBuilder builder =
         service.authorizationCodeGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
                                                         new HashMap<>(), mock(ExpressionEvaluator.class));
@@ -108,5 +111,67 @@ public class DancerMinimalConfigTestCase extends AbstractMuleContextTestCase {
     final OAuthDancer minimalDancer = builder.build();
     initialiseIfNeeded(minimalDancer);
     startIfNeeded(minimalDancer);
+    verify(httpClient).start();
+
+    stopIfNeeded(minimalDancer);
+    verify(httpClient).stop();
+  }
+
+  @Test
+  public void clientCredentialsReuseHttpClient() throws MuleException {
+    final OAuthClientCredentialsDancerBuilder builder =
+        service.clientCredentialsGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
+                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+
+    builder.clientCredentials("clientId", "clientSecret");
+    builder.tokenUrl(httpClient, "http://host/token");
+
+    final OAuthDancer minimalDancer = builder.build();
+    initialiseIfNeeded(minimalDancer);
+    startIfNeeded(minimalDancer);
+    verify(httpClient, never()).start();
+
+    stopIfNeeded(minimalDancer);
+    verify(httpClient, never()).stop();
+  }
+
+  @Test
+  public void authorizationCodeReuseHttpClient() throws MuleException, MalformedURLException {
+    final OAuthAuthorizationCodeDancerBuilder builder =
+        service.authorizationCodeGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
+                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+
+    builder.clientCredentials("clientId", "clientSecret");
+    builder.tokenUrl(httpClient, "http://host/token");
+    builder.authorizationUrl("http://host/auth");
+    builder.localCallback(new URL("http://localhost:8080/localCallback"));
+
+    final OAuthDancer minimalDancer = builder.build();
+    initialiseIfNeeded(minimalDancer);
+    startIfNeeded(minimalDancer);
+    verify(httpClient, never()).start();
+
+    stopIfNeeded(minimalDancer);
+    verify(httpClient, never()).stop();
+  }
+
+  @Test
+  public void authorizationCodeReuseHttpServer() throws MuleException, IOException {
+    final OAuthAuthorizationCodeDancerBuilder builder =
+        service.authorizationCodeGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
+                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+
+    builder.clientCredentials("clientId", "clientSecret");
+    builder.tokenUrl("http://host/token");
+    builder.authorizationUrl("http://host/auth");
+    builder.localCallback(httpServer, "/localCallback");
+
+    final OAuthDancer minimalDancer = builder.build();
+    initialiseIfNeeded(minimalDancer);
+    startIfNeeded(minimalDancer);
+    verify(httpServer, never()).start();
+
+    stopIfNeeded(minimalDancer);
+    verify(httpServer, never()).stop();
   }
 }

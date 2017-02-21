@@ -7,6 +7,8 @@
 package org.mule.services.oauth.internal;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_ID_PARAMETER;
@@ -18,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
@@ -32,6 +34,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 
@@ -61,15 +65,19 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   public void start() throws MuleException {
     super.start();
     try {
-      refreshToken(null);
-    } catch (Exception e) {
+      refreshToken(null).get();
+    } catch (ExecutionException e) {
       super.stop();
-      throw e;
+      throw new LifecycleException(e.getCause(), this);
+    } catch (InterruptedException e) {
+      super.stop();
+      currentThread().interrupt();
+      throw new LifecycleException(e, this);
     }
   }
 
   @Override
-  public void refreshToken(String resourceOwner) {
+  public CompletableFuture<Void> refreshToken(String resourceOwner) {
     final Map<String, String> formData = new HashMap<>();
 
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);
@@ -101,8 +109,11 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
       }
 
       updateResourceOwnerOAuthContext(defaultUserState);
+      return completedFuture(null);
     } catch (TokenUrlResponseException | TokenNotFoundException e) {
-      throw new MuleRuntimeException(e);
+      final CompletableFuture<Void> exceptionFuture = new CompletableFuture<>();
+      exceptionFuture.completeExceptionally(e);
+      return exceptionFuture;
     }
 
   }

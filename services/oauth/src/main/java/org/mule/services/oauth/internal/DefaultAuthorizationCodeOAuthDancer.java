@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
@@ -77,6 +78,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -131,10 +133,9 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
 
   @Override
   public void initialise() throws InitialisationException {
-    redirectUrlHandlerManager =
-        addRequestHandler(httpServer, GET, localCallbackUrlPath, createRedirectUrlListener());
-    localAuthorizationUrlHandlerManager = addRequestHandler(httpServer, GET, localAuthorizationUrlPath,
-                                                            createLocalAuthorizationUrlListener());
+    redirectUrlHandlerManager = addRequestHandler(httpServer, GET, localCallbackUrlPath, createRedirectUrlListener());
+    localAuthorizationUrlHandlerManager =
+        addRequestHandler(httpServer, GET, localAuthorizationUrlPath, createLocalAuthorizationUrlListener());
   }
 
   private static <T> RequestHandlerManager addRequestHandler(HttpServer server, Method method, String path,
@@ -396,7 +397,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
   }
 
   @Override
-  public void refreshToken(String resourceOwner) {
+  public CompletableFuture<Void> refreshToken(String resourceOwner) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Executing refresh token for user " + resourceOwner);
     }
@@ -425,7 +426,9 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
           updateResourceOwnerState(resourceOwnerOAuthContext, null, tokenResponse);
           updateResourceOwnerOAuthContext(resourceOwnerOAuthContext);
         } catch (TokenUrlResponseException | TokenNotFoundException e) {
-          throw new MuleRuntimeException(e);
+          final CompletableFuture<Void> exceptionFuture = new CompletableFuture<>();
+          exceptionFuture.completeExceptionally(e);
+          return exceptionFuture;
         }
       }
     } finally {
@@ -438,6 +441,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
       resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().lock();
       resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().unlock();
     }
+    return completedFuture(null);
   }
 
   private void updateResourceOwnerState(ResourceOwnerOAuthContext resourceOwnerOAuthContext, String newState,

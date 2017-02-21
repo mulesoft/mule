@@ -6,6 +6,7 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 
@@ -15,6 +16,7 @@ import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -32,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Represents the config element for {@code oauth:authentication-code-config}.
@@ -190,14 +193,28 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
 
   @Override
   public void authenticate(HttpRequestBuilder builder) throws MuleException {
-    builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(dancer.accessToken(resourceOwnerId.resolve())));
+    try {
+      builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(dancer.accessToken(resourceOwnerId.resolve()).get()));
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      throw new DefaultMuleException(e);
+    } catch (ExecutionException e) {
+      throw new DefaultMuleException(e.getCause());
+    }
   }
 
   @Override
   public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
     Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
-      dancer.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult));
+      try {
+        dancer.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult)).get();
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+        throw new DefaultMuleException(e);
+      } catch (ExecutionException e) {
+        throw new DefaultMuleException(e.getCause());
+      }
     }
     return shouldRetryRequest;
   }

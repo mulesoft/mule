@@ -148,17 +148,20 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
     }
     initialiseIfNeeded(tokenManager, muleContext);
 
-    if (getTlsContextFactory() != null) {
-      initialiseIfNeeded(getTlsContextFactory());
-    }
-
     try {
-      dancer = configDancer(muleContext.getRegistry().lookupObject(OAuthService.class))
-          .clientCredentials(getClientId(), getClientSecret())
-          .tokenUrl(getTokenUrl())
+      OAuthDancerBuilder dancerBuilder = configDancer(muleContext.getRegistry().lookupObject(OAuthService.class))
+          .clientCredentials(getClientId(), getClientSecret());
+
+      if (getTlsContextFactory() != null) {
+        initialiseIfNeeded(getTlsContextFactory());
+        dancerBuilder = dancerBuilder.tokenUrl(getTokenUrl(), getTlsContextFactory());
+      } else {
+        dancerBuilder = dancerBuilder.tokenUrl(getTokenUrl());
+      }
+
+      dancer = dancerBuilder
           .scopes(getScopes())
           .encoding(getDefaultEncoding(muleContext))
-          .tlsContextFactory(getTlsContextFactory())
           .responseAccessTokenExpr(resolver.getExpression(getResponseAccessToken()))
           .responseRefreshTokenExpr(resolver.getExpression(getResponseRefreshToken()))
           .responseExpiresInExpr(resolver.getExpression(getResponseExpiresIn()))

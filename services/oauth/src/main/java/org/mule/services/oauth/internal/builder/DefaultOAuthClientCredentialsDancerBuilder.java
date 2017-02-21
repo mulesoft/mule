@@ -15,6 +15,7 @@ import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
 import org.mule.services.oauth.internal.ClientCredentialsOAuthDancer;
 
 import java.util.Map;
@@ -46,7 +47,7 @@ public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDan
     return new ClientCredentialsOAuthDancer(clientId, clientSecret, tokenUrl, scopes, encodeClientCredentialsInBody, encoding,
                                             responseAccessTokenExpr, responseRefreshTokenExpr, responseExpiresInExpr,
                                             customParametersExtractorsExprs, lockProvider, tokensStore,
-                                            createHttpClient(httpService, tlsContextFactory), expressionEvaluator);
+                                            (HttpClient) httpClientFactory.get(), expressionEvaluator);
   }
 
 }

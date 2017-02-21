@@ -23,10 +23,15 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
+import org.mule.service.http.api.server.ServerAddress;
 import org.mule.services.oauth.internal.DefaultAuthorizationCodeOAuthDancer;
 import org.mule.services.oauth.internal.OAuthCallbackServersManager;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -59,7 +64,6 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
     localCallbackServerFactory = (serversManager) -> {
       final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
       serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
-      tlsContextFactory.ifPresent(tls -> serverConfigBuilder.setTlsContextFactory(tls));
       try {
         return serversManager.getServer(serverConfigBuilder.build());
       } catch (ConnectionException e) {
@@ -90,7 +94,50 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   @Override
   public OAuthAuthorizationCodeDancerBuilder localCallback(HttpServer server, String localCallbackConfigPath) {
-    localCallbackServerFactory = (serversManager) -> server;
+    localCallbackServerFactory = (serversManager) -> {
+      return new HttpServer() {
+
+        @Override
+        public void stop() {
+          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+        }
+
+        @Override
+        public void start() throws IOException {
+          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+        }
+
+        @Override
+        public boolean isStopping() {
+          return server.isStopping();
+        }
+
+        @Override
+        public boolean isStopped() {
+          return server.isStopped();
+        }
+
+        @Override
+        public ServerAddress getServerAddress() {
+          return server.getServerAddress();
+        }
+
+        @Override
+        public void dispose() {
+          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+        }
+
+        @Override
+        public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+          return server.addRequestHandler(localCallbackConfigPath, requestHandler);
+        }
+
+        @Override
+        public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+          return server.addRequestHandler(methods, localCallbackConfigPath, requestHandler);
+        }
+      };
+    };
     localCallbackUrlPath = localCallbackConfigPath;
     return this;
   }
@@ -145,8 +192,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
                                                    localAuthorizationUrlPath, localAuthorizationUrlResourceOwnerId, state,
                                                    authorizationUrl, responseAccessTokenExpr, responseRefreshTokenExpr,
                                                    responseExpiresInExpr, customParameters, customParametersExtractorsExprs,
-                                                   lockProvider, tokensStore, createHttpClient(httpService, tlsContextFactory),
-                                                   expressionEvaluator);
+                                                   lockProvider, tokensStore, httpClientFactory.get(), expressionEvaluator);
   }
 
 }

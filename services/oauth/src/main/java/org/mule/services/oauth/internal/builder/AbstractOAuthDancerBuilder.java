@@ -8,8 +8,6 @@ package org.mule.services.oauth.internal.builder;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.lock.LockFactory;
@@ -21,10 +19,16 @@ import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.client.HttpClientConfiguration.Builder;
+import org.mule.service.http.api.client.HttpRequestAuthentication;
+import org.mule.service.http.api.client.async.ResponseHandler;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implements OAuthDancerBuilder<D> {
 
@@ -36,7 +40,7 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
   protected String clientId;
   protected String clientSecret;
   protected String tokenUrl;
-  protected Optional<TlsContextFactory> tlsContextFactory = empty();
+  protected Supplier<HttpClient> httpClientFactory;
 
   protected Charset encoding = UTF_8;
   protected String responseAccessTokenExpr = "#[(payload match /.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
@@ -53,14 +57,6 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
     this.expressionEvaluator = expressionEvaluator;
   }
 
-  protected final HttpClient createHttpClient(HttpService httpService, Optional<TlsContextFactory> tlsContextFactory) {
-    final Builder clientConfigBuilder =
-        new HttpClientConfiguration.Builder().setThreadNamePrefix(format("oauthToken.requester[%s]", tokenUrl));
-    tlsContextFactory.ifPresent(tcf -> clientConfigBuilder.setTlsContextFactory(tcf));
-    return httpService.getClientFactory().create(clientConfigBuilder.build());
-
-  }
-
   @Override
   public OAuthDancerBuilder clientCredentials(String clientId, String clientSecret) {
     this.clientId = clientId;
@@ -71,6 +67,57 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
   @Override
   public OAuthDancerBuilder tokenUrl(String tokenUrl) {
     this.tokenUrl = tokenUrl;
+    this.httpClientFactory = () -> {
+      final Builder clientConfigBuilder =
+          new HttpClientConfiguration.Builder().setThreadNamePrefix(format("oauthToken.requester[%s]", tokenUrl));
+      return httpService.getClientFactory().create(clientConfigBuilder.build());
+    };
+    return this;
+  }
+
+  @Override
+  public OAuthDancerBuilder tokenUrl(HttpClient httpClient, String tokenUrl) {
+    this.httpClientFactory = () -> {
+      return new HttpClient() {
+
+        @Override
+        public void stop() {
+          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+        }
+
+        @Override
+        public void start() {
+          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+        }
+
+        @Override
+        public void send(HttpRequest request, int responseTimeout, boolean followRedirects,
+                         HttpRequestAuthentication authentication,
+                         ResponseHandler handler) {
+          httpClient.send(request, responseTimeout, followRedirects, authentication, handler);
+        }
+
+        @Override
+        public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                 HttpRequestAuthentication authentication)
+            throws IOException, TimeoutException {
+          return httpClient.send(request, responseTimeout, followRedirects, authentication);
+        }
+      };
+    };
+    this.tokenUrl = tokenUrl;
+    return this;
+  }
+
+  @Override
+  public OAuthDancerBuilder tokenUrl(String tokenUrl, TlsContextFactory tlsContextFactory) {
+    this.tokenUrl = tokenUrl;
+    this.httpClientFactory = () -> {
+      final Builder clientConfigBuilder =
+          new HttpClientConfiguration.Builder().setThreadNamePrefix(format("oauthToken.requester[%s]", tokenUrl));
+      clientConfigBuilder.setTlsContextFactory(tlsContextFactory);
+      return httpService.getClientFactory().create(clientConfigBuilder.build());
+    };
     return this;
   }
 
@@ -83,12 +130,6 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
   @Override
   public OAuthDancerBuilder encoding(Charset encoding) {
     this.encoding = encoding;
-    return this;
-  }
-
-  @Override
-  public OAuthDancerBuilder tlsContextFactory(TlsContextFactory tlsContextFactory) {
-    this.tlsContextFactory = ofNullable(tlsContextFactory);
     return this;
   }
 
