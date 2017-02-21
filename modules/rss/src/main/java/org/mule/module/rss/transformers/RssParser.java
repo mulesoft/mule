@@ -61,130 +61,17 @@ public class RssParser extends RSS20Parser implements WireFeedParser
     {
 
         final Item item = super.parseItem(rssRoot, itemElement, locale);
-
-        if (item.getTitle() == null)
-        {
-            final Element title = parseChildWithNamespaces(itemElement, "title");
-            if (item.getTitle() == null)
-            {
-                item.setTitle(title.getText());
-            }
-        }
-
-        if (item.getLink() == null)
-        {
-            final Element link = parseChildWithNamespaces(itemElement, "link");
-            if (link != null)
-            {
-                item.setLink(link.getText());
-                item.setUri(link.getText());
-            }
-        }
-
-        if (item.getDescription() == null)
-        {
-            final Element description = parseChildWithNamespaces(itemElement, "description");
-
-            if (description != null)
-            {
-                Description descriptionBean = new Description();
-                descriptionBean.setValue(description.getText());
-                item.setDescription(descriptionBean);
-                final String type = description.getAttributeValue("type");
-                if (type != null)
-                {
-                    item.getDescription().setType(type);
-                }
-            }
-        }
-
-        if (item.getAuthor() == null)
-        {
-            final Element author = parseChildWithNamespaces(itemElement, "author");
-
-            if (author != null)
-            {
-                item.setAuthor(author.getText());
-            }
-
-        }
-
-        if (item.getComments() == null)
-        {
-            final Element comments = parseChildWithNamespaces(itemElement, "comments");
-
-            if (comments != null)
-            {
-                item.setComments(comments.getText());
-            }
-        }
-
-        if (item.getSource() == null)
-        {
-            final Element source = parseChildWithNamespaces(itemElement, "source");
-            if (source != null)
-            {
-                Source sourceBean = new Source();
-                sourceBean.setValue(source.getText());
-                final String url = source.getAttributeValue("url");
-                sourceBean.setUrl(url);
-                item.setSource(sourceBean);
-            }
-        }
-
-        if (item.getGuid() == null)
-        {
-            final Element guid = parseChildWithNamespaces(itemElement, "guid");
-            if (guid != null)
-            {
-                Guid guidBean = new Guid();
-                final String isPermaLink = guid.getAttributeValue("isPermaLink");
-
-                if (isPermaLink != null)
-                {
-                    guidBean.setPermaLink(isPermaLink.equalsIgnoreCase("true"));
-                }
-                guidBean.setValue(guid.getText());
-                item.setGuid(guidBean);
-            }
-        }
-
-        if (item.getPubDate() == null)
-        {
-            final Element pubDate = parseChildWithNamespaces(itemElement, "pubDate");
-
-            if (pubDate != null)
-            {
-                item.setPubDate(parseDate(pubDate.getText(), locale));
-            }
-        }
-
-        if (item.getExpirationDate() == null)
-        {
-            final Element expirationDate = parseChildWithNamespaces(itemElement, "expirationDate");
-            if (expirationDate != null)
-            {
-                item.setExpirationDate(parseDate(expirationDate.getText(), locale));
-            }
-        }
-
-        if (item.getContent() == null)
-        {
-            final Element encoded = parseChildWithNamespaces(itemElement, "encoded");
-            if (encoded != null)
-            {
-                final Content content = new Content();
-                content.setType(Content.HTML);
-                content.setValue(encoded.getText());
-                item.setContent(content);
-            }
-        }
-
-        if (item.getCategories() != null && item.getCategories().size() == 0)
-        {
-            final List<Element> categories = parseChildrenWithNamespaces(itemElement, "category");
-            item.setCategories(parseCategories(categories));
-        }
+        parseTitle(item, itemElement);
+        parseLink(item, itemElement);
+        parseDescription(item, itemElement);
+        parseAuthor(item, itemElement);
+        parseComments(item, itemElement);
+        parseSource(item, itemElement);
+        parseGuid(item, itemElement);
+        parsePubDate(item, itemElement, locale);
+        parseExpirationDate(item, itemElement, locale);
+        parseContent(item, itemElement);
+        parseCategories(item, itemElement);
 
         return item;
     }
@@ -224,6 +111,162 @@ public class RssParser extends RSS20Parser implements WireFeedParser
         namespaces = new ArrayList<>(rssRoot.getAdditionalNamespaces());
         namespaces.add(NO_NAMESPACE);
         return parseChannel(rssRoot, locale);
+    }
+
+    private void parseTitle(Item item, final Element itemElement)
+    {
+        if (item.getTitle() == null)
+        {
+            final Element title = parseChildWithNamespaces(itemElement, "title");
+            if (title != null)
+            {
+                item.setTitle(title.getText());
+            }
+        }
+    }
+
+    private void parseLink(Item item, final Element itemElement)
+    {
+        if (item.getLink() == null)
+        {
+            final Element link = parseChildWithNamespaces(itemElement, "link");
+            if (link != null)
+            {
+                item.setLink(link.getText());
+                item.setUri(link.getText());
+            }
+        }
+    }
+
+    private void parseDescription(Item item, final Element itemElement)
+    {
+        if (item.getDescription() == null)
+        {
+            final Element description = parseChildWithNamespaces(itemElement, "description");
+            if (description != null)
+            {
+                Description descriptionBean = new Description();
+                descriptionBean.setValue(description.getText());
+                item.setDescription(descriptionBean);
+                final String type = description.getAttributeValue("type");
+                if (type != null)
+                {
+                    item.getDescription().setType(type);
+                }
+            }
+        }
+    }
+
+    private void parseAuthor(Item item, final Element itemElement)
+    {
+        if (item.getAuthor() == null)
+        {
+            final Element author = parseChildWithNamespaces(itemElement, "author");
+
+            if (author != null)
+            {
+                item.setAuthor(author.getText());
+            }
+
+        }
+    }
+
+    private void parseComments(Item item, final Element itemElement)
+    {
+        if (item.getComments() == null)
+        {
+            final Element comments = parseChildWithNamespaces(itemElement, "comments");
+
+            if (comments != null)
+            {
+                item.setComments(comments.getText());
+            }
+        }
+    }
+
+    private void parseSource(Item item, final Element itemElement)
+    {
+        if (item.getSource() == null)
+        {
+            final Element source = parseChildWithNamespaces(itemElement, "source");
+            if (source != null)
+            {
+                Source sourceBean = new Source();
+                sourceBean.setValue(source.getText());
+                final String url = source.getAttributeValue("url");
+                sourceBean.setUrl(url);
+                item.setSource(sourceBean);
+            }
+        }
+    }
+
+    private void parseGuid(Item item, final Element itemElement)
+    {
+        if (item.getGuid() == null)
+        {
+            final Element guid = parseChildWithNamespaces(itemElement, "guid");
+            if (guid != null)
+            {
+                Guid guidBean = new Guid();
+                final String isPermaLink = guid.getAttributeValue("isPermaLink");
+
+                if (isPermaLink != null)
+                {
+                    guidBean.setPermaLink(isPermaLink.equalsIgnoreCase("true"));
+                }
+                guidBean.setValue(guid.getText());
+                item.setGuid(guidBean);
+            }
+        }
+    }
+
+    private void parsePubDate(Item item, final Element itemElement, Locale locale)
+    {
+        if (item.getPubDate() == null)
+        {
+            final Element pubDate = parseChildWithNamespaces(itemElement, "pubDate");
+
+            if (pubDate != null)
+            {
+                item.setPubDate(parseDate(pubDate.getText(), locale));
+            }
+        }
+    }
+
+    private void parseExpirationDate(Item item, final Element itemElement, Locale locale)
+    {
+        if (item.getExpirationDate() == null)
+        {
+            final Element expirationDate = parseChildWithNamespaces(itemElement, "expirationDate");
+            if (expirationDate != null)
+            {
+                item.setExpirationDate(parseDate(expirationDate.getText(), locale));
+            }
+        }
+    }
+
+    private void parseContent(Item item, final Element itemElement)
+    {
+        if (item.getContent() == null)
+        {
+            final Element encoded = parseChildWithNamespaces(itemElement, "encoded");
+            if (encoded != null)
+            {
+                final Content content = new Content();
+                content.setType(Content.HTML);
+                content.setValue(encoded.getText());
+                item.setContent(content);
+            }
+        }
+    }
+
+    private void parseCategories(Item item, final Element itemElement)
+    {
+        if (item.getCategories() != null && item.getCategories().size() == 0)
+        {
+            final List<Element> categories = parseChildrenWithNamespaces(itemElement, "category");
+            item.setCategories(parseCategories(categories));
+        }
     }
 
 }

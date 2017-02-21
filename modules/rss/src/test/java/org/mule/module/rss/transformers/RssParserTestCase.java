@@ -7,10 +7,10 @@
 
 package org.mule.module.rss.transformers;
 
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.rometools.rome.feed.synd.SyndCategory;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -24,11 +24,13 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class RssParserTestCase
+public class RssParserTestCase extends AbstractMuleTestCase
 {
+
     private static List<SyndEntry> entries = null;
+
     @BeforeClass
-    public static void  setup() throws Exception
+    public static void setup() throws Exception
     {
         ObjectToRssFeed objectToRssFeed = new ObjectToRssFeed();
         InputStream fileInputStream;
