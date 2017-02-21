@@ -116,7 +116,6 @@
         <skipFunctionalTests>true</skipFunctionalTests>
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipSystemTests>true</skipSystemTests>
-        <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
 
@@ -1526,9 +1525,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>${assembly.plugin.version}</version>
-                    <configuration>
-                        <skipAssembly>${skipDistributions}</skipAssembly>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -2139,7 +2135,6 @@
             <id>compile</id>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipSystemTests>true</skipSystemTests>
@@ -2153,7 +2148,6 @@
             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipSystemTests>true</skipSystemTests>
                 <skipInstalls>true</skipInstalls>
@@ -2167,7 +2161,6 @@
             <properties>
                 <skipFunctionalTests>false</skipFunctionalTests>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipSystemTests>true</skipSystemTests>
                 <skipInstalls>true</skipInstalls>
@@ -2180,7 +2173,6 @@
             </build>
             <properties>
                 <skipIntegrationTests>false</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipSystemTests>true</skipSystemTests>
@@ -2194,7 +2186,6 @@
             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipTests>true</skipTests>
@@ -2205,7 +2196,6 @@
             <id>distributions</id>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>false</skipDistributions>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
             </properties>
