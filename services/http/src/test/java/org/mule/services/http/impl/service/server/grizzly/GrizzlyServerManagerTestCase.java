@@ -11,13 +11,12 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-
-import org.mule.runtime.module.http.internal.listener.DefaultServerAddress;
-import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
+import org.mule.services.http.impl.service.server.DefaultServerAddress;
+import org.mule.services.http.impl.service.server.HttpListenerRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
