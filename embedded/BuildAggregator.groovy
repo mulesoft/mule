@@ -1,9 +1,3 @@
-if (project.properties.skipDistributions == "true")
-{
-    log.info("Skipping distribution")
-    return
-}
-
 // splash
 log.info '*' * 80
 log.info('Aggregating files from distribution'.center(80))
