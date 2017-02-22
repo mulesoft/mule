@@ -19,6 +19,14 @@
     <sub-flow name="subFlow">
         <processor ref="flowStackAsserter"/>
     </sub-flow>
+
+    <sub-flow name="subFlowSubRef1">
+        <flow-ref name="subFlow"/>
+    </sub-flow>
+
+    <sub-flow name="subFlowSubRef2">
+        <flow-ref name="subFlow"/>
+    </sub-flow>
     
     <flow name="flow">
         <processor ref="flowStackAsserter"/>
@@ -66,6 +74,11 @@
         <vm:inbound-endpoint path="in-secondSubFlowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['subFlow']"/>
         <flow-ref name="#['subFlow']"/>
+    </flow>
+
+    <flow name="subSubFlowDynamic">
+        <vm:inbound-endpoint path="in-subSubFlowDynamic" exchange-pattern="request-response"/>
+        <flow-ref name="#['subFlowSubRef' + payload]"/>
     </flow>
 
     <!-- Async -->
@@ -182,6 +195,19 @@
             </when>
             <otherwise>
                 <test:component throwException="true"/>
+            </otherwise>
+        </choice>
+    </flow>
+
+    <flow name="recursiveSubFlow">
+        <vm:inbound-endpoint path="in-recursiveSubFlow" exchange-pattern="request-response"/>
+        <set-payload value="#[payload - 1]"/>
+        <choice>
+            <when expression="#[payload == 0]">
+                <flow-ref name="recursiveSubFlow"/>
+            </when>
+            <otherwise>
+                <flow-ref name="subFlow"/>
             </otherwise>
         </choice>
     </flow>

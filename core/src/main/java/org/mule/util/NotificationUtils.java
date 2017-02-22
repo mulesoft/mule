@@ -37,8 +37,6 @@ public class NotificationUtils
     public static class FlowMap implements PathResolver
     {
         private Map<MessageProcessor, String> flowMap = new ConcurrentHashMap<MessageProcessor, String>();
-        // This set allows for dynamic containers to not be analyzed more than once. Dynamic containers cannot be removed because as a container it also must have a path.
-        private Set<MessageProcessor> resolvedDynamicContainers = synchronizedSet(new HashSet<MessageProcessor>());
 
         public FlowMap(Map<MessageProcessor, String> paths)
         {
@@ -53,22 +51,19 @@ public class NotificationUtils
             {
                 return path;
             }
-            else
+
+            for (Entry<MessageProcessor, String> flowMapEntries : flowMap.entrySet())
             {
-                for (Entry<MessageProcessor, String> flowMapEntries : flowMap.entrySet())
+                if (flowMapEntries.getKey() instanceof DynamicMessageProcessorContainer)
                 {
-                    if (flowMapEntries.getKey() instanceof DynamicMessageProcessorContainer && !resolvedDynamicContainers.contains(flowMapEntries.getKey()))
+                    FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntries.getKey()).buildInnerPaths();
+                    if (resolvedInnerPaths != null)
                     {
-                        FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntries.getKey()).buildInnerPaths();
-                        if (resolvedInnerPaths != null)
-                        {
-                            flowMap.putAll(resolvedInnerPaths.getFlowMap());
-                            resolvedDynamicContainers.add(flowMapEntries.getKey());
-                        }
+                        flowMap.putAll(resolvedInnerPaths.getFlowMap());
                     }
                 }
-                return flowMap.get(processor);
             }
+            return flowMap.get(processor);
         }
 
         public Collection<String> getAllPaths()

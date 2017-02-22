@@ -146,6 +146,28 @@ public class FlowStackTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void subSubFlowDynamic() throws Exception
+    {
+        muleContext.getClient().send("vm://in-subSubFlowDynamic", new DefaultMuleMessage("1", muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/subSubFlowDynamic/processors/0/subFlowSubRef1/subprocessors/0/subFlow/subprocessors/0"),
+                isFlowStackElement("subFlowSubRef1", "/subSubFlowDynamic/processors/0/subFlowSubRef1/subprocessors/0"),
+                isFlowStackElement("subSubFlowDynamic", "/subSubFlowDynamic/processors/0"));
+
+        muleContext.getClient().send("vm://in-subSubFlowDynamic", new DefaultMuleMessage("2", muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/subSubFlowDynamic/processors/0/subFlowSubRef2/subprocessors/0/subFlow/subprocessors/0"),
+                isFlowStackElement("subFlowSubRef2", "/subSubFlowDynamic/processors/0/subFlowSubRef2/subprocessors/0"),
+                isFlowStackElement("subSubFlowDynamic", "/subSubFlowDynamic/processors/0"));
+    }
+
+    @Test
     public void flowStaticWithAsync() throws Exception
     {
         muleContext.getClient().send("vm://in-flowStaticWithAsync", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
@@ -295,6 +317,18 @@ public class FlowStackTestCase extends FunctionalTestCase
         assertStackElements(stackToAssert,
                 isFlowStackElement("subFlow", "/subFlowDynamicWithChoice/processors/0/0/0/subFlow/subprocessors/0"),
                 isFlowStackElement("subFlowDynamicWithChoice", "/subFlowDynamicWithChoice/processors/0/0/0"));
+    }
+
+    @Test
+    public void recursiveSubFlow() throws Exception
+    {
+        muleContext.getClient().send("vm://in-recursiveSubFlow", new DefaultMuleMessage(5, muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/recursiveSubFlow/processors/1/1/0/subFlow/subprocessors/0"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlow/processors/1/1/0"));
     }
 
     @Test
