@@ -184,6 +184,7 @@ public class DbConfigResolverFactoryBean extends AnnotatedObjectFactoryBean<DbCo
     {
         this.muleContext = context;
         dataSourceConfig.setMuleContext(muleContext);
+        ((GenericDbConfigFactory) dbConfigFactory).setMuleContext(muleContext);
     }
 
     public void setUseXaTransactions(boolean useXaTransactions)
