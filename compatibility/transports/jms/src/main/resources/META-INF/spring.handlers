@@ -1,2 +1,0 @@
-http\://www.mulesoft.org/schema/mule/transport/jms=org.mule.compatibility.transport.jms.config.JmsNamespaceHandler
-

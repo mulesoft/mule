@@ -1,9 +1,0 @@
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sam="http://example.cxf.module.compatibility.mule.org/">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <sam:getAll>
-            <pageSize>10</pageSize>
-            <pageNumber>1</pageNumber>
-        </sam:getAll>
-    </soapenv:Body>
-</soapenv:Envelope>
