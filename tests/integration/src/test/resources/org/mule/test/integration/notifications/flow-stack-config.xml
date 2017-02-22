@@ -19,6 +19,14 @@
     <sub-flow name="subFlow">
         <processor ref="flowStackAsserter"/>
     </sub-flow>
+
+    <sub-flow name="subFlowSubRef1">
+        <flow-ref name="subFlow"/>
+    </sub-flow>
+
+    <sub-flow name="subFlowSubRef2">
+        <flow-ref name="subFlow"/>
+    </sub-flow>
     
     <flow name="flow">
         <processor ref="flowStackAsserter"/>
@@ -66,6 +74,21 @@
         <vm:inbound-endpoint path="in-secondSubFlowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['subFlow']"/>
         <flow-ref name="#['subFlow']"/>
+    </flow>
+
+    <sub-flow name="recursiveSubFlow">
+        <set-payload value="#[payload - 1]"/>
+        <flow-ref name="#[payload == 0? 'subFlow' : 'recursiveSubFlow']"/>
+    </sub-flow>
+
+    <flow name="recursiveSubFlowDynamic">
+        <vm:inbound-endpoint path="in-recursiveSubFlowDynamic" exchange-pattern="request-response"/>
+        <flow-ref name="recursiveSubFlow"/>
+    </flow>
+
+    <flow name="subSubFlowDynamic">
+        <vm:inbound-endpoint path="in-subSubFlowDynamic" exchange-pattern="request-response"/>
+        <flow-ref name="#['subFlowSubRef' + payload]"/>
     </flow>
 
     <!-- Async -->
@@ -184,6 +207,23 @@
                 <test:component throwException="true"/>
             </otherwise>
         </choice>
+    </flow>
+
+    <sub-flow name="recursiveSubFlowChoice">
+        <set-payload value="#[payload - 1]"/>
+        <choice>
+            <when expression="#[payload == 0]">
+                <flow-ref name="#['recursiveSubFlowChoice']"/>
+            </when>
+            <otherwise>
+                <flow-ref name="subFlow"/>
+            </otherwise>
+        </choice>
+    </sub-flow>
+
+    <flow name="recursiveSubFlowWithChoice">
+        <vm:inbound-endpoint path="in-recursiveSubFlowWithChoice" exchange-pattern="request-response"/>
+        <flow-ref name="recursiveSubFlowChoice"/>
     </flow>
     
     <!-- Scatter Gather single -->
