@@ -7,6 +7,7 @@
 package org.mule.runtime.dsl.api.component.config;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -126,6 +127,28 @@ public class DefaultComponentLocation implements ComponentLocation {
                                                      Optional<String> fileName, Optional<Integer> lineInFile) {
     return new DefaultComponentLocation(ofNullable(name), ImmutableList.<DefaultLocationPart>builder().addAll(parts)
         .add(new DefaultLocationPart(partPath, partIdentifier, fileName, lineInFile)).build());
+  }
+
+  /**
+   * Utility method that adds a processors part to the location. This is the part used for nested processors in configuration
+   * components.
+   * 
+   * @return a new instance with the processors location part appended.
+   */
+  public DefaultComponentLocation appendProcessorsPart() {
+    return new DefaultComponentLocation(ofNullable(name), ImmutableList.<DefaultLocationPart>builder().addAll(parts)
+        .add(new DefaultLocationPart("processors", empty(), empty(), empty())).build());
+  }
+
+  /**
+   * Utility method that adds a router part to the location. This is the part used for nested processors in configuration
+   * components.
+   *
+   * @return a new instance with the processors location part appended.
+   */
+  public DefaultComponentLocation appendRoutePart() {
+    return new DefaultComponentLocation(ofNullable(name), ImmutableList.<DefaultLocationPart>builder().addAll(parts)
+        .add(new DefaultLocationPart("route", empty(), empty(), empty())).build());
   }
 
   /**

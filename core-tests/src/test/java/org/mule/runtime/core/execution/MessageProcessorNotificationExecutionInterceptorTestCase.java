@@ -91,7 +91,6 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
   public void testExecutionSuccessfully() throws MuleException {
     final List<ServerNotification> serverNotifications = new ArrayList<>();
     when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
-    when(mockPipeline.getProcessorPath(mockMessageProcessor)).thenReturn("hi");
     when(mockMuleEvent.isNotificationsEnabled()).thenReturn(true);
     when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenReturn(mockResultMuleEvent);
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
@@ -159,7 +158,6 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
   public void testExecutionFailure() throws MuleException {
     final List<ServerNotification> serverNotifications = new ArrayList<>();
     when(mockNextInterceptor.execute(mockMessageProcessor, mockMuleEvent)).thenThrow(mockMessagingException);
-    when(mockPipeline.getProcessorPath(mockMessageProcessor)).thenReturn("hi");
     when(mockMuleEvent.isNotificationsEnabled()).thenReturn(true);
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
     doAnswer(invocationOnMock -> {

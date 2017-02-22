@@ -17,7 +17,6 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory.LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -34,13 +33,10 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -67,8 +63,6 @@ import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrat
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
-import org.mule.runtime.core.util.NotificationUtils;
-import org.mule.runtime.core.util.NotificationUtils.PathResolver;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -98,7 +92,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected StreamingManagerAdapter streamingManager;
 
   protected List<Processor> messageProcessors = Collections.emptyList();
-  private PathResolver flowMap;
 
   protected ProcessingStrategyFactory processingStrategyFactory;
   protected ProcessingStrategy processingStrategy;
@@ -282,7 +275,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     initialiseIfInitialisable(messageSource);
     initialiseIfInitialisable(pipeline);
 
-    createFlowMap();
   }
 
   protected Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
@@ -389,43 +381,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
-  private void createFlowMap() {
-    DefaultMessageProcessorPathElement pipeLinePathElement = new DefaultMessageProcessorPathElement(null, getName());
-    addMessageProcessorPathElements(pipeLinePathElement);
-    flowMap = buildPathResolver(pipeLinePathElement);
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    String processorsPrefix = "processors";
-    String esPrefix = "es";
-
-    NotificationUtils.addMessageProcessorPathElements(pipeline, pathElement.addChild(processorsPrefix));
-
-    if (exceptionListener instanceof MessageProcessorContainer) {
-      String esGlobalName = getExceptionStrategyGlobalName();
-      MessageProcessorPathElement exceptionStrategyPathElement = pathElement;
-      if (esGlobalName != null) {
-        exceptionStrategyPathElement = exceptionStrategyPathElement.addChild(esGlobalName);
-      }
-      exceptionStrategyPathElement = exceptionStrategyPathElement.addChild(esPrefix);
-      ((MessageProcessorContainer) exceptionListener).addMessageProcessorPathElements(exceptionStrategyPathElement);
-
-    }
-
-  }
-
   private String getExceptionStrategyGlobalName() {
     String globalName = null;
     if (exceptionListener instanceof GlobalNameableObject) {
       globalName = ((GlobalNameableObject) exceptionListener).getGlobalName();
     }
     return globalName;
-  }
-
-  @Override
-  public String getProcessorPath(Processor processor) {
-    return flowMap.resolvePath(processor);
   }
 
   public Consumer<Event> assertStarted() {

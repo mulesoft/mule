@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
@@ -103,11 +102,6 @@ public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcesso
     @Override
     public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
       chain.setMessagingExceptionHandler(messagingExceptionHandler);
-    }
-
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      chain.addMessageProcessorPathElements(pathElement);
     }
 
     @Override

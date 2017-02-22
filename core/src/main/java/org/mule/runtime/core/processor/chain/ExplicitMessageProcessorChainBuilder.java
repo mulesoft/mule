@@ -7,9 +7,7 @@
 package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.List;
 
@@ -32,13 +30,6 @@ public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcesso
     ExplicitMessageProcessorChain(String name, Processor head, List<Processor> processors,
                                   List<Processor> processorsForLifecycle) {
       super(name, head, processors, processorsForLifecycle);
-    }
-
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      // As this is an explicit chain a MessageProcessorPathElement needs to exist for the chain itself and not just it's child
-      // processors.
-      NotificationUtils.addMessageProcessorPathElements(processors, pathElement.addChild(this));
     }
 
   }

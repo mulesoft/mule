@@ -215,7 +215,7 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
                             CONFIG_FILE_NAME, of(46))
         .appendLocationPart("0", ON_ERROR_CONTINUE, CONFIG_FILE_NAME,
                             of(47))
-        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", VALIDATION_IS_FALSE, CONFIG_FILE_NAME,
                             of(48)));
     assertNoNextProcessorNotification();
@@ -228,21 +228,22 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
         .appendLocationPart("0", CHOICE, CONFIG_FILE_NAME, of(38));
     assertNextProcessorLocationIs(choiceLocation);
     assertNextProcessorLocationIs(choiceLocation
-        .appendLocationPart("0", WHEN, CONFIG_FILE_NAME, of(39))
-        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendRoutePart()
+        .appendLocationPart("0", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", TEST_COMPONENT, CONFIG_FILE_NAME, of(40)));
     assertNextProcessorLocationIs(FLOW_WITH_ERROR_HANDLER
         .appendLocationPart("errorHandler", ERROR_HANDLER, CONFIG_FILE_NAME, of(46))
         .appendLocationPart("1", ON_ERROR_PROPAGATE, CONFIG_FILE_NAME, of(50))
-        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", BLOCK, CONFIG_FILE_NAME, of(51)));
     assertNextProcessorLocationIs(FLOW_WITH_ERROR_HANDLER
         .appendLocationPart("errorHandler", ERROR_HANDLER, CONFIG_FILE_NAME, of(46))
         .appendLocationPart("1", ON_ERROR_PROPAGATE, CONFIG_FILE_NAME,
                             of(50))
-        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", BLOCK, CONFIG_FILE_NAME, of(51))
-        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", VALIDATION_IS_TRUE, CONFIG_FILE_NAME, of(52)));
     assertNoNextProcessorNotification();
   }
@@ -255,16 +256,17 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
             .appendLocationPart("0", BLOCK, CONFIG_FILE_NAME, of(59));
     assertNextProcessorLocationIs(blockLocation);
     assertNextProcessorLocationIs(blockLocation
-        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", TEST_COMPONENT, CONFIG_FILE_NAME, of(60)));
     DefaultComponentLocation blockOnErrorContinueProcessorsLocation = blockLocation
         .appendLocationPart("errorHandler", ERROR_HANDLER, CONFIG_FILE_NAME, of(61))
         .appendLocationPart("0", ON_ERROR_CONTINUE, CONFIG_FILE_NAME,
-                            of(62))
-        .appendLocationPart("processors", empty(), empty(), empty());
-    assertNextProcessorLocationIs(blockOnErrorContinueProcessorsLocation
+                            of(62));
+    assertNextProcessorLocationIs(blockOnErrorContinueLocation
+        .appendProcessorsPart()
         .appendLocationPart("0", VALIDATION_IS_FALSE, CONFIG_FILE_NAME, of(63)));
-    assertNextProcessorLocationIs(blockOnErrorContinueProcessorsLocation
+    assertNextProcessorLocationIs(blockOnErrorContinueLocation
+        .appendProcessorsPart()
         .appendLocationPart("1", VALIDATION_IS_TRUE, CONFIG_FILE_NAME, of(64)));
     assertNoNextProcessorNotification();
   }
@@ -316,16 +318,18 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
   public void flowWithSubflow() throws Exception {
     flowRunner("flowWithSubflow").run();
     DefaultComponentLocation flowWithSplitterProcessorsLocation =
-        FLOW_WITH_SUBFLOW.appendLocationPart("processors", empty(), empty(), empty());
+        FLOW_WITH_SUBFLOW.appendProcessorsPart();
     assertNextProcessorLocationIs(flowWithSplitterProcessorsLocation
         .appendLocationPart("0", LOGGER, CONFIG_FILE_NAME, of(88)));
     assertNextProcessorLocationIs(flowWithSplitterProcessorsLocation
         .appendLocationPart("1", FLOW_REF, CONFIG_FILE_NAME, of(89)));
 
-    assertNextProcessorLocationIs(SUBFLOW.appendLocationPart("0", LOGGER,
-                                                             CONFIG_FILE_NAME, of(94)));
-    assertNextProcessorLocationIs(SUBFLOW.appendLocationPart("1", VALIDATION_IS_TRUE,
-                                                             CONFIG_FILE_NAME, of(95)));
+    assertNextProcessorLocationIs(SUBFLOW.appendProcessorsPart()
+        .appendLocationPart("0", LOGGER,
+                            CONFIG_FILE_NAME, of(94)));
+    assertNextProcessorLocationIs(SUBFLOW.appendProcessorsPart()
+        .appendLocationPart("1", VALIDATION_IS_TRUE,
+                            CONFIG_FILE_NAME, of(95)));
 
     assertNextProcessorLocationIs(flowWithSplitterProcessorsLocation
         .appendLocationPart("2", VALIDATION_IS_FALSE, CONFIG_FILE_NAME,
@@ -343,17 +347,25 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
         flowWithSplitterProcessorsLocation.appendLocationPart("0", SCATTER_GATHER,
                                                               CONFIG_FILE_NAME, of(99));
     assertNextProcessorLocationIs(scatterGatherLocation);
-    DefaultComponentLocation scatterGatherProcessorsLocation =
-        scatterGatherLocation.appendLocationPart("processors", empty(), empty(), empty());
-    assertNextProcessorLocationIs(scatterGatherProcessorsLocation
+    assertNextProcessorLocationIs(scatterGatherLocation
+        .appendRoutePart()
+        .appendLocationPart("0", empty(), empty(), empty())
+        .appendProcessorsPart()
         .appendLocationPart("0", LOGGER,
                             CONFIG_FILE_NAME, of(100)));
-    assertNextProcessorLocationIs(scatterGatherProcessorsLocation.appendLocationPart("1",
-                                                                                     VALIDATION_IS_TRUE,
-                                                                                     CONFIG_FILE_NAME, of(101)));
-    assertNextProcessorLocationIs(scatterGatherProcessorsLocation.appendLocationPart("2",
-                                                                                     VALIDATION_IS_FALSE,
-                                                                                     CONFIG_FILE_NAME, of(102)));
+    assertNextProcessorLocationIs(scatterGatherLocation
+        .appendRoutePart()
+        .appendLocationPart("1", empty(), empty(), empty())
+        .appendProcessorsPart()
+        .appendLocationPart("1",
+                            VALIDATION_IS_TRUE,
+                            CONFIG_FILE_NAME, of(101)));
+    assertNextProcessorLocationIs(scatterGatherLocation.appendRoutePart()
+        .appendLocationPart("2", empty(), empty(), empty())
+        .appendProcessorsPart()
+        .appendLocationPart("2",
+                            VALIDATION_IS_FALSE,
+                            CONFIG_FILE_NAME, of(102)));
     assertNoNextProcessorNotification();
   }
 
@@ -366,21 +378,20 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
         flowWithWireTapLocation.appendLocationPart("0", WIRE_TAP,
                                                    CONFIG_FILE_NAME, of(107));
     assertNextProcessorLocationIs(wireTapLocation);
-    DefaultComponentLocation wireTapProcessorChainLocation =
-        wireTapLocation.appendLocationPart("processors", empty(), empty(), empty())
+    DefaultComponentLocation wireTapProcessorChainProcessorsLocation =
+        wireTapLocation
+            .appendProcessorsPart()
             .appendLocationPart("0", PROCESS_CHAIN,
-                                CONFIG_FILE_NAME, of(108));
-    assertNextProcessorLocationIs(wireTapProcessorChainLocation
-        .appendLocationPart("processors", empty(), empty(), empty())
+                                CONFIG_FILE_NAME, of(108))
+            .appendProcessorsPart();
+    assertNextProcessorLocationIs(wireTapProcessorChainProcessorsLocation
         .appendLocationPart("0",
                             LOGGER,
                             CONFIG_FILE_NAME, of(109)));
-    assertNextProcessorLocationIs(wireTapProcessorChainLocation
-        .appendLocationPart("processors", empty(), empty(), empty())
+    assertNextProcessorLocationIs(wireTapProcessorChainProcessorsLocation
         .appendLocationPart("1", VALIDATION_IS_TRUE, CONFIG_FILE_NAME,
                             of(110)));
-    assertNextProcessorLocationIs(wireTapProcessorChainLocation
-        .appendLocationPart("processors", empty(), empty(), empty())
+    assertNextProcessorLocationIs(wireTapProcessorChainProcessorsLocation
         .appendLocationPart("2", VALIDATION_IS_FALSE, CONFIG_FILE_NAME,
                             of(111)));
     assertNoNextProcessorNotification();
@@ -390,16 +401,18 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
   public void flowWithAsync() throws Exception {
     flowRunner("flowWithAsync").run();
     waitUntilNotificationsArrived(3);
-    DefaultComponentLocation flowWithAsyncLocation = FLOW_WITH_ASYNC.appendLocationPart("processors", empty(), empty(), empty());
+    DefaultComponentLocation flowWithAsyncLocation = FLOW_WITH_ASYNC.appendProcessorsPart();
     DefaultComponentLocation asyncLocation = flowWithAsyncLocation
         .appendLocationPart("0", ASYNC, CONFIG_FILE_NAME, of(117));
     assertNextProcessorLocationIs(asyncLocation);
-    assertNextProcessorLocationIs(asyncLocation
-        .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", LOGGER, CONFIG_FILE_NAME, of(118)));
-    assertNextProcessorLocationIs(asyncLocation
-        .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("1", VALIDATION_IS_TRUE, CONFIG_FILE_NAME, of(119)));
+    DefaultComponentLocation asyncProcessorsLocation = asyncLocation
+        .appendProcessorsPart();
+    assertNextProcessorLocationIs(asyncProcessorsLocation
+        .appendLocationPart("0", LOGGER,
+                            CONFIG_FILE_NAME, of(118)));
+    assertNextProcessorLocationIs(asyncProcessorsLocation
+        .appendLocationPart("1", VALIDATION_IS_TRUE,
+                            CONFIG_FILE_NAME, of(119)));
     assertNoNextProcessorNotification();
   }
 

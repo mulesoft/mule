@@ -452,7 +452,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
   @Test
   public void mvelError() throws Exception {
     MessagingException me = flowRunner("mvel-error").runExpectingException();
-    assertThat((String) me.getInfo().get(INFO_LOCATION_KEY), startsWith("/mvel-error/processors/0 @"));
+    assertThat((String) me.getInfo().get(INFO_LOCATION_KEY), startsWith("mvel-error/processors/0 @"));
   }
 
   @Test
