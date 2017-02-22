@@ -146,6 +146,43 @@ public class FlowStackTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void recursiveSubFlowDynamic() throws Exception
+    {
+        muleContext.getClient().send("vm://in-recursiveSubFlowDynamic", new DefaultMuleMessage(3, muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1/subFlow/subprocessors/0"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1"),
+                isFlowStackElement("recursiveSubFlowDynamic", "/recursiveSubFlowDynamic/processors/0"));
+    }
+
+    @Test
+    public void subSubFlowDynamic() throws Exception
+    {
+        muleContext.getClient().send("vm://in-subSubFlowDynamic", new DefaultMuleMessage("1", muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/subSubFlowDynamic/processors/0/subFlowSubRef1/subprocessors/0/subFlow/subprocessors/0"),
+                isFlowStackElement("subFlowSubRef1", "/subSubFlowDynamic/processors/0/subFlowSubRef1/subprocessors/0"),
+                isFlowStackElement("subSubFlowDynamic", "/subSubFlowDynamic/processors/0"));
+
+        muleContext.getClient().send("vm://in-subSubFlowDynamic", new DefaultMuleMessage("2", muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/subSubFlowDynamic/processors/0/subFlowSubRef2/subprocessors/0/subFlow/subprocessors/0"),
+                isFlowStackElement("subFlowSubRef2", "/subSubFlowDynamic/processors/0/subFlowSubRef2/subprocessors/0"),
+                isFlowStackElement("subSubFlowDynamic", "/subSubFlowDynamic/processors/0"));
+    }
+
+    @Test
     public void flowStaticWithAsync() throws Exception
     {
         muleContext.getClient().send("vm://in-flowStaticWithAsync", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
@@ -295,6 +332,19 @@ public class FlowStackTestCase extends FunctionalTestCase
         assertStackElements(stackToAssert,
                 isFlowStackElement("subFlow", "/subFlowDynamicWithChoice/processors/0/0/0/subFlow/subprocessors/0"),
                 isFlowStackElement("subFlowDynamicWithChoice", "/subFlowDynamicWithChoice/processors/0/0/0"));
+    }
+
+    @Test
+    public void recursiveSubFlowWithChoice() throws Exception
+    {
+        muleContext.getClient().send("vm://in-recursiveSubFlowWithChoice", new DefaultMuleMessage(5, muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/recursiveSubFlowWithChoice/processors/0/recursiveSubFlowChoice/subprocessors/1/1/0/subFlow/subprocessors/0"),
+                isFlowStackElement("recursiveSubFlowChoice", "/recursiveSubFlowWithChoice/processors/0/recursiveSubFlowChoice/subprocessors/1/1/0"),
+                isFlowStackElement("recursiveSubFlowWithChoice", "/recursiveSubFlowWithChoice/processors/0"));
     }
 
     @Test
