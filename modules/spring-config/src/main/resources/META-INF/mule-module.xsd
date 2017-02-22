@@ -164,7 +164,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="minMuleVersion" type="xsd:string" use="optional" default="4.0.0">
+                <xsd:attribute name="minMuleVersion" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Min Mule version that the extension requires to work correctly.
