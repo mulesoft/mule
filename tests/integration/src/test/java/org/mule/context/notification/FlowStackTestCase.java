@@ -146,6 +146,21 @@ public class FlowStackTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void recursiveSubFlowDynamic() throws Exception
+    {
+        muleContext.getClient().send("vm://in-recursiveSubFlowDynamic", new DefaultMuleMessage(3, muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("subFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1/subFlow/subprocessors/0"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1/recursiveSubFlow/subprocessors/1"),
+                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlowDynamic/processors/0/recursiveSubFlow/subprocessors/1"),
+                isFlowStackElement("recursiveSubFlowDynamic", "/recursiveSubFlowDynamic/processors/0"));
+    }
+
+    @Test
     public void subSubFlowDynamic() throws Exception
     {
         muleContext.getClient().send("vm://in-subSubFlowDynamic", new DefaultMuleMessage("1", muleContext));
@@ -320,15 +335,16 @@ public class FlowStackTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void recursiveSubFlow() throws Exception
+    public void recursiveSubFlowWithChoice() throws Exception
     {
-        muleContext.getClient().send("vm://in-recursiveSubFlow", new DefaultMuleMessage(5, muleContext));
+        muleContext.getClient().send("vm://in-recursiveSubFlowWithChoice", new DefaultMuleMessage(5, muleContext));
 
         assertThat(stackToAssert, not(nullValue()));
 
         assertStackElements(stackToAssert,
-                isFlowStackElement("subFlow", "/recursiveSubFlow/processors/1/1/0/subFlow/subprocessors/0"),
-                isFlowStackElement("recursiveSubFlow", "/recursiveSubFlow/processors/1/1/0"));
+                isFlowStackElement("subFlow", "/recursiveSubFlowWithChoice/processors/0/recursiveSubFlowChoice/subprocessors/1/1/0/subFlow/subprocessors/0"),
+                isFlowStackElement("recursiveSubFlowChoice", "/recursiveSubFlowWithChoice/processors/0/recursiveSubFlowChoice/subprocessors/1/1/0"),
+                isFlowStackElement("recursiveSubFlowWithChoice", "/recursiveSubFlowWithChoice/processors/0"));
     }
 
     @Test

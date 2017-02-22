@@ -52,11 +52,11 @@ public class NotificationUtils
                 return path;
             }
 
-            for (Entry<MessageProcessor, String> flowMapEntries : flowMap.entrySet())
+            for (MessageProcessor flowMapEntry : flowMap.keySet())
             {
-                if (flowMapEntries.getKey() instanceof DynamicMessageProcessorContainer)
+                if (flowMapEntry instanceof DynamicMessageProcessorContainer)
                 {
-                    FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntries.getKey()).buildInnerPaths();
+                    FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntry).buildInnerPaths();
                     if (resolvedInnerPaths != null)
                     {
                         flowMap.putAll(resolvedInnerPaths.getFlowMap());

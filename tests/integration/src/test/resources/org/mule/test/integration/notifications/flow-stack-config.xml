@@ -76,6 +76,16 @@
         <flow-ref name="#['subFlow']"/>
     </flow>
 
+    <sub-flow name="recursiveSubFlow">
+        <set-payload value="#[payload - 1]"/>
+        <flow-ref name="#[payload == 0? 'subFlow' : 'recursiveSubFlow']"/>
+    </sub-flow>
+
+    <flow name="recursiveSubFlowDynamic">
+        <vm:inbound-endpoint path="in-recursiveSubFlowDynamic" exchange-pattern="request-response"/>
+        <flow-ref name="recursiveSubFlow"/>
+    </flow>
+
     <flow name="subSubFlowDynamic">
         <vm:inbound-endpoint path="in-subSubFlowDynamic" exchange-pattern="request-response"/>
         <flow-ref name="#['subFlowSubRef' + payload]"/>
@@ -199,17 +209,21 @@
         </choice>
     </flow>
 
-    <flow name="recursiveSubFlow">
-        <vm:inbound-endpoint path="in-recursiveSubFlow" exchange-pattern="request-response"/>
+    <sub-flow name="recursiveSubFlowChoice">
         <set-payload value="#[payload - 1]"/>
         <choice>
             <when expression="#[payload == 0]">
-                <flow-ref name="recursiveSubFlow"/>
+                <flow-ref name="#['recursiveSubFlowChoice']"/>
             </when>
             <otherwise>
                 <flow-ref name="subFlow"/>
             </otherwise>
         </choice>
+    </sub-flow>
+
+    <flow name="recursiveSubFlowWithChoice">
+        <vm:inbound-endpoint path="in-recursiveSubFlowWithChoice" exchange-pattern="request-response"/>
+        <flow-ref name="recursiveSubFlowChoice"/>
     </flow>
     
     <!-- Scatter Gather single -->
