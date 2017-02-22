@@ -116,7 +116,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
     }
 
-    protected void pollNotIsReceiveMessagesInTransaction() throws Exception
+    protected void pollMessagesOutsideTransactions() throws Exception
     {
         ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
         List messages = getMessages();
@@ -190,7 +190,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             else
             {
                 // Receive messages and launch a worker for each message
-                pollNotIsReceiveMessagesInTransaction();
+                pollMessagesOutsideTransactions();
             }
         }
         catch (MessagingException e)

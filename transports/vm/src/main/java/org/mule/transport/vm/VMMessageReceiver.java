@@ -102,7 +102,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     }
     
     @Override
-    protected void pollNotIsReceiveMessagesInTransaction() throws Exception 
+    protected void pollMessagesOutsideTransactions() throws Exception 
     {
         ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
         List messages = getMessages();
