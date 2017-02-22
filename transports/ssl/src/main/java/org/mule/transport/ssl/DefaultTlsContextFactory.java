@@ -235,7 +235,6 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
         this.trustStoreInsecure = insecure;
     }
 
-
     @Override
     public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
     {
@@ -285,6 +284,86 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
     public void setEnabledProtocols(String enabledProtocols)
     {
         this.enabledProtocols = StringUtils.splitAndTrim(enabledProtocols, ",");
+    }
+
+    public Boolean getRcStandardEnable()
+    {
+        return tlsConfiguration.getRcStandardEnable();
+    }
+
+    public void setRcStandardEnable(Boolean rcStandardEnable)
+    {
+        tlsConfiguration.setRcStandardEnable(rcStandardEnable);
+    }
+
+    public Boolean getRcStandardOnlyEndEntities()
+    {
+        return tlsConfiguration.getRcStandardOnlyEndEntities();
+    }
+
+    public void setRcStandardOnlyEndEntities(Boolean rcStandardOnlyEndEntities)
+    {
+        tlsConfiguration.setRcStandardOnlyEndEntities(rcStandardOnlyEndEntities);
+    }
+
+    public Boolean getRcStandardPreferCrls()
+    {
+        return tlsConfiguration.getRcStandardPreferCrls();
+    }
+
+    public void setRcStandardPreferCrls(Boolean rcStandardPreferCrls)
+    {
+        tlsConfiguration.setRcStandardPreferCrls(rcStandardPreferCrls);
+    }
+
+    public Boolean getRcStandardNoFallback()
+    {
+        return tlsConfiguration.getRcStandardNoFallback();
+    }
+
+    public void setRcStandardNoFallback(Boolean rcStandardNoFallback)
+    {
+        tlsConfiguration.setRcStandardNoFallback(rcStandardNoFallback);
+    }
+
+    public Boolean getRcStandardSoftFail()
+    {
+        return tlsConfiguration.getRcStandardSoftFail();
+    }
+
+    public void setRcStandardSoftFail(Boolean rcStandardSoftFail)
+    {
+        tlsConfiguration.setRcStandardSoftFail(rcStandardSoftFail);
+    }
+
+    public String getRcCrlFilePath()
+    {
+        return tlsConfiguration.getRcCrlFilePath();
+    }
+
+    public void setRcCrlFilePath(String rcCrlFilePath)
+    {
+        tlsConfiguration.setRcCrlFilePath(rcCrlFilePath);
+    }
+
+    public String getRcCustomOcspUrl()
+    {
+        return tlsConfiguration.getRcCustomOcspUrl();
+    }
+
+    public void setRcCustomOcspUrl(String rcCustomOcspUrl)
+    {
+        tlsConfiguration.setRcCustomOcspUrl(rcCustomOcspUrl);
+    }
+
+    public String getRcCustomOcspCertAlias()
+    {
+        return tlsConfiguration.getRcCustomOcspCertAlias();
+    }
+
+    public void setRcCustomOcspCertAlias(String rcCustomOcspCertAlias)
+    {
+        tlsConfiguration.setRcCustomOcspCertAlias(rcCustomOcspCertAlias);
     }
 
     @Override

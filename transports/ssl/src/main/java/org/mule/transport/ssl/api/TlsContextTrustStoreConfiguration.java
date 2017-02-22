@@ -15,5 +15,4 @@ public interface TlsContextTrustStoreConfiguration extends TlsContextStoreConfig
      * @return true if the trust store was configured and set as insecure, meaning no certificate validations will be performed.
      */
     boolean isInsecure();
-
 }
