@@ -9,16 +9,21 @@ package org.mule.test.integration.domain.tls;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;
@@ -61,27 +66,22 @@ public class TlsSharedContextTestCase extends DomainFunctionalTestCase {
   }
 
   @Test
-  public void muleClientUsingLocalRequesterWithSharedTlsContextToListenerUsingSharedTlsContext() throws Exception {
-    MuleContext secondAppContext = getMuleContextForApp(SECOND_APP);
-    HttpRequesterConfig requesterConfig = secondAppContext.getRegistry().lookupObject("requestConfig");
-    HttpRequestOptions requestConfigOptions = HttpRequestOptionsBuilder.newOptions().requestConfig(requesterConfig).build();
-    testMuleClient(requestConfigOptions);
-  }
-
-  @Test
   public void muleClientUsingSharedTlsContextToListenerUsingSharedTlsContext() throws Exception {
     MuleContext domainContext = getMuleContextForDomain();
     TlsContextFactory tlsContextFactory = domainContext.getRegistry().lookupObject("sharedTlsContext2");
-    HttpRequestOptions tlsContextOptions = HttpRequestOptionsBuilder.newOptions().tlsContextFactory(tlsContextFactory).build();
-    testMuleClient(tlsContextOptions);
-  }
-
-  private void testMuleClient(HttpRequestOptions operationOptions) throws Exception {
     MuleContext context = getMuleContextForApp(SECOND_APP);
-    InternalMessage response = context.getClient().send(format("https://localhost:%s/helloAll", port3.getValue()),
-                                                        InternalMessage.builder().payload(DATA).build(), operationOptions)
-        .getRight();
-    assertThat(getPayloadAsString(response, context), is("hello all"));
+
+    HttpClient httpClient = context.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    httpClient.start();
+
+    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s/helloAll", port3.getValue())).setMethod(GET)
+        .setEntity(new ByteArrayHttpEntity(DATA.getBytes())).build();
+    final HttpResponse response = httpClient.send(request, DEFAULT_TEST_TIMEOUT_SECS, false, null);
+
+    httpClient.stop();
+
+    assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is("hello all"));
   }
 
   private void testFlowForApp(String flowName, String appName, String expected) throws Exception {

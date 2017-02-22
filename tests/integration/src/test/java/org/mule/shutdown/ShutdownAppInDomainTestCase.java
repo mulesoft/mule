@@ -9,23 +9,33 @@ package org.mule.shutdown;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.report.HeapDumpOnFailure;
 
+import java.io.IOException;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -60,6 +70,25 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
     requestContextRefs.clear();
   }
 
+  /**
+   * This client is used to hit http listeners under test.
+   */
+  protected HttpClient httpClient;
+
+  @Before
+  public void createHttpClient() throws RegistrationException, IOException, InitialisationException {
+    MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
+
+    httpClient = muleContextForApp.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().build());
+    httpClient.start();
+  }
+
+  @After
+  public void disposeHttpClient() {
+    httpClient.stop();
+  }
+
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
 
@@ -76,30 +105,38 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
   }
 
   @Test
-  public void httpListener() throws MuleException {
+  public void httpListener() throws IOException, TimeoutException {
     MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
 
-    muleContextForApp.getClient().request("http://localhost:" + httpPort.getNumber() + "/sync", MESSAGE_TIMEOUT);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPort.getNumber() + "/sync").setMethod(GET).build();
+    httpClient.send(request, MESSAGE_TIMEOUT, false, null);
+
     muleContextForApp.dispose();
 
     assertEventsUnreferenced();
   }
 
   @Test
-  public void httpListenerNonBlocking() throws MuleException {
+  public void httpListenerNonBlocking() throws IOException, TimeoutException {
     MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
 
-    muleContextForApp.getClient().request("http://localhost:" + httpPort.getNumber() + "/nonBlocking", MESSAGE_TIMEOUT);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPort.getNumber() + "/nonBlocking").setMethod(GET).build();
+    httpClient.send(request, MESSAGE_TIMEOUT, false, null);
+
     muleContextForApp.dispose();
 
     assertEventsUnreferenced();
   }
 
   @Test
-  public void httpRequest() throws MuleException {
+  public void httpRequest() throws IOException, TimeoutException {
     MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
 
-    muleContextForApp.getClient().request("http://localhost:" + httpPort.getNumber() + "/request", MESSAGE_TIMEOUT);
+    HttpRequest request =
+        HttpRequest.builder().setUri("http://localhost:" + httpPort.getNumber() + "/request").setMethod(GET).build();
+    httpClient.send(request, MESSAGE_TIMEOUT, false, null);
     muleContextForApp.dispose();
 
     assertEventsUnreferenced();

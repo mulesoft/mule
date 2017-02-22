@@ -10,10 +10,14 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -40,7 +44,15 @@ public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase {
   public void sendMessageToNotSharedConnectorInDomain() throws Exception {
     String url = format("http://localhost:%d/test", dynamicPort.getNumber());
     MuleContext muleContext = getMuleContextForApp(APP);
-    muleContext.getClient().send(url, InternalMessage.builder().payload("").build());
+
+    HttpClient httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().build());
+    httpClient.start();
+
+    HttpRequest request = HttpRequest.builder().setUri(url).setMethod(GET).build();
+    httpClient.send(request, DEFAULT_TEST_TIMEOUT_SECS, false, null);
+
+    httpClient.stop();
 
     assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
   }
