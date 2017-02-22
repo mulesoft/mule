@@ -16,8 +16,10 @@
 
 package org.mule.transport.sftp;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -229,6 +231,15 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
+        addSerializedSessionAsInboundProperty(event);
         return event.getMessage();
+    }
+
+    private void addSerializedSessionAsInboundProperty(MuleEvent event)
+    {
+        if (event.getMessage().getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null)
+        {
+            ((DefaultMuleMessage) event.getMessage()).setInboundProperty(MuleProperties.MULE_SESSION_PROPERTY, event.getMessage().getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY));
+        }
     }
 }
