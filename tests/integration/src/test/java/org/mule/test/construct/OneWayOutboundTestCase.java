@@ -7,21 +7,13 @@
 package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.client.MuleClient;
 
-import org.junit.Before;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.test.AbstractIntegrationTestCase;
+
 import org.junit.Test;
 
 public abstract class OneWayOutboundTestCase extends AbstractIntegrationTestCase {
-
-  private MuleClient client;
-
-  @Before
-  public void setUp() throws Exception {
-    client = muleContext.getClient();
-  }
 
   @Test
   public void noOutbound() throws Exception {

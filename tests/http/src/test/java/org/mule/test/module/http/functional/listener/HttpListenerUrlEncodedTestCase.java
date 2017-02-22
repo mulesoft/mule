@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -37,7 +38,6 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -89,7 +89,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
 
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(httpResponse.getStatusLine().getStatusCode(), equalTo(200));
+    assertThat(httpResponse.getStatusLine().getStatusCode(), equalTo(OK.getStatusCode()));
 
     assertThat(URLDecoder.decode(IOUtils.toString(httpResponse.getEntity().getContent()), UTF_8.name()),
                is("Invalid url encoded content"));
@@ -146,13 +146,13 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
   @Test
   public void emptyParameterMapHttp10() throws Exception {
     final Response response = Request.Post(getListenerUrl("map")).version(HTTP_1_0).execute();
-    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(OK.getStatusCode()));
   }
 
   @Test
   public void emptyParameterMapHttp11() throws Exception {
     final Response response = Request.Post(getListenerUrl("map")).version(HTTP_1_1).execute();
-    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(OK.getStatusCode()));
   }
 
   private void assertNullPayloadAndEmptyResponse(Response response) throws Exception {
@@ -160,7 +160,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
     assertThat(receivedMessage.getPayload().getValue(), is(nullValue()));
 
     final HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), Is.is("0"));
+    assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is("0"));
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(StringUtils.EMPTY));
   }
 

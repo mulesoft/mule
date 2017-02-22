@@ -13,21 +13,20 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -46,8 +45,6 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
   private static final Pattern IPADDRESS_PATTERN = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
       + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
   private static final int TIMEOUT = 1000;
-  private static final HttpRequestOptions GET_OPTIONS = HttpRequestOptionsBuilder.newOptions()
-      .method(HttpConstants.Method.GET.name()).responseTimeout(TIMEOUT).disableStatusCodeValidation().build();
 
   @Rule
   public DynamicPort fullConfigPort = new DynamicPort("fullConfigPort");
@@ -121,11 +118,13 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
   }
 
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
-    InternalMessage response = muleContext.getClient().send(url, InternalMessage.of(TEST_PAYLOAD), GET_OPTIONS).getRight();
-    assertThat((Integer) response
-        .getInboundProperty(org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY),
-               is(expectedStatus));
-    return IOUtils.toString((InputStream) response.getPayload().getValue());
+    HttpRequest request =
+        HttpRequest.builder().setUri(url).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    final org.mule.service.http.api.domain.message.response.HttpResponse response =
+        httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    assertThat(response.getStatusCode(), is(expectedStatus));
+
+    return IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
   }
 
   private HttpResponse callAndAssertStatus(String url, int expectedStatus) throws IOException {

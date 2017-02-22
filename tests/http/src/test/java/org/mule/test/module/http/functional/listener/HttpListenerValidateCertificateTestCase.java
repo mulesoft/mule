@@ -9,13 +9,21 @@ package org.mule.test.module.http.functional.listener;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClientConfiguration;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
@@ -39,45 +47,73 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   }
 
   @Before
-  public void setup() throws IOException {
+  public void setup() throws RegistrationException, IOException, InitialisationException {
     tlsContextFactory = new DefaultTlsContextFactory();
 
     // Configure trust store in the client with the certificate of the server.
     tlsContextFactory.setTrustStorePath("tls/trustStore");
     tlsContextFactory.setTrustStorePassword("mulepassword");
-
   }
 
-  @Test(expected = MessagingException.class)
+  @Test(expected = IOException.class)
   public void serverWithValidationRejectsRequestWithInvalidCertificate() throws Exception {
+    httpClient.stop();
+
+    initialiseIfNeeded(tlsContextFactory);
+    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    httpClient.start();
+
     // Send a request without configuring key store in the client.
     sendRequest(getUrl(portWithValidation.getNumber()), TEST_MESSAGE);
   }
 
   @Test
   public void serverWithValidationAcceptsRequestWithValidCertificate() throws Exception {
+    httpClient.stop();
+
     configureClientKeyStore();
+    initialiseIfNeeded(tlsContextFactory);
+    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    httpClient.start();
+
     assertValidRequest(getUrl(portWithValidation.getNumber()));
     verify("listenerWithTrustStoreFlow");
   }
 
   @Test
   public void serverWithoutValidationAcceptsRequestWithInvalidCertificate() throws Exception {
+    httpClient.stop();
+
+    initialiseIfNeeded(tlsContextFactory);
+    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    httpClient.start();
+
     // Send a request without configuring key store in the client.
     assertValidRequest(getUrl(portWithoutValidation.getNumber()));
   }
 
   @Test
   public void serverWithoutValidationAcceptsRequestWithValidCertificate() throws Exception {
+    httpClient.stop();
+
     configureClientKeyStore();
+    initialiseIfNeeded(tlsContextFactory);
+    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    httpClient.start();
+
     assertValidRequest(getUrl(portWithoutValidation.getNumber()));
   }
 
   private String sendRequest(String url, String payload) throws Exception {
-    InternalMessage response = muleContext.getClient()
-        .send(url, InternalMessage.of(payload), newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build())
-        .getRight();
-    return getPayloadAsString(response);
+    HttpRequest request =
+        HttpRequest.builder().setUri(url).setMethod(POST).setEntity(new ByteArrayHttpEntity(payload.getBytes())).build();
+    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+
+    return IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream());
   }
 
   private void assertValidRequest(String url) throws Exception {
