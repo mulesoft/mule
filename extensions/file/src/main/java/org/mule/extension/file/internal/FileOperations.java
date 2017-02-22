@@ -22,7 +22,6 @@ import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider
 import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -34,10 +33,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
+
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * File connector operations.
@@ -112,24 +111,6 @@ public final class FileOperations extends BaseFileSystemOperations {
 
   /**
    * Writes the {@code content} into the file pointed by {@code path}.
-   * <p>
-   * The {@code content} can be of any of the given types:
-   * <ul>
-   * <li>{@link String}</li>
-   * <li>{@code String[]}</li>
-   * <li>{@code byte}</li>
-   * <li>{@code byte[]}</li>
-   * <li>{@link OutputHandler}</li>
-   * <li>{@link Iterable}</li>
-   * <li>{@link Iterator}</li>
-   * </ul>
-   * <p>
-   * {@code null} contents are not allowed and will result in an {@link IllegalArgumentException}.
-   * <p>
-   * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
-   * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
-   * thrown.
    * <p>
    * If the directory on which the file is attempting to be written doesn't exist, then the operation will either throw
    * {@link IllegalArgumentException} or create such folder depending on the value of the {@code createParentDirectory}.
