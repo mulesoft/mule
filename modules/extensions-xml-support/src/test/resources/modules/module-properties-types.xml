@@ -14,4 +14,6 @@
     <property name="stringParam" type="string"/>
     <property name="timeParam" type="time"/>
 
+    <property name="optionalProperty" type="string" use="OPTIONAL"/>
+
 </module>

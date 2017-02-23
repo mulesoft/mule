@@ -6,6 +6,7 @@
  */
 package org.mule.test.functional;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -48,8 +49,20 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
   }
 
   @Test
+  public void testSetPayloadConfigDefaultPropertyUseOptionalFlow() throws Exception {
+    Event muleEvent = flowRunner("testSetPayloadConfigDefaultPropertyUseOptionalFlow").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("some default-config-value-parameter"));
+  }
+
+  @Test
   public void testSetPayloadAddParamAndPropertyValues() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadAddParamAndPropertyValues").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("a parameter value some config-value-parameter"));
+  }
+
+  @Test
+  public void testSetPayloadConfigOptionalProperty() throws Exception {
+    Event muleEvent = flowRunner("testSetPayloadConfigOptionalProperty").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 }

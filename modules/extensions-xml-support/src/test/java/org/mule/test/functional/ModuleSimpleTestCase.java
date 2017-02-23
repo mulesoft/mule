@@ -47,6 +47,12 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   }
 
   @Test
+  public void testSetPayloadParamDefaultUseOptionalFlow() throws Exception {
+    Event muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
+  }
+
+  @Test
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
@@ -98,5 +104,11 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();
     assertThat(targetMessage.getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Test
+  public void testSetPayloadUsingOptionalParam() throws Exception {
+    Event muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 }

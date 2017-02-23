@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-property-required-default"
+        minMuleVersion="4.0.0"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd">
+
+    <property name="aWrongDefinedProperty" type="string" use="REQUIRED" defaultValue="a default value"/>
+</module>

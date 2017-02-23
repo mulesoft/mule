@@ -10,6 +10,8 @@
 
     <property name="configParam" type="string"/>
     <property name="defaultConfigParam" defaultValue="some default-config-value-parameter" type="string"/>
+    <property name="optionalProperty" use="OPTIONAL" type="string"/>
+    <property name="defaultConfigPropertyUseOptional" use="OPTIONAL" defaultValue="some default-config-value-parameter" type="string"/>
 
     <operation name="set-payload-hardcoded-value">
         <body>
@@ -42,12 +44,28 @@
         <output type="string"/>
     </operation>
 
+    <operation name="set-payload-config-default-property-use-optional">
+        <body>
+            <mule:set-payload value="#[property.defaultConfigPropertyUseOptional]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
     <operation name="set-payload-add-param-and-property-values">
         <parameters>
             <parameter name="value1" type="string"/>
         </parameters>
         <body>
             <mule:set-payload value="#[param.value1 ++ ' ' ++ property.configParam]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-config-optional-property">
+        <body>
+            <mule:set-payload value="a value"/>
+            <!-- will override payload with the null 'optionalProperty' parameter-->
+            <mule:set-payload value="#[property.optionalProperty]"/>
         </body>
         <output type="string"/>
     </operation>

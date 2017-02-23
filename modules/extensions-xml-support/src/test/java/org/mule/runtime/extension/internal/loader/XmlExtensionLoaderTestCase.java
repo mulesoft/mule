@@ -43,7 +43,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(8));
+    assertThat(extensionModel.getOperationModels().size(), is(10));
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("set-payload-concat-params-values");
     assertThat(operationModel.isPresent(), is(true));
@@ -68,7 +68,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getAllParameterModels().size(), is(2));
+    assertThat(configurationModel.getAllParameterModels().size(), is(4));
     assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("configParam"));
     assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("defaultConfigParam"));
 
@@ -77,7 +77,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(0));
 
-    assertThat(configurationModel.getOperationModels().size(), is(5));
+    assertThat(configurationModel.getOperationModels().size(), is(7));
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("set-payload-add-param-and-property-values");
     assertThat(operationModel.isPresent(), is(true));
