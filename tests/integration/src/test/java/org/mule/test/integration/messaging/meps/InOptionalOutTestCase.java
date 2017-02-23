@@ -11,24 +11,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
-import java.io.IOException;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,22 +32,8 @@ public class InOptionalOutTestCase extends AbstractIntegrationTestCase {
   @Rule
   public DynamicPort port = new DynamicPort("port1");
 
-  /**
-   * This client is used to hit http listeners under test.
-   */
-  protected HttpClient httpClient;
-
-  @Before
-  public void createHttpClient() throws RegistrationException, IOException, InitialisationException {
-    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().build());
-    httpClient.start();
-  }
-
-  @After
-  public void disposeHttpClient() {
-    httpClient.stop();
-  }
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {

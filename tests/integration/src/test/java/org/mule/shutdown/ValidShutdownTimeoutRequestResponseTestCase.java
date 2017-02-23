@@ -10,22 +10,16 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.io.IOException;
-
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,17 +30,8 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
   @Rule
   public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
 
-  /**
-   * This client is used to hit http listeners under test.
-   */
-  protected HttpClient httpClient;
-
-  @Before
-  public void createHttpClient() throws RegistrationException, IOException, InitialisationException {
-    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().build());
-    httpClient.start();
-  }
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @After
   public void disposeHttpClient() {

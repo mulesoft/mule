@@ -16,13 +16,11 @@ import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
-import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -39,6 +37,9 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase {
   @Rule
   public SystemProperty endpointScheme = getEndpointSchemeSystemProperty();
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
+
   @Test
   public void appShutdownDoesNotStopsDomainConnector() throws Exception {
     MuleContext domainContext = null;
@@ -53,15 +54,9 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase {
           .setDomainContext(domainContext).build();
       firstAppContext.stop();
 
-      HttpClient httpClient = secondAppContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
-          .create(new HttpClientConfiguration.Builder().build());
-      httpClient.start();
-
       HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld")
           .setMethod(GET).setEntity(new ByteArrayHttpEntity("test".getBytes())).build();
       final HttpResponse response = httpClient.send(request, DEFAULT_TEST_TIMEOUT_SECS, false, null);
-
-      httpClient.stop();
 
       assertThat(response, notNullValue());
       assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is("hello world"));

@@ -10,28 +10,25 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -48,8 +45,6 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -73,38 +68,24 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   @Rule
   public DynamicPort dynamicPort3 = new DynamicPort("port3");
-  private DefaultTlsContextFactory tlsContextFactory;
 
-  /**
-   * This client is used to hit http listeners under test.
-   */
-  protected HttpClient httpClient;
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(() -> {
+    try {
+      DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+      // Configure trust store in the client with the certificate of the server.
+      tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
+      tlsContextFactory.setTrustStorePassword("changeit");
 
-  @After
-  public void disposeHttpClient() {
-    httpClient.stop();
-  }
+      return tlsContextFactory;
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }).build();
 
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/exceptions/on-error-continue-use-case-flow.xml";
-  }
-
-  @Before
-  public void setup() throws IOException {
-    tlsContextFactory = new DefaultTlsContextFactory();
-
-    // Configure trust store in the client with the certificate of the server.
-    tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-    tlsContextFactory.setTrustStorePassword("changeit");
-  }
-
-  @Before
-  public void createHttpClient() throws RegistrationException, IOException, InitialisationException {
-    initialiseIfNeeded(tlsContextFactory);
-    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
-    httpClient.start();
   }
 
   @Test

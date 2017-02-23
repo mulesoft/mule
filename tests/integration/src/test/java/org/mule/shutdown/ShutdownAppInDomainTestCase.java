@@ -13,16 +13,12 @@ import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -35,7 +31,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -70,24 +65,8 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
     requestContextRefs.clear();
   }
 
-  /**
-   * This client is used to hit http listeners under test.
-   */
-  protected HttpClient httpClient;
-
-  @Before
-  public void createHttpClient() throws RegistrationException, IOException, InitialisationException {
-    MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
-
-    httpClient = muleContextForApp.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().build());
-    httpClient.start();
-  }
-
-  @After
-  public void disposeHttpClient() {
-    httpClient.stop();
-  }
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");

@@ -14,10 +14,8 @@ import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -29,6 +27,9 @@ public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
 
   @Override
   protected String getDomainConfig() {
@@ -45,14 +46,8 @@ public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase {
     String url = format("http://localhost:%d/test", dynamicPort.getNumber());
     MuleContext muleContext = getMuleContextForApp(APP);
 
-    HttpClient httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().build());
-    httpClient.start();
-
     HttpRequest request = HttpRequest.builder().setUri(url).setMethod(GET).build();
     httpClient.send(request, DEFAULT_TEST_TIMEOUT_SECS, false, null);
-
-    httpClient.stop();
 
     assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
   }

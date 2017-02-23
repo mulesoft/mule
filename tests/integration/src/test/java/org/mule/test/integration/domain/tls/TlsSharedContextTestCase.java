@@ -17,13 +17,12 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;
@@ -69,10 +68,8 @@ public class TlsSharedContextTestCase extends DomainFunctionalTestCase {
   public void muleClientUsingSharedTlsContextToListenerUsingSharedTlsContext() throws Exception {
     MuleContext domainContext = getMuleContextForDomain();
     TlsContextFactory tlsContextFactory = domainContext.getRegistry().lookupObject("sharedTlsContext2");
-    MuleContext context = getMuleContextForApp(SECOND_APP);
 
-    HttpClient httpClient = context.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    HttpClient httpClient = new TestHttpClient.Builder().tlsContextFactory(tlsContextFactory).build();
     httpClient.start();
 
     HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s/helloAll", port3.getValue())).setMethod(GET)
