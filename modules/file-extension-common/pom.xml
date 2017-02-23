@@ -7,7 +7,6 @@
         <artifactId>mule-modules</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-file-extension-common</artifactId>
     <name>Mule File Extension Common</name>
     <packaging>mule-plugin</packaging>
@@ -32,7 +31,7 @@
             <artifactId>spring-core</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!--Test Dependencies-->
+        <!--Test Dependencies -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
@@ -69,6 +68,19 @@
                 <groupId>org.mule.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
