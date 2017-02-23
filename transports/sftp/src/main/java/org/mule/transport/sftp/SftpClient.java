@@ -466,7 +466,7 @@ public class SftpClient
 
     /**
      * @param filename File name
-     * @return Number of seconds since the file was written to
+     * @return Last file modification time in milliseconds after "the epoch"
      * @throws IOException If an error occurs
      */
     public long getLastModifiedTime(String filename) throws IOException
