@@ -124,6 +124,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final ApplicationFileBuilder emptyAppFileBuilder = new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
     private final ApplicationFileBuilder springPropertyAppFileBuilder = new ApplicationFileBuilder("property-app").definedBy("app-properties-config.xml");
     private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app").definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/mule/module/launcher/EchoTest.clazz");
+    private final ApplicationFileBuilder dummyAppDescriptorFileBuilderWithUpperCaseInExtension =            new ApplicationFileBuilder("dummy-app", true).definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue").containingClass("org/mule/module/launcher/EchoTest.clazz");
     private final ApplicationFileBuilder waitAppFileBuilder = new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
     private final ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
     private final ApplicationFileBuilder incompleteAppFileBuilder = new ApplicationFileBuilder("incomplete-app").definedBy("incomplete-app-config.xml");
@@ -219,20 +220,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     @Test
     public void deploysAppZipOnStartup() throws Exception
     {
-        addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
-
-        deploymentService.start();
-
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-        assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
-        assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
-
-        // just assert no privileged entries were put in the registry
-        final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
-        final MuleRegistry registry = getMuleRegistry(app);
-
-        // mule-app.properties from the zip archive must have loaded properly
-        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+        deployAfterStartUp(dummyAppDescriptorFileBuilder);
     }
 
     @Test
@@ -293,6 +281,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         };
         deploysAppAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(deployPackagedWaitAppAction);
     }
+
+    @Test
+    public void deploysAppZipWithExtensionUpperCaseAfterStartup() throws Exception
+    {
+        deployAfterStartUp(dummyAppDescriptorFileBuilderWithUpperCaseInExtension);
+    }
+
 
     @Test
     public void deploysAppZipAfterStartup() throws Exception
@@ -3353,4 +3348,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             waitLatch = new Latch();
         }
     }
+
+    private void deployAfterStartUp(ApplicationFileBuilder applicationFileBuilder) throws Exception
+    {
+        deploymentService.start();
+
+        addPackedAppFromBuilder(applicationFileBuilder);
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+        assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
+        assertApplicationAnchorFileExists(applicationFileBuilder.getId());
+
+        // just assert no privileged entries were put in the registry
+        final Application app = findApp(applicationFileBuilder.getId(), 1);
+        final MuleRegistry registry = getMuleRegistry(app);
+
+        // mule-app.properties from the zip archive must have loaded properly
+        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+    }
+
 }

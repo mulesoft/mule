@@ -46,12 +46,23 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
      * Creates a new builder
      *
      * @param id artifact identifier. Non empty.
+     * @param upperCaseInExtension whether the extension is in uppercase
      */
-    public AbstractArtifactFileBuilder(String id)
+    public AbstractArtifactFileBuilder(String id, boolean upperCaseInExtension)
     {
         checkArgument(!StringUtils.isEmpty(id), "ID cannot be empty");
         this.id = id;
-        this.fileName = id + ".zip";
+        this.fileName = id + (upperCaseInExtension ? ".ZIP" : ".zip");
+    }
+
+    /**
+     * Creates a new builder
+     *
+     * @param id artifact identifier. Non empty.
+     */
+    public AbstractArtifactFileBuilder(String id)
+    {
+        this(id, false);
     }
 
     /**

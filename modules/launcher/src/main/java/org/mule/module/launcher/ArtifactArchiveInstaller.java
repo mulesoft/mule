@@ -47,7 +47,7 @@ public class ArtifactArchiveInstaller
      */
     public String installArtifact(final URL artifactUrl) throws IOException
     {
-        if (!artifactUrl.toString().endsWith(".zip"))
+        if (!artifactUrl.toString().toLowerCase().endsWith(".zip"))
         {
             throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
         }
