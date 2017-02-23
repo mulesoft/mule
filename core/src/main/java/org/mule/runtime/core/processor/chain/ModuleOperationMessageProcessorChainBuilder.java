@@ -142,8 +142,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     private Event createNewEventFromJustMessage(Event request, Event response) {
       final Event.Builder builder = Event.builder(request);
       if (target.isPresent()) {
-        builder.addVariable(target.get(), response.getMessage().getPayload().getValue(),
-                            response.getMessage().getPayload().getDataType());
+        builder.addVariable(target.get(), response.getMessage());
       } else {
         builder.message(builder(response.getMessage()).build());
       }
