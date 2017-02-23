@@ -66,7 +66,7 @@ public class ExceptionEnricherManagerTestCase {
     mockExceptionEnricher(sourceModel, sourceFactory);
     when(sourceEnricher.enrichException(any(Exception.class))).thenReturn(new HeisenbergException(ERROR_MESSAGE));
     when(sourceFactory.createHandler()).thenReturn(sourceEnricher);
-    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     when(extensionModel.getName()).thenReturn("Test Extension");
     when(sourceModel.getName()).thenReturn("Test Source");
 

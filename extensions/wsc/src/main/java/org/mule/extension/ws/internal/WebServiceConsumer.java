@@ -22,7 +22,6 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
@@ -37,7 +36,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
     subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
         WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
 @Extension(name = "Web Service Consumer")
-@Xml(namespace = "wsc")
+@Xml(prefix = "wsc")
 public class WebServiceConsumer {
 
   /**

@@ -60,7 +60,7 @@ class ExtensionErrorsRegistrant {
    */
   void registerErrors(ExtensionModel extensionModel) {
     Set<ErrorModel> errorTypes = extensionModel.getErrorModels();
-    String extensionNamespace = extensionModel.getXmlDslModel().getNamespace();
+    String extensionNamespace = extensionModel.getXmlDslModel().getPrefix();
     String errorExtensionNamespace = getExtensionsErrorNamespace(extensionModel);
     DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(extensionModel, new SingleExtensionImportTypesStrategy());
 

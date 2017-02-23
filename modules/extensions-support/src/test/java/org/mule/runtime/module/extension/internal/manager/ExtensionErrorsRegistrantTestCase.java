@@ -96,7 +96,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     XmlDslModel.XmlDslModelBuilder builder = XmlDslModel.builder();
-    builder.setNamespace(EXTENSION_NAMESPACE);
+    builder.setPrefix(EXTENSION_NAMESPACE);
     XmlDslModel xmlDslModel = builder.build();
 
     typeRepository = ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository();

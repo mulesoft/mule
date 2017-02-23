@@ -93,7 +93,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     if (extensionManager.isPresent()
         && schemaResourceFactory.isPresent()) {
       Optional<ExtensionModel> extensionModel = extensionManager.get().getExtensions().stream()
-          .filter(em -> systemId.startsWith(em.getXmlDslModel().getNamespaceUri()))
+          .filter(em -> systemId.startsWith(em.getXmlDslModel().getNamespace()))
           .findAny();
       if (extensionModel.isPresent()) {
         InputStream schema = getSchema(extensionModel.get());

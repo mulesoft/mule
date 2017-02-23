@@ -42,7 +42,7 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
                                                    ExtensionModel extensionModel, RetryPolicyTemplate retryPolicyTemplate) {
     super(connectionProvider);
     this.errorTypeRepository = muleContext.getErrorTypeRepository();
-    namespace = extensionModel.getXmlDslModel().getNamespace().toUpperCase();
+    namespace = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
     this.retryPolicyTemplate = retryPolicyTemplate;
   }
 

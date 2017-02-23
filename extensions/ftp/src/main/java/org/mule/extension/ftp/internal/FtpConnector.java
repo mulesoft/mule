@@ -37,7 +37,7 @@ import javax.inject.Inject;
 @ConnectionProviders({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
 @Export(classes = {SftpFileAttributes.class, ClassicFtpFileAttributes.class, FtpFileAttributes.class})
 @ErrorTypes(FileError.class)
-@Xml(namespace = "ftp")
+@Xml(prefix = "ftp")
 public class FtpConnector extends FileConnectorConfig {
 
   public static final String FTP_PROTOCOL = "ftp";

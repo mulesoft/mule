@@ -33,7 +33,7 @@ import java.util.Map;
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Revolver.class})
 @Export(classes = {Revolver.class})
-@Xml(namespace = "subtypes", namespaceLocation = "http://www.mulesoft.org/schema/mule/subtypes")
+@Xml(prefix = "subtypes", namespace = "http://www.mulesoft.org/schema/mule/subtypes")
 public class SubTypesMappingConnector {
 
   @Parameter

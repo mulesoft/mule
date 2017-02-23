@@ -142,7 +142,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getExtensionModel().getName()).thenReturn(DUMMY_NAME);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
 
-    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
                                             muleContext.getErrorTypeRepository());
 

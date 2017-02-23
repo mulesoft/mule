@@ -34,7 +34,7 @@ import org.mule.test.metadata.extension.model.shapes.Square;
 @SubTypeMapping(baseType = AbstractOutputAttributes.class,
     subTypes = {AnimalsOutputAttributes.class, ShapeOutputAttributes.class})
 @SubTypeMapping(baseType = Rectangle.class, subTypes = {Square.class})
-@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata")
+@Xml(namespace = "http://www.mulesoft.org/schema/mule/metadata", prefix = "metadata")
 public class MetadataExtension {
 
   @Parameter

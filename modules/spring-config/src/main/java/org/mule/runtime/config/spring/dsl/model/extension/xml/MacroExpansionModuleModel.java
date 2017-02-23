@@ -73,7 +73,7 @@ public class MacroExpansionModuleModel {
     this.applicationModel = applicationModel;
     this.extensions = extensions.stream()
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
-        .collect(toMap(extensionModel -> extensionModel.getXmlDslModel().getNamespace(), identity()));
+        .collect(toMap(extensionModel -> extensionModel.getXmlDslModel().getPrefix(), identity()));
   }
 
   /**

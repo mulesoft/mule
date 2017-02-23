@@ -190,7 +190,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(of(mock(Attributes.class)));
 
-    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
     cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(muleContext);
 

@@ -38,8 +38,8 @@ public final class JavaXmlDeclarationEnricher extends AbstractAnnotatedDeclarati
   }
 
   private XmlDslModel getXmlLanguageModel(Xml xml, ExtensionDeclaration extensionDeclaration) {
-    final Optional<String> extensionNamespace = xml != null ? ofNullable(xml.namespace()) : empty();
-    final Optional<String> extensionNamespaceLocation = xml != null ? ofNullable(xml.namespaceLocation()) : empty();
+    final Optional<String> extensionNamespace = xml != null ? ofNullable(xml.prefix()) : empty();
+    final Optional<String> extensionNamespaceLocation = xml != null ? ofNullable(xml.namespace()) : empty();
     return createXmlLanguageModel(extensionNamespace, extensionNamespaceLocation, extensionDeclaration.getName(),
                                   extensionDeclaration.getVersion());
   }

@@ -134,7 +134,7 @@ public final class SchemaBuilder {
     SchemaBuilder builder = new SchemaBuilder();
     builder.extensionModel = extensionModel;
     builder.schema = new Schema();
-    builder.schema.setTargetNamespace(xmlDslModel.getNamespaceUri());
+    builder.schema.setTargetNamespace(xmlDslModel.getNamespace());
     builder.schema.setElementFormDefault(FormChoice.QUALIFIED);
     builder.schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
     builder.withDslSyntaxResolver(extensionModel, dslContext)
@@ -565,7 +565,7 @@ public final class SchemaBuilder {
   private XmlDslModel registerExtensionImport(ExtensionModel extension) {
     XmlDslModel languageModel = extension.getXmlDslModel();
     Import schemaImport = new Import();
-    schemaImport.setNamespace(languageModel.getNamespaceUri());
+    schemaImport.setNamespace(languageModel.getNamespace());
     schemaImport.setSchemaLocation(languageModel.getSchemaLocation());
     if (!schema.getIncludeOrImportOrRedefine().contains(schemaImport)) {
       schema.getIncludeOrImportOrRedefine().add(schemaImport);

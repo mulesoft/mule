@@ -187,7 +187,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     when(operationModel.getName()).thenReturn(getClass().getName());
     when(operationModel.isBlocking()).thenReturn(true);
-    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     when(operationModel.getOutput())
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));
     mockExecutorFactory(operationModel, operationExecutorFactory);

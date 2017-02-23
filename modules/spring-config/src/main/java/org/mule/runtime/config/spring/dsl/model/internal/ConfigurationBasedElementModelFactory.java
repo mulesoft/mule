@@ -85,7 +85,7 @@ class ConfigurationBasedElementModelFactory {
 
     Optional<Map.Entry<ExtensionModel, DslSyntaxResolver>> entry =
         resolvers.entrySet().stream()
-            .filter(e -> e.getKey().getXmlDslModel().getNamespaceUri().equals(identifier.getNamespace()))
+            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getNamespace()))
             .findFirst();
 
     if (!entry.isPresent()) {

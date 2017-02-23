@@ -30,7 +30,7 @@ public class SpringHandlerBundleResourceFactory extends AbstractXmlResourceFacto
   @Override
   protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                                   DslResolvingContext context) {
-    String content = String.format(BUNDLE_MASK, xmlDslModel.getNamespaceUri(), ExtensionNamespaceHandler.class.getName());
+    String content = String.format(BUNDLE_MASK, xmlDslModel.getNamespace(), ExtensionNamespaceHandler.class.getName());
     return new GeneratedResource(GENERATED_FILE_NAME, escape(content).getBytes());
   }
 }

@@ -73,8 +73,8 @@ public class XmlGeneratedResourcesTestCase extends AbstractGeneratedResourceFact
   public void before() {
     xmlDslModel = XmlDslModel.builder()
         .setSchemaVersion(EXTENSION_VERSION)
-        .setNamespace(EXTENSION_NAME)
-        .setNamespaceUri(UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION)
+        .setPrefix(EXTENSION_NAME)
+        .setNamespace(UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION)
         .setSchemaLocation(String.format("%s/%s/%s", UNESCAPED_LOCATION_PREFIX + SCHEMA_LOCATION, CURRENT_VERSION, SCHEMA_NAME))
         .setXsdFileName(SCHEMA_NAME)
         .build();

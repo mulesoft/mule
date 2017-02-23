@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 @SubTypeMapping(baseType = HttpAuthentication.class,
     subTypes = {DefaultAuthorizationCodeGrantType.class, ClientCredentialsGrantType.class})
 @ErrorTypes(OAuthErrors.class)
-@Xml(namespace = "oauth")
+@Xml(prefix = "oauth")
 @Export(classes = {TokenManagerConfig.class, ConfigOAuthContext.class})
 public class OAuthExtension {
 

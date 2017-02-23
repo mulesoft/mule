@@ -80,7 +80,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String MULESOFT = "MuleSoft";
   private static final String OTHER_VENDOR = "OtherVendor";
-  private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setNamespace("extension-namespace").build();
+  private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setPrefix("extension-namespace").build();
   private ExtensionManager extensionsManager;
 
   private static final String EXTENSION1_NAME = "extension1";

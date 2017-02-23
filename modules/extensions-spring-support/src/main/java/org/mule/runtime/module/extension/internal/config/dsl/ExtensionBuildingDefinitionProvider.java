@@ -147,7 +147,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder =
-        new Builder().withNamespace(xmlDslModel.getNamespace());
+        new Builder().withNamespace(xmlDslModel.getPrefix());
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensionManager.getExtensions()));
 
