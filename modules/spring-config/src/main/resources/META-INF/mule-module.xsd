@@ -229,8 +229,8 @@
         <xsd:annotation>
             <xsd:documentation>
                 Set of defined uses for a given property/parameter.
-                REQUIRED marks the attribute as required in the XSD, failing if leaved empty when consuming the parameter/property. It can not be REQUIRED if the parameter/property has a defaultValue;
-                OPTIONAL marks the attribute as optional in the XSD. Can be OPTIONAL if the parameter/property has a defaultValue;
+                REQUIRED implies the property/parameter must be present. It can not be REQUIRED if the parameter/property has a defaultValue;
+                OPTIONAL implies the property/parameter could be absent.
                 AUTO will default at runtime to REQUIRED if defaultValue is absent, otherwise it will be marked as OPTIONAL.
             </xsd:documentation>
         </xsd:annotation>
