@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -51,15 +52,15 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
-import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
-import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.api.connector.PollingController;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
@@ -71,27 +72,26 @@ import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
-import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.connector.ConnectException;
-import org.mule.runtime.core.internal.connector.DefaultPollingController;
-import org.mule.runtime.core.api.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
@@ -100,6 +100,8 @@ import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
+import org.mule.runtime.core.internal.connector.DefaultPollingController;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
@@ -115,7 +117,6 @@ import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -128,7 +129,6 @@ import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Hooks;
 
@@ -1082,6 +1082,11 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   public void setProcessorInterceptorManager(ProcessorInterceptorProvider processorInterceptorManager) {
+    try {
+      getRegistry().registerObject(OBJECT_PROCESSOR_INTERCEPTOR_MANAGER, processorInterceptorManager);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
     this.processorInterceptorManager = processorInterceptorManager;
   }
 
