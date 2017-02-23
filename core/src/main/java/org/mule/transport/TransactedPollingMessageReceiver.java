@@ -116,15 +116,39 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         }
     }
 
+    protected void pollMessagesOutsideTransactions() throws Exception
+    {
+        ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
+        List messages = getMessages();
+        if (messages != null && messages.size() > 0)
+        {
+            final CountDownLatch countdown = new CountDownLatch(messages.size());
+            for (Object message : messages)
+            {
+                try
+                {
+                    this.getWorkManager().scheduleWork(
+                            new MessageProcessorWorker(pt, countdown, endpoint.getMuleContext().getExceptionListener(), message));
+                }
+                catch (Exception e)
+                {
+                    countdown.countDown();
+                    throw e;
+                }
+            }
+            countdown.await();
+        }
+
+    }
+
     @Override
     public void poll() throws Exception
     {
         try
         {
-            ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
-
             if (this.isReceiveMessagesInTransaction())
             {
+                ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
                 if (hasNoMessages())
                 {
                     if (NO_MESSAGES_SLEEP_TIME > 0)
@@ -166,25 +190,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             else
             {
                 // Receive messages and launch a worker for each message
-                List messages = getMessages();
-                if (messages != null && messages.size() > 0)
-                {
-                    final CountDownLatch countdown = new CountDownLatch(messages.size());
-                    for (Object message : messages)
-                    {
-                        try
-                        {
-                            this.getWorkManager().scheduleWork(
-                                    new MessageProcessorWorker(pt, countdown, endpoint.getMuleContext().getExceptionListener(), message));
-                        }
-                        catch (Exception e)
-                        {
-                            countdown.countDown();
-                            throw e;
-                        }
-                    }
-                    countdown.await();
-                }
+                pollMessagesOutsideTransactions();
             }
         }
         catch (MessagingException e)
