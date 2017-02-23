@@ -61,6 +61,20 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/module-param-default-types" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Optional-parameter-operationType" substitutionGroup="mule:abstract-operator" name="optional-parameter-operation"></xs:element>
+    <xs:complexType name="Optional-parameter-operationType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:expressionString" use="optional" name="optionalParameter"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/module-param-default-types" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="String-param-operationType" substitutionGroup="mule:abstract-operator" name="string-param-operation"></xs:element>
     <xs:complexType name="String-param-operationType">
         <xs:complexContent>

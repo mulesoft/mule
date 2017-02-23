@@ -67,4 +67,14 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="optional-parameter-operation">
+        <parameters>
+            <parameter name="optionalParameter" type="string" use="OPTIONAL"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="some value"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>

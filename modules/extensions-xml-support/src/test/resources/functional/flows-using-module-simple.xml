@@ -15,7 +15,11 @@
     </flow>
 
     <flow name="testSetPayloadParamDefaultFlow">
-        <simple-prefix:set-payload-param-default-value  />
+        <simple-prefix:set-payload-param-default-value />
+    </flow>
+
+    <flow name="testSetPayloadParamDefaultUseOptionalFlow">
+        <simple-prefix:set-payload-param-default-value-use-optional />
     </flow>
 
     <flow name="testSetPayloadNoSideEffectFlowVariable">
@@ -50,4 +54,7 @@
         <simple-prefix:set-payload-hardcoded-value target="existing-variable" />
     </flow>
 
+    <flow name="testSetPayloadUsingOptionalParam">
+        <simple-prefix:set-payload-using-optional-param />
+    </flow>
 </mule>

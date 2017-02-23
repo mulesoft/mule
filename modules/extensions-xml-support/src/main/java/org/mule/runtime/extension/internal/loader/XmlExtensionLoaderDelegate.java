@@ -14,7 +14,9 @@ import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -46,6 +48,7 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
@@ -96,6 +99,15 @@ final class XmlExtensionLoaderDelegate {
   private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
   private static final String ROLE = "role";
+  private static final String ATTRIBUTE_USE = "use";
+
+  /**
+   * ENUM used to discriminate which type of {@link ParameterDeclarer} has to be created (required or not).
+   * @see #getParameterDeclarer(ParameterizedDeclarer, Map)
+   */
+  private enum UseEnum {
+    REQUIRED, OPTIONAL, AUTO
+  }
 
   private static ImmutableMap.Builder<String, MetadataType> getCommonTypesBuilder() {
     return ImmutableMap.<String, MetadataType>builder()
@@ -109,8 +121,8 @@ final class XmlExtensionLoaderDelegate {
 
   private static ParameterRole getRole(final String role) {
     if (!parameterRoleTypes.containsKey(role)) {
-      throw new IllegalArgumentException(format("The parametrized role [%s] doesn't match any of the expected types [%s]", role,
-                                                join(", ", parameterRoleTypes.keySet())));
+      throw new IllegalParameterModelDefinitionException(format("The parametrized role [%s] doesn't match any of the expected types [%s]",
+                                                                role, join(", ", parameterRoleTypes.keySet())));
     }
     return parameterRoleTypes.get(role);
   }
@@ -218,8 +230,9 @@ final class XmlExtensionLoaderDelegate {
 
   private void loadModuleExtension(ExtensionDeclarer declarer, ComponentModel moduleModel) {
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
-      throw new IllegalArgumentException(format("The root element of a module must be '%s', but found '%s'",
-                                                MODULE_IDENTIFIER.toString(), moduleModel.getIdentifier().toString()));
+      throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
+                                                                MODULE_IDENTIFIER.toString(),
+                                                                moduleModel.getIdentifier().toString())));
     }
     String name = moduleModel.getParameters().get(MODULE_NAME);
 
@@ -318,21 +331,48 @@ final class XmlExtensionLoaderDelegate {
 
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
     Map<String, String> parameters = param.getParameters();
-    String parameterName = parameters.get(PARAMETER_NAME);
-    String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
     LayoutModel layoutModel = parseBoolean(parameters.get(PASSWORD)) ? builder().asPassword().build()
         : builder().build();
     MetadataType parameterType = extractType(defaultInputTypes, receivedInputType);
 
-    ParameterDeclarer parameterDeclarer =
-        parameterDefaultValue == null ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
-            : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
-                .defaultingTo(parameterDefaultValue);
+    ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, parameters);
     parameterDeclarer.describedAs(getDescription(param))
         .withLayout(layoutModel)
         .withRole(role)
         .ofType(parameterType);
+  }
+
+  /**
+   * Giving a {@link ParameterDeclarer} for the parameter and the attributes in the {@code parameters}, this method will verify the
+   * rules for the {@link #ATTRIBUTE_USE} where:
+   * <ul>
+   *   <li>{@link UseEnum#REQUIRED} marks the attribute as required in the XSD, failing if leaved empty when consuming the
+   *   parameter/property. It can not be {@link UseEnum#REQUIRED} if the parameter/property has a {@link #PARAMETER_DEFAULT_VALUE}
+   *   attribute</li>
+   *   <li>{@link UseEnum#OPTIONAL} marks the attribute as optional in the XSD. Can be {@link UseEnum#OPTIONAL} if the
+   *   parameter/property has a {@link #PARAMETER_DEFAULT_VALUE} attribute</li>
+   *   <li>{@link UseEnum#AUTO} will default at runtime to {@link UseEnum#REQUIRED} if {@link #PARAMETER_DEFAULT_VALUE} attribute
+   *   is absent, otherwise it will be marked as {@link UseEnum#OPTIONAL}</li>
+   * </ul>
+   *
+   * @param parameterizedDeclarer builder to declare the {@link ParameterDeclarer}
+   * @param parameters attributes to consume the values from
+   * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
+   */
+  private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, Map<String, String> parameters) {
+    final String parameterName = parameters.get(PARAMETER_NAME);
+    final String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
+    final UseEnum use = UseEnum.valueOf(parameters.get(ATTRIBUTE_USE));
+    if (UseEnum.REQUIRED.equals(use) && isNotBlank(parameterDefaultValue)) {
+      throw new IllegalParameterModelDefinitionException(format("The parameter [%s] cannot have the %s attribute set to %s when it has a default value",
+                                                                parameterName, ATTRIBUTE_USE, UseEnum.REQUIRED));
+    }
+    // Is required if either is marked as REQUIRED or it's marked as AUTO an doesn't have a default value
+    boolean parameterRequired = UseEnum.REQUIRED.equals(use) || (UseEnum.AUTO.equals(use) && isBlank(parameterDefaultValue));
+    return parameterRequired ? parameterizedDeclarer.onDefaultParameterGroup().withRequiredParameter(parameterName)
+        : parameterizedDeclarer.onDefaultParameterGroup().withOptionalParameter(parameterName)
+            .defaultingTo(parameterDefaultValue);
   }
 
   private void extractOutputType(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
@@ -365,7 +405,7 @@ final class XmlExtensionLoaderDelegate {
         errorMessage +=
             format(" Custom types [%s] doesn't have support for the specified [%s] type", getCustomTypeFilename(), receivedType);
       }
-      throw new IllegalArgumentException(errorMessage);
+      throw new IllegalParameterModelDefinitionException(errorMessage);
     }
     return metadataType.get();
   }

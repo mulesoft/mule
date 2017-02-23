@@ -78,9 +78,10 @@
     <xsd:complexType name="parameterType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
-                <xsd:attribute name="name"/>
-                <xsd:attribute name="defaultValue" use="optional"/>
-                <xsd:attribute name="type" type="xsd:string"/>
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                <xsd:attribute name="defaultValue" type="xsd:string" use="optional"/>
+                <xsd:attribute name="use" type="useType" default="AUTO"/>
+                <xsd:attribute name="type" use="required" type="xsd:string"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
                 <xsd:attribute name="role" type="roleParameterType" default="BEHAVIOUR"/>
             </xsd:extension>
@@ -114,8 +115,9 @@
     <xsd:complexType name="propertyType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
-                <xsd:attribute name="name" use="required"/>
-                <xsd:attribute name="defaultValue" use="optional"/>
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                <xsd:attribute name="defaultValue" type="xsd:string" use="optional"/>
+                <xsd:attribute name="use" type="useType" default="AUTO"/>
                 <xsd:attribute name="type" type="xsd:string" use="required"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
             </xsd:extension>
@@ -210,13 +212,32 @@
     <xsd:simpleType name="roleParameterType">
         <xsd:annotation>
             <xsd:documentation>
-                Set of defined roles for a given parameter. BEHAVIOUR will render attributes, CONTENT implies support for DataWeave in place and PRIMARY works similarly to CONTENT although it also implies it will map to the payload
+                Set of defined roles for a given parameter.
+                BEHAVIOUR will render attributes;
+                CONTENT implies support for DataWeave in place;
+                PRIMARY works similarly to CONTENT although it also implies it will map to the payload
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="BEHAVIOUR"/>
             <xsd:enumeration value="CONTENT"/>
             <xsd:enumeration value="PRIMARY"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="useType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Set of defined uses for a given property/parameter.
+                REQUIRED marks the attribute as required in the XSD, failing if leaved empty when consuming the parameter/property. It can not be REQUIRED if the parameter/property has a defaultValue;
+                OPTIONAL marks the attribute as optional in the XSD. Can be OPTIONAL if the parameter/property has a defaultValue;
+                AUTO will default at runtime to REQUIRED if defaultValue is absent, otherwise it will be marked as OPTIONAL.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="REQUIRED"/>
+            <xsd:enumeration value="OPTIONAL"/>
+            <xsd:enumeration value="AUTO"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>
