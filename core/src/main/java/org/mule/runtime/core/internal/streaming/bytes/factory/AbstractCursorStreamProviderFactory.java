@@ -138,11 +138,6 @@ abstract class AbstractCursorStreamProviderFactory implements CursorStreamProvid
     }
 
     @Override
-    public boolean isDisposed() {
-      return delegate.isDisposed();
-    }
-
-    @Override
     public int read() throws IOException {
       return delegate.read();
     }

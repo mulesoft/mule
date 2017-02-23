@@ -172,7 +172,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
       try {
         Event result = flow.process(event);
         event.getContext().success(result);
-        streamingManager.success(event);
         return result;
       } catch (Exception e) {
         event.getContext().error(e);

@@ -159,14 +159,6 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
   }
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isDisposed() {
-    return disposed;
-  }
-
-  /**
    * Releases all the resources held by {@code this} cursor, but not the ones held
    * by the provider that created it. After being disposed, a cursor is no longer usable.
    */
