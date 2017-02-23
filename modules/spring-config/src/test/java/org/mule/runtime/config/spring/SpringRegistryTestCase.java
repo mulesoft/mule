@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring;
 
-import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -101,10 +100,14 @@ public class SpringRegistryTestCase extends AbstractRegistryTestCase {
     final Startable asyncStartableBean = mock(Startable.class, withSettings().extraInterfaces(Disposable.class));
 
     final Latch startingLatch = new Latch();
+    final Latch disposingLatch = new Latch();
 
     doAnswer(invocation -> {
       startingLatch.countDown();
-      sleep(1000);
+      synchronized (muleContext) {
+        disposingLatch.await();
+      }
+
       verify((Disposable) asyncStartableBean, never()).dispose();
       return null;
     }).when(asyncStartableBean).start();
@@ -129,6 +132,7 @@ public class SpringRegistryTestCase extends AbstractRegistryTestCase {
         } catch (InterruptedException e) {
           throw new MuleRuntimeException(e);
         }
+        disposingLatch.countDown();
         synchronized (muleContext) {
           springRegistry.dispose();
         }
