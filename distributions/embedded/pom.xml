@@ -25,7 +25,6 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <skip>${skipDistributions}</skip>
                             <includeGroupIds>org.mule</includeGroupIds>
                             <excludes>**/spring.handlers,**/spring.schemas,**/registry-bootstrap.properties,**/mule.custom-property-editors,org/slf4j/**,org/apache/commons/logging/**</excludes>
                             <excludeTypes>pom</excludeTypes>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-global-element"
-        namespace="http://www.mulesoft.org/schema/mule/module-global-element"
+        minMuleVersion="4.0.0"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
         xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"

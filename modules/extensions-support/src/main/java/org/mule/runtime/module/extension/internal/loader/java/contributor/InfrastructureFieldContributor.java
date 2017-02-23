@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -30,9 +31,12 @@ public class InfrastructureFieldContributor implements ParameterDeclarerContribu
   @Override
   public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
                          ParameterDeclarationContext declarationContext) {
-    if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaringClass())) {
+    String name = InfrastructureTypeMapping.getMap().get(parameter.getType().getDeclaringClass());
+    if (!isBlank(name)) {
       declarer.withModelProperty(new InfrastructureParameterModelProperty());
       declarer.withExpressionSupport(NOT_SUPPORTED);
+      InfrastructureTypeMapping.getQName(name).ifPresent(declarer::withModelProperty);
+      InfrastructureTypeMapping.getDslConfiguration(name).ifPresent(declarer::withDsl);
     }
   }
 }

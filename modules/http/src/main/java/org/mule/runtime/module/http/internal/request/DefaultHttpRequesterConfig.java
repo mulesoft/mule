@@ -12,27 +12,28 @@ import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.compatibility.transport.socket.internal.DefaultTcpClientSocketProperties;
-import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.module.http.api.HttpAuthentication;
-import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
-import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.client.proxy.ProxyConfig;
 
 import java.net.CookieManager;
 
@@ -77,6 +78,9 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
   private boolean started = false;
 
   @Inject
+  private SchedulerService schedulerService;
+
+  @Inject
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
   private MuleContext muleContext;
@@ -115,9 +119,9 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
 
     HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
     if (httpClientFactory == null) {
-      httpClient = new GrizzlyHttpClient(configuration);
+      httpClient = new GrizzlyHttpClient(configuration, schedulerService);
     } else {
-      httpClient = httpClientFactory.create(configuration);
+      httpClient = httpClientFactory.create(configuration, schedulerService);
     }
     initialised = true;
   }
@@ -313,6 +317,10 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
 
   public void setEnableCookies(boolean enableCookies) {
     this.enableCookies = enableCookies;
+  }
+
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 
   @Override

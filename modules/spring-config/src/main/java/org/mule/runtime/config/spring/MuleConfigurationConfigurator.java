@@ -8,11 +8,10 @@ package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
-
-import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -20,11 +19,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * only work if the MuleContext has not yet been started, otherwise the modifications will be ignored (and warnings logged).
  */
 // TODO MULE-9638 remove usage of SmartFactoryBean
-public class MuleConfigurationConfigurator implements MuleContextAware, SmartFactoryBean, ObjectFactory {
+public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactory implements MuleContextAware, SmartFactoryBean {
 
   private MuleContext muleContext;
 
@@ -62,28 +61,6 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
   @Override
   public boolean isPrototype() {
     return false;
-  }
-
-  @Override
-  public Object getObject() throws Exception {
-    MuleConfiguration configuration = muleContext.getConfiguration();
-    if (configuration instanceof DefaultMuleConfiguration) {
-      DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
-      defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
-      defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
-      defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
-      defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
-      defaultConfig.addExtensions(config.getExtensions());
-      defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
-      determineDefaultProcessingStrategy(defaultConfig);
-      validateDefaultErrorHandler();
-      applyDefaultIfNoObjectSerializerSet(defaultConfig);
-
-      return configuration;
-    } else {
-      throw new ConfigurationException(I18nMessageFactory
-          .createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
-    }
   }
 
   private void determineDefaultProcessingStrategy(DefaultMuleConfiguration defaultConfig) {
@@ -176,4 +153,25 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     config.addExtensions(extensions);
   }
 
+  @Override
+  public Object doGetObject() throws Exception {
+    MuleConfiguration configuration = muleContext.getConfiguration();
+    if (configuration instanceof DefaultMuleConfiguration) {
+      DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
+      defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
+      defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
+      defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
+      defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
+      defaultConfig.addExtensions(config.getExtensions());
+      defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
+      determineDefaultProcessingStrategy(defaultConfig);
+      validateDefaultErrorHandler();
+      applyDefaultIfNoObjectSerializerSet(defaultConfig);
+
+      return configuration;
+    } else {
+      throw new ConfigurationException(I18nMessageFactory
+          .createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
+    }
+  }
 }

@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
+import static org.mule.runtime.core.util.IOUtils.ifInputStream;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.exception.NotAnInputStreamException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectStreamConstants;
 import java.io.PushbackInputStream;
 import java.nio.charset.Charset;
@@ -32,27 +33,31 @@ public class ByteArrayToObject extends ByteArrayToSerializable {
       } else {
         return new String(bytes, encoding);
       }
-    } else if (src instanceof InputStream) {
-      try {
-        PushbackInputStream pushbackStream = new PushbackInputStream((InputStream) src);
-        int firstByte = pushbackStream.read();
-        pushbackStream.unread((byte) firstByte);
-
-        if (this.checkStreamHeader((byte) firstByte)) {
-          return super.doTransform(pushbackStream, encoding);
-        } else {
-          try {
-            return IOUtils.toString(pushbackStream, encoding);
-          } finally {
-            // this also closes the underlying stream that's stored in src
-            pushbackStream.close();
-          }
-        }
-      } catch (IOException iox) {
-        throw new TransformerException(this, iox);
-      }
     } else {
-      throw new TransformerException(CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(this.getName(), src.getClass()));
+      try {
+        return ifInputStream(src, stream -> {
+          try {
+            PushbackInputStream pushbackStream = new PushbackInputStream(stream);
+            int firstByte = pushbackStream.read();
+            pushbackStream.unread((byte) firstByte);
+
+            if (this.checkStreamHeader((byte) firstByte)) {
+              return super.doTransform(pushbackStream, encoding);
+            } else {
+              try {
+                return IOUtils.toString(pushbackStream, encoding);
+              } finally {
+                // this also closes the underlying stream that's stored in src
+                pushbackStream.close();
+              }
+            }
+          } catch (IOException iox) {
+            throw new TransformerException(this, iox);
+          }
+        });
+      } catch (NotAnInputStreamException e) {
+        throw new TransformerException(transformOnObjectUnsupportedTypeOfEndpoint(this.getName(), src.getClass()));
+      }
     }
   }
 

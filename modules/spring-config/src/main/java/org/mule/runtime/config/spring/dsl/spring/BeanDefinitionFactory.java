@@ -9,8 +9,11 @@ package org.mule.runtime.config.spring.dsl.spring;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
@@ -29,15 +32,15 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_V
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.COLLECTION;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_PARAMETERS;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.parseComponentIdentifier;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -52,7 +55,6 @@ import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -65,9 +67,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import javax.xml.namespace.QName;
-
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -103,16 +102,17 @@ public class BeanDefinitionFactory {
    * These are the set of current language construct that have specific bean definitions parsers since we don't want to include
    * them in the parsing API.
    */
-  private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers = ImmutableSet.<ComponentIdentifier>builder()
-      .add(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(QUEUE_STORE).build())
-      .add(MULE_PROPERTIES_IDENTIFIER)
-      .add(MULE_PROPERTY_IDENTIFIER)
-      .add(SPRING_ENTRY_IDENTIFIER)
-      .add(SPRING_LIST_IDENTIFIER)
-      .add(SPRING_MAP_IDENTIFIER)
-      .add(SPRING_VALUE_IDENTIFIER)
-      .add(INTERCEPTOR_STACK_IDENTIFIER)
-      .build();
+  private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers =
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(builder().withNamespace(CORE_NAMESPACE).withName(QUEUE_STORE).build())
+          .add(MULE_PROPERTIES_IDENTIFIER)
+          .add(MULE_PROPERTY_IDENTIFIER)
+          .add(SPRING_ENTRY_IDENTIFIER)
+          .add(SPRING_LIST_IDENTIFIER)
+          .add(SPRING_MAP_IDENTIFIER)
+          .add(SPRING_VALUE_IDENTIFIER)
+          .add(INTERCEPTOR_STACK_IDENTIFIER)
+          .build();
 
 
   private ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
@@ -150,13 +150,16 @@ public class BeanDefinitionFactory {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
-        if (hasDefinition(innerComponent.getIdentifier(), of(innerComponent.getParent().getIdentifier()))) {
-          resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor, oldParsingMechanism);
-        } else {
-          AbstractBeanDefinition oldBeanDefinition =
-              (AbstractBeanDefinition) oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
-          oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
-          innerComponent.setBeanDefinition(oldBeanDefinition);
+        if (innerComponent.isEnabled()) {
+          if (hasDefinition(innerComponent.getIdentifier(), of(innerComponent.getParent().getIdentifier()))) {
+            resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor,
+                                        oldParsingMechanism);
+          } else {
+            AbstractBeanDefinition oldBeanDefinition =
+                (AbstractBeanDefinition) oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
+            oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
+            innerComponent.setBeanDefinition(oldBeanDefinition);
+          }
         }
       }
     }
@@ -166,7 +169,7 @@ public class BeanDefinitionFactory {
   private BeanDefinition resolveComponent(ComponentModel parentComponentModel, ComponentModel componentModel,
                                           BeanDefinitionRegistry registry,
                                           BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor) {
-    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier())) {
+    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier()) || !componentModel.isEnabled()) {
       return null;
     }
     resolveComponentBeanDefinition(parentComponentModel, componentModel);
@@ -177,26 +180,18 @@ public class BeanDefinitionFactory {
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
         .ifPresent(componentBuildingDefinition -> {
           if ((componentModel.getType() != null) && AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
-            PropertyValue propertyValue =
-                componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(AnnotatedObject.PROPERTY_NAME);
-            Map<QName, Object> annotations;
-            if (propertyValue == null) {
-              annotations = new HashMap<>();
-              propertyValue = new PropertyValue(AnnotatedObject.PROPERTY_NAME, annotations);
-              componentModel.getBeanDefinition().getPropertyValues().addPropertyValue(propertyValue);
-            } else {
-              annotations = (Map<QName, Object>) propertyValue.getValue();
-            }
-            annotations.put(ANNOTATION_NAME, componentModel.getIdentifier());
-            annotations.put(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getParameters()));
+            addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), componentModel);
+            // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
+            // and it will be done by mutating the same map.
+            addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getParameters()), componentModel);
             // add any error mappings if present
             List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
                 .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
             if (!errorMappingComponents.isEmpty()) {
-              annotations.put(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+              addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
                 Map<String, String> parameters = innerComponent.getParameters();
-                ComponentIdentifier source = parseComponentIdentifier(parameters.get(SOURCE_TYPE));
-                ComponentIdentifier target = parseComponentIdentifier(parameters.get(TARGET_TYPE));
+                ComponentIdentifier source = buildFromStringRepresentation(parameters.get(SOURCE_TYPE));
+                ComponentIdentifier target = buildFromStringRepresentation(parameters.get(TARGET_TYPE));
 
                 ErrorType errorType = errorTypeRepository
                     .lookupErrorType(source)
@@ -206,10 +201,13 @@ public class BeanDefinitionFactory {
                 ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
                 ErrorType targetType = resolveErrorType(target);
                 return new ErrorMapping(errorTypeMatcher, targetType);
-              }).collect(toList()));
+              }).collect(toList()), componentModel);
             }
           }
         });
+
+    addAnnotation(LOCATION_KEY, componentModel.getComponentLocation(), componentModel);
+
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
   }

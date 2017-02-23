@@ -1,2 +1,0 @@
-http\://www.mulesoft.org/schema/mule/transport/http=org.mule.compatibility.transport.http.config.HttpNamespaceHandler
-http\://www.mulesoft.org/schema/mule/transport/https=org.mule.compatibility.transport.http.config.HttpsNamespaceHandler

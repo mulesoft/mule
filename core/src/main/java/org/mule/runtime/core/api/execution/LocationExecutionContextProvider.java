@@ -43,7 +43,9 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    */
   public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String fileName, int lineNumber,
                                                    String xmlContent) {
-    beanAnnotations.put(SOURCE_FILE_ANNOTATION_KEY, fileName);
+    if (fileName != null) {
+      beanAnnotations.put(SOURCE_FILE_ANNOTATION_KEY, fileName);
+    }
     beanAnnotations.put(SOURCE_FILE_LINE_ANNOTATION_KEY, lineNumber);
     beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, xmlContent);
   }

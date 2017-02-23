@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.HashMap;
@@ -40,7 +41,8 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * The map's values will contain the actual assignation for each parameter.
    */
   @Parameter
-  @Optional(defaultValue = "#[mel:new java.util.HashMap()]")
+  @Optional(defaultValue = "#[{}]")
+  @Example("#[{'name': \"Max\", 'nickname': \"The Mule\", 'company': \"MuleSoft\"}]")
   @Content
   @Placement(order = 2)
   @TypeResolver(DbInputMetadataResolver.class)

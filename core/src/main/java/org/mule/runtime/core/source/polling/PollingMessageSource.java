@@ -24,6 +24,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -56,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * server.
  * </p>
  */
-public class PollingMessageSource
+public class PollingMessageSource extends AbstractAnnotatedObject
     implements MessageSource, FlowConstructAware, Startable, Stoppable, MuleContextAware, Initialisable, Disposable {
 
   private static Logger logger = LoggerFactory.getLogger(PollingMessageSource.class);

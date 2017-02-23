@@ -12,6 +12,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -38,7 +39,7 @@ public interface ConfigurationProviderFactory {
                                                            ExtensionModel extensionModel,
                                                            ConfigurationModel configurationModel,
                                                            ResolverSet resolverSet,
-                                                           ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                           ConnectionProviderValueResolver connectionProviderResolver,
                                                            DynamicConfigPolicy dynamicConfigPolicy)
       throws Exception;
 
@@ -59,7 +60,7 @@ public interface ConfigurationProviderFactory {
                                                           ExtensionModel extensionModel,
                                                           ConfigurationModel configurationModel,
                                                           ResolverSet resolverSet,
-                                                          ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                          ConnectionProviderValueResolver connectionProviderResolver,
                                                           MuleContext muleContext)
       throws Exception;
 }

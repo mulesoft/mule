@@ -12,19 +12,19 @@ import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
@@ -109,7 +109,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   private ArtifactClassLoader getCustomDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy, DomainDescriptor domain) {
     validateDomain(domain.getName());
     final List<URL> urls = getDomainUrls(domain.getName());
-    final Map<String, ClassLoaderLookupStrategy> domainLookStrategies = getLookStrategiesFrom(urls);
+    final Map<String, LookupStrategy> domainLookStrategies = getLookStrategiesFrom(urls);
     final ClassLoaderLookupPolicy domainLookupPolicy = containerLookupPolicy.extend(domainLookStrategies);
 
     ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, parentClassLoader, domainLookupPolicy, urls);
@@ -117,8 +117,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     return createClassLoaderUnregisterWrapper(classLoader);
   }
 
-  private Map<String, ClassLoaderLookupStrategy> getLookStrategiesFrom(List<URL> libraries) {
-    final Map<String, ClassLoaderLookupStrategy> result = new HashMap<>();
+  private Map<String, LookupStrategy> getLookStrategiesFrom(List<URL> libraries) {
+    final Map<String, LookupStrategy> result = new HashMap<>();
 
     for (URL library : libraries) {
       Set<String> packages = jarExplorer.explore(library).getPackages();

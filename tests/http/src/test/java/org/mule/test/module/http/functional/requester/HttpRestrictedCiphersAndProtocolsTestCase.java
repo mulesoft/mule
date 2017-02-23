@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -64,7 +64,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Test
   public void worksWithProtocolAndCipherSuiteMatch() throws Exception {
     Event response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
-    assertThat(response.getMessageAsString(muleContext), is(TEST_PAYLOAD));
+    assertThat(response.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
   @Test

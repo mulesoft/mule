@@ -8,29 +8,21 @@ package org.mule.extension.file.common.api;
 
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
-import org.mule.extension.file.common.api.exceptions.FileCopyErrorTypeProvider;
-import org.mule.extension.file.common.api.exceptions.FileDeleteErrorTypeProvider;
-import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider;
-import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.file.common.api.exceptions.IllegalContentException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -97,31 +89,14 @@ public abstract class BaseFileSystemOperations {
                                                        @Connection FileSystem fileSystem,
                                                        @DisplayName("File Path") String path,
                                                        MediaType mediaType,
-                                                       @Optional(defaultValue = "false") boolean lock) {
+                                                       @Optional(defaultValue = "false") @Placement(
+                                                           tab = ADVANCED_TAB) boolean lock) {
     fileSystem.changeToBaseDir();
     return fileSystem.read(config, path, mediaType, lock);
   }
 
   /**
    * Writes the {@code content} into the file pointed by {@code path}.
-   * <p>
-   * The {@code content} can be of any of the given types:
-   * <ul>
-   * <li>{@link String}</li>
-   * <li>{@code String[]}</li>
-   * <li>{@code byte}</li>
-   * <li>{@code byte[]}</li>
-   * <li>{@link OutputHandler}</li>
-   * <li>{@link Iterable}</li>
-   * <li>{@link Iterator}</li>
-   * </ul>
-   * <p>
-   * {@code null} contents are not allowed and will result in an {@link IllegalArgumentException}.
-   * <p>
-   * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
-   * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
-   * thrown.
    * <p>
    * If the directory on which the file is attempting to be written doesn't exist, then the operation will either throw
    * {@link IllegalArgumentException} or create such folder depending on the value of the {@code createParentDirectory}.
@@ -140,30 +115,22 @@ public abstract class BaseFileSystemOperations {
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param lock                    whether or not to lock the file. Defaults to false
    * @param mode                    a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
-   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
-  @Throws(FileWriteErrorTypeProvider.class)
-  public void write(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
-                    @Content @Summary("Content to be written into the file") Object content,
-                    @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
-                    @Optional(defaultValue = "true") boolean createParentDirectories,
-                    @Optional(defaultValue = "false") boolean lock, @Optional(
-                        defaultValue = "OVERWRITE") @Summary("How the file is going to be written") @DisplayName("Write Mode") FileWriteMode mode,
-                    Event event) {
+  protected void doWrite(FileConnectorConfig config, FileSystem fileSystem, String path, InputStream content, String encoding,
+                         boolean createParentDirectories, boolean lock, FileWriteMode mode) {
     if (content == null) {
       throw new IllegalContentException("Cannot write a null content");
     }
 
+    validatePath(path, "path");
     fileSystem.changeToBaseDir();
-    path = resolvePath(path, event, "path");
 
     if (encoding == null) {
       encoding = config.getDefaultWriteEncoding();
     }
 
-    fileSystem.write(path, content, mode, event, lock, createParentDirectories, encoding);
+    fileSystem.write(path, content, mode, lock, createParentDirectories, encoding);
   }
 
   /**
@@ -194,25 +161,14 @@ public abstract class BaseFileSystemOperations {
    * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param event                   the {@link Event} which triggered this operation
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Copies a file in another directory")
-  @Throws(FileCopyErrorTypeProvider.class)
-  public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
-                   String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite,
-                   Event event) {
+  protected void doCopy(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
+                        String targetPath, boolean createParentDirectories, boolean overwrite) {
     fileSystem.changeToBaseDir();
-    validateTargetPath(targetPath);
-    sourcePath = resolvePath(sourcePath, event, "sourcePath");
-    fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event);
-  }
-
-  private void validateTargetPath(String targetPath) {
-    if (StringUtils.isBlank(targetPath)) {
-      throw new IllegalPathException("target path cannot be null nor blank");
-    }
+    validatePath(targetPath, "target path");
+    validatePath(sourcePath, "source path");
+    fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories);
   }
 
   /**
@@ -243,18 +199,13 @@ public abstract class BaseFileSystemOperations {
    * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param event                   The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Moves a file to another directory")
-  @Throws(FileCopyErrorTypeProvider.class)
-  public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
-                   String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite,
-                   Event event) {
+  protected void doMove(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
+                        String targetPath, boolean createParentDirectories, boolean overwrite) {
     fileSystem.changeToBaseDir();
-    validateTargetPath(targetPath);
-    sourcePath = resolvePath(sourcePath, event, "sourcePath");
+    validatePath(targetPath, "target path");
+    validatePath(sourcePath, "source path");
     fileSystem.move(config, sourcePath, targetPath, overwrite, createParentDirectories);
   }
 
@@ -268,14 +219,10 @@ public abstract class BaseFileSystemOperations {
    *
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be deleted
-   * @param event      The current {@link Event}
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
-  @Summary("Deletes a file")
-  @Throws(FileDeleteErrorTypeProvider.class)
-  public void delete(@Connection FileSystem fileSystem, @Optional String path, Event event) {
+  protected void doDelete(FileSystem fileSystem, @Optional String path) {
     fileSystem.changeToBaseDir();
-    path = resolvePath(path, event, "path");
     fileSystem.delete(path);
   }
 
@@ -289,17 +236,13 @@ public abstract class BaseFileSystemOperations {
    * <p>
    * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will be thrown if this
    * precondition is not honored.
-   *
-   * @param fileSystem a reference to the host {@link FileSystem}
+   *  @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be renamed
    * @param to         the file's new name
    * @param overwrite  whether or not overwrite the file if the target destination already exists.
-   * @param event      The current {@link Event}
    */
-  @Summary("Renames a file")
-  @Throws(FileRenameErrorTypeProvider.class)
-  public void rename(@Connection FileSystem fileSystem, @Optional String path,
-                     @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
+  protected void doRename(@Connection FileSystem fileSystem, @Optional String path,
+                          @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite) {
     if (get(to).getNameCount() != 1) {
       throw new IllegalPathException(
                                      format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
@@ -307,7 +250,6 @@ public abstract class BaseFileSystemOperations {
     }
 
     fileSystem.changeToBaseDir();
-    path = resolvePath(path, event, "path");
     fileSystem.rename(path, to, overwrite);
   }
 
@@ -317,26 +259,17 @@ public abstract class BaseFileSystemOperations {
    * @param fileSystem    a reference to the host {@link FileSystem}
    * @param directoryPath the new directory's name
    */
-  @Summary("Creates a new directory")
-  @Throws(FileRenameErrorTypeProvider.class)
-  public void createDirectory(@Connection FileSystem fileSystem, String directoryPath) {
+
+  protected void doCreateDirectory(@Connection FileSystem fileSystem, String directoryPath) {
+    validatePath(directoryPath, "directory path");
     fileSystem.changeToBaseDir();
     fileSystem.createDirectory(directoryPath);
   }
 
-  private String resolvePath(String path, Event event, String attributeName) {
-    if (!StringUtils.isBlank(path)) {
-      return path;
+  private void validatePath(String path, String pathName) {
+    if (isBlank(path)) {
+      throw new IllegalPathException(format("%s cannot be null nor blank", pathName));
     }
-
-    Message message = event.getMessage();
-    if (message.getAttributes() instanceof FileAttributes) {
-      return ((FileAttributes) message.getAttributes()).getPath();
-    }
-
-    throw new IllegalPathException(
-                                   format("A %s was not specified and a default one could not be obtained from the current message attributes",
-                                          attributeName));
   }
 
   private Predicate<FileAttributes> getPredicate(FilePredicateBuilder builder) {

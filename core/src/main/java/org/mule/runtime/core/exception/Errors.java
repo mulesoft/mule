@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
-import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
-
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
  * Provides the constants for the core error types
@@ -43,8 +44,8 @@ public abstract class Errors {
     public static final String EXPRESSION_ERROR_IDENTIFIER = "EXPRESSION";
 
     /**
-     * Indicates that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has
-     * been exhausted
+     * Indicates that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has been
+     * exhausted
      */
     public static final String REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER = "REDELIVERY_EXHAUSTED";
 
@@ -90,31 +91,38 @@ public abstract class Errors {
      */
     public static final String OVERLOAD_ERROR_IDENTIFIER = "OVERLOAD";
 
+    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
+
   }
 
   public static final class ComponentIdentifiers {
 
     public static final ComponentIdentifier ANY =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(ANY_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE).withName(ANY_IDENTIFIER).build();
     public static final ComponentIdentifier CRITICAL =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE).withName(CRITICAL_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE).withName(CRITICAL_IDENTIFIER).build();
     public static final ComponentIdentifier TRANSFORMATION =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier EXPRESSION =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier REDELIVERY_EXHAUSTED = new ComponentIdentifier.Builder()
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier REDELIVERY_EXHAUSTED = builder()
         .withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier RETRY_EXHAUSTED = new ComponentIdentifier.Builder()
+    public static final ComponentIdentifier RETRY_EXHAUSTED = builder()
         .withNamespace(CORE_NAMESPACE_NAME).withName(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier ROUTING =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(ROUTING_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(ROUTING_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier CONNECTIVITY =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONNECTIVITY_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONNECTIVITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SECURITY =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
+
+
     public static final ComponentIdentifier UNKNOWN =
-        new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
+
   }
 }

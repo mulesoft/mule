@@ -53,9 +53,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-    AbstractFileInputStream payload = (AbstractFileInputStream) response.getMessage().getPayload().getValue();
-    assertThat(payload.isLocked(), is(false));
-    assertThat(IOUtils.toString(payload), is(HELLO_WORLD));
+    assertThat(toString(response.getMessage().getPayload().getValue()), is(HELLO_WORLD));
   }
 
   @Test
@@ -65,7 +63,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
     File binaryFile = new File(temporaryFolder.getRoot(), binaryFileName);
     FileUtils.writeByteArrayToFile(binaryFile, binaryPayload);
 
-    Event response = getPath(binaryFile.getAbsolutePath());
+    Event response = getPath(binaryFile.getAbsolutePath(), false);
 
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
                is(MediaType.BINARY.getPrimaryType()));

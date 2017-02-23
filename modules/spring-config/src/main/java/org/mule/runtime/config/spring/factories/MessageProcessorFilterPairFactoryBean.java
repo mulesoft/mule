@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -21,7 +22,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class MessageProcessorFilterPairFactoryBean implements FactoryBean<MessageProcessorFilterPair>, MuleContextAware {
+public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObject
+    implements FactoryBean<MessageProcessorFilterPair>, MuleContextAware {
 
   private List<Processor> messageProcessors;
   private Filter filter = new ExpressionFilter();
@@ -52,7 +54,9 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
       }
     }
 
-    return createFilterPair(builder);
+    MessageProcessorFilterPair filterPair = createFilterPair(builder);
+    filterPair.setAnnotations(getAnnotations());
+    return filterPair;
   }
 
   private MessageProcessorFilterPair createFilterPair(MessageProcessorChainBuilder builder) throws Exception {

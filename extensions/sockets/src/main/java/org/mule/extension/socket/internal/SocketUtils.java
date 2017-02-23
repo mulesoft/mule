@@ -7,6 +7,7 @@
 package org.mule.extension.socket.internal;
 
 import static java.lang.String.format;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.connection.AbstractSocketConnection;
@@ -17,6 +18,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
@@ -47,8 +49,17 @@ public final class SocketUtils {
   public static byte[] getByteArray(Object data, boolean streamingIsAllowed, String encoding,
                                     ObjectSerializer objectSerializer)
       throws IOException {
+
+    if (data instanceof CursorStreamProvider) {
+      if (!streamingIsAllowed) {
+        throw streamingNotAllowedException();
+      }
+      data = ((CursorStreamProvider) data).openCursor();
+    }
+
     if (data instanceof InputStream && !streamingIsAllowed) {
-      throw new IOException("Streaming is not allowed with this configuration");
+      closeQuietly((InputStream) data);
+      throw streamingNotAllowedException();
     } else if (data instanceof byte[]) {
       return (byte[]) data;
     } else if (data instanceof String) {
@@ -58,6 +69,10 @@ public final class SocketUtils {
     }
 
     throw new IllegalArgumentException(format("Cannot serialize data: '%s'", data));
+  }
+
+  private static IOException streamingNotAllowedException() {
+    return new IOException("Streaming is not allowed with this configuration");
   }
 
   /**

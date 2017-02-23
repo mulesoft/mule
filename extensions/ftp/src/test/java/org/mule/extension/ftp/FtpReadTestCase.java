@@ -51,16 +51,14 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
     assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
     assertThat(message.getPayload().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-    AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload().getValue();
-    assertThat(payload.isLocked(), is(false));
-    assertThat(getPayloadAsString(message), is(HELLO_WORLD));
+    assertThat(toString(message.getPayload().getValue()), is(HELLO_WORLD));
   }
 
   @Test
   public void readBinary() throws Exception {
     testHarness.createBinaryFile();
 
-    Message response = readPath(BINARY_FILE_NAME);
+    Message response = readPath(BINARY_FILE_NAME, false);
 
     assertThat(response.getPayload().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
     assertThat(response.getPayload().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));

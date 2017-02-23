@@ -10,13 +10,16 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
+import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
+import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.ServerAddress;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
@@ -33,23 +36,34 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   private final HttpListenerRegistry listenerRegistry;
   private TCPNIOServerConnection serverConnection;
   private Supplier<Scheduler> schedulerSource;
+  private Runnable schedulerDisposer;
   private Scheduler scheduler;
   private boolean stopped = true;
   private boolean stopping;
   private String ownerName;
 
   public GrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry,
-                           Supplier<Scheduler> schedulerSource) {
+                           Supplier<Scheduler> schedulerSource, Runnable schedulerDisposer) {
     this.serverAddress = serverAddress;
     this.transport = transport;
     this.listenerRegistry = listenerRegistry;
     this.schedulerSource = schedulerSource;
+    this.schedulerDisposer = schedulerDisposer;
   }
 
   @Override
   public synchronized void start() throws IOException {
-    this.scheduler = schedulerSource.get();
+    this.scheduler = schedulerSource != null ? schedulerSource.get() : null;
     serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
+    serverConnection.addCloseListener((closeable, type) -> {
+      try {
+        // TODO MULE-11115 Add a stop() method to Scheduler
+        scheduler.stop(5000, MILLISECONDS);
+      } finally {
+        scheduler = null;
+      }
+      schedulerDisposer.run();
+    });
     stopped = false;
   }
 
@@ -60,12 +74,6 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
       transport.unbind(serverConnection);
     } finally {
       stopping = false;
-    }
-    try {
-      // TODO - MULE-11115: Get rid of muleContext once we have a stop() method
-      scheduler.stop(5000, MILLISECONDS);
-    } finally {
-      scheduler = null;
     }
   }
 
@@ -90,8 +98,17 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(PathAndMethodRequestMatcher requestMatcher, RequestHandler requestHandler) {
-    return this.listenerRegistry.addRequestHandler(this, requestHandler, requestMatcher);
+  public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+    return this.listenerRegistry.addRequestHandler(this, requestHandler,
+                                                   new ListenerRequestMatcher(new DefaultMethodRequestMatcher(methods
+                                                       .toArray(new String[methods.size()])),
+                                                                              path));
+  }
+
+  @Override
+  public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+    return this.listenerRegistry.addRequestHandler(this, requestHandler,
+                                                   new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), path));
   }
 
   @Override

@@ -47,7 +47,8 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                                               disableValidation, retryPolicyTemplate,
                                                                               getConnectionManager(), extensionModel,
-                                                                              muleContext));
+                                                                              muleContext),
+                                          resolverSet);
   }
 
   private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {

@@ -7,37 +7,39 @@
 package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-import org.mule.runtime.core.execution.BlockingCompletionHandler;
-import org.mule.runtime.core.execution.CompletionHandler;
-import org.mule.runtime.core.api.Event;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.debug.DebugInfoProvider;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.runtime.core.execution.BlockingCompletionHandler;
+import org.mule.runtime.core.execution.CompletionHandler;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpAuthentication;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
-import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.client.HttpRequestAuthentication;
+import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
@@ -344,10 +346,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                                              muleEvent);
 
       // Encode spaces to generate a valid HTTP request.
-      resolvedPath = HttpParser.encodeSpaces(resolvedPath);
-
-      return String.format("%s://%s:%s%s", requestConfig.getScheme(), host.resolveStringValue(muleEvent),
-                           port.resolveIntegerValue(muleEvent), resolvedPath);
+      return format("%s://%s:%s%s", requestConfig.getScheme(), host.resolveStringValue(muleEvent),
+                    port.resolveIntegerValue(muleEvent), encodeSpaces(resolvedPath));
     }
 
   }

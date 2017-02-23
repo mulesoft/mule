@@ -8,7 +8,7 @@ package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import org.hamcrest.core.Is;
+import static org.hamcrest.core.Is.is;
 import org.junit.Test;
 import org.mule.runtime.core.api.Event;
 
@@ -31,14 +31,14 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
     final Event muleEvent = flowRunner("testSetPayloadUsingContent").run();
     final Object value = muleEvent.getMessage().getPayload().getValue();
     assertThat(value, instanceOf(Map.class));
-    assertThat(((Map) value).get("smart"), Is.is("connector"));
+    assertThat(((Map) value).get("smart"), is("connector"));
   }
 
   @Test
   public void testSetPayloadUsingContentAndSimpleParameter() throws Exception {
     final Event muleEvent = flowRunner("testSetPayloadUsingContentAndSimpleParameter").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
-               Is.is("attribute value:[value from attribute], value of content (accessing map under key smart):[connector]"));
+               is("attribute value:[value from attribute], value of content (accessing map under key smart):[connector]"));
   }
 
   @Test
@@ -46,13 +46,13 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
     final Event muleEvent = flowRunner("testSetPayloadUsingPrimary").run();
     final Object value = muleEvent.getMessage().getPayload().getValue();
     assertThat(value, instanceOf(Map.class));
-    assertThat(((Map) value).get("smart2"), Is.is("connector2"));
+    assertThat(((Map) value).get("smart2"), is("connector2"));
   }
 
   @Test
   public void testSetPayloadUsingContentAndPrimaryAndSimpleParameter() throws Exception {
     final Event muleEvent = flowRunner("testSetPayloadUsingContentAndPrimaryAndSimpleParameter").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is
-        .is("attribute value:[value from attribute], value of content (accessing map under key smart):[connector], value of primary (accessing map under key smart2):[connector2]"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(),
+               is("attribute value:[value from attribute], value of content (accessing map under key smart):[connector], value of primary (accessing map under key smart2):[connector2]"));
   }
 }

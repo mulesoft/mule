@@ -10,13 +10,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.construct.FlowValidationTestCase.FLOW_NAME;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -24,7 +23,7 @@ import org.junit.Test;
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =
-      new Builder().withNamespace("http").withName("listener").build();
+      builder().withNamespace("http").withName("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
   private static final String FLOW_NAME = "flow-name";
@@ -43,7 +42,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   @Test
   public void doesNotSupportHttpRequester() {
     assertThat(factory
-        .supportsSourceIdentifier(new Builder().withNamespace("http").withName("request").build()),
+        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("http").withName("request").build()),
                is(false));;
   }
 

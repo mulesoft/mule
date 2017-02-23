@@ -16,7 +16,8 @@ import java.util.Map;
 
 public class VeganFidelityOperation {
 
-  public String tryEat(@XmlHints(allowReferences = false) Object food) {
+  public String tryEat(@XmlHints(allowReferences = false) Object food,
+                       @Optional @XmlHints(allowInlineDefinition = false) Map<String, Integer> menu) {
     if (food instanceof Fruit) {
       return "tasty " + food.getClass().getSimpleName();
     }

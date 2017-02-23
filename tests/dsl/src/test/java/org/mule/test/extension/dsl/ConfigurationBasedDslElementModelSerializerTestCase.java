@@ -55,8 +55,9 @@ public class ConfigurationBasedDslElementModelSerializerTestCase extends Abstrac
     addRedeliveryPolicy(componentsFlow, httpListenerSource);
     flow.appendChild(httpListenerSource);
 
-    flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(DB_INSERT_PATH))));
+    flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(DB_BULK_INSERT_PATH))));
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(REQUESTER_PATH))));
+    flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(DB_INSERT_PATH))));
 
     doc.getDocumentElement().appendChild(flow);
 

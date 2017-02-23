@@ -21,12 +21,10 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
@@ -146,8 +144,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private HttpService httpService;
 
   @Inject
-  private SchedulerService schedulerService;
-  @Inject
   private MuleContext muleContext;
 
   private HttpServer server;
@@ -182,7 +178,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setSchedulerSupplier(() -> schedulerService.cpuLightScheduler()).build();
+        .build();
 
     try {
       server = httpService.getServerFactory().create(serverConfiguration);

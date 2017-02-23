@@ -35,6 +35,7 @@
                 </httpn:response-validator>
             </httpn:request>
         </poll>
+        <object-to-string-transformer />
         <test:queue name="toclient"/>
     </flow>
 
@@ -46,6 +47,7 @@
                 </httpn:response-validator>
             </httpn:request>
         </poll>
+        <object-to-string-transformer />
         <test:queue name="toclient2"/>
     </flow>
 

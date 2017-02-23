@@ -9,7 +9,6 @@ package org.mule.functional.functional;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.functional.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -17,6 +16,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @see FunctionalTestNotificationListener
  */
 // TODO This should really extend StaticComponent from mule-core as it is quite similar.
-public class FunctionalTestComponent
+public class FunctionalTestComponent extends AbstractAnnotatedObject
     implements Callable, Initialisable, Disposable, MuleContextAware, FlowConstructAware, Receiveable, Startable, Stoppable {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -439,7 +439,6 @@ public class FunctionalTestComponent
   public void setLogMessageDetails(boolean logMessageDetails) {
     this.logMessageDetails = logMessageDetails;
   }
-
 
   public String getExceptionText() {
     return exceptionText;

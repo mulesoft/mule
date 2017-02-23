@@ -8,6 +8,7 @@
 package org.mule.services.http;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -16,6 +17,7 @@ import org.mule.service.http.api.client.async.ResponseHandler;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -26,8 +28,8 @@ import org.junit.rules.ExternalResource;
  * Defines a {@link org.mule.service.http.api.client.HttpClient} using a default implementation of {@link HttpService}
  *
  * <p/>
- * This rule is intended to simplify the usage of the {@link org.mule.service.http.api.client.HttpClient} as it
- * will be started/stopped as part of the test lifecycle.
+ * This rule is intended to simplify the usage of the {@link org.mule.service.http.api.client.HttpClient} as it will be
+ * started/stopped as part of the test lifecycle.
  */
 public class TestHttpClient extends ExternalResource implements org.mule.service.http.api.client.HttpClient {
 
@@ -36,7 +38,7 @@ public class TestHttpClient extends ExternalResource implements org.mule.service
   private org.mule.service.http.api.client.HttpClient httpClient;
 
   private TestHttpClient() {
-    this(new HttpServiceImplementation());
+    this(new HttpServiceImplementation(new SimpleUnitTestSupportSchedulerService()));
   }
 
   private TestHttpClient(HttpService httpService) {

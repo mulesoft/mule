@@ -12,12 +12,12 @@
     </spring:beans>
 
     <flow name="move">
-        <ftp:move sourcePath="#[mel:source]" targetPath="#[mel:target]" overwrite="#[mel:overwrite]" createParentDirectories="#[mel:createParent]"/>
+        <ftp:move sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]" createParentDirectories="#[createParent]"/>
     </flow>
 
     <flow name="readAndDo">
-        <ftp:read path="#[mel:source]" />
-        <ftp:move targetPath="#[mel:target]" overwrite="#[mel:overwrite]" createParentDirectories="#[mel:createParent]"/>
+        <ftp:read path="#[source]" />
+        <ftp:move sourcePath="#[source]" targetPath="#[target]" overwrite="#[overwrite]" createParentDirectories="#[createParent]"/>
     </flow>
 
 </mule>

@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.DefaultEventContext.create;
-
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -18,6 +20,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 public class MessageProcessorNotification extends ServerNotification implements SynchronousServerEvent {
 
@@ -29,6 +32,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
   private final transient Processor processor;
   private final transient FlowConstruct flowConstruct;
   private final String processorPath;
+  private final DefaultComponentLocation componentLocation;
 
   static {
     registerAction("message processor pre invoke", MESSAGE_PROCESSOR_PRE_INVOKE);
@@ -50,7 +54,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
     } else {
       this.processorPath = null;
     }
-
+    this.componentLocation = ((DefaultComponentLocation) ((AnnotatedObject) processor).getAnnotation(LOCATION_KEY));
     this.flowConstruct = flowConstruct;
   }
 
@@ -99,6 +103,10 @@ public class MessageProcessorNotification extends ServerNotification implements 
 
   public MessagingException getExceptionThrown() {
     return exceptionThrown;
+  }
+
+  public ComponentLocation getComponentLocation() {
+    return componentLocation;
   }
 
   public String getProcessorPath() {

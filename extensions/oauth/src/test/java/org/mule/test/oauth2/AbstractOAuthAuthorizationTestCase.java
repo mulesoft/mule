@@ -13,26 +13,30 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
-import static org.mule.extension.oauth2.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CODE_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE;
-import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
-import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.SCOPE_PARAMETER;
+import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
+import static org.mule.services.oauth.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.service.http.api.HttpHeaders;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -61,7 +65,7 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   public static final String AUTHORIZE_PATH = "/authorize";
   protected final DynamicPort oauthServerPort = new DynamicPort("port2");
   protected final DynamicPort oauthHttpsServerPort = new DynamicPort("port3");
-  private String keyStorePath = Thread.currentThread().getContextClassLoader().getResource("ssltest-keystore.jks").getPath();
+  private String keyStorePath = currentThread().getContextClassLoader().getResource("ssltest-keystore.jks").getPath();
   private String keyStorePassword = "changeit";
 
   @Rule
@@ -69,7 +73,8 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
 
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(oauthServerPort.getNumber())
-      .httpsPort(oauthHttpsServerPort.getNumber()).keystorePath(keyStorePath).keystorePassword(keyStorePassword));
+      .httpsPort(oauthHttpsServerPort.getNumber()).keystorePath(keyStorePath)
+      .keystorePassword(keyStorePassword));
 
   @Rule
   public SystemProperty clientId = new SystemProperty("client.id", "ndli93xdws2qoe6ms1d389vl6bxquv3e");
@@ -92,14 +97,14 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   @Rule
   public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
+  private ExtensionsClient client;
+
   @Before
   public void before() throws Exception {
     try {
       // Force the initialization of the OAuth context
-      // TODO MULE-11405 switch to the client
-      // muleContext.getRegistry().lookupObject(ExtensionsClient.class).execute("HTTP", "request",
-      // builder().configName("requestConfig").build());
-      flowRunner("testFlow").runNoVerify();
+      client = muleContext.getRegistry().lookupObject(ExtensionsClient.class);
+      client.execute("HTTP", "request", builder().configName("requestConfig").build());
     } catch (Exception e) {
       // Ignore
     }
@@ -165,9 +170,9 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
     for (Object customParameterName : customParameters.keySet()) {
       bodyParametersMapBuilder.put(customParameterName, customParameters.get(customParameterName));
     }
-    final String body = HttpParser.encodeString(UTF_8, bodyParametersMapBuilder.build());
+    final String body = encodeString(bodyParametersMapBuilder.build(), UTF_8);
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(body)
-        .withHeader(HttpHeaders.Names.CONTENT_TYPE, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())));
+        .withHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())));
   }
 
   protected void verifyRequestDoneToTokenUrlForAuthorizationCode() throws UnsupportedEncodingException {

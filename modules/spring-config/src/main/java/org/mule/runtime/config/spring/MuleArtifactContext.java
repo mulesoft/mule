@@ -27,6 +27,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOW
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -42,6 +43,7 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.processors.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.spring.processors.LifecycleStatePostProcessor;
@@ -65,7 +67,6 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -123,6 +124,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
+  private SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -156,7 +158,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
-          //TODO MULE-9637 remove support for MuleContextAware injection.
+          // TODO MULE-9637 remove support for MuleContextAware injection.
           if (componentBuildingDefinitionProvider instanceof MuleContextAware) {
             ((MuleContextAware) componentBuildingDefinitionProvider).setMuleContext(muleContext);
           }
@@ -236,7 +238,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
                           new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
                                                                  (DefaultListableBeanFactory) beanFactory),
-                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()));
+                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
+                          new ComponentLocatorCreatePostProcessor(componentLocator));
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
   }
@@ -311,7 +314,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     List<String> createdComponentModels = new ArrayList<>();
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (!mustBeRoot || componentModel.isRoot()) {
-        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER)) {
+        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER) || !componentModel.isEnabled()) {
           return;
         }
         if (componentModel.getNameAttribute() != null) {
@@ -350,7 +353,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory)
+    new SpringMuleContextServiceConfigurator(muleContext, artifactType, optionalObjectsController, beanFactory, componentLocator)
         .createArtifactServices();
   }
 
@@ -382,9 +385,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected MuleBeanDefinitionDocumentReader createBeanDefinitionDocumentReader(BeanDefinitionFactory beanDefinitionFactory) {
     if (artifactType.equals(ArtifactType.DOMAIN)) {
-      return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
+      return new MuleDomainBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser,
+                                                        componentBuildingDefinitionRegistry);
     }
-    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser);
+    return new MuleBeanDefinitionDocumentReader(beanDefinitionFactory, xmlApplicationParser, componentBuildingDefinitionRegistry);
   }
 
   protected MuleDocumentLoader createLoader() {

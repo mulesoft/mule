@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
@@ -26,6 +27,7 @@ public class ByteArrayToHexString extends AbstractTransformer {
   public ByteArrayToHexString() {
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     setReturnDataType(DataType.STRING);
   }
 
@@ -45,13 +47,10 @@ public class ByteArrayToHexString extends AbstractTransformer {
 
     try {
       byte[] bytes = null;
-      if (src instanceof InputStream) {
-        InputStream input = (InputStream) src;
-        try {
-          bytes = IOUtils.toByteArray(input);
-        } finally {
-          IOUtils.closeQuietly(input);
-        }
+      if (src instanceof CursorStreamProvider) {
+        bytes = handleStream(((CursorStreamProvider) src).openCursor());
+      } else if (src instanceof InputStream) {
+        bytes = handleStream((InputStream) src);
       } else {
         bytes = (byte[]) src;
       }
@@ -62,4 +61,11 @@ public class ByteArrayToHexString extends AbstractTransformer {
     }
   }
 
+  private byte[] handleStream(InputStream input) {
+    try {
+      return IOUtils.toByteArray(input);
+    } finally {
+      IOUtils.closeQuietly(input);
+    }
+  }
 }

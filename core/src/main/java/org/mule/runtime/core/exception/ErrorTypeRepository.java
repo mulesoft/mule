@@ -15,10 +15,9 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOW
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +47,8 @@ public class ErrorTypeRepository {
           .parentErrorType(ANY_ERROR_TYPE).build();
 
   /**
-   * Error type for which there will be no handling since it represents an error so critical it should not be handled.
-   * If such an error occurs it will always be propagated. Same for it's children.
+   * Error type for which there will be no handling since it represents an error so critical it should not be handled. If such an
+   * error occurs it will always be propagated. Same for it's children.
    */
   protected static final ErrorType CRITICAL_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
@@ -65,8 +64,8 @@ public class ErrorTypeRepository {
   }
 
   /**
-   * Adds and returns an {@link ErrorType} for a given identifier with the given parent that will be fully visible, meaning
-   * it will be available for use in on-error components.
+   * Adds and returns an {@link ErrorType} for a given identifier with the given parent that will be fully visible, meaning it
+   * will be available for use in on-error components.
    *
    * @param errorTypeIdentifier the {@link ComponentIdentifier} for the error
    * @param parentErrorType the {@link ErrorType} that will act as parent

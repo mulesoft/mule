@@ -7,6 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
@@ -36,18 +37,25 @@ public class StringAppendTransformer extends AbstractTransformer {
     String string;
     if (src instanceof byte[]) {
       string = new String((byte[]) src);
+    } else if (src instanceof CursorStreamProvider) {
+      string = handleStream(((CursorStreamProvider) src).openCursor());
     } else if (src instanceof InputStream) {
-      InputStream input = (InputStream) src;
-      try {
-        string = IOUtils.toString(input);
-      } finally {
-        IOUtils.closeQuietly(input);
-      }
+      string = handleStream((InputStream) src);
     } else {
       string = (String) src;
     }
 
     return append(message, string);
+  }
+
+  private String handleStream(InputStream input) {
+    String string;
+    try {
+      string = IOUtils.toString(input);
+    } finally {
+      IOUtils.closeQuietly(input);
+    }
+    return string;
   }
 
   public static String append(String append, String msg) {

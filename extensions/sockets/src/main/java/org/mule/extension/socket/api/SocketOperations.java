@@ -9,11 +9,7 @@ package org.mule.extension.socket.api;
 import org.mule.extension.socket.api.client.SocketClient;
 import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
-import org.mule.extension.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -22,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Basic set of operations for socket extension
@@ -31,34 +28,48 @@ import java.io.IOException;
 public class SocketOperations {
 
   /**
-   * Sends the data using the client associated to the {@link RequesterConnection}.
-   * <p>
-   * If {@code hasResponse} is set, the operation blocks until a response is received or the timeout is met, in which case the
-   * operation will return a {@link Message} with {@code null} payload.
+   * Sends the data using the client associated to the {@link RequesterConnection} and
+   * then blocks until a response is received or the timeout is met, in which case the
+   * operation will return a {@code null} payload.
    *
-   * @param content data that will be serialized and sent through the socket.
-   * @param hasResponse whether the operation should await for a response or not
+   * @param content        data that will be serialized and sent through the socket.
    * @param outputEncoding encoding that will be used to serialize the {@code data} if its type is {@link String}.
-   * @param muleMessage if there is no response expected, the outcome of the operation will be the same {@link Message} as the
-   *        input.
    * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
    */
-  @OutputResolver(output = SocketMetadataResolver.class)
-  public Result<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
-                           @Content Object content,
-                           @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
-                           @MetadataKeyId boolean hasResponse, Message muleMessage)
+  public Result<InputStream, SocketAttributes> sendAndReceive(@Connection RequesterConnection connection,
+                                                              @UseConfig RequesterConfig config,
+                                                              @Content Object content,
+                                                              @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding)
       throws ConnectionException, IOException {
     SocketClient client = connection.getClient();
 
-    if (outputEncoding == null) {
-      outputEncoding = config.getDefaultEncoding();
-    }
+    outputEncoding = override(outputEncoding, config.getDefaultEncoding());
 
     client.write(content, outputEncoding);
 
-    return hasResponse
-        ? Result.builder().output(client.read()).attributes(client.getAttributes()).build()
-        : Result.builder(muleMessage).build();
+    return Result.<InputStream, SocketAttributes>builder()
+        .output(client.read())
+        .attributes(client.getAttributes())
+        .build();
+  }
+
+  /**
+   * Sends the data using the client associated to the {@link RequesterConnection}.
+   *
+   * @param content        data that will be serialized and sent through the socket.
+   * @param outputEncoding encoding that will be used to serialize the {@code data} if its type is {@link String}.
+   * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
+   */
+  public void send(@Connection RequesterConnection connection,
+                   @UseConfig RequesterConfig config,
+                   @Content Object content,
+                   @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding)
+      throws ConnectionException, IOException {
+
+    connection.getClient().write(content, override(outputEncoding, config.getDefaultEncoding()));
+  }
+
+  private String override(String override, String defaultValue) {
+    return override == null ? defaultValue : override;
   }
 }

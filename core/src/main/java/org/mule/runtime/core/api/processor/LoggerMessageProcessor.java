@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static org.mule.runtime.core.internal.streaming.bytes.CursorStreamUtils.withCursoredEvent;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.apache.log4j.Level;
@@ -57,8 +58,10 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
 
   @Override
   public Event process(Event event) throws MuleException {
-    log(event);
-    return event;
+    return withCursoredEvent(event, cursored -> {
+      log(event);
+      return event;
+    });
   }
 
   protected void log(Event event) {

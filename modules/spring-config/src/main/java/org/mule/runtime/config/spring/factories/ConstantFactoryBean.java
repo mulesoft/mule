@@ -7,6 +7,8 @@
 package org.mule.runtime.config.spring.factories;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -28,7 +30,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @param <T>
  * @since 3.7.0
  */
-public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware, Lifecycle {
+public class ConstantFactoryBean<T> extends AbstractAnnotatedObject implements FactoryBean<T>, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ConstantFactoryBean.class);
 
@@ -41,6 +43,9 @@ public class ConstantFactoryBean<T> implements FactoryBean<T>, MuleContextAware,
 
   @Override
   public T getObject() throws Exception {
+    if (value instanceof AnnotatedObject) {
+      ((AnnotatedObject) value).setAnnotations(getAnnotations());
+    }
     return value;
   }
 

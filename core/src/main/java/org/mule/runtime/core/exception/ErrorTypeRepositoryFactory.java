@@ -13,6 +13,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELI
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 
 import org.mule.runtime.api.message.ErrorType;
@@ -41,6 +42,7 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addErrorType(ROUTING, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(SECURITY, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
+    errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
     return errorTypeRepository;
   }
 

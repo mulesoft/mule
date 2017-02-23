@@ -6,11 +6,10 @@
  */
 package org.mule.test.functional;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.Event;
-
-import org.hamcrest.core.Is;
 import org.junit.Test;
+import org.mule.runtime.core.api.Event;
 
 public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -27,30 +26,30 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
   @Test
   public void testSetPayloadHardcodedFromModuleFlow() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadHardcodedFromModuleFlow").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("hardcoded value from module"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("hardcoded value from module"));
   }
 
   @Test
   public void testSetPayloadParamFromModuleFlow() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadParamFromModuleFlow").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("new payload from module"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload from module"));
   }
 
   @Test
   public void testSetPayloadConfigParamFlow() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadConfigParamFlow").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("some config-value-parameter"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("some config-value-parameter"));
   }
 
   @Test
   public void testSetPayloadConfigDefaultParamFlow() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadConfigDefaultParamFlow").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("some default-config-value-parameter"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("some default-config-value-parameter"));
   }
 
   @Test
   public void testSetPayloadAddParamAndPropertyValues() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadAddParamAndPropertyValues").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is("a parameter value some config-value-parameter"));
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("a parameter value some config-value-parameter"));
   }
 }

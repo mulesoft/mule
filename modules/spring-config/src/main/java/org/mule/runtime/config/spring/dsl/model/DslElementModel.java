@@ -7,13 +7,15 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.LinkedHashSet;
@@ -23,30 +25,31 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Provides a declaration of how a given {@code model} of type {@code T} is related to its
- * {@link DslElementSyntax DSL} representation.
+ * Provides a declaration of how a given {@code model} of type {@code T} is related to its {@link DslElementSyntax DSL}
+ * representation.
  * <p>
- * This {@link DslElementModel} can be related to an {@link ComponentConfiguration} of a configuration file
- * by using the {@link #findElement} lookup with the required {@link ComponentIdentifier}, and
- * thus providing a way to relate an {@link ComponentConfiguration} to the {@link ExtensionModel} component
- * or {@link MetadataType} it represents.
+ * This {@link DslElementModel} can be related to an {@link ComponentConfiguration} of a configuration file by using the
+ * {@link #findElement} lookup with the required {@link ComponentIdentifier}, and thus providing a way to relate an
+ * {@link ComponentConfiguration} to the {@link ExtensionModel} component or {@link MetadataType} it represents.
  *
  * @since 4.0
  */
 public class DslElementModel<T> {
 
   private final T model;
+  private final String value;
   private final DslElementSyntax dsl;
   private final Set<DslElementModel> containedElements;
   private final ComponentConfiguration configuration;
   private final ComponentIdentifier identifier;
 
   private DslElementModel(T model, DslElementSyntax dsl, Set<DslElementModel> containedElements,
-                          ComponentConfiguration configuration) {
+                          ComponentConfiguration configuration, String value) {
     this.dsl = dsl;
     this.model = model;
     this.containedElements = containedElements;
     this.configuration = configuration;
+    this.value = value;
     this.identifier = createIdentifier();
   }
 
@@ -72,19 +75,26 @@ public class DslElementModel<T> {
   }
 
   /**
-   * @return the {@link ComponentIdentifier identifier} associated to
-   * {@code this} {@link DslElementModel element}, if one was provided.
+   * @return the {@link ComponentIdentifier identifier} associated to {@code this} {@link DslElementModel element}, if one was
+   *         provided.
    */
   public Optional<ComponentIdentifier> getIdentifier() {
     return Optional.ofNullable(identifier);
   }
 
   /**
-   * @return the {@link ComponentConfiguration} associated to {@code this}
-   * {@link DslElementModel element}, if one was provided.
+   * @return the {@link ComponentConfiguration} associated to {@code this} {@link DslElementModel element}, if one was provided.
    */
   public Optional<ComponentConfiguration> getConfiguration() {
     return Optional.ofNullable(configuration);
+  }
+
+  /**
+   * @return the {@code value} assigned to this element in its current configuration.
+   * This represents either the value of an attribute or that of a text child element.
+   */
+  public Optional<String> getValue() {
+    return Optional.ofNullable(value);
   }
 
   /**
@@ -94,8 +104,7 @@ public class DslElementModel<T> {
    * then a DFS lookup is performed for each of its {@link #getContainedElements inner elements}.
    *
    * @param identifier the {@link ComponentIdentifier} used for matching
-   * @return the {@link DslElementModel} associated to the given {@code identifier},
-   * if one was found.
+   * @return the {@link DslElementModel} associated to the given {@code identifier}, if one was found.
    */
   public <E> Optional<DslElementModel<E>> findElement(ComponentIdentifier identifier) {
     if (this.identifier != null && this.identifier.equals(identifier)) {
@@ -106,17 +115,14 @@ public class DslElementModel<T> {
   }
 
   /**
-   * Lookup method for finding a given {@link DslElementModel} based on its
-   * {@code parameterName} from {@code this} element as root.
-   * If {@code this} {@link DslElementModel} name doesn't match with the given parameterName,
-   * then a DFS lookup is performed for each of its {@link #getContainedElements inner elements}.
-   * Since not all the elements may in an application may have an
-   * {@link DslElementSyntax::getElementName} this lookup method may produce different results
-   * than the lookup by {@link ComponentIdentifier identifier}
+   * Lookup method for finding a given {@link DslElementModel} based on its {@code parameterName} from {@code this} element as
+   * root. If {@code this} {@link DslElementModel} name doesn't match with the given parameterName, then a DFS lookup is performed
+   * for each of its {@link #getContainedElements inner elements}. Since not all the elements may in an application may have an
+   * {@link DslElementSyntax::getElementName} this lookup method may produce different results than the lookup by
+   * {@link ComponentIdentifier identifier}
    *
    * @param modelName the {@code modelName} used for matching
-   * @return the {@link DslElementModel} associated to the given {@code identifier},
-   * if one was found.
+   * @return the {@link DslElementModel} associated to the given {@code identifier}, if one was found.
    */
   public <E> Optional<DslElementModel<E>> findElement(String modelName) {
     if (dsl.getAttributeName().equals(modelName) ||
@@ -154,6 +160,7 @@ public class DslElementModel<T> {
   public static final class Builder<M> {
 
     private M model;
+    private String value;
     private DslElementSyntax dsl;
     private ComponentConfiguration configuration;
     private Set<DslElementModel> contained = new LinkedHashSet<>();
@@ -180,8 +187,28 @@ public class DslElementModel<T> {
       return this;
     }
 
+    public Builder<M> withValue(String value) {
+      this.value = value;
+      return this;
+    }
+
     public DslElementModel<M> build() {
-      return new DslElementModel<>(model, dsl, contained, configuration);
+      if (configuration != null) {
+        Optional<String> configurationValue = configuration.getValue();
+        if (configurationValue.isPresent() && !isBlank(configurationValue.get())) {
+          if (value == null) {
+            value = configurationValue.get();
+          } else {
+            checkState(value.equals(configurationValue.get()),
+                       "The same element cannot have two different values associated.");
+          }
+        } else {
+          checkState(value == null,
+                     "The same element cannot have two different values associated.");
+        }
+      }
+
+      return new DslElementModel<>(model, dsl, contained, configuration, value);
     }
 
   }

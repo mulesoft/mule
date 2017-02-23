@@ -1,1 +1,0 @@
-http\://www.mulesoft.org/schema/mule/transports=org.mule.compatibility.config.spring.handlers.MuleTransportsNamespaceHandler

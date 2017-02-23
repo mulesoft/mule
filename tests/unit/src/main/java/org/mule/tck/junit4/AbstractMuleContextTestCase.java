@@ -6,6 +6,7 @@
  */
 package org.mule.tck.junit4;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -231,6 +233,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         contextBuilder.setObjectSerializer(getObjectSerializer());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
+        recordSchedulersOnInit(context);
         if (!isGracefulShutdown()) {
           ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(0);
         }
@@ -252,7 +255,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return this.getClass().getClassLoader();
   }
 
-  // This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
+  // This shouldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     builders.add(new TestServicesConfigurationBuilder(mockHttpService()));
@@ -328,9 +331,21 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     }
   }
 
+  private static List<Scheduler> schedulersOnInit;
+
+  protected static void recordSchedulersOnInit(MuleContext context) {
+    if (context != null) {
+      final SchedulerService serviceImpl = context.getSchedulerService();
+      schedulersOnInit = serviceImpl.getSchedulers();
+    } else {
+      schedulersOnInit = emptyList();
+    }
+  }
+
   protected static void verifyAndStopSchedulers() throws MuleException {
     final SchedulerService serviceImpl = muleContext.getSchedulerService();
-    final List<Scheduler> schedulers = serviceImpl.getSchedulers();
+    final List<Scheduler> schedulers = new ArrayList<>(serviceImpl.getSchedulers());
+    schedulers.removeAll(schedulersOnInit);
 
     try {
       assertThat(schedulers, empty());

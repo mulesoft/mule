@@ -10,6 +10,7 @@ package org.mule.runtime.container.internal;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

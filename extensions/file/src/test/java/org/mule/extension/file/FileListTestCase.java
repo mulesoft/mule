@@ -20,11 +20,9 @@ import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class FileListTestCase extends FileConnectorTestCase {
@@ -107,15 +105,6 @@ public class FileListTestCase extends FileConnectorTestCase {
     assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
   }
 
-  @Test
-  public void listWithoutPath() throws Exception {
-    List<Message> messages = (List<Message>) flowRunner("listWithoutPath").run().getMessage().getPayload().getValue();
-
-    assertThat(messages, hasSize(6));
-    FileAttributes attributes = (FileAttributes) messages.get(0).getAttributes();
-    assertThat(new File(attributes.getPath()).getParent(), is(equalTo(temporaryFolder.getRoot().getAbsolutePath())));
-  }
-
   private boolean assertListedFiles(List<Message> messages) throws Exception {
     boolean directoryWasFound = false;
 
@@ -127,7 +116,7 @@ public class FileListTestCase extends FileConnectorTestCase {
         assertThat(attributes.getName(), equalTo(SUB_DIRECTORY_NAME));
       } else {
         assertThat(attributes.getName(), endsWith(".html"));
-        assertThat(IOUtils.toString((InputStream) message.getPayload().getValue()), equalTo(CONTENT));
+        assertThat(toString(message.getPayload().getValue()), equalTo(CONTENT));
         assertThat(attributes.getSize(), is(new Long(CONTENT.length())));
       }
     }

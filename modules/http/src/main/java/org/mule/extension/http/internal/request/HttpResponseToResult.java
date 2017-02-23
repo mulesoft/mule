@@ -16,6 +16,7 @@ import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
@@ -25,7 +26,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
@@ -81,7 +81,7 @@ public class HttpResponseToResult {
           throw new HttpMessageParsingException(createStaticMessage("Unable to process multipart response"), e);
         }
       } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
-        payload = HttpParser.decodeString(IOUtils.toString(responseInputStream), encoding);
+        payload = decodeUrlEncodedBody(IOUtils.toString(responseInputStream), encoding);
       }
     }
 

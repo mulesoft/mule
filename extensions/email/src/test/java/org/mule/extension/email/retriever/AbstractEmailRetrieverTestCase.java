@@ -35,7 +35,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.core.streaming.ConsumerIterator;
+import org.mule.runtime.core.internal.streaming.object.ConsumerIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;

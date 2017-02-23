@@ -7,10 +7,7 @@
 package org.mule.extension.socket;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.runner.RunnerDelegateTo;
-
-import java.io.InputStream;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -27,10 +24,8 @@ public class TcpMultipleSendTestCase extends ParameterizedProtocolTestCase {
   public void multipleSendString() throws Exception {
     // TODO repeat this test with different messages and test that they arrive in the same order
     for (int i = 0; i < REPETITIONS; i++) {
-      InputStream payload =
-          (InputStream) flowRunner("tcp-send").withPayload(TEST_STRING).run().getMessage().getPayload().getValue();
-
-      assertEquals(RESPONSE_TEST_STRING, IOUtils.toString(payload));
+      String payload = (String) flowRunner("tcp-send").withPayload(TEST_STRING).run().getMessage().getPayload().getValue();
+      assertEquals(RESPONSE_TEST_STRING, payload);
     }
   }
 }

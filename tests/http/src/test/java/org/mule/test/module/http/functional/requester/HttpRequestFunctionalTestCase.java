@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,8 +45,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void responseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload().getValue() instanceof InputStream);
-    assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 
   @Rule
@@ -57,7 +55,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   public void blockingResponseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
     assertTrue(event.getMessage().getPayload().getValue() instanceof String);
-    assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo("value"));
   }
 
   @Test

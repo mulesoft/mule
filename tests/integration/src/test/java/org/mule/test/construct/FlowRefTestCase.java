@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -81,6 +82,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
     }
   }
 
+  @Ignore("MULE-11482 - ignoring since it's going to be removed on next commit")
   @Test
   public void dynamicFlowRefProcessorPath() throws Exception {
     flowRunner("flow2").withPayload("0").withVariable("letter", "J").run();
@@ -90,6 +92,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
                is("/flow2/processors/0/sub-flow-J/subprocessors/0"));
   }
 
+  @Ignore("MULE-11482 - ignoring since it's going to be removed on next commit")
   @Test
   public void dynamicFlowRefProcessorPathSameSubflowFromSingleFlow() throws Exception {
     flowRunner("flow3").withPayload("0").withVariable("letter", "J").run();
@@ -101,6 +104,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
                is("/flow3/processors/1/sub-flow-J/subprocessors/0"));
   }
 
+  @Ignore("MULE-11482 - ignoring since it's going to be removed on next commit")
   @Test
   public void dynamicFlowRefProcessorPathSameSubflowFromDifferentFlow() throws Exception {
     flowRunner("flow2").withPayload("0").withVariable("letter", "J").run();

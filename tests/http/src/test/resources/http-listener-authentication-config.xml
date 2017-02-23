@@ -3,6 +3,7 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:ss="http://www.springframework.org/schema/security"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
@@ -10,7 +11,8 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
         http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
-        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:beans>
         <ss:authentication-manager alias="authenticationManager">
@@ -25,8 +27,9 @@
     </spring:beans>
 
     <mule-ss:security-manager>
-        <mule-ss:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager" />
+        <mule-ss:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
+
 
     <httpn:listener-config name="listenerConfigBasicAuth">
         <httpn:listener-connection host="localhost" port="${port}"/>
@@ -34,8 +37,16 @@
 
     <flow name="listenerBasicAuth">
         <httpn:listener config-ref="listenerConfigBasicAuth" path="/basic"/>
-        <httpn:basic-security-filter realm="mule-realm"/>
+        <httpn:basic-security-filter realm="mule-realm" securityProviders="#[[attributes.queryParams.provider]]"/>
         <set-payload value="TestBasicAuthOk"/>
+        <error-handler>
+            <on-error-propagate type="HTTPN:UNAUTHORIZED">
+                <test:queue name="unauthorized"/>
+            </on-error-propagate>
+            <on-error-propagate type="HTTPN:SECURITY">
+                <test:queue name="security"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>

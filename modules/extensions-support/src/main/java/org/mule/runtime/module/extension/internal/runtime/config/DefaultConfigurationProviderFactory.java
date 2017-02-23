@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -37,7 +38,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                   ExtensionModel extensionModel,
                                                                   ConfigurationModel configurationModel,
                                                                   ResolverSet resolverSet,
-                                                                  ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                                  ConnectionProviderValueResolver connectionProviderResolver,
                                                                   DynamicConfigPolicy dynamicConfigPolicy)
       throws Exception {
     configureConnectionProviderResolver(name, connectionProviderResolver);
@@ -53,7 +54,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                  ExtensionModel extensionModel,
                                                                  ConfigurationModel configurationModel,
                                                                  ResolverSet resolverSet,
-                                                                 ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                                 ConnectionProviderValueResolver connectionProviderResolver,
                                                                  MuleContext muleContext)
       throws Exception {
     return withExtensionClassLoader(extensionModel, () -> {

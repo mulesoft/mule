@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -22,7 +23,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.api.lock.LockFactory;
 import org.mule.runtime.core.util.store.ObjectStorePartition;
 import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 

@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -35,6 +36,7 @@ import org.mule.test.vegan.extension.VeganPolicy;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -56,6 +58,12 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
   @Override
   protected void doSetUp() throws Exception {
     this.client = muleContext.getRegistry().lookupObject(ExtensionsClient.class);
+    HeisenbergOperations.disposed = false;
+  }
+
+  @After
+  public void after() {
+    HeisenbergOperations.disposed = false;
   }
 
   @Override
@@ -67,7 +75,6 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
   protected String[] getConfigFiles() {
     return new String[] {"vegan-config.xml", "heisenberg-config.xml"};
   }
-
 
   abstract <T, A extends Attributes> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
       throws Throwable;
@@ -114,6 +121,7 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
     assertThat(result.getOutput(), is("Killed with: You have been killed with Ricin , Type FIRE_WEAPON and attribute brand"));
   }
 
+
   @Test
   @Description("Executes an operation that has a parameter group using the client and checks the output")
   public void executeOperationWithParameterGroup() throws Throwable {
@@ -126,7 +134,6 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
     Result<String, Attributes> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
     assertThat(result.getOutput(), is(ALIAS_OUTPUT));
   }
-
 
   @Test
   @Description("Executes an operation that has a parameter with default value using the client and checks the output")
@@ -200,5 +207,19 @@ public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCa
     exception.expectMessage("No configuration [configDontExist] found");
     OperationParameters params = builder().configName("configDontExist").build();
     doExecute(VEGAN, "applyPolicy", params);
+  }
+
+  @Test
+  @Description("Checks that an operation disposes the resources after terminated")
+  public void disposeAfterExecution() throws Throwable {
+    executeSimpleOperation();
+    assertThat(HeisenbergOperations.disposed, is(true));
+  }
+
+  @Test
+  @Description("Checks that an operation disposes the resources when an error occurred while executing")
+  public void disposeOnFailureOperation() throws Throwable {
+    executeFailureOperation();
+    assertThat(HeisenbergOperations.disposed, is(true));
   }
 }

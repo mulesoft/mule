@@ -9,11 +9,12 @@ package org.mule.runtime.config.spring.dsl.spring;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSOR_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.QUEUE_STORE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.processor.ReferenceProcessor;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -43,14 +44,22 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String REF_ATTRIBUTE = "ref";
-  private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers = new ImmutableMap.Builder()
-      .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
-      .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
-      .put(TRANSFORMER_IDENTIFIER, getConsumer())
-      .build();
+  private ImmutableMap<ComponentIdentifier, Consumer<CreateBeanDefinitionRequest>> referenceConsumers =
+      new ImmutableMap.Builder()
+          .put(QUEUE_STORE_IDENTIFIER, getQueueStoreConsumer())
+          .put(PROCESSOR_IDENTIFIER, getProcessorConsumer())
+          .put(TRANSFORMER_IDENTIFIER, getConsumer())
+          .build();
 
   private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
-    return getFixedConsumer(Processor.class);
+    return (beanDefinitionRequest) -> {
+      ComponentModel componentModel = beanDefinitionRequest.getComponentModel();
+      componentModel.setBeanDefinition(rootBeanDefinition(ReferenceProcessor.class)
+          .addConstructorArgReference(componentModel.getParameters().get(REF_ATTRIBUTE)).getBeanDefinition());
+      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+      beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
+      componentModel.setType(objectTypeVisitor.getType());
+    };
   }
 
   private Consumer<CreateBeanDefinitionRequest> getQueueStoreConsumer() {
@@ -84,4 +93,5 @@ public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
     }
     return false;
   }
+
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.extension.db.integration.transaction;
 
-import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -27,10 +26,6 @@ public abstract class AbstractTxDbIntegrationTestCase extends AbstractDbIntegrat
 
   protected static final String MARS = "Mars";
   protected static final String MERCURY = "Mercury";
-
-  protected Map<String, Object> additionalVariables() {
-    return emptyMap();
-  }
 
   protected void executeTransaction(String flowName) throws Exception {
     FlowRunner flowRunner = flowRunner(flowName);

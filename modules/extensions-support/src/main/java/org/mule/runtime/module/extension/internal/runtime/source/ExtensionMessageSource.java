@@ -8,13 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -32,6 +33,7 @@ import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.ExceptionCallback;
@@ -43,7 +45,6 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
-import org.mule.runtime.module.extension.internal.runtime.operation.IllegalOperationException;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
 import java.util.Optional;
@@ -66,7 +67,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private MessageProcessingManager messageProcessingManager;
 
   @Inject
-  private SchedulerService schdulerService;
+  private SchedulerService schedulerService;
 
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
@@ -78,10 +79,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
 
-  public ExtensionMessageSource(ExtensionModel extensionModel, SourceModel sourceModel, SourceAdapterFactory sourceAdapterFactory,
-                                ConfigurationProvider configurationProvider, RetryPolicyTemplate retryPolicyTemplate,
+  public ExtensionMessageSource(ExtensionModel extensionModel,
+                                SourceModel sourceModel,
+                                SourceAdapterFactory sourceAdapterFactory,
+                                ConfigurationProvider configurationProvider,
+                                RetryPolicyTemplate retryPolicyTemplate,
+                                CursorStreamProviderFactory cursorStreamProviderFactory,
                                 ExtensionManager managerAdapter) {
-    super(extensionModel, sourceModel, configurationProvider, managerAdapter);
+    super(extensionModel, sourceModel, configurationProvider, cursorStreamProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
@@ -129,6 +134,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setProcessContextSupplier(this::createProcessingContext)
+        .setCursorStreamProviderFactory(getCursorStreamProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();
   }
@@ -167,10 +173,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void doStart() throws MuleException {
     if (retryScheduler == null) {
-      retryScheduler = schdulerService.ioScheduler();
+      retryScheduler = schedulerService.ioScheduler();
     }
     if (flowTriggerScheduler == null) {
-      flowTriggerScheduler = schdulerService.cpuLightScheduler();
+      flowTriggerScheduler = schedulerService.cpuLightScheduler();
     }
 
     startSource();
@@ -256,7 +262,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       @Override
       public ComponentIdentifier getSourceIdentifier() {
-        return new ComponentIdentifier.Builder().withNamespace(getExtensionModel().getName().toLowerCase())
+        return builder().withNamespace(getExtensionModel().getName().toLowerCase())
             .withName(sourceModel.getName()).build();
       }
 
@@ -312,11 +318,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
         && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
-      throw new IllegalOperationException(format(
-                                                 "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-                                                     + "The selected config does not support that operation.",
-                                                 flowConstruct.getName(), sourceModel.getName(),
-                                                 configurationProvider.getName()));
+      throw new IllegalSourceException(format(
+                                              "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                  + "The selected config does not support that operation.",
+                                              flowConstruct.getName(), sourceModel.getName(),
+                                              configurationProvider.getName()));
     }
   }
 

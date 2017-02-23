@@ -12,10 +12,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -24,7 +26,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.exception.TypedException;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.tck.size.SmallTest;
 
@@ -89,7 +90,7 @@ public class ModuleExceptionHandlerTestCase {
   public void handleTypedException() {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
-    typeRepository.addErrorType(new ComponentIdentifier.Builder()
+    typeRepository.addErrorType(builder()
         .withName(CONNECTIVITY_ERROR_IDENTIFIER)
         .withNamespace(ERROR_NAMESPACE)
         .build(),

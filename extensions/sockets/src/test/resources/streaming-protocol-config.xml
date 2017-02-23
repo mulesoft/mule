@@ -23,11 +23,13 @@
     </sockets:listener-config>
 
     <flow name="tcp-send">
-        <sockets:send config-ref="tcp-requester" hasResponse="false"/>
+        <sockets:send config-ref="tcp-requester"/>
     </flow>
 
     <flow name="tcp-listen">
-        <sockets:socket-listener config-ref="tcp-listener"/>
+        <sockets:socket-listener config-ref="tcp-listener">
+            <in-memory-stream />
+        </sockets:socket-listener>
         <component>
             <!-- This component knows how to look for EOF -->
             <singleton-object class="org.mule.extension.socket.EOFStreamingTestComponent" />

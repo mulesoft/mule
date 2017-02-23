@@ -8,6 +8,7 @@
 package org.mule.extension.db.integration;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang.StringUtils.endsWith;
 import static org.apache.commons.lang.StringUtils.replace;
 import static org.apache.commons.lang.StringUtils.startsWith;
@@ -20,8 +21,9 @@ import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
+import org.junit.Before;
+import org.junit.runners.Parameterized;
 import org.mule.extension.db.api.StatementResult;
-import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
@@ -34,30 +36,27 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.sql.DataSource;
-
-import org.junit.Before;
-import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase
@@ -83,6 +82,10 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     testDatabase.createDefaultDatabaseConfig(getDefaultDataSource());
   }
 
+  protected Map<String, Object> additionalVariables() {
+    return emptyMap();
+  }
+
   protected DataSource getDefaultDataSource() {
     return getDefaultDataSource("dbConfig");
   }
@@ -92,13 +95,21 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
       ConfigurationProvider configurationProvider = muleContext.getRegistry().get(configName);
       ConnectionProviderWrapper<DbConnection> connectionProviderWrapper =
           (ConnectionProviderWrapper<DbConnection>) configurationProvider
-              .get(testEvent())
+              .get(getEvent())
               .getConnectionProvider().get();
 
       return ((DbConnectionProvider) unwrapProviderWrapper(connectionProviderWrapper)).getConfiguredDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private Event getEvent() throws MuleException {
+    Event.Builder builder = Event.builder(testEvent());
+    additionalVariables()
+        .entrySet()
+        .forEach(entry -> builder.addVariable(entry.getKey(), entry.getValue()));
+    return builder.build();
   }
 
   @Override

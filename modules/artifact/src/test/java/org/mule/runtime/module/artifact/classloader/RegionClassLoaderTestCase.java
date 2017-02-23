@@ -20,9 +20,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.REGION_OWNER_CANNOT_BE_REMOVED_ERROR;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createCannotRemoveClassLoaderError;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
@@ -316,14 +316,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     return classLoaders;
   }
 
-  public static class TestApplicationClassLoader extends TestArtifactClassLoader implements DisposableClassLoader {
+  public static class TestApplicationClassLoader extends TestArtifactClassLoader {
 
-    private boolean disposed;
-
-    @Override
-    public void dispose() {
-      this.disposed = true;
-    }
   }
 
   // Used to ensure that the composite classloader is able to access

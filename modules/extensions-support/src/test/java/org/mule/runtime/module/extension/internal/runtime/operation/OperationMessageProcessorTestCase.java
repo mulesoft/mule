@@ -48,6 +48,7 @@ import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -69,7 +70,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -99,7 +99,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                         extensionManager, mockPolicyManager);
+                                         cursorStreamProviderFactory, extensionManager, mockPolicyManager);
   }
 
   @Test
@@ -306,7 +306,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void executeWithPolicy() throws Exception {
     ComponentIdentifier componentIdentifier =
-        new ComponentIdentifier.Builder().withNamespace(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
+        ComponentIdentifier.builder().withNamespace(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
     when(extensionModel.getName()).thenReturn(componentIdentifier.getNamespace());
     when(operationModel.getName()).thenReturn(componentIdentifier.getName());
 
@@ -365,7 +365,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     final OutputTypeResolver outputTypeResolver = mock(OutputTypeResolver.class);
     when(outputTypeResolver.getOutputType(any(), eq("person"))).thenReturn(objectType);
     when(metadataResolverFactory.getOutputResolver()).thenReturn(outputTypeResolver);
-    //verify(operationModel).getTypedModel(any(), any());
+    // verify(operationModel).getTypedModel(any(), any());
 
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = messageProcessor.getMetadata();
     assertThat(metadata.isSuccess(), is(true));

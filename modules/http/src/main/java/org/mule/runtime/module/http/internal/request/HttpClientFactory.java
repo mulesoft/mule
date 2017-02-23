@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
+import org.mule.runtime.core.api.scheduler.SchedulerService;
+
 /**
  * Factory object for {@link HttpClient} mule-to-httpLibrary adapters.
  */
@@ -13,8 +15,9 @@ public interface HttpClientFactory {
 
   /**
    * @param configuration the configuration to use for the underlying http library.
+   * @param schedulerService the provider of the thread pools to be used by the grizzly client
    * @return a newly built {@link HttpClient}
    */
-  HttpClient create(HttpClientConfiguration configuration);
+  HttpClient create(HttpClientConfiguration configuration, SchedulerService schedulerService);
 
 }

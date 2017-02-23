@@ -9,13 +9,14 @@ package org.mule.test.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager.MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.internal.HttpParser.appendQueryParam;
-import static org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager.MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpResponse;

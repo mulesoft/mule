@@ -19,9 +19,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -33,7 +35,6 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeLocatorFactory;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -57,7 +58,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
   private static final String OAUTH_TEST_CONNECTIVITY_ERROR_TYPE = "OAUTH_CONNECTIVITY";
   private static final String MULE = "MULE";
 
-  private static final ComponentIdentifier OPERATION_IDENTIFIER = new ComponentIdentifier.Builder()
+  private static final ComponentIdentifier OPERATION_IDENTIFIER = builder()
       .withName(NameUtils.hyphenize(OPERATION_NAME))
       .withNamespace(EXTENSION_NAMESPACE)
       .build();
@@ -142,9 +143,9 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     when(extensionModel.getErrorModels()).thenReturn(singleton(oauthExtensionConnectivityError));
     errorsRegistrant.registerErrors(extensionModel);
 
-    Optional<ErrorType> optionalOAuthType = typeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+    Optional<ErrorType> optionalOAuthType = typeRepository.lookupErrorType(builder()
         .withName(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE).withNamespace(EXTENSION_NAMESPACE).build());
-    Optional<ErrorType> optionalConnectivityType = typeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+    Optional<ErrorType> optionalConnectivityType = typeRepository.lookupErrorType(builder()
         .withName(TEST_CONNECTIVITY_ERROR_TYPE).withNamespace(EXTENSION_NAMESPACE).build());
 
     assertThat(optionalOAuthType.isPresent(), is(true));

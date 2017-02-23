@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
@@ -13,10 +15,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_P
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.VALUE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.List;
 import java.util.Properties;
@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 import org.springframework.util.PropertyPlaceholderHelper;
 
 /**
- * Class used to read xml files from {@link ConfigLine}s, unifying knowledge on how to properly read the files returning
- * the {@link ComponentModel} object.
+ * Class used to read xml files from {@link ConfigLine}s, unifying knowledge on how to properly read the files returning the
+ * {@link ComponentModel} object.
  *
  * It also replaces the values of the attributes by using the {@link Properties} object parametrized in its constructor.
  */
@@ -43,9 +43,12 @@ public class ComponentModelReader {
 
     String namespace = configLine.getNamespace() == null ? CORE_NAMESPACE : configLine.getNamespace();
     ComponentModel.Builder builder = new ComponentModel.Builder()
-        .setIdentifier(new ComponentIdentifier.Builder().withNamespace(namespace).withName(configLine.getIdentifier()).build())
-        .setTextContent(configLine.getTextContent());
-    to(builder).addNode(from(configLine).getNode()).addConfigFileName(configFileName);
+        .setIdentifier(builder().withNamespace(namespace).withName(configLine.getIdentifier())
+            .build())
+        .setTextContent(configLine.getTextContent())
+        .setConfigFileName(configFileName)
+        .setLineNumber(configLine.getLineNumber());
+    to(builder).addNode(from(configLine).getNode());
     for (SimpleConfigAttribute simpleConfigAttribute : configLine.getConfigAttributes().values()) {
       builder.addParameter(simpleConfigAttribute.getName(), resolveValueIfIsPlaceHolder(simpleConfigAttribute.getValue()),
                            simpleConfigAttribute.isValueFromSchema());

@@ -42,6 +42,7 @@
     <xs:complexType name="GetConnectionType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -64,6 +65,7 @@
     <xs:complexType name="VerifyNoTransactionType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -81,6 +83,7 @@
     <xs:complexType name="VerifyTransactionBegunType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -98,6 +101,7 @@
     <xs:complexType name="VerifyTransactionCommitedType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -115,6 +119,7 @@
     <xs:complexType name="VerifyTransactionRolledbackType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -131,7 +136,9 @@
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FailType" substitutionGroup="mule:abstract-operator" name="fail"></xs:element>
     <xs:complexType name="FailType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType"></xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+            </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 </xs:schema>

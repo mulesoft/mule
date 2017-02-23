@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.module.artifact.classloader.DefaultResourceReleaser;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -139,12 +140,12 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
       super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, new ClassLoaderLookupPolicy() {
 
         @Override
-        public ClassLoaderLookupStrategy getLookupStrategy(String className) {
-          return ClassLoaderLookupStrategy.PARENT_FIRST;
+        public LookupStrategy getLookupStrategy(String className) {
+          return PARENT_FIRST;
         }
 
         @Override
-        public ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies) {
+        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
           return null;
         }
       });

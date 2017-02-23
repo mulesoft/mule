@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -53,6 +54,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
@@ -165,6 +167,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   protected OperationMessageProcessor messageProcessor;
 
+  protected CursorStreamProviderFactory cursorStreamProviderFactory;
   protected String configurationName = CONFIG_NAME;
   protected String target = EMPTY;
 
@@ -172,6 +175,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Before
   public void before() throws Exception {
+    cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(muleContext);
     event = configureEvent();
     when(context.getInjector().inject(any())).thenAnswer(invocationOnMock -> {
       final Object subject = invocationOnMock.getArguments()[0];

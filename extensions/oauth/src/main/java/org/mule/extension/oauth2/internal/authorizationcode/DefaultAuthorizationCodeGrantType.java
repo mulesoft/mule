@@ -6,50 +6,35 @@
  */
 package org.mule.extension.oauth2.internal.authorizationcode;
 
-import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
-import static org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
-import org.mule.extension.oauth2.api.RequestAuthenticationException;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
-import org.mule.extension.oauth2.internal.OAuthCallbackServersManager;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
-import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.oauth.api.OAuthService;
+import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.HttpServerConfiguration;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.slf4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Represents the config element for {@code oauth:authentication-code-config}.
@@ -59,21 +44,7 @@ import org.slf4j.Logger;
  * authentication code and retrieve the access token
  */
 @Alias("authorization-code-grant-type")
-public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Lifecycle, AuthorizationCodeGrantType {
-
-  private static final Logger LOGGER = getLogger(DefaultAuthorizationCodeGrantType.class);
-
-  /**
-   * Application identifier as defined in the oauth authentication server.
-   */
-  @Parameter
-  private String clientId;
-
-  /**
-   * Application secret as defined in the oauth authentication server.
-   */
-  @Parameter
-  private String clientSecret;
+public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
 
   /**
    * Listener configuration to be used instead of localCallbackUrl. Note that if using this you must also provide a
@@ -108,34 +79,43 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   private String externalCallbackUrl;
 
   /**
-   * This element configures an automatic flow created by mule to handle
-   */
-  @Parameter
-  @ParameterGroup(name = "authorization-request")
-  private AuthorizationRequestHandler authorizationRequestHandler;
-
-  /**
-   * This element configures an automatic flow created by mule that listens in the configured url by the redirectUrl attribute and
-   * process the request to retrieve an access token from the oauth authentication server.
-   */
-  @Parameter
-  @ParameterGroup(name = "token-request")
-  private AutoAuthorizationCodeTokenRequestHandler tokenRequestHandler;
-
-  private OAuthCallbackServersManager serversManager;
-  private SchedulerService schedulerService;
-
-  /**
-   * References a TLS config that will be used to receive incoming HTTP request and do HTTP request during the OAuth dance.
+   * State parameter for holding state between the authentication request and the callback done by the oauth authorization server
+   * to the redirectUrl.
    */
   @Parameter
   @Optional
-  @Expression(NOT_SUPPORTED)
-  @DisplayName(TLS_CONFIGURATION)
-  @Placement(tab = SECURITY_TAB)
-  private TlsContextFactory tlsContextFactory;
+  private ParameterResolver<String> state;
 
-  private HttpServer server;
+  /**
+   * Identifier under which the oauth authentication attributes are stored (accessToken, refreshToken, etc).
+   * <p>
+   * This attribute is only required when the applications needs to access resources from more than one user in the OAuth
+   * authentication server.
+   */
+  @Parameter
+  @Optional
+  private ParameterResolver<String> localAuthorizationUrlResourceOwnerId;
+
+  /**
+   * If this attribute is provided mule will automatically create and endpoint in the host server that the user can hit to
+   * authenticate and grant access to the application for his account.
+   */
+  @Parameter
+  private String localAuthorizationUrl;
+
+  /**
+   * The oauth authentication server url to authorize the app for a certain user.
+   */
+  @Parameter
+  private String authorizationUrl;
+
+  /**
+   * Custom parameters to send to the authorization request url or the oauth authorization sever.
+   */
+  @Parameter
+  @Optional
+  @Alias("custom-parameters")
+  private Map<String, String> customParameters = new HashMap<>();
 
   /**
    * Identifier under which the oauth authentication attributes are stored (accessToken, refreshToken, etc).
@@ -147,172 +127,95 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
   @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID)
   private ParameterResolver<String> resourceOwnerId;
 
-  @Override
   public HttpListenerConfig getLocalCallbackConfig() {
     return localCallbackConfig;
   }
 
-  @Override
   public String getLocalCallbackConfigPath() {
     return localCallbackConfigPath;
   }
 
-  @Override
   public String getLocalCallbackUrl() {
     return localCallbackUrl;
   }
 
-  @Override
   public String getExternalCallbackUrl() {
     return externalCallbackUrl;
   }
 
-  @Override
   public ConfigOAuthContext getUserOAuthContext() {
     return tokenManager.getConfigOAuthContext();
   }
 
   @Override
-  public String getClientSecret() {
-    return clientSecret;
-  }
-
-  @Override
-  public String getClientId() {
-    return clientId;
-  }
-
-  @Override
-  public TlsContextFactory getTlsContext() {
-    return tlsContextFactory;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
+  protected OAuthDancerBuilder configDancer(OAuthService oauthService)
+      throws InitialisationException {
+    OAuthAuthorizationCodeDancerBuilder dancerBuilder =
+        oauthService.authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
+                                                             new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                             muleContext.getExpressionManager());
     try {
-      this.serversManager = muleContext.getRegistry().lookupObject(OAuthCallbackServersManager.class);
-      this.schedulerService = muleContext.getSchedulerService();
-
-      if (tokenManager == null) {
-        this.tokenManager = TokenManagerConfig.createDefault(muleContext);
-      }
-      initialiseIfNeeded(tokenManager, muleContext);
-
       if (localCallbackConfig != null && localCallbackUrl != null) {
         throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackUrl are mutually exclusive");
       }
       if ((localCallbackConfig == null) != (localCallbackConfigPath == null)) {
         throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackConfigPath must be both present or absent");
       }
-
-      if (tlsContextFactory != null) {
-        initialiseIfNeeded(tlsContextFactory);
-        tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
-      }
-      tokenRequestHandler.setMuleContext(muleContext);
-      tokenRequestHandler.initialise();
-
-      buildHttpServer();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
-  }
-
-  private void buildHttpServer() throws InitialisationException {
-    final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
-
-    if (getLocalCallbackUrl() != null) {
-      try {
-        final URL localCallbackUrl = new URL(getLocalCallbackUrl());
-        serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
-      } catch (MalformedURLException e) {
-        LOGGER.warn("Could not parse provided url %s. Validate that the url is correct", getLocalCallbackUrl());
-        throw new InitialisationException(e, this);
-      }
-    } else if (getLocalCallbackConfig() != null) {
-      // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
-      throw new UnsupportedOperationException("Not implemented yet.");
-    } else {
-      throw new IllegalStateException("No localCallbackUrl or localCallbackConfig defined.");
-    }
-
-    if (getTlsContext() != null) {
-      serverConfigBuilder.setTlsContextFactory(getTlsContext());
-    }
-
-    // TODO MULE-11272 Change to cpu-lite
-    HttpServerConfiguration serverConfiguration =
-        serverConfigBuilder.setSchedulerSupplier(() -> schedulerService.ioScheduler()).build();
 
     try {
-      server = serversManager.getServer(serverConfiguration);
-    } catch (ConnectionException e) {
-      LOGGER.warn("Could not create server for OAuth callback.");
+      if (localCallbackUrl != null) {
+        if (getTlsContextFactory() != null) {
+          dancerBuilder = dancerBuilder.localCallback(new URL(localCallbackUrl), getTlsContextFactory());
+        } else {
+          dancerBuilder = dancerBuilder.localCallback(new URL(localCallbackUrl));
+        }
+      } else if (localCallbackConfig != null) {
+        // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
+        HttpServer server = null;
+        dancerBuilder = dancerBuilder.localCallback(server, localCallbackConfigPath);
+        throw new UnsupportedOperationException("Not implemented yet.");
+      }
+      dancerBuilder = dancerBuilder
+          .localAuthorizationUrlPath(new URL(localAuthorizationUrl).getPath())
+          .localAuthorizationUrlResourceOwnerId(resolver.getExpression(localAuthorizationUrlResourceOwnerId))
+          .customParameters(customParameters)
+          .state(resolver.getExpression(state))
+          .authorizationUrl(authorizationUrl)
+          .externalCallbackUrl(externalCallbackUrl);
+      return dancerBuilder;
+    } catch (MalformedURLException e) {
       throw new InitialisationException(e, this);
     }
-
   }
 
   @Override
   public void authenticate(HttpRequestBuilder builder) throws MuleException {
-    final String accessToken =
-        getUserOAuthContext().getContextForResourceOwner(resourceOwnerId.resolve()).getAccessToken();
-    if (accessToken == null) {
-      throw new RequestAuthenticationException(createStaticMessage(format("No access token for the '%s' user. Verify that you have authenticated the user before trying to execute an operation to the API.",
-                                                                          resourceOwnerId.resolve())));
+    try {
+      builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(dancer.accessToken(resourceOwnerId.resolve()).get()));
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      throw new DefaultMuleException(e);
+    } catch (ExecutionException e) {
+      throw new DefaultMuleException(e.getCause());
     }
-    builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(accessToken));
   }
 
   @Override
   public boolean shouldRetry(final Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
-    Boolean shouldRetryRequest = resolver.resolveExpression(tokenRequestHandler.getRefreshTokenWhen(), firstAttemptResult);
+    Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
-      tokenRequestHandler.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult));
+      try {
+        dancer.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult)).get();
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+        throw new DefaultMuleException(e);
+      } catch (ExecutionException e) {
+        throw new DefaultMuleException(e.getCause());
+      }
     }
     return shouldRetryRequest;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    super.setMuleContext(muleContext);
-    authorizationRequestHandler.setMuleContext(muleContext);
-  }
-
-  @Override
-  public void start() throws MuleException {
-    try {
-      server.start();
-    } catch (IOException e) {
-      throw new DefaultMuleException(e);
-    }
-
-    if (authorizationRequestHandler != null) {
-      authorizationRequestHandler.setOauthConfig(this);
-      authorizationRequestHandler.init();
-      authorizationRequestHandler.start();
-    }
-    if (tokenRequestHandler != null) {
-      tokenRequestHandler.setOauthConfig(this);
-      tokenRequestHandler.init();
-      tokenRequestHandler.start();
-    }
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    tokenRequestHandler.stop();
-    authorizationRequestHandler.stop();
-    server.stop();
-  }
-
-  @Override
-  public void dispose() {
-    server.dispose();
-  }
-
-  @Override
-  public HttpServer getServer() {
-    return server;
   }
 }

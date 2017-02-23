@@ -21,14 +21,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
@@ -142,13 +142,12 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .transform(next)
         .doOnNext(result -> setCurrentEvent(result)));
 
-    List<ProcessorInterceptor> interceptionHandlerChain = muleContext.getProcessorInterceptorManager().getInterceptors();
     List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptorsToBeExecuted =
         new LinkedList<>();
     // TODO MULE-11521 Review how interceptors are registered!
-    interceptionHandlerChain.stream()
-        .forEach(interceptionHandler -> {
-          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptionHandler);
+    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
+        .forEach(interceptorFactory -> {
+          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
           reactiveInterceptorAdapter.setFlowConstruct(flowConstruct);
           interceptorsToBeExecuted.add(0, reactiveInterceptorAdapter);
         });
@@ -202,8 +201,9 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
                                 int action) {
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
-      if (flowConstruct instanceof MessageProcessorPathResolver
-          && ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(processor) != null) {
+
+      if (processor instanceof AnnotatedObject
+          && ((AnnotatedObject) processor).getLocation() != null) {
         serverNotificationManager
             .fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
       }

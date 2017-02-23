@@ -18,7 +18,9 @@ public class AcceptsAllMethodsRequestMatcher extends DefaultMethodRequestMatcher
 
   private static AcceptsAllMethodsRequestMatcher instance = new AcceptsAllMethodsRequestMatcher();
 
-  private AcceptsAllMethodsRequestMatcher() {}
+  private AcceptsAllMethodsRequestMatcher() {
+    super(new String[] {"*"});
+  }
 
   @Override
   public boolean matches(HttpRequest httpRequest) {

@@ -8,7 +8,7 @@ package org.mule.test.usecases.routing.response;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -47,7 +47,7 @@ public class SerializationOnResponseAggregatorTestCase extends AbstractIntegrati
     muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME,
                                              new TestObjectStore(muleContext));
     HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + dynamicPort.getNumber())
-        .setEntity(new ByteArrayHttpEntity("request".getBytes())).setMethod(POST.name()).build();
+        .setEntity(new ByteArrayHttpEntity("request".getBytes())).setMethod(POST).build();
 
     HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 

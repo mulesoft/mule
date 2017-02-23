@@ -9,8 +9,7 @@ package org.mule.runtime.container.internal;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
+import org.mule.runtime.container.api.MuleModule;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -25,6 +24,11 @@ import java.util.Set;
 public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   public static final String MODULE_PROPERTIES = "META-INF/mule-module.properties";
+  public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
+  public static final String PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.privileged.classPackages";
+  public static final String PRIVILEGED_ARTIFACTS_PROPERTY = "artifact.privileged.artifacts";
+  public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
+
   private final ClassLoader classLoader;
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader) {
@@ -55,23 +59,43 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   private MuleModule createModule(Properties moduleProperties) {
     final String moduleName = (String) moduleProperties.get("module.name");
-    if (isEmpty(moduleName)) {
-      throw new IllegalStateException("Mule-module.properties must contain module.name property");
-    }
+    Set<String> modulePackages = getExportedPackageByProperty(moduleProperties, EXPORTED_CLASS_PACKAGES_PROPERTY);
+    Set<String> modulePaths = getExportedResourcePaths(moduleProperties);
+    Set<String> modulePrivilegedPackages =
+        getExportedPackageByProperty(moduleProperties, PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY);
+    Set<String> privilegedArtifacts = getPrivilegedArtifactIds(moduleProperties);
 
-    Set<String> modulePackages = new HashSet<>();
-    Set<String> modulePaths = new HashSet<>();
+    return new MuleModule(moduleName, modulePackages, modulePaths, modulePrivilegedPackages, privilegedArtifacts);
+  }
 
-    final String exportedPackagesProperty = (String) moduleProperties.get(EXPORTED_CLASS_PACKAGES_PROPERTY);
-    if (!isEmpty(exportedPackagesProperty)) {
-      for (String packageName : exportedPackagesProperty.split(",")) {
-        packageName = packageName.trim();
-        if (!isEmpty(packageName)) {
-          modulePackages.add(packageName);
+  private Set<String> getPrivilegedArtifactIds(Properties moduleProperties) {
+    Set<String> privilegedArtifacts;
+    final String privilegedArtifactsProperty = (String) moduleProperties.get(PRIVILEGED_ARTIFACTS_PROPERTY);
+    Set<String> artifactsIds = new HashSet<>();
+    if (!isEmpty(privilegedArtifactsProperty)) {
+      for (String artifactName : privilegedArtifactsProperty.split(",")) {
+        if (!isEmpty(artifactName.trim())) {
+          artifactsIds.add(artifactName);
         }
       }
     }
+    privilegedArtifacts = artifactsIds;
+    return privilegedArtifacts;
+  }
 
+  private Set<String> getExportedPackageByProperty(Properties moduleProperties, String privilegedExportedClassPackagesProperty) {
+    final String privilegedExportedPackagesProperty = (String) moduleProperties.get(privilegedExportedClassPackagesProperty);
+    Set<String> modulePrivilegedPackages;
+    if (!isEmpty(privilegedExportedPackagesProperty)) {
+      modulePrivilegedPackages = getPackagesFromProperty(privilegedExportedPackagesProperty);
+    } else {
+      modulePrivilegedPackages = new HashSet<>();
+    }
+    return modulePrivilegedPackages;
+  }
+
+  private Set<String> getExportedResourcePaths(Properties moduleProperties) {
+    Set<String> paths = new HashSet<>();
     final String exportedResourcesProperty = (String) moduleProperties.get(EXPORTED_RESOURCE_PROPERTY);
     if (!isEmpty(exportedResourcesProperty)) {
       for (String path : exportedResourcesProperty.split(",")) {
@@ -79,12 +103,21 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
           if (path.startsWith("/")) {
             path = path.substring(1);
           }
-          modulePaths.add(path);
+          paths.add(path);
         }
       }
     }
-
-    return new MuleModule(moduleName, modulePackages, modulePaths);
+    return paths;
   }
 
+  private Set<String> getPackagesFromProperty(String privilegedExportedPackagesProperty) {
+    Set<String> packages = new HashSet<>();
+    for (String packageName : privilegedExportedPackagesProperty.split(",")) {
+      packageName = packageName.trim();
+      if (!isEmpty(packageName)) {
+        packages.add(packageName);
+      }
+    }
+    return packages;
+  }
 }

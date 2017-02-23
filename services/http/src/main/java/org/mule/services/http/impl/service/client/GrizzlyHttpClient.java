@@ -9,19 +9,20 @@ package org.mule.services.http.impl.service.client;
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.DECOMPRESS_RESPONSE;
 import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Runtime.getRuntime;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.internal.request.grizzly.CompositeTransportCustomizer;
-import org.mule.runtime.module.http.internal.request.grizzly.CustomTimeoutThrottleRequestFilter;
-import org.mule.runtime.module.http.internal.request.grizzly.IOStrategyTransportCustomizer;
-import org.mule.runtime.module.http.internal.request.grizzly.LoggerTransportCustomizer;
 import org.mule.service.http.api.client.HttpAuthenticationType;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -85,11 +86,15 @@ public class GrizzlyHttpClient implements HttpClient {
   private int connectionIdleTimeout;
 
   private String threadNamePrefix;
+  private Scheduler selectorScheduler;
+  private Scheduler workerScheduler;
+  private SchedulerService schedulerService;
   private String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
 
-  public GrizzlyHttpClient(HttpClientConfiguration config) {
+
+  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService) {
     this.tlsContextFactory = config.getTlsContextFactory();
     this.proxyConfig = config.getProxyConfig();
     this.clientSocketProperties = config.getClientSocketProperties();
@@ -98,10 +103,17 @@ public class GrizzlyHttpClient implements HttpClient {
     this.connectionIdleTimeout = config.getConnectionIdleTimeout();
     this.threadNamePrefix = config.getThreadNamePrefix();
     this.ownerName = config.getOwnerName();
+
+    this.schedulerService = schedulerService;
   }
 
   @Override
   public void start() {
+    selectorScheduler = schedulerService
+        .customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix),
+                         MAX_VALUE);
+    workerScheduler = schedulerService.ioScheduler();
+
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
     builder.setAllowPoolingConnections(true);
 
@@ -180,7 +192,8 @@ public class GrizzlyHttpClient implements HttpClient {
   private void configureTransport(AsyncHttpClientConfig.Builder builder) {
     GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
     CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
-    compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer(threadNamePrefix));
+    compositeTransportCustomizer
+        .addTransportCustomizer(new IOStrategyTransportCustomizer(selectorScheduler, workerScheduler));
     compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
 
     if (clientSocketProperties != null) {
@@ -374,6 +387,8 @@ public class GrizzlyHttpClient implements HttpClient {
   @Override
   public void stop() {
     asyncHttpClient.close();
+    workerScheduler.stop(5, SECONDS);
+    selectorScheduler.stop(5, SECONDS);
   }
 
   private class ResponseBodyDeferringAsyncHandler implements AsyncHandler<Response> {
@@ -392,6 +407,7 @@ public class GrizzlyHttpClient implements HttpClient {
       this.input = new PipedInputStream(output);
     }
 
+    @Override
     public void onThrowable(Throwable t) {
       try {
         closeOut();
@@ -411,19 +427,22 @@ public class GrizzlyHttpClient implements HttpClient {
       }
     }
 
+    @Override
     public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
       responseBuilder.reset();
       responseBuilder.accumulate(responseStatus);
       return STATE.CONTINUE;
     }
 
+    @Override
     public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
       responseBuilder.accumulate(headers);
       return STATE.CONTINUE;
     }
 
+    @Override
     public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
-      //body arrived, can handle the partial response
+      // body arrived, can handle the partial response
       handleIfNecessary();
       bodyPart.writeTo(output);
       return STATE.CONTINUE;
@@ -437,8 +456,9 @@ public class GrizzlyHttpClient implements HttpClient {
       }
     }
 
+    @Override
     public Response onCompleted() throws IOException {
-      //there may have been no body, handle partial response
+      // there may have been no body, handle partial response
       handleIfNecessary();
       closeOut();
       return null;

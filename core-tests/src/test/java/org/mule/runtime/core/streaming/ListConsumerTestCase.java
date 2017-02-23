@@ -11,6 +11,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import org.mule.runtime.core.internal.streaming.object.ClosedConsumerException;
+import org.mule.runtime.core.internal.streaming.object.Consumer;
+import org.mule.runtime.core.internal.streaming.object.ListConsumer;
+import org.mule.runtime.core.internal.streaming.object.Producer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

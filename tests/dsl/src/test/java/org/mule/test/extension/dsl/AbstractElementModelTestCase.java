@@ -12,12 +12,13 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -29,8 +30,6 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.io.InputStream;
@@ -47,7 +46,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.junit.Before;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -69,8 +67,9 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   protected static final String HTTP_NS = "http://www.mulesoft.org/schema/mule/httpn";
   protected static final String COMPONENTS_FLOW = "testFlow";
   protected static final int LISTENER_PATH = 0;
-  protected static final int DB_INSERT_PATH = 2;
+  protected static final int DB_BULK_INSERT_PATH = 2;
   protected static final int REQUESTER_PATH = 3;
+  protected static final int DB_INSERT_PATH = 4;
 
   protected DslResolvingContext dslContext;
   protected DslElementModelFactory modelResolver;
@@ -137,7 +136,7 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   }
 
   protected ComponentIdentifier newIdentifier(String name, String ns) {
-    return ComponentIdentifier.builder().withName(name).withNamespace(ns).build();
+    return builder().withName(name).withNamespace(ns).build();
   }
 
   protected void assertHasParameter(ParameterizedModel model, String name) {
@@ -176,22 +175,6 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     return new ApplicationModel(artifactConfig, new ArtifactDeclaration());
   }
 
-  protected void addSchemaLocation(ExtensionModel extension) {
-
-    XmlDslModel xmlDslModel = extension.getXmlDslModel();
-    String location = xmlDslModel.getNamespaceUri() + " " + xmlDslModel.getSchemaLocation();
-
-    Attr schemaLocation = doc.getDocumentElement().getAttributeNodeNS("http://www.w3.org/2001/XMLSchema-instance",
-                                                                      "schemaLocation");
-    if (schemaLocation != null) {
-      location = schemaLocation.getValue().concat(" ").concat(location);
-    }
-
-    doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
-                                            "xsi:schemaLocation",
-                                            location);
-  }
-
   protected String write() throws Exception {
     // write the content into xml file
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -220,6 +203,10 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     mule.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                         "xsi:schemaLocation",
                         "http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd");
+  }
+
+  protected void assertValue(DslElementModel elementModel, String value) {
+    assertThat(elementModel.getValue().get(), is(value));
   }
 
 }

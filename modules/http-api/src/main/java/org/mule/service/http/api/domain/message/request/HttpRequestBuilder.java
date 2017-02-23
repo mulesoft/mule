@@ -7,13 +7,16 @@
 package org.mule.service.http.api.domain.message.request;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+
+import org.mule.service.http.api.HttpConstants.Method;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.message.HttpMessageBuilder;
 
 /**
- * Builder of {@link HttpRequest}s. Instances can only be obtained using {@link HttpRequest#builder()}.
- * At the very least, the request URI needs to be provided via {@link #setUri(String)}. By default, GET is used as method with
- * empty headers, query params and entity.
+ * Builder of {@link HttpRequest}s. Instances can only be obtained using {@link HttpRequest#builder()}. At the very least, the
+ * request URI needs to be provided via {@link #setUri(String)}. By default, GET is used as method with empty headers, query
+ * params and entity.
  *
  * @since 4.0
  */
@@ -21,7 +24,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
 
   private String path;
   private String uri;
-  private String method = "GET";
+  private String method = GET.name();
   private ParameterMap queryParams = new ParameterMap();
 
   HttpRequestBuilder() {}
@@ -40,11 +43,22 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
+   * Allows for using extension methods, as defined in the rfc. In general, {@link #setMethod(Method)} should be used.
+   * 
    * @param method the HTTP method of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
   public HttpRequestBuilder setMethod(String method) {
     this.method = method;
+    return this;
+  }
+
+  /**
+   * @param method the HTTP method of the {@link HttpRequest} desired. Non null.
+   * @return this builder
+   */
+  public HttpRequestBuilder setMethod(Method method) {
+    this.method = method.name();
     return this;
   }
 

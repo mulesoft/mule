@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;

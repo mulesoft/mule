@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -25,11 +26,11 @@ public class CompositeModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void delegatesToComposedDiscovers() throws Exception {
     final ModuleDiscoverer discoverer1 = mock(ModuleDiscoverer.class);
-    MuleModule module1 = new MuleModule("module1", emptySet(), emptySet());
+    MuleModule module1 = new MuleModule("module1", emptySet(), emptySet(), emptySet(), emptySet());
     final List<MuleModule> modules1 = new ArrayList<>();
     modules1.add(module1);
     when(discoverer1.discover()).thenReturn(modules1);
-    MuleModule module2 = new MuleModule("module1", emptySet(), emptySet());
+    MuleModule module2 = new MuleModule("module1", emptySet(), emptySet(), emptySet(), emptySet());
     final List<MuleModule> modules2 = new ArrayList<>();
     modules2.add(module2);
     final ModuleDiscoverer discoverer2 = mock(ModuleDiscoverer.class);

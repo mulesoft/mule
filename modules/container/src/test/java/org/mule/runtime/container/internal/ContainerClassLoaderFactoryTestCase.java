@@ -7,15 +7,18 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
+import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -33,21 +36,20 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createsClassLoaderLookupPolicy() throws Exception {
-    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
-    final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final List<MuleModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar").build());
     modules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").build());
-    when(moduleDiscoverer.discover()).thenReturn(modules);
-    factory.setModuleDiscoverer(moduleDiscoverer);
+    when(moduleRepository.getModules()).thenReturn(modules);
 
     final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), is(PARENT_ONLY));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), is(PARENT_ONLY));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), is(PARENT_ONLY));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), is(CHILD_FIRST));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), sameInstance(CHILD_FIRST));
   }
 
   @Test
@@ -91,12 +93,11 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   }
 
   private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
-    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory();
-    final ModuleDiscoverer moduleDiscoverer = mock(ModuleDiscoverer.class);
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final List<MuleModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("module1").exportingResources(BOOTSTRAP_PROPERTIES).build());
-    when(moduleDiscoverer.discover()).thenReturn(modules);
-    factory.setModuleDiscoverer(moduleDiscoverer);
+    when(moduleRepository.getModules()).thenReturn(modules);
     return factory;
   }
 }

@@ -24,6 +24,7 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,17 +46,22 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
 
   @Test
   public void assertTypes() throws Exception {
-    doAssertTypes(extensionModel.getTypes(), Ricin.class, KnockeableDoor.class, HeisenbergException.class, CarWash.class,
-                  Weapon.class, Weapon.WeaponAttributes.class, PersonalInfo.class, Methylamine.class);
+    assertTypes(extensionModel.getTypes(), true, "Type %s was not present",
+                Ricin.class, KnockeableDoor.class, HeisenbergException.class, CarWash.class,
+                Weapon.class, Weapon.WeaponAttributes.class, PersonalInfo.class, Methylamine.class);
+
+    assertTypes(extensionModel.getTypes(), false, "Invalid type %s was exported",
+                Object.class, Map.class);
   }
 
-  private void doAssertTypes(Set<ObjectType> extensionTypes, Class<?>... expectedTypes) {
+  private void assertTypes(Set<ObjectType> extensionTypes, boolean typeShouldBePresent, String message,
+                           Class<?>... expectedTypes) {
     for (Class<?> expectedType : expectedTypes) {
       Optional<ObjectType> extensionType = extensionTypes.stream()
           .filter(type -> getId(type).equals(expectedType.getCanonicalName()))
           .findFirst();
 
-      assertThat(format("Type %s was not present", expectedType.getName()), extensionType.isPresent(), is(true));
+      assertThat(format(message, expectedType.getName()), extensionType.isPresent(), is(typeShouldBePresent));
     }
   }
 }

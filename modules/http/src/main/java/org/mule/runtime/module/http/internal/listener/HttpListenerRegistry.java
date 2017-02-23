@@ -10,14 +10,19 @@ import static org.mule.runtime.module.http.internal.HttpParser.normalizePathWith
 import static org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher.getMethodsListRepresentation;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.PathAndMethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
+
+import com.google.common.base.Joiner;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
@@ -87,6 +92,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
     private LoadingCache<String, Stack<PathMap>> pathMapSearchCache =
         CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, Stack<PathMap>>() {
 
+          @Override
           public Stack<PathMap> load(String path) {
             return findPossibleRequestHandlers(path);
           }
@@ -97,7 +103,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
       pathMapSearchCache.invalidateAll();
       String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
       Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER),
-                                  "path parameter must start with /");
+                                  "path parameter must start with / (received '" + requestMatcherPath + "')");
       validateCollision(requestMatcher);
       List<String> matcherMethods = requestMatcher.getMethodRequestMatcher().getMethods();
       paths.add(getMethodAndPath(getMethodsListRepresentation(matcherMethods), requestMatcherPath));

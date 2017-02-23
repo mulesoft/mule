@@ -7,9 +7,13 @@
 
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder.createMultipartContent;
+import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.createFrom;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -17,6 +21,8 @@ import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -31,12 +37,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.UUID;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.HttpResponseHeaderBuilder;
-import org.mule.runtime.module.http.internal.multipart.HttpMultipartEncoder;
-import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.service.http.api.HttpHeaders;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
@@ -115,7 +116,7 @@ public class HttpResponseFactory {
     final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
 
     HttpEntity httpEntity;
-    final Object payload = body.getValue();
+    Object payload = body.getValue();
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
@@ -241,7 +242,7 @@ public class HttpResponseFactory {
   }
 
   private String createMultipartFormDataContentType() {
-    return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
+    return format("%s; boundary=%s", MULTIPART_FORM_DATA, getUUID());
   }
 
   private HttpEntity createUrlEncodedEntity(MediaType mediaType, Map payload) {
@@ -251,9 +252,9 @@ public class HttpResponseFactory {
       String encodedBody;
       final Charset encoding = mediaType.getCharset().get();
       if (mapPayload instanceof ParameterMap) {
-        encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
+        encodedBody = encodeString(((ParameterMap) mapPayload).toListValuesMap(), encoding);
       } else {
-        encodedBody = HttpParser.encodeString(encoding, mapPayload);
+        encodedBody = encodeString(mapPayload, encoding);
       }
       entity = new ByteArrayHttpEntity(encodedBody.getBytes());
     }
@@ -262,18 +263,18 @@ public class HttpResponseFactory {
 
   private void warnMapPayloadButNoUrlEncodedContentType(String contentType) {
     if (!mapPayloadButNoUrlEncodedContentTypeWarned) {
-      logger.warn(String.format(
-                                "Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.",
-                                contentType, APPLICATION_X_WWW_FORM_URLENCODED));
+      logger
+          .warn(format("Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.",
+                       contentType, APPLICATION_X_WWW_FORM_URLENCODED));
       mapPayloadButNoUrlEncodedContentTypeWarned = true;
     }
   }
 
   private void warnNoMultipartContentTypeButMultipartEntity(String contentType) {
     if (!multipartEntityWithNoMultipartContentyTypeWarned) {
-      logger.warn(String.format(
-                                "Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated.",
-                                contentType));
+      logger
+          .warn(format("Sending http response with Content-Type %s but the message has attachment and a multipart entity is generated.",
+                       contentType));
       multipartEntityWithNoMultipartContentyTypeWarned = true;
     }
   }
@@ -287,8 +288,8 @@ public class HttpResponseFactory {
     final MultipartHttpEntity multipartEntity;
     try {
 
-      multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(partPayload, objectToByteArray));
-      return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
+      multipartEntity = new MultipartHttpEntity(createFrom(partPayload, objectToByteArray));
+      return new ByteArrayHttpEntity(createMultipartContent(multipartEntity, contentType));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error creating multipart HTTP entity."), e);
     }

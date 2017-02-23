@@ -11,19 +11,33 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.functional.junit4.rules.ExpectedError.none;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.service.http.api.HttpConstants.Methods.GET;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
 import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
+import org.mule.extension.http.api.error.HttpError;
+import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
+import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.net.ConnectException;
+
+import org.junit.Rule;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(HTTP_CONNECTOR_FEATURE)
 public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public ExpectedError expectedError = none();
+
+  @Rule
+  public DynamicPort unusedPort = new DynamicPort("unusedPort");
 
   @Override
   protected String getConfigFile() {
@@ -96,4 +110,31 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
     assertThat(headers.keys(), hasItem(TRANSFER_ENCODING));
   }
 
+  @Test
+  public void requestWithDynamicConnectionParamUsesDifferentConfigs() throws Exception {
+    Event result = flowRunner("client2")
+        .withVariable("parse", false)
+        .withVariable("stream", "AUTO")
+        .withVariable("timeout", 20000)
+        .withVariable("port", httpPort.getNumber())
+        .withVariable("body", TEST_PAYLOAD)
+        .withPayload(TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(POST.toString()));
+    assertThat(uri, is("/testPath"));
+    assertThat(body, is(TEST_PAYLOAD));
+    assertThat(headers.keys(), not(hasItem(TRANSFER_ENCODING)));
+
+
+    expectedError.expectError(HTTP_NAMESPACE.toUpperCase(), HttpError.CONNECTIVITY, ConnectException.class, "Connection refused");
+    flowRunner("client2")
+        .withVariable("parse", false)
+        .withVariable("stream", "AUTO")
+        .withVariable("timeout", 20000)
+        .withVariable("port", unusedPort.getNumber())
+        .withVariable("body", TEST_PAYLOAD)
+        .withPayload(TEST_MESSAGE)
+        .run();
+  }
 }

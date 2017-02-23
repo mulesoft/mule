@@ -7,11 +7,14 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.RESPONSE_VALIDATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
@@ -24,14 +27,13 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
-import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
+import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
@@ -46,7 +48,6 @@ import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -63,12 +64,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.listener.ListenerPath;
-import org.mule.runtime.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.DefaultMethodRequestMatcher;
-import org.mule.runtime.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -76,7 +73,6 @@ import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.domain.request.HttpRequestContext;
 import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.MethodRequestMatcher;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
@@ -149,9 +145,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @Placement(tab = ADVANCED_TAB)
   private HttpStreamingType responseStreamingMode;
 
-  private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
   private HttpListenerResponseSender responseSender;
-  private String[] parsedAllowedMethods;
   private ListenerPath listenerPath;
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
@@ -159,7 +153,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private Boolean parseRequest;
   private Class interpretedAttributes;
 
-  //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
+  // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
   public void onSuccess(
                         @Optional @Placement(
@@ -171,7 +165,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     responseSender.sendResponse(context, response);
   }
 
-  //TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
+  // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
   public void onError(
                       @Optional @Placement(
@@ -220,11 +214,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   @Override
   public void onStart(SourceCallback<Object, HttpRequestAttributes> sourceCallback) throws MuleException {
-    if (allowedMethods != null) {
-      parsedAllowedMethods = extractAllowedMethods();
-      methodRequestMatcher = new DefaultMethodRequestMatcher(parsedAllowedMethods);
-    }
-
     path = HttpParser.sanitizePathWithStartSlash(path);
     listenerPath = config.getFullListenerPath(path);
     path = listenerPath.getResolvedPath();
@@ -241,8 +230,13 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       interpretedAttributes = HttpListenerResponseAttributes.class;
     }
     try {
-      requestHandlerManager =
-          server.addRequestHandler(new ListenerRequestMatcher(methodRequestMatcher, path), getRequestHandler(sourceCallback));
+      if (allowedMethods != null) {
+        requestHandlerManager =
+            server.addRequestHandler(asList(extractAllowedMethods()), path, getRequestHandler(sourceCallback));
+      } else {
+        requestHandlerManager =
+            server.addRequestHandler(path, getRequestHandler(sourceCallback));
+      }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -253,7 +247,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private List<ErrorTypeMatcher> createErrorMatcherList(ErrorTypeRepository errorTypeRepository) {
     List<ErrorTypeMatcher> matchers = new LinkedList<>();
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(SECURITY).get()));
-    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(ComponentIdentifier.builder()
+    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(builder()
         .withNamespace(HTTP_NAMESPACE.toUpperCase())
         .withName(RESPONSE_VALIDATION.name())
         .build()).get()));
@@ -304,10 +298,12 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
       private void sendErrorResponse(final HttpStatus status, String message,
                                      HttpResponseReadyCallback responseCallback) {
+        byte[] responseData = message.getBytes();
         responseCallback.responseReady(HttpResponse.builder()
             .setStatusCode(status.getStatusCode())
             .setReasonPhrase(status.getReasonPhrase())
-            .setEntity(new ByteArrayHttpEntity(message.getBytes()))
+            .setEntity(new ByteArrayHttpEntity(responseData))
+            .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
             .build(), new ResponseStatusCallback() {
 
               @Override
@@ -336,7 +332,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       try {
         httpError = HttpError.valueOf(error.getErrorType().getIdentifier());
       } catch (Throwable t) {
-        //Do nothing
+        // Do nothing
       }
       if (httpError != null) {
         java.util.Optional<HttpStatus> status = HttpError.getHttpStatus(httpError);

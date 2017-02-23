@@ -6,25 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessage;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMessageCollection;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.execution.SourceResultAdapter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
-import java.util.Collection;
 import java.util.function.Supplier;
 
 /**
@@ -85,6 +82,11 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       return this;
     }
 
+    public Builder<T, A> setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
+      product.cursorStreamProviderFactory = cursorStreamProviderFactory;
+      return this;
+    }
+
     public SourceCallback<T, A> build() {
       checkArgument(product.listener, "listener");
       checkArgument(product.flowConstruct, "flowConstruct");
@@ -93,6 +95,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       checkArgument(product.processContextSupplier, "processContextSupplier");
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
       checkArgument(product.sourceModel, "sourceModel");
+      checkArgument(product.cursorStreamProviderFactory, "cursorStreamProviderFactory");
 
       return product;
     }
@@ -117,6 +120,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;
   private SourceCompletionHandlerFactory completionHandlerFactory;
+  private CursorStreamProviderFactory cursorStreamProviderFactory;
   private boolean returnsListOfMessages = false;
 
   private DefaultSourceCallback() {}
@@ -135,22 +139,11 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
     MessageProcessContext messageProcessContext = processContextSupplier.get();
-    final T resultValue = result.getOutput();
 
-    Message message;
+    SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorStreamProviderFactory, returnsListOfMessages);
+    Message message = Message.builder().payload(resultAdapter).build();
 
-    if (resultValue instanceof Collection && returnsListOfMessages) {
-      message = toMessage(Result.<Collection<Message>, Attributes>builder()
-          .output(toMessageCollection((Collection<Result>) resultValue, result.getMediaType().orElse(ANY)))
-          .attributes(NULL_ATTRIBUTES)
-          .mediaType(result.getMediaType().orElse(ANY))
-          .build());
-    } else {
-      message = toMessage(result);
-    }
-
-    messageProcessingManager.processMessage(
-                                            new ModuleFlowProcessingTemplate(message,
+    messageProcessingManager.processMessage(new ModuleFlowProcessingTemplate(message,
                                                                              listener,
                                                                              completionHandlerFactory
                                                                                  .createCompletionHandler(context),

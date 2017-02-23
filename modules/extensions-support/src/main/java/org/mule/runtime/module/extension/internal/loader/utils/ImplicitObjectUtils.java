@@ -10,8 +10,13 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.List;
 
@@ -33,15 +38,25 @@ public final class ImplicitObjectUtils {
    * @param muleContext        the Mule node.
    * @return a {@link ResolverSet}
    */
+  // TODO - MULE-11610 : Implicit resolvers doesn't use the same resolving mechanism that for a defined element
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     ResolverSet resolverSet = new ResolverSet();
+    ParametersResolver parametersResolver =
+        ParametersResolver.fromDefaultValues(parameterizedModel, muleContext);
+
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       Object defaultValue = parameterModel.getDefaultValue();
-      if (defaultValue != null) {
-        resolverSet.add(parameterModel.getName(),
-                        new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()),
-                                                              muleContext));
+      ValueResolver resolver;
+
+      resolver = defaultValue != null
+          ? new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()), muleContext)
+          : new StaticValueResolver<>(null);
+
+      if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
+        resolver = NullSafeValueResolverWrapper.of(resolver, parameterModel.getType(), muleContext, parametersResolver);
       }
+
+      resolverSet.add(parameterModel.getName(), resolver);
     }
 
     return resolverSet;
@@ -59,13 +74,10 @@ public final class ImplicitObjectUtils {
    * @return one of the items in {@code models} or {@code null} if none of the models are implicit
    */
   public static <T extends ParameterizedModel> T getFirstImplicit(List<T> models) {
-    for (T model : models) {
-      if (canBeUsedImplicitly(model)) {
-        return model;
-      }
-    }
-
-    return null;
+    return models.stream()
+        .filter(ImplicitObjectUtils::canBeUsedImplicitly)
+        .findFirst()
+        .orElse(null);
   }
 
   private static boolean canBeUsedImplicitly(ParameterizedModel parameterizedModel) {

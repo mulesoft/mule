@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 
-import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -37,7 +36,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   @Override
   public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
     FluxProcessor<Event, Event> processor = EmitterProcessor.<Event>create(false).serialize();
-    return new ReactorSink(processor.connectSink(), flowConstruct, processor.transform(function).retry().subscribe(),
+    return new ReactorSink(processor.connectSink(), processor.transform(function).retry().subscribe(),
                            createOnEventConsumer());
   }
 
@@ -56,14 +55,12 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   static final class ReactorSink implements Sink, Disposable {
 
     private final BlockingSink blockingSink;
-    private final FlowConstruct flowConstruct;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
 
-    ReactorSink(BlockingSink blockingSink, FlowConstruct flowConstruct, reactor.core.Disposable disposable,
+    ReactorSink(BlockingSink blockingSink, reactor.core.Disposable disposable,
                 Consumer<Event> onEventConsumer) {
       this.blockingSink = blockingSink;
-      this.flowConstruct = flowConstruct;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
     }

@@ -19,15 +19,19 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -43,6 +47,8 @@ import org.xml.sax.SAXParseException;
  * @since 4.0
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 
   private ConnectivityTestingService lazyConnectivityTestingService;
   private MetadataService metadataService;
@@ -97,12 +103,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     }
   }
 
+  /**
+   * During a lazy intialization of an artifact the components should not be created.
+   */
   @Override
   protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory,
                                                     BeanDefinitionReader beanDefinitionReader) {
-    if (useNewParsingMechanism) {
-      createComponents(beanFactory, applicationModel, true);
-    } else {
+    if (!useNewParsingMechanism) {
       throw new MuleRuntimeException(createStaticMessage("Could not create mule application since lazy init is enabled but there are component in the configuration "
           +
           "that are not parsed with the new mechanism " + getOldParsingMechanismComponentIdentifiers()));
@@ -115,8 +122,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       if (muleContext.getRegistry().get(componentName) != null) {
         return;
       }
+
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
+
+      // First unregister any already initialized/started component
+      unregisterComponents(minimalApplicationModelGenerator.resolveComponentModelDependencies());
+
       ApplicationModel minimalApplicationModel;
       if (!componentName.contains("/")) {
         minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByName(componentName);
@@ -125,6 +137,22 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       }
       createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
     });
+  }
+
+  private void unregisterComponents(List<ComponentModel> componentModels) {
+    if (muleContext.isStarted()) {
+      componentModels.stream().forEach(componentModel -> {
+        final String nameAttribute = componentModel.getNameAttribute();
+        if (nameAttribute != null) {
+          try {
+            muleContext.getRegistry().unregisterObject(nameAttribute);
+          } catch (RegistrationException e) {
+            throw new RuntimeException(e);
+          }
+        }
+      });
+    }
+    applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(true));
   }
 
   @Override

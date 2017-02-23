@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.lang.reflect.Field;
@@ -89,6 +90,10 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
     Object value = resolver.resolve(event);
     if (value instanceof ValueResolver) {
       value = resolve((ValueResolver) value, event);
+    }
+
+    if (value instanceof CursorStreamProvider) {
+      value = ((CursorStreamProvider) value).openCursor();
     }
 
     return value;

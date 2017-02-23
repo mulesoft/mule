@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -28,8 +28,6 @@ import java.nio.charset.Charset;
  */
 public class ObjectToString extends AbstractTransformer implements DiscoverableTransformer {
 
-  protected static final int DEFAULT_BUFFER_SIZE = 80;
-
   /** Give core transformers a slighty higher priority */
   private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
@@ -37,6 +35,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
     registerSourceType(DataType.OBJECT);
     registerSourceType(DataType.BYTE_ARRAY);
     registerSourceType(DataType.INPUT_STREAM);
+    registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
     registerSourceType(DataType.fromType(OutputHandler.class));
     setReturnDataType(DataType.STRING);
   }
@@ -45,7 +44,9 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
   public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
     String output = "";
 
-    if (src instanceof InputStream) {
+    if (src instanceof CursorStreamProvider) {
+      output = createStringFromInputStream(((CursorStreamProvider) src).openCursor(), outputEncoding);
+    } else if (src instanceof InputStream) {
       output = createStringFromInputStream((InputStream) src, outputEncoding);
     } else if (src instanceof OutputHandler) {
       output = createStringFromOutputHandler((OutputHandler) src, outputEncoding);

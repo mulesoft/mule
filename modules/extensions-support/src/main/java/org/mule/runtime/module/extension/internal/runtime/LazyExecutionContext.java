@@ -74,24 +74,6 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
    * {@inheritDoc}
    */
   @Override
-  public <T> T getTypeSafeParameter(String parameterName, Class<? extends T> expectedType) {
-    Object value = getParameter(parameterName);
-    if (value == null) {
-      return null;
-    }
-
-    if (!expectedType.isInstance(value)) {
-      throw new IllegalArgumentException(String.format("'%s' was expected to be of type '%s' but type '%s' was found instead",
-                                                       parameterName, expectedType.getName(), value.getClass().getName()));
-    }
-
-    return (T) value;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public Optional<ConfigurationInstance> getConfiguration() {
     return empty();
   }

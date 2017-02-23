@@ -6,21 +6,20 @@
  */
 package org.mule.extension.http.internal;
 
+import static org.mule.extension.http.api.error.HttpError.FORBIDDEN;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
-import org.mule.extension.http.api.HttpRequestAttributes;
+import static org.mule.extension.http.api.error.HttpError.UNAUTHORIZED;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-
-import javax.inject.Inject;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 /**
  * General HTTP operations that do not required any specific configuration or connection.
@@ -29,26 +28,19 @@ import javax.inject.Inject;
  */
 public class HttpOperations {
 
-  @Inject
-  private MuleContext muleContext;
-
   /**
    * Authenticates received HTTP requests. Must be used after a listener component.
-   *
-   * @param realm Authentication realm.
-   * @param securityProviders The delegate-security-provider to use for authenticating. Use this in case you have multiple
-   *        security managers defined in your configuration.
-   * @throws MuleException if unauthenticated.
    */
   @Throws(BasicSecurityErrorTypeProvider.class)
-  public void basicSecurityFilter(String realm, @Optional String securityProviders,
-                                  @Optional(defaultValue = "#[attributes]") HttpRequestAttributes attributes, Event event)
-      throws MuleException {
-    HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders, attributes);
-
+  public void basicSecurityFilter(@ParameterGroup(name = "Security Filter") HttpBasicAuthenticationFilter filter,
+                                  AuthenticationHandler authenticationHandler) {
     try {
-      filter.doFilter(event);
-    } catch (Exception e) {
+      filter.authenticate(authenticationHandler);
+    } catch (UnauthorisedException e) {
+      throw new ModuleException(e, UNAUTHORIZED);
+    } catch (SecurityException e) {
+      throw new ModuleException(e, FORBIDDEN);
+    } catch (SecurityProviderNotFoundException | UnknownAuthenticationTypeException e) {
       throw new ModuleException(e, SECURITY);
     }
   }
@@ -64,14 +56,4 @@ public class HttpOperations {
     return resourceLoader.load();
   }
 
-  private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders, HttpRequestAttributes attributes)
-      throws InitialisationException {
-    HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
-    filter.setRealm(realm);
-    filter.setSecurityProviders(securityProviders);
-    filter.setMuleContext(muleContext);
-    filter.setAttributes(attributes);
-    filter.initialise();
-    return filter;
-  }
 }

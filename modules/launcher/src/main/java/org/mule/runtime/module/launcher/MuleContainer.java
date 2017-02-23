@@ -72,7 +72,7 @@ public class MuleContainer {
   private final RepositoryService repositoryService;
   private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
-  private MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry();
+  private MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
 
   static {
     if (System.getProperty(MuleProperties.MULE_SIMPLE_LOG) == null) {

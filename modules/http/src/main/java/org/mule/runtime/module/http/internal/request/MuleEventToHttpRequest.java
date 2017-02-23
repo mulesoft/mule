@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
@@ -19,6 +21,7 @@ import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
@@ -32,7 +35,6 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
@@ -48,8 +50,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
 public class MuleEventToHttpRequest {
 
   private static final Logger logger = LoggerFactory.getLogger(MuleEventToHttpRequest.class);
-  private static final List<String> ignoredProperties = Arrays.asList(CONNECTION, HOST, TRANSFER_ENCODING);
+  private static final List<String> ignoredProperties = asList(CONNECTION, HOST, TRANSFER_ENCODING);
   private static final String APPLICATION_JAVA = "application/java";
 
   private DefaultHttpRequester requester;
@@ -105,7 +105,7 @@ public class MuleEventToHttpRequest {
     if (requester.getConfig().isEnableCookies()) {
       try {
         Map<String, List<String>> headers =
-            requester.getConfig().getCookieManager().get(URI.create(resolvedUri), Collections.<String, List<String>>emptyMap());
+            requester.getConfig().getCookieManager().get(URI.create(resolvedUri), emptyMap());
         List<String> cookies = headers.get(COOKIE);
         if (cookies != null) {
           for (String cookie : cookies) {
@@ -197,8 +197,8 @@ public class MuleEventToHttpRequest {
       if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.get().startsWith(APPLICATION_JAVA)) {
         if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
-          String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
-              .orElse(getDefaultEncoding(muleContext)), (Map) payload);
+          String body = encodeString((Map) payload, muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
+              .orElse(getDefaultEncoding(muleContext)));
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
         }

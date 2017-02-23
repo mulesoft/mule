@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
@@ -21,6 +23,7 @@ import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -56,20 +59,19 @@ public class HttpRequestBuilderTestCase {
 
   @Test
   public void complexResponse() {
-    String post = "POST";
     ParameterMap paramMap = new ParameterMap();
 
     paramMap.put(name, value);
     HttpRequest request = builder.setEntity(new ByteArrayHttpEntity("test".getBytes()))
         .setUri(URI_VALUE)
-        .setMethod(post)
+        .setMethod(POST)
         .setQueryParams(paramMap)
         .setHeaders(paramMap)
         .addHeader(name.toUpperCase(), value.toUpperCase())
         .build();
 
     assertThat(request.getUri(), is(URI_VALUE));
-    assertThat(request.getMethod(), is(post));
+    assertThat(request.getMethod(), is(POST.name()));
     assertThat(request.getEntity(), is(instanceOf(ByteArrayHttpEntity.class)));
     assertThat(request.getHeaderNames(), hasItems(name));
     assertThat(request.getHeaderValues(name), hasItems(value, value.toUpperCase()));
@@ -88,13 +90,13 @@ public class HttpRequestBuilderTestCase {
     parameterMap.put(name, value);
     parameterMap.put(name, otherValue);
 
-    //add multiple valued header through parameter map and individually
+    // add multiple valued header through parameter map and individually
     builder.setHeaders(parameterMap);
     builder.addHeader(name, value);
     assertThat(builder.getHeaderValues(name), hasItems(value, otherValue, value));
     assertThat(builder.build().getHeaderValues(name), hasItems(value, otherValue, value));
 
-    //remove header
+    // remove header
     builder.removeHeader(name);
     assertThat(builder.build().getHeaderNames(), empty());
   }

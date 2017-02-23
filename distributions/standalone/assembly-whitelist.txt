@@ -159,6 +159,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
 /mule-standalone-${productVersion}/lib/mule/mule-service-http-api-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-service-oauth-api-${productVersion}.jar
 
 #
 # /plugins
@@ -183,6 +184,7 @@
 /mule-standalone-${productVersion}/services
 /mule-standalone-${productVersion}/services/mule-service-scheduler-${productVersion}.zip
 /mule-standalone-${productVersion}/services/mule-service-http-${productVersion}.zip
+/mule-standalone-${productVersion}/services/mule-service-oauth-${productVersion}.zip
 
 #
 # /lib/opt
@@ -269,7 +271,7 @@
 /mule-standalone-${productVersion}/lib/opt/plexus-interpolation-1.21.jar
 /mule-standalone-${productVersion}/lib/opt/plexus-utils-3.0.22.jar
 /mule-standalone-${productVersion}/lib/opt/reactive-streams-1.0.0.jar
-/mule-standalone-${productVersion}/lib/opt/reactor-core-3.0.5.BUILD-+
+/mule-standalone-${productVersion}/lib/opt/reactor-core-3.0.5.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.10.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-3.jar

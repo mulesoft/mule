@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -71,8 +73,6 @@ import org.xml.sax.InputSource;
 public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
 
   public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
-
-  public static final String XPATH1_FALLBACK = "mule.xml.xpath10.fallback";
 
   // xml parser feature names for optional XSD validation
   public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
@@ -161,6 +161,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
       tr.setMuleContext(muleContext);
       tr.setReturnDataType(DataType.fromType(org.dom4j.Document.class));
       return (org.dom4j.Document) tr.transform(obj);
+    } else if (obj instanceof CursorStreamProvider) {
+      return reader.read(((CursorStreamProvider) obj).openCursor());
     } else if (obj instanceof java.io.InputStream) {
       return reader.read((java.io.InputStream) obj);
     } else if (obj instanceof String) {
@@ -200,9 +202,10 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
       Source source = (payload instanceof Source) ? (Source) payload : toXmlSource(null, true, payload);
       idTransformer.transform(source, result);
       return (Document) result.getNode();
+    } else if (payload instanceof CursorStreamProvider) {
+      return streamToDocument(((CursorStreamProvider) payload).openCursor());
     } else if (payload instanceof java.io.InputStream) {
-      InputStreamReader input = new InputStreamReader((InputStream) payload);
-      return parseXML(input);
+      return streamToDocument((InputStream) payload);
     } else if (payload instanceof String) {
       Reader input = new StringReader((String) payload);
 
@@ -217,6 +220,11 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     } else {
       return null;
     }
+  }
+
+  private static Document streamToDocument(InputStream payload) throws Exception {
+    InputStreamReader input = new InputStreamReader(payload);
+    return parseXML(input);
   }
 
   private static org.w3c.dom.Document parseXML(Reader source) throws Exception {
@@ -263,24 +271,10 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
       return factory.createXMLStreamReader(new javax.xml.transform.dom.DOMSource((org.w3c.dom.Document) obj));
     } else if (obj instanceof org.dom4j.Document) {
       return factory.createXMLStreamReader(new org.dom4j.io.DocumentSource((org.dom4j.Document) obj));
+    } else if (obj instanceof CursorStreamProvider) {
+      return streamToReader(factory, ((CursorStreamProvider) obj).openCursor());
     } else if (obj instanceof java.io.InputStream) {
-      final InputStream is = (java.io.InputStream) obj;
-
-      XMLStreamReader xsr = factory.createXMLStreamReader(is);
-      return new DelegateXMLStreamReader(xsr) {
-
-        @Override
-        public void close() throws XMLStreamException {
-          super.close();
-
-          try {
-            is.close();
-          } catch (IOException e) {
-            throw new XMLStreamException(e);
-          }
-        }
-
-      };
+      return streamToReader(factory, (java.io.InputStream) obj);
     } else if (obj instanceof String) {
       return factory.createXMLStreamReader(new StringReader((String) obj));
     } else if (obj instanceof byte[]) {
@@ -299,6 +293,24 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     } else {
       return null;
     }
+  }
+
+  private static XMLStreamReader streamToReader(XMLInputFactory factory, final InputStream is) throws XMLStreamException {
+    XMLStreamReader xsr = factory.createXMLStreamReader(is);
+    return new DelegateXMLStreamReader(xsr) {
+
+      @Override
+      public void close() throws XMLStreamException {
+        super.close();
+
+        try {
+          is.close();
+        } catch (IOException e) {
+          throw new XMLStreamException(e);
+        }
+      }
+
+    };
   }
 
   public static javax.xml.transform.Source toXmlSource(XMLStreamReader src) throws Exception {
@@ -322,6 +334,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     } else if (src instanceof byte[]) {
       ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) src);
       return toStreamSource(xmlInputFactory, useStaxSource, stream);
+    } else if (src instanceof CursorStreamProvider) {
+      return toStreamSource(xmlInputFactory, useStaxSource, ((CursorStreamProvider) src).openCursor());
     } else if (src instanceof InputStream) {
       return toStreamSource(xmlInputFactory, useStaxSource, (InputStream) src);
     } else if (src instanceof String) {
@@ -377,6 +391,8 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   public static Node toDOMNode(Object src, Event event, DocumentBuilderFactory factory) throws Exception {
     if (src instanceof Node) {
       return (Node) src;
+    } else if (src instanceof CursorStreamProvider) {
+      return factory.newDocumentBuilder().parse(((CursorStreamProvider) src).openCursor());
     } else if (src instanceof InputSource) {
       return factory.newDocumentBuilder().parse((InputSource) src);
     } else if (src instanceof org.dom4j.Document) {

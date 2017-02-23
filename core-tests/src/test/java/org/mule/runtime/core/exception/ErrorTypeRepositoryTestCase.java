@@ -12,14 +12,14 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNEC
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -28,7 +28,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 public class ErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
   private ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
-  private ComponentIdentifier MY_ERROR = new ComponentIdentifier.Builder().withNamespace("ns").withName("name").build();
+  private ComponentIdentifier MY_ERROR =
+      ComponentIdentifier.builder().withNamespace("ns").withName("name").build();
 
   @Before
   public void setUp() {

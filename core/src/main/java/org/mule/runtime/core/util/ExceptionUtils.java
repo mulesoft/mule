@@ -10,16 +10,17 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.ANNOTATION_NAME;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorMapping;
@@ -28,7 +29,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -235,7 +235,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
    */
   public static Event createErrorEvent(Event currentEvent, Object annotatedObject, MessagingException messagingException,
                                        ErrorTypeLocator errorTypeLocator) {
-    //TODO: MULE-10970/MULE-10971 - Change signature to AnnotatedObject once every processor and source is one
+    // TODO: MULE-10970/MULE-10971 - Change signature to AnnotatedObject once every processor and source is one
     Throwable causeException = messagingException.getCause() != null ? messagingException.getCause() : messagingException;
     Optional<Error> error = messagingException.getEvent().getError();
     if (!error.isPresent() || errorCauseMatchesException(causeException, error)

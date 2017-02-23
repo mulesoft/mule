@@ -7,9 +7,8 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
-import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import java.util.Objects;
 
 /**
  * A convenience class to represent value pairs.
@@ -36,8 +35,6 @@ public final class Pair<K, V> {
    * @param second The second element of this pair
    */
   public Pair(K first, V second) {
-    checkArgument(first != null, "the first value cannot be null");
-    checkArgument(second != null, "the second value cannot be null");
     this.first = first;
     this.second = second;
   }
@@ -69,14 +66,19 @@ public final class Pair<K, V> {
    */
   @Override
   public int hashCode() {
-    return reflectionHashCode(this);
+    return Objects.hash(first, second);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean equals(Object other) {
-    return reflectionEquals(this, other);
+  public boolean equals(Object o) {
+    if (o instanceof Pair) {
+      Pair other = (Pair) o;
+      return Objects.equals(first, other.getFirst()) && Objects.equals(second, other.getSecond());
+    }
+
+    return false;
   }
 }

@@ -12,7 +12,7 @@
     </spring:beans>
 
     <flow name="createDirectory">
-        <file:create-directory directoryPath="#[mel:directory]"/>
+        <file:create-directory directoryPath="#[directory]"/>
     </flow>
 
 </mule>

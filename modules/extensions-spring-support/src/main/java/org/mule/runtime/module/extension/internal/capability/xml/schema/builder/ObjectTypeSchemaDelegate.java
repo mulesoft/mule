@@ -23,12 +23,14 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -69,15 +71,16 @@ final class ObjectTypeSchemaDelegate {
   }
 
   /**
-   * For any given {@code parameter} with an {@link ObjectType} as {@link MetadataType}, the element generated in the schema
-   * will vary depending on the properties of the type itself along with the properties associated to the parameter.
+   * For any given {@code parameter} with an {@link ObjectType} as {@link MetadataType}, the element generated in the schema will
+   * vary depending on the properties of the type itself along with the properties associated to the parameter.
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
-   * @param type        the {@link ObjectType} of the parameter for which the element is being created
+   * 
+   * @param type the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
-   * @param paramDsl    the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
+   * @param paramDsl the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
-   * @param all         the {@link ExplicitGroup group} the generated element should belong to
+   * @param all the {@link ExplicitGroup group} the generated element should belong to
    */
   void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ParameterDslConfiguration paramDsl,
                            String description, List<TopLevelElement> all) {
@@ -210,14 +213,14 @@ final class ObjectTypeSchemaDelegate {
   }
 
   /**
-   * The given {@code type} type will be registered as a {@link TopLevelComplexType} in the current namespace
-   * if it was not imported.
+   * The given {@code type} type will be registered as a {@link TopLevelComplexType} in the current namespace if it was not
+   * imported.
    * <p/>
    * If an abstract or concrete {@link TopLevelElement} declaration are required for this type, then they will also be registered.
    * This method is idempotent for any given {@code type}
    *
-   * @param type        a {@link MetadataType} describing a pojo type
-   * @param baseType    a {@link MetadataType} describing a pojo's base type
+   * @param type a {@link MetadataType} describing a pojo type
+   * @param baseType a {@link MetadataType} describing a pojo's base type
    * @param description the type's description
    * @return the reference name of the complexType
    */
@@ -245,8 +248,8 @@ final class ObjectTypeSchemaDelegate {
   /**
    * Registers the {@link TopLevelComplexType} associated to the given {@link ObjectType} in the current namespace
    *
-   * @param type        the {@link ObjectType} that will be represented by the registered {@link ComplexType}
-   * @param baseType    the {@code base} for the {@link ComplexType} {@code extension} declaration
+   * @param type the {@link ObjectType} that will be represented by the registered {@link ComplexType}
+   * @param baseType the {@code base} for the {@link ComplexType} {@code extension} declaration
    * @param description
    * @return a new {@link ComplexType} declaration for the given {@link ObjectType}
    */
@@ -274,8 +277,7 @@ final class ObjectTypeSchemaDelegate {
 
 
   /**
-   * @return the {@link QName} of the {@code base} type for which the new {@link ComplexType}
-   * declares an {@code extension}
+   * @return the {@link QName} of the {@code base} type for which the new {@link ComplexType} declares an {@code extension}
    */
   private QName getComplexTypeBase(ObjectType baseType) {
     Optional<DslElementSyntax> baseDsl = builder.getDslResolver().resolve(baseType);
@@ -345,6 +347,12 @@ final class ObjectTypeSchemaDelegate {
     ParameterModel parameter = asParameter(field);
     if (fieldDsl == null) {
       fieldDsl = dsl.resolve(parameter);
+    }
+
+    final String id = getId(field.getValue());
+    if (id.equals(TlsContextFactory.class.getName())) {
+      builder.addTlsSupport(extension, all);
+      return;
     }
 
     builder.declareAsParameter(field.getValue(), extension, parameter, fieldDsl, all);

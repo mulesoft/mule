@@ -17,17 +17,17 @@ import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_ID_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
-import static org.mule.extension.oauth2.internal.OAuthConstants.GRANT_TYPE_REFRESH_TOKEN;
-import static org.mule.extension.oauth2.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_ID_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMETER;
+import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_REFRESH_TOKEN;
+import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
-import org.mule.extension.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 
@@ -69,7 +69,7 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
     configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
 
     final Event result = flowRunner(flowName).withPayload("message").withVariable("userId", userId).run();
-    assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
+    assertThat(result.getMessage().getPayload().getValue(), is(RESOURCE_RESULT));
 
     wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
         .withRequestBody(containing(CLIENT_ID_PARAMETER + "=" + encode(clientId.getValue(), UTF_8.name())))

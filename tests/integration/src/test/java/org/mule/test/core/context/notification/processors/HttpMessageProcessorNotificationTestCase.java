@@ -85,7 +85,7 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
         .serial(pre()).serial(prePost()).serial(post())
 
         // <response> end
-        .serial(prePost()).serial(post());
+        .serial(pre()).serial(prePost()).serial(post()).serial(post());
   }
 
   @Override

@@ -7,10 +7,11 @@
 package org.mule.test.usecases.sync;
 
 import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Methods.POST;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
@@ -50,7 +51,7 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testTransform() throws Exception {
     HttpRequest httpRequest = HttpRequest.builder().setUri(format("http://localhost:%d/RemoteService", httpPort1.getNumber()))
-        .setEntity(new ByteArrayHttpEntity("payload".getBytes())).setMethod(POST.name()).build();
+        .setEntity(new ByteArrayHttpEntity("payload".getBytes())).setMethod(POST).build();
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
     GZipUncompressTransformer transformer = new GZipUncompressTransformer();
@@ -67,7 +68,7 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     payload.add(42);
     HttpRequest httpRequest = HttpRequest.builder().setUri(format("http://localhost:%d/RemoteService", httpPort2.getNumber()))
         .setEntity(new ByteArrayHttpEntity(muleContext.getObjectSerializer().getExternalProtocol().serialize(payload)))
-        .setMethod(POST.name()).build();
+        .setMethod(POST).build();
     HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
 
     ByteArrayToSerializable transformer = new ByteArrayToSerializable();
@@ -82,10 +83,6 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     Object payload = Arrays.asList(42);
     InternalMessage message = flowRunner("LocalService").withPayload(payload).run().getMessage();
     assertNotNull(message);
-    ByteArrayToSerializable bas = new ByteArrayToSerializable();
-    bas.setMuleContext(muleContext);
-    assertNotNull(message.getPayload().getValue());
-    Object result = bas.transform(message.getPayload().getValue());
-    assertThat(result, is(payload));
+    assertThat(message.getPayload().getValue(), equalTo(payload));
   }
 }

@@ -8,18 +8,22 @@ package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -54,11 +58,30 @@ public class ComponentModel {
   private Map<String, Object> annotations = new HashedMap();
   private List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
+  private DefaultComponentLocation componentLocation;
 
   // TODO MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
   private Class<?> type;
+  private Integer lineNumber;
+  private String configFileName;
+  private boolean enabled = true;
+
+  /**
+   * @return the line number in which the component was defined in the configuration file. It may be empty if the component was
+   *         created pragmatically.
+   */
+  public Optional<Integer> getLineNumber() {
+    return ofNullable(lineNumber);
+  }
+
+  /**
+   * @return the config file name in which the component was defined. It may be empty if the component was created pragmatically.
+   */
+  public Optional<String> getConfigFileName() {
+    return ofNullable(configFileName);
+  }
 
   /**
    * @return the configuration identifier.
@@ -172,6 +195,20 @@ public class ComponentModel {
   }
 
   /**
+   * @param componentLocation the location of the component in the configuration.
+   */
+  public void setComponentLocation(DefaultComponentLocation componentLocation) {
+    this.componentLocation = componentLocation;
+  }
+
+  /**
+   * @return the location of the component in the configuration.
+   */
+  public DefaultComponentLocation getComponentLocation() {
+    return componentLocation;
+  }
+
+  /**
    * @param beanReference the {@code BeanReference} that represents this object.
    */
   public void setBeanReference(BeanReference beanReference) {
@@ -201,7 +238,7 @@ public class ComponentModel {
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
   public ComponentConfiguration getConfiguration() {
     ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
-        .withIdentifier(ComponentIdentifier.builder()
+        .withIdentifier(builder()
             .withName(this.getIdentifier().getName())
             .withNamespace((String) this.getCustomAttributes().get(XmlCustomAttributeHandler.NAMESPACE_URI))
             .build())
@@ -211,6 +248,23 @@ public class ComponentModel {
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
 
     return builder.build();
+  }
+
+  /**
+   * Sets the component as enabled, meaning that it should be created and the beanDefinition associated with created too.
+   *
+   * @param enabled if this component is enabled and has to be created.
+   */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    this.getInnerComponents().stream().forEach(innerComponent -> innerComponent.setEnabled(enabled));
+  }
+
+  /**
+   * @return {@code true} if this component is enabled and has to be created.
+   */
+  public boolean isEnabled() {
+    return this.enabled;
   }
 
   /**
@@ -286,6 +340,24 @@ public class ComponentModel {
      */
     public Builder addCustomAttribute(String name, Object value) {
       this.model.customAttributes.put(name, value);
+      return this;
+    }
+
+    /**
+     * @param configFileName the config file name in which this component was defined.
+     * @return the builder.
+     */
+    public Builder setConfigFileName(String configFileName) {
+      this.model.configFileName = configFileName;
+      return this;
+    }
+
+    /**
+     * @param lineNumber the line number within the config file in which this component was defined.
+     * @return the builder.
+     */
+    public Builder setLineNumber(int lineNumber) {
+      this.model.lineNumber = lineNumber;
       return this;
     }
 

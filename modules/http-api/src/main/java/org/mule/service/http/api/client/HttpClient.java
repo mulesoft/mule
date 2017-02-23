@@ -6,16 +6,16 @@
  */
 package org.mule.service.http.api.client;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 import org.mule.service.http.api.client.async.ResponseHandler;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 /**
- * Object that sends an HTTP request, and returns the response. Notice must be started to be used and stopped to be disposed properly.
- * Blocking and non-blocking options are available to execute requests.
+ * Object that sends an HTTP request, and returns the response. Notice must be started to be used and stopped to be disposed
+ * properly. Blocking and non-blocking options are available to execute requests.
  *
  * @since 4.0
  */
@@ -57,7 +57,6 @@ public interface HttpClient {
    * @param followRedirects whether or not to follow redirect responses
    * @param authentication the optional {@link HttpRequestAuthentication} to use
    * @param handler the {@link ResponseHandler} to be invoked when the {@link HttpResponse} is ready.
-   * @return the received {@link HttpResponse}
    */
   void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
             ResponseHandler handler);

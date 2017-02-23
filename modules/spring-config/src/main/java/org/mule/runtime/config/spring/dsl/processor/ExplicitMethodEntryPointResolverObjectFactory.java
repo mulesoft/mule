@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
@@ -18,20 +19,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ExplicitMethodEntryPointResolverObjectFactory implements ObjectFactory<EntryPointResolver> {
+public class ExplicitMethodEntryPointResolverObjectFactory extends AbstractAnnotatedObjectFactory<EntryPointResolver> {
 
   private boolean acceptVoidMethods;
   private List<MethodEntryPoint> methodEntryPoints = new ArrayList<>();
-
-  @Override
-  public EntryPointResolver getObject() throws Exception {
-    ExplicitMethodEntryPointResolver explicitMethodEntryPointResolver = new ExplicitMethodEntryPointResolver();
-    explicitMethodEntryPointResolver.setAcceptVoidMethods(acceptVoidMethods);
-    for (MethodEntryPoint methodEntryPoint : methodEntryPoints) {
-      explicitMethodEntryPointResolver.addMethod(methodEntryPoint.getMethod());
-    }
-    return explicitMethodEntryPointResolver;
-  }
 
   /**
    * @param acceptVoidMethods true if void methods may be invoked, false otherwise.
@@ -45,5 +36,15 @@ public class ExplicitMethodEntryPointResolverObjectFactory implements ObjectFact
    */
   public void setMethodEntryPoints(List<MethodEntryPoint> methodEntryPoints) {
     this.methodEntryPoints = methodEntryPoints;
+  }
+
+  @Override
+  public EntryPointResolver doGetObject() throws Exception {
+    ExplicitMethodEntryPointResolver explicitMethodEntryPointResolver = new ExplicitMethodEntryPointResolver();
+    explicitMethodEntryPointResolver.setAcceptVoidMethods(acceptVoidMethods);
+    for (MethodEntryPoint methodEntryPoint : methodEntryPoints) {
+      explicitMethodEntryPointResolver.addMethod(methodEntryPoint.getMethod());
+    }
+    return explicitMethodEntryPointResolver;
   }
 }

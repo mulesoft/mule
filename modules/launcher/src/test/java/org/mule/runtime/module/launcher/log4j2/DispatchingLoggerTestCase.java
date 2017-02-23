@@ -7,10 +7,11 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -37,9 +38,6 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   @Mock
   private ClassLoader additionalClassLoader;
-
-  @Mock(extraInterfaces = {ArtifactClassLoader.class})
-  private ClassLoader artifactClassLoader;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Logger originalLogger;
@@ -85,11 +83,11 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void artifactClassLoader() {
-    withContextClassLoader(artifactClassLoader, () -> {
+  public void regionClassLoader() {
+    RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
+    withContextClassLoader(regionClassLoader, () -> {
       logger.info(MESSAGE);
-      verify(contextSelector).getContext(LOGGER_NAME, artifactClassLoader, true);
+      verify(contextSelector).getContext(LOGGER_NAME, regionClassLoader, true);
     });
   }
-
 }

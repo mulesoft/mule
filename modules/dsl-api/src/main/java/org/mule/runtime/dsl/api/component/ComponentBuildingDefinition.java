@@ -13,8 +13,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.concat;
-
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import org.mule.runtime.api.component.ComponentIdentifier;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -276,8 +276,8 @@ public class ComponentBuildingDefinition {
 
     /**
      * Mark configuration parameters to be ignored when building the component. This is mostly useful when
-     * {@link AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} there are certain configuration parameters
-     * that we don't want to included them in the process of building the object.
+     * {@link AttributeDefinition.Builder#fromUndefinedSimpleAttributes()} there are certain configuration parameters that we
+     * don't want to included them in the process of building the object.
      *
      * @param parameterName the configuration parameter name.
      * @return {@code this} builder.
@@ -334,7 +334,8 @@ public class ComponentBuildingDefinition {
       checkState(!definition.keyTypeConverter.isPresent()
           || (definition.keyTypeConverter.isPresent() && componentType.isPresent() && isMapType(componentType.get())),
                  KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE);
-      definition.componentIdentifier = new ComponentIdentifier.Builder().withName(identifier).withNamespace(namespace).build();
+      definition.componentIdentifier =
+          builder().withName(identifier).withNamespace(namespace).build();
       return definition;
     }
 

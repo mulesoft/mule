@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-documentation"
-        namespace="http://www.mulesoft.org/schema/mule/module-documentation"
+        minMuleVersion="4.0.0"
         doc:description="Documentation for the connector"
 
         xmlns="http://www.mulesoft.org/schema/mule/module"

@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
 
@@ -20,7 +21,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExpirationPolicyObjectFactory implements ObjectFactory<ExpirationPolicy> {
+public class ExpirationPolicyObjectFactory extends AbstractAnnotatedObjectFactory<ExpirationPolicy> {
 
   @Inject
   private TimeSupplier timeSupplier;
@@ -28,20 +29,19 @@ public class ExpirationPolicyObjectFactory implements ObjectFactory<ExpirationPo
   private Long maxIdleTime = null;
   private TimeUnit timeUnit = null;
 
-  @Override
-  public ExpirationPolicy getObject() throws Exception {
-    if (maxIdleTime != null && timeUnit != null) {
-      return new ImmutableExpirationPolicy(maxIdleTime, timeUnit, timeSupplier);
-    }
-
-    return ImmutableExpirationPolicy.getDefault(timeSupplier);
-  }
-
   public void setMaxIdleTime(Long maxIdleTime) {
     this.maxIdleTime = maxIdleTime;
   }
 
   public void setTimeUnit(TimeUnit timeUnit) {
     this.timeUnit = timeUnit;
+  }
+
+  @Override
+  public ExpirationPolicy doGetObject() throws Exception {
+    if (maxIdleTime != null && timeUnit != null) {
+      return new ImmutableExpirationPolicy(maxIdleTime, timeUnit, timeSupplier);
+    }
+    return ImmutableExpirationPolicy.getDefault(timeSupplier);
   }
 }

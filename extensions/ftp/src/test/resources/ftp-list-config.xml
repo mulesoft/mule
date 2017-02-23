@@ -14,11 +14,11 @@
     <ftp:matcher name="globalMatcher" directory="true" filenamePattern="sub*" />
 
     <flow name="list">
-        <ftp:list directoryPath="#[mel:path]" recursive="#[mel:recursive]" />
+        <ftp:list directoryPath="#[path]" recursive="#[recursive]" />
     </flow>
 
     <flow name="listWithEmbeddedPredicate">
-        <ftp:list directoryPath="#[mel:path]" recursive="#[mel:recursive]">
+        <ftp:list directoryPath="#[path]" recursive="#[recursive]">
             <ftp:match-with>
                 <ftp:matcher filenamePattern="*[1-2]*.html" />
             </ftp:match-with>
@@ -26,11 +26,6 @@
     </flow>
 
     <flow name="listWithGlobalMatcher">
-        <ftp:list directoryPath="#[mel:path]" recursive="#[mel:recursive]" matchWith="globalMatcher"/>
+        <ftp:list directoryPath="#[path]" recursive="#[recursive]" matchWith="globalMatcher"/>
     </flow>
-
-    <flow name="listWithoutPath">
-        <ftp:list />
-    </flow>
-
 </mule>

@@ -18,10 +18,11 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.dsl.api.component.config.ComponentIdentifier.Builder;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -44,7 +45,6 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelP
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
@@ -73,6 +73,7 @@ final class XmlExtensionLoaderDelegate {
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
   private static final String TYPE_ATTRIBUTE = "type";
   private static final String MODULE_NAME = "name";
+  private static final String MODULE_PREFIX_ATTRIBUTE = "prefix";
   private static final String MODULE_NAMESPACE_ATTRIBUTE = "namespace";
   private static final String MODULE_NAMESPACE_NAME = "module";
   protected static final String CONFIG_NAME = "config";
@@ -91,6 +92,7 @@ final class XmlExtensionLoaderDelegate {
 
   private static final String CATEGORY = "category";
   private static final String VENDOR = "vendor";
+  private static final String MIN_MULE_VERSION = "minMuleVersion";
   private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
   private static final String ROLE = "role";
@@ -114,19 +116,19 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
   private static final ComponentIdentifier OPERATION_BODY_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      new Builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
+      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
           .build();
   private static final String SEPARATOR = "/";
   public static final String XSD_SUFFIX = ".xsd";
@@ -145,7 +147,8 @@ final class XmlExtensionLoaderDelegate {
   }
 
   public void declare(ExtensionLoadingContext context) {
-    // We will assume the context classLoader of the current thread will be the one defined for the plugin (which is not filtered and will allow us to access any resource in it
+    // We will assume the context classLoader of the current thread will be the one defined for the plugin (which is not filtered
+    // and will allow us to access any resource in it
     URL resource = getResource(modulePath);
     if (resource == null) {
       throw new IllegalArgumentException(format("There's no reachable XML in the path '%s'", modulePath));
@@ -219,24 +222,18 @@ final class XmlExtensionLoaderDelegate {
                                                 MODULE_IDENTIFIER.toString(), moduleModel.getIdentifier().toString()));
     }
     String name = moduleModel.getParameters().get(MODULE_NAME);
-    String namespace = moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE);
 
     String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
+    final String minMuleVersion = moduleModel.getParameters().get(MIN_MULE_VERSION);
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
-        .withMinMuleVersion(new MuleVersion("4.0.0")) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from ExtensionModel
+        .withMinMuleVersion(new MuleVersion(minMuleVersion)) // TODO(fernandezlautaro): MULE-11010 remove minMuleVersion from
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
-        .withXmlDsl(XmlDslModel.builder()
-            .setSchemaVersion(version)
-            .setNamespace(name)
-            .setNamespaceUri(namespace)
-            .setSchemaLocation(namespace.concat(SEPARATOR).concat("current").concat(SEPARATOR).concat(name).concat(XSD_SUFFIX))
-            .setXsdFileName(name.concat(XSD_SUFFIX))
-            .build());
+        .withXmlDsl(getXmlDslModel(moduleModel, name, version));
     declarer.withModelProperty(new XmlExtensionModelProperty());
     final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel);
     if (configurationDeclarer.isPresent()) {
@@ -244,6 +241,12 @@ final class XmlExtensionLoaderDelegate {
     } else {
       loadOperationsFrom(declarer, moduleModel);
     }
+  }
+
+  private XmlDslModel getXmlDslModel(ComponentModel moduleModel, String name, String version) {
+    final Optional<String> prefix = ofNullable(moduleModel.getParameters().get(MODULE_PREFIX_ATTRIBUTE));
+    final Optional<String> namespace = ofNullable(moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
+    return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
   private String getDescription(ComponentModel componentModel) {

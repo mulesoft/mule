@@ -150,7 +150,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    }, this, command.getClass().getName(), idGenerator.getAndIncrement());
+    }, currentThread().getContextClassLoader(), this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     final ScheduledFuture<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.scheduleAtFixedRate(schedulableTask(task), initialDelay, period, unit),
@@ -171,7 +171,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       } else {
         taskFinished(t);
       }
-    }, this, command.getClass().getName(), idGenerator.getAndIncrement());
+    }, currentThread().getContextClassLoader(), this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     final ScheduledFutureDecorator<?> scheduled =
         new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
@@ -194,7 +194,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
       if (t.isCancelled()) {
         taskFinished(t);
       }
-    }, this, command.getClass().getName(), idGenerator.getAndIncrement());
+    }, currentThread().getContextClassLoader(), this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     JobDataMap jobDataMap = new JobDataMap();
     jobDataMap.put(JOB_TASK_KEY, schedulableTask(task));

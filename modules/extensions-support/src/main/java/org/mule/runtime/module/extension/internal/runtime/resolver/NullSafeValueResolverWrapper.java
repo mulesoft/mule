@@ -19,8 +19,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isP
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;

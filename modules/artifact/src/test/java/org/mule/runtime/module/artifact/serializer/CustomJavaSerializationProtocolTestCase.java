@@ -15,12 +15,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
@@ -75,7 +75,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
 
     final URL[] urls = new URL[] {compiler.getTargetFolder().toURL()};
     final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    when(lookupPolicy.getLookupStrategy(any())).thenReturn(ClassLoaderLookupStrategy.PARENT_FIRST);
+    when(lookupPolicy.getLookupStrategy(any())).thenReturn(PARENT_FIRST);
     final MuleArtifactClassLoader artifactClassLoader =
         new MuleArtifactClassLoader(ARTIFACT_ID, new ArtifactDescriptor(ARTIFACT_NAME), urls, getClass().getClassLoader(),
                                     lookupPolicy);

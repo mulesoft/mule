@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;

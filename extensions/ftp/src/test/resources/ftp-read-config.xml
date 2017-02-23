@@ -12,15 +12,28 @@
     </spring:beans>
 
     <flow name="read">
-        <ftp:read path="#[mel:path]"/>
+        <choice>
+            <when expression="#[streaming]">
+                <ftp:read path="#[path]"/>
+                <object-to-string-transformer />
+            </when>
+            <otherwise>
+                <ftp:read path="#[path]">
+                    <in-memory-stream />
+                </ftp:read>
+            </otherwise>
+        </choice>
     </flow>
 
     <flow name="readWithLock" processingStrategy="synchronous">
-        <ftp:read path="files/hello.json" lock="true"/>
+        <ftp:read path="files/hello.json" lock="true">
+            <in-memory-stream />
+        </ftp:read>
     </flow>
 
     <flow name="readWithForcedMimeType">
-        <ftp:read path="#[mel:path]" outputMimeType="test/test"/>
+        <ftp:read path="#[path]" outputMimeType="test/test"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

@@ -31,6 +31,7 @@
 
     <flow name="clientFlow">
         <httpn:request config-ref="requestConfig" path="#[mel:path]" method="POST"/>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="serverFlow">

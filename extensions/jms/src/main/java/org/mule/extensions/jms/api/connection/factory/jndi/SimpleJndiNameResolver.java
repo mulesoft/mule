@@ -6,10 +6,11 @@
  */
 package org.mule.extensions.jms.api.connection.factory.jndi;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
-
+import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
 
 /**
  * Defines a simple {@link JndiNameResolver} that maintains a {@link Context}
@@ -23,7 +24,12 @@ public final class SimpleJndiNameResolver extends AbstractJndiNameResolver {
   private Context jndiContext;
 
   public synchronized Object lookup(String name) throws NamingException {
-    return jndiContext.lookup(name);
+    try {
+      return doLookUp(name);
+    } catch (CommunicationException e) {
+      jndiContext = this.createInitialContext();
+      return doLookUp(name);
+    }
   }
 
   @Override
@@ -48,5 +54,9 @@ public final class SimpleJndiNameResolver extends AbstractJndiNameResolver {
         jndiContext = null;
       }
     }
+  }
+
+  private Object doLookUp(String name) throws NamingException {
+    return jndiContext.lookup(name);
   }
 }

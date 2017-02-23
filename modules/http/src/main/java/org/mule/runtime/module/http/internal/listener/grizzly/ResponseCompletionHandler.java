@@ -9,8 +9,8 @@ package org.mule.runtime.module.http.internal.listener.grizzly;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
@@ -106,6 +106,7 @@ public class ResponseCompletionHandler extends BaseResponseCompletionHandler {
         sendResponse();
       } else {
         ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
+        responseStatusCallback.responseSendSuccessfully();
         resume();
       }
     } catch (IOException e) {

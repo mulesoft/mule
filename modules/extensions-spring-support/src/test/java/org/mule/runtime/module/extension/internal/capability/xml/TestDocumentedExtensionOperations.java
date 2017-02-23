@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
-public class TestDocumentedExtensionOperations {
+public class TestDocumentedExtensionOperations extends AbstractTestDocumentedOperations {
 
   /**
    * Test Operation

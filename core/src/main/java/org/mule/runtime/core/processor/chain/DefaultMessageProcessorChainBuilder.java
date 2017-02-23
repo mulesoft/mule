@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.processor.ReferenceProcessor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,7 +50,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
-      if (processor instanceof InterceptingMessageProcessor) {
+      if (processor instanceof InterceptingMessageProcessor && (!(processor instanceof ReferenceProcessor)
+          || ((ReferenceProcessor) processor).getReferencedProcessor() instanceof InterceptingMessageProcessor)) {
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
         if (i + 1 < processors.size()) {

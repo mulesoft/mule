@@ -7,9 +7,12 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -34,7 +37,6 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.HttpConstants;
 
 import javax.inject.Inject;
@@ -53,15 +55,14 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   /**
    * Consumes an HTTP service.
    *
-   * @param path                       Path where the request will be sent.
-   * @param method                     The HTTP method for the request.
-   * @param overrides                  configuration overrides parameter group
+   * @param path Path where the request will be sent.
+   * @param method The HTTP method for the request.
+   * @param overrides configuration overrides parameter group
    * @param responseValidationSettings response validation parameter group
-   * @param requestBuilder             configures the request
-   * @param outputSettings             additional settings parameter group
-   * @param client                     the http connection
-   * @param config                     the configuration for this operation. All parameters not configured will be taken from
-   *                                   it.
+   * @param requestBuilder configures the request
+   * @param outputSettings additional settings parameter group
+   * @param client the http connection
+   * @param config the configuration for this operation. All parameters not configured will be taken from it.
    * @return an {@link Result} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
@@ -118,9 +119,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private String resolveUri(HttpConstants.Protocols scheme, String host, Integer port, String path) {
     // Encode spaces to generate a valid HTTP request.
-    String resolvedPath = HttpParser.encodeSpaces(path);
-
-    return String.format("%s://%s:%s%s", scheme.getScheme(), host, port, resolvedPath);
+    return format("%s://%s:%s%s", scheme.getScheme(), host, port, encodeSpaces(path));
   }
 
   private int resolveResponseTimeout(HttpRequesterConfig config, Integer responseTimeout) {

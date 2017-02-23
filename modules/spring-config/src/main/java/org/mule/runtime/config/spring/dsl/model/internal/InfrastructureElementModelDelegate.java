@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
@@ -24,10 +25,10 @@ import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrate
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 /**
@@ -98,7 +99,7 @@ class InfrastructureElementModelDelegate {
       public void visitObjectValue(ParameterObjectValue objectValue) {
 
         ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
-            .withIdentifier(ComponentIdentifier.builder()
+            .withIdentifier(builder()
                 .withNamespace("tls")
                 .withName(TLS_CONTEXT_ELEMENT_IDENTIFIER)
                 .build());
@@ -114,7 +115,7 @@ class InfrastructureElementModelDelegate {
               @Override
               public void visitObjectValue(ParameterObjectValue objectValue) {
                 ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
-                    .withIdentifier(ComponentIdentifier.builder()
+                    .withIdentifier(builder()
                         .withNamespace("tls")
                         .withName(name)
                         .build());
@@ -150,7 +151,7 @@ class InfrastructureElementModelDelegate {
                                          ParameterObjectValue objectValue, String elementName) {
 
     ComponentConfiguration.Builder redeliveryConfig = ComponentConfiguration.builder()
-        .withIdentifier(ComponentIdentifier.builder()
+        .withIdentifier(builder()
             .withNamespace(CORE_NAMESPACE)
             .withName(elementName)
             .build());

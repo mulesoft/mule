@@ -9,7 +9,6 @@ package org.mule.test.petstore.extension;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -62,14 +61,13 @@ public class PetStoreOperations {
     return forbiddenPets;
   }
 
-  public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, Event event) throws Exception {
-    CountDownLatch countDownLatch = (CountDownLatch) event.getVariable("testLatch").getValue();
+  public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, Object countDownLatch, Object latch)
+      throws Exception {
     if (countDownLatch != null) {
-      countDownLatch.countDown();
+      ((CountDownLatch) countDownLatch).countDown();
     }
 
-    Latch latch = (Latch) event.getVariable("connectionLatch").getValue();
-    latch.await();
+    ((Latch) latch).await();
     return client;
   }
 

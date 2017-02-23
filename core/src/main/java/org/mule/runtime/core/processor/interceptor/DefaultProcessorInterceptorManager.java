@@ -7,10 +7,12 @@
 
 package org.mule.runtime.core.processor.interceptor;
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
-import org.mule.runtime.api.interception.ProcessorInterceptor;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
 
 import java.util.ArrayList;
@@ -19,23 +21,38 @@ import java.util.List;
 //TODO MULE-11521 Define if this will remain here
 public class DefaultProcessorInterceptorManager implements ProcessorInterceptorProvider {
 
-  private List<ProcessorInterceptor> interceptors = new ArrayList<>();
+  private List<ProcessorInterceptorFactory> interceptorFactories = new ArrayList<>();
+  private List<String> interceptorsOrder = new ArrayList<>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void addInterceptor(ProcessorInterceptor interceptor) {
-    checkNotNull(interceptor, "interceptionHandler cannot be null");
-
-    this.interceptors.add(interceptor);
+  public void setInterceptorsOrder(String... packagesOrder) {
+    interceptorsOrder = asList(packagesOrder);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public List<ProcessorInterceptor> getInterceptors() {
-    return unmodifiableList(interceptors);
+  public void addInterceptorFactory(ProcessorInterceptorFactory interceptorFactory) {
+    checkNotNull(interceptorFactory, "interceptorFactory cannot be null");
+
+    this.interceptorFactories.add(interceptorFactory);
+  }
+
+  @Override
+  public List<ProcessorInterceptorFactory> getInterceptorFactories() {
+    final List<ProcessorInterceptorFactory> sortedInterceptors = new ArrayList<>(interceptorFactories);
+
+    sortedInterceptors.sort((o1, o2) -> orderIndexOf(o1) - orderIndexOf(o2));
+
+    return unmodifiableList(sortedInterceptors);
+  }
+
+  private int orderIndexOf(ProcessorInterceptorFactory factory) {
+    int i = 0;
+    for (String interceptorsOrderItem : interceptorsOrder) {
+      if (factory.getClass().getName().startsWith(interceptorsOrderItem)) {
+        return i;
+      }
+      ++i;
+    }
+    return MAX_VALUE;
   }
 }

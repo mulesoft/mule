@@ -103,7 +103,6 @@
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
-        <module>compatibility</module>
     </modules>
 
     <properties>
@@ -116,7 +115,6 @@
         <skipFunctionalTests>true</skipFunctionalTests>
         <skipIntegrationTests>false</skipIntegrationTests>
         <skipSystemTests>true</skipSystemTests>
-        <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
 
@@ -198,7 +196,7 @@
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <!-- TODO MULE-10771 -->
-        <projectReactorVersion>3.0.5.BUILD-SNAPSHOT</projectReactorVersion>
+        <projectReactorVersion>3.0.5.RELEASE</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.3</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
@@ -257,7 +255,11 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
         <mule.module.maven.plugin.version>1.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <!-- v1.1.0 has an issue with Optional dependencies, when resolving the graph it overrides the optionality of a transitive
+        <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
+
+        <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
              dependency with the one define in the dependency management (which is mostly in all the cases "false")
              https://bugs.eclipse.org/bugs/show_bug.cgi?id=501019 -->
         <aetherVersion>1.0.2.v20150114</aetherVersion>
@@ -1522,9 +1524,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>${assembly.plugin.version}</version>
-                    <configuration>
-                        <skipAssembly>${skipDistributions}</skipAssembly>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1660,6 +1659,11 @@
                     <version>${release.plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>com.google.code.maven-replacer-plugin</groupId>
+                    <artifactId>replacer</artifactId>
+                    <version>${maven.replacer.plugin}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${resources.plugin.version}</version>
@@ -1700,6 +1704,7 @@
                         <systemPropertyVariables>
                             <!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
                             <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
+                            <maven.projectVersion>${project.version}</maven.projectVersion>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1816,6 +1821,18 @@
                     <groupId>org.mule.tools.maven</groupId>
                     <artifactId>mule-module-maven-plugin</artifactId>
                     <version>${mule.module.maven.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.mule.plugins</groupId>
+                    <artifactId>mule-app-plugins-maven-plugin</artifactId>
+                    <version>${mule.app.plugins.maven.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.mule.extensions</groupId>
+                    <artifactId>mule-extensions-maven-plugin</artifactId>
+                    <version>${mule.extensions.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
@@ -2117,7 +2134,6 @@
             <id>compile</id>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipSystemTests>true</skipSystemTests>
@@ -2131,7 +2147,6 @@
             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipSystemTests>true</skipSystemTests>
                 <skipInstalls>true</skipInstalls>
@@ -2145,7 +2160,6 @@
             <properties>
                 <skipFunctionalTests>false</skipFunctionalTests>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipSystemTests>true</skipSystemTests>
                 <skipInstalls>true</skipInstalls>
@@ -2158,7 +2172,6 @@
             </build>
             <properties>
                 <skipIntegrationTests>false</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipSystemTests>true</skipSystemTests>
@@ -2172,7 +2185,6 @@
             </build>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>true</skipDistributions>
                 <skipVerifications>true</skipVerifications>
                 <skipInstalls>true</skipInstalls>
                 <skipTests>true</skipTests>
@@ -2183,7 +2195,6 @@
             <id>distributions</id>
             <properties>
                 <skipIntegrationTests>true</skipIntegrationTests>
-                <skipDistributions>false</skipDistributions>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
             </properties>
@@ -2200,6 +2211,7 @@
                 <skipTests>true</skipTests>
                 <skipSystemTests>true</skipSystemTests>
                 <skipGpg>false</skipGpg>
+                <skipNoSnapshotsEnforcerPluginRule>false</skipNoSnapshotsEnforcerPluginRule>
             </properties>
             <build>
                 <defaultGoal>deploy</defaultGoal>
@@ -2247,6 +2259,27 @@
                         <configuration>
                             <skip>${skipGpg}</skip>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed!</message>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

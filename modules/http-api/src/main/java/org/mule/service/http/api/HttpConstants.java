@@ -11,8 +11,8 @@ package org.mule.service.http.api;
  */
 public abstract class HttpConstants {
 
-  public enum Methods {
-    POST, GET, PUT, OPTIONS, HEAD, DELETE;
+  public enum Method {
+    POST, GET, PUT, PATCH, OPTIONS, HEAD, DELETE;
   }
 
   public static enum Protocols {

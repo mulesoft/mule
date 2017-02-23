@@ -7,6 +7,12 @@
 package org.mule.services.http.impl.service.server;
 
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Runtime.getRuntime;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.services.http.impl.service.server.grizzly.IdleExecutor.IDLE_TIMEOUT_THREADS_PREFIX_NAME;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -14,11 +20,9 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
-import org.mule.runtime.module.http.internal.listener.DefaultServerAddress;
-import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
-import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
 import org.mule.service.http.api.server.HttpServerFactory;
@@ -42,10 +46,18 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
       "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
   private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
+  private SchedulerService schedulerService;
+  private Scheduler selectorScheduler;
+  private Scheduler workerScheduler;
+  private Scheduler idleTimeoutScheduler;
   private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
   private HttpServerManager httpServerManager;
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
+
+  public HttpListenerConnectionManager(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+  }
 
   @Override
   public void initialise() throws InitialisationException {
@@ -53,11 +65,18 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
       return;
     }
 
-    //TODO - MULE-11116: Analyze how to allow users to configure this
+    // TODO - MULE-11116: Analyze how to allow users to configure this
     TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 
     try {
-      httpServerManager = new GrizzlyServerManager(LISTENER_THREAD_NAME_PREFIX, httpListenerRegistry, tcpServerSocketProperties);
+      selectorScheduler = schedulerService
+          .customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1)
+              .withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
+      workerScheduler = schedulerService.ioScheduler();
+      idleTimeoutScheduler =
+          schedulerService.ioScheduler(config().withName(LISTENER_THREAD_NAME_PREFIX + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+      httpServerManager = new GrizzlyServerManager(selectorScheduler, workerScheduler, idleTimeoutScheduler, httpListenerRegistry,
+                                                   tcpServerSocketProperties);
     } catch (IOException e) {
       throw new InitialisationException(e, this);
     }
@@ -67,6 +86,9 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   @Override
   public synchronized void dispose() {
     httpServerManager.dispose();
+    idleTimeoutScheduler.stop(5, SECONDS);
+    workerScheduler.stop(5, SECONDS);
+    selectorScheduler.stop(5, SECONDS);
   }
 
   @Override

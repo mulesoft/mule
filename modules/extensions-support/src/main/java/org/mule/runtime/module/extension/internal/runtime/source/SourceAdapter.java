@@ -27,7 +27,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
-import org.mule.runtime.core.util.func.UnsafeRunnable;
+import org.mule.runtime.core.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -151,7 +151,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
       });
     }
 
-    private void safely(UnsafeRunnable task, ExceptionCallback exceptionCallback) {
+    private void safely(CheckedRunnable task, ExceptionCallback exceptionCallback) {
       try {
         task.run();
       } catch (Throwable e) {

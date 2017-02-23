@@ -8,18 +8,21 @@ package org.mule.runtime.config.spring.dsl.model;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.util.Collections.reverse;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -50,7 +53,6 @@ public class MinimalApplicationModelGenerator {
   public MinimalApplicationModelGenerator(ApplicationModel applicationModel,
                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.applicationModel = applicationModel;
-    this.applicationModel.resolveComponentTypes();
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
 
@@ -78,17 +80,59 @@ public class MinimalApplicationModelGenerator {
    */
   public ApplicationModel getMinimalModelByName(String name) {
     ComponentModel requestedComponentModel = findRequiredComponentModel(name);
-    final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(requestedComponentModel);
-    otherRequiredGlobalComponents.add(name);
-    Set<String> allRequiredComponentModels = findComponentModelsDependencies(otherRequiredGlobalComponents);
+    Set<String> allRequiredComponentModels = resolveComponentModelDependencies(name, requestedComponentModel);
     Iterator<ComponentModel> iterator = applicationModel.getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
       ComponentModel componentModel = iterator.next();
       if (componentModel.getNameAttribute() == null || !allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
-        iterator.remove();
+        componentModel.setEnabled(false);
       }
     }
     return applicationModel;
+  }
+
+  /**
+   * @return a {@link List} of the component models by dependency references. For instance (A refs B), (B refs C) and D.
+   * The resulting list would have the following order: D, A, B, C.
+   */
+  public List<ComponentModel> resolveComponentModelDependencies() {
+    LinkedHashMap<ComponentModel, List<ComponentModel>> componentModelDependencies = new LinkedHashMap<>();
+    applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
+      if (componentModel.getNameAttribute() != null && componentModel.isEnabled()) {
+        List<ComponentModel> dependencies = resolveComponentModelDependencies(null, componentModel).stream()
+            .map(componentModelName -> applicationModel.findNamedComponent(componentModelName).get()).collect(toList());
+        componentModelDependencies.put(componentModel, dependencies);
+      }
+    });
+
+    List<ComponentModel> used = new ArrayList<>();
+    List<ComponentModel> sorted = new ArrayList<>();
+    for (ComponentModel componentModel : componentModelDependencies.keySet()) {
+      if (!used.contains(componentModel)) {
+        resolveDependency(componentModelDependencies, used, sorted, componentModel);
+      }
+    }
+    reverse(sorted);
+    return sorted;
+  }
+
+  private void resolveDependency(Map<ComponentModel, List<ComponentModel>> allDependencies, List<ComponentModel> used,
+                                 List<ComponentModel> sortedComponentModel, ComponentModel componentModel) {
+    used.add(componentModel);
+    for (ComponentModel dependency : allDependencies.get(componentModel)) {
+      if (!used.contains(componentModel)) {
+        resolveDependency(allDependencies, used, sortedComponentModel, dependency);
+      }
+    }
+    sortedComponentModel.add(componentModel);
+  }
+
+  private Set<String> resolveComponentModelDependencies(String name, ComponentModel componentModel) {
+    final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(componentModel);
+    if (name != null) {
+      otherRequiredGlobalComponents.add(name);
+    }
+    return findComponentModelsDependencies(otherRequiredGlobalComponents);
   }
 
   private ComponentModel filterFlowModelParts(ComponentModel flowModel, String[] parts) {
@@ -97,7 +141,7 @@ public class MinimalApplicationModelGenerator {
     for (int i = 1; i < parts.length; i++) {
       String part = parts[i];
       switch (part) {
-        case "source": {
+        case "-1": {
           ComponentModel sourceComponentModel = flowModel.getInnerComponents().get(0);
           checkState(areMatchingTypes(MessageSource.class, sourceComponentModel.getType()),
                      format(
@@ -107,8 +151,8 @@ public class MinimalApplicationModelGenerator {
           // Just keep the first element that it's the source.
           iterator.next();
           while (iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
+            ComponentModel componentModel = iterator.next();
+            componentModel.setEnabled(false);
           }
         }
           break;
@@ -122,13 +166,13 @@ public class MinimalApplicationModelGenerator {
             if (childComponentModel.getType() != null
                 && areMatchingTypes(Processor.class, childComponentModel.getType())) {
               if (currentElement != selectedPath) {
-                iterator.remove();
+                childComponentModel.setEnabled(false);
               } else {
                 currentLevelModel = childComponentModel;
               }
               currentElement++;
             } else {
-              iterator.remove();
+              childComponentModel.setEnabled(false);
             }
           }
         }
@@ -161,6 +205,9 @@ public class MinimalApplicationModelGenerator {
   }
 
   private Set<String> resolveComponentDependencies(ComponentModel requestedComponentModel) {
+    if (!requestedComponentModel.isEnabled()) {
+      return new HashSet<>();
+    }
     Set<String> otherDependencies = new HashSet<>();
     requestedComponentModel.getInnerComponents()
         .stream().forEach(childComponent -> {
@@ -169,20 +216,19 @@ public class MinimalApplicationModelGenerator {
     final Set<String> parametersReferencingDependencies = new HashSet<>();
     // TODO MULE-10516 - Remove one the config-ref attribute is defined as a reference
     parametersReferencingDependencies.add("config-ref");
-    ComponentBuildingDefinition buildingDefinition =
-        componentBuildingDefinitionRegistry.getBuildingDefinition(requestedComponentModel.getIdentifier())
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("No component building definition for component "
-                + requestedComponentModel.getIdentifier())));
+    componentBuildingDefinitionRegistry.getBuildingDefinition(requestedComponentModel.getIdentifier())
+        .ifPresent(buildingDefinition -> {
+          buildingDefinition.getAttributesDefinitions()
+              .stream().forEach(attributeDefinition -> {
+                attributeDefinition.accept(new AbstractAttributeDefinitionVisitor() {
 
-    buildingDefinition.getAttributesDefinitions()
-        .stream().forEach(attributeDefinition -> {
-          attributeDefinition.accept(new AbstractAttributeDefinitionVisitor() {
+                  @Override
+                  public void onReferenceSimpleParameter(String reference) {
+                    parametersReferencingDependencies.add(reference);
+                  }
+                });
+              });
 
-            @Override
-            public void onReferenceSimpleParameter(String reference) {
-              parametersReferencingDependencies.add(reference);
-            }
-          });
         });
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {

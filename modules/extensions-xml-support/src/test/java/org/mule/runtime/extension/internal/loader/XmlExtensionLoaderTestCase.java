@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader
 import org.junit.Test;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -31,12 +32,15 @@ import java.util.Optional;
 
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
+  private static final MuleVersion DEFAULT_MIN_MULE_VERSION = new MuleVersion("4.0.0");
+
   @Test
   public void testModuleSimple() {
     String modulePath = "module-simple/module-simple.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-simple"));
+    assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(8));
@@ -60,6 +64,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-properties"));
+    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
@@ -93,6 +98,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-global-element"));
+    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
@@ -128,6 +134,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-custom-types"));
+    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(1));
@@ -159,6 +166,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-documentation"));
+    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getDescription(), is("Documentation for the connector"));
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);

@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -21,7 +23,6 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.ExceptionMapper;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
 
@@ -31,9 +32,8 @@ import java.util.Set;
 /**
  * Extension's {@link ErrorType} registrant.
  * <p>
- * For each {@link OperationModel} from an {@link ExtensionModel} consumes the declared {@link ErrorModel}s converts
- * these to {@link ErrorType}s using the {@link ErrorTypeRepository}, and finally register an {@link ExceptionMapper}
- * for the operation.
+ * For each {@link OperationModel} from an {@link ExtensionModel} consumes the declared {@link ErrorModel}s converts these to
+ * {@link ErrorType}s using the {@link ErrorTypeRepository}, and finally register an {@link ExceptionMapper} for the operation.
  *
  * @see ErrorModel
  * @see ErrorType
@@ -53,8 +53,8 @@ class ExtensionErrorsRegistrant {
   }
 
   /**
-   * Registers the found {@link ErrorModel} from each {@link OperationModel} into the {@link ErrorTypeRepository}
-   * and creates an {@link ExceptionMapper} for each {@link OperationModel} that declares {@link ErrorModel}s.
+   * Registers the found {@link ErrorModel} from each {@link OperationModel} into the {@link ErrorTypeRepository} and creates an
+   * {@link ExceptionMapper} for each {@link OperationModel} that declares {@link ErrorModel}s.
    *
    * @param extensionModel from where get the {@link ErrorModel} from each {@link OperationModel}
    */
@@ -107,6 +107,6 @@ class ExtensionErrorsRegistrant {
   }
 
   private static ComponentIdentifier createIdentifier(String name, String namespace) {
-    return new ComponentIdentifier.Builder().withName(name).withNamespace(namespace).build();
+    return builder().withName(name).withNamespace(namespace).build();
   }
 }

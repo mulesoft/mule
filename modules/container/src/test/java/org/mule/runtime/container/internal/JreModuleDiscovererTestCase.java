@@ -16,6 +16,7 @@ import static org.mule.runtime.container.internal.JreModuleDiscoverer.JRE_MODULE
 import static org.mule.runtime.container.internal.JreModuleDiscoverer.UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR;
 import static org.mule.runtime.core.util.JdkVersionUtils.JAVA_VERSION_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;

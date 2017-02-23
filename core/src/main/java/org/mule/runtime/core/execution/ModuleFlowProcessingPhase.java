@@ -6,34 +6,43 @@
  */
 package org.mule.runtime.core.execution;
 
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
-import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
+import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
+import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -54,11 +63,14 @@ public class ModuleFlowProcessingPhase
   // TODO MULE-11167 Policies should be non blocking
   public static final String ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY = "enableSourcePolicies";
 
-  private final PolicyManager policyManager;
-  protected static transient Logger logger = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 
-  public ModuleFlowProcessingPhase(PolicyManager policyManager) {
+  private final StreamingManagerAdapter streamingManager;
+  private final PolicyManager policyManager;
+
+  public ModuleFlowProcessingPhase(PolicyManager policyManager, StreamingManagerAdapter streamingManager) {
     this.policyManager = policyManager;
+    this.streamingManager = streamingManager;
   }
 
   @Override
@@ -79,25 +91,36 @@ public class ModuleFlowProcessingPhase
           getErrorConsumer(messageSource, template.getFailedExecutionResponseParametersFunction(),
                            messageProcessContext, template, phaseResultNotifier);
 
-      final Event templateEvent =
-          Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
-              .message((InternalMessage) template.getMessage()).build();
 
+      Event templateEvent = createEvent(template, messageProcessContext, sourceIdentifier);
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
-
+        Reference<Event> eventReference = new Reference<>();
         just(templateEvent)
-            .doOnNext(request -> fireNotification(messageProcessContext.getMessageSource(), request,
-                                                  messageProcessContext.getFlowConstruct(),
-                                                  MESSAGE_RECEIVED))
+            .doOnNext(request -> {
+              eventReference.set(request);
+              fireNotification(messageProcessContext.getMessageSource(), request,
+                               messageProcessContext.getFlowConstruct(),
+                               MESSAGE_RECEIVED);
+            })
             .then(request -> from(template.routeEventAsync(request)))
             .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, exceptionHandler, errorConsumer,
                                             messageProcessContext, phaseResultNotifier,
                                             template))
             .doOnError(MessagingException.class, errorConsumer)
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                       throwable -> logger.error("Unhandled exception processing request" + throwable))
+                       throwable -> LOGGER.error("Unhandled exception processing request" + throwable))
+            .doAfterTerminate((event, e) -> {
+              if (event == null) {
+                event = eventReference.get();
+              }
+              if (e != null) {
+                streamingManager.error(event);
+              } else {
+                streamingManager.success(event);
+              }
+            })
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
@@ -130,7 +153,7 @@ public class ModuleFlowProcessingPhase
             // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
             if (flowExecutionResponse == null) {
               flowExecutionResponse =
-                  Event.builder(templateEvent).message((InternalMessage) Message.builder().nullPayload().build()).build();
+                  Event.builder(templateEvent).message(Message.builder().nullPayload().build()).build();
             }
 
             Map<String, Object> responseParameters = sourcePolicyResult.getRight().getResponseParameters();
@@ -158,6 +181,35 @@ public class ModuleFlowProcessingPhase
     } catch (Exception e) {
       phaseResultNotifier.phaseFailure(e);
     }
+  }
+
+  private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
+                            ComponentIdentifier sourceIdentifier)
+      throws MuleException {
+    Message message = template.getMessage();
+    Event templateEvent =
+        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
+            .message(message).build();
+
+    if (message.getPayload().getValue() instanceof SourceResultAdapter) {
+      SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();
+      final Result<?, ?> result = adapter.getResult();
+      final Object resultValue = result.getOutput();
+
+      if (resultValue instanceof Collection && adapter.isCollection()) {
+        message = toMessage(Result.<Collection<Message>, Attributes>builder()
+            .output(toMessageCollection((Collection<Result>) resultValue, result.getMediaType().orElse(ANY),
+                                        adapter.getCursorStreamProviderFactory(), templateEvent))
+            .attributes(NULL_ATTRIBUTES)
+            .mediaType(result.getMediaType().orElse(ANY))
+            .build());
+      } else {
+        message = toMessage(result, result.getMediaType().orElse(ANY), adapter.getCursorStreamProviderFactory(), templateEvent);
+      }
+
+      templateEvent = Event.builder(templateEvent).message(message).build();
+    }
+    return templateEvent;
   }
 
   private Consumer<MessagingException> getErrorConsumer(MessageSource messageSource,
@@ -197,7 +249,7 @@ public class ModuleFlowProcessingPhase
       // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
       if (response == null) {
         response =
-            Event.builder(request).message((InternalMessage) Message.builder().nullPayload().build()).build();
+            Event.builder(request).message(Message.builder().nullPayload().build()).build();
       }
 
       Map<String, Object> responseParameters =

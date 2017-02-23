@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.functional;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -33,7 +36,7 @@ final public class Either<L, R> {
    * @return the created {@code Either instance}
    */
   public static <L, R> Either<L, R> left(L value) {
-    return new Either<>(Optional.of(value), Optional.empty());
+    return new Either<>(ofNullable(value), empty());
   }
 
   /**
@@ -45,7 +48,7 @@ final public class Either<L, R> {
    * @return the created {@code Either instance}
    */
   public static <L, R> Either<L, R> right(R value) {
-    return new Either<>(Optional.empty(), Optional.of(value));
+    return new Either<>(empty(), ofNullable(value));
   }
 
   private final Optional<L> left;
@@ -59,34 +62,42 @@ final public class Either<L, R> {
   /**
    * Allows to execute a function over the left value if it is present
    * 
-   * @param lFunc the function to apply to the left value
+   * @param func the function to apply to the left value
    * @param <T> the return type of the function.
    * @return a new {@code Either} created from the result of applying the function.
    */
-  public <T> Either<T, R> mapLeft(Function<? super L, ? extends T> lFunc) {
-    return new Either<>(left.map(lFunc), right);
+  public <T> Either<T, R> mapLeft(Function<? super L, ? extends T> func) {
+    return new Either<>(left.map(func), right);
+  }
+
+  public void applyLeft(Consumer<? super L> consumer) {
+    left.ifPresent(consumer::accept);
+  }
+
+  public void applyRight(Consumer<? super R> consumer) {
+    right.ifPresent(consumer::accept);
   }
 
   /**
    * Allows to execute a function over the right value if it is present
    * 
-   * @param rFunc the function to apply to the right value
+   * @param func the function to apply to the right value
    * @param <T> the return type of the function.
    * @return a new {@code Either} created from the result of applying the function.
    */
-  public <T> Either<L, T> mapRight(Function<? super R, ? extends T> rFunc) {
-    return new Either<>(left, right.map(rFunc));
+  public <T> Either<L, T> mapRight(Function<? super R, ? extends T> func) {
+    return new Either<>(left, right.map(func));
   }
 
   /**
    * Receives a {@link Consumer} functions for both, the left and right value and applies the one over the value that is present.
    *
-   * @param lFunc the function to apply to the left value
-   * @param rFunc the function to apply to the right value
+   * @param leftFunc the function to apply to the left value
+   * @param rightFunc the function to apply to the right value
    */
-  public void apply(Consumer<? super L> lFunc, Consumer<? super R> rFunc) {
-    left.ifPresent(lFunc);
-    right.ifPresent(rFunc);
+  public void apply(Consumer<? super L> leftFunc, Consumer<? super R> rightFunc) {
+    applyLeft(leftFunc);
+    applyRight(rightFunc);
   }
 
   /**
@@ -107,13 +118,23 @@ final public class Either<L, R> {
    * @return the left value
    */
   public L getLeft() {
-    return left.get();
+    return left.orElse(null);
   }
 
   /**
    * @return the right value
    */
   public R getRight() {
-    return right.get();
+    return right.orElse(null);
+  }
+
+  public Optional<Object> getValue() {
+    if (left.isPresent()) {
+      return (Optional<Object>) left;
+    } else if (right.isPresent()) {
+      return (Optional<Object>) right;
+    } else {
+      return empty();
+    }
   }
 }

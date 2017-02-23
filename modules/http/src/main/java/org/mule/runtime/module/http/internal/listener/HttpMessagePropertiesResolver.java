@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.module.http.internal.HttpParser.decodeQueryString;
-import static org.mule.runtime.module.http.internal.HttpParser.decodeUriParams;
 import static org.mule.runtime.module.http.internal.HttpParser.extractPath;
 import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.service.http.api.domain.ParameterMap;

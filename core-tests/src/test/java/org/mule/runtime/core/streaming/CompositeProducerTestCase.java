@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.streaming;
 
+import org.mule.runtime.core.internal.streaming.object.CompositeProducer;
+import org.mule.runtime.core.internal.streaming.object.Producer;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

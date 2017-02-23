@@ -7,11 +7,17 @@
 
 package org.mule.runtime.deployment.model.api.plugin;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 
@@ -24,6 +30,20 @@ import java.util.Set;
  */
 public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
 
+
+  private final ModuleRepository moduleRepository;
+
+  /**
+   * Creates a new factory
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non null.
+   */
+  public ArtifactPluginClassLoaderFactory(ModuleRepository moduleRepository) {
+    checkArgument(moduleRepository != null, "moduleRepository cannot be null");
+
+    this.moduleRepository = moduleRepository;
+  }
+
   /**
    * @param artifactId artifact unique ID. Non empty.
    * @param parent parent for the new artifact classloader.
@@ -32,16 +52,26 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
    */
   @Override
   public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
-    Map<String, ClassLoaderLookupStrategy> pluginsLookupPolicies = new HashMap<>();
+    Map<String, LookupStrategy> pluginsLookupPolicies = new HashMap<>();
     for (ArtifactPluginDescriptor dependencyPluginDescriptor : descriptor.getArtifactPluginDescriptors()) {
       if (dependencyPluginDescriptor.getName().equals(descriptor.getName())) {
         continue;
       }
 
-      final ClassLoaderLookupStrategy parentFirst = getClassLoaderLookupStrategy(descriptor, dependencyPluginDescriptor);
+      final LookupStrategy parentFirst = getClassLoaderLookupStrategy(descriptor, dependencyPluginDescriptor);
 
       for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderModel().getExportedPackages()) {
         pluginsLookupPolicies.put(exportedPackage, parentFirst);
+      }
+    }
+
+    ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
+
+    for (MuleModule module : moduleRepository.getModules()) {
+      if (module.getPrivilegedArtifacts().contains(descriptor.getName())) {
+        for (String packageName : module.getPrivilegedExportedPackages()) {
+          pluginsLookupPolicies.put(packageName, containerOnlyLookupStrategy);
+        }
       }
     }
 
@@ -51,13 +81,13 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
                                        parent.getClassLoader(), lookupPolicy);
   }
 
-  private ClassLoaderLookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
-                                                                 ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    final ClassLoaderLookupStrategy parentFirst;
+  private LookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,
+                                                      ArtifactPluginDescriptor dependencyPluginDescriptor) {
+    final LookupStrategy parentFirst;
     if (isDependencyPlugin(descriptor.getClassLoaderModel().getDependencies(), dependencyPluginDescriptor)) {
-      parentFirst = ClassLoaderLookupStrategy.PARENT_FIRST;
+      parentFirst = PARENT_FIRST;
     } else {
-      parentFirst = ClassLoaderLookupStrategy.CHILD_ONLY;
+      parentFirst = CHILD_ONLY;
     }
     return parentFirst;
   }

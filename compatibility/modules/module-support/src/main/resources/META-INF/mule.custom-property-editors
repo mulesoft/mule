@@ -1,2 +1,0 @@
-org.mule.compatibility.core.api.transport.Connector=org.mule.compatibility.config.spring.editors.ConnectorPropertyEditor
-org.mule.compatibility.core.endpoint.URIBuilder=org.mule.compatibility.config.spring.editors.URIBuilderPropertyEditor

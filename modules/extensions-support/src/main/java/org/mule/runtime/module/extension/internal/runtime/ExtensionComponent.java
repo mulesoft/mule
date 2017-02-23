@@ -18,7 +18,6 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -36,7 +35,7 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -44,6 +43,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
@@ -89,6 +90,7 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
   protected final ClassLoader classLoader;
 
+  private CursorStreamProviderFactory cursorStreamProviderFactory;
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
 
@@ -96,17 +98,22 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
   protected ConnectionManagerAdapter connectionManager;
 
   @Inject
+  private StreamingManager streamingManager;
+
+  @Inject
   private MuleMetadataService metadataService;
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
                                ConfigurationProvider configurationProvider,
+                               CursorStreamProviderFactory cursorStreamProviderFactory,
                                ExtensionManager extensionManager) {
     this.extensionModel = extensionModel;
     this.classLoader = getClassLoader(extensionModel);
     this.componentModel = componentModel;
     this.configurationProvider = configurationProvider;
     this.extensionManager = extensionManager;
+    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
@@ -119,6 +126,9 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
    */
   @Override
   public final void initialise() throws InitialisationException {
+    if (cursorStreamProviderFactory == null) {
+      cursorStreamProviderFactory = streamingManager.forBytes().getDefaultCursorStreamProviderFactory();
+    }
     withContextClassLoader(classLoader, () -> {
       validateConfigurationProviderIsNotExpression();
       findConfigurationProvider().ifPresent(this::validateOperationConfiguration);
@@ -310,6 +320,10 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
     return Optional.of(getConfigurationProviderByModel()
         .map(provider -> provider.get(event))
         .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event)));
+  }
+
+  protected CursorStreamProviderFactory getCursorStreamProviderFactory() {
+    return cursorStreamProviderFactory;
   }
 
   private Optional<ConfigurationProvider> findConfigurationProvider() {

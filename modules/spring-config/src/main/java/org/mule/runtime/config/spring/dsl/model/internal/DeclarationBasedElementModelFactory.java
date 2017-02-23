@@ -11,15 +11,19 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.ExtensionConstants.INFRASTRUCTURE_PARAMETER_NAMES;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getId;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -38,6 +42,7 @@ import org.mule.runtime.api.app.declaration.SourceElementDeclaration;
 import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ParameterListValue;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -56,7 +61,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
@@ -67,8 +72,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Implementation of {@link DslElementModelFactory} that creates
- * a {@link DslElementModel} based on its {@link ElementDeclaration} representation.
+ * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its {@link ElementDeclaration}
+ * representation.
  *
  * @since 4.0
  */
@@ -76,6 +81,7 @@ class DeclarationBasedElementModelFactory {
 
   private final DslResolvingContext context;
   private final InfrastructureElementModelDelegate infrastructureDelegate;
+  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private Map<ExtensionModel, DslSyntaxResolver> resolvers;
   private ExtensionModel currentExtension;
   private DslSyntaxResolver dsl;
@@ -278,7 +284,8 @@ class DeclarationBasedElementModelFactory {
           .map(ElementDeclaration::getName)
           .collect(joining(","));
 
-      throw new IllegalArgumentException(format("The parameter%s [%s] were declared but they do not exist in the associated model",
+      throw new IllegalArgumentException(
+                                         format("The parameter%s [%s] were declared but they do not exist in the associated model",
                                                 missing));
     }
   }
@@ -313,7 +320,7 @@ class DeclarationBasedElementModelFactory {
                             final ComponentConfiguration.Builder parentConfig,
                             final DslElementModel.Builder parentElement) {
 
-    if (INFRASTRUCTURE_PARAMETER_NAMES.contains(parameter.getName())) {
+    if (isInfrastructure(parameterModel)) {
       infrastructureDelegate.addParameter(parameter, parameterModel, paramDsl, parentConfig, parentElement);
       return;
     }
@@ -327,8 +334,11 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       public void visitListValue(ParameterListValue list) {
-        checkArgument(paramDsl.supportsChildDeclaration(), "Cannot build nested ");
-
+        checkArgument(paramDsl.supportsChildDeclaration(),
+                      format("Inline List values are not allowed for this parameter [%s]", parameterModel.getName()));
+        checkArgument(parameterModel.getType() instanceof ArrayType,
+                      format("List values can only be associated to ArrayType parameters. Parameter [%s] is of type [%s]",
+                             parameterModel.getName(), getId(parameterModel.getType())));
         // the parameter is of list type, so we have nested elements
         // we'll resolve this based on the type of the parameter, since no
         // further model information is available
@@ -337,10 +347,92 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       public void visitObjectValue(ParameterObjectValue objectValue) {
-        checkArgument(paramDsl.supportsChildDeclaration(), "Cannot build nested ");
-        createComplexParameter(objectValue, paramDsl, parameterModel, parentConfig, parentElement);
+        checkArgument(parameterModel.getType() instanceof ObjectType,
+                      format("Complex values can only be associated to ObjectType parameters. Parameter [%s] is of type [%s]",
+                             parameterModel.getName(), getId(parameterModel.getType())));
+        checkArgument(paramDsl.supportsChildDeclaration(),
+                      format("Complex values are not allowed for this parameter [%s]", parameterModel.getName()));
+
+        if (isMap(parameterModel.getType())) {
+          createMapParameter(objectValue, paramDsl, parameterModel, (ObjectType) parameterModel.getType(),
+                             parentConfig, parentElement);
+        } else {
+          createComplexParameter(objectValue, paramDsl, parameterModel, parentConfig, parentElement);
+        }
       }
     });
+  }
+
+  private void createMapParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, Object model, ObjectType mapType,
+                                  ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement) {
+
+    ComponentConfiguration.Builder mapConfig = ComponentConfiguration.builder()
+        .withIdentifier(asIdentifier(paramDsl));
+
+    DslElementModel.Builder mapElement = DslElementModel.builder()
+        .withModel(model)
+        .withDsl(paramDsl);
+
+    MetadataType valueType = mapType.getOpenRestriction().get();
+
+    paramDsl.getGeneric(valueType)
+        .ifPresent(entryDsl -> objectValue.getParameters().forEach((key, value) -> {
+          ComponentConfiguration.Builder entryConfigBuilder = ComponentConfiguration.builder()
+              .withIdentifier(asIdentifier(entryDsl));
+
+          DslElementModel.Builder<MetadataType> entryElement = DslElementModel.<MetadataType>builder()
+              .withModel(valueType)
+              .withDsl(entryDsl);
+
+
+          entryDsl.getAttribute(KEY_ATTRIBUTE_NAME)
+              .ifPresent(keyDsl -> {
+                entryConfigBuilder.withParameter(KEY_ATTRIBUTE_NAME, key);
+                entryElement.containing(DslElementModel.builder()
+                    .withModel(typeLoader.load(String.class))
+                    .withDsl(keyDsl)
+                    .withValue(key)
+                    .build());
+              });
+
+          entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME)
+              .ifPresent(valueDsl -> value.accept(new ParameterValueVisitor() {
+
+                @Override
+                public void visitSimpleValue(String value) {
+                  entryConfigBuilder.withParameter(VALUE_ATTRIBUTE_NAME, value);
+                  entryElement.containing(DslElementModel.builder()
+                      .withModel(valueType)
+                      .withDsl(valueDsl)
+                      .withValue(value)
+                      .build());
+                }
+
+                @Override
+                public void visitListValue(ParameterListValue list) {
+                  createList(list, valueDsl, (ArrayType) valueType, entryConfigBuilder, entryElement);
+                }
+
+                @Override
+                public void visitObjectValue(ParameterObjectValue objectValue) {
+                  if (isMap(valueType)) {
+                    createMapParameter(objectValue, valueDsl, valueType, (ObjectType) valueType, entryConfigBuilder,
+                                       entryElement);
+                  } else {
+                    createObject(objectValue, valueDsl, valueType, (ObjectType) valueType, entryConfigBuilder, entryElement);
+                  }
+                }
+              }));
+
+          ComponentConfiguration entryConfig = entryConfigBuilder.build();
+          mapConfig.withNestedComponent(entryConfig);
+          mapElement.containing(entryElement.withConfig(entryConfig).build());
+        }));
+
+    ComponentConfiguration result = mapConfig.build();
+    parentConfig.withNestedComponent(result);
+
+    parentElement.containing(mapElement.withConfig(result).build());
   }
 
   private void createComplexParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, ParameterModel parameterModel,
@@ -350,7 +442,7 @@ class DeclarationBasedElementModelFactory {
       // and attributes as values of this element.
       // we'll resolve this based on the type of the parameter, since no
       // further model information is available
-      createObject((ObjectType) parameterModel.getType(), objectValue, paramDsl, parentConfig, parentElement);
+      createObject(objectValue, paramDsl, parameterModel, (ObjectType) parameterModel.getType(), parentConfig, parentElement);
 
     } else {
       // the parameter is of an extensible object type, so we need a wrapper element
@@ -375,13 +467,13 @@ class DeclarationBasedElementModelFactory {
         objectValue.getTypeId().equals(getId(parameterModel.getType()))) {
 
       nestedElementType = (ObjectType) parameterModel.getType();
-
     } else {
       nestedElementType = lookupType(objectValue);
     }
 
     dsl.resolve(nestedElementType)
-        .ifPresent(typeDsl -> createObject(nestedElementType, objectValue, typeDsl, wrapperConfig, wrapperElement));
+        .ifPresent(typeDsl -> createObject(objectValue, typeDsl, nestedElementType, nestedElementType, wrapperConfig,
+                                           wrapperElement));
 
     ComponentConfiguration result = wrapperConfig.build();
 
@@ -397,6 +489,7 @@ class DeclarationBasedElementModelFactory {
       parentElement.containing(DslElementModel.<ParameterModel>builder()
           .withModel(parameterModel)
           .withDsl(paramDsl)
+          .withValue(value)
           .build());
     } else {
       // we are in the content case, so we have one more nesting level
@@ -472,9 +565,12 @@ class DeclarationBasedElementModelFactory {
 
           @Override
           public void visitObject(ObjectType objectType) {
-            createObject(objectType, objectValue, itemDsl, parentConfig, parentElement);
+            if (isMap(objectType)) {
+              createMapParameter(objectValue, itemDsl, itemValueType, objectType, parentConfig, parentElement);
+            } else {
+              createObject(objectValue, itemDsl, objectType, objectType, parentConfig, parentElement);
+            }
           }
-
         });
       }
     });
@@ -494,6 +590,7 @@ class DeclarationBasedElementModelFactory {
           objectElement.containing(DslElementModel.builder()
               .withModel(fieldType)
               .withDsl(fieldDsl)
+              .withValue(value)
               .build());
         } else {
           ComponentConfiguration contentConfiguration = ComponentConfiguration.builder()
@@ -522,7 +619,11 @@ class DeclarationBasedElementModelFactory {
 
           @Override
           public void visitObject(ObjectType objectType) {
-            createObject(objectType, objectValue, fieldDsl, objectConfig, objectElement);
+            if (isMap(objectType)) {
+              createMapParameter(objectValue, fieldDsl, fieldType, objectType, objectConfig, objectElement);
+            } else {
+              createObject(objectValue, fieldDsl, objectType, objectType, objectConfig, objectElement);
+            }
           }
         });
       }
@@ -553,17 +654,15 @@ class DeclarationBasedElementModelFactory {
     parentElement.containing(listElement.withConfig(result).build());
   }
 
-  private void createObject(ObjectType objectType,
-                            ParameterObjectValue objectValue,
-                            DslElementSyntax objectDsl,
+  private void createObject(ParameterObjectValue objectValue, DslElementSyntax objectDsl, Object model, ObjectType objectType,
                             ComponentConfiguration.Builder parentConfig,
                             DslElementModel.Builder parentElement) {
 
     ComponentConfiguration.Builder objectConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(objectDsl));
 
-    DslElementModel.Builder<MetadataType> objectElement = DslElementModel.<MetadataType>builder()
-        .withModel(objectType)
+    DslElementModel.Builder objectElement = DslElementModel.builder()
+        .withModel(model)
         .withDsl(objectDsl);
 
     populateObjectElementFields(objectType, objectValue, objectDsl, objectConfig, objectElement);
@@ -576,7 +675,7 @@ class DeclarationBasedElementModelFactory {
 
   private void populateObjectElementFields(ObjectType objectType, ParameterObjectValue objectValue, DslElementSyntax objectDsl,
                                            ComponentConfiguration.Builder objectConfig,
-                                           DslElementModel.Builder<MetadataType> objectElement) {
+                                           DslElementModel.Builder objectElement) {
     List<ObjectFieldType> fields = objectType.getFields()
         .stream()
         .flatMap(f -> isParameterGroup(f) ? ((ObjectType) f.getValue()).getFields().stream() : of(f))
@@ -594,7 +693,7 @@ class DeclarationBasedElementModelFactory {
     checkArgument(fieldDsl.supportsTopLevelDeclaration() || fieldDsl.supportsChildDeclaration(),
                   format("The given component '%s' does not support element-like declaration", fieldDsl.getAttributeName()));
 
-    return ComponentIdentifier.builder()
+    return builder()
         .withName(fieldDsl.getElementName())
         .withNamespace(fieldDsl.getNamespaceUri())
         .build();

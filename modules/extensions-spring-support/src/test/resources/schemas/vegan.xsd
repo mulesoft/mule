@@ -82,22 +82,9 @@
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="parameterized-functions">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="parameterized-function">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
-                    <xs:attribute type="mule:expressionMap" use="optional" name="parameterizedFunction"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -181,6 +168,7 @@
     <xs:complexType name="EatAppleType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -199,6 +187,7 @@
     <xs:complexType name="SpreadTheWordType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -250,6 +239,7 @@
     <xs:complexType name="EatBananaType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -267,6 +257,7 @@
     <xs:complexType name="EatPealedType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -285,6 +276,7 @@
     <xs:complexType name="GetConfigType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -302,6 +294,7 @@
     <xs:complexType name="GetLunchType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -319,6 +312,7 @@
     <xs:complexType name="GetQualifiedLunchType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -336,6 +330,66 @@
     <xs:complexType name="GetRawLunchType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="grape">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="grape-connection-connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="extension:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="vegan-policy">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="veganPolicy"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="500" name="maxCalories"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GrapeOperationType" substitutionGroup="mule:abstract-operator" name="grape-operation"></xs:element>
+    <xs:complexType name="GrapeOperationType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -376,6 +430,7 @@
     <xs:complexType name="EatKiwiType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -450,19 +505,11 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConvinceAnimalKillerType" substitutionGroup="mule:abstract-operator" name="convince-animal-killer"></xs:element>
     <xs:complexType name="ConvinceAnimalKillerType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" name="argument1"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="argument2"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="argument3"></xs:attribute>
@@ -567,7 +614,9 @@
     <xs:complexType name="TryEatType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
                 <xs:attribute type="xs:string" use="required" name="food"></xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="menu"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

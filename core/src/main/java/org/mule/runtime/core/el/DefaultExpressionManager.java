@@ -72,6 +72,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
+  public void addGlobalContext(BindingContext bindingContext) {
+    expressionLanguage.registerGlobalContext(bindingContext);
+  }
+
+  @Override
   public TypedValue evaluate(String expression) {
     return evaluate(expression, BindingContext.builder().build());
   }
