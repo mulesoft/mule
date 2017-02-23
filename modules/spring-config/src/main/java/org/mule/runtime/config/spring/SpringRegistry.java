@@ -9,17 +9,18 @@ package org.mule.runtime.config.spring;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
-import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.registry.AbstractRegistry;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -397,27 +398,30 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       return object;
     }
 
-    private synchronized void doRegisterObject(String key, Object value) throws RegistrationException {
-      if (springContextInitialised.get()) {
-        if (applicationContext.containsBean(key)) {
-          if (logger.isWarnEnabled()) {
-            logger.warn(String
-                .format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
+    private void doRegisterObject(String key, Object value) throws RegistrationException {
+      synchronized (muleContext) {
+        if (springContextInitialised.get()) {
+          if (applicationContext.containsBean(key)) {
+            if (logger.isWarnEnabled()) {
+              logger.warn(String
+                  .format("Spring registry already contains an object named '%s'. The previous object will be overwritten.",
+                          key));
+            }
+            SpringRegistry.this.unregisterObject(key);
           }
-          SpringRegistry.this.unregisterObject(key);
-        }
 
-        try {
-          value = initialiseObject(applicationContext, key, value);
-          applyLifecycle(value);
-          applicationContext.getBeanFactory().registerSingleton(key, value);
-        } catch (Exception e) {
-          throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+          try {
+            value = initialiseObject(applicationContext, key, value);
+            applyLifecycle(value);
+            applicationContext.getBeanFactory().registerSingleton(key, value);
+          } catch (Exception e) {
+            throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+          }
+        } else {
+          // since the context has not yet bean initialized, we register a bean definition instead.
+          registeredBeanDefinitionsBeforeInitialization.put(key, genericBeanDefinition(ConstantFactoryBean.class)
+              .addConstructorArgValue(value).getBeanDefinition());
         }
-      } else {
-        // since the context has not yet bean initialized, we register a bean definition instead.
-        registeredBeanDefinitionsBeforeInitialization.put(key, genericBeanDefinition(ConstantFactoryBean.class)
-            .addConstructorArgValue(value).getBeanDefinition());
       }
     }
   }
