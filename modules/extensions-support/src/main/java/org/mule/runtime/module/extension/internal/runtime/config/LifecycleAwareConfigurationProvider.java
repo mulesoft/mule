@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -13,10 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -24,6 +22,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -54,8 +56,7 @@ public abstract class LifecycleAwareConfigurationProvider implements Configurati
   private final ConfigurationModel configurationModel;
   private final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
-  protected SimpleLifecycleManager lifecycleManager =
-      new DefaultLifecycleManager<>(String.format("%s-%s", getClass().getName(), getName()), this);
+  protected final SimpleLifecycleManager lifecycleManager;
 
   @Inject
   protected MuleContext muleContext;
@@ -65,6 +66,7 @@ public abstract class LifecycleAwareConfigurationProvider implements Configurati
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     extensionClassLoader = getClassLoader(extensionModel);
+    lifecycleManager = new DefaultLifecycleManager<>(format("%s-%s", getClass().getName(), getName()), this);
   }
 
   /**

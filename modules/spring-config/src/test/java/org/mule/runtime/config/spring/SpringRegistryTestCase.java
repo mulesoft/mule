@@ -6,14 +6,32 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.concurrent.Executors.newCachedThreadPool;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.registry.AbstractRegistryTestCase;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -70,5 +88,71 @@ public class SpringRegistryTestCase extends AbstractRegistryTestCase {
     applicationContext = new StaticApplicationContext();
     parentApplicationContext = new StaticApplicationContext();
     springRegistry = new SpringRegistry(REGISTERY_ID, applicationContext, parentApplicationContext, null);
+  }
+
+  @Test
+  public void registerObjectAsynchronously() throws MuleException, InterruptedException, ExecutionException {
+    final MuleContext muleContext = mock(MuleContext.class);
+    springRegistry = new SpringRegistry(new StaticApplicationContext(), muleContext);
+    springRegistry.initialise();
+    springRegistry.getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
+
+    final Startable asyncStartableBean = mock(Startable.class, withSettings().extraInterfaces(Disposable.class));
+
+    final Latch startingLatch = new Latch();
+    final Latch disposingLatch = new Latch();
+
+    doAnswer(invocation -> {
+      startingLatch.countDown();
+      synchronized (muleContext) {
+        disposingLatch.await();
+      }
+
+      verify((Disposable) asyncStartableBean, never()).dispose();
+      return null;
+    }).when(asyncStartableBean).start();
+
+    ((Disposable) doAnswer(invocation -> {
+      return null;
+    }).when(asyncStartableBean)).dispose();
+
+    final ExecutorService threadPool = newCachedThreadPool();
+
+    try {
+      final Future<?> submittedStop = threadPool.submit(() -> {
+        try {
+          springRegistry.registerObject(BEAN_KEY, asyncStartableBean);
+        } catch (RegistrationException e) {
+          throw new MuleRuntimeException(e);
+        }
+      });
+      final Future<?> submittedRegistryDispose = threadPool.submit(() -> {
+        try {
+          startingLatch.await();
+        } catch (InterruptedException e) {
+          throw new MuleRuntimeException(e);
+        }
+        disposingLatch.countDown();
+        synchronized (muleContext) {
+          springRegistry.dispose();
+        }
+      });
+
+      submittedRegistryDispose.get();
+      submittedStop.get();
+    } finally {
+      threadPool.shutdownNow();
+    }
+
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      try {
+        verify(asyncStartableBean).start();
+        verify((Disposable) asyncStartableBean).dispose();
+        return true;
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }));
+
   }
 }
