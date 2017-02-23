@@ -440,26 +440,29 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
             return object;
         }
 
-        private synchronized void doRegisterObject(String key, Object value) throws RegistrationException
+        private void doRegisterObject(String key, Object value) throws RegistrationException
         {
-            if (applicationContext.containsBean(key))
+            synchronized (muleContext)
             {
-                if (logger.isWarnEnabled())
+                if (applicationContext.containsBean(key))
                 {
-                    logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
+                    }
+                    SpringRegistry.this.unregisterObject(key);
                 }
-                SpringRegistry.this.unregisterObject(key);
-            }
-
-            try
-            {
-                value = initialiseObject(applicationContext, key, value);
-                applyLifecycle(value);
-                applicationContext.getBeanFactory().registerSingleton(key, value);
-            }
-            catch (Exception e)
-            {
-                throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+    
+                try
+                {
+                    value = initialiseObject(applicationContext, key, value);
+                    applyLifecycle(value);
+                    applicationContext.getBeanFactory().registerSingleton(key, value);
+                }
+                catch (Exception e)
+                {
+                    throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+                }
             }
         }
     }
