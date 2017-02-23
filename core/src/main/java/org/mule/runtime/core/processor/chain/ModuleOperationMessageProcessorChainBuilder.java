@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.core.api.message.InternalMessage.builder;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,6 +24,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -83,6 +87,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     private Map<String, String> parameters;
     private boolean returnsVoid;
     private ExpressionManager expressionManager;
+    private Optional<String> target;
 
     ModuleOperationProcessorChain(String name, Processor head, List<Processor> processors,
                                   List<Processor> processorsForLifecycle,
@@ -91,6 +96,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
                                   ExpressionManager expressionManager) {
       super(name, head, processors, processorsForLifecycle);
       this.properties = properties;
+      this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
       this.parameters = parameters;
       this.returnsVoid = returnsVoid;
       this.expressionManager = expressionManager;
@@ -125,8 +131,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       if (!returnsVoid) {
         return from(publisher)
             .concatMap(request -> just(request)
-                .map(event -> createEventWithParameters(event))
-                .transform(s -> super.apply(s))
+                .map(this::createEventWithParameters)
+                .transform(super::apply)
                 .map(result -> createNewEventFromJustMessage(request, result)));
       } else {
         return publisher;
@@ -134,7 +140,14 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     }
 
     private Event createNewEventFromJustMessage(Event request, Event response) {
-      return Event.builder(request).message(builder(response.getMessage()).build()).build();
+      final Event.Builder builder = Event.builder(request);
+      if (target.isPresent()) {
+        builder.addVariable(target.get(), response.getMessage().getPayload().getValue(),
+                            response.getMessage().getPayload().getDataType());
+      } else {
+        builder.message(builder(response.getMessage()).build());
+      }
+      return builder.build();
     }
 
     private Event createEventWithParameters(Event event) {

@@ -6,10 +6,12 @@
  */
 package org.mule.test.functional;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import org.hamcrest.core.Is;
 import org.junit.Test;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 
 public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
@@ -72,5 +74,23 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
   public void testSetPayloadUsingUndefinedParam() throws Exception {
     Event muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is(nullValue()));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFlowWithTarget() throws Exception {
+    Event event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
+    assertThat(event.getMessage().getPayload().getValue(), nullValue());
+    final TypedValue<Object> targetVariable = event.getVariable("target-variable");
+    assertThat(targetVariable, notNullValue());
+    assertThat(targetVariable.getValue(), Is.is("hardcoded value"));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable() throws Exception {
+    Event event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
+    assertThat(event.getMessage().getPayload().getValue(), nullValue());
+    final TypedValue<Object> targetVariable = event.getVariable("existing-variable");
+    assertThat(targetVariable, notNullValue());
+    assertThat(targetVariable.getValue(), Is.is("hardcoded value"));
   }
 }
