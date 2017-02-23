@@ -17,7 +17,6 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
@@ -31,14 +30,12 @@ import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMET
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
@@ -52,8 +49,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -93,21 +88,9 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
   private String configFile;
 
-  protected HttpClient httpClient;
-
-  @Before
-  public void createHttpClient() throws RegistrationException, IOException, InitialisationException {
-    final TlsContextFactory tlsContextFactory = createClientTlsContextFactory();
-    initialiseIfNeeded(tlsContextFactory);
-    httpClient = muleContext.getRegistry().lookupObject(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
-    httpClient.start();
-  }
-
-  @After
-  public void disposeHttpClient() {
-    httpClient.stop();
-  }
+  @Rule
+  public TestHttpClient httpClient =
+      new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(() -> createClientTlsContextFactory()).build();
 
   @Override
   protected String getConfigFile() {
@@ -171,15 +154,19 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
         .assertContainsCustomTokenResponseParam(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE);
   }
 
-  private TlsContextFactory createClientTlsContextFactory() throws IOException {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-    tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-    tlsContextFactory.setTrustStorePassword("changeit");
-    tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
-    tlsContextFactory.setKeyStorePassword("changeit");
-    tlsContextFactory.setKeyManagerPassword("changeit");
+  private TlsContextFactory createClientTlsContextFactory() {
+    try {
+      DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+      tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
+      tlsContextFactory.setTrustStorePassword("changeit");
+      tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
+      tlsContextFactory.setKeyStorePassword("changeit");
+      tlsContextFactory.setKeyManagerPassword("changeit");
 
-    return tlsContextFactory;
+      return tlsContextFactory;
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   @Override
