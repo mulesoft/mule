@@ -7,8 +7,6 @@
 package org.mule.runtime.module.http.api;
 
 
-import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
-import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -24,6 +22,7 @@ import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 
 import com.google.common.collect.Iterables;
 
@@ -47,7 +46,7 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
   public void initialise() throws InitialisationException {
     Collection<TcpServerSocketProperties> tcpServerSocketPropertiesBeans =
         muleContext.getRegistry().lookupObjects(TcpServerSocketProperties.class);
-    TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
+    TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpSocketProperties();
 
     if (tcpServerSocketPropertiesBeans.size() == 1) {
       tcpServerSocketProperties = Iterables.getOnlyElement(tcpServerSocketPropertiesBeans);

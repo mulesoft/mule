@@ -9,13 +9,13 @@ package org.mule.runtime.module.http.internal.listener;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.service.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpListenerConnectionManager;
+import org.mule.service.http.api.HttpConstants;
+import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.function.Supplier;

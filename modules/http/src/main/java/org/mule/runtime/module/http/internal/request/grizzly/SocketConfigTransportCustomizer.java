@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.http.internal.request.grizzly;
 
-import com.ning.http.client.providers.grizzly.TransportCustomizer;
+import org.mule.service.http.api.tcp.TcpClientSocketProperties;
 
-import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
+import com.ning.http.client.providers.grizzly.TransportCustomizer;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
@@ -42,8 +42,8 @@ public class SocketConfigTransportCustomizer implements TransportCustomizer {
     if (clientSocketProperties.getSendBufferSize() != null) {
       transport.setWriteBufferSize(clientSocketProperties.getSendBufferSize());
     }
-    if (clientSocketProperties.getTimeout() != null) {
-      transport.setClientSocketSoTimeout(clientSocketProperties.getTimeout());
+    if (clientSocketProperties.getClientTimeout() != null) {
+      transport.setClientSocketSoTimeout(clientSocketProperties.getConnectionTimeout());
     }
     if (clientSocketProperties.getLinger() != null) {
       transport.setLinger(clientSocketProperties.getLinger());
