@@ -3365,7 +3365,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final MuleRegistry registry = getMuleRegistry(app);
 
         // mule-app.properties from the zip archive must have loaded properly
-        assertThat("mule-app.properties should have been loaded.", "someValue", equalTo(registry.get("myCustomProp")));
+        assertThat("mule-app.properties should have been loaded.", (String) registry.get("myCustomProp"), equalTo("someValue"));
     }
 
 }
