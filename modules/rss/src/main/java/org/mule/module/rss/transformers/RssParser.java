@@ -33,8 +33,9 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 /**
- * Parses RSS item elements and its children.
- * Considers the use of namespaces that were added in RSS 1.0
+ * RSS20Parser considers all the elements added in the last standard (and earlier standards).
+ * However Rome doesn't support the use of namespaces although this feature was added in RSS 1.0 Standard.
+ * Therefore, RssParser calls in each method the parent method first, and then checks if elements that haven't been parsed by the parent Parser exist but were ignored because of namespaces.
  */
 public class RssParser extends RSS20Parser implements WireFeedParser
 {

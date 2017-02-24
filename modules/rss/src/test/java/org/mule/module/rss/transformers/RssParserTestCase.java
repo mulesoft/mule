@@ -42,12 +42,22 @@ public class RssParserTestCase extends AbstractMuleTestCase
     @Test
     public void testParsedEntries() throws Exception
     {
-        assertValues(entries.get(0));
-        assertValues(entries.get(1));
+        assertRSSEntriesWithoutNamespaces(entries.get(0));
+        assertRSSEntriesWithNamespaces(entries.get(1));
         assertThat(entries.size(), is(2));
     }
 
-    public void assertValues(SyndEntry entry)
+    private void assertRSSEntriesWithNamespaces(SyndEntry entry)
+    {
+        assertValues(entry);
+    }
+
+    private void assertRSSEntriesWithoutNamespaces(SyndEntry entry)
+    {
+        assertValues(entry);
+    }
+
+    private void assertValues(SyndEntry entry)
     {
         List<SyndCategory> categories = entry.getCategories();
         SyndCategory category = categories.get(0);
