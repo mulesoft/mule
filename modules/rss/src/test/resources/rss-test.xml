@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+    <channel>
+        <item>
+            <title>Title</title>
+            <link>Link</link>
+            <comments>Comments</comments>
+            <pubDate>Fri, 12 Aug 2011 06:25:22 +0000</pubDate>
+            <dc:creator>Creator</dc:creator>
+            <category><![CDATA[Category]]></category>
+            <category><![CDATA[Category2]]></category>
+            <description>Description</description>
+        </item>
+        <item>
+            <media:title>Title</media:title>
+            <media:link>Link</media:link>
+            <media:comments>Comments</media:comments>
+            <media:pubDate>Fri, 12 Aug 2011 06:25:22 +0000</media:pubDate>
+            <dc:creator>Creator</dc:creator>
+            <media:category><![CDATA[Category]]></media:category>
+            <media:category><![CDATA[Category2]]></media:category>
+            <media:description>Description</media:description>
+        </item>
+    </channel>
+</rss>

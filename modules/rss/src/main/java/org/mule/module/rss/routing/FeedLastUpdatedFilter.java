@@ -13,7 +13,8 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.types.DataTypeFactory;
 
-import com.sun.syndication.feed.synd.SyndFeed;
+
+import com.rometools.rome.feed.synd.SyndFeed;
 
 import java.util.Date;
 

@@ -10,13 +10,14 @@ import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
-import com.sun.syndication.feed.synd.SyndFeed;
 
 import java.io.DataInputStream;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+
+import com.rometools.rome.feed.synd.SyndFeed;
 
 public class TransformerDiscoveryTestCase extends AbstractMuleContextTestCase
 {
