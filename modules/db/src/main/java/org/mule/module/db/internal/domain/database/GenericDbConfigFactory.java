@@ -7,6 +7,8 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import org.mule.api.MuleContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.module.db.internal.domain.connection.ConnectionFactory;
 import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
@@ -20,6 +22,7 @@ import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.type.JdbcTypes;
 import org.mule.module.db.internal.domain.type.MetadataDbTypeManager;
 import org.mule.module.db.internal.domain.type.StaticDbTypeManager;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,11 +38,16 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
 
     private List<DbType> customDataTypes;
     private RetryPolicyTemplate retryPolicyTemplate;
+    private MuleContext muleContext;
 
     @Override
     public DbConfig create(String name, DataSource dataSource)
     {
         ConnectionFactory connectionFactory;
+        if (retryPolicyTemplate == null)
+        {
+            retryPolicyTemplate = getDefaultRetryPolicyTemplate();
+        }
         if (retryPolicyTemplate == null)
         {
             connectionFactory = new SimpleConnectionFactory();
@@ -110,4 +118,16 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
     {
         this.retryPolicyTemplate = retryPolicyTemplate;
     }
+
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    protected RetryPolicyTemplate getDefaultRetryPolicyTemplate ()
+    {
+        RetryPolicyTemplate retryPolicyTemplate = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+        return retryPolicyTemplate instanceof NoRetryPolicyTemplate ? null : retryPolicyTemplate;
+    }
+
 }

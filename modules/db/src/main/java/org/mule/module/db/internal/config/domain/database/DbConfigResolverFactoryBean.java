@@ -183,6 +183,7 @@ public class DbConfigResolverFactoryBean extends AbstractFactoryBean<DbConfigRes
     {
         this.muleContext = context;
         dataSourceConfig.setMuleContext(muleContext);
+        ((GenericDbConfigFactory) dbConfigFactory).setMuleContext(muleContext);
     }
 
     public void setUseXaTransactions(boolean useXaTransactions)
