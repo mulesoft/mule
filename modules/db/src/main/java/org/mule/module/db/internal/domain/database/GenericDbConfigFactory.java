@@ -7,7 +7,9 @@
 
 package org.mule.module.db.internal.domain.database;
 
+import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import org.mule.AbstractAnnotatedObject;
+import org.mule.api.MuleContext;
 import org.mule.api.NamedObject;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.module.db.internal.domain.connection.ConnectionCreationException;
@@ -23,6 +25,7 @@ import org.mule.module.db.internal.domain.type.DbTypeManager;
 import org.mule.module.db.internal.domain.type.JdbcTypes;
 import org.mule.module.db.internal.domain.type.MetadataDbTypeManager;
 import org.mule.module.db.internal.domain.type.StaticDbTypeManager;
+import org.mule.retry.policies.NoRetryPolicyTemplate;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ import javax.xml.namespace.QName;
  */
 public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
 {
+
     private class AnnotatedConnectionFactory extends AbstractAnnotatedObject implements ConnectionFactory, NamedObject
     {
 
@@ -67,6 +71,7 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
 
     private List<DbType> customDataTypes;
     private RetryPolicyTemplate retryPolicyTemplate;
+    private MuleContext muleContext;
 
     @Override
     public DbConfig create(String name, Map<QName, Object> annotations, DataSource dataSource)
@@ -74,6 +79,10 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
         ConnectionFactory connectionFactory;
 
         SimpleConnectionFactory simpleConnectionFactory = new SimpleConnectionFactory();
+        if (retryPolicyTemplate == null)
+        {
+            retryPolicyTemplate = getDefaultRetryPolicyTemplate();
+        }
         if (retryPolicyTemplate == null)
         {
             connectionFactory = simpleConnectionFactory;
@@ -84,7 +93,6 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
         }
 
         DbTypeManager dbTypeManager = doCreateTypeManager();
-
         DbConnectionFactory dbConnectionFactory = createDbConnectionFactory(dataSource, connectionFactory, dbTypeManager);
 
         return doCreateDbConfig(dataSource, dbTypeManager, dbConnectionFactory, name);
@@ -144,4 +152,16 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
     {
         this.retryPolicyTemplate = retryPolicyTemplate;
     }
+
+    public void setMuleContext(MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+    }
+
+    protected RetryPolicyTemplate getDefaultRetryPolicyTemplate ()
+    {
+        RetryPolicyTemplate retryPolicyTemplate = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+        return retryPolicyTemplate instanceof NoRetryPolicyTemplate ? null : retryPolicyTemplate;
+    }
+
 }

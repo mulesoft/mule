@@ -72,4 +72,5 @@ public class RetryConnectionFactory extends AbstractConnectionFactory
 
         return connectionRef.get();
     }
+
 }
