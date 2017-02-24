@@ -38,6 +38,17 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
     {
         super(id);
     }
+    
+    /**
+     * Creates a new builder
+     *
+     * @param id artifact identifier. Non empty.
+     * @param upperCaseInExtension whether the extension is in uppercase
+     */
+    public ApplicationFileBuilder(String id, boolean upperCaseInExtension)
+    {
+        super(id, upperCaseInExtension);
+    }
 
     /**
      * Creates a new builder from another instance.
