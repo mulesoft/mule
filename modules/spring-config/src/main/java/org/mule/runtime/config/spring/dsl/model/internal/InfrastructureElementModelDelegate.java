@@ -25,7 +25,6 @@ import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrate
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -100,7 +99,7 @@ class InfrastructureElementModelDelegate {
 
         ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
             .withIdentifier(builder()
-                .withNamespace("tls")
+                .withPrefix("tls")
                 .withName(TLS_CONTEXT_ELEMENT_IDENTIFIER)
                 .build());
 
@@ -116,7 +115,7 @@ class InfrastructureElementModelDelegate {
               public void visitObjectValue(ParameterObjectValue objectValue) {
                 ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
                     .withIdentifier(builder()
-                        .withNamespace("tls")
+                        .withPrefix("tls")
                         .withName(name)
                         .build());
 
@@ -152,7 +151,7 @@ class InfrastructureElementModelDelegate {
 
     ComponentConfiguration.Builder redeliveryConfig = ComponentConfiguration.builder()
         .withIdentifier(builder()
-            .withNamespace(CORE_NAMESPACE)
+            .withPrefix(CORE_NAMESPACE)
             .withName(elementName)
             .build());
 

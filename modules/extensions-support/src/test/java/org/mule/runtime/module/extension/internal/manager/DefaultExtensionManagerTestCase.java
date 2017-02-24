@@ -34,6 +34,12 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import com.google.common.collect.ImmutableList;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -56,8 +62,6 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,19 +72,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String MULESOFT = "MuleSoft";
   private static final String OTHER_VENDOR = "OtherVendor";
-  private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setNamespace("extension-namespace").build();
+  private static final XmlDslModel XML_DSL_MODEL = XmlDslModel.builder().setPrefix("extension-prefix").build();
   private ExtensionManager extensionsManager;
 
   private static final String EXTENSION1_NAME = "extension1";

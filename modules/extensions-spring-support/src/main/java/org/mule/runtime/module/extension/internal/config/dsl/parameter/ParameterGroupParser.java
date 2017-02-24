@@ -52,7 +52,7 @@ public class ParameterGroupParser extends ExtensionDefinitionParser {
     this.classLoader = classLoader;
     this.groupDsl = groupDsl;
     this.name = groupDsl.getElementName();
-    this.namespace = groupDsl.getNamespace();
+    this.namespace = groupDsl.getPrefix();
     this.metadataType = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass());
   }
 

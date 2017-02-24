@@ -60,7 +60,7 @@ class ExtensionErrorsRegistrant {
    */
   void registerErrors(ExtensionModel extensionModel) {
     Set<ErrorModel> errorTypes = extensionModel.getErrorModels();
-    String extensionNamespace = extensionModel.getXmlDslModel().getNamespace();
+    String extensionNamespace = extensionModel.getXmlDslModel().getPrefix();
     String errorExtensionNamespace = getExtensionsErrorNamespace(extensionModel);
     DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(extensionModel, new SingleExtensionImportTypesStrategy());
 
@@ -107,6 +107,6 @@ class ExtensionErrorsRegistrant {
   }
 
   private static ComponentIdentifier createIdentifier(String name, String namespace) {
-    return builder().withName(name).withNamespace(namespace).build();
+    return builder().withName(name).withPrefix(namespace).build();
   }
 }

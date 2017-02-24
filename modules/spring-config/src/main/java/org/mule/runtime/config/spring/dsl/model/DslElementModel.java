@@ -144,7 +144,7 @@ public class DslElementModel<T> {
 
     return ComponentIdentifier.builder()
         .withName(dsl.getElementName())
-        .withNamespace(dsl.getNamespaceUri())
+        .withPrefix(dsl.getNamespace())
         .build();
   }
 

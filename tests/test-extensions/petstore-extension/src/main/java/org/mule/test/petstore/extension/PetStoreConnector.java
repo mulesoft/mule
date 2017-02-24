@@ -23,7 +23,7 @@ import java.util.List;
 @ConnectionProviders({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class,
     TransactionalPetStoreConnectionProvider.class})
 @Sources({PetStoreSource.class})
-@Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
+@Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
 public class PetStoreConnector {
 
   @Parameter

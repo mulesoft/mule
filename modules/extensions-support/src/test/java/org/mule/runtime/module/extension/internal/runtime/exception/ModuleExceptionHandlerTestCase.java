@@ -17,7 +17,6 @@ import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -51,7 +50,7 @@ public class ModuleExceptionHandlerTestCase {
 
   @Before
   public void setUp() {
-    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setNamespace("test-extension").build());
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     when(extensionModel.getName()).thenReturn("Test Extension");
     when(operationModel.getName()).thenReturn("testOperation");
 
@@ -92,7 +91,7 @@ public class ModuleExceptionHandlerTestCase {
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     typeRepository.addErrorType(builder()
         .withName(CONNECTIVITY_ERROR_IDENTIFIER)
-        .withNamespace(ERROR_NAMESPACE)
+        .withPrefix(ERROR_NAMESPACE)
         .build(),
                                 typeRepository.getAnyErrorType());
 

@@ -130,7 +130,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     this.policyManager = policyManager;
     operationIdentifier = TypedComponentIdentifier.builder().withIdentifier(ComponentIdentifier.builder()
         .withName(operationModel.getName())
-        .withNamespace(extensionModel.getName().toLowerCase())
+        .withPrefix(extensionModel.getName().toLowerCase())
         .build()).withType(TypedComponentIdentifier.ComponentType.PROCESSOR).build();
   }
 

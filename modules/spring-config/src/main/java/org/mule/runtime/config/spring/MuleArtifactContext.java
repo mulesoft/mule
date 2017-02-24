@@ -517,7 +517,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
             .map(ext -> {
               XmlDslModel xmlDslModel = ext.getXmlDslModel();
               return xmlDslModel != null
-                  ? new StaticXmlNamespaceInfo(xmlDslModel.getNamespaceUri(), xmlDslModel.getNamespace()) : null;
+                  ? new StaticXmlNamespaceInfo(xmlDslModel.getNamespace(), xmlDslModel.getPrefix()) : null;
             })
             .filter(info -> info != null)
             .collect(new ImmutableListCollector<>());

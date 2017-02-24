@@ -254,8 +254,8 @@ public abstract class ExtensionDefinitionParser {
           if (isNestedProcessor(objectType)) {
             parseNestedProcessor(parameter);
           } else {
-            if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getNamespace())) {
-              parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getNamespace(), objectType);
+            if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getPrefix())) {
+              parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
               parseObjectParameter(parameter, paramDsl);
             } else {
               parseObject(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
@@ -372,9 +372,9 @@ public abstract class ExtensionDefinitionParser {
 
         DslElementSyntax valueChild = containedElement.get();
         if ((valueChild.supportsTopLevelDeclaration() || (valueChild.supportsChildDeclaration() && !valueChild.isWrapped())) &&
-            !parsingContext.isRegistered(valueChild.getElementName(), valueChild.getNamespace())) {
+            !parsingContext.isRegistered(valueChild.getElementName(), valueChild.getPrefix())) {
           try {
-            parsingContext.registerObjectType(valueChild.getElementName(), valueChild.getNamespace(), objectType);
+            parsingContext.registerObjectType(valueChild.getElementName(), valueChild.getPrefix(), objectType);
             new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                           parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
@@ -461,7 +461,7 @@ public abstract class ExtensionDefinitionParser {
     Optional<DslElementSyntax> collectionItemDsl = parameterDsl.getGeneric(arrayType.getType());
     if (parameterDsl.supportsChildDeclaration() && collectionItemDsl.isPresent()) {
       String itemIdentifier = collectionItemDsl.get().getElementName();
-      String itemNamespace = collectionItemDsl.get().getNamespace();
+      String itemNamespace = collectionItemDsl.get().getPrefix();
 
       arrayType.getType().accept(new BasicTypeMetadataVisitor() {
 
@@ -496,9 +496,9 @@ public abstract class ExtensionDefinitionParser {
 
           DslElementSyntax itemDsl = collectionItemDsl.get();
           if ((itemDsl.supportsTopLevelDeclaration() || itemDsl.supportsChildDeclaration()) &&
-              !parsingContext.isRegistered(itemDsl.getElementName(), itemDsl.getNamespace())) {
+              !parsingContext.isRegistered(itemDsl.getElementName(), itemDsl.getPrefix())) {
             try {
-              parsingContext.registerObjectType(itemDsl.getElementName(), itemDsl.getNamespace(), objectType);
+              parsingContext.registerObjectType(itemDsl.getElementName(), itemDsl.getPrefix(), objectType);
               new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                             parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {
@@ -755,7 +755,7 @@ public abstract class ExtensionDefinitionParser {
 
     parseObject(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, elementDsl, modelProperties);
 
-    final String elementNamespace = elementDsl.getNamespace();
+    final String elementNamespace = elementDsl.getPrefix();
     final String elementName = elementDsl.getElementName();
 
     if (elementDsl.supportsChildDeclaration() && !elementDsl.isWrapped() &&

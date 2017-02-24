@@ -240,7 +240,7 @@ public class ComponentModel {
     ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
         .withIdentifier(builder()
             .withName(this.getIdentifier().getName())
-            .withNamespace((String) this.getCustomAttributes().get(XmlCustomAttributeHandler.NAMESPACE_URI))
+            .withPrefix((String) this.getCustomAttributes().get(XmlCustomAttributeHandler.NAMESPACE_URI))
             .build())
         .withValue(textContent);
 

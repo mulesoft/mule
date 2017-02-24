@@ -335,7 +335,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   private ComponentIdentifier getComponentIdentifier(Node element) {
     String parentNodeNamespace = getNamespace(element);
     String parentNodeName = element.getLocalName();
-    return builder().withNamespace(parentNodeNamespace).withName(parentNodeName).build();
+    return builder().withPrefix(parentNodeNamespace).withName(parentNodeName).build();
   }
 
   private boolean isMuleRootElement(ComponentIdentifier componentIdentifier) {

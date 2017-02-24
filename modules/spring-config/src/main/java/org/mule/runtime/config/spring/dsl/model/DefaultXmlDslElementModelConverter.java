@@ -164,9 +164,9 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private Element createElement(DslElementSyntax dsl) {
     doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                            "xmlns:" + dsl.getNamespace(), dsl.getNamespaceUri());
+                                            "xmlns:" + dsl.getPrefix(), dsl.getNamespace());
 
-    return doc.createElementNS(dsl.getNamespaceUri(), dsl.getNamespace() + ":" + dsl.getElementName());
+    return doc.createElementNS(dsl.getNamespace(), dsl.getPrefix() + ":" + dsl.getElementName());
   }
 
   private boolean isInfrastructure(DslElementModel elementModel) {
@@ -187,7 +187,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
           } else {
             Optional<ComponentConfiguration> config = e.getConfiguration();
             config.ifPresent(c -> {
-              if (c.getIdentifier().getNamespace().contains(TLS_PREFIX)) {
+              if (c.getIdentifier().getPrefix().contains(TLS_PREFIX)) {
                 element.appendChild(createTLS(c));
               } else {
                 element.appendChild(clone(c));

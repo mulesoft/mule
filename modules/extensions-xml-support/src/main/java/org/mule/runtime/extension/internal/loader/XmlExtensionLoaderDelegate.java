@@ -128,19 +128,19 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName("property").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName("parameter").build();
   private static final ComponentIdentifier OPERATION_BODY_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName("body").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName("output").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
+      ComponentIdentifier.builder().withPrefix(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
           .build();
   private static final String SEPARATOR = "/";
   public static final String XSD_SUFFIX = ".xsd";

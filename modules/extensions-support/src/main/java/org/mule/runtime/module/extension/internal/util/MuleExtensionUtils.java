@@ -505,7 +505,7 @@ public class MuleExtensionUtils {
   }
 
   private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
-    return dslModel.getNamespace().toUpperCase();
+    return dslModel.getPrefix().toUpperCase();
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz) {

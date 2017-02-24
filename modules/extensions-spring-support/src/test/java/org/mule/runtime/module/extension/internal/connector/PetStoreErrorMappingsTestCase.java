@@ -88,7 +88,7 @@ public class PetStoreErrorMappingsTestCase extends ExtensionFunctionalTestCase {
   @Extension(name = "petstore", description = "PetStore Test connector")
   @Operations(PetStoreErrorMappingsTestCase.PetStoreFailingOperations.class)
   @ConnectionProviders(SimplePetStoreConnectionProvider.class)
-  @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/petstore", namespace = "petstore")
+  @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
   public static class PetStoreConnectorWithFailingOperation extends PetStoreConnector {
   }
 

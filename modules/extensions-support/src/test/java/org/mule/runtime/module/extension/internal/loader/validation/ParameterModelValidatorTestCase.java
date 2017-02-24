@@ -72,7 +72,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getName()).thenReturn("extensionModel");
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
     when(extensionModel.getXmlDslModel())
-        .thenReturn(XmlDslModel.builder().setNamespace("ns").setNamespaceUri("http://www.mulesoft.org/schema/mule/ns")
+        .thenReturn(XmlDslModel.builder().setPrefix("ns").setNamespace("http://www.mulesoft.org/schema/mule/ns")
             .setSchemaLocation("http://www.mulesoft.org/schema/mule/heisenberg/current/mule-ns.xsd").build());
 
     when(operationModel.getName()).thenReturn("dummyOperation");

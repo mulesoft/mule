@@ -50,8 +50,8 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     assertThat(dslModel, is(notNullValue()));
     assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(dslModel.getNamespace(), is(NAMESPACE));
-    assertThat(dslModel.getNamespaceUri(), is(NAMESPACE_LOCATION));
+    assertThat(dslModel.getPrefix(), is(NAMESPACE));
+    assertThat(dslModel.getNamespace(), is(NAMESPACE_LOCATION));
     assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
     assertThat(dslModel.getSchemaLocation(),
                is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE_LOCATION, String.format(XSD_FILENAME_MASK, NAMESPACE))));
@@ -64,8 +64,8 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     assertThat(dslModel, is(notNullValue()));
     assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(dslModel.getNamespace(), is(EXTENSION_HYPHENAZED_NAME));
-    assertThat(dslModel.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
+    assertThat(dslModel.getPrefix(), is(EXTENSION_HYPHENAZED_NAME));
+    assertThat(dslModel.getNamespace(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
     assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, EXTENSION_HYPHENAZED_NAME)));
     assertThat(dslModel.getSchemaLocation(),
                is(String.format(DEFAULT_SCHEMA_LOCATION_MASK,
@@ -80,8 +80,8 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     assertThat(dslModel, is(notNullValue()));
     assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(dslModel.getNamespace(), is(NAMESPACE));
-    assertThat(dslModel.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE)));
+    assertThat(dslModel.getPrefix(), is(NAMESPACE));
+    assertThat(dslModel.getNamespace(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE)));
     assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
     assertThat(dslModel.getSchemaLocation(),
                is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE),
@@ -95,8 +95,8 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     assertThat(dslModel, is(notNullValue()));
     assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(dslModel.getNamespace(), is(EXTENSION.toLowerCase()));
-    assertThat(dslModel.getNamespaceUri(), equalTo(NAMESPACE_LOCATION));
+    assertThat(dslModel.getPrefix(), is(EXTENSION.toLowerCase()));
+    assertThat(dslModel.getNamespace(), equalTo(NAMESPACE_LOCATION));
     assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION))));
     assertThat(dslModel.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE_LOCATION,
                                                               String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION)))));
@@ -108,17 +108,17 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
     return extensionDeclarer.getDeclaration().getXmlDslModel();
   }
 
-  @Xml(namespace = NAMESPACE, namespaceLocation = NAMESPACE_LOCATION)
+  @Xml(prefix = NAMESPACE, namespace = NAMESPACE_LOCATION)
   private static class XmlSupport {
 
   }
 
-  @Xml(namespace = NAMESPACE)
+  @Xml(prefix = NAMESPACE)
   private static class DefaultXmlExtension {
 
   }
 
-  @Xml(namespaceLocation = NAMESPACE_LOCATION)
+  @Xml(namespace = NAMESPACE_LOCATION)
   private static class CustomSchemaLocationXmlExtension {
 
   }

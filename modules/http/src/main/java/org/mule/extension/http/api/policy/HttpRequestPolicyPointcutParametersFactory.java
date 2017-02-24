@@ -26,7 +26,7 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   protected static final String PATH_PARAMETER_NAME = "path";
   protected static final String METHOD_PARAMETER_NAME = "method";
   private final static ComponentIdentifier requestIdentifier =
-      builder().withNamespace("http").withName("request").build();
+      builder().withPrefix("http").withName("request").build();
 
   @Override
   public boolean supportsOperationIdentifier(ComponentIdentifier operationIdentifier) {

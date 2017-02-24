@@ -45,7 +45,7 @@ import java.util.List;
 @Operations({DmlOperations.class, DdlOperations.class, BulkOperations.class})
 @ConnectionProviders({DataSourceReferenceConnectionProvider.class, GenericConnectionProvider.class, DerbyConnectionProvider.class,
     MySqlConnectionProvider.class, OracleDbConnectionProvider.class})
-@Xml(namespace = "db")
+@Xml(prefix = "db")
 @Export(
     classes = {QueryDefinition.class, StoredProcedureCall.class, BulkQueryDefinition.class, ConnectionCreationException.class})
 @ErrorTypes(DbError.class)

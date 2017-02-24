@@ -180,8 +180,8 @@ public class DeclarationElementModelFactoryTestCase {
     when(extension.getName()).thenReturn(EXTENSION_NAME);
     when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
         .setXsdFileName("mule-mockns.xsd")
-        .setNamespace(NAMESPACE)
-        .setNamespaceUri(NAMESPACE_URI)
+        .setPrefix(NAMESPACE)
+        .setNamespace(NAMESPACE_URI)
         .setSchemaLocation(SCHEMA_LOCATION)
         .setSchemaVersion("4.0")
         .build());
@@ -189,8 +189,8 @@ public class DeclarationElementModelFactoryTestCase {
     when(extension.getImportedTypes()).thenReturn(emptySet());
     when(extension.getXmlDslModel()).thenReturn(XmlDslModel.builder()
         .setXsdFileName(EMPTY)
-        .setNamespace(NAMESPACE)
-        .setNamespaceUri(NAMESPACE_URI)
+        .setPrefix(NAMESPACE)
+        .setNamespace(NAMESPACE_URI)
         .setSchemaLocation(SCHEMA_LOCATION)
         .setSchemaVersion(EMPTY)
         .build());
@@ -287,7 +287,7 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
     assertThat(element.findElement(builder()
         .withName("my-camel-case-name")
-        .withNamespace(NAMESPACE_URI)
+        .withPrefix(NAMESPACE_URI)
         .build()).get().getConfiguration().get()
         .getValue().get(), is("#[{field: value}]"));
     assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));

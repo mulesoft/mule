@@ -73,7 +73,7 @@ public class MacroExpansionModuleModel {
     this.applicationModel = applicationModel;
     this.extensions = extensions.stream()
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
-        .collect(toMap(extensionModel -> extensionModel.getXmlDslModel().getNamespace(), identity()));
+        .collect(toMap(extensionModel -> extensionModel.getXmlDslModel().getPrefix(), identity()));
   }
 
   /**
@@ -102,7 +102,7 @@ public class MacroExpansionModuleModel {
           // config elements will be worked later on, that's why we are skipping this element
           continue;
         }
-        ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
+        ExtensionModel extensionModel = extensionManager.get(identifier.getPrefix());
         if (extensionModel != null) {
 
           HasOperationModels hasOperationModels = extensionModel;
@@ -145,7 +145,7 @@ public class MacroExpansionModuleModel {
       for (int i = 0; i < componentModel.getInnerComponents().size(); i++) {
         ComponentModel configRefModel = componentModel.getInnerComponents().get(i);
         ComponentIdentifier identifier = configRefModel.getIdentifier();
-        ExtensionModel extensionModel = extensionManager.get(identifier.getNamespace());
+        ExtensionModel extensionModel = extensionManager.get(identifier.getPrefix());
         if (extensionModel != null) {
           List<ComponentModel> replacementGlobalElements =
               createGlobalElementsInstance(configRefModel, extensionModel);
@@ -200,7 +200,7 @@ public class MacroExpansionModuleModel {
 
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
-        .setIdentifier(builder().withNamespace("mule").withName("module-operation-chain").build());
+        .setIdentifier(builder().withPrefix("mule").withName("module-operation-chain").build());
 
 
     processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
@@ -229,10 +229,10 @@ public class MacroExpansionModuleModel {
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
     ComponentModel.Builder parametersBuilder = new ComponentModel.Builder();
     parametersBuilder
-        .setIdentifier(builder().withNamespace("mule").withName(wrapperParameters).build());
+        .setIdentifier(builder().withPrefix("mule").withName(wrapperParameters).build());
     parameters.forEach((paramName, paramValue) -> {
       ComponentModel.Builder parameterBuilder = new ComponentModel.Builder();
-      parameterBuilder.setIdentifier(builder().withNamespace("mule")
+      parameterBuilder.setIdentifier(builder().withPrefix("mule")
           .withName(entryParameter).build());
 
       parameterBuilder.addParameter("key", paramName, false);
@@ -253,7 +253,7 @@ public class MacroExpansionModuleModel {
     String configParameter = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
     if (configParameter != null) {
       ComponentModel configRefComponentModel = applicationModel.getRootComponentModel().getInnerComponents().stream()
-          .filter(componentModel -> componentModel.getIdentifier().getNamespace().equals(extensionModel.getName())
+          .filter(componentModel -> componentModel.getIdentifier().getPrefix().equals(extensionModel.getName())
               && componentModel.getIdentifier().getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
               && configParameter.equals(componentModel.getParameters().get(NAME_ATTRIBUTE)))
           .findFirst()

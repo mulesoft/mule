@@ -29,7 +29,7 @@ public class ErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
   private ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
   private ComponentIdentifier MY_ERROR =
-      ComponentIdentifier.builder().withNamespace("ns").withName("name").build();
+      ComponentIdentifier.builder().withPrefix("ns").withName("name").build();
 
   @Before
   public void setUp() {

@@ -42,7 +42,7 @@ public class SchemaGenerator {
   private void validate(ExtensionModel extensionModel, XmlDslModel xmlDslModel) {
     checkArgument(extensionModel != null, "extension cannot be null");
     checkArgument(xmlDslModel != null, "xml model property cannot be null");
-    checkState(!StringUtils.isBlank(xmlDslModel.getNamespace()), "xml model property cannot provide a blank namespace");
+    checkState(!StringUtils.isBlank(xmlDslModel.getPrefix()), "xml model property cannot provide a blank namespace");
   }
 
   public String generate(ExtensionModel extensionModel, XmlDslModel xmlDslModel, DslResolvingContext dslContext) {

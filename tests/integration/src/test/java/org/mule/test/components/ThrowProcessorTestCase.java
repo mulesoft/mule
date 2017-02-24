@@ -79,9 +79,9 @@ public class ThrowProcessorTestCase extends AbstractMuleContextTestCase {
     @Override
     protected boolean matchesSafely(TypedException item) {
       ErrorType errorType = item.getErrorType();
-      return errorIdentifier.getNamespace().equals(errorType.getNamespace()) && errorIdentifier.getName().equals(
-                                                                                                                 errorType
-                                                                                                                     .getIdentifier());
+      return errorIdentifier.getPrefix().equals(errorType.getNamespace()) && errorIdentifier.getName().equals(
+                                                                                                              errorType
+                                                                                                                  .getIdentifier());
     }
 
     @Override

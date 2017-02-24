@@ -19,7 +19,7 @@ import java.util.concurrent.Executor;
 public class HttpMessageProcessContext implements MessageProcessContext {
 
   private static final ComponentIdentifier COMPONENT_IDENTIFIER =
-      builder().withNamespace("http").withName("listener").build();
+      builder().withPrefix("http").withName("listener").build();
 
   private final DefaultHttpListener listener;
   private final FlowConstruct flowConstruct;

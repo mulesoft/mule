@@ -89,7 +89,7 @@ public class ErrorTypeRepository {
 
   private ErrorType addErrorTypeTo(ComponentIdentifier identifier, ErrorType parent, Map<ComponentIdentifier, ErrorType> map) {
     ErrorTypeBuilder errorTypeBuilder =
-        ErrorTypeBuilder.builder().namespace(identifier.getNamespace())
+        ErrorTypeBuilder.builder().namespace(identifier.getPrefix())
             .identifier(identifier.getName())
             .parentErrorType(parent);
     ErrorType errorType = errorTypeBuilder.build();

@@ -134,7 +134,7 @@ public final class SchemaBuilder {
     SchemaBuilder builder = new SchemaBuilder();
     builder.extensionModel = extensionModel;
     builder.schema = new Schema();
-    builder.schema.setTargetNamespace(xmlDslModel.getNamespaceUri());
+    builder.schema.setTargetNamespace(xmlDslModel.getNamespace());
     builder.schema.setElementFormDefault(FormChoice.QUALIFIED);
     builder.schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
     builder.withDslSyntaxResolver(extensionModel, dslContext)
@@ -428,12 +428,12 @@ public final class SchemaBuilder {
     choice.setMinOccurs(minOccurs);
     choice.setMaxOccurs(maxOccurs);
 
-    QName refAbstract = new QName(typeDsl.getNamespaceUri(), getAbstractElementName(typeDsl), typeDsl.getNamespace());
+    QName refAbstract = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
     TopLevelElement localAbstractElementRef = createRefElement(refAbstract, false);
     choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
 
-    QName refGlobal = new QName(typeDsl.getNamespaceUri(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
-                                typeDsl.getNamespace());
+    QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
+                                typeDsl.getPrefix());
     TopLevelElement topLevelElementRef = createRefElement(refGlobal, false);
     choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
 
@@ -479,7 +479,7 @@ public final class SchemaBuilder {
                                                        objectTypeDelegate.getTypeQName(typeDsl, type));
     }
 
-    QName refQName = new QName(typeDsl.getNamespaceUri(), getAbstractElementName(typeDsl), typeDsl.getNamespace());
+    QName refQName = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
     return createRefElement(refQName, isRequired);
   }
 
@@ -565,7 +565,7 @@ public final class SchemaBuilder {
   private XmlDslModel registerExtensionImport(ExtensionModel extension) {
     XmlDslModel languageModel = extension.getXmlDslModel();
     Import schemaImport = new Import();
-    schemaImport.setNamespace(languageModel.getNamespaceUri());
+    schemaImport.setNamespace(languageModel.getNamespace());
     schemaImport.setSchemaLocation(languageModel.getSchemaLocation());
     if (!schema.getIncludeOrImportOrRedefine().contains(schemaImport)) {
       schema.getIncludeOrImportOrRedefine().add(schemaImport);
