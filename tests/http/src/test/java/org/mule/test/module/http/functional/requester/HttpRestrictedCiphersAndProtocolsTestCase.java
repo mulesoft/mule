@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -18,11 +19,11 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
-import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -53,7 +54,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Rule
   public ExpectedError expectedError = ExpectedError.none();
 
-  // Create a new HttpClient because i need to configure the TLS context per test
+  // Uses a new HttpClient because it is needed to configure the TLS context per test
   public HttpClient httpClientWithCertificate;
 
   private DefaultTlsContextFactory tlsContextFactory;
@@ -89,9 +90,9 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     createHttpClient();
 
     // Uses default ciphers and protocols
-    HttpRequest request = HttpRequest.builder().setUri(String.format("https://localhost:%s", port1.getValue())).setMethod(POST)
+    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s", port1.getValue())).setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
-    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is(TEST_PAYLOAD));
   }
 
@@ -102,15 +103,15 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     createHttpClient();
 
     // Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA
-    HttpRequest request = HttpRequest.builder().setUri(String.format("https://localhost:%s", port3.getValue())).setMethod(POST)
+    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s", port3.getValue())).setMethod(POST)
         .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
-    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is(TEST_PAYLOAD));
   }
 
   public void createHttpClient() {
-    httpClientWithCertificate =
-        new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(tlsContextFactory).build();
+    httpClientWithCertificate = getService(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
     httpClientWithCertificate.start();
   }
 

@@ -8,7 +8,6 @@ package org.mule.test.module.http.functional;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
 import org.mule.services.http.TestHttpClient;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
@@ -22,5 +21,5 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
   protected static final int DEFAULT_TIMEOUT = 1000;
 
   @Rule
-  public HttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 }

@@ -112,7 +112,7 @@ public class TestHttpClient extends ExternalResource implements org.mule.service
     }
 
     /**
-     * @param tlsContextFactory the tls context factory for creating the context to secure the connection
+     * @param tlsContextFactory the TLS context factory for creating the context to secure the connection
      * @return same builder instance
      */
     public Builder tlsContextFactory(TlsContextFactory tlsContextFactory) {
@@ -122,7 +122,7 @@ public class TestHttpClient extends ExternalResource implements org.mule.service
     }
 
     /**
-     * @param tlsContextFactorySupplier the tls context factory for creating the context to secure the connection
+     * @param tlsContextFactorySupplier a supplier for the TLS context factory for creating the context to secure the connection
      * @return same builder instance
      */
     public Builder tlsContextFactory(Supplier<TlsContextFactory> tlsContextFactorySupplier) {

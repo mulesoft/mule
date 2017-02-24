@@ -18,11 +18,11 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
-import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
@@ -41,7 +41,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   @Rule
   public DynamicPort portWithoutValidation = new DynamicPort("port2");
 
-  // Create a new HttpClient because i need to configure the TLS context per test
+  // Uses a new HttpClient because it is needed to configure the TLS context per test
   public HttpClient httpClientWithCertificate;
 
   private DefaultTlsContextFactory tlsContextFactory;
@@ -105,8 +105,8 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   }
 
   public void createHttpClient() {
-    httpClientWithCertificate =
-        new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(tlsContextFactory).build();
+    httpClientWithCertificate = getService(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
     httpClientWithCertificate.start();
   }
 
