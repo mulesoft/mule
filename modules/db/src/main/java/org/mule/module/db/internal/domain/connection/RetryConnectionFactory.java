@@ -73,9 +73,4 @@ public class RetryConnectionFactory extends AbstractConnectionFactory
         return connectionRef.get();
     }
 
-    public RetryPolicyTemplate getRetryPolicyTemplate()
-    {
-        return retryPolicyTemplate;
-    }
-
 }

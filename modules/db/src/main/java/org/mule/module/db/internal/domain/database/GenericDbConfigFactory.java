@@ -179,7 +179,7 @@ public class GenericDbConfigFactory implements ConfigurableDbConfigFactory
         this.muleContext = muleContext;
     }
 
-    private RetryPolicyTemplate getDefaultRetryPolicyTemplate ()
+    protected RetryPolicyTemplate getDefaultRetryPolicyTemplate ()
     {
         RetryPolicyTemplate retryPolicyTemplate = muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
         return retryPolicyTemplate instanceof NoRetryPolicyTemplate ? null : retryPolicyTemplate;

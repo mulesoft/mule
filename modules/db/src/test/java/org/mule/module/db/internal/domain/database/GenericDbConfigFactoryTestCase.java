@@ -7,22 +7,27 @@
 
 package org.mule.module.db.internal.domain.database;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
+import static org.mule.module.db.internal.domain.transaction.TransactionalAction.JOIN_IF_POSSIBLE;
 import org.mule.api.MuleContext;
+import org.mule.api.context.WorkManager;
 import org.mule.api.registry.MuleRegistry;
+import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.module.db.internal.domain.connection.RetryConnectionFactory;
-import org.mule.module.db.internal.domain.connection.SimpleConnectionFactory;
-import org.mule.module.db.internal.domain.connection.TransactionalDbConnectionFactory;
+import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +52,7 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
     private final NoRetryPolicyTemplate noRetryPolicyTemplate = mock(NoRetryPolicyTemplate.class);
     private final RetryPolicyTemplate specificRetryPolicyTemplate = mock(RetryPolicyTemplate.class);
     private DbConfig dbConfig = null;
-    private TransactionalDbConnectionFactory transactionalDbConnectionFactory = null;
-    private RetryConnectionFactory retryConnectionFactory = null;
+    private DbConnectionFactory dbConnectionFactory = null;
 
     @Before
     public void setUp() throws Exception
@@ -65,11 +69,16 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
     {
         when(muleRegistry.lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE)).thenReturn(globalRetryPolicyTemplate);
         dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
-        assertThat(dbConfig.getConnectionFactory(), instanceOf(TransactionalDbConnectionFactory.class));
-        transactionalDbConnectionFactory = (TransactionalDbConnectionFactory) dbConfig.getConnectionFactory();
-        assertThat(transactionalDbConnectionFactory.getConnectionFactory(), instanceOf(RetryConnectionFactory.class));
-        retryConnectionFactory = (RetryConnectionFactory) transactionalDbConnectionFactory.getConnectionFactory();
-        assertEquals(retryConnectionFactory.getRetryPolicyTemplate(), globalRetryPolicyTemplate);
+        dbConnectionFactory = dbConfig.getConnectionFactory();
+        try
+        {
+            dbConnectionFactory.createConnection(JOIN_IF_POSSIBLE);
+            fail("SQL Exception wasn't triggered");
+        }
+        catch (SQLException e)
+        {
+            verify(globalRetryPolicyTemplate).execute(any(RetryCallback.class), any(WorkManager.class));
+        }
     }
 
     @Test
@@ -77,21 +86,24 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
     {
         genericDbConfigFactory.setRetryPolicyTemplate(specificRetryPolicyTemplate);
         dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
-        assertThat(dbConfig.getConnectionFactory(), instanceOf(TransactionalDbConnectionFactory.class));
-        transactionalDbConnectionFactory = (TransactionalDbConnectionFactory) dbConfig.getConnectionFactory();
-        assertThat(transactionalDbConnectionFactory.getConnectionFactory(), instanceOf(RetryConnectionFactory.class));
-        retryConnectionFactory = (RetryConnectionFactory) transactionalDbConnectionFactory.getConnectionFactory();
-        assertEquals(retryConnectionFactory.getRetryPolicyTemplate(), specificRetryPolicyTemplate);
+        dbConnectionFactory = dbConfig.getConnectionFactory();
+        try
+        {
+            dbConnectionFactory.createConnection(JOIN_IF_POSSIBLE);
+            fail("SQL Exception wasn't triggered");
+
+        }
+        catch (SQLException e)
+        {
+            verify(specificRetryPolicyTemplate).execute(any(RetryCallback.class), any(WorkManager.class));
+        }
     }
 
     @Test
-    public void testNotExistAnyRetryPolicyTemplate() throws Exception
+    public void testNotExistGlobalRetryPolicyTemplate() throws Exception
     {
         when(muleRegistry.lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE)).thenReturn(noRetryPolicyTemplate);
-        dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
-        assertThat(dbConfig.getConnectionFactory(), instanceOf(TransactionalDbConnectionFactory.class));
-        transactionalDbConnectionFactory = (TransactionalDbConnectionFactory) dbConfig.getConnectionFactory();
-        assertThat(transactionalDbConnectionFactory.getConnectionFactory(), instanceOf(SimpleConnectionFactory.class));
+        assertThat(genericDbConfigFactory.getDefaultRetryPolicyTemplate(), is(nullValue()));
     }
 
     @Test
@@ -100,11 +112,16 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
         genericDbConfigFactory.setRetryPolicyTemplate(specificRetryPolicyTemplate);
         when(muleRegistry.lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE)).thenReturn(globalRetryPolicyTemplate);
         dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
-        assertThat(dbConfig.getConnectionFactory(), instanceOf(TransactionalDbConnectionFactory.class));
-        transactionalDbConnectionFactory = (TransactionalDbConnectionFactory) dbConfig.getConnectionFactory();
-        assertThat(transactionalDbConnectionFactory.getConnectionFactory(), instanceOf(RetryConnectionFactory.class));
-        retryConnectionFactory = (RetryConnectionFactory) transactionalDbConnectionFactory.getConnectionFactory();
-        assertEquals("Specific Retry Policy should override Global Retry Policy", retryConnectionFactory.getRetryPolicyTemplate(), specificRetryPolicyTemplate);
+        dbConnectionFactory = dbConfig.getConnectionFactory();
+        try
+        {
+            dbConnectionFactory.createConnection(JOIN_IF_POSSIBLE);
+            fail("SQL Exception wasn't triggered");
+        }
+        catch (SQLException e)
+        {
+            verify(specificRetryPolicyTemplate).execute(any(RetryCallback.class), any(WorkManager.class));
+        }
     }
 
 }

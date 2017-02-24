@@ -207,8 +207,4 @@ public class TransactionalDbConnectionFactory implements DbConnectionFactory
         }
     }
 
-    public ConnectionFactory getConnectionFactory()
-    {
-        return connectionFactory;
-    }
 }
