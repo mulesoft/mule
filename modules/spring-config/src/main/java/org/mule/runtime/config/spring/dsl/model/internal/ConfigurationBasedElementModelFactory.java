@@ -85,7 +85,7 @@ class ConfigurationBasedElementModelFactory {
 
     Optional<Map.Entry<ExtensionModel, DslSyntaxResolver>> entry =
         resolvers.entrySet().stream()
-            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getNamespace()))
+            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getPrefix()))
             .findFirst();
 
     if (!entry.isPresent()) {
@@ -531,7 +531,7 @@ class ConfigurationBasedElementModelFactory {
     if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
       return Optional.of(builder()
           .withName(dsl.getElementName())
-          .withNamespace(dsl.getNamespaceUri())
+          .withPrefix(dsl.getNamespace())
           .build());
     }
 
@@ -546,11 +546,11 @@ class ConfigurationBasedElementModelFactory {
     switch (paramModel.getName()) {
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
-                                                        paramDsl.getNamespaceUri());
+                                                        paramDsl.getNamespace());
 
         ComponentConfiguration config = nested.containsKey(reconnectId)
             ? nested.get(reconnectId)
-            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getNamespaceUri()));
+            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getNamespace()));
 
         if (config != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
@@ -559,7 +559,7 @@ class ConfigurationBasedElementModelFactory {
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         ComponentConfiguration redelivery = nested.get(newIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getNamespaceUri()));
+                                                                     paramDsl.getNamespace()));
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
         }
@@ -592,7 +592,7 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private ComponentIdentifier newIdentifier(String name, String ns) {
-    return ComponentIdentifier.builder().withName(name).withNamespace(ns).build();
+    return ComponentIdentifier.builder().withName(name).withPrefix(ns).build();
   }
 
   private DslElementModel newElementModel(ParameterModel paramModel, DslElementSyntax paramDsl,

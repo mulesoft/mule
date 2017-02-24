@@ -23,6 +23,11 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
@@ -41,18 +46,12 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
-  private static final String EXTENSION_NAMESPACE = "test-namespace";
-  private static final String ERROR_NAMESPACE = EXTENSION_NAMESPACE.toUpperCase();
+  private static final String EXTENSION_PREFIX = "test-namespace";
+  private static final String ERROR_PREFIX = EXTENSION_PREFIX.toUpperCase();
   private static final String OPERATION_NAME = "operationName";
   private static final String TEST_CONNECTIVITY_ERROR_TYPE = "TEST_CONNECTIVITY";
   private static final String OAUTH_TEST_CONNECTIVITY_ERROR_TYPE = "OAUTH_CONNECTIVITY";
@@ -60,7 +59,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER = builder()
       .withName(NameUtils.hyphenize(OPERATION_NAME))
-      .withNamespace(EXTENSION_NAMESPACE)
+      .withPrefix(EXTENSION_PREFIX)
       .build();
 
   private static final ErrorModel MULE_CONNECTIVITY_ERROR =
@@ -68,12 +67,12 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
           .build();
 
   private static final ErrorModel extensionConnectivityError =
-      newError(TEST_CONNECTIVITY_ERROR_TYPE, ERROR_NAMESPACE)
+      newError(TEST_CONNECTIVITY_ERROR_TYPE, ERROR_PREFIX)
           .withParent(MULE_CONNECTIVITY_ERROR)
           .build();
 
   private static final ErrorModel oauthExtensionConnectivityError =
-      newError(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE, ERROR_NAMESPACE)
+      newError(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE, ERROR_PREFIX)
           .withParent(extensionConnectivityError)
           .build();
 
@@ -96,7 +95,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     XmlDslModel.XmlDslModelBuilder builder = XmlDslModel.builder();
-    builder.setPrefix(EXTENSION_NAMESPACE);
+    builder.setPrefix(EXTENSION_PREFIX);
     XmlDslModel xmlDslModel = builder.build();
 
     typeRepository = ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository();
@@ -125,7 +124,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     ErrorType errorType = typeLocator.lookupComponentErrorType(OPERATION_IDENTIFIER, ConnectionException.class);
 
     assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
-    assertThat(errorType.getNamespace(), is(EXTENSION_NAMESPACE.toUpperCase()));
+    assertThat(errorType.getNamespace(), is(EXTENSION_PREFIX.toUpperCase()));
 
     ErrorType muleConnectivityError = errorType.getParentErrorType();
     assertThat(muleConnectivityError.getNamespace(), is(MULE_CONNECTIVITY_ERROR.getNamespace()));
@@ -144,9 +143,9 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     errorsRegistrant.registerErrors(extensionModel);
 
     Optional<ErrorType> optionalOAuthType = typeRepository.lookupErrorType(builder()
-        .withName(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE).withNamespace(EXTENSION_NAMESPACE).build());
+        .withName(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE).withPrefix(EXTENSION_PREFIX).build());
     Optional<ErrorType> optionalConnectivityType = typeRepository.lookupErrorType(builder()
-        .withName(TEST_CONNECTIVITY_ERROR_TYPE).withNamespace(EXTENSION_NAMESPACE).build());
+        .withName(TEST_CONNECTIVITY_ERROR_TYPE).withPrefix(EXTENSION_PREFIX).build());
 
     assertThat(optionalOAuthType.isPresent(), is(true));
     assertThat(optionalConnectivityType.isPresent(), is(true));

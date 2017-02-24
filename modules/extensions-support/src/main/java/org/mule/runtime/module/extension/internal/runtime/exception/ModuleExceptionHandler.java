@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -75,7 +74,7 @@ public class ModuleExceptionHandler {
     }
 
     ErrorType errorType = typeRepository.lookupErrorType(builder()
-        .withNamespace(extensionNamespace)
+        .withPrefix(extensionNamespace)
         .withName(errorDefinition.getType())
         .build())
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "

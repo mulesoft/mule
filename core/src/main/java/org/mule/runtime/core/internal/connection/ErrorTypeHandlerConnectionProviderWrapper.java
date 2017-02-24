@@ -35,14 +35,14 @@ import java.util.Optional;
 public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
   private final ErrorTypeRepository errorTypeRepository;
-  private final String namespace;
+  private final String prefix;
   private final RetryPolicyTemplate retryPolicyTemplate;
 
   public ErrorTypeHandlerConnectionProviderWrapper(ConnectionProvider<C> connectionProvider, MuleContext muleContext,
                                                    ExtensionModel extensionModel, RetryPolicyTemplate retryPolicyTemplate) {
     super(connectionProvider);
     this.errorTypeRepository = muleContext.getErrorTypeRepository();
-    namespace = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
+    this.prefix = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
     this.retryPolicyTemplate = retryPolicyTemplate;
   }
 
@@ -125,6 +125,6 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
   }
 
   private ComponentIdentifier getIdentifier(ErrorTypeDefinition errorType) {
-    return builder().withName(errorType.getType()).withNamespace(namespace).build();
+    return builder().withName(errorType.getType()).withPrefix(prefix).build();
   }
 }

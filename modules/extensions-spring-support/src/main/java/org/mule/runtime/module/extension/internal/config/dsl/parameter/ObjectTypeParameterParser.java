@@ -58,7 +58,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     this.classLoader = classLoader;
     this.typeDsl = dslResolver.resolve(type).orElseThrow(() -> new IllegalArgumentException("Non parseable object"));
     this.name = typeDsl.getElementName();
-    this.namespace = typeDsl.getNamespace();
+    this.namespace = typeDsl.getPrefix();
   }
 
   public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type,
@@ -147,8 +147,8 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         }
 
         DslElementSyntax dsl = fieldDsl.get();
-        if (!parsingContext.isRegistered(dsl.getElementName(), dsl.getNamespace())) {
-          parsingContext.registerObjectType(dsl.getElementName(), dsl.getNamespace(), type);
+        if (!parsingContext.isRegistered(dsl.getElementName(), dsl.getPrefix())) {
+          parsingContext.registerObjectType(dsl.getElementName(), dsl.getPrefix(), type);
           parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
                                dsl, emptySet());
         } else {

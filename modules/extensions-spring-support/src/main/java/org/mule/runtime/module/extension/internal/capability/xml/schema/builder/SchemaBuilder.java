@@ -428,12 +428,12 @@ public final class SchemaBuilder {
     choice.setMinOccurs(minOccurs);
     choice.setMaxOccurs(maxOccurs);
 
-    QName refAbstract = new QName(typeDsl.getNamespaceUri(), getAbstractElementName(typeDsl), typeDsl.getNamespace());
+    QName refAbstract = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
     TopLevelElement localAbstractElementRef = createRefElement(refAbstract, false);
     choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
 
-    QName refGlobal = new QName(typeDsl.getNamespaceUri(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
-                                typeDsl.getNamespace());
+    QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
+                                typeDsl.getPrefix());
     TopLevelElement topLevelElementRef = createRefElement(refGlobal, false);
     choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
 
@@ -479,7 +479,7 @@ public final class SchemaBuilder {
                                                        objectTypeDelegate.getTypeQName(typeDsl, type));
     }
 
-    QName refQName = new QName(typeDsl.getNamespaceUri(), getAbstractElementName(typeDsl), typeDsl.getNamespace());
+    QName refQName = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
     return createRefElement(refQName, isRequired);
   }
 

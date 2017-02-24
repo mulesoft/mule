@@ -287,7 +287,7 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
     assertThat(element.findElement(builder()
         .withName("my-camel-case-name")
-        .withNamespace(NAMESPACE_URI)
+        .withPrefix(NAMESPACE_URI)
         .build()).get().getConfiguration().get()
         .getValue().get(), is("#[{field: value}]"));
     assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));

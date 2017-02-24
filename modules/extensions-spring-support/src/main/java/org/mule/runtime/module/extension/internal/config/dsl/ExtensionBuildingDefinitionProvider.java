@@ -236,7 +236,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                          ExtensionParsingContext parsingContext) {
     Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
     if (!dslElement.isPresent() ||
-        parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getNamespace())) {
+        parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getPrefix())) {
       return;
     }
 

@@ -91,7 +91,7 @@ public class ModuleExceptionHandlerTestCase {
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     typeRepository.addErrorType(builder()
         .withName(CONNECTIVITY_ERROR_IDENTIFIER)
-        .withNamespace(ERROR_NAMESPACE)
+        .withPrefix(ERROR_NAMESPACE)
         .build(),
                                 typeRepository.getAnyErrorType());
 

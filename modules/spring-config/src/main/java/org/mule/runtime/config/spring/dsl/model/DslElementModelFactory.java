@@ -16,7 +16,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.config.spring.dsl.model.internal.DefaultDslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public interface DslElementModelFactory {
    * Provides a default implementation of the {@link DslElementModelFactory}
    *
    * @param context the {@link DslResolvingContext} to be used when performing a
-   *        {@link org.mule.runtime.api.component.ComponentIdentifier#getNamespace namespace} or
+   *        {@link org.mule.runtime.api.component.ComponentIdentifier#getPrefix namespace} or
    *        {@link ElementDeclaration#getName} based lookup for a given {@link ExtensionModel}.
    * @return a default implementation of the {@link DslElementModelFactory}
    */
