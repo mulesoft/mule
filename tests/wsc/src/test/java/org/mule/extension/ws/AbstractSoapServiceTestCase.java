@@ -12,6 +12,7 @@ import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import static org.mule.extension.ws.api.SoapVersion.SOAP11;
 import static org.mule.extension.ws.api.SoapVersion.SOAP12;
+
 import org.mule.extension.ws.api.SoapVersion;
 import org.mule.extension.ws.service.Soap11Service;
 import org.mule.extension.ws.service.Soap12Service;
@@ -28,7 +29,8 @@ import org.junit.ClassRule;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-wsc"})
+@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext",
+    "org.mule.modules:mule-module-wsc"}, providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctionalTestCase {
 
   @ClassRule
