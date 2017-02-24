@@ -15,8 +15,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
-
-import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -42,17 +40,7 @@ import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.service.http.api.tcp.TcpClientSocketProperties;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -67,6 +55,17 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient {
 

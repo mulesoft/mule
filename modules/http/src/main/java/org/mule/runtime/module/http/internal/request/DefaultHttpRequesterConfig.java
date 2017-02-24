@@ -9,9 +9,6 @@ package org.mule.runtime.module.http.internal.request;
 import static java.lang.String.format;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
-
-import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;
-import org.mule.compatibility.transport.socket.internal.DefaultTcpClientSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -34,6 +31,7 @@ import org.mule.runtime.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
+import org.mule.service.http.api.tcp.TcpClientSocketProperties;
 
 import java.net.CookieManager;
 

@@ -12,8 +12,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
-
-import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -24,6 +22,7 @@ import org.mule.runtime.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.runtime.module.http.internal.listener.HttpServerManager;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 
 import java.io.IOException;
 import java.util.Map;
@@ -131,8 +130,8 @@ public class GrizzlyServerManager implements HttpServerManager {
     if (serverSocketProperties.getServerTimeout() != null) {
       transportBuilder.setServerSocketSoTimeout(serverSocketProperties.getServerTimeout());
     }
-    if (serverSocketProperties.getTimeout() != null) {
-      transportBuilder.setClientSocketSoTimeout(serverSocketProperties.getTimeout());
+    if (serverSocketProperties.getClientTimeout() != null) {
+      transportBuilder.setClientSocketSoTimeout(serverSocketProperties.getClientTimeout());
     }
   }
 

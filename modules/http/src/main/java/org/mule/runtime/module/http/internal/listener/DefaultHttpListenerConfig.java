@@ -9,16 +9,13 @@ package org.mule.runtime.module.http.internal.listener;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
-
-import org.mule.compatibility.transport.socket.api.TcpServerSocketProperties;
-import org.mule.compatibility.transport.socket.internal.DefaultTcpServerSocketProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -63,7 +60,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   @Inject
   private HttpListenerConnectionManager connectionManager;
   private TlsContextFactory tlsContext;
-  private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
   private boolean started = false;
   private HttpServer server;
   private Scheduler workManager;
@@ -100,10 +96,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
 
   public void setTlsContext(TlsContextFactory tlsContext) {
     this.tlsContext = tlsContext;
-  }
-
-  public void setServerSocketProperties(TcpServerSocketProperties serverSocketProperties) {
-    this.serverSocketProperties = serverSocketProperties;
   }
 
   public void setParseRequest(Boolean parseRequest) {
