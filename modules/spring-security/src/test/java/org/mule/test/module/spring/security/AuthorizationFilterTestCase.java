@@ -6,10 +6,16 @@
  */
 package org.mule.test.module.spring.security;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -18,7 +24,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -34,22 +39,22 @@ public class AuthorizationFilterTestCase extends UsesHttpExtensionFunctionalTest
 
   @Test
   public void testNotAuthenticated() throws Exception {
-    doRequest("localhost", getUrl(), 401);
+    doRequest("localhost", getUrl(), UNAUTHORIZED.getStatusCode());
   }
 
   @Test
   public void testAuthenticatedButNotAuthorized() throws Exception {
-    doRequest(null, "localhost", "anon", "anon", getUrl(), false, 405);
+    doRequest(null, "localhost", "anon", "anon", getUrl(), false, METHOD_NOT_ALLOWED.getStatusCode());
   }
 
   @Test
   public void testAuthorized() throws Exception {
-    doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
+    doRequest(null, "localhost", "ross", "ross", getUrl(), false, OK.getStatusCode());
   }
 
   @Test
   public void testAuthorizedInAnotherFlow() throws Exception {
-    doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
+    doRequest(null, "localhost", "ross", "ross", getUrl(), false, OK.getStatusCode());
   }
 
   protected String getUrl() {
@@ -61,9 +66,9 @@ public class AuthorizationFilterTestCase extends UsesHttpExtensionFunctionalTest
     GetMethod get = new GetMethod(url);
     try {
       int status = client.executeMethod(get);
-      assertEquals(status, result);
-      assertNotNull(get.getResponseHeader("WWW-Authenticate"));
-      assertThat(get.getResponseHeader("WWW-Authenticate").getValue().contains("mule-realm"), Is.is(true));
+      assertThat(result, is(status));
+      assertThat(get.getResponseHeader(WWW_AUTHENTICATE), not(nullValue()));
+      assertThat(get.getResponseHeader(WWW_AUTHENTICATE).getValue(), containsString("mule-realm"));
     } finally {
       get.releaseConnection();
     }
