@@ -16,8 +16,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
 import org.mule.routing.AbstractSplitter;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
+
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
 
 import java.util.ArrayList;
 import java.util.Comparator;
