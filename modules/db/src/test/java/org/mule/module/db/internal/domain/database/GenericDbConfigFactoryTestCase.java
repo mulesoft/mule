@@ -10,7 +10,6 @@ package org.mule.module.db.internal.domain.database;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,11 +35,16 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 
 public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
 {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private final GenericDbConfigFactory genericDbConfigFactory = new GenericDbConfigFactory();
     private final Map<QName, Object> annotations = mock(Map.class);
@@ -67,15 +71,15 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void testOnlyExistsGlobalRetryPolicyTemplate() throws Exception
     {
+        expectedException.expect(SQLException.class);
         when(muleRegistry.lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE)).thenReturn(globalRetryPolicyTemplate);
         dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
         dbConnectionFactory = dbConfig.getConnectionFactory();
         try
         {
             dbConnectionFactory.createConnection(JOIN_IF_POSSIBLE);
-            fail("SQL Exception wasn't triggered");
         }
-        catch (SQLException e)
+        finally
         {
             verify(globalRetryPolicyTemplate).execute(any(RetryCallback.class), any(WorkManager.class));
         }
@@ -84,16 +88,15 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void testOnlyExistsSpecificRetryPolicyTemplate() throws Exception
     {
+        expectedException.expect(SQLException.class);
         genericDbConfigFactory.setRetryPolicyTemplate(specificRetryPolicyTemplate);
         dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
         dbConnectionFactory = dbConfig.getConnectionFactory();
         try
         {
             dbConnectionFactory.createConnection(JOIN_IF_POSSIBLE);
-            fail("SQL Exception wasn't triggered");
-
         }
-        catch (SQLException e)
+        finally
         {
             verify(specificRetryPolicyTemplate).execute(any(RetryCallback.class), any(WorkManager.class));
         }
@@ -109,6 +112,7 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
     @Test
     public void testExistsBothRetryPolicyTemplates() throws Exception
     {
+        expectedException.expect(SQLException.class);
         genericDbConfigFactory.setRetryPolicyTemplate(specificRetryPolicyTemplate);
         when(muleRegistry.lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE)).thenReturn(globalRetryPolicyTemplate);
         dbConfig = genericDbConfigFactory.create("name", annotations, dataSource);
@@ -116,9 +120,8 @@ public class GenericDbConfigFactoryTestCase extends AbstractMuleTestCase
         try
         {
             dbConnectionFactory.createConnection(JOIN_IF_POSSIBLE);
-            fail("SQL Exception wasn't triggered");
         }
-        catch (SQLException e)
+        finally
         {
             verify(specificRetryPolicyTemplate).execute(any(RetryCallback.class), any(WorkManager.class));
         }
