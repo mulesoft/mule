@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
@@ -61,7 +62,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
   public static final String CHANGE_CHECK_INTERVAL_PROPERTY = "mule.launcher.changeCheckInterval";
   public static final IOFileFilter ZIP_ARTIFACT_FILTER =
-      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
+      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());

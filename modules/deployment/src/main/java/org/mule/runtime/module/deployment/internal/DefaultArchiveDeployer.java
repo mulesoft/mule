@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppsDir;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -68,7 +69,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     URL url;
     File artifactZip;
     try {
-      final String artifactName = StringUtils.removeEnd(zip, ZIP_FILE_SUFFIX);
+      final String artifactName = removeEndIgnoreCase(zip, ZIP_FILE_SUFFIX);
       artifactZip = new File(artifactDir, zip);
       url = artifactZip.toURI().toURL();
       return deployPackagedArtifact(url, artifactName);
@@ -133,7 +134,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         trackArtifact(artifact);
       } catch (Throwable t) {
         File artifactArchive = new File(artifactAchivedUrl.toURI());
-        String artifactName = StringUtils.removeEnd(artifactArchive.getName(), ZIP_FILE_SUFFIX);
+        String artifactName = removeEndIgnoreCase(artifactArchive.getName(), ZIP_FILE_SUFFIX);
 
         // error text has been created by the deployer already
         logDeploymentFailure(t, artifactName);

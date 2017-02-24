@@ -78,14 +78,39 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -139,31 +164,6 @@ import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -323,6 +323,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private final ApplicationFileBuilder dummyAppDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
       .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
       .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+  private final ApplicationFileBuilder dummyAppDescriptorFileBuilderWithUpperCaseInExtension =
+      new ApplicationFileBuilder("dummy-app", true)
+          .definedBy("dummy-app-config.xml").configuredWith("myCustomProp", "someValue")
+          .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   private final ApplicationFileBuilder waitAppFileBuilder =
       new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
   private final ApplicationFileBuilder brokenAppFileBuilder = new ApplicationFileBuilder("broken-app").corrupted();
@@ -583,20 +587,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysAppZipAfterStartup() throws Exception {
-    startDeployment();
+    deployAfterStartUp(dummyAppDescriptorFileBuilder);
+  }
 
-    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
-
-    // just assert no privileged entries were put in the registry
-    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
-    final MuleRegistry registry = getMuleRegistry(app);
-
-    // mule-app.properties from the zip archive must have loaded properly
-    assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+  @Test
+  public void deploysAppZipWithExtensionUpperCaseAfterStartup() throws Exception {
+    deployAfterStartUp(dummyAppDescriptorFileBuilderWithUpperCaseInExtension);
   }
 
   @Test
@@ -3962,5 +3958,22 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       return eventContext.getMessage().getPayload();
     }
+  }
+
+  private void deployAfterStartUp(ApplicationFileBuilder applicationFileBuilder) throws Exception {
+    startDeployment();
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(applicationFileBuilder.getId());
+
+    // just assert no privileged entries were put in the registry
+    final Application app = findApp(applicationFileBuilder.getId(), 1);
+    final MuleRegistry registry = getMuleRegistry(app);
+
+    // mule-app.properties from the zip archive must have loaded properly
+    assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
   }
 }
