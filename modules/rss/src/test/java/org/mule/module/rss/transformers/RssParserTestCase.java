@@ -11,50 +11,40 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import com.rometools.rome.feed.synd.SyndCategory;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
+@SmallTest
 public class RssParserTestCase extends AbstractMuleTestCase
 {
 
-    private static List<SyndEntry> entries = null;
+    private List<SyndEntry> entries = null;
 
-    @BeforeClass
-    public static void setup() throws Exception
+    @Before
+    public void setup() throws Exception
     {
         ObjectToRssFeed objectToRssFeed = new ObjectToRssFeed();
         InputStream fileInputStream;
-        fileInputStream = new FileInputStream(new File("src/test/resources/rss-test.xml"));
+        fileInputStream = getClass().getResourceAsStream("/rss-test.xml");
         SyndFeed feed = (SyndFeed) objectToRssFeed.doTransform(fileInputStream, null);
         entries = feed.getEntries();
     }
 
     @Test
-    public void testEntriesSize() throws Exception
-    {
-        assertThat(entries.size(), is(2));
-    }
-
-    @Test
-    public void testRSSWithoutNamespaces() throws Exception
+    public void testParsedEntries() throws Exception
     {
         assertValues(entries.get(0));
-    }
-
-    @Test
-    public void testRSSWithNamespaces() throws Exception
-    {
         assertValues(entries.get(1));
+        assertThat(entries.size(), is(2));
     }
 
     public void assertValues(SyndEntry entry)
@@ -71,4 +61,5 @@ public class RssParserTestCase extends AbstractMuleTestCase
         assertThat(category2.getName(), is("Category2"));
         assertThat(entry.getDescription().getValue(), is("Description"));
     }
+
 }

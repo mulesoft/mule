@@ -32,7 +32,10 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
-
+/**
+ * Parses RSS item elements and its children.
+ * Considers the use of namespaces that were added in RSS 1.0
+ */
 public class RssParser extends RSS20Parser implements WireFeedParser
 {
 
@@ -59,7 +62,6 @@ public class RssParser extends RSS20Parser implements WireFeedParser
     @Override
     public Item parseItem(final Element rssRoot, final Element itemElement, final Locale locale)
     {
-
         final Item item = super.parseItem(rssRoot, itemElement, locale);
         parseTitle(item, itemElement);
         parseLink(item, itemElement);
@@ -79,11 +81,11 @@ public class RssParser extends RSS20Parser implements WireFeedParser
     private Element parseChildWithNamespaces(Element parentElement, String childName)
     {
         Element element = null;
-        Iterator itr = namespaces.iterator();
+        Iterator namespacesIterator = namespaces.iterator();
 
-        while (itr.hasNext() && element == null)
+        while (namespacesIterator.hasNext() && element == null)
         {
-            Namespace namespace = (Namespace) itr.next();
+            Namespace namespace = (Namespace) namespacesIterator.next();
             element = parentElement.getChild(childName, namespace);
         }
 
@@ -93,11 +95,11 @@ public class RssParser extends RSS20Parser implements WireFeedParser
     private List<Element> parseChildrenWithNamespaces(Element parentElement, String childName)
     {
         List<Element> elements = new ArrayList<>();
-        Iterator itr = namespaces.iterator();
+        Iterator namespacesIterator = namespaces.iterator();
 
-        while (itr.hasNext() && elements.size() == 0)
+        while (namespacesIterator.hasNext() && elements.size() == 0)
         {
-            Namespace namespace = (Namespace) itr.next();
+            Namespace namespace = (Namespace) namespacesIterator.next();
             elements = parentElement.getChildren(childName, namespace);
         }
 
