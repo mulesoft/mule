@@ -152,7 +152,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-sockets-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-transport-sockets-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tooling-support-${productVersion}.jar
