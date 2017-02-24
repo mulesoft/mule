@@ -13,9 +13,9 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
@@ -34,7 +34,7 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
    */
   public static final String REPOSITORY = MULE_ARTIFACT_FOLDER + separator + "repository";
 
-  private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
+  private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();
 
   /**
@@ -46,17 +46,16 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
     super(name);
   }
 
-  public List<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
+  public Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
     return artifactPluginDescriptors;
   }
 
-  public void setArtifactPluginDescriptors(List<ArtifactPluginDescriptor> pluginDependencyDescriptors) {
+  public void setArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> pluginDependencyDescriptors) {
     this.artifactPluginDescriptors = pluginDependencyDescriptors;
   }
 
   /**
-   * @return the {@link LoaderDescriber} that will contain all mandatory values to generate an {@link ExtensionModel}
-   * from it.
+   * @return the {@link LoaderDescriber} that will contain all mandatory values to generate an {@link ExtensionModel} from it.
    */
   public Optional<LoaderDescriber> getExtensionModelDescriptorProperty() {
     return extensionModelDescriptorProperty;

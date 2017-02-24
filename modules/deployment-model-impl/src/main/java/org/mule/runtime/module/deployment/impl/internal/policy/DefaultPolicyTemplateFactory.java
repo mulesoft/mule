@@ -20,6 +20,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
@@ -37,6 +38,7 @@ import java.util.Set;
 public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
 
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
+  private final PluginDependenciesResolver pluginDependenciesResolver;
 
   /**
    * Creates a new factory
@@ -44,17 +46,20 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
    * @param policyTemplateClassLoaderBuilderFactory creates class loader builders to create the class loaders for the created
    *        policy templates. Non null.
    */
-  public DefaultPolicyTemplateFactory(PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory) {
+  public DefaultPolicyTemplateFactory(PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
+                                      PluginDependenciesResolver pluginDependenciesResolver) {
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyTemplateClassLoaderBuilderFactory cannot be null");
 
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
+    this.pluginDependenciesResolver = pluginDependenciesResolver;
   }
 
   @Override
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader policyClassLoader;
+    Set<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors = pluginDependenciesResolver.resolve(descriptor.getPlugins());
     ArtifactPluginDescriptor[] artifactPluginDescriptors =
-        getArtifactPluginDescriptors(application.getDescriptor().getPlugins(), descriptor);
+        getArtifactPluginDescriptors(resolveArtifactPluginDescriptors, descriptor);
     try {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(artifactPluginDescriptors)

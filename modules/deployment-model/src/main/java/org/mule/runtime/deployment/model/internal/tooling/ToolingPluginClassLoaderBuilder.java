@@ -12,9 +12,7 @@ import static org.mule.runtime.core.util.UUID.getUUID;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
@@ -49,15 +47,12 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
    * {@inheritDoc}
    *
    * @param artifactPluginDescriptor desired plugin to generate an {@link ArtifactClassLoader} for.
-   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    * @see #build()
    */
   public ToolingPluginClassLoaderBuilder(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
-                                         ArtifactPluginRepository artifactPluginRepository,
                                          ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                         ArtifactPluginDescriptor artifactPluginDescriptor,
-                                         PluginDependenciesResolver pluginDependenciesResolver) {
-    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+                                         ArtifactPluginDescriptor artifactPluginDescriptor) {
+    super(artifactPluginClassLoaderFactory);
     this.artifactPluginDescriptor = artifactPluginDescriptor;
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }

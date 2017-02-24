@@ -41,6 +41,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   private File artifactFile;
   protected List<ZipResource> resources = new LinkedList<>();
   protected boolean corrupted;
+  private File tempFolder;
 
   /**
    * Creates a new builder
@@ -114,6 +115,20 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   }
 
   /**
+   * Sets the temporary folder to be used to create the artifact file.
+   *
+   * @param tempFolder temporary folder to use to create the artifact file.
+   * @return the same builder instance
+   */
+  public T tempFolder(File tempFolder) {
+    checkImmutable();
+    checkArgument(tempFolder != null, "tempFolder cannot be null");
+    checkArgument(tempFolder.isDirectory(), "tempFolder must be a directory");
+    this.tempFolder = tempFolder;
+    return getThis();
+  }
+
+  /**
    * Indicates that the generated artifact file must be a corrupted ZIP.
    *
    * @return the same builder instance
@@ -158,7 +173,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
       tempFile.deleteOnExit();
 
       if (corrupted) {
-        buildBrokenZipFile(tempFile);
+        buildBrokenJarFile(tempFile);
       } else {
         final List<ZipResource> zipResources = new LinkedList<>(resources);
         zipResources.addAll(getCustomResources());
@@ -179,7 +194,9 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     ZipResource result = null;
 
     if (!props.isEmpty()) {
-      final File applicationPropertiesFile = new File(getTempFolder(), propertiesFileName);
+      File classesFolder = new File(getTempFolder(), "classes");
+      classesFolder.mkdirs();
+      final File applicationPropertiesFile = new File(classesFolder, propertiesFileName);
       applicationPropertiesFile.deleteOnExit();
       createPropertiesFile(applicationPropertiesFile, props);
 
@@ -199,10 +216,13 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   }
 
   protected String getTempFolder() {
+    if (tempFolder != null) {
+      return tempFolder.getAbsolutePath();
+    }
     return System.getProperty("java.io.tmpdir");
   }
 
-  private void buildBrokenZipFile(File tempFile) throws UncheckedIOException {
+  private void buildBrokenJarFile(File tempFile) throws UncheckedIOException {
     try {
       FileUtils.write(tempFile, "This content represents invalid compressed data");
     } catch (IOException e) {

@@ -10,12 +10,15 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.descriptor.DescriptorLoader;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +29,7 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
 
   private final ServiceRegistry serviceRegistry;
   private final Class[] descriptorLoaderClasses = new Class[] {ClassLoaderModelLoader.class, BundleDescriptorLoader.class};
-  private Map<Class, Map<String, DescriptorLoader>> descriptorLoaders;
+  private Map<Class, List<DescriptorLoader>> descriptorLoaders;
 
   /**
    * Creates a new repository
@@ -40,15 +43,20 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
   }
 
   @Override
-  public <T extends DescriptorLoader> T get(String id, Class<T> loaderClass) throws LoaderNotFoundException {
+  public <T extends DescriptorLoader> T get(String id, ArtifactType artifactType, Class<T> loaderClass)
+      throws LoaderNotFoundException {
     if (descriptorLoaders == null) {
       initializeDescriptorLoaders();
     }
 
     DescriptorLoader descriptorLoader = null;
-    Map<String, DescriptorLoader> registeredDescriptorLoaders = descriptorLoaders.get(loaderClass);
+    List<DescriptorLoader> registeredDescriptorLoaders = descriptorLoaders.get(loaderClass);
     if (registeredDescriptorLoaders != null) {
-      descriptorLoader = registeredDescriptorLoaders.get(id);
+      for (DescriptorLoader loader : registeredDescriptorLoaders) {
+        if (loader.getId().equals(id) && loader.supportsArtifactType(artifactType)) {
+          descriptorLoader = loader;
+        }
+      }
     }
 
     if (descriptorLoader == null) {
@@ -59,7 +67,7 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
   }
 
   protected static <T extends DescriptorLoader> String noRegisteredLoaderError(String id, Class<T> loaderClass) {
-    return format("There is no loader with ID='%s' and type '$s'", id, loaderClass.getName());
+    return format("There is no loader with ID='%s' and type '%s'", id, loaderClass.getName());
   }
 
   private void initializeDescriptorLoaders() {
@@ -73,18 +81,13 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
     }
   }
 
-  private Map<String, DescriptorLoader> findBundleDescriptorLoaders(Class<? extends DescriptorLoader> descriptorLoaderClass) {
-    Map<String, DescriptorLoader> descriptorLoaders = new HashMap<>();
+  private List<DescriptorLoader> findBundleDescriptorLoaders(Class<? extends DescriptorLoader> descriptorLoaderClass) {
+    List<DescriptorLoader> descriptorLoaders = new ArrayList<>();
     Collection<? extends DescriptorLoader> providers =
         serviceRegistry.lookupProviders(descriptorLoaderClass, this.getClass().getClassLoader());
 
     for (DescriptorLoader loader : providers) {
-      if (descriptorLoaders.containsKey(loader.getId())) {
-        throw new IllegalStateException(format("Duplicated bundle descriptor loader ID: %s of class '%s'", loader.getId(),
-                                               descriptorLoaderClass.getName()));
-      }
-
-      descriptorLoaders.put(loader.getId(), loader);
+      descriptorLoaders.add(loader);
     }
 
     return descriptorLoaders;

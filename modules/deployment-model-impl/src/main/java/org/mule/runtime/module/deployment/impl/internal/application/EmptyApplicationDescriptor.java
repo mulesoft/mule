@@ -24,8 +24,9 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor {
    */
   public EmptyApplicationDescriptor(File appLocation) {
     super(appLocation.getName());
-    setConfigResources(new String[] {DEFAULT_CONFIGURATION_RESOURCE});
-    File configPathFile = new File(appLocation, DEFAULT_CONFIGURATION_RESOURCE);
+    String configLocation = "mule" + File.separator + DEFAULT_CONFIGURATION_RESOURCE;
+    setConfigResources(new String[] {configLocation});
+    File configPathFile = new File(appLocation, configLocation);
     setArtifactLocation(appLocation);
     setRootFolder(appLocation.getParentFile());
     String configPath = String.format(configPathFile.getAbsolutePath());

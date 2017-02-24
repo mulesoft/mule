@@ -103,6 +103,8 @@
         <module>modules</module>
         <module>tests</module>
         <module>extensions</module>
+        <module>bom</module>
+        <module>embedded</module>
     </modules>
 
     <properties>

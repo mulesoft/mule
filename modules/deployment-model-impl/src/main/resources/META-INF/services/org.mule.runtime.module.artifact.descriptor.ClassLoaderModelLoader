@@ -1,1 +1,4 @@
-org.mule.runtime.module.deployment.impl.internal.plugin.MavenClassLoaderModelLoader
+org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader
+org.mule.runtime.module.deployment.impl.internal.application.AppMavenClassLoaderModelLoader
+
+

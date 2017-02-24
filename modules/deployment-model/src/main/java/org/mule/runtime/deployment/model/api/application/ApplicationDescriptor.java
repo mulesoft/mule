@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
-  public static final String DEFAULT_CONFIGURATION_RESOURCE = getAppConfigFolderPath() + "mule-config.xml";
+  public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
   public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
 
   private String encoding;

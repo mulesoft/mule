@@ -16,11 +16,13 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates {@link MuleApplicationClassLoader} instances based on the application descriptor.
@@ -53,6 +55,9 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
 
   private ClassLoaderLookupPolicy getApplicationClassLoaderLookupPolicy(ArtifactClassLoader parent,
                                                                         ApplicationDescriptor descriptor) {
+
+    Set<BundleDependency> dependencies = descriptor.getClassLoaderModel().getDependencies();
+
     final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {

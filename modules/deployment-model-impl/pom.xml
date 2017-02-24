@@ -86,6 +86,10 @@
             <artifactId>aether-transport-file</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
             <version>${aetherProviderVersion}</version>

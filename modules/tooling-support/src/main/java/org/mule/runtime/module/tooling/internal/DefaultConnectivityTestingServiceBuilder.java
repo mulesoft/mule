@@ -7,9 +7,11 @@
 package org.mule.runtime.module.tooling.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
@@ -28,7 +30,6 @@ import java.util.List;
  */
 class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder {
 
-  private static final String EXTENSION_BUNDLE_CLASSIFIER = "mule-plugin";
   private static final String JAR_BUNDLE_TYPE = "jar";
   private final RepositoryService repositoryService;
   private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
@@ -66,7 +67,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
     BundleDescriptor bundleDescriptor =
         new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
-            .setType(JAR_BUNDLE_TYPE).setClassifier(EXTENSION_BUNDLE_CLASSIFIER).build();
+            .setType(JAR_BUNDLE_TYPE).setClassifier(MULE_PLUGIN_CLASSIFIER).build();
     this.extensionsBundleDependencies
         .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
     return this;

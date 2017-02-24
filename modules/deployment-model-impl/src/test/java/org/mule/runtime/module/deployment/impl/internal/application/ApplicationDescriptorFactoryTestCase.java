@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.IOUtils.copy;
@@ -14,6 +15,9 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -24,12 +28,18 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppPluginsFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -42,8 +52,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Set;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -166,5 +180,169 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   private void copyResourceAs(String resourceName, File destination) throws IOException {
     final InputStream sourcePlugin = IOUtils.getResourceAsStream(resourceName, getClass());
     copy(sourcePlugin, new FileOutputStream(destination));
+  }
+
+  @Test
+  public void applicationDescriptorFromJson() throws Exception {
+    String appPath = "apps/no-dependencies";
+    ApplicationDescriptor desc = createApplicationDescriptor(appPath);
+
+    assertThat(desc.getMinMuleVersion(), is(new MuleVersion("4.0.0")));
+    assertThat(desc.getConfigResources().length, is(1));
+    assertThat(desc.getConfigResources()[0], is("mule/" + DEFAULT_CONFIGURATION_RESOURCE));
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+    assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
+    assertThat(classLoaderModel.getUrls().length, is(1));
+    assertThat(classLoaderModel.getUrls()[0].getFile(), is(new File(getApplicationFolder(appPath), "classes").getAbsolutePath()));
+
+    assertThat(classLoaderModel.getExportedPackages().isEmpty(), is(true));
+    assertThat(classLoaderModel.getExportedResources().isEmpty(), is(true));
+    assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
+  }
+
+  @Test
+  public void applicationDescriptorFromJsonWithCustomConfigFiles() throws Exception {
+    String appPath = "apps/custom-config-files";
+    ApplicationDescriptor desc = createApplicationDescriptor(appPath);
+
+    assertThat(asList(desc.getConfigResources()), contains("file1.xml", "file2.xml"));
+  }
+
+  @Test
+  public void classLoaderModelWithSingleDependency() throws Exception {
+    ApplicationDescriptor desc = createApplicationDescriptor("apps/single-dependency");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    BundleDependency commonsCollectionDependency = classLoaderModel.getDependencies().iterator().next();
+    assertThat(commonsCollectionDependency, commonsColecctionDependencyMatcher());
+
+    assertThat(classLoaderModel.getUrls().length, is(2));
+    assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUrl()));
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependency() throws Exception {
+    ApplicationDescriptor desc = createApplicationDescriptor("apps/plugin-dependency");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    assertThat(classLoaderModel.getDependencies(), hasItem(socketsPluginDependencyMatcher()));
+
+    assertThat(classLoaderModel.getUrls().length, is(1));
+    assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
+  }
+
+  @Test
+  public void classLoaderModelWithPluginDependencyWithAnotherPlugin() throws Exception {
+    ApplicationDescriptor desc = createApplicationDescriptor("apps/plugin-dependency-with-another-plugin");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies().size(), is(2));
+    assertThat(classLoaderModel.getDependencies(), hasItems(socketsPluginDependencyMatcher(), httpPluginDependencyMatcher()));
+
+    assertThat(classLoaderModel.getUrls().length, is(1));
+    classLoaderModel.getDependencies().stream()
+        .forEach(bundleDependency -> {
+          assertThat(asList(classLoaderModel.getUrls()), not(hasItem(bundleDependency.getBundleUrl())));
+        });
+  }
+
+  private Matcher<BundleDependency> commonsColecctionDependencyMatcher() {
+    return new BaseMatcher<BundleDependency>() {
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("invalid bundle configuration");
+      }
+
+      @Override
+      public boolean matches(Object o) {
+        if (!(o instanceof BundleDependency)) {
+          return false;
+        }
+
+        BundleDependency bundleDependency = (BundleDependency) o;
+        return bundleDependency.getScope().equals(COMPILE) &&
+            !bundleDependency.getDescriptor().getClassifier().isPresent() &&
+            bundleDependency.getDescriptor().getArtifactId().equals("commons-collections") &&
+            bundleDependency.getDescriptor().getGroupId().equals("commons-collections") &&
+            bundleDependency.getDescriptor().getVersion().equals("3.2.2");
+      }
+    };
+  }
+
+  private Matcher<BundleDependency> socketsPluginDependencyMatcher() {
+    return new BaseMatcher<BundleDependency>() {
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("invalid bundle configuration");
+      }
+
+      @Override
+      public boolean matches(Object o) {
+        if (!(o instanceof BundleDependency)) {
+          return false;
+        }
+
+        BundleDependency bundleDependency = (BundleDependency) o;
+        return bundleDependency.getScope().equals(COMPILE) &&
+            bundleDependency.getDescriptor().getClassifier().isPresent() &&
+            bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
+            bundleDependency.getDescriptor().getArtifactId().equals("mule-module-sockets") &&
+            bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
+            bundleDependency.getDescriptor().getVersion().equals("4.0-SNAPSHOT");
+      }
+    };
+  }
+
+  private Matcher<BundleDependency> httpPluginDependencyMatcher() {
+    return new BaseMatcher<BundleDependency>() {
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("invalid bundle configuration");
+      }
+
+      @Override
+      public boolean matches(Object o) {
+        if (!(o instanceof BundleDependency)) {
+          return false;
+        }
+
+        BundleDependency bundleDependency = (BundleDependency) o;
+        return bundleDependency.getScope().equals(COMPILE) &&
+            bundleDependency.getDescriptor().getClassifier().isPresent() &&
+            bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
+            bundleDependency.getDescriptor().getArtifactId().equals("mule-module-http") &&
+            bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
+            bundleDependency.getDescriptor().getVersion().equals("4.0-SNAPSHOT");
+      }
+    };
+  }
+
+  private ApplicationDescriptor createApplicationDescriptor(String appPath) {
+    final ApplicationDescriptorFactory applicationDescriptorFactory =
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
+                                         applicationPluginRepository);
+
+    File applicationFolder = getApplicationFolder(appPath);
+
+    return applicationDescriptorFactory.create(applicationFolder);
+  }
+
+  private File getApplicationFolder(String appPath) {
+    URL noDependenciesFolderUrl = getClass().getClassLoader().getResource(appPath);
+    return new File(noDependenciesFolderUrl.getFile());
+  }
+
+  @Test
+  public void readFromJsonDescriptor() throws Exception {
+
   }
 }

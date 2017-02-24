@@ -6,18 +6,29 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.apache.commons.io.IOUtils.toByteArray;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -39,6 +50,61 @@ public final class JarUtils {
 
   private JarUtils() {
     // utility class only
+  }
+
+  /**
+   * Loads the content of a file within a jar into a byte array.
+   * 
+   * @param jarFile the jar file
+   * @param filePath the path to the file within the jar file
+   * @return the content of the file as byte array or empty if the file does not exists within the jar file.
+   * @throws IOException if there was a problem reading from the jar file.
+   */
+  public static Optional<Byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
+    URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
+    JarURLConnection jarConnection = (JarURLConnection) jsonDescriptorUrl.openConnection();
+    try (InputStream inputStream = jarConnection.getInputStream()) {
+      byte[] byteArray = toByteArray(inputStream);
+      Byte[] byteArrayWrapper = new Byte[byteArray.length];
+      Arrays.setAll(byteArrayWrapper, n -> byteArray[n]);
+      return of(byteArrayWrapper);
+    } catch (FileNotFoundException e) {
+      return empty();
+    }
+  }
+
+  /**
+   * Creates an URL to a path within a jar file.
+   *
+   * @param jarFile the jar file
+   * @param filePath the path within the jar file
+   * @return an URL to the {@code filePath} within the {@code jarFile}
+   * @throws MalformedURLException if the provided {@code filePath} is malformed
+   */
+  public static URL getUrlWithinJar(File jarFile, String filePath) throws MalformedURLException {
+    return new URL("jar:" + jarFile.toURI().toString() + "!/" + filePath);
+  }
+
+  /**
+   * Gets all the URL of files within a directory
+   * 
+   * @param file the jar file
+   * @param directory the directory within the jar file
+   * @return a collection of URLs to files within the directory {@code directory}. Empty collection if the directory does not
+   *         exists or is empty.
+   * @throws IOException
+   */
+  public static List<URL> getUrlsWithinJar(File file, String directory) throws IOException {
+    List<URL> urls = new ArrayList<>();
+    JarFile jarFile = new JarFile(file);
+    Enumeration<JarEntry> entries = jarFile.entries();
+    while (entries.hasMoreElements()) {
+      JarEntry jarEntry = entries.nextElement();
+      if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(directory + File.separator)) {
+        urls.add(getUrlWithinJar(file, jarEntry.getName()));
+      }
+    }
+    return urls;
   }
 
   public static LinkedHashMap readJarFileEntries(File jarFile) throws Exception {
@@ -173,4 +239,5 @@ public final class JarUtils {
   public static File getMuleLocalJarFile() {
     return new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME);
   }
+
 }

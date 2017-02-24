@@ -15,9 +15,9 @@ import static java.util.Collections.emptySet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleTmpDir;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
@@ -107,7 +107,8 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
     BundleDescriptorLoader bundleDescriptorLoader;
     try {
       bundleDescriptorLoader =
-          descriptorLoaderRepository.get(mulePolicyModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
+          descriptorLoaderRepository.get(mulePolicyModel.getBundleDescriptorLoader().getId(), POLICY,
+                                         BundleDescriptorLoader.class);
     } catch (LoaderNotFoundException e) {
       throw new ArtifactDescriptorCreateException(invalidBundleDescriptorLoaderIdError(mulePolicyModel
           .getBundleDescriptorLoader()));
@@ -125,7 +126,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
     ClassLoaderModelLoader classLoaderModelLoader;
     try {
       classLoaderModelLoader =
-          descriptorLoaderRepository.get(muleArtifactLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
+          descriptorLoaderRepository.get(muleArtifactLoaderDescriptor.getId(), POLICY, ClassLoaderModelLoader.class);
     } catch (LoaderNotFoundException e) {
       throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(muleArtifactLoaderDescriptor));
     }
@@ -160,11 +161,10 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
       sort(pluginZips);
 
       for (String pluginZip : pluginZips) {
-        String unpackDestinationFolder = descriptor.getName() + separator + PLUGINS_FOLDER + separator;
         File pluginZipFile = new File(pluginsDir, pluginZip);
         try {
           plugins.add(artifactPluginDescriptorLoader
-              .load(pluginZipFile, new File(getMuleTmpDir(), unpackDestinationFolder)));
+              .load(pluginZipFile));
         } catch (IOException e) {
           throw new ArtifactDescriptorCreateException("Cannot load plugin descriptor: " + pluginZip, e);
         }

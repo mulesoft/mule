@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.createTempFile;
 import static java.util.Collections.emptySet;
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,8 +19,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.core.util.FileUtils.stringToFile;
-import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.util.JarUtils.appendJarFileEntries;
+import static org.mule.runtime.core.util.JarUtils.getUrlWithinJar;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
@@ -32,6 +35,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.tck.ZipUtils.compress;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.core.util.FileUtils;
@@ -50,8 +54,10 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundE
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader;
+import org.mule.tck.ZipUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -59,6 +65,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,12 +80,12 @@ import org.junit.rules.TemporaryFolder;
 
 public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
-  private static final String PLUGIN_NAME = "testPlugin";
+  private static final String PLUGIN_NAME = "testPlugin.jar";
   private static final String INVALID_LOADER_ID = "INVALID";
   private static final String MIN_MULE_VERSION = "4.0.0";
 
   @Rule
-  public TemporaryFolder pluginsFolder = new TemporaryFolder();
+  public TemporaryFolder pluginsTempFolder = new TemporaryFolder();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -92,32 +99,32 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(classLoaderFilterFactory.create(null, null))
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
-    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
-    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
 
-    when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, BundleDescriptorLoader.class))
+    when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, PLUGIN, BundleDescriptorLoader.class))
         .thenReturn(new PropertiesBundleDescriptorLoader());
-    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, BundleDescriptorLoader.class))
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, PLUGIN, BundleDescriptorLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
   }
 
   @Test
   public void parsesPluginWithNoDescriptor() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
-    new PluginDescriptorChecker(pluginFolder).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFile).assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
   public void parsesLoaderExportClass() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
 
     final String exportedClassPackages = "org.foo, org.bar";
-    new PluginPropertiesBuilder(pluginFolder).exportingClassesFrom(exportedClassPackages).build();
+    new PluginPropertiesBuilder(pluginFile).exportingClassesFrom(exportedClassPackages).build();
 
     final ArtifactClassLoaderFilter classLoaderFilter = mock(DefaultArtifactClassLoaderFilter.class);
     Set<String> parsedExportedPackages = new HashSet<>();
@@ -126,17 +133,17 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(classLoaderFilter.getExportedClassPackages()).thenReturn(parsedExportedPackages);
     when(classLoaderFilterFactory.create(exportedClassPackages, null)).thenReturn(classLoaderFilter);
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
-    new PluginDescriptorChecker(pluginFolder).exportingPackages(parsedExportedPackages).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFile).exportingPackages(parsedExportedPackages).assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
   public void parsesLoaderExportResource() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
 
     final String exportedResources = "META-INF, META-INF/xml";
-    new PluginPropertiesBuilder(pluginFolder).exportingResourcesFrom(exportedResources).build();
+    new PluginPropertiesBuilder(pluginFile).exportingResourcesFrom(exportedResources).build();
 
     final ArtifactClassLoaderFilter classLoaderFilter = mock(DefaultArtifactClassLoaderFilter.class);
     Set<String> parsedExportedResources = new HashSet<>();
@@ -145,80 +152,81 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(classLoaderFilter.getExportedResources()).thenReturn(parsedExportedResources);
     when(classLoaderFilterFactory.create(null, exportedResources)).thenReturn(classLoaderFilter);
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
-    new PluginDescriptorChecker(pluginFolder).exportingResources(parsedExportedResources)
+    new PluginDescriptorChecker(pluginFile).exportingResources(parsedExportedResources)
         .assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
   public void parsesLibraries() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginTempLibFolder = pluginsTempFolder.newFolder("lib");
+    final File jar1 = createDummyJarFile(pluginTempLibFolder, "lib1.jar");
+    final File jar2 = createDummyJarFile(pluginTempLibFolder, "lib2.jar");
+    final File pluginFile = createPluginFile(new ZipUtils.ZipResource[] {
+        new ZipUtils.ZipResource(jar1.getAbsolutePath(), "lib/lib1.jar"),
+        new ZipUtils.ZipResource(jar2.getAbsolutePath(), "lib/lib2.jar")
+    });
 
-    final File pluginLibFolder = new File(pluginFolder, "lib");
-    assertThat(pluginLibFolder.mkdir(), is(true));
+    final URL[] libraries = new URL[] {getUrlWithinJar(pluginFile, "lib/lib1.jar"), getUrlWithinJar(pluginFile, "lib/lib2.jar")};
 
-    final File jar1 = createDummyJarFile(pluginLibFolder, "lib1.jar");
-    final File jar2 = createDummyJarFile(pluginLibFolder, "lib2.jar");
-    final URL[] libraries = new URL[] {jar1.toURI().toURL(), jar2.toURI().toURL()};
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
-
-    new PluginDescriptorChecker(pluginFolder).containing(libraries).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFile).containing(libraries).assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
   public void parsesNamedDefinedPluginDependency() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
 
     final String pluginDependencies = "foo";
-    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+    new PluginPropertiesBuilder(pluginFile).dependingOn(pluginDependencies).build();
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
     BundleDescriptor descriptor =
         new BundleDescriptor.Builder().setArtifactId("foo").setGroupId("test").setVersion("1.0").build();
-    new PluginDescriptorChecker(pluginFolder).dependingOn(descriptor).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFile).dependingOn(descriptor).assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
   public void parsesFullyDefinedPluginDependency() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
 
     final String pluginDependencies = "org.foo:foo:2.0";
-    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+    new PluginPropertiesBuilder(pluginFile).dependingOn(pluginDependencies).build();
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
     BundleDescriptor descriptor =
         new BundleDescriptor.Builder().setArtifactId("foo").setGroupId("org.foo").setVersion("2.0").build();
-    new PluginDescriptorChecker(pluginFolder).dependingOn(descriptor).assertPluginDescriptor(pluginDescriptor);
+    new PluginDescriptorChecker(pluginFile).dependingOn(descriptor).assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test
   public void parsesMultiplePluginDependencies() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
 
     final String pluginDependencies = "org.foo:foo:2.0,org.bar:bar:1.0";
-    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+    new PluginPropertiesBuilder(pluginFile).dependingOn(pluginDependencies).build();
 
-    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFolder);
+    final ArtifactPluginDescriptor pluginDescriptor = descriptorFactory.create(pluginFile);
 
     BundleDescriptor fooDescriptor =
         new BundleDescriptor.Builder().setArtifactId("foo").setGroupId("org.foo").setVersion("2.0").build();
     BundleDescriptor barDEscriptor =
         new BundleDescriptor.Builder().setArtifactId("bar").setGroupId("org.bar").setVersion("1.0").build();
-    new PluginDescriptorChecker(pluginFolder).dependingOn(fooDescriptor).dependingOn(barDEscriptor)
+    new PluginDescriptorChecker(pluginFile).dependingOn(fooDescriptor).dependingOn(barDEscriptor)
         .assertPluginDescriptor(pluginDescriptor);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void failsTooParseDescriptorWithIncompletePluginDependency() throws Exception {
-    final File pluginFolder = createPluginFolder();
+    final File pluginFile = createPluginFile();
     final String pluginDependencies = "org.foo:foo";
-    new PluginPropertiesBuilder(pluginFolder).dependingOn(pluginDependencies).build();
+    new PluginPropertiesBuilder(pluginFile).dependingOn(pluginDependencies).build();
 
-    descriptorFactory.create(pluginFolder);
+    descriptorFactory.create(pluginFile);
   }
 
   @Test
@@ -229,15 +237,25 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     pluginModelBuilder.withClassLoaderModelDescriber().setId(INVALID_LOADER_ID);
 
     ArtifactPluginFileBuilder pluginFileBuilder =
-        new ArtifactPluginFileBuilder(PLUGIN_NAME).describedBy(pluginModelBuilder.build());
-    File tempFolder = createTempFolder();
-    unzip(pluginFileBuilder.getArtifactFile(), tempFolder);
+        new ArtifactPluginFileBuilder(PLUGIN_NAME).tempFolder(pluginsTempFolder.newFolder())
+            .describedBy(pluginModelBuilder.build());
+
+    File pluginJarLocation = createJarFileFromArtifactFile(pluginFileBuilder);
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
-        .expectMessage(invalidClassLoaderModelIdError(tempFolder, pluginModelBuilder.getClassLoaderModelDescriptorLoader()));
+        .expectMessage(invalidClassLoaderModelIdError(pluginJarLocation,
+                                                      pluginModelBuilder.getClassLoaderModelDescriptorLoader()));
 
-    descriptorFactory.create(tempFolder);
+    descriptorFactory.create(pluginJarLocation);
+  }
+
+  private File createJarFileFromArtifactFile(ArtifactPluginFileBuilder pluginFileBuilder) throws IOException {
+    // TODO MULE-11456 - Once we moved everything to .jar, we won't need this hack
+    File artifactFile = pluginFileBuilder.getArtifactFile();
+    File pluginJarLocation = new File(artifactFile.getParent(), artifactFile.getName().replace(".zip", ""));
+    copyFile(artifactFile, pluginJarLocation);
+    return pluginJarLocation;
   }
 
   @Test
@@ -247,21 +265,23 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     pluginModelBuilder.withClassLoaderModelDescriber().setId(FILE_SYSTEM_POLICY_MODEL_LOADER_ID);
 
     ArtifactPluginFileBuilder pluginFileBuilder =
-        new ArtifactPluginFileBuilder(PLUGIN_NAME).describedBy(pluginModelBuilder.build());
-    File tempFolder = createTempFolder();
-    unzip(pluginFileBuilder.getArtifactFile(), tempFolder);
+        new ArtifactPluginFileBuilder(PLUGIN_NAME).tempFolder(pluginsTempFolder.newFolder())
+            .describedBy(pluginModelBuilder.build());
+
+    // TODO MULE-11456 - Once we moved everything to .jar, we won't need this hack
+    File pluginJarLocation = createJarFileFromArtifactFile(pluginFileBuilder);
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
-        .expectMessage(invalidBundleDescriptorLoaderIdError(tempFolder, pluginModelBuilder.getBundleDescriptorLoader()));
+        .expectMessage(invalidBundleDescriptorLoaderIdError(pluginJarLocation, pluginModelBuilder.getBundleDescriptorLoader()));
 
-    descriptorFactory.create(tempFolder);
+    descriptorFactory.create(pluginJarLocation);
   }
 
-  private File createPluginFolder() {
-    final File pluginFolder = new File(pluginsFolder.getRoot(), PLUGIN_NAME);
-    assertThat(pluginFolder.mkdir(), is(true));
-    return pluginFolder;
+  private File createPluginFile(ZipUtils.ZipResource... zipResources) {
+    final File pluginFile = new File(pluginsTempFolder.getRoot(), PLUGIN_NAME);
+    compress(pluginFile, zipResources);
+    return pluginFile;
   }
 
   private File createDummyJarFile(File pluginLibFolder, String child) throws IOException {
@@ -282,21 +302,21 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     attributes.put(VERSION, "1.0");
     attributes.put(GROUP_ID, "org.mule.test");
     attributes.put(ARTIFACT_ID, PLUGIN_NAME);
-    attributes.put(CLASSIFIER, "mule-plugin");
+    attributes.put(CLASSIFIER, MULE_PLUGIN_CLASSIFIER);
     attributes.put(TYPE, "jar");
     return new MuleArtifactLoaderDescriptor(bundleDescriptorLoaderId, attributes);
   }
 
   private static class PluginDescriptorChecker {
 
-    private final File pluginFolder;
+    private final File pluginFile;
     private URL[] libraries = new URL[0];;
     private Set<String> resources = emptySet();
     private Set<String> packages = emptySet();
     private List<BundleDescriptor> dependencies = new ArrayList<>();
 
-    public PluginDescriptorChecker(File pluginFolder) {
-      this.pluginFolder = pluginFolder;
+    public PluginDescriptorChecker(File pluginFile) {
+      this.pluginFile = pluginFile;
     }
 
     public PluginDescriptorChecker exportingResources(Set<String> resources) {
@@ -322,16 +342,15 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     }
 
     public void assertPluginDescriptor(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
-      assertThat(pluginDescriptor.getName(), equalTo(pluginFolder.getName()));
+      assertThat(pluginDescriptor.getName(), equalTo(pluginFile.getName()));
       try {
         assertThat(pluginDescriptor.getClassLoaderModel().getUrls()[0],
-                   equalTo(pluginFolder.toURI().toURL()));
+                   equalTo(pluginFile.toURI().toURL()));
       } catch (MalformedURLException e) {
         throw new AssertionError("Can't compare classes dir", e);
       }
 
       assertUrls(pluginDescriptor);
-      assertThat(pluginDescriptor.getRootFolder(), equalTo(pluginFolder));
       assertThat(pluginDescriptor.getClassLoaderModel().getExportedResources(), equalTo(resources));
       assertThat(pluginDescriptor.getClassLoaderModel().getExportedPackages(), equalTo(packages));
       assertPluginDependencies(pluginDescriptor.getClassLoaderModel());
@@ -348,7 +367,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     private void assertUrls(ArtifactPluginDescriptor pluginDescriptor) throws Exception {
       assertThat(pluginDescriptor.getClassLoaderModel().getUrls().length, equalTo(libraries.length + 1));
       assertThat(pluginDescriptor.getClassLoaderModel().getUrls(),
-                 hasItemInArray(equalTo(pluginFolder.toURI().toURL())));
+                 hasItemInArray(equalTo(pluginFile.toURI().toURL())));
 
       for (URL libUrl : libraries) {
         assertThat(pluginDescriptor.getClassLoaderModel().getUrls(), hasItemInArray(equalTo(libUrl)));
@@ -358,13 +377,13 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   private static class PluginPropertiesBuilder {
 
-    private final File pluginFolder;
+    private final File pluginFile;
     private String exportedClassPackages;
     private String exportedResources;
     private String pluginDependencies;
 
-    public PluginPropertiesBuilder(File pluginFolder) {
-      this.pluginFolder = pluginFolder;
+    public PluginPropertiesBuilder(File pluginFile) {
+      this.pluginFile = pluginFile;
     }
 
     public PluginPropertiesBuilder exportingClassesFrom(String packages) {
@@ -385,33 +404,24 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
       return this;
     }
 
-    public File build() throws IOException {
-      final File pluginProperties = new File(pluginFolder, PLUGIN_PROPERTIES);
-      if (pluginProperties.exists()) {
-        throw new IllegalStateException(String.format("File '%s' already exists", pluginProperties.getAbsolutePath()));
-      }
-
-      addDescriptorProperty(pluginProperties, EXPORTED_CLASS_PACKAGES_PROPERTY, this.exportedClassPackages);
-      addDescriptorProperty(pluginProperties, EXPORTED_RESOURCE_PROPERTY, this.exportedResources);
+    public void build() throws Exception {
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      addDescriptorProperty(byteArrayOutputStream, EXPORTED_CLASS_PACKAGES_PROPERTY, this.exportedClassPackages);
+      addDescriptorProperty(byteArrayOutputStream, EXPORTED_RESOURCE_PROPERTY, this.exportedResources);
       if (!isEmpty(pluginDependencies)) {
-        addDescriptorProperty(pluginProperties, PLUGIN_DEPENDENCIES, pluginDependencies);
+        addDescriptorProperty(byteArrayOutputStream, PLUGIN_DEPENDENCIES, this.pluginDependencies);
       }
-
-      return pluginProperties;
+      LinkedHashMap entries = new LinkedHashMap();
+      entries.put(PLUGIN_PROPERTIES, byteArrayOutputStream.toByteArray());
+      appendJarFileEntries(pluginFile, entries);
     }
 
-    private void addDescriptorProperty(File pluginProperties, String propertyName, String propertyValue) throws IOException {
+    private void addDescriptorProperty(ByteArrayOutputStream byteArrayOutputStream, String propertyName, String propertyValue)
+        throws IOException {
       if (!isEmpty(propertyValue)) {
-        final String descriptorProperty = generateDescriptorProperty(propertyName, propertyValue);
-
-        stringToFile(pluginProperties.getAbsolutePath(), descriptorProperty, true);
+        byteArrayOutputStream.write((propertyName + "=" + propertyValue).getBytes());
       }
     }
 
-    private String generateDescriptorProperty(String propertyName, String propertyValue) {
-      StringBuilder builder = new StringBuilder(propertyName).append("=").append(propertyValue);
-
-      return builder.toString();
-    }
   }
 }
