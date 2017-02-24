@@ -8,7 +8,9 @@
 package org.mule.services.http;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -21,6 +23,7 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.junit.rules.ExternalResource;
 
@@ -109,11 +112,28 @@ public class TestHttpClient extends ExternalResource implements org.mule.service
     }
 
     /**
-     * @param tlsContextFactory the tls context factory for creating the context to secure the connection
+     * @param tlsContextFactory the TLS context factory for creating the context to secure the connection
      * @return same builder instance
      */
     public Builder tlsContextFactory(TlsContextFactory tlsContextFactory) {
       this.tlsContextFactory = tlsContextFactory;
+
+      return this;
+    }
+
+    /**
+     * @param tlsContextFactorySupplier a supplier for the TLS context factory for creating the context to secure the connection
+     * @return same builder instance
+     */
+    public Builder tlsContextFactory(Supplier<TlsContextFactory> tlsContextFactorySupplier) {
+      final TlsContextFactory tlsContextFactoryLocal = tlsContextFactorySupplier.get();
+      try {
+        initialiseIfNeeded(tlsContextFactoryLocal);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+
+      this.tlsContextFactory = tlsContextFactoryLocal;
 
       return this;
     }

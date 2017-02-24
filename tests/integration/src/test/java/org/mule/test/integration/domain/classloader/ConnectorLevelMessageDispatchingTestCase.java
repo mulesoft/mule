@@ -6,18 +6,25 @@
  */
 package org.mule.test.integration.domain.classloader;
 
+import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Ignore;
@@ -36,6 +43,9 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
   @Rule
   public UseMuleLog4jContextFactory muleLogging = new UseMuleLog4jContextFactory();
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
+
   @Test
   public void verifyClassLoaderIsAppClassLoader() throws Exception {
     muleServer.deployDomainFromClasspathFolder("domain/deployable-domains/http-domain-listener", "domain");
@@ -47,12 +57,16 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
   }
 
   private void verifyAppProcessMessageWithAppClassLoader(FakeMuleServer fakeMuleServer, String appName, String requestUrl)
-      throws MuleException {
+      throws IOException, TimeoutException, RegistrationException {
     MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
+
     final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<>();
     FlowExecutionListener flowExecutionListener = new FlowExecutionListener(applicationContext);
     flowExecutionListener.addListener(source -> executionClassLoader.set(Thread.currentThread().getContextClassLoader()));
-    applicationContext.getClient().send(String.format(requestUrl, dynamicPort.getNumber()), "test-data", null);
+    HttpRequest request =
+        HttpRequest.builder().setUri(format(requestUrl, dynamicPort.getNumber())).setMethod(GET)
+            .setEntity(new ByteArrayHttpEntity("test-data".getBytes())).build();
+    httpClient.send(request, DEFAULT_TEST_TIMEOUT_SECS, false, null);
     flowExecutionListener.waitUntilFlowIsComplete();
     assertThat(executionClassLoader.get(), is(applicationContext.getExecutionClassLoader()));
   }

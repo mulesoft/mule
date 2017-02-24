@@ -9,16 +9,15 @@ package org.mule.test.integration.resolvers;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.Event;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.Base64;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.List;
 import java.util.Random;
@@ -66,11 +65,9 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Abstract
 
   private class ClientRequest extends Thread {
 
-    final MuleClient client;
     int requestCount;
 
     private ClientRequest(final int requestCount) throws MuleException {
-      client = muleContext.getClient();
       this.requestCount = requestCount;
     }
 

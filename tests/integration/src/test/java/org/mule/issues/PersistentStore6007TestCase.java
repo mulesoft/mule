@@ -14,7 +14,6 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ListableObjectStore;
@@ -59,7 +58,6 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
     Component.latch = latch;
     PersistentObjectStore.addEvents();
     muleContext.start();
-    MuleClient client = muleContext.getClient();
     InternalMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
     assertEquals("Hello", result.getPayload().getValue());
     assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));

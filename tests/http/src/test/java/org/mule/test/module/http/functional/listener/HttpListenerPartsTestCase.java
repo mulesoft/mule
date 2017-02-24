@@ -14,41 +14,39 @@ import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasMediaType;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.functional.junit4.matchers.MultiPartPayloadMatchers.hasSize;
-import static org.mule.functional.junit4.matchers.PartAttributesMatchers.hasFilename;
-import static org.mule.functional.junit4.matchers.PartAttributesMatchers.hasName;
-import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.runtime.api.message.Message.builder;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
+import static org.mule.runtime.module.http.internal.HttpParser.parseMultipartContent;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.service.http.api.HttpHeaders;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.Part;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -57,6 +55,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -135,20 +134,23 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
   @Test
   public void respondWithSeveralAttachments() throws Exception {
-    InternalMessage response =
-        muleContext.getClient().send(getUrl(filePath.getValue()), InternalMessage.of(TEST_PAYLOAD)).getRight();
-    assertThat(response.getPayload().getValue(), instanceOf(MultiPartPayload.class));
-    assertThat((MultiPartPayload) response.getPayload().getValue(), hasSize(2));
+    HttpRequest request = HttpRequest.builder().setUri(getUrl(filePath.getValue())).setMethod(GET)
+        .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    final Collection<HttpPart> parts = parseMultipartContent(((InputStreamHttpEntity) response.getEntity()).getInputStream(),
+                                                             response.getHeaderValueIgnoreCase(CONTENT_TYPE));
+    assertThat(parts, hasSize(2));
 
-    Message attachment1 = ((MultiPartPayload) response.getPayload().getValue()).getPart(FILE_BODY_FIELD_NAME);
-    assertThat(attachment1, hasAttributes(that(hasName(FILE_BODY_FIELD_NAME))));
-    assertThat(attachment1, hasAttributes(that(hasFilename(FILE_BODY_FIELD_FILENAME))));
-    assertThat(attachment1, hasMediaType(BINARY));
-    assertThat(attachment1, hasPayload(equalTo(FILE_BODY_FIELD_VALUE)));
+    final Iterator<HttpPart> responsePartsIterator = parts.iterator();
 
-    Message attachment2 = ((MultiPartPayload) response.getPayload().getValue()).getPart(TEXT_BODY_FIELD_NAME);
-    assertThat(attachment2, hasPayload(equalTo(TEXT_BODY_FIELD_VALUE)));
-    assertThat(attachment2, hasMediaType(TEXT_PLAIN_LATIN));
+    HttpPart part1 = responsePartsIterator.next();
+    assertThat(part1.getContentType(), is(TEXT_PLAIN_LATIN.toRfcString()));
+    assertThat(IOUtils.toString(part1.getInputStream()), is(TEXT_BODY_FIELD_VALUE));
+
+    HttpPart part2 = responsePartsIterator.next();
+    assertThat(part2.getFileName(), is(FILE_BODY_FIELD_FILENAME));
+    assertThat(part2.getContentType(), is(BINARY.toRfcString()));
+    assertThat(IOUtils.toString(part2.getInputStream()), is(FILE_BODY_FIELD_VALUE));
   }
 
   @Test
@@ -169,7 +171,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
         final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
         assertThat(contentType, containsString(MULTIPART_FORM_DATA));
 
-        final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
+        final Collection<HttpPart> parts = parseMultipartContent(response.getEntity().getContent(), contentType);
         assertThat(parts.size(), is(1));
         Map<String, Part> partsAsMap = convertPartsToMap(parts);
         assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());
@@ -198,7 +200,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
         final String contentType = response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue();
         assertThat(contentType, containsString(expectedResponseContentType));
 
-        final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getEntity().getContent(), contentType);
+        final Collection<HttpPart> parts = parseMultipartContent(response.getEntity().getContent(), contentType);
         assertThat(parts.size(), is(2));
         Map<String, Part> partsAsMap = convertPartsToMap(parts);
         assertThat(partsAsMap.get(TEXT_BODY_FIELD_NAME), notNullValue());

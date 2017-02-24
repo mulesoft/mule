@@ -12,14 +12,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
-
-import org.mule.runtime.core.api.message.InternalMessage;
-
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,16 +38,16 @@ public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
 
   @Test
   public void sendsInvalidContentTypeOnRequest() throws Exception {
-    MuleClient client = muleContext.getClient();
     final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
-
-    InternalMessage response = client.send(url, TEST_MESSAGE, null).getRight();
+    HttpRequest request =
+        HttpRequest.builder().setUri(url).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_MESSAGE.getBytes())).build();
+    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     assertNoContentTypeProperty(response);
-    assertThat(getPayloadAsString(response), equalTo("invalidMimeType"));
+    assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), equalTo("invalidMimeType"));
   }
 
-  private void assertNoContentTypeProperty(InternalMessage response) {
-    assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(CONTENT_TYPE))));
+  private void assertNoContentTypeProperty(HttpResponse response) {
+    assertThat(response.getHeaderNames(), not(hasItem(equalToIgnoringCase(CONTENT_TYPE))));
   }
 }

@@ -7,12 +7,19 @@
 package org.mule.shutdown;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,6 +29,14 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
 
   @Rule
   public SystemProperty contextShutdownTimeout = new SystemProperty("contextShutdownTimeout", "5000");
+
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+
+  @After
+  public void disposeHttpClient() {
+    httpClient.stop();
+  }
 
   @Override
   protected boolean isGracefulShutdown() {
@@ -49,7 +64,6 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
   }
 
   private void doShutDownTest(final String payload, final String url) throws MuleException, InterruptedException {
-    final MuleClient client = muleContext.getClient();
     final boolean[] results = new boolean[] {false};
 
     Thread t = new Thread() {
@@ -57,9 +71,10 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
       @Override
       public void run() {
         try {
-          InternalMessage muleMessage = InternalMessage.builder().payload(payload).build();
-          InternalMessage result = client.send(url, muleMessage).getRight();
-          results[0] = payload.equals(getPayloadAsString(result));
+          HttpRequest request =
+              HttpRequest.builder().setUri(url).setMethod(GET).setEntity(new ByteArrayHttpEntity(payload.getBytes())).build();
+          final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+          results[0] = payload.equals(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()));
         } catch (Exception e) {
           // Ignore
         }

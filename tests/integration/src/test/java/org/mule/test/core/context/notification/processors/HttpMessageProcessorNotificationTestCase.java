@@ -6,11 +6,17 @@
  */
 package org.mule.test.core.context.notification.processors;
 
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.NON_BLOCKING_PROCESSING_STRATEGY;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
-import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.core.context.notification.Node;
@@ -20,6 +26,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -33,6 +40,13 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
   @Rule
   public SystemProperty systemProperty;
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+
+  @After
+  public void disposeHttpClient() {
+    httpClient.stop();
+  }
 
   public HttpMessageProcessorNotificationTestCase(boolean nonBlocking) {
     if (nonBlocking) {
@@ -56,8 +70,9 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
 
   @Test
   public void doTest() throws Exception {
-    MuleClient client = muleContext.getClient();
-    assertNotNull(client.send("http://localhost:" + proxyPort.getValue() + "/in", "test", null));
+    HttpRequest request = HttpRequest.builder().setUri("http://localhost:" + proxyPort.getValue() + "/in").setMethod(GET)
+        .setEntity(new ByteArrayHttpEntity("test".getBytes())).build();
+    assertThat(httpClient.send(request, RECEIVE_TIMEOUT, false, null).getEntity(), not(nullValue()));
 
     assertNotifications();
   }

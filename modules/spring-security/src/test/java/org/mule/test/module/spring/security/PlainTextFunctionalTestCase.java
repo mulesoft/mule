@@ -6,17 +6,21 @@
  */
 package org.mule.test.module.spring.security;
 
-import static org.junit.Assert.assertEquals;
+import static java.lang.String.format;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.core.api.security.DefaultMuleCredentials.createHeader;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;
@@ -29,6 +33,9 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
 
+  @Rule
+  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
+
   @Override
   protected String getConfigFile() {
     // Note that this file contains global attributes, which the configuration-building
@@ -38,41 +45,34 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
 
   @Test
   public void testAuthenticationFailureNoContext() throws Exception {
-    org.mule.runtime.core.api.client.MuleClient client = muleContext.getClient();
-    InternalMessage m = client.send(getUrl(), InternalMessage.of(TEST_PAYLOAD)).getRight();
-    assertNotNull(m);
-    int status = m.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
-    assertEquals(UNAUTHORIZED.getStatusCode(), status);
+    HttpRequest request =
+        HttpRequest.builder().setUri(getUrl()).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+    assertNotNull(response);
+    assertThat(response.getStatusCode(), is(UNAUTHORIZED.getStatusCode()));
   }
 
   @Test
   public void testAuthenticationFailureBadCredentials() throws Exception {
-    MuleClient client = muleContext.getClient();
-
-    InternalMessage message = createRequestMessage("anonX", "anonX");
-    InternalMessage response = client.send(getUrl(), message).getRight();
+    HttpRequest request =
+        HttpRequest.builder().setUri(getUrl()).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes()))
+            .addHeader(MULE_USER_PROPERTY, createHeader("anonX", "anonX".toCharArray())).build();
+    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     assertNotNull(response);
-    int status = response.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
-    assertEquals(UNAUTHORIZED.getStatusCode(), status);
+    assertThat(response.getStatusCode(), is(UNAUTHORIZED.getStatusCode()));
   }
 
   @Test
   public void testAuthenticationAuthorised() throws Exception {
-    MuleClient client = muleContext.getClient();
-
-    InternalMessage message = createRequestMessage("anon", "anon");
-    InternalMessage response = client.send(getUrl(), message).getRight();
+    HttpRequest request =
+        HttpRequest.builder().setUri(getUrl()).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes()))
+            .addHeader(MULE_USER_PROPERTY, createHeader("anon", "anon".toCharArray())).build();
+    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     assertNotNull(response);
-    int status = response.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
-    assertEquals(OK, status);
-  }
-
-  private InternalMessage createRequestMessage(String user, String password) {
-    String header = DefaultMuleCredentials.createHeader(user, password.toCharArray());
-    return InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_USER_PROPERTY, header).build();
+    assertThat(response.getStatusCode(), is(OK.getStatusCode()));
   }
 
   private String getUrl() {
-    return String.format("http://localhost:%s/index.html", port1.getNumber());
+    return format("http://localhost:%s/index.html", port1.getNumber());
   }
 }

@@ -9,12 +9,12 @@ package org.mule.test.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.compression.GZipCompression;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -37,7 +37,6 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
   @Test
   public void testCompressDecompressByteArray() throws Exception {
     byte[] testDataByteArray = TEST_DATA.getBytes();
-    MuleClient client = muleContext.getClient();
 
     // Compress input.
     Event muleEvent = flowRunner("compressInput").withPayload(testDataByteArray).run();
@@ -58,7 +57,6 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
   @Test
   public void testCompressDecompressInputStream() throws Exception {
     ByteArrayInputStream bis = new ByteArrayInputStream(TEST_DATA.getBytes());
-    MuleClient client = muleContext.getClient();
 
     // Compress input.
     Event muleEvent = flowRunner("compressInput").withPayload(bis).run();
@@ -79,8 +77,6 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
 
   @Test
   public void testCompressDecompressString() throws Exception {
-    MuleClient client = muleContext.getClient();
-
     // Compress input.
     Event muleEvent = flowRunner("compressInput").withPayload(TEST_DATA).run();
     InternalMessage compressedResponse = muleEvent.getMessage();

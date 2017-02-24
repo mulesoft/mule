@@ -15,9 +15,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -29,10 +30,12 @@ import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMET
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
@@ -85,6 +88,10 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
   private String configFile;
 
+  @Rule
+  public TestHttpClient httpClient =
+      new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(() -> createClientTlsContextFactory()).build();
+
   @Override
   protected String getConfigFile() {
     return configFile;
@@ -102,14 +109,13 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
   @Test
   public void localAuthorizationUrlRedirectsToOAuthAuthorizationUrl() throws Exception {
-    wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(200)));
+    wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(OK.getStatusCode())));
 
-    HttpRequestOptions options = newOptions().enableFollowsRedirect().tlsContextFactory(createClientTlsContextFactory()).build();
-
-    muleContext.getClient().send(localAuthorizationUrl.getValue(), InternalMessage.builder().nullPayload().build(), options);
+    HttpRequest request = HttpRequest.builder().setUri(localAuthorizationUrl.getValue()).setMethod(GET).build();
+    httpClient.send(request, RECEIVE_TIMEOUT, true, null);
 
     final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
-    assertThat(requests.size(), is(1));
+    assertThat(requests, hasSize(1));
 
     AuthorizationRequestAsserter.create((requests.get(0))).assertMethodIsGet().assertClientIdIs(clientId.getValue())
         .assertRedirectUriIs(localCallbackUrl.getValue()).assertScopeIs(scopes.getValue()).assertStateIs(state.getValue())
@@ -135,9 +141,9 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
     final ImmutableMap<String, String> redirectUrlQueryParams = ImmutableMap.<String, String>builder()
         .put(CODE_PARAMETER, AUTHENTICATION_CODE).put(STATE_PARAMETER, state.getValue()).build();
 
-    muleContext.getClient().send(localCallbackUrl.getValue() + "?" + encodeQueryString(redirectUrlQueryParams),
-                                 InternalMessage.builder().nullPayload().build(),
-                                 newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
+    HttpRequest request = HttpRequest.builder()
+        .setUri(localCallbackUrl.getValue() + "?" + encodeQueryString(redirectUrlQueryParams)).setMethod(GET).build();
+    httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
 
@@ -148,15 +154,19 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
         .assertContainsCustomTokenResponseParam(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE);
   }
 
-  private TlsContextFactory createClientTlsContextFactory() throws IOException {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-    tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-    tlsContextFactory.setTrustStorePassword("changeit");
-    tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
-    tlsContextFactory.setKeyStorePassword("changeit");
-    tlsContextFactory.setKeyManagerPassword("changeit");
+  private TlsContextFactory createClientTlsContextFactory() {
+    try {
+      DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+      tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
+      tlsContextFactory.setTrustStorePassword("changeit");
+      tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
+      tlsContextFactory.setKeyStorePassword("changeit");
+      tlsContextFactory.setKeyManagerPassword("changeit");
 
-    return tlsContextFactory;
+      return tlsContextFactory;
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   @Override

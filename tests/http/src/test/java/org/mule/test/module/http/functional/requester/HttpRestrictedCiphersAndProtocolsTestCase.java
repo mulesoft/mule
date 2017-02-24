@@ -6,23 +6,31 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+
 import org.mule.functional.junit4.rules.ExpectedError;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.client.HttpClient;
+import org.mule.service.http.api.client.HttpClientConfiguration;
+import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +54,9 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Rule
   public ExpectedError expectedError = ExpectedError.none();
 
-  private HttpRequestOptionsBuilder optionsBuilder = HttpRequestOptionsBuilder.newOptions().method(POST.name());
+  // Uses a new HttpClient because it is needed to configure the TLS context per test
+  public HttpClient httpClientWithCertificate;
+
   private DefaultTlsContextFactory tlsContextFactory;
 
   @Override
@@ -61,6 +71,13 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     tlsContextFactory.setTrustStorePassword("mulepassword");
   }
 
+  @After
+  public void after() {
+    if (httpClientWithCertificate != null) {
+      httpClientWithCertificate.stop();
+    }
+  }
+
   @Test
   public void worksWithProtocolAndCipherSuiteMatch() throws Exception {
     Event response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
@@ -69,25 +86,33 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Test
   public void worksWithProtocolMatch() throws Exception {
+    initialiseIfNeeded(tlsContextFactory);
+    createHttpClient();
+
     // Uses default ciphers and protocols
-    HttpRequestOptions requestOptions = optionsBuilder.tlsContextFactory(tlsContextFactory).build();
-    InternalMessage response = muleContext.getClient().send(String.format("https://localhost:%s", port1.getValue()),
-                                                            InternalMessage.of(TEST_PAYLOAD), requestOptions)
-        .getRight();
-    assertThat(muleContext.getTransformationService().transform(response, DataType.STRING).getPayload().getValue(),
-               is(TEST_PAYLOAD));
+    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s", port1.getValue())).setMethod(POST)
+        .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
+    assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is(TEST_PAYLOAD));
   }
 
   @Test
   public void worksWithCipherSuiteMatch() throws Exception {
-    // Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA
     tlsContextFactory.setEnabledCipherSuites(cipherSuites.getValue());
-    HttpRequestOptions requestOptions = optionsBuilder.tlsContextFactory(tlsContextFactory).build();
-    InternalMessage response = muleContext.getClient().send(String.format("https://localhost:%s", port3.getValue()),
-                                                            InternalMessage.of(TEST_PAYLOAD), requestOptions)
-        .getRight();
-    assertThat(muleContext.getTransformationService().transform(response, DataType.STRING).getPayload().getValue(),
-               is(TEST_PAYLOAD));
+    initialiseIfNeeded(tlsContextFactory);
+    createHttpClient();
+
+    // Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s", port3.getValue())).setMethod(POST)
+        .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
+    assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is(TEST_PAYLOAD));
+  }
+
+  public void createHttpClient() {
+    httpClientWithCertificate = getService(HttpService.class).getClientFactory()
+        .create(new HttpClientConfiguration.Builder().setTlsContextFactory(tlsContextFactory).build());
+    httpClientWithCertificate.start();
   }
 
   @Test
