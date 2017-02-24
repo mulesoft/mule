@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -112,6 +113,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     //APP constants
     private static final ArtifactDescriptor dummyAppDescriptor = new ArtifactDescriptor("dummy-app", "/dummy-app.zip", "/dummy-app", null, null);
+    private static final ArtifactDescriptor dummyAppAppDescriptorUpperCaseZipExtension = new ArtifactDescriptor("dummy-app-uppercase", "/dummy-app-uppercase.ZIP", "/dummy-app-uppercase", null, null);
     private static final ArtifactDescriptor emptyAppDescriptor = new ArtifactDescriptor("empty-app", "/empty-app.zip", null, "empty-app.zip", null);
     private static final ArtifactDescriptor brokenAppDescriptor = new ArtifactDescriptor("broken-app", "/broken-app.zip", null, "brokenApp.zip", null);
     private static final ArtifactDescriptor brokenAppWithFunkyNameDescriptor = new ArtifactDescriptor("broken-app+", "/broken-app+.zip", null, "brokenApp+.zip", null);
@@ -206,25 +208,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void deploysAppZipOnStartup() throws Exception
-    {
-        addPackedAppFromResource(dummyAppDescriptor.zipPath);
-
-        deploymentService.start();
-
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
-        assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
-        assertApplicationAnchorFileExists(dummyAppDescriptor.id);
-
-        // just assert no privileged entries were put in the registry
-        final Application app = findApp(dummyAppDescriptor.id, 1);
-        final MuleRegistry registry = getMuleRegistry(app);
-
-        // mule-app.properties from the zip archive must have loaded properly
-        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
-    }
-
-    @Test
     public void extensionManagerPresent() throws Exception
     {
         addPackedAppFromResource(dummyAppDescriptor.zipPath);
@@ -285,22 +268,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void deploysAppZipWithExtensionUpperCaseAfterStartup() throws Exception
+    {
+        deployAfterStartUp(dummyAppAppDescriptorUpperCaseZipExtension);
+    }
+
+
+    @Test
     public void deploysAppZipAfterStartup() throws Exception
     {
-        deploymentService.start();
-
-        addPackedAppFromResource(dummyAppDescriptor.zipPath);
-
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
-        assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
-        assertApplicationAnchorFileExists(dummyAppDescriptor.id);
-
-        // just assert no privileged entries were put in the registry
-        final Application app = findApp(dummyAppDescriptor.id, 1);
-        final MuleRegistry registry = getMuleRegistry(app);
-
-        // mule-app.properties from the zip archive must have loaded properly
-        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+    	deployAfterStartUp(dummyAppDescriptor);
     }
 
     @Test
@@ -3380,6 +3357,24 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             componentInitializedLatch = new Latch();
             waitLatch = new Latch();
         }
+    }
+
+    private void deployAfterStartUp(ArtifactDescriptor artifactDescriptor) throws Exception
+    {
+        addPackedAppFromResource(artifactDescriptor.zipPath);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, artifactDescriptor.id);
+        assertAppsDir(NONE, new String[] {artifactDescriptor.id}, true);
+        assertApplicationAnchorFileExists(artifactDescriptor.id);
+
+        // just assert no privileged entries were put in the registry
+        final Application app = findApp(artifactDescriptor.id, 1);
+        final MuleRegistry registry = getMuleRegistry(app);
+
+        // mule-app.properties from the zip archive must have loaded properly
+        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
     }
 
 }
