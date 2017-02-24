@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.util.SplashScreen.miniSplash;
 
 import org.mule.config.i18n.CoreMessages;
@@ -15,7 +16,6 @@ import org.mule.module.launcher.artifact.Artifact;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.util.CollectionUtils;
-import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         File artifactZip;
         try
         {
-            final String artifactName = StringUtils.removeEnd(zip, ZIP_FILE_SUFFIX);
+            final String artifactName = removeEndIgnoreCase(zip, ZIP_FILE_SUFFIX);
             artifactZip = new File(artifactDir, zip);
             url = artifactZip.toURI().toURL();
             return deployPackagedArtifact(url, artifactName);
@@ -148,7 +148,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             catch (Throwable t)
             {
                 File artifactArchive = new File(artifactAchivedUrl.toURI());
-                String artifactName = StringUtils.removeEnd(artifactArchive.getName(), ZIP_FILE_SUFFIX);
+                String artifactName = removeEndIgnoreCase(artifactArchive.getName(), ZIP_FILE_SUFFIX);
 
                 // error text has been created by the deployer already
                 logDeploymentFailure(t, artifactName);
