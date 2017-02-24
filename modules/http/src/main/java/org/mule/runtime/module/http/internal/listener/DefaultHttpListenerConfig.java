@@ -60,8 +60,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   @Inject
   private HttpListenerConnectionManager connectionManager;
   private TlsContextFactory tlsContext;
-  // TODO(pablo.kraan): is this field needed?
-  //private TcpServerSocketProperties serverSocketProperties = new DefaultTcpServerSocketProperties();
   private boolean started = false;
   private HttpServer server;
   private Scheduler workManager;
@@ -99,10 +97,6 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject
   public void setTlsContext(TlsContextFactory tlsContext) {
     this.tlsContext = tlsContext;
   }
-
-  //public void setServerSocketProperties(TcpServerSocketProperties serverSocketProperties) {
-  //  this.serverSocketProperties = serverSocketProperties;
-  //}
 
   public void setParseRequest(Boolean parseRequest) {
     this.parseRequest = parseRequest;
