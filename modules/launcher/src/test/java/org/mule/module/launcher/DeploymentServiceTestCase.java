@@ -8,6 +8,7 @@ package org.mule.module.launcher;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -3351,9 +3352,9 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void deployAfterStartUp(ApplicationFileBuilder applicationFileBuilder) throws Exception
     {
-        deploymentService.start();
+        addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
-        addPackedAppFromBuilder(applicationFileBuilder);
+        deploymentService.start();
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         assertAppsDir(NONE, new String[] {applicationFileBuilder.getId()}, true);
@@ -3364,7 +3365,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         final MuleRegistry registry = getMuleRegistry(app);
 
         // mule-app.properties from the zip archive must have loaded properly
-        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+        assertThat("mule-app.properties should have been loaded.", "someValue", equalTo(registry.get("myCustomProp")));
     }
 
 }

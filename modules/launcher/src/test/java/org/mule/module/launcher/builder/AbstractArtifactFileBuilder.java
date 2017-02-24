@@ -7,6 +7,8 @@
 
 package org.mule.module.launcher.builder;
 
+import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
@@ -52,7 +54,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     {
         checkArgument(!StringUtils.isEmpty(id), "ID cannot be empty");
         this.id = id;
-        this.fileName = id + (upperCaseInExtension ? ".ZIP" : ".zip");
+        this.fileName = upperCaseInExtension ? (id + ZIP_FILE_SUFFIX.toUpperCase()) : (id + ZIP_FILE_SUFFIX);
     }
 
     /**

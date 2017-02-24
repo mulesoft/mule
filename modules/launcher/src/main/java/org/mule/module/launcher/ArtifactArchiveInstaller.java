@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher;
 
+import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
@@ -47,7 +49,7 @@ public class ArtifactArchiveInstaller
      */
     public String installArtifact(final URL artifactUrl) throws IOException
     {
-        if (!artifactUrl.toString().toLowerCase().endsWith(".zip"))
+        if (!artifactUrl.toString().toLowerCase().endsWith(ZIP_FILE_SUFFIX))
         {
             throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
         }
