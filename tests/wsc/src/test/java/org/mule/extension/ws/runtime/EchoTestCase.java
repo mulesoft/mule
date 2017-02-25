@@ -9,7 +9,6 @@ package org.mule.extension.ws.runtime;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
@@ -23,9 +22,7 @@ import org.mule.runtime.api.message.Message;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;

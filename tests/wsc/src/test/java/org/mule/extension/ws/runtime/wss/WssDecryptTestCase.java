@@ -13,11 +13,6 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("WSS")
 public class WssDecryptTestCase extends AbstractWebServiceSecurityTestCase {
 
-  private final static String TIMESTAMP = "timestamp";
-  private final static String USERNAME = "username";
-  private final static String VERIFY_SIGNATURE = "verify";
-  private final static String SIGN = "sign";
-  private final static String ENCRYPT = "encrypt";
   private final static String DECRYPT = "decrypt";
 
   public WssDecryptTestCase() {
