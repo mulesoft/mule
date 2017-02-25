@@ -46,6 +46,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-service-http-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
             <version>${project.version}</version>
@@ -122,13 +128,6 @@
             <artifactId>aspectjrt</artifactId>
         </dependency>
 
-        <dependency>
-            <!-- TODO MULE-9705 remove this when http is fully migrated to the extension -->  
-             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>

@@ -44,7 +44,7 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
    * This is the property to set the error code to no the message it is the property name the Transport provider uses set the set
    * the error code on the underlying message
    */
-  public static final String ERROR_CODE_PROPERTY = "error.code.property";
+  private static final String ERROR_CODE_PROPERTY = "error.code.property";
 
   /**
    * logger used by this class
