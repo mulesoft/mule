@@ -33,6 +33,36 @@ public final class HttpEncoderDecoderUtils {
   private static final String SPACE_ENTITY = "%20";
 
   /**
+   * Extracts the path (what's left of the {@code ?} character) from the passed uri.
+   * 
+   * @param uri the uri to extract the path from
+   * @return the path form the uri
+   */
+  public static String extractPath(String uri) {
+    String path = uri;
+    int i = path.indexOf('?');
+    if (i > -1) {
+      path = path.substring(0, i);
+    }
+    return path;
+  }
+
+  /**
+   * Extracts the query parameters (what's right of the {@code ?} character) from the passed uri.
+   * 
+   * @param uri the uri to extract the parameters from
+   * @return the parameters form the uri
+   */
+  public static String extractQueryParams(String uri) {
+    int i = uri.indexOf("?");
+    String queryString = "";
+    if (i > -1) {
+      queryString = uri.substring(i + 1);
+    }
+    return queryString;
+  }
+
+  /**
    * Converts a query-string from a request url into a {@link ParameterMap}.
    * <p>
    * This is the inverse of {@link #encodeQueryString(Map)}.
