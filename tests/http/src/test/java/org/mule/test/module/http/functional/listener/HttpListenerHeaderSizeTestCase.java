@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.internal.listener.grizzly.GrizzlyServerManager.MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
@@ -31,7 +31,7 @@ public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
 
   @Rule
   public SystemProperty maxHeaderSectionSizeSystemProperty =
-      new SystemProperty(MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY, "10000");
+      new SystemProperty(SYSTEM_PROPERTY_PREFIX + "http.headerSectionSize", "10000");
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port");
 
