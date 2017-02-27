@@ -142,28 +142,6 @@
         </dependency>
 
         <!-- Test jars -->
-        <!-- some tests reference cxf test classes -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-cxf</artifactId>
-            <version>${project.version}</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-testutils</artifactId>
-            <version>${cxfVersion}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-security</artifactId>
@@ -172,11 +150,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Needed for CXF -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
         <!-- Used by ServerTools.java -->
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -345,7 +318,6 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
