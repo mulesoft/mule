@@ -6,6 +6,13 @@
  */
 package org.mule.extension.ws.runtime.wss;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -17,5 +24,19 @@ public class WssTimestampTestCase extends AbstractWebServiceSecurityTestCase {
 
   public WssTimestampTestCase() {
     super(TIMESTAMP);
+  }
+
+  @Override
+  protected Interceptor buildInInterceptor() {
+    final Map<String, Object> props = new HashMap<>();
+    props.put("action", "Timestamp");
+    return new WSS4JInInterceptor(props);
+  }
+
+  @Override
+  protected Interceptor buildOutInterceptor() {
+    final Map<String, Object> props = new HashMap<>();
+    props.put("action", "Timestamp");
+    return new WSS4JOutInterceptor(props);
   }
 }

@@ -18,7 +18,6 @@ import org.mule.extension.ws.service.Soap11Service;
 import org.mule.extension.ws.service.Soap12Service;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -29,12 +28,12 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.runners.Parameterized;
 
@@ -71,6 +70,8 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
     System.setProperty("soapVersion", soapVersion.toString());
     System.setProperty("serviceClass", getServiceClass());
     XMLUnit.setIgnoreWhitespace(true);
+
+    createWebService();
   }
 
   protected Message runFlowWithRequest(String flowName, String requestXmlResourceName) throws Exception {
@@ -89,10 +90,6 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
   }
 
   public void createWebService() throws Exception {
-
-    // TODO(pablo.kraan): need to remove this property?
-    System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME,
-                       "org.apache.cxf.bus.CXFBusFactory");
     try {
       httpServer = new Server(servicePort.getNumber());
       ServletHandler servletHandler = new ServletHandler();
@@ -108,11 +105,29 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
       httpServer.start();
 
       Bus bus = cxf.getBus();
+
+      Interceptor inInterceptor = buildInInterceptor();
+      if (inInterceptor != null) {
+        bus.getInInterceptors().add(inInterceptor);
+      }
+      Interceptor outInterceptor = buildOutInterceptor();
+      if (outInterceptor != null) {
+        bus.getOutInterceptors().add(outInterceptor);
+      }
+
       BusFactory.setDefaultBus(bus);
-      Endpoint.publish("/server", createServiceInstance());
+      Endpoint.publish("/" + getTestName(), createServiceInstance());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  protected Interceptor buildInInterceptor() {
+    return null;
+  }
+
+  protected Interceptor buildOutInterceptor() {
+    return null;
   }
 
   private Object createServiceInstance() throws Exception {
@@ -121,17 +136,18 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
     return serviceClass.newInstance();
   }
 
-  @After
-  public void tearDown() throws Exception {
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    super.doTearDownAfterMuleContextDispose();
+
     if (httpServer != null) {
       httpServer.stop();
       httpServer.destroy();
     }
   }
 
-  @Override
-  protected MuleContext createMuleContext() throws Exception {
-    createWebService();
-    return super.createMuleContext();
+  protected String getTestName() {
+    return "server";
   }
+
 }

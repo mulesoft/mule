@@ -2,17 +2,15 @@
 
 <mule   xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
         xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
-        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
         xmlns="http://www.mulesoft.org/schema/mule/core"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
     http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
-    http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
     http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="username">
-        <wsc:connection wsdlLocation="http://localhost:${servicePort}/usernameToken?wsdl" service="TestService" port="TestPort">
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/username?wsdl" service="TestService" port="TestPort">
             <reconnect blocking="false" />
             <wsc:security-strategies>
                 <wsc:wss-username-token-security-strategy username="admin" password="textPassword" addCreated="true" addNonce="true"/>
@@ -26,19 +24,6 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
-    </flow>
-
-    <flow name="usernameServer">
-        <httpn:listener config-ref="httpConfig" path="/usernameToken" />
-        <cxf:jaxws-service configuration-ref="cxfConfig" serviceClass="${serviceClass}">
-            <cxf:ws-security>
-                <cxf:ws-config>
-                    <cxf:property key="action" value="UsernameToken"/>
-                    <cxf:property key="passwordCallbackClass" value="org.mule.extension.ws.service.ServerPasswordCallback"/>
-                </cxf:ws-config>
-            </cxf:ws-security>
-        </cxf:jaxws-service>
-        <component class="${serviceClass}"/>
     </flow>
 
 </mule>

@@ -2,18 +2,16 @@
 
 <mule   xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
         xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
-        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
         xmlns="http://www.mulesoft.org/schema/mule/core"
         xmlns:spring="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
     http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
-    http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
     http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="verify">
-        <wsc:connection wsdlLocation="http://localhost:${servicePort}/verifySignature?wsdl" service="TestService" port="TestPort">
+        <wsc:connection wsdlLocation="http://localhost:${servicePort}/verify?wsdl" service="TestService" port="TestPort">
             <reconnect blocking="false" />
             <wsc:security-strategies>
                 <wsc:wss-verify-signature-security-strategy>
@@ -30,35 +28,5 @@
             </wsc:message>
         </wsc:consume>
     </flow>
-
-    <flow name="verifySignatureServer">
-        <httpn:listener config-ref="httpConfig" path="/verifySignature" />
-        <cxf:jaxws-service configuration-ref="cxfConfig" serviceClass="${serviceClass}">
-            <cxf:outInterceptors>
-                <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-                    <spring:constructor-arg>
-                        <spring:map>
-                            <spring:entry key="action" value="Signature" />
-                            <spring:entry key="signatureUser" value="muleserver" />
-                            <spring:entry key="passwordCallbackClass" value="org.mule.extension.ws.service.VerifyPasswordCallback" />
-                            <spring:entry key="signaturePropRefId" value="serverOutSecurityProperties" />
-                            <spring:entry key="serverOutSecurityProperties">
-                                <spring:props>
-                                    <spring:prop key="org.apache.ws.security.crypto.provider">org.apache.ws.security.components.crypto.Merlin</spring:prop>
-                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.type">jks</spring:prop>
-                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.password">mulepassword</spring:prop>
-                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.private.password">mulepassword</spring:prop>
-                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.alias">muleserver</spring:prop>
-                                    <spring:prop key="org.apache.ws.security.crypto.merlin.keystore.file">security/serverKeystore</spring:prop>
-                                </spring:props>
-                            </spring:entry>
-                        </spring:map>
-                    </spring:constructor-arg>
-                </spring:bean>
-            </cxf:outInterceptors>
-        </cxf:jaxws-service>
-        <component class="${serviceClass}"/>
-    </flow>
-
 </mule>
 
