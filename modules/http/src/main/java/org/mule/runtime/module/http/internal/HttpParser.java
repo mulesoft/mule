@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.http.internal;
 
-import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
@@ -31,28 +31,7 @@ import org.apache.commons.io.IOUtils;
 
 public class HttpParser {
 
-  private static final String SPACE_ENTITY = "%20";
-  private static final String PLUS_SIGN = "\\+";
-  private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
   private static final String NAME_ATTRIBUTE = "name";
-
-  public static String extractPath(String uri) {
-    String path = uri;
-    int i = path.indexOf('?');
-    if (i > -1) {
-      path = path.substring(0, i);
-    }
-    return path;
-  }
-
-  public static String extractQueryParams(String uri) {
-    int i = uri.indexOf("?");
-    String queryString = "";
-    if (i > -1) {
-      queryString = uri.substring(i + 1);
-    }
-    return queryString;
-  }
 
   public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
     MimeMultipart mimeMultipart = null;
@@ -72,7 +51,7 @@ public class HttpParser {
 
         String filename = part.getFileName();
         String partName = filename;
-        String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION_PART_HEADER);
+        String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION);
         if (contentDispositions != null) {
           String contentDisposition = contentDispositions[0];
           if (contentDisposition.contains(NAME_ATTRIBUTE)) {
@@ -98,13 +77,6 @@ public class HttpParser {
     return parts;
   }
 
-  public static String sanitizePathWithStartSlash(String path) {
-    if (path == null) {
-      return null;
-    }
-    return path.startsWith("/") ? path : "/" + path;
-  }
-
   /**
    * Extracts the subtype from a content type
    *
@@ -119,15 +91,5 @@ public class HttpParser {
     } catch (ParseException e) {
       throw new MuleRuntimeException(e);
     }
-  }
-
-  /**
-   * Normalize a path that may contains spaces, %20 or +.
-   *
-   * @param path path with encoded spaces or raw spaces
-   * @return path with only spaces.
-   */
-  public static String normalizePathWithSpacesOrEncodedSpaces(String path) {
-    return path.replaceAll(SPACE_ENTITY, WHITE_SPACE).replaceAll(PLUS_SIGN, WHITE_SPACE);
   }
 }
