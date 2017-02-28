@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api;
+package org.mule.extension.http.internal;
 
 /**
  * Streaming mode for HTTP. Streaming in HTTP implies using Transfer-Encoding: chunked

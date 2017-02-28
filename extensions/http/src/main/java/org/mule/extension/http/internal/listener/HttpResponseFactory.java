@@ -24,8 +24,8 @@ import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
-import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
+import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;

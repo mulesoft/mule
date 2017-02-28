@@ -7,8 +7,8 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
-import org.mule.extension.http.api.HttpSendBodyMode;
-import org.mule.extension.http.api.HttpStreamingType;
+
+import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;

@@ -12,9 +12,9 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SE
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import org.mule.extension.http.api.HttpSendBodyMode;
-import org.mule.extension.http.api.HttpStreamingType;
+
 import org.mule.extension.http.api.request.RamlApiConfiguration;
+import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;

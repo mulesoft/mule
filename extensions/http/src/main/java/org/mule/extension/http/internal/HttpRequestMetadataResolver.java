@@ -6,13 +6,12 @@
  */
 package org.mule.extension.http.internal;
 
-import static org.mule.extension.http.api.HttpMetadataKey.ANY;
-import static org.mule.extension.http.api.HttpMetadataKey.FORM;
-import static org.mule.extension.http.api.HttpMetadataKey.MULTIPART;
-import static org.mule.extension.http.api.HttpMetadataKey.STREAM;
+import static org.mule.extension.http.internal.HttpMetadataKey.ANY;
+import static org.mule.extension.http.internal.HttpMetadataKey.FORM;
+import static org.mule.extension.http.internal.HttpMetadataKey.MULTIPART;
+import static org.mule.extension.http.internal.HttpMetadataKey.STREAM;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 
-import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;

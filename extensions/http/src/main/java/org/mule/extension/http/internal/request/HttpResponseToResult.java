@@ -122,12 +122,12 @@ public class HttpResponseToResult {
     return builder.attributes(responseAttributes).build();
   }
 
-  public static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)
+  private static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)
       throws IOException {
     return multiPartPayloadForAttachments(parseMultipartContent(responseInputStream, responseContentType));
   }
 
-  public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
+  private static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
     MimeMultipart mimeMultipart = null;
     List<HttpPart> parts = Lists.newArrayList();
 
@@ -226,7 +226,7 @@ public class HttpResponseToResult {
    * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
    * @return
    */
-  public static MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
+  private static MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType = MediaType.ANY;
 
     if (contentTypeValue != null) {

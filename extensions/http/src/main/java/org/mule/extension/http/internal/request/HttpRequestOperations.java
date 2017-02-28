@@ -14,13 +14,12 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SE
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.HttpSendBodyMode;
-import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpRequestMetadataResolver;
+import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;

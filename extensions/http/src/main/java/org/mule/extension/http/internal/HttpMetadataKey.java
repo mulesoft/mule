@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.internal;
 
-public enum HttpParamType {
-  QUERY_PARAM, URI_PARAM, HEADER;
-
+public enum HttpMetadataKey {
+  STREAM, MULTIPART, FORM, ANY
 }
