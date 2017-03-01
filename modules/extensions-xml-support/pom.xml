@@ -25,12 +25,10 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-api</artifactId>
-            <version>${muleApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.extensions</groupId>
             <artifactId>mule-extensions-api</artifactId>
-            <version>${muleExtensionsApiVersion}</version>
         </dependency>
         <dependency>
             <!-- TODO(fernandezlautaro): MULE-11009 needed dependency as we heavily rely  org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory to generate an ExtensionModel from a Describer -->
@@ -44,6 +42,13 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-service-http-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!--Test Dependencies-->
         <dependency>
             <groupId>org.mule.tests</groupId>
