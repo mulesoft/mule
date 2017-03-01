@@ -163,10 +163,10 @@ public abstract class Controller {
     }
   }
 
-  protected void addFileToFolder(File file, String fileExtension, File folderToCopyFile, String artifactType,
+  private void addFileToFolder(File file, String fileExtension, File folderToCopyFile, String artifactType,
                                  String errorMessage) {
     verify(file.exists(), "%s file does not exist: %s", artifactType, file);
-    verify(fileExtension.equals(FilenameUtils.getExtension(file.getAbsolutePath())), "[%s] [%s] don't have .[%s] extension.",
+    verify(fileExtension.equals(FilenameUtils.getExtension(file.getAbsolutePath())), "[%s] [%s] doesn't have .[%s] extension.",
            artifactType, file, fileExtension);
     verify(file.canRead(), "Cannot read %s file: %s", artifactType, file);
     verify(folderToCopyFile.canWrite(), "Cannot write on [%s] dir: %", artifactType, folderToCopyFile);
