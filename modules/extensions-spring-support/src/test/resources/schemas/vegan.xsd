@@ -663,32 +663,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="RegisterVeganProductsArrayType" substitutionGroup="mule:abstract-operator" name="register-vegan-products-array"></xs:element>
-    <xs:complexType name="RegisterVeganProductsArrayType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="products">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="product">
-                                    <xs:complexType>
-                                        <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionList" use="optional" name="products"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TryEatType" substitutionGroup="mule:abstract-operator" name="try-eat"></xs:element>
     <xs:complexType name="TryEatType">
         <xs:complexContent>
