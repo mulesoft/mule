@@ -25,4 +25,12 @@
         <vegan:get-healthy-food food="topLevelFood"/>
     </flow>
 
+    <flow name="nullSafeOnMap">
+        <vegan:add-vegan-products-descriptions/>
+    </flow>
+
+    <flow name="nullSafeOnList">
+        <vegan:register-vegan-products/>
+    </flow>
+
 </mule>

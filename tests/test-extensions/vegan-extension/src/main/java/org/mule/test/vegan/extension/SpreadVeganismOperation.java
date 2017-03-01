@@ -14,6 +14,9 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
+import java.util.List;
+import java.util.Map;
+
 public class SpreadVeganismOperation {
 
   public static final String ARGUMENTS_TAB = "Arguments";
@@ -32,6 +35,14 @@ public class SpreadVeganismOperation {
 
   public FarmedFood getHealthyFood(HealthyFood food) {
     return food;
+  }
+
+  public Map<String, String> addVeganProductsDescriptions(@Optional @NullSafe Map<String, String> productDescription) {
+    return productDescription;
+  }
+
+  public List<String> registerVeganProducts(@Optional @NullSafe List<String> products) {
+    return products;
   }
 
   public void convinceAnimalKiller(@ParameterGroup(name = "arguments") @Placement(tab = ARGUMENTS_TAB) VeganArguments arguments) {
