@@ -137,6 +137,12 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxfVersion}</version>
+            <exclusions>
+            	<exclusion>
+            		<groupId>joda-time</groupId>
+            		<artifactId>joda-time</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
