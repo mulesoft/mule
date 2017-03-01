@@ -24,7 +24,16 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 
+import javax.xml.ws.Endpoint;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.ClassRule;
 import org.junit.runners.Parameterized;
 
@@ -41,6 +50,7 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   @Parameterized.Parameter(1)
   public String serviceClass;
+  private Server httpServer;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -52,7 +62,7 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"config/soapService.xml", getConfigurationFile()};
+    return new String[] {getConfigurationFile()};
   }
 
   @Override
@@ -60,6 +70,8 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
     System.setProperty("soapVersion", soapVersion.toString());
     System.setProperty("serviceClass", getServiceClass());
     XMLUnit.setIgnoreWhitespace(true);
+
+    createWebService();
   }
 
   protected Message runFlowWithRequest(String flowName, String requestXmlResourceName) throws Exception {
@@ -76,4 +88,66 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
   protected String getServiceClass() {
     return serviceClass;
   }
+
+  public void createWebService() throws Exception {
+    try {
+      httpServer = new Server(servicePort.getNumber());
+      ServletHandler servletHandler = new ServletHandler();
+      httpServer.setHandler(servletHandler);
+
+      CXFNonSpringServlet cxf = new CXFNonSpringServlet();
+      ServletHolder servlet = new ServletHolder(cxf);
+      servlet.setName("server");
+      servlet.setForcedPath("/");
+
+      servletHandler.addServletWithMapping(servlet, "/*");
+
+      httpServer.start();
+
+      Bus bus = cxf.getBus();
+
+      Interceptor inInterceptor = buildInInterceptor();
+      if (inInterceptor != null) {
+        bus.getInInterceptors().add(inInterceptor);
+      }
+      Interceptor outInterceptor = buildOutInterceptor();
+      if (outInterceptor != null) {
+        bus.getOutInterceptors().add(outInterceptor);
+      }
+
+      BusFactory.setDefaultBus(bus);
+      Endpoint.publish("/" + getTestName(), createServiceInstance());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected Interceptor buildInInterceptor() {
+    return null;
+  }
+
+  protected Interceptor buildOutInterceptor() {
+    return null;
+  }
+
+  private Object createServiceInstance() throws Exception {
+    Class<?> serviceClass = this.getClass().getClassLoader().loadClass(getServiceClass());
+
+    return serviceClass.newInstance();
+  }
+
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
+    super.doTearDownAfterMuleContextDispose();
+
+    if (httpServer != null) {
+      httpServer.stop();
+      httpServer.destroy();
+    }
+  }
+
+  protected String getTestName() {
+    return "server";
+  }
+
 }

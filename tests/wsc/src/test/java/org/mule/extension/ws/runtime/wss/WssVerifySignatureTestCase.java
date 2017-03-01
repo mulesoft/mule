@@ -6,19 +6,47 @@
  */
 package org.mule.extension.ws.runtime.wss;
 
-import org.junit.Ignore;
+import org.mule.extension.ws.service.VerifyPasswordCallback;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.ws.security.components.crypto.Merlin;
 
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Web Service Consumer")
 @Stories("WSS")
-@Ignore("MULE-11888 - Check why this doesn't work with the http extension")
 public class WssVerifySignatureTestCase extends AbstractWebServiceSecurityTestCase {
 
   private final static String VERIFY_SIGNATURE = "verify";
 
   public WssVerifySignatureTestCase() {
     super(VERIFY_SIGNATURE);
+  }
+
+  @Override
+  protected Interceptor buildOutInterceptor() {
+    final Map<String, Object> props = new HashMap<>();
+    props.put("action", "Signature");
+    props.put("signatureUser", "muleserver");
+    props.put("passwordCallbackClass", VerifyPasswordCallback.class.getName());
+
+    final String signaturePropRefId = "serverOutSecurityProperties";
+    props.put("signaturePropRefId", signaturePropRefId);
+    final Properties securityProperties = new Properties();
+    securityProperties.put("org.apache.ws.security.crypto.provider", Merlin.class.getName());
+    securityProperties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
+    securityProperties.put("org.apache.ws.security.crypto.merlin.keystore.password", "mulepassword");
+    securityProperties.put("org.apache.ws.security.crypto.merlin.keystore.private.password", "mulepassword");
+    securityProperties.put("org.apache.ws.security.crypto.merlin.keystore.alias", "muleserver");
+    securityProperties.put("org.apache.ws.security.crypto.merlin.keystore.file", "security/serverKeystore");
+    props.put(signaturePropRefId, securityProperties);
+
+    return new WSS4JOutInterceptor(props);
   }
 }

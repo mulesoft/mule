@@ -6,6 +6,14 @@
  */
 package org.mule.extension.ws.runtime.wss;
 
+import org.mule.extension.ws.service.ServerPasswordCallback;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -17,5 +25,13 @@ public class WssUsernameTestCase extends AbstractWebServiceSecurityTestCase {
 
   public WssUsernameTestCase() {
     super(USERNAME);
+  }
+
+  @Override
+  protected Interceptor buildInInterceptor() {
+    final Map<String, Object> props = new HashMap<>();
+    props.put("action", "UsernameToken");
+    props.put("passwordCallbackClass", ServerPasswordCallback.class.getName());
+    return new WSS4JInInterceptor(props);
   }
 }

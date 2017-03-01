@@ -8,11 +8,13 @@ package org.mule.extension.ws.runtime.wss;
 
 import static java.lang.String.format;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
+
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.extension.ws.WscTestUtils;
 import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 
 public abstract class AbstractWebServiceSecurityTestCase extends AbstractSoapServiceTestCase {
@@ -28,6 +30,10 @@ public abstract class AbstractWebServiceSecurityTestCase extends AbstractSoapSer
   @Override
   protected String getConfigurationFile() {
     return format(WSS_CONFIG_FILE_MASK, security);
+  }
+
+  protected String getTestName() {
+    return security;
   }
 
   @Test

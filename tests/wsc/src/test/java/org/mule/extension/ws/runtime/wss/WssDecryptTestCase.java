@@ -6,6 +6,13 @@
  */
 package org.mule.extension.ws.runtime.wss;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -13,14 +20,26 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("WSS")
 public class WssDecryptTestCase extends AbstractWebServiceSecurityTestCase {
 
-  private final static String TIMESTAMP = "timestamp";
-  private final static String USERNAME = "username";
-  private final static String VERIFY_SIGNATURE = "verify";
-  private final static String SIGN = "sign";
-  private final static String ENCRYPT = "encrypt";
   private final static String DECRYPT = "decrypt";
 
   public WssDecryptTestCase() {
     super(DECRYPT);
+  }
+
+  @Override
+  protected Interceptor buildOutInterceptor() {
+    final Map<String, Object> props = new HashMap<>();
+    props.put("action", "Encrypt");
+    props.put("encryptionUser", "s1as");
+
+    final String encryptionPropRefId = "securityProperties";
+    props.put("encryptionPropRefId", encryptionPropRefId);
+    final Properties securityProperties = new Properties();
+    securityProperties.put("org.apache.ws.security.crypto.merlin.truststore.type", "jks");
+    securityProperties.put("org.apache.ws.security.crypto.merlin.truststore.password", "changeit");
+    securityProperties.put("org.apache.ws.security.crypto.merlin.truststore.file", "security/ssltest-cacerts.jks");
+    props.put(encryptionPropRefId, securityProperties);
+
+    return new WSS4JOutInterceptor(props);
   }
 }
