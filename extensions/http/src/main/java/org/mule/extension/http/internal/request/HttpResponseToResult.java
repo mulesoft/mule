@@ -14,12 +14,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
+import static org.mule.services.http.impl.service.server.grizzly.HttpParser.parseMultipartContent;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
@@ -37,25 +37,16 @@ import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 
-import com.google.common.collect.Lists;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.mail.BodyPart;
-import javax.mail.Header;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +60,6 @@ public class HttpResponseToResult {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpResponseToResult.class);
   private static final String MULTI_PART_PREFIX = "multipart/";
-  private static final String NAME_ATTRIBUTE = "name";
 
   private final Boolean parseResponse;
   private final HttpRequesterCookieConfig config;
@@ -125,50 +115,6 @@ public class HttpResponseToResult {
   private static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)
       throws IOException {
     return multiPartPayloadForAttachments(parseMultipartContent(responseInputStream, responseContentType));
-  }
-
-  private static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
-    MimeMultipart mimeMultipart = null;
-    List<HttpPart> parts = Lists.newArrayList();
-
-    try {
-      mimeMultipart = new MimeMultipart(new ByteArrayDataSource(content, contentType));
-    } catch (MessagingException e) {
-      throw new IOException(e);
-    }
-
-    try {
-      int partCount = mimeMultipart.getCount();
-
-      for (int i = 0; i < partCount; i++) {
-        BodyPart part = mimeMultipart.getBodyPart(i);
-
-        String filename = part.getFileName();
-        String partName = filename;
-        String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION);
-        if (contentDispositions != null) {
-          String contentDisposition = contentDispositions[0];
-          if (contentDisposition.contains(NAME_ATTRIBUTE)) {
-            partName = contentDisposition.substring(contentDisposition.indexOf(NAME_ATTRIBUTE) + NAME_ATTRIBUTE.length() + 2);
-            partName = partName.substring(0, partName.indexOf("\""));
-          }
-        }
-        HttpPart httpPart =
-            new HttpPart(partName, filename, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
-
-        Enumeration<Header> headers = part.getAllHeaders();
-
-        while (headers.hasMoreElements()) {
-          Header header = headers.nextElement();
-          httpPart.addHeader(header.getName(), header.getValue());
-        }
-        parts.add(httpPart);
-      }
-    } catch (MessagingException e) {
-      throw new IOException(e);
-    }
-
-    return parts;
   }
 
   private static MultiPartPayload multiPartPayloadForAttachments(Collection<HttpPart> httpParts) throws IOException {

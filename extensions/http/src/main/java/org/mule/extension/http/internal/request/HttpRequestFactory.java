@@ -6,11 +6,9 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.Math.toIntExact;
-import static java.util.stream.Collectors.toList;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createFrom;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
@@ -26,23 +24,19 @@ import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
@@ -53,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -218,28 +211,6 @@ public class HttpRequestFactory {
 
       return new ByteArrayHttpEntity(getMessageAsBytes(payload));
     }
-  }
-
-  private static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, Transformer objectToByteArray) {
-    return multiPartPayload.getParts().stream().map(message -> {
-      PartAttributes partAttributes = (PartAttributes) message.getAttributes();
-      TypedValue<Object> payload = message.getPayload();
-      String name = partAttributes.getName();
-      byte[] data;
-      try {
-        data = (byte[]) objectToByteArray.transform(payload.getValue());
-        String fileName = partAttributes.getFileName();
-        String contentType = payload.getDataType().getMediaType().toRfcString();
-        int size = toIntExact(partAttributes.getSize());
-        if (fileName != null) {
-          return new HttpPart(name, fileName, data, contentType, size);
-        } else {
-          return new HttpPart(name, data, contentType, size);
-        }
-      } catch (TransformerException e) {
-        throw new MuleRuntimeException(createStaticMessage(String.format("Could not create HTTP part %s", name), e));
-      }
-    }).collect(toList());
   }
 
   private byte[] getMessageAsBytes(Object payload) throws TransformerException {

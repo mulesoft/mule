@@ -7,9 +7,9 @@
 
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Math.toIntExact;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
+import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createFrom;
+import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createMultipartContent;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -26,7 +26,6 @@ import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeStri
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
-import org.mule.extension.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -37,26 +36,20 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
-
-import javax.mail.internet.MimeMultipart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -299,36 +292,5 @@ public class HttpResponseFactory {
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error creating multipart HTTP entity."), e);
     }
-  }
-
-  private static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, Transformer objectToByteArray) {
-    return multiPartPayload.getParts().stream().map(message -> {
-      PartAttributes partAttributes = (PartAttributes) message.getAttributes();
-      TypedValue<Object> payload = message.getPayload();
-      String name = partAttributes.getName();
-      byte[] data;
-      try {
-        data = (byte[]) objectToByteArray.transform(payload.getValue());
-        String fileName = partAttributes.getFileName();
-        String contentType = payload.getDataType().getMediaType().toRfcString();
-        int size = toIntExact(partAttributes.getSize());
-        if (fileName != null) {
-          return new HttpPart(name, fileName, data, contentType, size);
-        } else {
-          return new HttpPart(name, data, contentType, size);
-        }
-      } catch (TransformerException e) {
-        throw new MuleRuntimeException(createStaticMessage(String.format("Could not create HTTP part %s", name), e));
-      }
-    }).collect(toList());
-  }
-
-  private static byte[] createMultipartContent(MultipartHttpEntity multipartEntity, String contentType)
-      throws IOException, javax.mail.MessagingException {
-    MimeMultipart mimeMultipartContent = HttpMultipartEncoder.createMultpartContent(multipartEntity, contentType);
-    final ByteArrayOutputStream byteArrayOutputStream;
-    byteArrayOutputStream = new ByteArrayOutputStream();
-    mimeMultipartContent.writeTo(byteArrayOutputStream);
-    return byteArrayOutputStream.toByteArray();
   }
 }
