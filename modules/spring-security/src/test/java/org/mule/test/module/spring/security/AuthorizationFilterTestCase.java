@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.FORBIDDEN;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
@@ -44,7 +44,7 @@ public class AuthorizationFilterTestCase extends UsesHttpExtensionFunctionalTest
 
   @Test
   public void testAuthenticatedButNotAuthorized() throws Exception {
-    doRequest(null, "localhost", "anon", "anon", getUrl(), false, METHOD_NOT_ALLOWED.getStatusCode());
+    doRequest(null, "localhost", "anon", "anon", getUrl(), false, FORBIDDEN.getStatusCode());
   }
 
   @Test
