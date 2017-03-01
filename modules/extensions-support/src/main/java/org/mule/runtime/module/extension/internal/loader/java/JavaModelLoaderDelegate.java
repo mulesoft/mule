@@ -447,7 +447,7 @@ public final class JavaModelLoaderDelegate {
                                                                       extensionParameter.getType().getName()));
           }
 
-          if (!isInstantiable(nullSafeType)) {
+          if (!isInstantiable(nullSafeType) && !isMap(nullSafeType)) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
                                                                    + "used with complex instantiable types (Pojos, Lists, Maps)",

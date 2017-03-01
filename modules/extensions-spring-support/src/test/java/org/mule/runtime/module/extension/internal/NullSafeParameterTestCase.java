@@ -10,15 +10,19 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+import org.junit.Test;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.test.vegan.extension.BananaConfig;
 import org.mule.test.vegan.extension.FarmedFood;
 import org.mule.test.vegan.extension.HealthyFood;
 import org.mule.test.vegan.extension.VeganExtension;
 import org.mule.test.vegan.extension.VeganPolicy;
 
-import org.junit.Test;
+import java.util.List;
+import java.util.Map;
 
 public class NullSafeParameterTestCase extends ExtensionFunctionalTestCase {
 
@@ -78,4 +82,19 @@ public class NullSafeParameterTestCase extends ExtensionFunctionalTestCase {
     assertHealthyFood(config.getHealthyFood());
   }
 
+  @Test
+  public void nullSafeOnMap() throws Exception {
+    TypedValue<Object> payload = flowRunner("nullSafeOnMap").run().getMessage().getPayload();
+    Object nullSafeMap = payload.getValue();
+    assertThat(nullSafeMap, is(instanceOf(Map.class)));
+    assertThat(((Map) nullSafeMap).isEmpty(), is(true));
+  }
+
+  @Test
+  public void nullSafeOnList() throws Exception {
+    TypedValue<Object> payload = flowRunner("nullSafeOnList").run().getMessage().getPayload();
+    Object nullSafeMap = payload.getValue();
+    assertThat(nullSafeMap, is(instanceOf(List.class)));
+    assertThat(((List<?>) nullSafeMap), is(empty()));
+  }
 }
