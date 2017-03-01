@@ -14,6 +14,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,12 +42,11 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Mock
   private ObjectTypeParametersResolver objectTypeParametersResolver;
 
-  private ValueResolver resolver;
-
   @Before
   public void setUp() {
     when(event.getFlowCallStack().clone()).thenReturn(mock(FlowCallStack.class));
     when(event.getError()).thenReturn(java.util.Optional.empty());
+    when(event.getMessage()).thenReturn(InternalMessage.builder().nullPayload().build());
   }
 
   @Test
@@ -64,15 +65,15 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   }
 
   @Test
-  public void testPojoWithDynamicMap() throws Exception {
+  public void testPojoWithMap() throws Exception {
     DynamicPojoWithMap pojo = new DynamicPojoWithMap();
     pojo.setMap(new HashMap<>());
-    assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojoWithMap.class), true, pojo);
+    assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojoWithMap.class), false, pojo);
   }
 
   private void assertExpected(ValueResolver valueResolver, MetadataType type, boolean isDynamic, Object expected)
       throws Exception {
-    resolver = NullSafeValueResolverWrapper.of(valueResolver, type, muleContext, objectTypeParametersResolver);
+    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, muleContext, objectTypeParametersResolver);
     assertThat(resolver.isDynamic(), is(isDynamic));
     assertThat(resolver.resolve(event), is(expected));
   }
@@ -86,7 +87,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     }
 
     @Parameter
-    @Optional(defaultValue = "#[mel: '5']")
+    @Optional(defaultValue = "#[5]")
     private int time;
 
     public int getTime() {
@@ -117,7 +118,8 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     public DynamicPojoWithMap() {}
 
     @Parameter
-    @Optional(defaultValue = "#[mel: new HashMap();]")
+    @Optional
+    @NullSafe
     private Map<String, String> map;
 
     public Map<String, String> getMap() {
