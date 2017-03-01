@@ -62,8 +62,10 @@ class ResolverUtils {
       return new ExpressionTypedValueValueResolver<>(expression, getType(type), muleContext);
     } else if (isParameterResolver.getAsBoolean()) {
       return new ExpressionBasedParameterResolverValueResolver<>(expression, type, muleContext);
-    } else {
+    } else if (muleContext.getExpressionManager().isExpression(expression)) {
       return new TypeSafeExpressionValueResolver<>(expression, getType(type), muleContext);
+    } else {
+      return new TypeSafeValueResolverWrapper(new StaticValueResolver<>(expression), getType(type), muleContext);
     }
   }
 }
