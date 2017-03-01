@@ -179,7 +179,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
 
   @Override
   public boolean isDynamic() {
-    return delegate.isDynamic();
+    return delegate.isDynamic() || fallback.isDynamic();
   }
 
 }
