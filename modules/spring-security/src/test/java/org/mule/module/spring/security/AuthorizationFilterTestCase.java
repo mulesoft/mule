@@ -64,7 +64,7 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
     @Test
     public void testAuthenticatedButNotAuthorized() throws Exception
     {
-        doRequest(null, "localhost", "anon", "anon", getUrl(), false, 405);
+        doRequest(null, "localhost", "anon", "anon", getUrl(), false, 403);
     }
     
     @Test
