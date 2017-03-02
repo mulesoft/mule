@@ -14,6 +14,8 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -207,7 +209,7 @@ public class MuleMetadataService implements MetadataService, Initialisable {
 
   private Object findComponent(Location location) throws InvalidComponentIdException {
     return componentLocator.find(location)
-        .orElseThrow(() -> new InvalidLexicalValueException("No object found with location " + location));
+        .orElseThrow(() -> new InvalidComponentIdException(createStaticMessage("No object found with location " + location)));
   }
 
   private <T extends ComponentModel<T>> MetadataProvider<T> findMetadataProvider(Location location)

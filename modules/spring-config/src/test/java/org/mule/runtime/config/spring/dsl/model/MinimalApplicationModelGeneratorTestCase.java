@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
@@ -30,10 +31,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCase {
 
+  @Rule
+  public final ExpectedException expectedException = none();
   private final MuleContext mockMuleContext = mock(MuleContext.class);
   private final ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
   private final XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(mockServiceRegistry);
@@ -46,10 +51,13 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void wrongElementIndexOnMinimalModelByPath() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
-    generator.getMinimalModel(builder().globalName("flow").addProcessorsPart().addIndexPart(3).build());
+    Location nonExistentComponentLocation = builder().globalName("flow").addProcessorsPart().addIndexPart(3).build();
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("No object found at location " + nonExistentComponentLocation.toString());
+    generator.getMinimalModel(nonExistentComponentLocation);
   }
 
   @Test
@@ -140,7 +148,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void flowWithSourcePathToSource() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("flow-source-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flowWithSource").addPart("source").build());
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flowWithSource").addSourcePart().build());
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),

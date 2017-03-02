@@ -51,7 +51,7 @@ public class ConfigurationComponentLocatorTestCase extends AbstractIntegrationTe
 
   @Test
   public void sourceByPath() {
-    Location sourceLocation = builder().globalName("myFlow").addPart("source").build();
+    Location sourceLocation = builder().globalName("myFlow").addSourcePart().build();
     Optional<Object> source = muleContext.getConfigurationComponentLocator().find(sourceLocation);
     assertThat(source.isPresent(), is(true));
     assertThat(source.get(), instanceOf(MessageSource.class));

@@ -119,7 +119,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void failToGetMetadataFromNonExistingSource() throws IOException {
-    location = builder().globalName(FLOW_WITHOUT_SOURCE).addPart("source").build();
+    location = builder().globalName(FLOW_WITHOUT_SOURCE).addSourcePart().build();
     final MetadataResult<MetadataKeysContainer> result = metadataService.getMetadataKeys(location);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),

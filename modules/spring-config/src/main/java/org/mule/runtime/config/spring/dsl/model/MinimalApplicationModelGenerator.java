@@ -147,7 +147,7 @@ public class MinimalApplicationModelGenerator {
       });
     });
     if (foundComponentModelReference.get() == null) {
-      throw new IllegalArgumentException("No object found under location " + location.toString());
+      throw new IllegalArgumentException("No object found at location " + location.toString());
     }
     return foundComponentModelReference.get();
   }

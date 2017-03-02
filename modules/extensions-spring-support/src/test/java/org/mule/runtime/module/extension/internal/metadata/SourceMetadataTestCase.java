@@ -41,7 +41,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
 
   @Before
   public void setUp() {
-    location = builder().globalName(SOURCE_METADATA).addPart("source").build();
+    location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
     provider = explicitMetadataResolver;
   }
 

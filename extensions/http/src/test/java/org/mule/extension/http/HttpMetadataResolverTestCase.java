@@ -96,7 +96,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   @Test
   public void getListenerMetadata() {
     MetadataResult<ComponentMetadataDescriptor<SourceModel>> server =
-        service.getSourceMetadata(Location.builder().globalName("server").addPart("source").build());
+        service.getSourceMetadata(Location.builder().globalName("server").addSourcePart().build());
     assertThat(server.isSuccess(), is(true));
     assertThat(server.get().getModel().getOutput().getType(), is(instanceOf(AnyType.class)));
   }

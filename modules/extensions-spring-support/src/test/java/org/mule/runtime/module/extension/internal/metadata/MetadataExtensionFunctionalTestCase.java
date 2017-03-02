@@ -57,8 +57,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunctionalTestCase {
 
-  protected static final String FIRST_PROCESSOR_INDEX = "0";
-
   protected static final String METADATA_TEST = "metadata-tests.xml";
   protected static final String DSQL_QUERY = "dsql:SELECT id FROM Circle WHERE (diameter < 18)";
 
