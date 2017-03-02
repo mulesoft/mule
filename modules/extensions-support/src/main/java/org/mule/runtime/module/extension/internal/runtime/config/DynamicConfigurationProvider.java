@@ -22,6 +22,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -84,9 +85,11 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ConfigurationModel configurationModel,
                                       ResolverSet resolverSet,
                                       ConnectionProviderValueResolver connectionProviderResolver,
-                                      ExpirationPolicy expirationPolicy) {
+                                      ExpirationPolicy expirationPolicy,
+                                      MuleContext muleContext) {
     super(name, extensionModel, configurationModel);
-    configurationInstanceFactory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet);
+    configurationInstanceFactory =
+        new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, muleContext);
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
     this.expirationPolicy = expirationPolicy;

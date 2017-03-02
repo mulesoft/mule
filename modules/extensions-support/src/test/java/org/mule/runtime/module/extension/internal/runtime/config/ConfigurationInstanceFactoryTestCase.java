@@ -108,7 +108,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
 
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
-    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet);
+    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, muleContext);
   }
 
   @Test

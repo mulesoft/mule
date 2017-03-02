@@ -12,47 +12,67 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitOb
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.getFirstImplicit;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+
+import java.util.Optional;
+
+import javax.inject.Provider;
 
 /**
  * Default implementation of {@link ImplicitConnectionProviderFactory}
  *
  * @since 4.0
  */
-public final class DefaultImplicitConnectionProviderFactory implements ImplicitConnectionProviderFactory {
+public final class DefaultImplicitConnectionProviderFactory<T> implements ImplicitConnectionProviderFactory {
 
-  ConnectionManagerAdapter connectionManagerAdapter;
+  private final ExtensionModel extensionModel;
+  private final MuleContext muleContext;
+  private final Provider<ResolverSet> resolverSetProvider;
+  private ConnectionManagerAdapter connectionManagerAdapter = null;
+  private ConnectionProviderModel connectionProviderModel = null;
+  private ResolverSet resolverSet = null;
+
+  public DefaultImplicitConnectionProviderFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                                  MuleContext muleContext) {
+    this.extensionModel = extensionModel;
+    this.muleContext = muleContext;
+
+    resolverSetProvider = () -> {
+      synchronized (this) {
+        if (resolverSet == null) {
+          connectionProviderModel = getFirstImplicit(getAllConnectionProviders(extensionModel, configurationModel));
+
+          if (connectionProviderModel == null) {
+            throw new IllegalStateException(format(
+                                                   "Configuration '%s' of extension '%s' does not define a connection provider and none can be created automatically. Please define one.",
+                                                   configurationModel.getName(), configurationModel.getName()));
+          }
+          resolverSet = buildImplicitResolverSet(connectionProviderModel, muleContext);
+        }
+        return resolverSet;
+      }
+    };
+  }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName,
-                                                                    ExtensionModel extensionModel,
-                                                                    ConfigurationModel configurationModel,
-                                                                    Event event, MuleContext muleContext) {
-    ConnectionProviderModel implicitModel = getFirstImplicit(getAllConnectionProviders(extensionModel, configurationModel));
-
-    if (implicitModel == null) {
-      throw new IllegalStateException(format(
-                                             "Configuration '%s' of extension '%s' does not define a connection provider and none can be created automatically. Please define one.",
-                                             configName, configurationModel.getName()));
-    }
-
-    final ResolverSet resolverSet = buildImplicitResolverSet(implicitModel, muleContext);
+  public <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName, Event event) {
+    ResolverSet resolverSet = resolverSetProvider.get();
     ConnectionProviderObjectBuilder<T> builder =
-        new ConnectionProviderObjectBuilder<>(implicitModel, resolverSet, getConnectionManager(muleContext), extensionModel,
+        new ConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, getConnectionManager(muleContext),
+                                              extensionModel,
                                               muleContext);
     builder.setOwnerConfigName(configName);
-
     try {
       return builder.build(event);
     } catch (MuleException e) {
@@ -65,5 +85,19 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
       connectionManagerAdapter = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
     }
     return connectionManagerAdapter;
+  }
+
+  /**
+   * Checking if an implicit connection provider is dynamic implies that there is a suitable implicit connection provider
+   * for the extension. If that implicit provider couldn't be found, an {@link IllegalStateException} will be thrown.
+   */
+  @Override
+  public boolean isDynamic() {
+    return resolverSetProvider.get().isDynamic();
+  }
+
+  @Override
+  public Optional<ResolverSet> getResolverSet() {
+    return Optional.of(resolverSetProvider.get());
   }
 }

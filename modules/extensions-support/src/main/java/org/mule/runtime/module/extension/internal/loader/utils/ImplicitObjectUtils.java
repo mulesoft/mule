@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -15,7 +15,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValue
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.List;
@@ -48,9 +47,11 @@ public final class ImplicitObjectUtils {
       Object defaultValue = parameterModel.getDefaultValue();
       ValueResolver resolver;
 
-      resolver = defaultValue != null
-          ? new TypeSafeExpressionValueResolver<>((String) defaultValue, getType(parameterModel.getType()), muleContext)
-          : new StaticValueResolver<>(null);
+      if (defaultValue instanceof String) {
+        resolver = getExpressionBasedValueResolver((String) defaultValue, parameterModel.getType(), muleContext);
+      } else {
+        resolver = new StaticValueResolver<>(null);
+      }
 
       if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
         resolver = NullSafeValueResolverWrapper.of(resolver, parameterModel.getType(), muleContext, parametersResolver);

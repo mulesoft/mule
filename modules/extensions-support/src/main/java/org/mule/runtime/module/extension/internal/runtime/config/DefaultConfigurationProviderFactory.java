@@ -39,11 +39,12 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                   ConfigurationModel configurationModel,
                                                                   ResolverSet resolverSet,
                                                                   ConnectionProviderValueResolver connectionProviderResolver,
-                                                                  DynamicConfigPolicy dynamicConfigPolicy)
+                                                                  DynamicConfigPolicy dynamicConfigPolicy,
+                                                                  MuleContext muleContext)
       throws Exception {
     configureConnectionProviderResolver(name, connectionProviderResolver);
     return new DynamicConfigurationProvider(name, extensionModel, configurationModel, resolverSet, connectionProviderResolver,
-                                            dynamicConfigPolicy.getExpirationPolicy());
+                                            dynamicConfigPolicy.getExpirationPolicy(), muleContext);
   }
 
   /**
@@ -61,7 +62,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
       configureConnectionProviderResolver(name, connectionProviderResolver);
       ConfigurationInstance configuration;
       try {
-        configuration = new ConfigurationInstanceFactory(extensionModel, configurationModel, resolverSet)
+        configuration = new ConfigurationInstanceFactory(extensionModel, configurationModel, resolverSet, muleContext)
             .createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
       } catch (MuleException e) {
         throw new ConfigurationException(createStaticMessage(String
