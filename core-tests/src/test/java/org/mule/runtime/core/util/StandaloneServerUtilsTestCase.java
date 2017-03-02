@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -28,7 +27,8 @@ public class StandaloneServerUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleHome() throws Exception {
-    testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE, () -> assertThat(getMuleHome().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE)));
+    testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE,
+                           () -> assertThat(getMuleHome().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE)));
   }
 
   @Test
