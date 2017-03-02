@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ws;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.mule.extension.ws.WscTestUtils.HEADER_IN;
 import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
@@ -18,6 +19,7 @@ import org.mule.extension.ws.service.Soap12Service;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -25,14 +27,19 @@ import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-wsc"})
+@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext",
+    "org.mule.modules:mule-module-wsc"}, providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctionalTestCase {
 
-  @ClassRule
-  public static DynamicPort servicePort = new DynamicPort("servicePort");
+  @Rule
+  public DynamicPort servicePort = new DynamicPort("servicePort");
+
+  @Rule
+  public SystemProperty humanWsdlPath;
 
   @Parameterized.Parameter
   public SoapVersion soapVersion;
@@ -55,6 +62,8 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+    System.setProperty("humanWsdl", currentThread().getContextClassLoader().getResource("wsdl/human.wsdl").getPath());
     System.setProperty("soapVersion", soapVersion.toString());
     System.setProperty("serviceClass", getServiceClass());
     XMLUnit.setIgnoreWhitespace(true);
