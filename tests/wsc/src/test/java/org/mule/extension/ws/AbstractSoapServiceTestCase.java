@@ -34,7 +34,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
@@ -42,14 +42,15 @@ import org.junit.runners.Parameterized;
     "org.mule.modules:mule-module-wsc"}, providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctionalTestCase {
 
-  @ClassRule
-  public static DynamicPort servicePort = new DynamicPort("servicePort");
+  @Rule
+  public DynamicPort servicePort = new DynamicPort("servicePort");
 
   @Parameterized.Parameter
   public SoapVersion soapVersion;
 
   @Parameterized.Parameter(1)
   public String serviceClass;
+
   private Server httpServer;
 
   @Parameterized.Parameters(name = "{0}")
@@ -67,6 +68,8 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+
     System.setProperty("soapVersion", soapVersion.toString());
     System.setProperty("serviceClass", getServiceClass());
     XMLUnit.setIgnoreWhitespace(true);
@@ -89,7 +92,7 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
     return serviceClass;
   }
 
-  public void createWebService() throws Exception {
+  private void createWebService() throws Exception {
     try {
       httpServer = new Server(servicePort.getNumber());
       ServletHandler servletHandler = new ServletHandler();
@@ -138,12 +141,12 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   @Override
   protected void doTearDownAfterMuleContextDispose() throws Exception {
-    super.doTearDownAfterMuleContextDispose();
-
     if (httpServer != null) {
       httpServer.stop();
       httpServer.destroy();
     }
+
+    super.doTearDownAfterMuleContextDispose();
   }
 
   protected String getTestName() {
