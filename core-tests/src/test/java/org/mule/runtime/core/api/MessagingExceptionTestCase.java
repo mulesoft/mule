@@ -14,7 +14,6 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -23,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.core.exception.MessagingException.PAYLOAD_INFO_KEY;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -102,14 +102,14 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getCauseExceptionWithoutCause() {
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent);
-    assertThat((MessagingException) exception.getRootCause(), is(exception));
+    assertThat(exception.getRootCause(), is(exception));
   }
 
   @Test
   public void getCauseExceptionWithMuleCause() {
     DefaultMuleException causeException = new DefaultMuleException("");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, causeException);
-    assertThat((DefaultMuleException) exception.getRootCause(), is(causeException));
+    assertThat(exception.getRootCause(), is(causeException));
   }
 
   @Test
@@ -225,13 +225,16 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void withFailingProcessorPathResolver() {
-    AbstractProcessor mockProcessor = mock(AbstractProcessor.class, RETURNS_DEEP_STUBS);
-    when(mockProcessor);
-    when(mockProcessor.getLocation().getLocation()).thenReturn("flow/processor");
+    AbstractProcessor mockProcessor = mock(AbstractProcessor.class);
+    ComponentLocation componentLocation = mock(ComponentLocation.class);
+    when((mockProcessor).getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleApp.xml");
+    when((mockProcessor).getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
+    when(mockProcessor.getLocation()).thenReturn(componentLocation);
+    when(componentLocation.getLocation()).thenReturn("flow/processor");
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(mockEvent, mockProcessor, flowConstruct));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
-               is("/flow/processor @ MessagingExceptionTestCase"));
+               is("flow/processor @ MessagingExceptionTestCase:muleApp.xml:10"));
   }
 
   @Test
@@ -266,16 +269,18 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void withAnnotatedFailingProcessorPathResolver() {
-    AbstractProcessor mockProcessor = mock(AbstractProcessor.class, RETURNS_DEEP_STUBS);
+    AbstractProcessor mockProcessor = mock(AbstractProcessor.class);
     when(mockProcessor.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
     when(mockProcessor.getAnnotation(eq(sourceFileNameAttrName))).thenReturn("muleApp.xml");
     when(mockProcessor.getAnnotation(eq(sourceFileLineAttrName))).thenReturn(10);
-    when(mockProcessor.getLocation().getLocation()).thenReturn("flow/processor");
+    ComponentLocation componentLocation = mock(ComponentLocation.class);
+    when(mockProcessor.getLocation()).thenReturn(componentLocation);
+    when(componentLocation.getLocation()).thenReturn("flow/processor");
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(mockEvent, mockProcessor, flowConstruct));
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
-               is("/flow/processor @ MessagingExceptionTestCase:muleApp.xml:10 (Mock Component)"));
+               is("flow/processor @ MessagingExceptionTestCase:muleApp.xml:10 (Mock Component)"));
   }
 
   @Test
