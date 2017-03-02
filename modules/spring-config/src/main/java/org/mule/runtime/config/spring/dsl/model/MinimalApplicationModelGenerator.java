@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 
@@ -147,7 +148,7 @@ public class MinimalApplicationModelGenerator {
       });
     });
     if (foundComponentModelReference.get() == null) {
-      throw new IllegalArgumentException("No object found at location " + location.toString());
+      throw new NoSuchComponentModelException(createStaticMessage("No object found at location " + location.toString()));
     }
     return foundComponentModelReference.get();
   }
