@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
@@ -32,7 +33,7 @@ public class AbstractDomainTestCase extends AbstractMuleTestCase {
   public static TemporaryFolder temporaryFolder = new TemporaryFolder();
   @Rule
   public final SystemProperty muleHomeSystemProperty =
-      new SystemProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
+      new SystemProperty(MULE_HOME_DIRECTORY_PROPERTY, temporaryFolder.getRoot().getCanonicalPath());
   protected final File muleHomeFolder;
   protected final ArtifactClassLoader containerClassLoader =
       new MuleArtifactClassLoader("mule", new ArtifactDescriptor("mule"), new URL[0],

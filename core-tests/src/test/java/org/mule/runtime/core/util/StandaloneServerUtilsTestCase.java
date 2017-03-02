@@ -7,7 +7,6 @@
 package org.mule.runtime.core.util;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
@@ -28,28 +27,28 @@ public class StandaloneServerUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void muleHome() throws Exception {
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE,
-                           () -> assertThat(getMuleHome().get().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE)));
+                           () -> assertThat(getMuleHome().get().getName(), is(EXPECTED_MULE_HOME_VALUE)));
   }
 
   @Test
   public void muleHomeIsNullWhenNotDefined() throws Exception {
-    assertThat(getMuleHome(), nullValue());
+    assertThat(getMuleHome().isPresent(), is(false));
   }
 
   @Test
   public void muleBase() throws Exception {
     testWithSystemProperty(MULE_BASE_DIRECTORY_PROPERTY, EXPECTED_MULE_BASE_VALUE,
-                           () -> assertThat(getMuleBase().get().getAbsolutePath(), is(EXPECTED_MULE_BASE_VALUE)));
+                           () -> assertThat(getMuleBase().get().getName(), is(EXPECTED_MULE_BASE_VALUE)));
   }
 
   @Test
   public void muleBaseReturnsMuleHomeWhenNotSet() throws Exception {
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE,
-                           () -> assertThat(getMuleBase().get().getAbsolutePath(), is(EXPECTED_MULE_HOME_VALUE)));
+                           () -> assertThat(getMuleBase().get().getName(), is(EXPECTED_MULE_HOME_VALUE)));
   }
 
   @Test
   public void muleBaseReturnsNullIfNetherMuleHomeOrMuleBaseIsSet() throws Exception {
-    assertThat(getMuleBase(), nullValue());
+    assertThat(getMuleBase().isPresent(), is(false));
   }
 }
