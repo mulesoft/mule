@@ -17,7 +17,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -31,8 +30,6 @@ import org.mule.runtime.module.artifact.util.JarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +45,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates artifact descriptor for application
@@ -117,7 +118,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     return desc;
   }
 
-  private URL[] findLibraries(ApplicationDescr/StandaloneServerUtilsTestCase.javaiptor descriptor) throws MalformedURLException {
+  private URL[] findLibraries(ApplicationDescriptor descriptor) throws MalformedURLException {
     return findJars(getAppLibFolder(descriptor)).toArray(new URL[0]);
   }
 
@@ -205,7 +206,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   private Set<ArtifactPluginDescriptor> parsePluginDescriptors(File appDir, ApplicationDescriptor appDescriptor)
       throws IOException {
     final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
-    //TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files
+    // TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files
     String[] pluginZips = pluginsDir.list(new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE));
     if (pluginZips == null || pluginZips.length == 0) {
       return emptySet();
