@@ -73,18 +73,20 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isTemplateOnErrorHandler(componentModel)) {
         componentLocation = processOnErrorModel(componentModel, parentComponentLocation, typedComponentIdentifier);
-      } else if (parentComponentIsRouter(componentModel) && isProcessor(componentModel)) {
-        // this is the case of the routes directly inside the router as with scatter-gather
-        componentLocation = parentComponentLocation
-            .appendRoutePart()
-            .appendLocationPart(findProcessorPath(componentModel), empty(), empty(), empty())
-            .appendProcessorsPart()
-            .appendLocationPart("0", typedComponentIdentifier, componentModel.getConfigFileName(),
-                                componentModel.getLineNumber());
-      } else if (parentComponentIsRouter(componentModel) && !isProcessor(componentModel)) {
-        // this is the case of the when element inside the choice
-        componentLocation = parentComponentLocation.appendRoutePart()
-            .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
+      } else if (parentComponentIsRouter(componentModel)) {
+        if (isProcessor(componentModel)) {
+          // this is the case of the routes directly inside the router as with scatter-gather
+          componentLocation = parentComponentLocation
+              .appendRoutePart()
+              .appendLocationPart(findProcessorPath(componentModel), empty(), empty(), empty())
+              .appendProcessorsPart()
+              .appendLocationPart("0", typedComponentIdentifier, componentModel.getConfigFileName(),
+                                  componentModel.getLineNumber());
+        } else {
+          // this is the case of the when element inside the choice
+          componentLocation = parentComponentLocation.appendRoutePart()
+              .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
+        }
       } else if (isProcessor(componentModel)) {
         componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
                                                                                               typedComponentIdentifier,
