@@ -96,7 +96,7 @@
             <outputDirectory>lib/boot</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <include>org.mule.modules:mule-module-reboot</include>
+                <include>org.mule.runtime:mule-module-reboot</include>
                 <include>commons-cli:commons-cli</include>
                 <include>tanukisoft:wrapper</include>
                 <include>org.slf4j:slf4j-api</include>
@@ -118,49 +118,49 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <!-- Mule API -->
-                <include>org.mule:mule-api</include>
+                <include>org.mule.runtime:mule-api</include>
                 <!--Metadata API-->
-                <include>org.mule:mule-metadata-model-api</include>
-                <include>org.mule:mule-metadata-model-java</include>
-                <include>org.mule:mule-metadata-model-persistence</include>
-                <include>org.mule:mule-metadata-model-xml</include>
-                <include>org.mule:mule-metadata-model-json</include>
+                <include>org.mule.runtime:mule-metadata-model-api</include>
+                <include>org.mule.runtime:mule-metadata-model-java</include>
+                <include>org.mule.runtime:mule-metadata-model-persistence</include>
+                <include>org.mule.runtime:mule-metadata-model-xml</include>
+                <include>org.mule.runtime:mule-metadata-model-json</include>
                 <!-- extensions API -->
-                <include>org.mule.extensions:mule-extensions-api</include>
-                <include>org.mule.extensions:mule-extensions-api-persistence</include>
-                <include>org.mule.extensions:mule-extensions-api-dsql</include>
+                <include>org.mule.runtime:mule-extensions-api</include>
+                <include>org.mule.runtime:mule-extensions-api-persistence</include>
+                <include>org.mule.runtime:mule-extensions-api-dsql</include>
                 <!-- Core -->
-                <include>org.mule:mule-core</include>
+                <include>org.mule.runtime:mule-core</include>
                 <!--Services-->
-                <include>org.mule.modules:mule-service-http-api</include>
-                <include>org.mule.modules:mule-service-oauth-api</include>
+                <include>org.mule.runtime:mule-service-http-api</include>
+                <include>org.mule.runtime:mule-service-oauth-api</include>
                 <!-- Modules -->
-                <include>org.mule.modules:mule-module-artifact</include>
-                <include>org.mule.modules:mule-module-launcher</include>
-                <include>org.mule.modules:mule-module-deployment</include>
-                <include>org.mule.modules:mule-module-deployment-model</include>
-                <include>org.mule.modules:mule-module-deployment-model-impl</include>
-                <include>org.mule.modules:mule-module-dsl-api</include>
-                <include>org.mule.modules:mule-module-service</include>
-                <include>org.mule.modules:mule-module-container</include>
-                <include>org.mule.modules:mule-module-builders</include>
-                <include>org.mule.modules:mule-module-extensions-support</include>
-                <include>org.mule.modules:mule-module-extensions-spring-support</include>
-                <include>org.mule.modules:mule-module-extensions-xml-support</include>
-                <include>org.mule.modules:mule-module-http</include>
-                <include>org.mule.modules:mule-module-jbossts</include>
-                <include>org.mule.modules:mule-module-management</include>
-                <include>org.mule.modules:mule-module-repository</include>
-                <include>org.mule.modules:mule-module-scripting</include>
-                <include>org.mule.modules:mule-module-scripting-jruby</include>
-                <include>org.mule.modules:mule-module-schedulers</include>
-                <include>org.mule.modules:mule-module-spring-config</include>
-                <include>org.mule.modules:mule-module-spring-security</include>
+                <include>org.mule.runtime:mule-module-artifact</include>
+                <include>org.mule.runtime:mule-module-launcher</include>
+                <include>org.mule.runtime:mule-module-deployment</include>
+                <include>org.mule.runtime:mule-module-deployment-model</include>
+                <include>org.mule.runtime:mule-module-deployment-model-impl</include>
+                <include>org.mule.runtime:mule-module-dsl-api</include>
+                <include>org.mule.runtime:mule-module-service</include>
+                <include>org.mule.runtime:mule-module-container</include>
+                <include>org.mule.runtime:mule-module-builders</include>
+                <include>org.mule.runtime:mule-module-extensions-support</include>
+                <include>org.mule.runtime:mule-module-extensions-spring-support</include>
+                <include>org.mule.runtime:mule-module-extensions-xml-support</include>
+                <include>org.mule.runtime:mule-module-http</include>
+                <include>org.mule.runtime:mule-module-jbossts</include>
+                <include>org.mule.runtime:mule-module-management</include>
+                <include>org.mule.runtime:mule-module-repository</include>
+                <include>org.mule.runtime:mule-module-scripting</include>
+                <include>org.mule.runtime:mule-module-scripting-jruby</include>
+                <include>org.mule.runtime:mule-module-schedulers</include>
+                <include>org.mule.runtime:mule-module-spring-config</include>
+                <include>org.mule.runtime:mule-module-spring-security</include>
                 <include>org.mule.modules:mule-module-sockets</include>
-                <include>org.mule.modules:mule-module-tls</include>
-                <include>org.mule.modules:mule-module-tomcat</include>
-                <include>org.mule.modules:mule-module-tooling-support</include>
-                <include>org.mule.modules:mule-module-xml</include>
+                <include>org.mule.runtime:mule-module-tls</include>
+                <include>org.mule.runtime:mule-module-tomcat</include>
+                <include>org.mule.runtime:mule-module-tooling-support</include>
+                <include>org.mule.runtime:mule-module-xml</include>
 
                 <!-- Shared libs -->
                 <include>org.mule.mvel:mule-mvel2</include>
@@ -190,57 +190,57 @@
     because they are already in a different directory). -->
             <excludes>
                 <!--Mule API-->
-                <exclude>org.mule:mule-api</exclude>
+                <exclude>org.mule.runtime:mule-api</exclude>
                 <!--Metadata API-->
-                <exclude>org.mule:mule-metadata-model-api</exclude>
-                <exclude>org.mule:mule-metadata-model-java</exclude>
-                <exclude>org.mule:mule-metadata-model-persistence</exclude>
-                <exclude>org.mule:mule-metadata-model-xml</exclude>
-                <exclude>org.mule:mule-metadata-model-json</exclude>
+                <exclude>org.mule.runtime:mule-metadata-model-api</exclude>
+                <exclude>org.mule.runtime:mule-metadata-model-java</exclude>
+                <exclude>org.mule.runtime:mule-metadata-model-persistence</exclude>
+                <exclude>org.mule.runtime:mule-metadata-model-xml</exclude>
+                <exclude>org.mule.runtime:mule-metadata-model-json</exclude>
                 <!--extensions API-->
-                <exclude>org.mule.extensions:mule-extensions-api</exclude>
-                <exclude>org.mule.extensions:mule-extensions-api-persistence</exclude>
-                <exclude>org.mule.extensions:mule-extensions-api-dsql</exclude>
+                <exclude>org.mule.runtime:mule-extensions-api</exclude>
+                <exclude>org.mule.runtime:mule-extensions-api-persistence</exclude>
+                <exclude>org.mule.runtime:mule-extensions-api-dsql</exclude>
                 <!--Services-->
-                <exclude>org.mule.modules:mule-service-http-api</exclude>
-                <exclude>org.mule.modules:mule-service-oauth-api</exclude>
+                <exclude>org.mule.runtime:mule-service-http-api</exclude>
+                <exclude>org.mule.runtime:mule-service-oauth-api</exclude>
                 <!-- lib/mule -->
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
-                <exclude>org.mule:mule-core</exclude>
+                <exclude>org.mule.runtime:mule-core</exclude>
                 <exclude>org.mule.extensions:mule-extensions-all</exclude>
                 <exclude>org.mule.services:mule-services-all</exclude>
-                <exclude>org.mule.modules:mule-modules-all</exclude>
-                <exclude>org.mule.modules:mule-module-artifact</exclude>
-                <exclude>org.mule.modules:mule-module-builders</exclude>
-                <exclude>org.mule.modules:mule-module-extensions-support</exclude>
-                <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
-                <exclude>org.mule.modules:mule-module-extensions-xml-support</exclude>
-                <exclude>org.mule.modules:mule-module-http</exclude>
+                <exclude>org.mule.runtime:mule-modules-all</exclude>
+                <exclude>org.mule.runtime:mule-module-artifact</exclude>
+                <exclude>org.mule.runtime:mule-module-builders</exclude>
+                <exclude>org.mule.runtime:mule-module-extensions-support</exclude>
+                <exclude>org.mule.runtime:mule-module-extensions-spring-support</exclude>
+                <exclude>org.mule.runtime:mule-module-extensions-xml-support</exclude>
+                <exclude>org.mule.runtime:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
                 <exclude>org.mule.modules:mule-module-email</exclude>
                 <exclude>org.mule.modules:mule-module-wsc</exclude>
-                <exclude>org.mule.modules:mule-module-jbossts</exclude>
-                <exclude>org.mule.modules:mule-module-container</exclude>
-                <exclude>org.mule.modules:mule-module-launcher</exclude>
-                <exclude>org.mule.modules:mule-module-deployment</exclude>
-                <exclude>org.mule.modules:mule-module-deployment-model</exclude>
-                <exclude>org.mule.modules:mule-module-deployment-model-impl</exclude>
-                <exclude>org.mule.modules:mule-module-dsl-api</exclude>
-                <exclude>org.mule.modules:mule-module-service</exclude>
-                <exclude>org.mule.modules:mule-module-management</exclude>
+                <exclude>org.mule.runtime:mule-module-jbossts</exclude>
+                <exclude>org.mule.runtime:mule-module-container</exclude>
+                <exclude>org.mule.runtime:mule-module-launcher</exclude>
+                <exclude>org.mule.runtime:mule-module-deployment</exclude>
+                <exclude>org.mule.runtime:mule-module-deployment-model</exclude>
+                <exclude>org.mule.runtime:mule-module-deployment-model-impl</exclude>
+                <exclude>org.mule.runtime:mule-module-dsl-api</exclude>
+                <exclude>org.mule.runtime:mule-module-service</exclude>
+                <exclude>org.mule.runtime:mule-module-management</exclude>
                 <exclude>org.mule.modules:mule-module-oauth</exclude>
-                <exclude>org.mule.modules:mule-module-reboot</exclude>
-                <exclude>org.mule.modules:mule-module-repository</exclude>
-                <exclude>org.mule.modules:mule-module-scripting</exclude>
-                <exclude>org.mule.modules:mule-module-scripting-jruby</exclude>
-                <exclude>org.mule.modules:mule-module-schedulers</exclude>
-                <exclude>org.mule.modules:mule-module-spring-config</exclude>
-                <exclude>org.mule.modules:mule-module-spring-security</exclude>
+                <exclude>org.mule.runtime:mule-module-reboot</exclude>
+                <exclude>org.mule.runtime:mule-module-repository</exclude>
+                <exclude>org.mule.runtime:mule-module-scripting</exclude>
+                <exclude>org.mule.runtime:mule-module-scripting-jruby</exclude>
+                <exclude>org.mule.runtime:mule-module-schedulers</exclude>
+                <exclude>org.mule.runtime:mule-module-spring-config</exclude>
+                <exclude>org.mule.runtime:mule-module-spring-security</exclude>
                 <exclude>org.mule.modules:mule-module-sockets</exclude>
-                <exclude>org.mule.modules:mule-module-tls</exclude>
-                <exclude>org.mule.modules:mule-module-tomcat</exclude>
-                <exclude>org.mule.modules:mule-module-tooling-support</exclude>
-                <exclude>org.mule.modules:mule-module-xml</exclude>
+                <exclude>org.mule.runtime:mule-module-tls</exclude>
+                <exclude>org.mule.runtime:mule-module-tomcat</exclude>
+                <exclude>org.mule.runtime:mule-module-tooling-support</exclude>
+                <exclude>org.mule.runtime:mule-module-xml</exclude>
 
                 <!-- lib/plugins (these artifacts are zip type) -->
                 <!--//TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips-->

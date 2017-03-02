@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.modules</groupId>
+        <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.modules</groupId>
+    <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-extensions-support</artifactId>
     <name>Mule Extensions Support</name>
     <packaging>jar</packaging>
@@ -22,32 +22,32 @@
     <dependencies>
         <!-- Mule Dependencies -->
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
             <version>${muleApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api-dsql</artifactId>
             <version>${muleExtensionsApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
             <version>${muleExtensionsApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api-persistence</artifactId>
             <version>${muleExtensionsApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -64,14 +64,14 @@
         </dependency>
         <!--Test Dependencies-->
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
             <version>${muleApiVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
             <version>${muleExtensionsApiVersion}</version>
             <type>test-jar</type>
@@ -84,7 +84,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>

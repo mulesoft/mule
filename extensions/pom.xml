@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.mule</groupId>
+        <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
@@ -37,43 +37,43 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <!--TODO: MULE-10837-->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-xml</artifactId>
             <version>${muleMetadataModelVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-java</artifactId>
             <version>${muleMetadataModelVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-json</artifactId>
             <version>${muleMetadataModelVersion}</version>
             <scope>provided</scope>
@@ -85,7 +85,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -153,14 +153,14 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.mule.extensions</groupId>
+                        <groupId>org.mule.runtime</groupId>
                         <artifactId>mule-extensions-api</artifactId>
                         <version>${muleExtensionsApiVersion}</version>
                     </dependency>
                 </dependencies>
             </plugin>
             <plugin>
-                <groupId>org.mule.extensions</groupId>
+                <groupId>org.mule.runtime.plugins</groupId>
                 <artifactId>mule-extensions-maven-plugin</artifactId>
                 <version>${mule.extensions.maven.plugin.version}</version>
                 <extensions>true</extensions>
@@ -199,7 +199,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.mule.extensions</groupId>
+                        <groupId>org.mule.runtime</groupId>
                         <artifactId>mule-extensions-maven-plugin</artifactId>
                         <version>${mule.extensions.maven.plugin.version}</version>
                         <executions>

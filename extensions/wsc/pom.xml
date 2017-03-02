@@ -102,7 +102,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -140,7 +140,7 @@
             <version>${cxfVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${parent.version}</version>
             <scope>provided</scope>
@@ -148,7 +148,7 @@
 
         <!--TODO: MULE-10837-->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>

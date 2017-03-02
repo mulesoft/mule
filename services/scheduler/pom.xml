@@ -35,7 +35,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.mule.plugins</groupId>
+                <groupId>org.mule.runtime.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
                 <extensions>true</extensions>
             </plugin>
@@ -54,13 +54,13 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <scope>provided</scope>
             <version>${project.version}</version>
