@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.reboot;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
 import java.io.File;
@@ -42,7 +43,7 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
-   * @return null if running embedded
+   * @return the mule runtime installation folder, null if running embedded
    */
   public static File getMuleHome() {
     final String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
@@ -50,10 +51,36 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
+   * The mule runtime base folder is a directory similar to the mule runtime installation one but with only the specific
+   * configuration parts of the mule runtime installation such as the apps folder, the domain folder, the conf folder.
+   * 
+   * @return the MULE_BASE directory of this instance. Returns the
+   *         {@link org.mule.runtime.core.api.config.MuleProperties#MULE_HOME_DIRECTORY_PROPERTY} property value if
+   *         {@link org.mule.runtime.core.api.config.MuleProperties#MULE_BASE_DIRECTORY_PROPERTY} is not set which may be null.
+   */
+  public static File getMuleBase() {
+    File muleBase = null;
+    String muleBaseVar = System.getProperty(MULE_BASE_DIRECTORY_PROPERTY);
+
+    if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%")) {
+      try {
+        muleBase = new File(muleBaseVar).getCanonicalFile();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    if (muleBase == null) {
+      muleBase = getMuleHome();
+    }
+    return muleBase;
+  }
+
+  /**
    * @return null if running embedded, otherwise the apps dir as a File ref
    */
   public static File getMuleAppsDir() {
-    return isStandalone() ? new File(getMuleHome(), MULE_APPS_FILENAME) : null;
+    return isStandalone() ? new File(getMuleBase(), MULE_APPS_FILENAME) : null;
   }
 
   /**
@@ -75,7 +102,7 @@ public final class MuleContainerBootstrapUtils {
    * @return null if running embedded, otherwise the $MULE_HOME/tmp dir reference
    */
   public static File getMuleTmpDir() {
-    return isStandalone() ? new File(getMuleHome(), MULE_TMP_FILENAME) : null;
+    return isStandalone() ? new File(getMuleBase(), MULE_TMP_FILENAME) : null;
   }
 
   public static File getMuleLocalJarFile() {
@@ -83,14 +110,14 @@ public final class MuleContainerBootstrapUtils {
   }
 
   public static File getMuleDomainsDir() {
-    return isStandalone() ? new File(getMuleHome(), MULE_DOMAIN_FOLDER) : null;
+    return isStandalone() ? new File(getMuleBase(), MULE_DOMAIN_FOLDER) : null;
   }
 
   /**
    * @return null if running embedded, otherwise the conf dir as a File ref
    */
   public static File getMuleConfDir() {
-    return isStandalone() ? new File(getMuleHome(), MULE_CONF_FILENAME) : null;
+    return isStandalone() ? new File(getMuleBase(), MULE_CONF_FILENAME) : null;
   }
 
   public static class ProxyInfo {

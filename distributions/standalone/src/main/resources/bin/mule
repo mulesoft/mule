@@ -81,6 +81,7 @@ if [ -z "$MULE_BASE" ] ; then
     MULE_BASE=$MULE_HOME
 fi
 export MULE_BASE
+echo "MULE_BASE is set to ${MULE_BASE}"
 
 # Application
 if [ "$MULE_APP" = "" ]
@@ -128,7 +129,7 @@ JPDA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="."
+PIDDIR="$MULE_BASE/."
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and

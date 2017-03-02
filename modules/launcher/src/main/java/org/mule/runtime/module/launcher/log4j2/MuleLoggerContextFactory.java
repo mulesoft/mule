@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleBase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.DirectoryResourceLocator;
@@ -128,7 +129,7 @@ public class MuleLoggerContextFactory {
     }
 
     if (appLogConfig == null) {
-      File defaultConfigFile = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+      File defaultConfigFile = new File(getMuleBase(), "conf");
       defaultConfigFile = new File(defaultConfigFile, "log4j2.xml");
 
       try {

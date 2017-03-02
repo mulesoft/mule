@@ -175,7 +175,7 @@ final class LoggerContextConfigurer {
     String artifactName = context.getArtifactName();
 
     String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
-    File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
+    File logDir = new File(MuleContainerBootstrapUtils.getMuleBase(), "logs");
     File logFile = new File(logDir, logName);
 
     if (context.getConfigLocation() == null) {
