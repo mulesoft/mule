@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
