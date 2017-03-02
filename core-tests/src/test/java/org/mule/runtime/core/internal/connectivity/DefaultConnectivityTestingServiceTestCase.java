@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.connectivity;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -14,13 +16,15 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.core.api.exception.ObjectNotFoundException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -48,6 +52,8 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
     connectivityTestingService = new DefaultConnectivityTestingService();
     connectivityTestingService.setServiceRegistry(mockServiceRegistry);
     connectivityTestingService.setMuleContext(mockMuleContext);
+    when(mockMuleContext.getConfigurationComponentLocator().find(any(Location.class)))
+        .thenReturn(of(fakeConnectivityTestingObject));
     when(mockServiceRegistry.lookupProviders(any(), any())).thenReturn(asList(mockConnectivityTestingStrategy));
     when(mockConnectivityTestingStrategy.accepts(fakeConnectivityTestingObject)).thenReturn(true);
     when(mockMuleContext.getRegistry().get(TEST_IDENTIFIER)).thenReturn(fakeConnectivityTestingObject);
@@ -58,7 +64,9 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   public void testConnectionThrowsException() throws Exception {
     RuntimeException exception = new RuntimeException();
     when(mockConnectivityTestingStrategy.testConnectivity(fakeConnectivityTestingObject)).thenThrow(exception);
-    ConnectionValidationResult validationResult = connectivityTestingService.testConnection(TEST_IDENTIFIER);
+    ConnectionValidationResult validationResult =
+        connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
+
     assertThat(validationResult.isValid(), is(false));
     assertThat(validationResult.getException(), is(exception));
   }
@@ -66,7 +74,8 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   @Test
   public void testConnection() {
     when(mockConnectivityTestingStrategy.testConnectivity(fakeConnectivityTestingObject)).thenReturn(success());
-    ConnectionValidationResult validationResult = connectivityTestingService.testConnection(TEST_IDENTIFIER);
+    ConnectionValidationResult validationResult =
+        connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
     assertThat(validationResult.isValid(), is(true));
   }
 
@@ -75,15 +84,15 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
     reset(mockConnectivityTestingStrategy);
     when(mockConnectivityTestingStrategy.accepts(fakeConnectivityTestingObject)).thenReturn(false);
     expectedException.expect(UnsupportedConnectivityTestingObjectException.class);
-    connectivityTestingService.testConnection(TEST_IDENTIFIER);
+    connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
   }
 
   @Test
   public void nonExistentConnectivityTestingObject() {
     reset(mockMuleContext);
-    when(mockMuleContext.getRegistry().get(TEST_IDENTIFIER)).thenReturn(null);
+    when(mockMuleContext.getConfigurationComponentLocator().find(any(Location.class))).thenReturn(empty());
     expectedException.expect(ObjectNotFoundException.class);
-    connectivityTestingService.testConnection(TEST_IDENTIFIER);
+    connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
   }
 
 }

@@ -171,8 +171,8 @@ public interface Location {
       return locationBuilder;
     }
 
-    private void verifyPartDoesNotContainsSlash(String globalName) {
-      checkArgument(!globalName.contains(PARTS_SEPARATOR), "Slash cannot be part of the global name or part");
+    private void verifyPartDoesNotContainsSlash(String part) {
+      checkArgument(!part.contains(PARTS_SEPARATOR), "Slash cannot be part of the global name or part, bad part is " + part);
     }
 
     @Override

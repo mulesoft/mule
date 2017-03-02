@@ -10,13 +10,12 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -25,11 +24,10 @@ import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
 import java.util.Optional;
 
 /**
- * {@link MetadataService} implementation that initialises the required components before doing test
- * connectivity.
+ * {@link MetadataService} implementation that initialises the required components before doing test connectivity.
  *
- * This guarantees that if the application has been created lazily, the requested components exists
- * before the execution of the actual {@link MetadataService}.
+ * This guarantees that if the application has been created lazily, the requested components exists before the execution of the
+ * actual {@link MetadataService}.
  *
  * @since 4.0
  */
@@ -48,54 +46,46 @@ public class LazyMetadataService implements MetadataService {
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentId componentId) {
-    return (MetadataResult<MetadataKeysContainer>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getMetadataKeys(adjustProcessorId(componentId)));
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(Location location) {
+    return (MetadataResult<MetadataKeysContainer>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getMetadataKeys(location));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId) {
-    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getOperationMetadata(adjustProcessorId(componentId)));
-  }
-
-  //TODO PABLO LG remove adjustProcessor when component model has component id inside
-  private ComponentId adjustProcessorId(ComponentId componentId) {
-    if (componentId instanceof ProcessorId) {
-      return new ProcessorId(componentId.getFlowName().get(), "0");
-    }
-    return componentId;
+  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(Location location) {
+    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getOperationMetadata(location));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(ComponentId componentId,
+  public MetadataResult<ComponentMetadataDescriptor<OperationModel>> getOperationMetadata(Location location,
                                                                                           MetadataKey key) {
-    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getOperationMetadata(adjustProcessorId(componentId), key));
+    return (MetadataResult<ComponentMetadataDescriptor<OperationModel>>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getOperationMetadata(location, key));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(ComponentId componentId) {
-    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getSourceMetadata(componentId));
+  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(Location location) {
+    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getSourceMetadata(location));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(ComponentId componentId, MetadataKey key) {
-    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getSourceMetadata(componentId, key));
+  public MetadataResult<ComponentMetadataDescriptor<SourceModel>> getSourceMetadata(Location location, MetadataKey key) {
+    return (MetadataResult<ComponentMetadataDescriptor<SourceModel>>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getSourceMetadata(location, key));
   }
 
   /**
@@ -110,26 +100,23 @@ public class LazyMetadataService implements MetadataService {
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<MetadataKeysContainer> getEntityKeys(ComponentId componentId) {
-    return (MetadataResult<MetadataKeysContainer>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getEntityKeys(componentId));
+  public MetadataResult<MetadataKeysContainer> getEntityKeys(Location location) {
+    return (MetadataResult<MetadataKeysContainer>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getEntityKeys(location));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(ComponentId componentId, MetadataKey key) {
-    return (MetadataResult<TypeMetadataDescriptor>) initializeComponent(componentId)
-        .orElseGet(() -> metadataService.getEntityMetadata(componentId, key));
+  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(Location location, MetadataKey key) {
+    return (MetadataResult<TypeMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getEntityMetadata(location, key));
   }
 
-  private Optional<MetadataResult<?>> initializeComponent(ComponentId componentId) {
-    //TODO MULE-9496: REFACTOR WHEN FLOW PATH IS AVAILABLE
-    final String componentIdentifier = componentId.getFlowName().isPresent()
-        ? componentId.getFlowName().get() + "/" + componentId.getComponentPath() : componentId.getComponentPath();
+  private Optional<MetadataResult<?>> initializeComponent(Location location) {
     try {
-      lazyMuleArtifactContext.initializeComponent(componentIdentifier);
+      lazyMuleArtifactContext.initializeComponent(location);
     } catch (NoSuchComponentModelException e) {
       return Optional.of(failure(newFailure(e).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
     } catch (Exception e) {

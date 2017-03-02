@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
@@ -32,18 +33,18 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
   }
 
   @Override
-  public ConnectionValidationResult testConnection(String identifier) {
+  public ConnectionValidationResult testConnection(Location location) {
     try {
-      lazyComponentInitializer.initializeComponent(identifier);
+      lazyComponentInitializer.initializeComponent(location);
     } catch (MuleRuntimeException e) {
       if (e.getCause() instanceof NoSuchComponentModelException) {
-        throw new ObjectNotFoundException(identifier);
+        throw new ObjectNotFoundException(location.toString());
       }
       return unknownFailureResponse(e);
     } catch (Exception e) {
       return unknownFailureResponse(e);
     }
-    return connectivityTestingService.testConnection(identifier);
+    return connectivityTestingService.testConnection(location);
   }
 
   private ConnectionValidationResult unknownFailureResponse(Exception e) {

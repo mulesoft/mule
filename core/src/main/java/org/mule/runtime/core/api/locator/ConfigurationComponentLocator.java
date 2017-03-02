@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.locator;
 
+import org.mule.runtime.api.component.location.Location;
+
 import java.util.Optional;
 
 /**

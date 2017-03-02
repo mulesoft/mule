@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.component.location.Location.builder;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -45,7 +45,7 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void getMetadataKeysForConfig() throws Exception {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
-        metadataManager.getMetadataKeys(new ConfigurationId("apple"));
+        metadataManager.getMetadataKeys(builder().globalName("apple").build());
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
     assertThat(metadataKeys.size(), is(2));
@@ -56,7 +56,7 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void getMetadataKeysForConfigWithoutResolvers() throws Exception {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
-        metadataManager.getMetadataKeys(new ConfigurationId("banana"));
+        metadataManager.getMetadataKeys(builder().globalName("banana").build());
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
     assertThat(metadataKeys.isEmpty(), is(true));

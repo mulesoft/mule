@@ -7,9 +7,9 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Optional.ofNullable;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
-import org.mule.runtime.core.api.locator.Location;
 
 import java.util.Map;
 import java.util.Optional;

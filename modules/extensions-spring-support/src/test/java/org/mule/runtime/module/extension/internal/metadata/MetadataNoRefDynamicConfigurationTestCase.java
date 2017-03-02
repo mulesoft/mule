@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
@@ -15,7 +16,6 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
@@ -30,7 +30,7 @@ public class MetadataNoRefDynamicConfigurationTestCase extends MetadataExtension
 
   @Test
   public void resolveMetadataWithNoRefDynamicConfig() throws Exception {
-    componentId = new ProcessorId(RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG, FIRST_PROCESSOR_INDEX);
+    location = builder().globalName(RESOLVER_WITH_IMPLICIT_DYNAMIC_CONFIG).addProcessorsPart().addIndexPart(0).build();
     MetadataKey key = newKey(AMERICA).withChild(newKey(USA).withChild(newKey(SAN_FRANCISCO))).build();
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadataResult = getComponentDynamicMetadata(key);
     assertFailureResult(metadataResult, 1);

@@ -7,14 +7,14 @@
 package org.mule.runtime.core.internal.metadata;
 
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
+import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.ComponentId;
-import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
- * Represents that the given {@link ComponentId} is invalid due that the Component could not be found in the current
+ * Represents that the given {@link Location} is invalid due that the Component could not be found in the current
  * {@link MuleContext}.
  *
  * @since 4.0

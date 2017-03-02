@@ -11,6 +11,7 @@ import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.collect.FluentIterable.from;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,8 +23,8 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifa
 /**
  * {@link ConnectivityTestingService} for a temporary artifact.
  * <p/>
- * This class will take care of the artifact initialization as part of the connection service invocation
- * and deal with any thrown exception by the startup of the artifact.
+ * This class will take care of the artifact initialization as part of the connection service invocation and deal with any thrown
+ * exception by the startup of the artifact.
  */
 public class TemporaryArtifactConnectivityTestingService implements ConnectivityTestingService {
 
@@ -44,8 +45,8 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
    * @throws MuleRuntimeException
    */
   @Override
-  public ConnectionValidationResult testConnection(String identifier) {
-    checkArgument(identifier != null, "identifier cannot be null");
+  public ConnectionValidationResult testConnection(Location location) {
+    checkArgument(location != null, "identifier cannot be null");
     try {
       if (!temporaryArtifact.isStarted()) {
         try {
@@ -59,7 +60,7 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
           throw new MuleRuntimeException(e);
         }
       }
-      return temporaryArtifact.getConnectivityTestingService().testConnection(identifier);
+      return temporaryArtifact.getConnectivityTestingService().testConnection(location);
     } finally {
       temporaryArtifact.dispose();
     }

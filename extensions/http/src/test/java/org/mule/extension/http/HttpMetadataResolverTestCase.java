@@ -12,22 +12,21 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
+import static org.mule.runtime.api.component.location.Location.builder;
 import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.metadata.ProcessorId;
-import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -96,7 +95,8 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   @Description("Resolves the metadata for a HTTP Listener")
   @Test
   public void getListenerMetadata() {
-    MetadataResult<ComponentMetadataDescriptor<SourceModel>> server = service.getSourceMetadata(new SourceId("server"));
+    MetadataResult<ComponentMetadataDescriptor<SourceModel>> server =
+        service.getSourceMetadata(Location.builder().globalName("server").addSourcePart().build());
     assertThat(server.isSuccess(), is(true));
     assertThat(server.get().getModel().getOutput().getType(), is(instanceOf(AnyType.class)));
   }
@@ -110,7 +110,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
         .map(MetadataKeyMatcher::metadataKeyWithId)
         .toArray(MetadataKeyMatcher[]::new);
 
-    MetadataResult<MetadataKeysContainer> keysResult = service.getMetadataKeys(new ConfigurationId("reqConfig"));
+    MetadataResult<MetadataKeysContainer> keysResult = service.getMetadataKeys(builder().globalName("reqConfig").build());
     String httpCategory = "HttpCategory";
     assertThat(keysResult.get().getCategories(), contains(httpCategory));
     Set<MetadataKey> keys = keysResult.get().getKeys(httpCategory).get();
@@ -125,7 +125,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
   private OutputModel getMetadata(String flowName) {
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result =
-        service.getOperationMetadata(new ProcessorId(flowName, "0"));
+        service.getOperationMetadata(Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build());
     assertThat(result.isSuccess(), is(true));
     return result.get().getModel().getOutput();
   }

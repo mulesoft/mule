@@ -13,6 +13,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.location.Location.builder;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
@@ -28,7 +30,7 @@ import org.junit.rules.ExpectedException;
 
 public class TemporaryArtifactConnectivityTestingServiceTestCase extends AbstractMuleTestCase {
 
-  private static final String COMPONENT_IDENTIFIER = "anyComponent";
+  private static final Location COMPONENT_LOCATION = builder().globalName("anyComponent").build();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -51,7 +53,7 @@ public class TemporaryArtifactConnectivityTestingServiceTestCase extends Abstrac
     when(mockTemporaryArtifact.isStarted()).thenReturn(false);
     doThrow(InitialisationException.class).when(mockTemporaryArtifact).start();
 
-    ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_LOCATION);
     assertThat(connectionResult.isValid(), is(false));
     assertThat(connectionResult.getException(), instanceOf(InitialisationException.class));
   }
@@ -62,7 +64,7 @@ public class TemporaryArtifactConnectivityTestingServiceTestCase extends Abstrac
     doThrow(MuleRuntimeException.class).when(mockTemporaryArtifact).start();
 
     expectedException.expect(MuleRuntimeException.class);
-    connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    connectivityTestingService.testConnection(COMPONENT_LOCATION);
   }
 
   @Test
@@ -70,7 +72,7 @@ public class TemporaryArtifactConnectivityTestingServiceTestCase extends Abstrac
     when(mockTemporaryArtifact.isStarted()).thenReturn(false);
     doThrow(ConnectionException.class).when(mockTemporaryArtifact).start();
 
-    ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_LOCATION);
     assertThat(connectionResult.isValid(), is(false));
     assertThat(connectionResult.getException(), instanceOf(ConnectionException.class));
   }

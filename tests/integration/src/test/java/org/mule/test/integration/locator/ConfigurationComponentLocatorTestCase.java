@@ -9,9 +9,9 @@ package org.mule.test.integration.locator;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.locator.Location.builder;
+import static org.mule.runtime.api.component.location.Location.builder;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.locator.Location;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
@@ -51,7 +51,7 @@ public class ConfigurationComponentLocatorTestCase extends AbstractIntegrationTe
 
   @Test
   public void sourceByPath() {
-    Location sourceLocation = builder().globalName("myFlow").addPart("source").build();
+    Location sourceLocation = builder().globalName("myFlow").addSourcePart().build();
     Optional<Object> source = muleContext.getConfigurationComponentLocator().find(sourceLocation);
     assertThat(source.isPresent(), is(true));
     assertThat(source.get(), instanceOf(MessageSource.class));
