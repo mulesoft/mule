@@ -9,13 +9,12 @@ package org.mule.runtime.core.internal.metadata;
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -46,8 +45,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
-
-import org.apache.xmlbeans.impl.common.InvalidLexicalValueException;
 
 /**
  * Default implementation of the {@link MetadataService}, which provides access to the Metadata of any Component in the
@@ -156,7 +153,7 @@ public class MuleMetadataService implements MetadataService, Initialisable {
   @Override
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(Location location, MetadataKey key) {
     return exceptionHandledMetadataFetch(() -> findEntityMetadataProvider(location).getEntityMetadata(key),
-                                         format(EXCEPTION_RESOLVING_COMPONENT_METADATA));
+                                         format(EXCEPTION_RESOLVING_COMPONENT_METADATA, location));
   }
 
   /**
@@ -165,7 +162,7 @@ public class MuleMetadataService implements MetadataService, Initialisable {
   @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys(Location location) {
     return exceptionHandledMetadataFetch(() -> findEntityMetadataProvider(location).getEntityKeys(),
-                                         format(EXCEPTION_RESOLVING_COMPONENT_METADATA));
+                                         format(EXCEPTION_RESOLVING_COMPONENT_METADATA, location));
   }
 
   /**
@@ -209,7 +206,8 @@ public class MuleMetadataService implements MetadataService, Initialisable {
 
   private Object findComponent(Location location) throws InvalidComponentIdException {
     return componentLocator.find(location)
-        .orElseThrow(() -> new InvalidComponentIdException(createStaticMessage("No object found with location " + location)));
+        .orElseThrow(() -> new InvalidComponentIdException(createStaticMessage("No object found with location " + location),
+                                                           COMPONENT_NOT_FOUND));
   }
 
   private <T extends ComponentModel<T>> MetadataProvider<T> findMetadataProvider(Location location)

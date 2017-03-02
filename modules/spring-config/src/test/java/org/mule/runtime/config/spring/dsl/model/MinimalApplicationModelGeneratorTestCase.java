@@ -55,7 +55,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   public void wrongElementIndexOnMinimalModelByPath() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("no-elements-config.xml");
     Location nonExistentComponentLocation = builder().globalName("flow").addProcessorsPart().addIndexPart(3).build();
-    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expect(NoSuchComponentModelException.class);
     expectedException.expectMessage("No object found at location " + nonExistentComponentLocation.toString());
     generator.getMinimalModel(nonExistentComponentLocation);
   }

@@ -45,9 +45,7 @@ import org.junit.Test;
 public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCase {
 
   private static final String NOT_A_METADATA_PROVIDER = "is not a MetadataProvider or MetadataEntityProvider";
-  private static final String PROCESSOR_DOES_NOT_EXIST = "Processor doesn't exist in the given index [%s]";
-  private static final String SOURCE_DOES_NOT_EXIST = "Flow doesn't contain a message source";
-  private static final String FLOW_DOES_NOT_EXIST = "Flow [%s] doesn't exist";
+  private static final String NO_OBJECT_FOUND = "No object found with location %s";
   private static final String FAIL_WITH_RESOLVING_EXCEPTION = "failWithResolvingException";
   private static final String FAIL_WITH_RUNTIME_EXCEPTION = "failWithRuntimeException";
   private static final String NON_EXISTING_FLOW = "nonExistingFlow";
@@ -65,7 +63,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void getOperationMetadataWithResolvingException() throws Exception {
-    location = builder().globalName(FAIL_WITH_RESOLVING_EXCEPTION).addIndexPart(0).build();
+    location = builder().globalName(FAIL_WITH_RESOLVING_EXCEPTION).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertThat(metadata.isSuccess(), is(false));
     assertFailureResult(metadata, 2);
@@ -76,7 +74,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void getKeysWithRuntimeException() throws Exception {
-    location = builder().globalName(FAIL_WITH_RUNTIME_EXCEPTION).addIndexPart(0).build();
+    location = builder().globalName(FAIL_WITH_RUNTIME_EXCEPTION).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<MetadataKeysContainer> metadata = metadataService.getMetadataKeys(location);
     assertFailureResult(metadata, 1);
     assertMetadataFailure(metadata.getFailures().get(0), "", UNKNOWN, RuntimeException.class.getName(), KEYS);
@@ -84,7 +82,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void getOperationMetadataWithRuntimeException() throws Exception {
-    location = builder().globalName(FAIL_WITH_RUNTIME_EXCEPTION).addIndexPart(0).build();
+    location = builder().globalName(FAIL_WITH_RUNTIME_EXCEPTION).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertFailureResult(metadata, 2);
     assertMetadataFailure(metadata.getFailures().get(0), "", UNKNOWN, "", OUTPUT_ATTRIBUTES);
@@ -93,11 +91,11 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void flowDoesNotExist() throws Exception {
-    location = builder().globalName(NON_EXISTING_FLOW).addIndexPart(0).build();
+    location = builder().globalName(NON_EXISTING_FLOW).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
-                          format(FLOW_DOES_NOT_EXIST, NON_EXISTING_FLOW),
+                          format(NO_OBJECT_FOUND, location.toString()),
                           COMPONENT_NOT_FOUND,
                           InvalidComponentIdException.class.getName(),
                           COMPONENT,
@@ -107,11 +105,12 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void processorDoesNotExist() throws Exception {
     String notValidIndex = "10";
-    location = builder().globalName(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID).addIndexPart(valueOf(notValidIndex)).build();
+    location = builder().globalName(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID).addProcessorsPart()
+        .addIndexPart(valueOf(notValidIndex)).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
-                          format(PROCESSOR_DOES_NOT_EXIST, notValidIndex),
+                          format(NO_OBJECT_FOUND, location),
                           COMPONENT_NOT_FOUND,
                           InvalidComponentIdException.class.getName(),
                           COMPONENT);
@@ -123,14 +122,14 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     final MetadataResult<MetadataKeysContainer> result = metadataService.getMetadataKeys(location);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
-                          SOURCE_DOES_NOT_EXIST,
+                          format(NO_OBJECT_FOUND, location),
                           COMPONENT_NOT_FOUND,
                           InvalidComponentIdException.class.getName(), COMPONENT);
   }
 
   @Test
   public void processorIsNotEntityMetadataProvider() throws Exception {
-    location = builder().globalName(LOGGER_FLOW).addIndexPart(0).build();
+    location = builder().globalName(LOGGER_FLOW).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<TypeMetadataDescriptor> result = metadataService.getEntityMetadata(location, PERSON_METADATA_KEY);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
@@ -145,7 +144,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
         metadataService.getMetadataKeys(location);
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
-                          format("Configuration named [%s] doesn't exist", NON_EXISTING_CONFIG),
+                          format(NO_OBJECT_FOUND, NON_EXISTING_CONFIG),
                           COMPONENT_NOT_FOUND,
                           InvalidComponentIdException.class.getName(), COMPONENT);
   }
@@ -164,7 +163,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void processorIsNotMetadataProvider() throws Exception {
-    location = builder().globalName(LOGGER_FLOW).addIndexPart(0).build();
+    location = builder().globalName(LOGGER_FLOW).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertMetadataFailure(result.getFailures().get(0),
                           NOT_A_METADATA_PROVIDER,
@@ -174,7 +173,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void fetchMissingElementFromCache() throws Exception {
-    location = builder().globalName(CONTENT_ONLY_CACHE_RESOLVER).addIndexPart(0).build();
+    location = builder().globalName(CONTENT_ONLY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(NULL_METADATA_KEY);
     assertMetadataFailure(result.getFailures().get(0),
                           "",
@@ -186,7 +185,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
 
   @Test
   public void failWithDynamicConfigurationWhenRetrievingMetadata() throws IOException {
-    location = builder().globalName(RESOLVER_WITH_DYNAMIC_CONFIG).addIndexPart(0).build();
+    location = builder().globalName(RESOLVER_WITH_DYNAMIC_CONFIG).addProcessorsPart().addIndexPart(0).build();
     MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(key);
     assertFailureResult(result, 1);
@@ -200,7 +199,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void failToGetMetadataWithMissingMetadataKeyLevels() throws Exception {
     assumeThat(resolutionType, is(ResolutionType.EXPLICIT_RESOLUTION));
-    location = builder().globalName(INCOMPLETE_MULTILEVEL_KEY_RESOLVER).addIndexPart(0).build();
+    location = builder().globalName(INCOMPLETE_MULTILEVEL_KEY_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     final MetadataKey metadataKey = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(metadataKey);
     assertMetadataFailure(result.getFailures().get(0), "Missing levels: [city]", INVALID_METADATA_KEY, "", COMPONENT);
