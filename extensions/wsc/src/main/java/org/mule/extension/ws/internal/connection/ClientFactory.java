@@ -152,6 +152,22 @@ final class ClientFactory {
     }
   }
 
+  private WscDispatcher createDispatcher(String address, HttpService httpService, String transportConfig)
+      throws ConnectionException {
+    int sep = address.indexOf("://");
+    if (sep > 0) {
+      String protocol = address.substring(0, sep);
+      if (transportConfig == null) {
+        if (protocol.startsWith("http")) {
+          return HttpDispatcher.createDefault(address, httpService);
+        }
+        throw new ConnectionException(format("Cannot create a default dispatcher for the [%s] protocol", protocol));
+      }
+    }
+    // TODO: MULE-10783: use custom transport configuration
+    throw new UnsupportedOperationException(format("cannot create a dispatcher for config [%s]", transportConfig));
+  }
+
   private void removeUnnecessaryCxfInterceptors(Client client) {
     Binding binding = client.getEndpoint().getBinding();
     removeInterceptor(binding.getOutInterceptors(), WrappedOutInterceptor.class.getName());
@@ -162,18 +178,5 @@ final class ClientFactory {
 
   private void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
     inInterceptors.removeIf(i -> i instanceof PhaseInterceptor && ((PhaseInterceptor) i).getId().equals(name));
-  }
-
-  private WscDispatcher createDispatcher(String address, HttpService httpService, String transportConfig)
-      throws ConnectionException {
-    String protocol = address.substring(0, address.indexOf("://"));
-    if (transportConfig == null) {
-      if (protocol.equals("http")) {
-        return HttpDispatcher.createDefault(address, httpService);
-      }
-      throw new ConnectionException(format("Cannot create a default dispatcher for the [%s] protocol", protocol));
-    }
-    // TODO: MULE-10783: use custom transport configuration
-    throw new UnsupportedOperationException(format("cannot create a dispatcher for config [%s]", transportConfig));
   }
 }
