@@ -28,13 +28,7 @@ public class StandaloneServerUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleHome() throws Exception {
-    testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE, new MuleTestUtils.TestCallback() {
-
-      @Override
-      public void run() throws Exception {
-        assertThat(getMuleHome().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE));
-      }
-    });
+    testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE, () -> assertThat(getMuleHome().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE)));
   }
 
   @Test

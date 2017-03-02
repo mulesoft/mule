@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
 import java.io.File;
@@ -13,7 +14,7 @@ import java.io.IOException;
 
 /**
  * Standalone server instance utility methods.
- *
+ * <p>
  * This utility methods are not meant to be used in container mode.
  * 
  * @since 4.0
@@ -38,7 +39,7 @@ public class StandaloneServerUtils {
    */
   public static File getMuleBase() {
     File muleBase = null;
-    String muleBaseVar = System.getProperty("mule.base");
+    String muleBaseVar = System.getProperty(MULE_BASE_DIRECTORY_PROPERTY);
 
     if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%")) {
       try {

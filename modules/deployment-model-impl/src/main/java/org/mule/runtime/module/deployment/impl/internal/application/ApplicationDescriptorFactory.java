@@ -117,7 +117,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     return desc;
   }
 
-  private URL[] findLibraries(ApplicationDescriptor descriptor) throws MalformedURLException {
+  private URL[] findLibraries(ApplicationDescr/StandaloneServerUtilsTestCase.javaiptor descriptor) throws MalformedURLException {
     return findJars(getAppLibFolder(descriptor)).toArray(new URL[0]);
   }
 
