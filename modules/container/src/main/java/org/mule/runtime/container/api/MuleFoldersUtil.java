@@ -81,7 +81,7 @@ public class MuleFoldersUtil {
   }
 
   public static File getDomainFolder(String domainName) {
-    return new File(getMuleBaseFolder(), domainName);
+    return new File(getDomainsFolder(), domainName);
   }
 
   public static File getDomainLibFolder(String domainName) {
