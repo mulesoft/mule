@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.component.location.Location.builder;
 
-import org.mule.extension.http.api.HttpMetadataKey;
+import org.mule.extension.http.internal.HttpMetadataKey;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
