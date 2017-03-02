@@ -33,14 +33,12 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
-import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
@@ -250,11 +248,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   protected List<Processor> getMessageProcessorsForLifecycle() {
     return processors;
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    NotificationUtils.addMessageProcessorPathElements(getMessageProcessors(), pathElement);
   }
 
   @Override

@@ -19,7 +19,6 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,14 +29,12 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,7 +42,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -155,11 +151,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   public ProcessingStrategy getProcessingStrategy() {
     return processingStrategy;
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    NotificationUtils.addMessageProcessorPathElements(delegate, pathElement.addChild(this));
   }
 
   @Override

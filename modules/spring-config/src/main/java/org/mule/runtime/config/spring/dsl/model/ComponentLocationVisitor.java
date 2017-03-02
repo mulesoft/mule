@@ -15,6 +15,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SUBFLOW_
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isMessageSource;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isProcessor;
+import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.resolveComponentType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -63,7 +64,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                                     componentModel.getLineNumber()))
               .build();
       componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts);
-    } else if (existsWithinFlow(componentModel)) {
+    } else if (existsWithinFlow(componentModel) || existsWithinSubflow(componentModel)) {
       ComponentModel parentComponentModel = componentModel.getParent();
       DefaultComponentLocation parentComponentLocation = parentComponentModel.getComponentLocation();
       if (parentComponentModel.getIdentifier().equals(FLOW_IDENTIFIER)) {
@@ -72,21 +73,30 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isTemplateOnErrorHandler(componentModel)) {
         componentLocation = processOnErrorModel(componentModel, parentComponentLocation, typedComponentIdentifier);
+      } else if (parentComponentIsRouter(componentModel)) {
+        if (isProcessor(componentModel)) {
+          // this is the case of the routes directly inside the router as with scatter-gather
+          componentLocation = parentComponentLocation
+              .appendRoutePart()
+              .appendLocationPart(findProcessorPath(componentModel), empty(), empty(), empty())
+              .appendProcessorsPart()
+              .appendLocationPart("0", typedComponentIdentifier, componentModel.getConfigFileName(),
+                                  componentModel.getLineNumber());
+        } else {
+          // this is the case of the when element inside the choice
+          componentLocation = parentComponentLocation.appendRoutePart()
+              .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
+        }
       } else if (isProcessor(componentModel)) {
-        componentLocation =
-            parentComponentLocation.appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
-                .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier,
-                                    componentModel.getConfigFileName(), componentModel.getLineNumber());
+        componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
+                                                                                              typedComponentIdentifier,
+                                                                                              componentModel.getConfigFileName(),
+                                                                                              componentModel.getLineNumber());
       } else {
         componentLocation =
             parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
                                                        componentModel.getConfigFileName(), componentModel.getLineNumber());
       }
-    } else if (existsWithinSubflow(componentModel)) {
-      DefaultComponentLocation parentComponentLocation = componentModel.getParent().getComponentLocation();
-      componentLocation =
-          parentComponentLocation.appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier,
-                                                     componentModel.getConfigFileName(), componentModel.getLineNumber());
     } else {
       DefaultComponentLocation parentComponentLocation = componentModel.getParent().getComponentLocation();
       componentLocation =
@@ -94,6 +104,20 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private boolean parentComponentIsRouter(ComponentModel componentModel) {
+    return existsWithinRouter(componentModel) && isRouter(componentModel.getParent());
+  }
+
+  private boolean existsWithinRouter(ComponentModel componentModel) {
+    while (componentModel.getParent() != null) {
+      if (isRouter(componentModel)) {
+        return true;
+      }
+      componentModel = componentModel.getParent();
+    }
+    return false;
   }
 
   private String findNonProcessorPath(ComponentModel componentModel) {

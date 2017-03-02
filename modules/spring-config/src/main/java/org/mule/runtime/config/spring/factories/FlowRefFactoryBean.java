@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -18,22 +17,17 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
-import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.runtime.core.util.NotificationUtils;
-import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +45,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware, Initialisable, Disposable {
 
   private abstract class FlowRefMessageProcessor
-      implements Processor, AnnotatedObject, FlowConstructAware, MessageProcessorContainer {
+      implements Processor, AnnotatedObject, FlowConstructAware {
 
     protected FlowConstruct flowConstruct;
 
@@ -78,29 +72,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   }
 
   private abstract class FlowRefMessageProcessorContainer extends FlowRefMessageProcessor
-      implements DynamicMessageProcessorContainer, FlowConstructAware {
+      implements FlowConstructAware {
 
-    private MessageProcessorPathElement pathElement;
     private Processor dynamicMessageProcessor;
-
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      this.pathElement = pathElement;
-    }
-
-    @Override
-    public FlowMap buildInnerPaths() {
-      if (dynamicMessageProcessor instanceof MessageProcessorContainer) {
-        ((MessageProcessorContainer) dynamicMessageProcessor).addMessageProcessorPathElements(getPathElement());
-        return buildPathResolver(getPathElement());
-      } else {
-        return null;
-      }
-    }
-
-    public MessageProcessorPathElement getPathElement() {
-      return pathElement;
-    }
 
     protected void setResolvedMessageProcessor(Processor dynamicMessageProcessor) {
       this.dynamicMessageProcessor = dynamicMessageProcessor;
@@ -154,13 +128,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     Processor processor =
         referencedMessageProcessor != null ? referencedMessageProcessor : createDynamicReferenceMessageProcessor(refName);
     // Wrap in chain to ensure the flow-ref element always has a path element and lifecycle will be propgated to child sub-flows
-    return new AbstractMessageProcessorChain(singletonList(processor)) {
-
-      @Override
-      public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-        NotificationUtils.addMessageProcessorPathElements(processor, pathElement.addChild(processor));
-      }
-    };
+    return new AbstractMessageProcessorChain(singletonList(processor)) {};
   }
 
   protected Processor createDynamicReferenceMessageProcessor(String name) throws MuleException {
@@ -269,11 +237,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         @Override
         public ComponentLocation getLocation() {
           return FlowRefFactoryBean.this.getLocation();
-        }
-
-        @Override
-        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-          NotificationUtils.addMessageProcessorPathElements(referencedFlow, pathElement);
         }
 
         @Override

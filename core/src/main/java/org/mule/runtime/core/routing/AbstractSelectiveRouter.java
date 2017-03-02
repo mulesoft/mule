@@ -7,29 +7,26 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -39,7 +36,6 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.RouterStatistics;
-import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,7 +47,7 @@ import org.apache.commons.collections.ListUtils;
 import org.reactivestreams.Publisher;
 
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
-    RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer {
+    RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware {
 
   private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<>();
   private Processor defaultProcessor;
@@ -311,18 +307,6 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   @Override
   public void setRouterStatistics(RouterStatistics routerStatistics) {
     this.routerStatistics = routerStatistics;
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    pathElement = pathElement.addChild(this);
-    List<Processor> messageProcessors =
-        conditionalMessageProcessors.stream().map(MessageProcessorFilterPair::getMessageProcessor).collect(toList());
-    messageProcessors.add(defaultProcessor);
-    for (Processor route : messageProcessors) {
-      // Add additional child for each route, as the route represents the 'when' container in XML.
-      NotificationUtils.addMessageProcessorPathElements(route, pathElement.addChild(route));
-    }
   }
 
   @Override

@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -25,7 +24,6 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -39,7 +37,6 @@ import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
-import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.Collections;
@@ -311,11 +308,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
     notificationTemplate.setFlowConstruct(flowConstruct);
-  }
-
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement.addChild(this));
   }
 
 }
