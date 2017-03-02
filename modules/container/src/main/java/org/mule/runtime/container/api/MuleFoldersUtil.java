@@ -9,7 +9,8 @@ package org.mule.runtime.container.api;
 
 import static java.io.File.separator;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.util.StandaloneServerUtils;
+import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class MuleFoldersUtil {
    * @return the mule runtime installation folder.
    */
   public static File getMuleHomeFolder() {
-    File muleHome = StandaloneServerUtils.getMuleHome();
+    File muleHome = getMuleHome().orElse(null);
     if (muleHome == null) {
       muleHome = new File(".");
     }
@@ -50,7 +51,7 @@ public class MuleFoldersUtil {
    * @return the mule runtime base folder.
    */
   public static File getMuleBaseFolder() {
-    File muleBase = StandaloneServerUtils.getMuleBase();
+    File muleBase = getMuleBase().orElse(null);
     if (muleBase == null) {
       muleBase = getMuleHomeFolder();
     }

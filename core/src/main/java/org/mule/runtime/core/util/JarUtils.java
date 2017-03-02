@@ -31,7 +31,7 @@ public final class JarUtils {
 
   private static final String MULE_MODULE_FILENAME = "lib" + File.separator + "module";
   private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
-  private static final String MULE_HOME = getMuleHome().getAbsolutePath();
+  private static final String MULE_HOME = getMuleHome().map(File::getAbsolutePath).orElse(null);
 
   public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 
