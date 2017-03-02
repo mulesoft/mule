@@ -357,13 +357,13 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
         .appendRoutePart()
         .appendLocationPart("1", empty(), empty(), empty())
         .appendProcessorsPart()
-        .appendLocationPart("1",
+        .appendLocationPart("0",
                             VALIDATION_IS_TRUE,
                             CONFIG_FILE_NAME, of(101)));
     assertNextProcessorLocationIs(scatterGatherLocation.appendRoutePart()
         .appendLocationPart("2", empty(), empty(), empty())
         .appendProcessorsPart()
-        .appendLocationPart("2",
+        .appendLocationPart("0",
                             VALIDATION_IS_FALSE,
                             CONFIG_FILE_NAME, of(102)));
     assertNoNextProcessorNotification();
