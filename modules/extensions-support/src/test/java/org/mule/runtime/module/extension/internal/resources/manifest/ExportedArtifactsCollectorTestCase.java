@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getOperationMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -77,6 +78,7 @@ public class ExportedArtifactsCollectorTestCase {
     OperationModel secondOperation = mockOperationModel(resultList, mockOutputModel(List.class), parameter);
     withMethod(secondOperation, empty());
     when(extensionModel.getOperationModels()).thenReturn(asList(firstOperation, secondOperation));
+    visitableMock(firstOperation, secondOperation);
     collector = new ExportedArtifactsCollector(extensionModel);
   }
 

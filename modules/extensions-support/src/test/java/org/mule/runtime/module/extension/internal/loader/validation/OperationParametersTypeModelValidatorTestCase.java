@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
@@ -52,6 +53,7 @@ public class OperationParametersTypeModelValidatorTestCase extends AbstractMuleT
     when(parameterModel.getName()).thenReturn("parameterName");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     mockParameters(operationModel, parameterModel);
+    visitableMock(operationModel);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)

@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -66,6 +67,8 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
     when(sourceModel.getName()).thenReturn("dummySource");
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
+
+    visitableMock(operationModel, sourceModel);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)

@@ -52,14 +52,11 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @SmallTest
-@Ignore("MULE-11459")
 public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
   private ExtensionModel extensionModel;
@@ -164,7 +161,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
 
   private void assertStreamingStrategyParameter(ParameterModel parameter) {
     assertThat(parameter.getName(), is(STREAMING_STRATEGY_PARAMETER_NAME));
-    assertDataType(parameter.getType(), Map.class, UnionType.class);
+    assertDataType(parameter.getType(), Object.class, UnionType.class);
   }
 
   @Test

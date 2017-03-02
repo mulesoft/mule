@@ -22,10 +22,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
@@ -35,7 +33,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
-import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
@@ -44,12 +41,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
-import org.mule.metadata.api.annotation.DescriptionAnnotation;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.exception.MuleException;
@@ -62,9 +53,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -79,6 +68,8 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
+
+import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.Map;
 import java.util.Set;
@@ -321,63 +312,15 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     verify(mockOperationPolicy).process(same(event));
   }
 
-  @Test
-  public void getExplicitOperationDynamicMetadata() throws Exception {
-    mockMetadataResolution();
-    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata =
-        messageProcessor.getMetadata(newKey("person", "Person").build());
-    verify(operationModel).getTypedModel(any(), any());
-    assertThat(metadata.isSuccess(), is(true));
-
-    MetadataType payloadMetadata = metadata.get().getModel().getOutput().getType();
-    assertThat(payloadMetadata, is(TYPE_BUILDER.booleanType().build()));
-
-    MetadataType attributesMetadata = metadata.get().getModel().getOutputAttributes().getType();
-    assertThat(attributesMetadata, is(TYPE_BUILDER.booleanType().build()));
-
-    assertThat(metadata.get().getModel().getAllParameterModels().stream()
-        .filter(p -> p.getName().equals("content"))
-        .findFirst().get().getType(), is(TYPE_BUILDER.stringType().build()));
-
-    assertThat(metadata.get().getModel().getAllParameterModels().stream()
-        .filter(p -> p.getName().equals("type"))
-        .findFirst().get().getType(), is(stringType));
-  }
-
   private void mockMetadataResolution() {
     OperationModel typedModel = mock(OperationModel.class);
     OutputModel resolvedOutputModel = mock(OutputModel.class);
     when(resolvedOutputModel.getType()).thenReturn(TYPE_BUILDER.booleanType().build());
     when(resolvedOutputModel.hasDynamicType()).thenReturn(true);
-    when(operationModel.getTypedModel(any(), any())).thenReturn(typedModel);
     when(typedModel.getOutput()).thenReturn(resolvedOutputModel);
     when(typedModel.getOutputAttributes()).thenReturn(resolvedOutputModel);
     when(contentMock.getType()).thenReturn(TYPE_BUILDER.stringType().build());
     when(typedModel.getAllParameterModels()).thenReturn(asList(keyParamMock, contentMock));
-  }
-
-  @Test
-  public void getDSLOperationDynamicMetadata() throws Exception {
-    final ObjectType objectType = BaseTypeBuilder
-        .create(JAVA).objectType()
-        .with(new DescriptionAnnotation("Some Description"))
-        .build();
-    mockMetadataResolution();
-    when(operationModel.getTypedModel(any(), any()).getOutput().getType()).thenReturn(objectType);
-
-    setUpValueResolvers();
-    final OutputTypeResolver outputTypeResolver = mock(OutputTypeResolver.class);
-    when(outputTypeResolver.getOutputType(any(), eq("person"))).thenReturn(objectType);
-    when(metadataResolverFactory.getOutputResolver()).thenReturn(outputTypeResolver);
-    // verify(operationModel).getTypedModel(any(), any());
-
-    final MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = messageProcessor.getMetadata();
-    assertThat(metadata.isSuccess(), is(true));
-
-    MetadataType outputMetadata = metadata.get().getModel().getOutput().getType();
-    assertThat(outputMetadata, is(objectType));
-
-    verify(resolverSet.getResolvers(), times(1));
   }
 
   @Test
