@@ -8,9 +8,8 @@
 package org.mule.runtime.container.api;
 
 import static java.io.File.separator;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
+import org.mule.runtime.core.util.StandaloneServerUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
@@ -36,17 +35,33 @@ public class MuleFoldersUtil {
 
   private MuleFoldersUtil() {}
 
+  /**
+   * @return the mule runtime installation folder.
+   */
   public static File getMuleHomeFolder() {
-    String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY, ".");
+    File muleHome = StandaloneServerUtils.getMuleHome();
+    if (muleHome == null) {
+      muleHome = new File(".");
+    }
+    return muleHome;
+  }
 
-    return new File(muleHome);
+  /**
+   * @return the mule runtime base folder.
+   */
+  public static File getMuleBaseFolder() {
+    File muleBase = StandaloneServerUtils.getMuleBase();
+    if (muleBase == null) {
+      muleBase = getMuleHomeFolder();
+    }
+    return muleBase;
   }
 
   /**
    * @return a {@link File} pointing to the container folder that contains services.
    */
   public static File getServicesFolder() {
-    return new File(getMuleHomeFolder(), SERVICES_FOLDER);
+    return new File(getMuleBaseFolder(), SERVICES_FOLDER);
   }
 
   /**
@@ -61,11 +76,11 @@ public class MuleFoldersUtil {
   }
 
   public static File getDomainsFolder() {
-    return new File(getMuleHomeFolder(), DOMAINS_FOLDER);
+    return new File(getMuleBaseFolder(), DOMAINS_FOLDER);
   }
 
   public static File getDomainFolder(String domainName) {
-    return new File(getDomainsFolder(), domainName);
+    return new File(getMuleBaseFolder(), domainName);
   }
 
   public static File getDomainLibFolder(String domainName) {
@@ -73,7 +88,7 @@ public class MuleFoldersUtil {
   }
 
   public static File getAppsFolder() {
-    return new File(getMuleHomeFolder(), APPS_FOLDER);
+    return new File(getMuleBaseFolder(), APPS_FOLDER);
   }
 
   public static File getAppFolder(String appName) {
@@ -145,7 +160,7 @@ public class MuleFoldersUtil {
    * @return relative path for libraries on an application
    */
   public static File getExecutionFolder() {
-    return new File(getMuleHomeFolder(), EXECUTION_FOLDER);
+    return new File(getMuleBaseFolder(), EXECUTION_FOLDER);
   }
 
   public static File getMuleLibFolder() {
@@ -156,12 +171,8 @@ public class MuleFoldersUtil {
     return new File(getMuleLibFolder(), USER_FOLDER);
   }
 
-  public static File getAppTempFolder(String appName) {
-    return new File(getExecutionFolder(), appName);
-  }
-
   public static File getContainerAppPluginsFolder() {
-    return new File(getMuleHomeFolder(), CONTAINER_APP_PLUGINS);
+    return new File(getMuleBaseFolder(), CONTAINER_APP_PLUGINS);
   }
 
   /**

@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.management.agent;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
-
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleHome;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -36,15 +35,14 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management, statistics and configuration viewing of a Mule
@@ -81,7 +79,7 @@ public class Mx4jAgent extends AbstractAgent {
 
   // TODO AH check how an embedded scenario can be handled (no mule home)
   private String xslFilePath =
-      System.getProperty(MULE_HOME_DIRECTORY_PROPERTY) + "/lib/mule/mule-module-management-" + getProductVersion() + ".jar";
+      getMuleHome() + "/lib/mule/mule-module-management-" + getProductVersion() + ".jar";
 
   private String pathInJar = DEFAULT_PATH_IN_JAR;
 

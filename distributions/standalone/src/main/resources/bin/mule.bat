@@ -31,6 +31,7 @@ echo MULE_HOME is set to %MULE_HOME%
 
 rem If MULE_BASE is not set, set it to MULE_HOME
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
+echo MULE_BASE is set to %MULE_BASE%
 
 if "%MULE_APP%" == "" (
     set MULE_APP=mule

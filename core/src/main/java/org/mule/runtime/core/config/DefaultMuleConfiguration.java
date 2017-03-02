@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.config;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
@@ -153,8 +154,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   private ObjectSerializer defaultObjectSerializer;
 
   /**
-   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link org.mule.runtime.core.api.construct.Flow}s which
-   * doesn't specify otherwise
+   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all
+   * {@link org.mule.runtime.core.api.construct.Flow}s which doesn't specify otherwise
    *
    * @since 3.7.0
    */
@@ -203,13 +204,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
     if (containerMode) {
-      final String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
+      final String muleBase = getMuleBase().getAbsolutePath();
       // in container mode the id is the app name, have each app isolate its work dir
       if (!isStandalone()) {
         // fallback to current dir as a parent
         this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
       } else {
-        this.workingDirectory = String.format("%s/%s/%s", muleHome.trim(), getWorkingDirectory(), getId());
+        this.workingDirectory = String.format("%s/%s/%s", muleBase.trim(), getWorkingDirectory(), getId());
       }
     } else if (isStandalone()) {
       this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
@@ -336,7 +337,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   @Override
   public String getMuleHomeDirectory() {
-    return System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
+    return getMuleHome().getAbsolutePath();
   }
 
   public void setWorkingDirectory(String workingDirectory) {
