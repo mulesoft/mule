@@ -73,7 +73,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isTemplateOnErrorHandler(componentModel)) {
         componentLocation = processOnErrorModel(componentModel, parentComponentLocation, typedComponentIdentifier);
-      } else if (existsWithinRouter(componentModel) && isProcessor(componentModel) && isRouter(componentModel.getParent())) {
+      } else if (parentComponentIsRouter(componentModel) && isProcessor(componentModel)) {
         // this is the case of the routes directly inside the router as with scatter-gather
         componentLocation = parentComponentLocation
             .appendRoutePart()
@@ -81,7 +81,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
             .appendProcessorsPart()
             .appendLocationPart("0", typedComponentIdentifier, componentModel.getConfigFileName(),
                                 componentModel.getLineNumber());
-      } else if (existsWithinRouter(componentModel) && !isProcessor(componentModel) && isRouter(componentModel.getParent())) {
+      } else if (parentComponentIsRouter(componentModel) && !isProcessor(componentModel)) {
         // this is the case of the when element inside the choice
         componentLocation = parentComponentLocation.appendRoutePart()
             .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
@@ -102,6 +102,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private boolean parentComponentIsRouter(ComponentModel componentModel) {
+    return existsWithinRouter(componentModel) && isRouter(componentModel.getParent());
   }
 
   private boolean existsWithinRouter(ComponentModel componentModel) {
