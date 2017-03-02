@@ -6,19 +6,20 @@
  */
 package org.mule.extension.ws;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.mule.extension.ws.WscTestUtils.HEADER_IN;
 import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
 import static org.mule.extension.ws.api.SoapVersion.SOAP11;
 import static org.mule.extension.ws.api.SoapVersion.SOAP12;
-
 import org.mule.extension.ws.api.SoapVersion;
 import org.mule.extension.ws.service.Soap11Service;
 import org.mule.extension.ws.service.Soap12Service;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -45,6 +46,9 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
   @Rule
   public DynamicPort servicePort = new DynamicPort("servicePort");
 
+  @Rule
+  public SystemProperty humanWsdlPath;
+
   @Parameterized.Parameter
   public SoapVersion soapVersion;
 
@@ -70,6 +74,7 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
     super.doSetUpBeforeMuleContextCreation();
 
+    System.setProperty("humanWsdl", currentThread().getContextClassLoader().getResource("wsdl/human.wsdl").getPath());
     System.setProperty("soapVersion", soapVersion.toString());
     System.setProperty("serviceClass", getServiceClass());
     XMLUnit.setIgnoreWhitespace(true);

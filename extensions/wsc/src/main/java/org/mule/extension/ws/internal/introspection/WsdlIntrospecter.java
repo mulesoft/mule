@@ -272,6 +272,10 @@ public class WsdlIntrospecter {
     return registry;
   }
 
+  public Message getMessage(QName qName) {
+    return definition.getMessage(qName);
+  }
+
   private void validateNotNull(Object paramValue, String errorMessage) {
     if (paramValue == null) {
       throw new IllegalArgumentException(errorMessage);
