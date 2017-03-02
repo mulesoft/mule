@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Standalone server instance utility methods.
@@ -24,9 +27,9 @@ public class StandaloneServerUtils {
   /**
    * @return the MULE_HOME directory of this instance. Returns null if the property is not set
    */
-  public static File getMuleHome() {
+  public static Optional<File> getMuleHome() {
     final String muleHome = System.getProperty(MULE_HOME_DIRECTORY_PROPERTY);
-    return muleHome != null ? new File(muleHome) : null;
+    return ofNullable(muleHome != null ? new File(muleHome) : null);
   }
 
   /**
@@ -37,13 +40,13 @@ public class StandaloneServerUtils {
    *         {@link org.mule.runtime.core.api.config.MuleProperties#MULE_HOME_DIRECTORY_PROPERTY} property value if
    *         {@link org.mule.runtime.core.api.config.MuleProperties#MULE_BASE_DIRECTORY_PROPERTY} is not set which may be null.
    */
-  public static File getMuleBase() {
-    File muleBase = null;
+  public static Optional<File> getMuleBase() {
+    Optional<File> muleBase = null;
     String muleBaseVar = System.getProperty(MULE_BASE_DIRECTORY_PROPERTY);
 
     if (muleBaseVar != null && !muleBaseVar.trim().equals("") && !muleBaseVar.equals("%MULE_BASE%")) {
       try {
-        muleBase = new File(muleBaseVar).getCanonicalFile();
+        muleBase = of(new File(muleBaseVar).getCanonicalFile());
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

@@ -204,7 +204,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
     if (containerMode) {
-      final String muleBase = getMuleBase().getAbsolutePath();
+      final String muleBase = getMuleBase().map(File::getAbsolutePath).orElse(null);
       // in container mode the id is the app name, have each app isolate its work dir
       if (!isStandalone()) {
         // fallback to current dir as a parent
@@ -337,7 +337,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   @Override
   public String getMuleHomeDirectory() {
-    return getMuleHome().getAbsolutePath();
+    return getMuleHome().map(File::getAbsolutePath).orElse(null);
   }
 
   public void setWorkingDirectory(String workingDirectory) {

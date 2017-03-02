@@ -28,7 +28,7 @@ public class StandaloneServerUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void muleHome() throws Exception {
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE,
-                           () -> assertThat(getMuleHome().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE)));
+                           () -> assertThat(getMuleHome().get().getAbsoluteFile(), is(EXPECTED_MULE_HOME_VALUE)));
   }
 
   @Test
@@ -39,13 +39,13 @@ public class StandaloneServerUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void muleBase() throws Exception {
     testWithSystemProperty(MULE_BASE_DIRECTORY_PROPERTY, EXPECTED_MULE_BASE_VALUE,
-                           () -> assertThat(getMuleBase().getAbsolutePath(), is(EXPECTED_MULE_BASE_VALUE)));
+                           () -> assertThat(getMuleBase().get().getAbsolutePath(), is(EXPECTED_MULE_BASE_VALUE)));
   }
 
   @Test
   public void muleBaseReturnsMuleHomeWhenNotSet() throws Exception {
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, EXPECTED_MULE_HOME_VALUE,
-                           () -> assertThat(getMuleBase().getAbsolutePath(), is(EXPECTED_MULE_HOME_VALUE)));
+                           () -> assertThat(getMuleBase().get().getAbsolutePath(), is(EXPECTED_MULE_HOME_VALUE)));
   }
 
   @Test
