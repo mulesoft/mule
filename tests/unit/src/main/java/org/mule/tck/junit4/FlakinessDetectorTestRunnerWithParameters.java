@@ -9,10 +9,13 @@ package org.mule.tck.junit4;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runner.Runner;
 import org.junit.runners.Parameterized;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.parameterized.BlockJUnit4ClassRunnerWithParameters;
+import org.junit.runners.parameterized.ParametersRunnerFactory;
+import org.junit.runners.parameterized.TestWithParameters;
 
 /**
  * Provides a tool to detect the cause of flaky tests by running then multiple times. It looks for classes or methods annotated
@@ -22,10 +25,10 @@ import org.junit.runners.model.InitializationError;
  * NOTE: This is a tool intended to be used by developers but not to commit any test using this test runner. That would be only
  * valid when a flaky test fails on the continuous integration server but not locally.
  * <p>
- * To use this tool annotate the test class with
+ * To use this tool annotate the @{@link Parameterized} test class with
  * 
  * <pre>
- *         &#64;RunWith(FlakinessDetectorTestRunner.class)
+ *         &#64;RunWith(FlakinessDetectorTestRunnerWithParametersFactory.class)
  * </pre>
  *
  * And then annotate the flaky test class or flaky test method with
@@ -33,13 +36,19 @@ import org.junit.runners.model.InitializationError;
  * <pre>
  *         &#64;FlakyTest(times= n) // where n is the number of times you want the test executed
  * </pre>
- * <p>
- * For {@link Parameterized} tests, you must use {@link FlakinessDetectorTestRunnerWithParameters} instead.
  */
-public class FlakinessDetectorTestRunner extends BlockJUnit4ClassRunner {
+public class FlakinessDetectorTestRunnerWithParameters extends BlockJUnit4ClassRunnerWithParameters {
 
-  public FlakinessDetectorTestRunner(Class<?> type) throws InitializationError {
-    super(type);
+  public static class FlakinessDetectorTestRunnerWithParametersFactory implements ParametersRunnerFactory {
+
+    @Override
+    public Runner createRunnerForTestWithParameters(TestWithParameters test) throws InitializationError {
+      return new FlakinessDetectorTestRunnerWithParameters(test);
+    }
+  }
+
+  public FlakinessDetectorTestRunnerWithParameters(TestWithParameters test) throws InitializationError {
+    super(test);
   }
 
   @Override

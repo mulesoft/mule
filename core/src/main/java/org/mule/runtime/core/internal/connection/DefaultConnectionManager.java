@@ -12,17 +12,18 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -130,9 +131,14 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
       final Object config = configurationInstance.getValue();
       ConnectionHandler<Object> connectionHandler;
       try {
-        connectionHandler = hasBinding(config)
-            ? getConnection(config)
-            : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+        readLock.lock();
+        try {
+          connectionHandler = hasBinding(config)
+              ? getConnection(config)
+              : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+        } finally {
+          readLock.unlock();
+        }
       } catch (ConnectionException e) {
         return failure(e.getMessage(), e.getErrorType().orElse(null), e);
       }

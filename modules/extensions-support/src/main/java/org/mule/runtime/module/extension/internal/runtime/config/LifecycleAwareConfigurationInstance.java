@@ -23,6 +23,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -33,8 +34,8 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
@@ -43,6 +44,7 @@ import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 
 import javax.inject.Inject;
 
@@ -81,11 +83,15 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private MuleContext muleContext;
 
   @Inject
+  private LockFactory lockFactory;
+
+  @Inject
   private SchedulerService schedulerService;
 
   @Inject
   private ConnectionManagerAdapter connectionManager;
 
+  private Lock testConnectivityLock;
   private Scheduler retryScheduler;
 
   private boolean doTestConnectivity = getDoTestConnectivityProperty();
@@ -161,12 +167,22 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
       @Override
       public void doWork(RetryContext context) throws Exception {
-        ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
-        if (result.isValid()) {
-          context.setOk();
+        final boolean lockAcquired = testConnectivityLock.tryLock();
+        if (lockAcquired) {
+          LOGGER.info("Doing testConnectivity() for config " + getName());
+          try {
+            ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
+            if (result.isValid()) {
+              context.setOk();
+            } else {
+              context.setFailed(result.getException());
+              throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+            }
+          } finally {
+            testConnectivityLock.unlock();
+          }
         } else {
-          context.setFailed(result.getException());
-          throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+          LOGGER.warn("There is a testConnectivity() already running for config " + getName());
         }
       }
 
@@ -201,8 +217,13 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     try {
       stopIfNeeded(value);
       if (connectionProvider.isPresent()) {
-        connectionManager.unbind(value);
-        stopIfNeeded(connectionProvider);
+        testConnectivityLock.lock();
+        try {
+          connectionManager.unbind(value);
+          stopIfNeeded(connectionProvider);
+        } finally {
+          testConnectivityLock.unlock();
+        }
       }
       super.stop();
     } finally {
@@ -224,6 +245,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   }
 
   private void doInitialise() throws InitialisationException {
+    testConnectivityLock = lockFactory.createLock(this.getClass().getName() + "-testConnectivity-" + getName());
     if (connectionProvider.isPresent()) {
       initialiseIfNeeded(connectionProvider, true, muleContext);
       connectionManager.bind(value, connectionProvider.get());

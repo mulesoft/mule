@@ -8,12 +8,13 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-import org.mule.runtime.core.api.Injector;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -32,10 +33,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 public abstract class AbstractInterceptableContractTestCase<T extends AbstractInterceptable> extends AbstractMuleContextTestCase {
 
   @Mock(extraInterfaces = Lifecycle.class)
-  private Interceptor interceptor1;
+  protected Interceptor interceptor1;
 
   @Mock(extraInterfaces = Lifecycle.class)
-  private Interceptor interceptor2;
+  protected Interceptor interceptor2;
 
   protected Injector injector;
   protected T interceptable;

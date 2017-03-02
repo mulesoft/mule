@@ -71,7 +71,7 @@ import org.mockito.verification.VerificationMode;
 public class LifecycleAwareConfigurationInstanceTestCase
     extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance> {
 
-  private static final int RECONNECTION_MAX_ATTEMPTS = 5;
+  protected static final int RECONNECTION_MAX_ATTEMPTS = 5;
   private static final int RECONNECTION_FREQ = 100;
   private static final String NAME = "name";
 
@@ -92,15 +92,15 @@ public class LifecycleAwareConfigurationInstanceTestCase
   private ConfigurationModel configurationModel;
 
   @Mock
-  private Lifecycle value;
+  protected Lifecycle value;
 
   @Mock
-  private ConnectionManagerAdapter connectionManager;
+  protected ConnectionManagerAdapter connectionManager;
 
-  private RetryPolicyTemplate retryPolicyTemplate;
+  protected RetryPolicyTemplate retryPolicyTemplate;
 
   private String name;
-  private Optional<ConnectionProvider> connectionProvider;
+  protected Optional<ConnectionProvider> connectionProvider;
 
   public LifecycleAwareConfigurationInstanceTestCase(String name, ConnectionProvider connectionProvider) {
     this.name = name;
@@ -116,10 +116,14 @@ public class LifecycleAwareConfigurationInstanceTestCase
     muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
     muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
 
-    retryPolicyTemplate = new SimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
+    retryPolicyTemplate = createRetryTemplate();
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
 
     super.before();
+  }
+
+  protected RetryPolicyTemplate createRetryTemplate() {
+    return new SimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
   }
 
   @After
