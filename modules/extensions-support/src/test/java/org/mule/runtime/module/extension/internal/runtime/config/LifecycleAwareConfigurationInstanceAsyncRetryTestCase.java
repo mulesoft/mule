@@ -18,7 +18,6 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -56,24 +55,12 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
       when(connectionManager.testConnectivity(interceptable))
           .thenReturn(failure(connectionException.getMessage(), connectionException));
 
-      interceptable.initialise();
       interceptable.start();
 
       new PollingProber().check(new JUnitLambdaProbe(() -> {
         verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(interceptable);
         return true;
       }));
-    }
-  }
-
-  @Override
-  @Test
-  public void valueStarted() throws Exception {
-    interceptable.initialise();
-    interceptable.start();
-    verify((Startable) value).start();
-    if (connectionProvider.isPresent()) {
-      verify((Startable) connectionProvider.get()).start();
     }
   }
 
@@ -87,15 +74,6 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
         return true;
       }));
     }
-  }
-
-  @Override
-  @Test
-  public void interceptorsStarted() throws Exception {
-    interceptable.initialise();
-    interceptable.start();
-    verify((Startable) interceptor1).start();
-    verify((Startable) interceptor2).start();
   }
 
   @Test
@@ -123,7 +101,6 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
         return success();
       });
 
-      interceptable.initialise();
       interceptable.start();
       assertThat(testConnectivityInvokedLatch.await(10, SECONDS), is(true));
 

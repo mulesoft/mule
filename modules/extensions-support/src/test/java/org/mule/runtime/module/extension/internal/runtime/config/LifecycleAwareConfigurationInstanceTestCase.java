@@ -156,7 +156,6 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueInjected() throws Exception {
-    interceptable.initialise();
     verify(injector).inject(value);
     if (connectionProvider.isPresent()) {
       verify(injector).inject(connectionProvider.get());
@@ -167,7 +166,6 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void connectionBound() throws Exception {
-    interceptable.initialise();
     assertBound();
   }
 
@@ -196,7 +194,6 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueInitialised() throws Exception {
-    interceptable.initialise();
     verify((Initialisable) value).initialise();
     if (connectionProvider.isPresent()) {
       verify((Initialisable) connectionProvider.get()).initialise();
@@ -290,12 +287,12 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test(expected = IllegalStateException.class)
   public void getStatsBeforeInit() {
+    interceptable.dispose();
     interceptable.getStatistics();
   }
 
   @Test
   public void getStatistics() throws Exception {
-    interceptable.initialise();
     assertThat(interceptable.getStatistics(), is(notNullValue()));
   }
 }

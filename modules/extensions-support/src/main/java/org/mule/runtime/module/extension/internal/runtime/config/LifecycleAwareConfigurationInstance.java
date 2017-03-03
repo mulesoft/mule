@@ -241,6 +241,8 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
     disposeIfNeeded(value, LOGGER);
     disposeIfNeeded(connectionProvider, LOGGER);
+    configurationStats = null;
+    testConnectivityLock = null;
     super.dispose();
   }
 

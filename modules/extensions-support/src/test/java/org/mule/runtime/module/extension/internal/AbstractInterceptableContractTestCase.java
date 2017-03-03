@@ -47,20 +47,19 @@ public abstract class AbstractInterceptableContractTestCase<T extends AbstractIn
     muleContext.getInjector().inject(interceptable);
 
     injector = spyInjector(muleContext);
+    interceptable.initialise();
   }
 
   protected abstract T createInterceptable();
 
   @Test
   public void interceptorsInjected() throws Exception {
-    interceptable.initialise();
     verify(injector).inject(interceptor1);
     verify(injector).inject(interceptor2);
   }
 
   @Test
   public void interceptorsInitialised() throws Exception {
-    interceptable.initialise();
     verify((Initialisable) interceptor1).initialise();
     verify((Initialisable) interceptor2).initialise();
   }
