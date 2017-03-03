@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,6 +44,7 @@ public class AuthorizationFilterTestCase extends UsesHttpExtensionFunctionalTest
   }
 
   @Test
+  @Ignore("MULE-11897: When filter throws exception, the handler loses the reference to the filter")
   public void testAuthenticatedButNotAuthorized() throws Exception {
     doRequest(null, "localhost", "anon", "anon", getUrl(), false, FORBIDDEN.getStatusCode());
   }

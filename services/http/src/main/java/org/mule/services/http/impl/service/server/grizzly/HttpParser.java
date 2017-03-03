@@ -7,10 +7,9 @@
 package org.mule.services.http.impl.service.server.grizzly;
 
 import static org.mule.runtime.core.util.StringUtils.WHITE_SPACE;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.service.http.api.domain.entity.multipart.HttpPart;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 
-import com.google.common.collect.Lists;
+import org.mule.service.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,18 +20,18 @@ import java.util.List;
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.MessagingException;
-import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.ParseException;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.io.IOUtils;
+
+import com.google.common.collect.Lists;
 
 public class HttpParser {
 
   private static final String SPACE_ENTITY = "%20";
   private static final String PLUS_SIGN = "\\+";
-  private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
+  private static final String CONTENT_DISPOSITION_PART_HEADER = CONTENT_DISPOSITION;
   private static final String NAME_ATTRIBUTE = "name";
 
   public static String extractPath(String uri) {
@@ -42,15 +41,6 @@ public class HttpParser {
       path = path.substring(0, i);
     }
     return path;
-  }
-
-  public static String extractQueryParams(String uri) {
-    int i = uri.indexOf("?");
-    String queryString = "";
-    if (i > -1) {
-      queryString = uri.substring(i + 1);
-    }
-    return queryString;
   }
 
   public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
@@ -95,29 +85,6 @@ public class HttpParser {
     }
 
     return parts;
-  }
-
-  public static String sanitizePathWithStartSlash(String path) {
-    if (path == null) {
-      return null;
-    }
-    return path.startsWith("/") ? path : "/" + path;
-  }
-
-  /**
-   * Extracts the subtype from a content type
-   *
-   * @param contentType the content type
-   * @return subtype of the content type.
-   */
-  public static String getContentTypeSubType(String contentType) {
-    final ContentType contentTypeValue;
-    try {
-      contentTypeValue = new ContentType(contentType);
-      return contentTypeValue.getSubType();
-    } catch (ParseException e) {
-      throw new MuleRuntimeException(e);
-    }
   }
 
   /**

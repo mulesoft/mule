@@ -81,12 +81,6 @@
             <scope>provided</scope>
             <classifier>mule-service</classifier>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.mule.modules</groupId>

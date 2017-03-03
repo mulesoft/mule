@@ -6,14 +6,19 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.service.http.api.HttpHeaders.Values.KEEP_ALIVE;
 
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.service.http.api.domain.ParameterMap;
 
 import org.junit.Test;
 
@@ -55,7 +60,10 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
     FlowRunner runner = flowRunner(flow).withPayload(TEST_MESSAGE);
 
     if (connectionOutboundProperty != null) {
-      runner = runner.withOutboundProperty(CONNECTION, connectionOutboundProperty);
+      final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
+      when(reqAttributes.getHeaders()).thenReturn(new ParameterMap(singletonMap(CONNECTION, connectionOutboundProperty)));
+
+      runner = runner.withAttributes(reqAttributes);
     }
     runner.run();
     String responseConnectionHeaderValue = StringUtils.join(headers.get(CONNECTION), " ");

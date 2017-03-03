@@ -15,7 +15,6 @@ import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
@@ -60,7 +59,7 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase {
 
       assertThat(response, notNullValue());
       assertThat(IOUtils.toString(((InputStreamHttpEntity) response.getEntity()).getInputStream()), is("hello world"));
-      assertThat((domainContext.getRegistry().<DefaultHttpListenerConfig>get("sharedListenerConfig")).isStarted(), is(true));
+      // TODO MULE-10633 assert that the shared listener is started
     } finally {
       closeQuietly(domainContext);
       closeQuietly(firstAppContext);

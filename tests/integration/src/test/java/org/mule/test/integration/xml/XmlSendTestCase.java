@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
@@ -24,6 +25,7 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.InputStream;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,6 +43,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
+  @Ignore("MULE-11897: When filter throws exception, the handler loses the reference to the filter")
   public void testXmlFilter() throws Exception {
     String url = "http://localhost:" + dynamicPort.getNumber() + "/xml-parse";
 
@@ -73,6 +76,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
+  @Ignore("MULE-11897: When filter throws exception, the handler loses the reference to the filter")
   public void testXmlValidation() throws Exception {
     String url = "http://localhost:" + dynamicPort.getNumber() + "/validate";
 

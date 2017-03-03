@@ -7,7 +7,10 @@
 package org.mule.extension.http.internal.temporary;
 
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
+
 import org.mule.extension.http.api.error.HttpError;
+import org.mule.extension.http.api.listener.server.HttpListenerConfig;
+import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -18,7 +21,6 @@ import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpOperations;
-import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
@@ -53,9 +55,9 @@ import org.mule.service.http.api.client.proxy.ProxyConfig;
 @Import(type = TcpServerSocketProperties.class, from = "Sockets")
 @ErrorTypes(HttpError.class)
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/httpn", prefix = HTTP_NAMESPACE)
-//TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
-//because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
-@Export(classes = {HttpExtensionClient.class})
+// TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
+// because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
+@Export(classes = {HttpListenerConfig.class, HttpExtensionClient.class, HttpPolicyRequestAttributes.class})
 public class HttpConnector {
 
 }

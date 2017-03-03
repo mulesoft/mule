@@ -6,19 +6,22 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
 
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
@@ -87,10 +90,13 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void ignoresHttpOutboundPropertiesButAcceptsHeaders() throws Exception {
-    flowRunner("httpHeaders").withPayload(TEST_MESSAGE).withOutboundProperty(HTTP_LISTENER_PATH, "listenerPath").run();
+    final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
+    when(reqAttributes.getListenerPath()).thenReturn("listenerPath");
 
-    assertThat(getFirstReceivedHeader(HTTP_SCHEME), is("testValue1"));
-    assertThat(headers.asMap(), not(hasKey(HTTP_LISTENER_PATH)));
+    flowRunner("httpHeaders").withPayload(TEST_MESSAGE).withAttributes(reqAttributes).run();
+
+    assertThat(getFirstReceivedHeader("http.scheme"), is("testValue1"));
+    assertThat(headers.asMap(), not(hasKey("http.listener.path")));
   }
 
   @Test
@@ -101,7 +107,10 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void ignoresConnectionOutboundProperty() throws Exception {
-    flowRunner("outboundProperties").withPayload(TEST_MESSAGE).withOutboundProperty(CONNECTION, CLOSE).run();
+    final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
+    when(reqAttributes.getHeaders()).thenReturn(new ParameterMap(singletonMap(CONNECTION, CLOSE)));
+
+    flowRunner("outboundProperties").withPayload(TEST_MESSAGE).withAttributes(reqAttributes).run();
     assertThat(getFirstReceivedHeader(CONNECTION), is(not(CLOSE)));
   }
 
@@ -112,23 +121,8 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
-  public void ignoresHostOutboundProperty() throws Exception {
-    flowRunner("outboundProperties").withPayload(TEST_MESSAGE).withOutboundProperty(HOST, host.getValue()).run();
-
-    assertThat(getFirstReceivedHeader(HOST), is(not(host.getValue())));
-  }
-
-  @Test
   public void acceptsTransferEncodingHeader() throws Exception {
     flowRunner("transferEncodingHeader").withPayload(TEST_MESSAGE).run();
     assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(encoding.getValue()));
   }
-
-  @Test
-  public void ignoresTransferEncodingOutboundProperty() throws Exception {
-    flowRunner("outboundProperties").withPayload(TEST_MESSAGE).withOutboundProperty(TRANSFER_ENCODING, encoding.getValue()).run();
-    assertThat(headers.asMap(), not(hasKey(TRANSFER_ENCODING)));
-  }
 }
-
-

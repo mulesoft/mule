@@ -8,9 +8,9 @@ package org.mule.test.oauth2.asserter;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.extractQueryParams;
 import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
 
 import org.mule.service.http.api.domain.ParameterMap;

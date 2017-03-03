@@ -26,7 +26,7 @@
 
     <flow name="server">
         <httpn:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true" config-ref="lisConfig"/>
-        <custom-processor class="org.mule.extension.http.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
+        <custom-processor class="org.mule.test.http.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
         <set-payload value="HEY"/>
     </flow>
 

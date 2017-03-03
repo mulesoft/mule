@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 
+import org.mule.compatibility.module.http.internal.listener.HttpResponseBuilder;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
