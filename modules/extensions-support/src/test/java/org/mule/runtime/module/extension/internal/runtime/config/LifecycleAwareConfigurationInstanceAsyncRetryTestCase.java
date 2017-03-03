@@ -38,11 +38,6 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
   }
 
   @Override
-  protected boolean isGracefulShutdown() {
-    return true;
-  }
-
-  @Override
   protected RetryPolicyTemplate createRetryTemplate() {
     return new AsynchronousRetryTemplate(super.createRetryTemplate());
   }
@@ -55,6 +50,7 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
       when(connectionManager.testConnectivity(interceptable))
           .thenReturn(failure(connectionException.getMessage(), connectionException));
 
+      interceptable.initialise();
       interceptable.start();
 
       new PollingProber().check(new JUnitLambdaProbe(() -> {
@@ -62,6 +58,27 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
         return true;
       }));
     }
+  }
+
+  @Override
+  @Test
+  public void valueStarted() throws Exception {
+    interceptable.initialise();
+    super.valueStarted();
+  }
+
+  @Override
+  @Test
+  public void valueStopped() throws Exception {
+    interceptable.initialise();
+    super.valueStopped();
+  }
+
+  @Override
+  @Test
+  public void connectionUnbound() throws Exception {
+    interceptable.initialise();
+    super.connectionUnbound();
   }
 
   @Override
@@ -76,6 +93,26 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
     }
   }
 
+  @Override
+  public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
+    interceptable.initialise();
+    super.disposeMetadataCacheWhenConfigIsDisposed();
+  }
+
+  @Override
+  @Test
+  public void interceptorsStarted() throws Exception {
+    interceptable.initialise();
+    super.interceptorsStarted();
+  }
+
+  @Override
+  @Test
+  public void interceptorsStopped() throws Exception {
+    interceptable.initialise();
+    super.interceptorsStopped();
+  }
+
   @Test
   public void stopWhileConnectivityTestingExcecuting() throws Throwable {
     if (connectionProvider.isPresent()) {
@@ -84,7 +121,7 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
 
       reset(connectionManager);
 
-      AtomicBoolean disposed = new AtomicBoolean();
+      AtomicBoolean stopped = new AtomicBoolean();
       AtomicReference<Throwable> thrownByTestConnectivity = new AtomicReference<>();
       AtomicBoolean testConnectivityFinished = new AtomicBoolean();
       when(connectionManager.getRetryTemplateFor(connectionProvider.get())).thenReturn(retryPolicyTemplate);
@@ -93,7 +130,7 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
 
         try {
           interceptableShutdownLatch.await(10, SECONDS);
-          assertThat(disposed.get(), is(false));
+          assertThat(stopped.get(), is(false));
         } catch (Throwable t) {
           thrownByTestConnectivity.set(t);
         }
@@ -101,12 +138,12 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
         return success();
       });
 
+      interceptable.initialise();
       interceptable.start();
       assertThat(testConnectivityInvokedLatch.await(10, SECONDS), is(true));
 
       interceptable.stop();
-      interceptable.dispose();
-      disposed.set(true);
+      stopped.set(true);
       interceptableShutdownLatch.countDown();
 
       new PollingProber(15000, 1000).check(new JUnitLambdaProbe(() -> {

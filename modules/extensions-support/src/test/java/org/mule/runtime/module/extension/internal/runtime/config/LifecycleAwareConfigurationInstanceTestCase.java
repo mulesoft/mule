@@ -156,6 +156,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueInjected() throws Exception {
+    interceptable.initialise();
     verify(injector).inject(value);
     if (connectionProvider.isPresent()) {
       verify(injector).inject(connectionProvider.get());
@@ -166,6 +167,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void connectionBound() throws Exception {
+    interceptable.initialise();
     assertBound();
   }
 
@@ -182,8 +184,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
   }
 
   @Test
-  public void connectionReBindedAfterStopStart() throws Exception {
+  public void connectionReBoundfterStopStart() throws Exception {
     connectionBound();
+    interceptable.start();
     interceptable.stop();
     verify(connectionManager, getBindingVerificationMode()).unbind(value);
 
@@ -194,6 +197,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueInitialised() throws Exception {
+    interceptable.initialise();
     verify((Initialisable) value).initialise();
     if (connectionProvider.isPresent()) {
       verify((Initialisable) connectionProvider.get()).initialise();
@@ -236,6 +240,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueStopped() throws Exception {
+    interceptable.start();
     interceptable.stop();
     verify((Stoppable) value).stop();
     if (connectionProvider.isPresent()) {
@@ -244,7 +249,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
   }
 
   @Test
-  public void connectionUnbinded() throws Exception {
+  public void connectionUnbound() throws Exception {
+    interceptable.start();
     interceptable.stop();
     if (connectionProvider.isPresent()) {
       verify(connectionManager).unbind(value);
@@ -255,6 +261,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueDisposed() throws Exception {
+    interceptable.initialise();
     interceptable.dispose();
     verify((Disposable) value).dispose();
     if (connectionProvider.isPresent()) {
@@ -266,6 +273,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
     MuleMetadataService muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     muleMetadataManager.getMetadataCache(NAME);
+    interceptable.start();
     interceptable.stop();
     new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));
   }
@@ -287,12 +295,12 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test(expected = IllegalStateException.class)
   public void getStatsBeforeInit() {
-    interceptable.dispose();
     interceptable.getStatistics();
   }
 
   @Test
   public void getStatistics() throws Exception {
+    interceptable.initialise();
     assertThat(interceptable.getStatistics(), is(notNullValue()));
   }
 }
