@@ -98,7 +98,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     try {
       return expressionExecutor.evaluate(sanitize(expression), context);
     } catch (ExpressionExecutionException e) {
-      throw new ExpressionRuntimeException(expressionEvaluationFailed(expression), e);
+      throw new ExpressionRuntimeException(expressionEvaluationFailed(expression, e.getMessage()), e);
     }
   }
 
