@@ -22,4 +22,9 @@ public class ConnectionCreationException extends RuntimeException
     {
         super(throwable);
     }
+
+    public ConnectionCreationException(Throwable throwable, String message)
+    {
+        super(message, throwable);
+    }
 }
