@@ -23,6 +23,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -33,8 +34,8 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
@@ -43,6 +44,7 @@ import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 
 import javax.inject.Inject;
 
@@ -81,12 +83,19 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private MuleContext muleContext;
 
   @Inject
+  private LockFactory lockFactory;
+
+  @Inject
   private SchedulerService schedulerService;
 
   @Inject
   private ConnectionManagerAdapter connectionManager;
 
+  private Lock testConnectivityLock;
   private Scheduler retryScheduler;
+
+  private volatile boolean initialized = false;
+  private volatile boolean started = false;
 
   private boolean doTestConnectivity = getDoTestConnectivityProperty();
 
@@ -119,16 +128,19 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @throws InitialisationException if an exception is found
    */
   @Override
-  public void initialise() throws InitialisationException {
-    try {
-      initStats();
-      doInitialise();
-      super.initialise();
-    } catch (Exception e) {
-      if (e instanceof InitialisationException) {
-        throw (InitialisationException) e;
-      } else {
-        throw new InitialisationException(e, this);
+  public synchronized void initialise() throws InitialisationException {
+    if (!initialized) {
+      initialized = true;
+      try {
+        initStats();
+        doInitialise();
+        super.initialise();
+      } catch (Exception e) {
+        if (e instanceof InitialisationException) {
+          throw (InitialisationException) e;
+        } else {
+          throw new InitialisationException(e, this);
+        }
       }
     }
   }
@@ -139,18 +151,22 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @throws MuleException if an exception is found
    */
   @Override
-  public void start() throws MuleException {
-    if (connectionProvider.isPresent()) {
-      startIfNeeded(connectionProvider);
-      if (!connectionManager.hasBinding(value)) {
-        connectionManager.bind(value, connectionProvider.get());
+  public synchronized void start() throws MuleException {
+    if (!started) {
+      started = true;
+      testConnectivityLock = lockFactory.createLock(this.getClass().getName() + "-testConnectivity-" + getName());
+      if (connectionProvider.isPresent()) {
+        startIfNeeded(connectionProvider);
+        if (!connectionManager.hasBinding(value)) {
+          connectionManager.bind(value, connectionProvider.get());
+        }
+        if (doTestConnectivity) {
+          testConnectivity();
+        }
       }
-      if (doTestConnectivity) {
-        testConnectivity();
-      }
+      startIfNeeded(value);
+      super.start();
     }
-    startIfNeeded(value);
-    super.start();
   }
 
   private void testConnectivity() throws MuleException {
@@ -161,12 +177,22 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
       @Override
       public void doWork(RetryContext context) throws Exception {
-        ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
-        if (result.isValid()) {
-          context.setOk();
+        final boolean lockAcquired = testConnectivityLock.tryLock();
+        if (lockAcquired) {
+          LOGGER.info("Doing testConnectivity() for config " + getName());
+          try {
+            ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
+            if (result.isValid()) {
+              context.setOk();
+            } else {
+              context.setFailed(result.getException());
+              throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+            }
+          } finally {
+            testConnectivityLock.unlock();
+          }
         } else {
-          context.setFailed(result.getException());
-          throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+          LOGGER.warn("There is a testConnectivity() already running for config " + getName());
         }
       }
 
@@ -197,16 +223,24 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @throws MuleException if an exception is found
    */
   @Override
-  public void stop() throws MuleException {
-    try {
-      stopIfNeeded(value);
-      if (connectionProvider.isPresent()) {
-        connectionManager.unbind(value);
-        stopIfNeeded(connectionProvider);
+  public synchronized void stop() throws MuleException {
+    if (started) {
+      started = false;
+      try {
+        stopIfNeeded(value);
+        if (connectionProvider.isPresent()) {
+          testConnectivityLock.lock();
+          try {
+            connectionManager.unbind(value);
+            stopIfNeeded(connectionProvider);
+          } finally {
+            testConnectivityLock.unlock();
+          }
+        }
+        super.stop();
+      } finally {
+        muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
       }
-      super.stop();
-    } finally {
-      muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
     }
   }
 
@@ -214,13 +248,18 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}
    */
   @Override
-  public void dispose() {
-    if (retryScheduler != null) {
-      retryScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+  public synchronized void dispose() {
+    if (initialized) {
+      initialized = false;
+      if (retryScheduler != null) {
+        retryScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      }
+      disposeIfNeeded(value, LOGGER);
+      disposeIfNeeded(connectionProvider, LOGGER);
+      configurationStats = null;
+      testConnectivityLock = null;
+      super.dispose();
     }
-    disposeIfNeeded(value, LOGGER);
-    disposeIfNeeded(connectionProvider, LOGGER);
-    super.dispose();
   }
 
   private void doInitialise() throws InitialisationException {

@@ -9,10 +9,13 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrationTestCase {
@@ -24,12 +27,23 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrat
     return "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml";
   }
 
-  @Test
-  public void testException() throws Exception {
-    Thread tester1 = new Tester();
-    Thread tester2 = new Tester();
+  private Thread tester1 = new Tester();
+  private Thread tester2 = new Tester();
+
+  @Before
+  public void before() {
     tester1.start();
     tester2.start();
+  }
+
+  @After
+  public void after() throws InterruptedException {
+    tester1.join(5000);
+    tester2.join(5000);
+  }
+
+  @Test
+  public void testException() throws Exception {
 
     MuleClient client = muleContext.getClient();
     InternalMessage msg;

@@ -163,9 +163,11 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected void doTearDown() throws Exception {
-    tearingDown = true;
-    for (FlowRunner runner : runners) {
-      runner.dispose();
+    synchronized (runners) {
+      tearingDown = true;
+      for (FlowRunner runner : runners) {
+        runner.dispose();
+      }
     }
     super.doTearDown();
   }
@@ -200,12 +202,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return the {@link FlowRunner}
    */
   protected FlowRunner flowRunner(String flowName) {
-    if (tearingDown) {
-      throw new IllegalStateException("Already tearing down.");
+    synchronized (runners) {
+      if (tearingDown) {
+        throw new IllegalStateException("Already tearing down.");
+      }
+      final FlowRunner flowRunner = new FlowRunner(muleContext, flowName);
+      runners.add(flowRunner);
+      return flowRunner;
     }
-    final FlowRunner flowRunner = new FlowRunner(muleContext, flowName);
-    runners.add(flowRunner);
-    return flowRunner;
   }
 
   /**

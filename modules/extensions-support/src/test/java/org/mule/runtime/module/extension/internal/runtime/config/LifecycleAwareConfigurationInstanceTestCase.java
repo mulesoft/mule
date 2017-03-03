@@ -71,7 +71,7 @@ import org.mockito.verification.VerificationMode;
 public class LifecycleAwareConfigurationInstanceTestCase
     extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance> {
 
-  private static final int RECONNECTION_MAX_ATTEMPTS = 5;
+  protected static final int RECONNECTION_MAX_ATTEMPTS = 5;
   private static final int RECONNECTION_FREQ = 100;
   private static final String NAME = "name";
 
@@ -92,15 +92,15 @@ public class LifecycleAwareConfigurationInstanceTestCase
   private ConfigurationModel configurationModel;
 
   @Mock
-  private Lifecycle value;
+  protected Lifecycle value;
 
   @Mock
-  private ConnectionManagerAdapter connectionManager;
+  protected ConnectionManagerAdapter connectionManager;
 
-  private RetryPolicyTemplate retryPolicyTemplate;
+  protected RetryPolicyTemplate retryPolicyTemplate;
 
   private String name;
-  private Optional<ConnectionProvider> connectionProvider;
+  protected Optional<ConnectionProvider> connectionProvider;
 
   public LifecycleAwareConfigurationInstanceTestCase(String name, ConnectionProvider connectionProvider) {
     this.name = name;
@@ -116,10 +116,14 @@ public class LifecycleAwareConfigurationInstanceTestCase
     muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
     muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
 
-    retryPolicyTemplate = new SimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
+    retryPolicyTemplate = createRetryTemplate();
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
 
     super.before();
+  }
+
+  protected RetryPolicyTemplate createRetryTemplate() {
+    return new SimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
   }
 
   @After
@@ -180,8 +184,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
   }
 
   @Test
-  public void connectionReBindedAfterStopStart() throws Exception {
+  public void connectionReBoundfterStopStart() throws Exception {
     connectionBound();
+    interceptable.start();
     interceptable.stop();
     verify(connectionManager, getBindingVerificationMode()).unbind(value);
 
@@ -235,6 +240,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueStopped() throws Exception {
+    interceptable.start();
     interceptable.stop();
     verify((Stoppable) value).stop();
     if (connectionProvider.isPresent()) {
@@ -243,7 +249,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
   }
 
   @Test
-  public void connectionUnbinded() throws Exception {
+  public void connectionUnbound() throws Exception {
+    interceptable.start();
     interceptable.stop();
     if (connectionProvider.isPresent()) {
       verify(connectionManager).unbind(value);
@@ -254,6 +261,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueDisposed() throws Exception {
+    interceptable.initialise();
     interceptable.dispose();
     verify((Disposable) value).dispose();
     if (connectionProvider.isPresent()) {
@@ -265,6 +273,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
     MuleMetadataService muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     muleMetadataManager.getMetadataCache(NAME);
+    interceptable.start();
     interceptable.stop();
     new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));
   }
