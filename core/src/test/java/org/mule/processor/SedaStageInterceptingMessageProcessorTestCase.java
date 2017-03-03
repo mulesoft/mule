@@ -194,9 +194,8 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     @Test
     public void testProcessOneWayNegativeThreadWaitTimeout() throws Exception
     {
-        final int threadTimeout = -1;
         ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
-        threadingProfile.setThreadWaitTimeout(threadTimeout);
+        threadingProfile.setThreadWaitTimeout(-1);
         // Need 2 threads: 1 for polling, 1 to process work
         threadingProfile.setMaxThreadsActive(2);
         threadingProfile.setPoolExhaustedAction(WHEN_EXHAUSTED_WAIT);
@@ -236,10 +235,11 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             sedaStageInterceptingMessageProcessor.process(event);
         }
 
-        // Release latch only after 400ms which is double the default queue timeout.  If the new custom queueTimeout wasn't being
+        // Release latch only after 220ms which is 20ms more than the default queue
+        // timeout.  If the new custom queueTimeout of -1 (unlimited) wasn't being
         // used then event 3 would be rejected, as there is no room for it in the queue while event 1 processing is waiting on
         // the latch.
-        Thread.sleep(400);
+        Thread.sleep(220);
         latch.countDown();
 
         ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
