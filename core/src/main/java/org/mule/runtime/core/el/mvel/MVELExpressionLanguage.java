@@ -209,7 +209,7 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initi
     try {
       return (T) expressionExecutor.execute(expression, variableResolverFactory);
     } catch (Exception e) {
-      throw new ExpressionRuntimeException(CoreMessages.expressionEvaluationFailed(expression, e.getMessage()), e);
+      throw new ExpressionRuntimeException(CoreMessages.expressionEvaluationFailed(e.getMessage(), expression), e);
     }
   }
 

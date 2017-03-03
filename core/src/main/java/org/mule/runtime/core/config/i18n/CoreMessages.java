@@ -890,8 +890,8 @@ public class CoreMessages extends I18nMessageFactory {
     return factory.createMessage(BUNDLE_PATH, 334, key);
   }
 
-  public static I18nMessage expressionEvaluationFailed(String expression, String errorMessage) {
-    return factory.createMessage(BUNDLE_PATH, 335, expression, errorMessage);
+  public static I18nMessage expressionEvaluationFailed(String errorMessage, String expression) {
+    return factory.createMessage(BUNDLE_PATH, 335, errorMessage, expression);
   }
 
   public static I18nMessage expressionFinalVariableCannotBeAssignedValue(String key) {
