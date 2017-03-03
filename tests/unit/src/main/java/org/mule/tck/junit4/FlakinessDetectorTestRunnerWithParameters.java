@@ -28,7 +28,7 @@ import org.junit.runners.parameterized.TestWithParameters;
  * To use this tool annotate the @{@link Parameterized} test class with
  * 
  * <pre>
- *         &#64;RunWith(FlakinessDetectorTestRunnerWithParametersFactory.class)
+ *         &#64;UseParametersRunnerFactory(FlakinessDetectorTestRunnerWithParametersFactory.class)
  * </pre>
  *
  * And then annotate the flaky test class or flaky test method with
