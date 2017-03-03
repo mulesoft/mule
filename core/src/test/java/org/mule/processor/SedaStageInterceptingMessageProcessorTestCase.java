@@ -228,9 +228,9 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         when(flow.getProcessingStrategy()).thenReturn(new AsynchronousProcessingStrategy());
         final MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
 
-        int NUMBER_OF_EVENTS = 3;
+        int numberOfEvents = 3;
 
-        for (int i = 0; i < NUMBER_OF_EVENTS; i++)
+        for (int i = 0; i < numberOfEvents; i++)
         {
             sedaStageInterceptingMessageProcessor.process(event);
         }
@@ -245,7 +245,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
 
         // Three events are processed
-        verify(mockListener, timeout(RECEIVE_TIMEOUT).times(NUMBER_OF_EVENTS)).process(argThat(notSameEvent));
+        verify(mockListener, timeout(RECEIVE_TIMEOUT).times(numberOfEvents)).process(argThat(notSameEvent));
     }
 
     @Test
