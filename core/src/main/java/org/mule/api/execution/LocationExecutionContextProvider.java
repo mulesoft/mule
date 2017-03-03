@@ -7,12 +7,11 @@
 package org.mule.api.execution;
 
 import static java.lang.String.format;
-import static java.util.regex.Pattern.compile;
+
 import org.mule.api.AnnotatedObject;
+import static org.mule.api.util.CredentialsMaskUtil.maskPasswords;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -29,11 +28,6 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     private static final QName SOURCE_FILE_LINE_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceFileLine");
     static final QName SOURCE_ELEMENT_ANNOTATION_KEY = new QName("http://www.mulesoft.org/schema/mule/documentation", "sourceElement");
 
-    private static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
-    private static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
-    private static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"]*)\"");
-    private static final String PASSWORD_MASK = "<<credentials>>";
-    public static final String PASSWORD_ATTRIBUTE_MASK = "password=\"%s\"";
 
     /**
      * Populates the passed beanAnnotations with the {@link #SOURCE_ELEMENT_ANNOTATION_KEY} passed parameters.
@@ -109,36 +103,6 @@ public abstract class LocationExecutionContextProvider implements ExceptionConte
     {
         Object sourceXml = element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY);
         return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
-    }
-
-    protected static String maskPasswords(String xml)
-    {
-        xml = maskUrlPassword(xml, URL_PATTERN);
-        xml = maskUrlPassword(xml, ADDRESS_PATTERN);
-
-        Matcher matcher = PASSWORD_PATTERN.matcher(xml);
-        if (matcher.find() && matcher.groupCount() > 0)
-        {
-            xml = xml.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
-        }
-        xml = maskUrlPassword(xml, PASSWORD_PATTERN);
-
-        return xml;
-    }
-
-    private static String maskUrlPassword(String xml, Pattern pattern)
-    {
-        Matcher matcher = pattern.matcher(xml);
-        if (matcher.find() && matcher.groupCount() > 0)
-        {
-            xml = xml.replaceAll(matcher.group(1), PASSWORD_MASK);
-        }
-        return xml;
-    }
-
-    private static String maskPasswordAttribute(String password)
-    {
-        return format(PASSWORD_ATTRIBUTE_MASK, password);
     }
 
 }
