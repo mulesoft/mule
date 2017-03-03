@@ -19,11 +19,11 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
    * Query parameters map built from the parsed string. Former 'http.query.params'.
    */
   protected ParameterMap queryParams;
+
   /**
    * URI parameters extracted from the request path. Former 'http.uri.params'.
    */
   protected ParameterMap uriParams;
-
   /**
    * Full path requested. Former 'http.request.path'.
    */
@@ -46,6 +46,18 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
 
   public ParameterMap getUriParams() {
     return uriParams;
+  }
+
+  public void setQueryParams(ParameterMap queryParams) {
+    this.queryParams = queryParams;
+  }
+
+  public void setUriParams(ParameterMap uriParams) {
+    this.uriParams = uriParams;
+  }
+
+  public void setRequestPath(String requestPath) {
+    this.requestPath = requestPath;
   }
 
 }

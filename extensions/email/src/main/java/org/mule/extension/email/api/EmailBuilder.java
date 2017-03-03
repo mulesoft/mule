@@ -163,4 +163,40 @@ public class EmailBuilder {
   private <T> List<T> ensureNotNullList(List<T> list) {
     return list != null ? list : emptyList();
   }
+
+  public void setFromAddress(String fromAddress) {
+    this.fromAddress = fromAddress;
+  }
+
+  public void setToAddresses(List<String> toAddresses) {
+    this.toAddresses = toAddresses;
+  }
+
+  public void setCcAddresses(List<String> ccAddresses) {
+    this.ccAddresses = ccAddresses;
+  }
+
+  public void setBccAddresses(List<String> bccAddresses) {
+    this.bccAddresses = bccAddresses;
+  }
+
+  public void setReplyToAddresses(List<String> replyToAddresses) {
+    this.replyToAddresses = replyToAddresses;
+  }
+
+  public void setSubject(String subject) {
+    this.subject = subject;
+  }
+
+  public void setBody(EmailBody body) {
+    this.body = body;
+  }
+
+  public void setAttachments(List<EmailAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  public void setHeaders(Map<String, String> headers) {
+    this.headers = headers;
+  }
 }

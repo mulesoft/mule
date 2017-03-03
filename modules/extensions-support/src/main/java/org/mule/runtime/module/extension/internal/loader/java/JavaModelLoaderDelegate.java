@@ -24,7 +24,7 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGettersAndSetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -372,7 +372,7 @@ public final class JavaModelLoaderDelegate {
     if (!annotatedParameters.isEmpty()) {
       declareParameters(component, annotatedParameters, contributors, declarationContext, ofNullable(declarer));
     } else {
-      declareParameters(component, getFieldsWithGetters(type.getDeclaringClass()).stream().map(FieldWrapper::new)
+      declareParameters(component, getFieldsWithGettersAndSetters(type.getDeclaringClass()).stream().map(FieldWrapper::new)
           .collect(toList()), contributors, declarationContext, ofNullable(declarer));
     }
 

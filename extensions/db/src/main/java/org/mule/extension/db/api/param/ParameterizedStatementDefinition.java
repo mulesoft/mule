@@ -126,4 +126,8 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
 
     return resolved;
   }
+
+  public void setInputParameters(Map<String, Object> inputParameters) {
+    this.inputParameters = inputParameters;
+  }
 }

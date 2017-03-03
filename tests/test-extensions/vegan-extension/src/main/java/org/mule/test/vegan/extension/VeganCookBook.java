@@ -49,4 +49,9 @@ public class VeganCookBook {
   public String getEditorial() {
     return editorial;
   }
+
+  public void setEditorial(String editorial) {
+    this.editorial = editorial;
+  }
+
 }

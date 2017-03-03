@@ -30,4 +30,12 @@ public class DifferedKnockableDoor {
   public TypedValue<String> getAddress() {
     return address;
   }
+
+  public void setVictim(ParameterResolver<String> victim) {
+    this.victim = victim;
+  }
+
+  public void setAddress(TypedValue<String> address) {
+    this.address = address;
+  }
 }

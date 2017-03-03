@@ -25,8 +25,8 @@ public class Banana implements Fruit {
   private static final Logger logger = LoggerFactory.getLogger(Banana.class);
 
   private boolean peeled = false;
-  private boolean bitten = false;
 
+  private boolean bitten = false;
   private String origin;
 
   public void peel() {
@@ -58,6 +58,14 @@ public class Banana implements Fruit {
 
   public void setOrigin(String origin) {
     this.origin = origin;
+  }
+
+  public void setPeeled(boolean peeled) {
+    this.peeled = peeled;
+  }
+
+  public void setBitten(boolean bitten) {
+    this.bitten = bitten;
   }
 
   @Override

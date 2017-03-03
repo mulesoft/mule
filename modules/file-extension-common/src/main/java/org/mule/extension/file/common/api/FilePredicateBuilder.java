@@ -6,17 +6,16 @@
  */
 package org.mule.extension.file.common.api;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.file.common.api.matcher.PathMatcherPredicate;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.function.Predicate;
-
-import static java.lang.String.format;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
  * Builds a {@link Predicate} which verifies that a {@link FileAttributes} instance is compliant with a number of criterias. This
@@ -104,7 +103,6 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
   @Optional
   private Long maxSize;
 
-
   /**
    * Builds a {@link Predicate} from the criterias in {@code this} builder's state.
    *
@@ -147,6 +145,7 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
     return addConditions(predicate);
   }
 
+
   /**
    * This method is invoked by {@link #build()} before returning the built {@link Predicate}.
    * <p>
@@ -187,38 +186,32 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
     return maxSize;
   }
 
-  public T setFilenamePattern(String filenamePattern) {
+  public void setFilenamePattern(String filenamePattern) {
     this.filenamePattern = filenamePattern;
-    return (T) this;
   }
 
-  public T setPathPattern(String pathPattern) {
+  public void setPathPattern(String pathPattern) {
     this.pathPattern = pathPattern;
-    return (T) this;
   }
 
-  public T setDirectory(Boolean directory) {
+  public void setDirectory(Boolean directory) {
     this.directory = directory;
-    return (T) this;
   }
 
-  public T setRegularFile(Boolean regularFile) {
+  public void setRegularFile(Boolean regularFile) {
     this.regularFile = regularFile;
-    return (T) this;
   }
 
-  public T setSymbolicLink(Boolean symbolicLink) {
+  public void setSymbolicLink(Boolean symbolicLink) {
     this.symbolicLink = symbolicLink;
-    return (T) this;
   }
 
-  public T setMinSize(Long minSize) {
+  public void setMinSize(Long minSize) {
     this.minSize = minSize;
-    return (T) this;
   }
 
-  public T setMaxSize(Long maxSize) {
+  public void setMaxSize(Long maxSize) {
     this.maxSize = maxSize;
-    return (T) this;
   }
+
 }

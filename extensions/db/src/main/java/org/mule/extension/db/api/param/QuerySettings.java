@@ -79,4 +79,19 @@ public class QuerySettings {
     return maxRows;
   }
 
+  public void setQueryTimeout(int queryTimeout) {
+    this.queryTimeout = queryTimeout;
+  }
+
+  public void setQueryTimeoutUnit(TimeUnit queryTimeoutUnit) {
+    this.queryTimeoutUnit = queryTimeoutUnit;
+  }
+
+  public void setFetchSize(Integer fetchSize) {
+    this.fetchSize = fetchSize;
+  }
+
+  public void setMaxRows(Integer maxRows) {
+    this.maxRows = maxRows;
+  }
 }

@@ -6,16 +6,15 @@
  */
 package org.mule.extension.email.api.predicate;
 
+import static java.util.regex.Pattern.compile;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
-
-import static java.util.regex.Pattern.compile;
 
 /**
  * Base builder class for {@link Predicate}s that verify that a {@link BaseEmailAttributes} instance is compliant with a
@@ -151,33 +150,27 @@ public abstract class BaseEmailPredicateBuilder {
     return emailAttributes -> true;
   }
 
-  public BaseEmailPredicateBuilder setFromRegex(String fromRegex) {
+  public void setFromRegex(String fromRegex) {
     this.fromRegex = fromRegex;
-    return this;
   }
 
-  public BaseEmailPredicateBuilder setReceivedSince(LocalDateTime receivedSince) {
+  public void setReceivedSince(LocalDateTime receivedSince) {
     this.receivedSince = receivedSince;
-    return this;
   }
 
-  public BaseEmailPredicateBuilder setReceivedUntil(LocalDateTime receivedUntil) {
+  public void setReceivedUntil(LocalDateTime receivedUntil) {
     this.receivedUntil = receivedUntil;
-    return this;
   }
 
-  public BaseEmailPredicateBuilder setSubjectRegex(String subjectRegex) {
+  public void setSubjectRegex(String subjectRegex) {
     this.subjectRegex = subjectRegex;
-    return this;
   }
 
-  public BaseEmailPredicateBuilder setSentSince(LocalDateTime sentSince) {
+  public void setSentSince(LocalDateTime sentSince) {
     this.sentSince = sentSince;
-    return this;
   }
 
-  public BaseEmailPredicateBuilder setSentUntil(LocalDateTime sentUntil) {
+  public void setSentUntil(LocalDateTime sentUntil) {
     this.sentUntil = sentUntil;
-    return this;
   }
 }

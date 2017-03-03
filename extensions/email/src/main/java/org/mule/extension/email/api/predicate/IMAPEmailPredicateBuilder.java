@@ -99,23 +99,19 @@ public class IMAPEmailPredicateBuilder extends BaseEmailPredicateBuilder {
     return recent;
   }
 
-  public IMAPEmailPredicateBuilder setAnswered(Boolean answered) {
+  public void setAnswered(Boolean answered) {
     this.answered = answered;
-    return this;
   }
 
-  public IMAPEmailPredicateBuilder setDeleted(Boolean deleted) {
+  public void setDeleted(Boolean deleted) {
     this.deleted = deleted;
-    return this;
   }
 
-  public IMAPEmailPredicateBuilder setRecent(Boolean recent) {
+  public void setRecent(Boolean recent) {
     this.recent = recent;
-    return this;
   }
 
-  public IMAPEmailPredicateBuilder setSeen(Boolean seen) {
+  public void setSeen(Boolean seen) {
     this.seen = seen;
-    return this;
   }
 }

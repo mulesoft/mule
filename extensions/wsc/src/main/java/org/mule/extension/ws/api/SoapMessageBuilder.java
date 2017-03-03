@@ -57,4 +57,16 @@ public class SoapMessageBuilder {
   public Map<String, SoapAttachment> getAttachments() {
     return attachments;
   }
+
+  public void setBody(String body) {
+    this.body = body;
+  }
+
+  public void setHeaders(String headers) {
+    this.headers = headers;
+  }
+
+  public void setAttachments(Map<String, SoapAttachment> attachments) {
+    this.attachments = attachments;
+  }
 }

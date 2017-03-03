@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
@@ -136,15 +135,15 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getFieldsWithGettersOnly() {
-    Collection<Field> fieldsWithGetters = getFieldsWithGetters(PhoneNumber.class);
+  public void getFieldsWithGettersAndSetters() {
+    Collection<Field> fieldsWithGetters = IntrospectionUtils.getFieldsWithGettersAndSetters(PhoneNumber.class);
     assertThat(fieldsWithGetters.size(), is(4));
   }
 
   @Test
   public void getWildCardFieldsDataTypes() {
 
-    Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class);
+    Collection<Field> exposedFields = IntrospectionUtils.getFieldsWithGettersAndSetters(FruitBox.class);
     assertNotNull(exposedFields);
     assertEquals(6, exposedFields.size());
     assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);

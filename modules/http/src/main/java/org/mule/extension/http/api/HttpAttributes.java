@@ -28,4 +28,8 @@ public abstract class HttpAttributes extends BaseAttributes {
   public ParameterMap getHeaders() {
     return headers;
   }
+
+  public void setHeaders(ParameterMap headers) {
+    this.headers = headers;
+  }
 }

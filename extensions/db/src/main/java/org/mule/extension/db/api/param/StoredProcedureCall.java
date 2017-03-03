@@ -38,6 +38,7 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   @DisplayName("Input - Output Parameters")
   @XmlHints(allowReferences = false)
   protected LinkedHashMap<String, Object> inOutParameters = new LinkedHashMap<>();
+
   /**
    * A list of output parameters to be set on the JDBC prepared
    * statement. Each parameter should be referenced in the sql
@@ -85,5 +86,17 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   @Override
   public StoredProcedureCall getTemplate() {
     return template;
+  }
+
+  public void setInOutParameters(LinkedHashMap<String, Object> inOutParameters) {
+    this.inOutParameters = inOutParameters;
+  }
+
+  public void setOutputParameters(List<OutputParameter> outputParameters) {
+    this.outputParameters = outputParameters;
+  }
+
+  public void setTemplate(StoredProcedureCall template) {
+    this.template = template;
   }
 }

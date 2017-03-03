@@ -20,39 +20,40 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   /**
    * Full path where the request was received. Former 'http.listener.path'.
    */
-  private final String listenerPath;
+  private String listenerPath;
+
   /**
    * Path where the request was received, without considering the base path. Former 'http.relative.path'.
    */
-  private final String relativePath;
+  private String relativePath;
   /**
    * HTTP version of the request. Former 'http.version'.
    */
-  private final String version;
+  private String version;
   /**
    * HTTP scheme of the request. Former 'http.scheme'.
    */
-  private final String scheme;
+  private String scheme;
   /**
    * HTTP method of the request. Former 'http.method'.
    */
-  private final String method;
+  private String method;
   /**
    * Full URI of the request. Former 'http.request.uri'.
    */
-  private final String requestUri;
+  private String requestUri;
   /**
    * Query string of the request. Former 'http.query.string'.
    */
-  private final String queryString;
+  private String queryString;
   /**
    * Remote host address from the sender. Former 'http.remote.address'.
    */
-  private final String remoteAddress;
+  private String remoteAddress;
   /**
    * Client certificate (if 2 way TLS is enabled). Former 'http.client.cert'.
    */
-  private final Certificate clientCertificate;
+  private Certificate clientCertificate;
 
   public HttpRequestAttributes(ParameterMap headers, String listenerPath, String relativePath, String version, String scheme,
                                String method, String requestPath, String requestUri, String queryString, ParameterMap queryParams,
@@ -103,6 +104,42 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public Certificate getClientCertificate() {
     return clientCertificate;
+  }
+
+  public void setListenerPath(String listenerPath) {
+    this.listenerPath = listenerPath;
+  }
+
+  public void setRelativePath(String relativePath) {
+    this.relativePath = relativePath;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public void setScheme(String scheme) {
+    this.scheme = scheme;
+  }
+
+  public void setMethod(String method) {
+    this.method = method;
+  }
+
+  public void setRequestUri(String requestUri) {
+    this.requestUri = requestUri;
+  }
+
+  public void setQueryString(String queryString) {
+    this.queryString = queryString;
+  }
+
+  public void setRemoteAddress(String remoteAddress) {
+    this.remoteAddress = remoteAddress;
+  }
+
+  public void setClientCertificate(Certificate clientCertificate) {
+    this.clientCertificate = clientCertificate;
   }
 
 }

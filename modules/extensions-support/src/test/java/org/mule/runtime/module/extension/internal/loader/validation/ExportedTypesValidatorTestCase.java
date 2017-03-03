@@ -57,6 +57,9 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
+    when(invalidParameterModel.getName()).thenReturn("pojo");
+
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(operationModel.getName()).thenReturn("dummyOperation");
@@ -66,40 +69,66 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
     when(sourceModel.getName()).thenReturn("dummySource");
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
+    when(sourceCallbackModel.getAllParameterModels()).thenReturn(emptyList());
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidModelDueToOperationWithArgumentParameterWithoutGetter() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
-    when(invalidParameterModel.getName()).thenReturn("pojo");
     when(operationModel.getAllParameterModels()).thenReturn(asList(invalidParameterModel));
     validate(extensionModel, validator);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToOperationWithReturnTypeParameterWithoutGetter() {
-    when(operationModel.getAllParameterModels()).thenReturn(emptyList());
-    when(operationModel.getOutput()).thenReturn(outputModel);
-    when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToSourceWithReturnTypeParameterWithoutGetter() {
-    when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
-    when(sourceModel.getOutput()).thenReturn(outputModel);
-    when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
+  public void invalidModelDueToSourceCallbackWithoutGetter() {
+    when(sourceCallbackModel.getAllParameterModels()).thenReturn(asList(invalidParameterModel));
     validate(extensionModel, validator);
   }
 
   @Test
-  public void outputAttributesAreNotValidated() {
+  public void sourceParameterAreNotValidated() {
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(invalidParameterModel));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void sourceOutputAttributesAreNotValidated() {
     OutputModel outputAttributes = mock(OutputModel.class);
     when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
     when(sourceModel.getOutput()).thenReturn(outputModel);
     when(sourceModel.getOutputAttributes()).thenReturn(outputAttributes);
-    when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithGetter.class));
+    when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithGetterAndSetter.class));
     when(outputAttributes.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void sourceOutputTypeIsNotValidated() {
+    OutputModel outputWithoutGetters = mock(OutputModel.class);
+    when(outputWithoutGetters.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
+    when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
+    when(sourceModel.getOutput()).thenReturn(outputWithoutGetters);
+    when(sourceModel.getOutputAttributes()).thenReturn(outputModel);
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void operationOutputAttributesAreNotValidated() {
+    OutputModel outputAttributes = mock(OutputModel.class);
+    when(operationModel.getAllParameterModels()).thenReturn(emptyList());
+    when(operationModel.getOutput()).thenReturn(outputModel);
+    when(operationModel.getOutputAttributes()).thenReturn(outputAttributes);
+    when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithGetterAndSetter.class));
+    when(outputAttributes.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void operationOutputTypeIsNotValidated() {
+    OutputModel outputWithoutGetters = mock(OutputModel.class);
+    when(outputWithoutGetters.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
+    when(operationModel.getAllParameterModels()).thenReturn(emptyList());
+    when(operationModel.getOutput()).thenReturn(outputWithoutGetters);
+    when(operationModel.getOutputAttributes()).thenReturn(outputModel);
     validate(extensionModel, validator);
   }
 
@@ -111,13 +140,17 @@ public class ExportedTypesValidatorTestCase extends AbstractMuleTestCase {
   }
 
 
-  private static class PojoWithParameterWithGetter {
+  private static class PojoWithParameterWithGetterAndSetter {
 
     @Parameter
-    private String fieldWithGetter;
+    private String field;
 
-    public String getFieldWithGetter() {
-      return fieldWithGetter;
+    public String getField() {
+      return field;
+    }
+
+    public void setField(String field) {
+      this.field = field;
     }
   }
 

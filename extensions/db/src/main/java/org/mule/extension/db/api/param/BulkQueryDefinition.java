@@ -31,12 +31,15 @@ public class BulkQueryDefinition extends StatementDefinition<BulkQueryDefinition
     return template;
   }
 
-
   @Override
   protected BulkQueryDefinition copy() {
     BulkQueryDefinition copy = super.copy();
     copy.template = template;
 
     return copy;
+  }
+
+  public void setTemplate(BulkQueryDefinition template) {
+    this.template = template;
   }
 }

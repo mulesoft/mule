@@ -34,4 +34,16 @@ public class RecursiveChainA {
   public List<RecursiveChainB> getbChains() {
     return bChains;
   }
+
+  public void setFieldA(String fieldA) {
+    this.fieldA = fieldA;
+  }
+
+  public void setChainB(RecursiveChainB chainB) {
+    this.chainB = chainB;
+  }
+
+  public void setbChains(List<RecursiveChainB> bChains) {
+    this.bChains = bChains;
+  }
 }

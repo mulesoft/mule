@@ -34,4 +34,16 @@ public class VeganPolicy {
   public Integer getMaxCalories() {
     return maxCalories;
   }
+
+  public void setMeetAllowed(Boolean meetAllowed) {
+    this.meetAllowed = meetAllowed;
+  }
+
+  public void setIngredients(VeganIngredients ingredients) {
+    this.ingredients = ingredients;
+  }
+
+  public void setMaxCalories(Integer maxCalories) {
+    this.maxCalories = maxCalories;
+  }
 }

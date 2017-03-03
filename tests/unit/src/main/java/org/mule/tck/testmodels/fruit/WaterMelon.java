@@ -31,6 +31,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
   private static final Logger logger = LoggerFactory.getLogger(WaterMelon.class);
 
   private boolean bitten = false;
+
   private Integer seeds = new Integer(100);
   private Double radius = new Double(4.34);
   private String brand;
@@ -89,6 +90,22 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
 
   public String getState() {
     return state;
+  }
+
+  public static long getSerialVersionUID() {
+    return serialVersionUID;
+  }
+
+  public static Logger getLogger() {
+    return logger;
+  }
+
+  public void setBitten(boolean bitten) {
+    this.bitten = bitten;
+  }
+
+  public void setState(String state) {
+    this.state = state;
   }
 
   @Override

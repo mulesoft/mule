@@ -44,4 +44,16 @@ public class RecursivePojo {
     return mappedChilds;
   }
 
+  public void setNext(RecursivePojo next) {
+    this.next = next;
+  }
+
+  public void setChilds(List<RecursivePojo> childs) {
+    this.childs = childs;
+  }
+
+  public void setMappedChilds(Map<String, RecursivePojo> mappedChilds) {
+    this.mappedChilds = mappedChilds;
+  }
+
 }

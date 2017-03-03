@@ -54,13 +54,11 @@ public class FtpFilePredicateBuilder extends FilePredicateBuilder<FtpFilePredica
     return predicate;
   }
 
-  public FtpFilePredicateBuilder setTimestampSince(LocalDateTime timestampSince) {
+  public void setTimestampSince(LocalDateTime timestampSince) {
     this.timestampSince = timestampSince;
-    return this;
   }
 
-  public FtpFilePredicateBuilder setTimestampUntil(LocalDateTime timestampUntil) {
+  public void setTimestampUntil(LocalDateTime timestampUntil) {
     this.timestampUntil = timestampUntil;
-    return this;
   }
 }

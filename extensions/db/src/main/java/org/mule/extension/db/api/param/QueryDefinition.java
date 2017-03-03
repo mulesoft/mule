@@ -41,4 +41,8 @@ public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefin
     return copy;
   }
 
+  public void setTemplate(QueryDefinition template) {
+    this.template = template;
+  }
+
 }

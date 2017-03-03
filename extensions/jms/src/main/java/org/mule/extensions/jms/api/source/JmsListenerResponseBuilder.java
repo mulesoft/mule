@@ -42,4 +42,12 @@ public class JmsListenerResponseBuilder {
   public JmsPublishParameters getOverrides() {
     return overrides;
   }
+
+  public void setMessageBuilder(MessageBuilder messageBuilder) {
+    this.messageBuilder = messageBuilder;
+  }
+
+  public void setOverrides(JmsPublishParameters overrides) {
+    this.overrides = overrides;
+  }
 }

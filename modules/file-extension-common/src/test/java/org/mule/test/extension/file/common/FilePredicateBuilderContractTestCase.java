@@ -60,8 +60,13 @@ public class FilePredicateBuilderContractTestCase<T extends FilePredicateBuilder
 
   @Test
   public void matchesAll() {
-    builder.setFilenamePattern("glob:*.{java, js}").setPathPattern("glob:**.{java, js}").setRegularFile(true).setDirectory(false)
-        .setSymbolicLink(false).setMinSize(1L).setMaxSize(1024L);
+    builder.setFilenamePattern("glob:*.{java, js}");
+    builder.setPathPattern("glob:**.{java, js}");
+    builder.setRegularFile(true);
+    builder.setDirectory(false);
+    builder.setSymbolicLink(false);
+    builder.setMinSize(1L);
+    builder.setMaxSize(1024L);
 
     assertMatch();
   }
