@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.api.config.ThreadingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -148,7 +149,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         threadingProfile.setThreadWaitTimeout(threadTimeout);
         // Need 3 threads: 1 for polling, 2 to process work successfully without timeout
         threadingProfile.setMaxThreadsActive(3);
-        threadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
+        threadingProfile.setPoolExhaustedAction(WHEN_EXHAUSTED_WAIT);
         threadingProfile.setMuleContext(muleContext);
 
         MessageProcessor mockListener = mock(MessageProcessor.class);
@@ -188,6 +189,63 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         verify(exceptionHandler, timeout(RECEIVE_TIMEOUT).times(1)).handleException((Exception)any(),
             argThat(notSameEvent));
 
+    }
+
+    @Test
+    public void testProcessOneWayNegativeThreadWaitTimeout() throws Exception
+    {
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile(muleContext.getDefaultThreadingProfile());
+        threadingProfile.setThreadWaitTimeout(-1);
+        // Need 2 threads: 1 for polling, 1 to process work
+        threadingProfile.setMaxThreadsActive(2);
+        threadingProfile.setPoolExhaustedAction(WHEN_EXHAUSTED_WAIT);
+        threadingProfile.setMuleContext(muleContext);
+
+        queueProfile.setMaxOutstandingMessages(1);
+
+        final Latch latch = new Latch();
+        MessageProcessor mockListener = mock(MessageProcessor.class);
+        when(mockListener.process((MuleEvent)any())).thenAnswer(new Answer<MuleEvent>()
+        {
+            public MuleEvent answer(InvocationOnMock invocation) throws Throwable
+            {
+                // Await on latch so that only thread available is busy and otehr events have be be queued.
+                latch.await();
+                return (MuleEvent)invocation.getArguments()[0];
+            }
+        });
+
+        SedaStageInterceptingMessageProcessor sedaStageInterceptingMessageProcessor = new SedaStageInterceptingMessageProcessor(
+            "testProcessOneWayNegativeThreadWaitTimeout", "testProcessOneWayNegativeThreadWaitTimeout", queueProfile,
+            queueTimeout, threadingProfile, queueStatistics, muleContext);
+        sedaStageInterceptingMessageProcessor.setListener(mockListener);
+        sedaStageInterceptingMessageProcessor.initialise();
+        sedaStageInterceptingMessageProcessor.start();
+
+        MessagingExceptionHandler exceptionHandler = mock(MessagingExceptionHandler.class);
+        Flow flow = mock(Flow.class);
+        when(flow.getExceptionListener()).thenReturn(exceptionHandler);
+        when(flow.getProcessingStrategy()).thenReturn(new AsynchronousProcessingStrategy());
+        final MuleEvent event = getTestEvent(TEST_MESSAGE, flow, MessageExchangePattern.ONE_WAY);
+
+        int numberOfEvents = 3;
+
+        for (int i = 0; i < numberOfEvents; i++)
+        {
+            sedaStageInterceptingMessageProcessor.process(event);
+        }
+
+        // Release latch only after 220ms which is 20ms more than the default queue
+        // timeout.  If the new custom queueTimeout of -1 (unlimited) wasn't being
+        // used then event 3 would be rejected, as there is no room for it in the queue while event 1 processing is waiting on
+        // the latch.
+        Thread.sleep(220);
+        latch.countDown();
+
+        ArgumentMatcher<MuleEvent> notSameEvent = createNotSameEventArgumentMatcher(event);
+
+        // Three events are processed
+        verify(mockListener, timeout(RECEIVE_TIMEOUT).times(numberOfEvents)).process(argThat(notSameEvent));
     }
 
     @Test
