@@ -8,14 +8,19 @@ package org.mule.transport.email;
 
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
+
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ReceiveException;
+import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.email.i18n.EmailMessages;
 import org.mule.util.FileUtils;
@@ -186,11 +191,19 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                                         processedMessages.add(messages[i]);
                                     }
                                 }
-                                routeMessage(message);
+
+                                final MuleMessage routedMessage = message;
+                                TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate(getEndpoint().getMuleContext(),
+                                        new MuleTransactionConfig()).execute(new ExecutionCallback<MuleEvent>() {
+                                            @Override
+                                            public MuleEvent process() throws Exception {
+                                                return routeMessage(routedMessage);
+                                            }
+                                        });
                             }
                             catch (org.mule.api.MessagingException e)
                             {
-                                //Already handled by TransactionTemplate
+                                //Already handled by TransactionalErrorHandlingExecutionTemplate
                             }
                             catch (Exception e)
                             {
