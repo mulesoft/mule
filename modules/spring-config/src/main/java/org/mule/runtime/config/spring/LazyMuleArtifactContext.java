@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
@@ -24,7 +25,6 @@ import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 
@@ -141,8 +141,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
         if (nameAttribute != null) {
           try {
             muleContext.getRegistry().unregisterObject(nameAttribute);
-          } catch (RegistrationException e) {
-            throw new RuntimeException(e);
+          } catch (Exception e) {
+            logger
+                .warn(format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
+                             nameAttribute, e.getMessage()));
+            if (logger.isDebugEnabled()) {
+              logger.debug(e.getMessage(), e);
+            }
           }
         }
       });
