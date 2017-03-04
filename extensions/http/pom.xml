@@ -30,19 +30,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <!--TODO(fernandezlautaro): MULE-11409 mule-module-proxy depends on the mule-module-http-ext-4.0-SNAPSHOT.jar rather than mule-module-http-ext-4.0-SNAPSHOT-mule-plugin.jar, remove this plugin when AGW updates their POM -->
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>mule-plugin</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
