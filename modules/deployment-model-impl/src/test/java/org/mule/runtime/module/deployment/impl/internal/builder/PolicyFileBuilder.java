@@ -10,31 +10,25 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.io.File.separator;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Creates Mule Application Policy files.
  */
-public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBuilder> {
+public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> {
 
   private List<ArtifactPluginFileBuilder> plugins = new LinkedList<>();
-  private Properties properties = new Properties();
   private MulePolicyModel mulePolicyModel;
 
   public PolicyFileBuilder(String id) {
@@ -68,7 +62,7 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
   }
 
   @Override
-  protected List<ZipResource> getCustomResources() {
+  protected List<ZipResource> doGetCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
 
     for (ArtifactPluginFileBuilder plugin : plugins) {
@@ -104,41 +98,5 @@ public class PolicyFileBuilder extends AbstractArtifactFileBuilder<PolicyFileBui
     this.plugins.add(plugin);
 
     return this;
-  }
-
-  /**
-   * Adds a dependency against another plugin
-   *
-   * @param pluginName name of the plugin to be dependent. Non empty.
-   * @return the same builder instance
-   */
-  public PolicyFileBuilder dependingOn(String pluginName) {
-    checkImmutable();
-    checkArgument(!isEmpty(pluginName), "Plugin name cannot be empty");
-    String plugins = properties.getProperty(PLUGIN_DEPENDENCIES);
-    if (isEmpty(plugins)) {
-      plugins = pluginName;
-    } else {
-      plugins = plugins + ", " + pluginName;
-    }
-
-    properties.setProperty(PLUGIN_DEPENDENCIES, plugins);
-
-    return this;
-  }
-
-  /**
-   * Adds a resource file to the artifact classes folder.
-   *
-   * @param resourceFile class file from a external file or test resource. Non empty.
-   * @param targetFile name to use on the added resource. Non empty.
-   * @return the same builder instance
-   */
-  public PolicyFileBuilder usingResource(String resourceFile, String targetFile) {
-    checkImmutable();
-    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, CLASSES_DIR + separator + targetFile));
-
-    return getThis();
   }
 }

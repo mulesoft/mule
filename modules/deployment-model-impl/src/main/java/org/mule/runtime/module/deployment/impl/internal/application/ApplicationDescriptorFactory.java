@@ -8,15 +8,17 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
@@ -47,6 +49,8 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundE
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
+import com.google.common.collect.ImmutableList;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -76,7 +80,6 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   private static final String UNKNOWN = "unknown";
 
   private static final Logger logger = LoggerFactory.getLogger(ApplicationDescriptorFactory.class);
-  private static final String MULE_APPLICATION_JSON = "mule-application.json";
   private static final String MULE_CONFIG_FILES_FOLDER = "mule";
 
   private final ArtifactPluginRepository applicationPluginRepository;
@@ -142,28 +145,31 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   }
 
 
-  private ApplicationDescriptor loadFromJsonDescriptor(File applicationFolder, File muleApplicatinoJsonFile) {
-    final MuleApplicationModel muleApplicationModel = getMuleApplicationJsonDescriber(muleApplicatinoJsonFile);
+  private ApplicationDescriptor loadFromJsonDescriptor(File applicationFolder, File muleApplicationJsonFile) {
+    final MuleApplicationModel muleApplicationModel = getMuleApplicationJsonDescriber(muleApplicationJsonFile);
 
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(applicationFolder.getName());
     descriptor.setArtifactLocation(applicationFolder);
     descriptor.setRootFolder(applicationFolder);
     descriptor.setBundleDescriptor(getBundleDescriptor(applicationFolder, muleApplicationModel));
     descriptor.setMinMuleVersion(new MuleVersion(muleApplicationModel.getMinMuleVersion()));
+    muleApplicationModel.getDomain().ifPresent(domain -> {
+      descriptor.setDomain(domain);
+    });
     List<String> muleApplicationModelConfigs = muleApplicationModel.getConfigs();
     if (muleApplicationModelConfigs != null && !muleApplicationModelConfigs.isEmpty()) {
       descriptor.setConfigResources(muleApplicationModelConfigs.stream().map(configFile -> appendMuleFolder(configFile))
-          .collect(toList()).toArray(new String[0]));
-      List<File> configFiles = asList(descriptor.getConfigResources())
+          .collect(toList()));
+      List<File> configFiles = descriptor.getConfigResources()
           .stream()
           .map(config -> new File(applicationFolder, config)).collect(toList());
-      descriptor.setConfigResourcesFile(configFiles.toArray(new File[0]));
+      descriptor.setConfigResourcesFile(configFiles.toArray(new File[configFiles.size()]));
       descriptor.setAbsoluteResourcePaths(configFiles.stream().map(configFile -> configFile.getAbsolutePath()).collect(toList())
-          .toArray(new String[0]));
+          .toArray(new String[configFiles.size()]));
     } else {
       File configFile = new File(applicationFolder, appendMuleFolder(DEFAULT_CONFIGURATION_RESOURCE));
       descriptor.setConfigResourcesFile(new File[] {configFile});
-      descriptor.setConfigResources(new String[] {DEFAULT_CONFIGURATION_RESOURCE});
+      descriptor.setConfigResources(ImmutableList.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE_LOCATION).build());
       descriptor.setAbsoluteResourcePaths(new String[] {configFile.getAbsolutePath()});
     }
 
@@ -171,18 +177,15 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       ClassLoaderModel classLoaderModel = getClassLoaderModel(applicationFolder, classLoaderModelLoaderDescriptor);
       descriptor.setClassLoaderModel(classLoaderModel);
 
-      descriptor.setClassLoaderModel(classLoaderModel);
-
       try {
-        descriptor.setPlugins(createArtifactPluginDescriptors(classLoaderModel, applicationFolder.getName()));
+        descriptor.setPlugins(createArtifactPluginDescriptors(classLoaderModel));
       } catch (IOException e) {
         throw new IllegalStateException(e);
       }
     });
     File appClassesFolder = getAppClassesFolder(descriptor);
     // get a ref to an optional app props file (right next to the descriptor)
-    final File appPropsFile = new File(appClassesFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
-    setApplicationProperties(descriptor, appPropsFile);
+    setApplicationProperties(descriptor, new File(appClassesFolder, DEFAULT_APP_PROPERTIES_RESOURCE));
     return descriptor;
   }
 
@@ -242,8 +245,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       URL[] sharedLibraries = findSharedLibraries(desc);
 
       // get a ref to an optional app props file (right next to the descriptor)
-      final File appPropsFile = new File(appClassesFolder, DEFAULT_APP_PROPERTIES_RESOURCE);
-      setApplicationProperties(desc, appPropsFile);
+      setApplicationProperties(desc, new File(appClassesFolder, DEFAULT_APP_PROPERTIES_RESOURCE));
 
       List<URL> urls = getApplicationResourceUrls(appClassesFolder.toURI().toURL(), libraries, sharedLibraries);
       if (!urls.isEmpty() && logger.isInfoEnabled()) {
@@ -258,13 +260,12 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       classLoaderModelBuilder.exportingPackages(jarInfo.getPackages())
           .exportingResources(jarInfo.getResources());
 
-      Set<BundleDependency> plugins = getPluginDependencies(artifactFolder);
-      classLoaderModelBuilder.dependingOn(plugins);
+      classLoaderModelBuilder.dependingOn(getPluginDependencies(artifactFolder));
       ClassLoaderModel classLoaderModel = classLoaderModelBuilder.build();
       desc.setClassLoaderModel(classLoaderModel);
 
 
-      desc.setPlugins(createArtifactPluginDescriptors(classLoaderModel, artifactFolder.getName()));
+      desc.setPlugins(createArtifactPluginDescriptors(classLoaderModel));
     } catch (IOException e) {
       throw new ArtifactDescriptorCreateException("Unable to create application descriptor", e);
     }
@@ -273,28 +274,31 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   }
 
   private Set<BundleDependency> getPluginDependencies(File applicationFolder) throws MalformedURLException {
-    File pluginsFolders = new File(applicationFolder, "plugins");
-    File[] files = pluginsFolders.listFiles();
     Set<BundleDependency> plugins = new HashSet<>();
-    if (!pluginsFolders.exists()) {
-      return plugins;
-    }
-    for (File file : files) {
-      plugins.add(new BundleDependency.Builder().setBundleUrl(file.toURL()).setScope(COMPILE)
-          .setDescriptor(new BundleDescriptor.Builder().setArtifactId(UNKNOWN).setGroupId(UNKNOWN).setVersion(UNKNOWN)
-              .setClassifier(MULE_PLUGIN_CLASSIFIER).build())
-          .build());
+    File pluginsFolders = new File(applicationFolder, "plugins");
+    if (pluginsFolders.exists()) {
+      File[] files = pluginsFolders.listFiles();
+      if (!pluginsFolders.exists()) {
+        return plugins;
+      }
+      BundleDescriptor bundleDescriptor =
+          new BundleDescriptor.Builder().setArtifactId(UNKNOWN).setGroupId(UNKNOWN).setVersion(UNKNOWN)
+              .setClassifier(MULE_PLUGIN_CLASSIFIER).build();
+      for (File file : files) {
+        plugins.add(new BundleDependency.Builder().setBundleUrl(file.toURL()).setScope(COMPILE)
+            .setDescriptor(bundleDescriptor)
+            .build());
+      }
     }
     return plugins;
   }
 
-  private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(ClassLoaderModel classLoaderModel, String applicationName)
+  private Set<ArtifactPluginDescriptor> createArtifactPluginDescriptors(ClassLoaderModel classLoaderModel)
       throws IOException {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
     for (BundleDependency bundleDependency : classLoaderModel.getDependencies()) {
       if (bundleDependency.getDescriptor().isPlugin()) {
-        // TODO(pablo.kraan): embedded - get the file form the app descriptor
-        File pluginFile = new File(bundleDependency.getBundleUrl().getFile());
+        File pluginFile = toFile(bundleDependency.getBundleUrl());
         pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginFile));
       }
     }

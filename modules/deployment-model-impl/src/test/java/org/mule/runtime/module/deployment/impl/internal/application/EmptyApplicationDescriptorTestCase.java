@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -40,8 +41,8 @@ public class EmptyApplicationDescriptorTestCase extends AbstractMuleTestCase {
   public void defaultValuesAreCorrect() throws IOException {
     EmptyApplicationDescriptor applicationDescriptor = new EmptyApplicationDescriptor(appFolder);
     assertThat(applicationDescriptor.getName(), is(APP_NAME));
-    assertThat(applicationDescriptor.getConfigResources()[0], is(DEFAULT_CONFIGURATION_RESOURCE));
-    String absolutePathForConfigResource = new File(appFolder, DEFAULT_CONFIGURATION_RESOURCE).getAbsolutePath();
+    assertThat(applicationDescriptor.getConfigResources().get(0), is(DEFAULT_CONFIGURATION_RESOURCE_LOCATION));
+    String absolutePathForConfigResource = new File(appFolder, DEFAULT_CONFIGURATION_RESOURCE_LOCATION).getAbsolutePath();
     assertThat(applicationDescriptor.getAbsoluteResourcePaths()[0], is(absolutePathForConfigResource));
     assertThat(applicationDescriptor.getConfigResourcesFile()[0].getAbsolutePath(), is(absolutePathForConfigResource));
     assertThat(applicationDescriptor.getLogConfigFile(), is(nullValue()));

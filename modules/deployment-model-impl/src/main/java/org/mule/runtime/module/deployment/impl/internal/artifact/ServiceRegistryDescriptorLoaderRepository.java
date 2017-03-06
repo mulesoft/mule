@@ -43,7 +43,7 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
   }
 
   @Override
-  public <T extends DescriptorLoader> T get(String id, ArtifactType artifactType, Class<T> loaderClass)
+  public synchronized <T extends DescriptorLoader> T get(String id, ArtifactType artifactType, Class<T> loaderClass)
       throws LoaderNotFoundException {
     if (descriptorLoaders == null) {
       initializeDescriptorLoaders();

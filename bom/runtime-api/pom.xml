@@ -13,7 +13,7 @@
     <version>4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Mule Runtime APIs BOM</name>
-    <description>Modules that provides all the APIs versions provided by the Mule Runtime for a particular runtime version. Users of the APIs should use this BOM when depending on any Mule API.</description>
+    <description>Module that provides all the APIs versions provided by the Mule Runtime for a particular runtime version. Users of the APIs should use this BOM when depending on any Mule API.</description>
 
     <dependencyManagement>
         <dependencies>

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.io.File.separator;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.core.util.PropertiesUtils;
@@ -17,6 +18,8 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -27,7 +30,7 @@ public class PropertiesDescriptorParser {
   protected static final String PROPERTY_ENCODING = "encoding";
   public static final String PROPERTY_DOMAIN = "domain";
   // support not yet implemented for CL reversal
-  protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
+  public static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
   protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
 
   /**
@@ -49,14 +52,14 @@ public class PropertiesDescriptorParser {
     appDescriptor.setRootFolder(location.getParentFile());
 
     final String resProps = properties.getProperty(PROPERTY_CONFIG_RESOURCES);
-    String[] urls;
+    List<String> urls = new ArrayList<>();
     if (StringUtils.isBlank(resProps)) {
-      urls = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
+      urls.add("mule" + File.separator + DEFAULT_CONFIGURATION_RESOURCE);
     } else {
-      urls = resProps.split(",");
-      for (int i = 0; i < urls.length; i++) {
-        urls[i] = getAppConfigFolderPath() + urls[i];
-      }
+      List<String> configs = asList(resProps.split(","));
+      configs.stream().forEach(config -> {
+        urls.add(getAppConfigFolderPath() + config);
+      });
     }
     appDescriptor.setConfigResources(urls);
 
@@ -82,10 +85,10 @@ public class PropertiesDescriptorParser {
     return configResourcesFile;
   }
 
-  private String[] convertConfigResourcesToAbsolutePatch(final String[] configResources, File location) {
-    String[] absoluteResourcePaths = new String[configResources.length];
-    for (int i = 0; i < configResources.length; i++) {
-      String resource = configResources[i];
+  private String[] convertConfigResourcesToAbsolutePatch(final List<String> configResources, File location) {
+    String[] absoluteResourcePaths = new String[configResources.size()];
+    for (int i = 0; i < configResources.size(); i++) {
+      String resource = configResources.get(i);
       absoluteResourcePaths[i] = toAbsoluteFile(resource, location);
     }
     return absoluteResourcePaths;

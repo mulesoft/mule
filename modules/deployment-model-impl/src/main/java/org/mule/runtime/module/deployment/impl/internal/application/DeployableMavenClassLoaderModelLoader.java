@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.lang.Boolean.getBoolean;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
@@ -34,14 +35,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
- * {@link ClassLoaderModel} TODO(fernandezlautaro): MULE-11094 this class is the default implementation for discovering
+ * {@link ClassLoaderModel}
+ *
+ * TODO(fernandezlautaro): MULE-11094 this class is the default implementation for discovering
  * dependencies and URLs, which happens to be Maven based. There could be other ways to look for dependencies and URLs (probably
  * for testing purposes where the plugins are done by hand and without maven) which will imply implementing the jira pointed out
  * in this comment.
  *
  * @since 4.0
  */
-public class AppMavenClassLoaderModelLoader extends MavenClassLoaderModelLoader {
+public class DeployableMavenClassLoaderModelLoader extends MavenClassLoaderModelLoader {
 
   public static final String ADD_TEST_DEPENDENCIES_KEY = "mule.embedded.maven.addTestDependenciesToAppClassPath";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -113,6 +116,6 @@ public class AppMavenClassLoaderModelLoader extends MavenClassLoaderModelLoader 
 
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
-    return artifactType.equals(APP);
+    return artifactType.equals(APP) || artifactType.equals(POLICY);
   }
 }

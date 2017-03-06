@@ -12,11 +12,19 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
+import org.apache.commons.lang3.SerializationUtils;
+
+/**
+ * Serializer for passing objects to embedded controller.
+ *
+ * @since 4.0
+ */
 public class Serializer {
 
   private Serializer() {}
 
   public static void serialize(Serializable obj, OutputStream outputStream) {
+    SerializationUtils.serialize(obj, outputStream);
     if (outputStream == null) {
       throw new IllegalArgumentException("The OutputStream must not be null");
     }

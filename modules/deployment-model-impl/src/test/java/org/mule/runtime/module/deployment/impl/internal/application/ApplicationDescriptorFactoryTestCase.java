@@ -28,7 +28,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppPluginsFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.util.FileUtils.unzip;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
@@ -91,7 +91,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void makesConfigFileRelativeToAppMuleFolder() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(APP_NAME)
-        .deployedWith("config.resources", "config1.xml,config2.xml").deployedWith("domain", "default");
+        .deployedWith("config.resources", "mule/config1.xml,mule/config2.xml").deployedWith("domain", "default");
     unzip(applicationFileBuilder.getArtifactFile(), getAppFolder(APP_NAME));
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
@@ -100,8 +100,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
-    String config1Path = new File(getAppConfigFolder(APP_NAME), "config1.xml").getAbsolutePath();
-    String config2Path = new File(getAppConfigFolder(APP_NAME), "config2.xml").getAbsolutePath();
+    String config1Path = new File(getAppConfigFolder(APP_NAME), "mule/config1.xml").getAbsolutePath();
+    String config2Path = new File(getAppConfigFolder(APP_NAME), "mule/config2.xml").getAbsolutePath();
     assertThat(desc.getAbsoluteResourcePaths().length, equalTo(2));
     assertThat(desc.getAbsoluteResourcePaths(), arrayContainingInAnyOrder(config1Path, config2Path));
   }
@@ -188,8 +188,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor desc = createApplicationDescriptor(appPath);
 
     assertThat(desc.getMinMuleVersion(), is(new MuleVersion("4.0.0")));
-    assertThat(desc.getConfigResources().length, is(1));
-    assertThat(desc.getConfigResources()[0], is("mule/" + DEFAULT_CONFIGURATION_RESOURCE));
+    assertThat(desc.getConfigResources().size(), is(1));
+    assertThat(desc.getConfigResources().get(0), is(DEFAULT_CONFIGURATION_RESOURCE_LOCATION));
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
     assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
@@ -206,7 +206,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     String appPath = "apps/custom-config-files";
     ApplicationDescriptor desc = createApplicationDescriptor(appPath);
 
-    assertThat(asList(desc.getConfigResources()), contains("file1.xml", "file2.xml"));
+    assertThat(desc.getConfigResources(), contains("mule/file1.xml", "mule/file2.xml"));
   }
 
   @Test
@@ -242,8 +242,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(2));
-    assertThat(classLoaderModel.getDependencies(), hasItems(socketsPluginDependencyMatcher(), httpPluginDependencyMatcher()));
+    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    assertThat(classLoaderModel.getDependencies(), hasItems(httpPluginDependencyMatcher()));
 
     assertThat(classLoaderModel.getUrls().length, is(1));
     classLoaderModel.getDependencies().stream()
@@ -306,7 +306,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
       @Override
       public void describeTo(Description description) {
-        description.appendText("invalid bundle configuration");
+        description.appendText(" invalid bundle configuration");
       }
 
       @Override
@@ -319,7 +319,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
         return bundleDependency.getScope().equals(COMPILE) &&
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
-            bundleDependency.getDescriptor().getArtifactId().equals("mule-module-http") &&
+            bundleDependency.getDescriptor().getArtifactId().equals("mule-module-http-ext") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
             bundleDependency.getDescriptor().getVersion().equals("4.0-SNAPSHOT");
       }

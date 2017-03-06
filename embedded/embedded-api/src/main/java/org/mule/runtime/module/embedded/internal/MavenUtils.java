@@ -26,28 +26,7 @@ import org.slf4j.LoggerFactory;
 // TODO MULE-11878 - consolidate with other aether usages in mule.
 public class MavenUtils {
 
-  private static final String USER_HOME = "user.home";
-  private static final String M2_REPO = "/.m2/repository";
-  private static String userHome = getProperty(USER_HOME);
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(MavenUtils.class);
-
   private MavenUtils() {}
-
-  public static File getMavenLocalRepository() {
-    String localRepositoryProperty = getProperty("localRepository");
-    if (localRepositoryProperty == null) {
-      localRepositoryProperty = userHome + M2_REPO;
-      LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);
-    }
-
-    LOGGER.debug("Using Maven localRepository: '{}'", localRepositoryProperty);
-    File mavenLocalRepositoryLocation = new File(localRepositoryProperty);
-    if (!mavenLocalRepositoryLocation.exists()) {
-      throw new IllegalArgumentException("Maven repository location couldn't be found, please check your configuration");
-    }
-    return mavenLocalRepositoryLocation;
-  }
 
   public static Model createModelFromPom(File pomLocation) {
     try (FileReader fileReader = new FileReader(pomLocation)) {

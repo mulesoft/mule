@@ -4,16 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.test</groupId>
-    <artifactId>application-using-http</artifactId>
+    <groupId>test</groupId>
+    <artifactId>plugin-dependency</artifactId>
     <version>1.0.0</version>
 
     <dependencies>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sockets</artifactId>
+            <version>4.0-SNAPSHOT</version>
+            <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
+
 
 </project>

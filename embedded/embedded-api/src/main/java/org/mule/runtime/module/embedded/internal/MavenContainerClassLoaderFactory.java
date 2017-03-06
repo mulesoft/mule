@@ -52,7 +52,7 @@ public class MavenContainerClassLoaderFactory {
         repository.assemblyDependenciesForArtifact(defaultArtifact, zipDependencyFilter);
     List<URL> urls = loadUrls(nlg);
 
-    return new URLClassLoader(urls.toArray(new URL[0]), parentClassLoader);
+    return new URLClassLoader(urls.toArray(new URL[urls.size()]), parentClassLoader);
   }
 
   public List<URL> getServices(String version) {
@@ -63,7 +63,7 @@ public class MavenContainerClassLoaderFactory {
                                                    dependency -> dependency.getArtifact().getArtifactId()
                                                        .equals("mule-services-all"));
     List<URL> urls = loadUrls(nlg);
-    return urls.stream().filter(u -> u.getFile().endsWith(".zip")).collect(toList());
+    return urls.stream().filter(u -> u.getFile().toLowerCase().endsWith(".zip")).collect(toList());
   }
 
   private Artifact getContainerBomArtifact(String version) {

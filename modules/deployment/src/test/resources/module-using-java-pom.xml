@@ -17,7 +17,6 @@
             <artifactId>echoPlugin</artifactId>
             <version>1.0</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.foo</groupId>

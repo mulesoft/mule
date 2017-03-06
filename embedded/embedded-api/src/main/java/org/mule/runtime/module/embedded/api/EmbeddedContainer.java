@@ -10,7 +10,7 @@ package org.mule.runtime.module.embedded.api;
 /**
  * Interface that represents an embedded container
  *
- * @since 1.0
+ * @since 4.0
  */
 public interface EmbeddedContainer {
 

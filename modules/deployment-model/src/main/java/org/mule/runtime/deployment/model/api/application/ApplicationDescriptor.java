@@ -14,9 +14,13 @@ import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
+import com.google.common.collect.ImmutableList;
+
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,11 +28,17 @@ import java.util.Set;
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
+  public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION = Paths.get("mule", "mule-config.xml").toString();
   public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
+  public static final String REPOSITORY_FOLDER = "repository";
+  public static final String MULE_APPLICATION_JSON = "mule-application.json";
+  public static final String MULE_APPLICATION_JSON_LOCATION =
+      Paths.get("META-INF", "mule-artifact", "mule-application.json").toString();
 
   private String encoding;
   private String domain = DEFAULT_DOMAIN_NAME;
-  private String[] configResources = new String[] {getAppConfigFolderPath() + DEFAULT_CONFIGURATION_RESOURCE};
+  private List<String> configResources =
+      ImmutableList.<String>builder().add(getAppConfigFolderPath() + DEFAULT_CONFIGURATION_RESOURCE).build();
   private String[] absoluteResourcePaths;
   private File[] configResourcesFile;
   private Map<String, String> appProperties = new HashMap<String, String>();
@@ -69,11 +79,11 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
     this.domain = domain;
   }
 
-  public String[] getConfigResources() {
+  public List<String> getConfigResources() {
     return configResources;
   }
 
-  public void setConfigResources(String[] configResources) {
+  public void setConfigResources(List<String> configResources) {
     this.configResources = configResources;
   }
 

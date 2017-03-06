@@ -9,23 +9,20 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.sort;
-import static java.util.Collections.emptySet;
-import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
@@ -43,9 +40,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
  * Creates descriptors for policy templates
@@ -98,8 +95,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
     }
 
     descriptor.setBundleDescriptor(getBundleDescriptor(artifactFolder, mulePolicyModel));
-    descriptor.setPlugins(parseArtifactPluginDescriptors(artifactFolder, descriptor));
-
+    descriptor.setPlugins(parseArtifactPluginDescriptors(descriptor));
     return descriptor;
   }
 
@@ -147,31 +143,17 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
     return "Unknown model loader: " + muleArtifactLoaderDescriptor.getId();
   }
 
-  private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(File artifactFolder, PolicyTemplateDescriptor descriptor) {
-    final File pluginsDir = new File(artifactFolder, PLUGINS_FOLDER);
-    // TODO(pablo.kraan): MULE-11383 all artifacts must be .jar files
-    String[] pluginZips = pluginsDir.list(new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE));
-    if (pluginZips == null) {
-      return emptySet();
-    }
+  private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(PolicyTemplateDescriptor descriptor) {
+    Set<BundleDependency> pluginDependencies = descriptor.getClassLoaderModel().getDependencies().stream()
+        .filter(dependency -> dependency.getDescriptor().isPlugin()).collect(Collectors.toSet());
 
-    final Set<ArtifactPluginDescriptor> plugins = new HashSet<>(pluginZips.length);
-
-    if (pluginZips != null && pluginZips.length != 0) {
-      sort(pluginZips);
-
-      for (String pluginZip : pluginZips) {
-        File pluginZipFile = new File(pluginsDir, pluginZip);
-        try {
-          plugins.add(artifactPluginDescriptorLoader
-              .load(pluginZipFile));
-        } catch (IOException e) {
-          throw new ArtifactDescriptorCreateException("Cannot load plugin descriptor: " + pluginZip, e);
-        }
+    return pluginDependencies.stream().map(dependency -> {
+      try {
+        return artifactPluginDescriptorLoader.load(new File(dependency.getBundleUrl().getFile()));
+      } catch (IOException e) {
+        throw new MuleRuntimeException(e);
       }
-    }
-
-    return plugins;
+    }).collect(Collectors.toSet());
   }
 
   private MulePolicyModel getMulePolicyJsonDescriber(File jsonFile) {

@@ -60,14 +60,29 @@ public final class JarUtils {
    * @return the content of the file as byte array or empty if the file does not exists within the jar file.
    * @throws IOException if there was a problem reading from the jar file.
    */
-  public static Optional<Byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
+  public static Optional<byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
     URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
     JarURLConnection jarConnection = (JarURLConnection) jsonDescriptorUrl.openConnection();
     try (InputStream inputStream = jarConnection.getInputStream()) {
       byte[] byteArray = toByteArray(inputStream);
-      Byte[] byteArrayWrapper = new Byte[byteArray.length];
-      Arrays.setAll(byteArrayWrapper, n -> byteArray[n]);
-      return of(byteArrayWrapper);
+      return of(byteArray);
+    } catch (FileNotFoundException e) {
+      return empty();
+    }
+  }
+
+  /**
+   * Loads the content of a file within a jar into a byte array.
+   *
+   * @param jarFile the jar file
+   * @return the content of the file as byte array or empty if the file does not exists within the jar file.
+   * @throws IOException if there was a problem reading from the jar file.
+   */
+  public static Optional<byte[]> loadFileContentFrom(URL jarFile) throws IOException {
+    JarURLConnection jarConnection = (JarURLConnection) jarFile.openConnection();
+    try (InputStream inputStream = jarConnection.getInputStream()) {
+      byte[] byteArray = toByteArray(inputStream);
+      return of(byteArray);
     } catch (FileNotFoundException e) {
       return empty();
     }

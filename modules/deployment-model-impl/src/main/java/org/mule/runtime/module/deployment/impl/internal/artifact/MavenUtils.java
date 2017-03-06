@@ -14,7 +14,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO(pablo.kraan): embedded - remove class duplication
+// TODO MULE-11878 - consolidate with other aether usages in mule.
 class MavenUtils {
 
   private static final String USER_HOME = "user.home";
@@ -25,6 +25,7 @@ class MavenUtils {
 
   private MavenUtils() {}
 
+  // TODO - MULE-11910 - Improve aether maven repository configuration
   public static File getMavenLocalRepository() {
     String localRepositoryProperty = getProperty("localRepository");
     if (localRepositoryProperty == null) {

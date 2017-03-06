@@ -9,12 +9,13 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.JarUtils.getUrlWithinJar;
+import static org.mule.runtime.core.util.JarUtils.getUrlsWithinJar;
 import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 
@@ -23,6 +24,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -46,18 +51,39 @@ public class MavenUtils {
   public static Model getPomModelFromJar(File artifactFile) {
     String pomFilePath = MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM;
     try {
-      Optional<Byte[]> pomFileContentOptional = loadFileContentFrom(artifactFile, pomFilePath);
-      if (!pomFileContentOptional.isPresent()) {
-        throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' within the artifact(error found while reading plugin '%s')",
-                                                           MAVEN, pomFilePath,
-                                                           artifactFile.getName()));
-      }
       MavenXpp3Reader reader = new MavenXpp3Reader();
-      return reader.read(new ByteArrayInputStream(toPrimitive(pomFileContentOptional.get())));
+      return reader.read(new ByteArrayInputStream(loadFileContentFrom(getPomUrlFromJar(artifactFile)).get()));
     } catch (IOException | XmlPullParserException e) {
       throw new ArtifactDescriptorCreateException(format("There was an issue reading '%s' for the plugin '%s'",
                                                          pomFilePath, artifactFile.getAbsolutePath()),
                                                   e);
+    }
+  }
+
+  /**
+   * Finds the URL of the pom file within the artifact file.
+   * 
+   * @param artifactFile the artifact file to search for the pom file.
+   * @return the URL to the pom file.
+   */
+  public static URL getPomUrlFromJar(File artifactFile) {
+    String pomFilePath = MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM;
+    URL possibleUrl;
+    try {
+      possibleUrl = getUrlWithinJar(artifactFile, pomFilePath);
+      try (InputStream ignored = possibleUrl.openStream()) {
+        return possibleUrl;
+      } catch (Exception e) {
+        List<URL> jarMavenUrls = getUrlsWithinJar(artifactFile, Paths.get("META-INF", "maven").toString());
+        Optional<URL> pomUrl = jarMavenUrls.stream().filter(url -> url.toString().endsWith("pom.xml")).findAny();
+        if (!pomUrl.isPresent()) {
+          throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' within the artifact(error found while reading plugin '%s')",
+                                                             artifactFile.getName()));
+        }
+        return pomUrl.get();
+      }
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
     }
   }
 
@@ -94,18 +120,17 @@ public class MavenUtils {
       }
       File[] directories = lookupFolder.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
       checkState(directories != null || directories.length == 0,
-                 format("No directories under %s so pom.xml file for artifact in folder %s could not be find",
+                 format("No directories under %s so pom.xml file for artifact in folder %s could not be found",
                         lookupFolder.getAbsolutePath(), artifactFolder.getAbsolutePath()));
       checkState(directories.length == 1,
-                 format("More than one directory under %s so pom.xml file for artifact in folder %s could not be find",
+                 format("More than one directory under %s so pom.xml file for artifact in folder %s could not be found",
                         lookupFolder.getAbsolutePath(), artifactFolder.getAbsolutePath()));
       lookupFolder = directories[0];
     }
 
     // final File mulePluginPom = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM);
     if (mulePluginPom == null || !mulePluginPom.exists()) {
-      throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' (error found while reading plugin '%s')",
-                                                         MAVEN, mulePluginPom.getName(),
+      throw new ArtifactDescriptorCreateException(format("The maven bundle loader requires the file pom.xml (error found while reading plugin '%s')",
                                                          artifactFolder.getName()));
     }
     return mulePluginPom;

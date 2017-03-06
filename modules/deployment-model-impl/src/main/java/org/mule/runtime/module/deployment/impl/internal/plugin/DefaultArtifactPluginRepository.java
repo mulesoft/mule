@@ -82,8 +82,7 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
   private List<ArtifactPluginDescriptor> createApplicationPluginDescriptors() {
     List<ArtifactPluginDescriptor> pluginDescriptors = new LinkedList<>();
 
-    for (File plguinJarFile : getContainerAppPluginsFolder()
-        .listFiles((dir, name) -> name.endsWith(".jar") || name.endsWith(".zip"))) {
+    for (File plguinJarFile : getContainerAppPluginsFolder().listFiles()) {
       final ArtifactPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(plguinJarFile);
       pluginDescriptors.add(appPluginDescriptor);
     }

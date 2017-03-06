@@ -28,9 +28,22 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
-public interface EmbeddedContainerFactory {
+/**
+ * Factory for creating an embedded container.
+ */
+final public class EmbeddedContainerFactory {
 
-  static EmbeddedContainer create(String muleVersion, URL containerBaseFolder, ArtifactInfo application) {
+  private EmbeddedContainerFactory() {}
+
+  /**
+   * Creates a container with by creating artifacts based on the {@code application} configuration.
+   *
+   * @param muleVersion the mule version of the runtime to use
+   * @param containerBaseFolder the base folder to use for the container to create the required files.
+   * @param application the application data.
+   * @return
+   */
+  public static EmbeddedContainer create(String muleVersion, URL containerBaseFolder, ArtifactInfo application) {
     try {
       Repository repository = new Repository();
 

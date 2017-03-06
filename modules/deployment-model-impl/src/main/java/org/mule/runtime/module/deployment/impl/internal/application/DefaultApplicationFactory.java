@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
@@ -38,7 +39,6 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -124,8 +124,12 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     Set<ArtifactPluginDescriptor> pluginDescriptors = createArtifactPluginDescriptors(descriptor);
 
     Set<ArtifactPluginDescriptor> applicationPluginDescriptors =
-        concat(artifactPluginRepository.getContainerArtifactPluginDescriptors().stream(), pluginDescriptors.stream())
-            .collect(Collectors.toSet());
+        concat(artifactPluginRepository.getContainerArtifactPluginDescriptors().stream()
+            .filter(containerPluginDescriptor -> !pluginDescriptors.stream()
+                .filter(appPluginDescriptor -> appPluginDescriptor.getName().equals(containerPluginDescriptor.getName()))
+                .findAny().isPresent()),
+               pluginDescriptors.stream())
+                   .collect(Collectors.toSet());
 
     Set<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(applicationPluginDescriptors);
@@ -169,7 +173,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
     for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
       if (bundleDependency.getDescriptor().isPlugin()) {
-        File pluginZip = new File(bundleDependency.getBundleUrl().getFile());
+        File pluginZip = toFile(bundleDependency.getBundleUrl());
         pluginDescriptors.add(pluginDescriptorLoader.load(pluginZip));
       }
     }

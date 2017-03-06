@@ -29,10 +29,6 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   public static final String MULE_ARTIFACT_FOLDER = META_INF + separator + "mule-artifact";
   public static final String MULE_PLUGIN_JSON = "mule-plugin.json";
   public static final String MULE_PLUGIN_POM = "pom.xml";
-  /**
-   * Target folder for the internal and cloned repository within the plugin end package.
-   */
-  public static final String REPOSITORY = MULE_ARTIFACT_FOLDER + separator + "repository";
 
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();

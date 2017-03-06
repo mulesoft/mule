@@ -7,6 +7,7 @@
 package org.mule.runtime.module.embedded.internal;
 
 import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.repository.RepositoryPolicy.CHECKSUM_POLICY_IGNORE;
 import static org.eclipse.aether.repository.RepositoryPolicy.UPDATE_POLICY_NEVER;
@@ -19,6 +20,7 @@ import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -120,10 +122,8 @@ public class Repository {
 
       final DependencyRequest dependencyRequest = new DependencyRequest();
 
-      Collection<String> excluded = new ArrayList<>();
-      Collections.addAll(excluded, PROVIDED, SYSTEM, RUNTIME, TEST);
-      Collection<String> included = new ArrayList<>();
-      included.add(COMPILE);
+      Collection<String> excluded = asList(PROVIDED, SYSTEM, RUNTIME, TEST);
+      Collection<String> included = asList(COMPILE);
       dependencyRequest.setFilter(new ScopeDependencyFilter(included, excluded));
 
       dependencyRequest.setRoot(collectResult.getRoot());
@@ -137,17 +137,17 @@ public class Repository {
       DependencyNode node = e.getResult().getRoot();
       logUnresolvedArtifacts(node, e);
       throw new RuntimeException(
-                                 String.format("There was an issue solving the dependencies for the container [%s]",
+                                 String.format("There was an problem solving the dependencies for the container [%s]",
                                                artifact),
                                  e);
     } catch (DependencyCollectionException e) {
       throw new RuntimeException(
-                                 String.format("There was an issue resolving the dependency tree for the container [%s]",
+                                 String.format("There was an problem resolving the dependency tree for the container [%s]",
                                                artifact),
                                  e);
     } catch (ArtifactDescriptorException e) {
       throw new RuntimeException(
-                                 String.format("There was an issue resolving the artifact descriptor for the container [%s]",
+                                 String.format("There was an problem resolving the artifact descriptor for the container [%s]",
                                                artifact),
                                  e);
     }

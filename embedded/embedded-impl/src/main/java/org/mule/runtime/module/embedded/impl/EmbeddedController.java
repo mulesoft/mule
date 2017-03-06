@@ -14,7 +14,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
-import static org.mule.runtime.module.deployment.impl.internal.application.AppMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
+import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
 import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFromPom;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,7 +43,7 @@ import org.apache.maven.model.Model;
 /**
  * Controller class for the runtime. It spin ups a new container instance using a temporary folder and dynamically loading the
  * container libraries.
- *
+ * <p>
  * Invoked by reflection
  *
  * @since 4.0
@@ -113,7 +113,7 @@ public class EmbeddedController {
     executeWithinContainerClassLoader(() -> {
       ApplicationDescriptor applicationDescriptor =
           artifactResourcesRegistry.getApplicationDescriptorFactory().create(applicationFolder);
-      applicationDescriptor.setConfigResources(configResources.toArray(new String[0]));
+      applicationDescriptor.setConfigResources(configResources);
       applicationDescriptor.setAbsoluteResourcePaths(configResources.toArray(new String[0]));
 
       artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
@@ -169,7 +169,7 @@ public class EmbeddedController {
     URL[] urLs = urlClassLoader.getURLs();
     for (URL urL : urLs) {
       File dependencyFile = new File(urL.getPath());
-      if (dependencyFile.getName().endsWith("zip")) {
+      if (dependencyFile.getName().toLowerCase().endsWith("zip")) {
         try {
           copyFile(dependencyFile, new File(getServicesFolder(), dependencyFile.getName()));
         } catch (IOException e) {

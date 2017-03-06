@@ -26,8 +26,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,19 +56,21 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   @Override
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader policyClassLoader;
-    Set<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors = pluginDependenciesResolver.resolve(descriptor.getPlugins());
-    ArtifactPluginDescriptor[] artifactPluginDescriptors =
-        getArtifactPluginDescriptors(resolveArtifactPluginDescriptors, descriptor);
+    Set<ArtifactPluginDescriptor> artifactPluginDescriptors =
+        getArtifactPluginDescriptors(application.getDescriptor().getPlugins(), descriptor);
+    Set<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors =
+        pluginDependenciesResolver.resolve(artifactPluginDescriptors);
     try {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-          .addArtifactPluginDescriptors(artifactPluginDescriptors)
+          .addArtifactPluginDescriptors(resolveArtifactPluginDescriptors
+              .toArray(new ArtifactPluginDescriptor[resolveArtifactPluginDescriptors.size()]))
           .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
     } catch (IOException e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
     }
     application.getRegionClassLoader().addClassLoader(policyClassLoader, NULL_CLASSLOADER_FILTER);
 
-    List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, Arrays.asList(artifactPluginDescriptors));
+    List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, artifactPluginDescriptors);
 
     DefaultPolicyTemplate policy =
         new DefaultPolicyTemplate(policyClassLoader.getArtifactId(), descriptor, policyClassLoader, artifactPlugins);
@@ -77,9 +78,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     return policy;
   }
 
-  private ArtifactPluginDescriptor[] getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> appPlugins,
-                                                                  PolicyTemplateDescriptor descriptor) {
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
+  private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> appPlugins,
+                                                                     PolicyTemplateDescriptor descriptor) {
+    Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
     for (ArtifactPluginDescriptor policyPluginDescriptor : descriptor.getPlugins()) {
       Optional<ArtifactPluginDescriptor> appPluginDescriptor =
           findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
@@ -96,7 +97,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
       }
     }
 
-    return artifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]);
+    return artifactPluginDescriptors;
   }
 
   private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
@@ -112,7 +113,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader policyClassLoader,
-                                                        List<ArtifactPluginDescriptor> plugins) {
+                                                        Set<ArtifactPluginDescriptor> plugins) {
     return plugins.stream()
         .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(policyClassLoader.getArtifactId(),
                                                                                        artifactPluginDescriptor.getName()),

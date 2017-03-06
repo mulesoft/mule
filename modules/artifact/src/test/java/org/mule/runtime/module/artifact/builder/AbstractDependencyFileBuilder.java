@@ -1,0 +1,234 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.artifact.builder;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+
+/**
+ * Base class for all kind of artifact that may exists in mule.
+ * 
+ * Provides all the support needed for maven.
+ * 
+ * @param <T> the actual type of the builder.
+ */
+public abstract class AbstractDependencyFileBuilder<T extends AbstractDependencyFileBuilder<T>> {
+
+  public static final String COMPILE_SCOPE = "compile";
+  private final String artifactId;
+  private final List<AbstractDependencyFileBuilder> dependencies = new ArrayList<>();
+  private String groupId = "org.mule.test";
+  private String version = "1.0.0";
+  private String type = "jar";
+  private String classifier;
+  private File artifactPomFile;
+  private File tempFolder;
+
+  /**
+   * @param artifactId the maven artifact id
+   */
+  public AbstractDependencyFileBuilder(String artifactId) {
+    checkArgument(artifactId != null, "artifact id cannot be null");
+    this.artifactId = artifactId;
+  }
+
+  protected String getTempFolder() {
+    if (tempFolder != null) {
+      return tempFolder.getAbsolutePath();
+    }
+    return System.getProperty("java.io.tmpdir");
+  }
+
+  /**
+   * Sets the temporary folder to be used to create the artifact file.
+   *
+   * @param tempFolder temporary folder to use to create the artifact file.
+   * @return the same builder instance
+   */
+  public T tempFolder(File tempFolder) {
+    checkArgument(tempFolder != null, "tempFolder cannot be null");
+    checkArgument(tempFolder.isDirectory(), "tempFolder must be a directory");
+    this.tempFolder = tempFolder;
+    return getThis();
+  }
+
+  public abstract File getArtifactFile();
+
+  public File getArtifactPomFile() {
+    if (artifactPomFile == null) {
+      checkArgument(!isEmpty(artifactId), "Filename cannot be empty");
+
+      final File tempFile = new File(getTempFolder(), artifactId + ".pom");
+      tempFile.deleteOnExit();
+
+      Model model = new Model();
+      model.setGroupId(getGroupId());
+      model.setArtifactId(getArtifactId());
+      model.setVersion(getVersion());
+      model.setModelVersion("4.0.0");
+
+      for (AbstractDependencyFileBuilder fileBuilderDependency : dependencies) {
+        model.addDependency(fileBuilderDependency.getAsMavenDependency());
+      }
+
+      artifactPomFile = new File(tempFile.getAbsolutePath());
+      try (FileOutputStream fileOutputStream = new FileOutputStream(artifactPomFile)) {
+        new MavenXpp3Writer().write(fileOutputStream, model);
+      } catch (IOException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
+    return artifactPomFile;
+  }
+
+  public T dependingOn(AbstractDependencyFileBuilder dependencyFileBuilder) {
+    dependencies.add(dependencyFileBuilder);
+    return getThis();
+  }
+
+  /**
+   * @param groupId the maven group id
+   * @return the same builder instance
+   */
+  public T withGroupId(String groupId) {
+    this.groupId = groupId;
+    return getThis();
+  }
+
+  /**
+   * @param version the maven version
+   * @return the same builder instnace
+   */
+  public T withVersion(String version) {
+    this.version = version;
+    return getThis();
+  }
+
+  /**
+   * @param classifier the maven classifier
+   * @return the same builder instance
+   */
+  public T withClassifier(String classifier) {
+    this.classifier = classifier;
+    return getThis();
+  }
+
+  /**
+   * @return maven group id
+   */
+  public String getGroupId() {
+    return groupId;
+  }
+
+  /**
+   * @return maven artifact id
+   */
+  public String getArtifactId() {
+    return artifactId;
+  }
+
+  /**
+   * @return maven version
+   */
+  public String getVersion() {
+    return version;
+  }
+
+  /**
+   * @return maven type
+   */
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * @return maven classifier
+   */
+  public String getClassifier() {
+    return classifier;
+  }
+
+  /**
+   * @return the path within the maven repository this artifact is located in.
+   */
+  public String getArtifactFileRepositoryPath() {
+    return getGroupId().replace(".", File.separator) + File.separator
+        + Paths
+            .get(getArtifactId(), getVersion(),
+                 getArtifactId() + "-" + getVersion() + (getClassifier() != null ? "-" + getClassifier() : "") + "." + type)
+            .toString();
+  }
+
+  /**
+   * @return the path within the maven repository this artifact pom is located in.
+   */
+  public String getArtifactFilePomRepositoryPath() {
+    return getGroupId().replace(".", File.separator) + File.separator
+        + Paths.get(getArtifactId(), getVersion(), getArtifactId() + "-" + getVersion() + ".pom").toString();
+  }
+
+  /**
+   * @return the path within the artifact file where the pom file is bundled
+   */
+  public String getArtifactFileBundledPomPath() {
+    return Paths.get("META-INF", "maven", getGroupId(), getArtifactId(), "pom.xml").toString();
+  }
+
+  /**
+   * Creates a {@link Dependency} object from this artifact with scope compile.
+   *
+   * @return a maven
+   */
+  public Dependency getAsMavenDependency() {
+    Dependency dependency = new Dependency();
+    dependency.setVersion(getVersion());
+    dependency.setGroupId(getGroupId());
+    dependency.setArtifactId(getArtifactId());
+    dependency.setClassifier(getClassifier());
+    dependency.setType(getType());
+    dependency.setScope(COMPILE_SCOPE);
+    return dependency;
+  }
+
+  /**
+   * @return current instance. Used just to avoid compilation warnings.
+   */
+  protected abstract T getThis();
+
+  /**
+   * @return the collection of dependencies of this artifact.
+   */
+  public List<AbstractDependencyFileBuilder> getDependencies() {
+    return dependencies;
+  }
+
+  /**
+   * @return a collection of all the compile dependencies of this artifact including the transitive ones
+   */
+  public List<AbstractDependencyFileBuilder> getAllCompileDependencies() {
+    List<AbstractDependencyFileBuilder> allCompileDependencies = new ArrayList<>();
+    for (AbstractDependencyFileBuilder dependency : dependencies) {
+      if (dependency.getAsMavenDependency().getScope().equals(COMPILE_SCOPE)) {
+        allCompileDependencies.addAll(dependency.getAllCompileDependencies());
+        allCompileDependencies.add(dependency);
+      }
+    }
+    return allCompileDependencies;
+  }
+}
