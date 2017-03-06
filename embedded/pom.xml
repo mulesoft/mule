@@ -89,7 +89,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
