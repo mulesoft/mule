@@ -226,7 +226,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   protected abstract List<ZipResource> getCustomResources();
 
   /**
-   * @return the descriptor loader for the artifact. May be null.
+   * @return the descriptor loader for the artifact.
    */
   protected Optional<MuleArtifactLoaderDescriptor> getBundleDescriptorLoader() {
     return empty();

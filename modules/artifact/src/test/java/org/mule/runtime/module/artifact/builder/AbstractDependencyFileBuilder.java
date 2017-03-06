@@ -23,7 +23,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 /**
  * Base class for all kind of artifact that may exists in mule.
- * 
+ * <p>
  * Provides all the support needed for maven.
  * 
  * @param <T> the actual type of the builder.

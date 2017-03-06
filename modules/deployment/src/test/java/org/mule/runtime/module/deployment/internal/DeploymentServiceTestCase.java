@@ -1826,7 +1826,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                                emptyAppFileBuilder.getId());
   }
 
-  @Ignore("TODO MULE-11551 - Define mechanism to inform shared libraries dependencies")
+  @Ignore("MULE-11551 - Define mechanism to inform shared libraries dependencies")
   @Test
   public void deploysDomainWithSharedLibPrecedenceOverApplicationSharedLib() throws Exception {
     final String domainId = "shared-lib";

@@ -19,10 +19,7 @@ import static org.eclipse.aether.util.artifact.JavaScopes.SYSTEM;
 import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -137,17 +134,17 @@ public class Repository {
       DependencyNode node = e.getResult().getRoot();
       logUnresolvedArtifacts(node, e);
       throw new RuntimeException(
-                                 String.format("There was an problem solving the dependencies for the container [%s]",
+                                 String.format("There was a problem solving the dependencies for the container [%s]",
                                                artifact),
                                  e);
     } catch (DependencyCollectionException e) {
       throw new RuntimeException(
-                                 String.format("There was an problem resolving the dependency tree for the container [%s]",
+                                 String.format("There was a problem resolving the dependency tree for the container [%s]",
                                                artifact),
                                  e);
     } catch (ArtifactDescriptorException e) {
       throw new RuntimeException(
-                                 String.format("There was an problem resolving the artifact descriptor for the container [%s]",
+                                 String.format("There was a problem resolving the artifact descriptor for the container [%s]",
                                                artifact),
                                  e);
     }

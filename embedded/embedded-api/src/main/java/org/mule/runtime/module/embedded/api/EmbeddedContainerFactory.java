@@ -36,12 +36,13 @@ final public class EmbeddedContainerFactory {
   private EmbeddedContainerFactory() {}
 
   /**
-   * Creates a container with by creating artifacts based on the {@code application} configuration.
+   * Creates a container by creating artifacts based on the {@code application} configuration.
    *
    * @param muleVersion the mule version of the runtime to use
    * @param containerBaseFolder the base folder to use for the container to create the required files.
    * @param application the application data.
-   * @return
+   * @return an {@link EmbeddedContainer} for the requested {@code muleVersion} and with the content provided by
+   *         {@code application}
    */
   public static EmbeddedContainer create(String muleVersion, URL containerBaseFolder, ArtifactInfo application) {
     try {

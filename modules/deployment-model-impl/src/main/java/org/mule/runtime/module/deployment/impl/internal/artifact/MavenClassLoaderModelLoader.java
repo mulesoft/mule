@@ -105,10 +105,9 @@ import org.slf4j.LoggerFactory;
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
  * {@link ClassLoaderModel}
  * <p>
- * TODO(fernandezlautaro): MULE-11094 this class is the default implementation for discovering
- * dependencies and URLs, which happens to be Maven based. There could be other ways to look for dependencies and URLs (probably
- * for testing purposes where the plugins are done by hand and without maven) which will imply implementing the jira pointed out
- * in this comment.
+ * TODO(fernandezlautaro): MULE-11094 this class is the default implementation for discovering dependencies and URLs, which
+ * happens to be Maven based. There could be other ways to look for dependencies and URLs (probably for testing purposes where the
+ * plugins are done by hand and without maven) which will imply implementing the jira pointed out in this comment.
  *
  * @since 4.0
  */
@@ -274,12 +273,12 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
 
   /**
    * Determines the local repository location.
-   * 
+   * <p>
    * If the artifact is being loaded from an application repository, then such repository must be used as the local maven
    * repository.
-   * 
+   * <p>
    * If the artifact doesn't belong to an application repository then the container repository must be used instead.
-   * 
+   * <p>
    * When the 'mule.mode.embedded' is enabled, then the user local repository must be used.
    * 
    * @param artifactFile the artifact file which dependencies are being resolved.

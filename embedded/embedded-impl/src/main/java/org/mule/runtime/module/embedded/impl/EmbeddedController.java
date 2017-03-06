@@ -188,15 +188,6 @@ public class EmbeddedController {
     return defaultDomainFolder;
   }
 
-  private File createAppDir() {
-    File containerFolder = new File(containerInfo.getContainerBaseFolder().getPath());
-    File appFolder = new File(new File(containerFolder, "apps"), "default");
-    if (!appFolder.mkdirs()) {
-      throw new RuntimeException("Could not create default app directory in " + appFolder.getAbsolutePath());
-    }
-    return appFolder;
-  }
-
   /**
    * Interface for running tasks within the container class loader.
    */

@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -188,7 +189,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor desc = createApplicationDescriptor(appPath);
 
     assertThat(desc.getMinMuleVersion(), is(new MuleVersion("4.0.0")));
-    assertThat(desc.getConfigResources().size(), is(1));
+    assertThat(desc.getConfigResources(), hasSize(1));
     assertThat(desc.getConfigResources().get(0), is(DEFAULT_CONFIGURATION_RESOURCE_LOCATION));
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
@@ -215,7 +216,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
+    assertThat(classLoaderModel.getDependencies(), hasSize(1));
     BundleDependency commonsCollectionDependency = classLoaderModel.getDependencies().iterator().next();
     assertThat(commonsCollectionDependency, commonsColecctionDependencyMatcher());
 
