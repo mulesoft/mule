@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
@@ -28,10 +29,11 @@ import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.slf4j.Logger;
+
+import javax.inject.Inject;
 
 public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
@@ -44,25 +46,10 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   public static final String FLOW = "flow";
 
   private ExpressionExecutor expressionExecutor;
-  private BindingContext globalBindingContext;
-  private boolean enabled;
 
-  public DataWeaveExpressionLanguage(ClassLoader lookupClassloader) {
-    Iterator<ExpressionExecutor> executors = load(ExpressionExecutor.class, lookupClassloader).iterator();
-
-    while (executors.hasNext()) {
-      try {
-        this.expressionExecutor = executors.next();
-        enabled = true;
-      } catch (Throwable e) {
-        // TODO - MULE-11413: Fix DW dependency for FunctionalTestCase
-        logger.warn("DW Executor could not be loaded. MEL will be the default EL.");
-        enabled = false;
-      }
-      break;
-    }
-    // TODO: MULE-10765 - Define global bindings
-    this.globalBindingContext = BindingContext.builder().build();
+  @Inject
+  public DataWeaveExpressionLanguage(ExpressionExecutor expressionExecutor) {
+    this.expressionExecutor = expressionExecutor;
   }
 
   /**
@@ -110,7 +97,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   }
 
   public boolean isEnabled() {
-    return enabled;
+    return expressionExecutor != null;
   }
 
   private TypedValue evaluate(String expression, BindingContext context) {

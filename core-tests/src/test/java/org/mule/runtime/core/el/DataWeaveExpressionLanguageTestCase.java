@@ -28,6 +28,8 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ERROR;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.FLOW;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.PAYLOAD;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.VARIABLES;
+
+import com.mulesoft.weave.el.WeaveExpressionExecutor;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -57,7 +59,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
 
   private DataWeaveExpressionLanguage expressionLanguage =
-      new DataWeaveExpressionLanguage(Thread.currentThread().getContextClassLoader());
+      new DataWeaveExpressionLanguage(new WeaveExpressionExecutor());
 
   @Test
   public void stringExpression() throws Exception {

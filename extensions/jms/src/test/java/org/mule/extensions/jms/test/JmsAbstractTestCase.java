@@ -37,8 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 
-@ArtifactClassLoaderRunnerConfig(plugins = {"com.mulesoft.weave:mule-plugin-weave"},
-    testInclusions = {"org.apache.activemq:artemis-jms-client"})
+@ArtifactClassLoaderRunnerConfig(testInclusions = {"org.apache.activemq:artemis-jms-client"})
 public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final Logger LOGGER = getLogger(JmsAbstractTestCase.class);

@@ -13,8 +13,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import org.junit.Rule;
 
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext",
-    "com.mulesoft.weave:mule-plugin-weave"},
+@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 

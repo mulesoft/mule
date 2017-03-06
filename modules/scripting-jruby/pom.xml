@@ -221,8 +221,8 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.mulesoft.weave</groupId>
-                    <artifactId>mule-plugin-weave</artifactId>
+                    <groupId>org.mule.services</groupId>
+                    <artifactId>mule-service-weave</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

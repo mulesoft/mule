@@ -55,8 +55,7 @@ import org.w3c.dom.Element;
         "org.mule.modules:mule-module-sockets",
         "org.mule.modules:mule-module-http-ext",
         "org.mule.modules:mule-module-db",
-        "org.mule.modules:mule-module-jms",
-        "com.mulesoft.weave:mule-plugin-weave"},
+        "org.mule.modules:mule-module-jms"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
 
