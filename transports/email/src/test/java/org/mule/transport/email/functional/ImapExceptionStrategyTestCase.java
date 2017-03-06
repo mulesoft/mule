@@ -15,7 +15,8 @@ import java.util.Collection;
 public class ImapExceptionStrategyTestCase extends AbstractEmailFunctionalTestCase
 {
     public ImapExceptionStrategyTestCase(ConfigVariant variant,
-                                         String configResources) {
+                                         String configResources)
+    {
         super(variant, STRING_MESSAGE, "imap", configResources);
     }
 
