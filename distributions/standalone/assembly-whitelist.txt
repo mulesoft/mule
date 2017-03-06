@@ -175,7 +175,6 @@
 /mule-standalone-${productVersion}/plugins/mule-module-oauth-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-plugin-weave-${productVersion}-dist.zip
 
 #
 # /services
@@ -184,7 +183,7 @@
 /mule-standalone-${productVersion}/services/mule-service-scheduler-${productVersion}.zip
 /mule-standalone-${productVersion}/services/mule-service-http-${productVersion}.zip
 /mule-standalone-${productVersion}/services/mule-service-oauth-${productVersion}.zip
-
+/mule-standalone-${productVersion}/services/mule-service-weave-${productVersion}.zip
 #
 # /lib/opt
 #

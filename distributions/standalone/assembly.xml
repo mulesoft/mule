@@ -16,6 +16,13 @@
                 <exclude>lib/boot/exec/**</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>target/services</directory>
+            <outputDirectory>services</outputDirectory>
+            <includes>
+                <include>*.zip</include>
+            </includes>
+        </fileSet>
 
         <!-- Make binary files executable. -->
         <fileSet>

@@ -728,8 +728,9 @@
                 <version>${assertJVersion}</version>
             </dependency>
             <dependency>
-                <groupId>com.mulesoft.weave</groupId>
-                <artifactId>mule-plugin-weave</artifactId>
+                <groupId>org.mule.services</groupId>
+                <artifactId>mule-service-weave</artifactId>
+                <classifier>mule-service</classifier>
                 <version>${weaveVersion}</version>
             </dependency>
 

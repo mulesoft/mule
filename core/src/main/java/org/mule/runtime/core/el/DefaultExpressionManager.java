@@ -16,7 +16,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
+import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 
@@ -55,11 +58,15 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
     this.muleContext = muleContext;
-    DataWeaveExpressionLanguage dataWeaveExpressionLanguage =
-        new DataWeaveExpressionLanguage(muleContext.getExecutionClassLoader());
-    MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-    this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dataWeaveExpressionLanguage, mvelExpressionLanguage);
-    forceMel = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isForceMel();
+    try {
+      final ExpressionExecutor expressionExecutor = muleContext.getRegistry().lookupObject(ExpressionExecutor.class);
+      final DataWeaveExpressionLanguage dataWeaveExpressionLanguage = new DataWeaveExpressionLanguage(expressionExecutor);
+      final MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+      this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dataWeaveExpressionLanguage, mvelExpressionLanguage);
+      this.forceMel = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isForceMel();
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   @Override
