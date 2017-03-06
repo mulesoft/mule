@@ -35,7 +35,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
 
   private final ExtensionModel extensionModel;
   private final MuleContext muleContext;
-  private final Provider<ResolverSet> resolverSetProvider;
+  private Provider<ResolverSet> resolverSetProvider;
   private ConnectionManagerAdapter connectionManagerAdapter = null;
   private ConnectionProviderModel connectionProviderModel = null;
   private ResolverSet resolverSet = null;
@@ -56,6 +56,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
                                                    configurationModel.getName(), configurationModel.getName()));
           }
           resolverSet = buildImplicitResolverSet(connectionProviderModel, muleContext);
+          resolverSetProvider = () -> resolverSet;
         }
         return resolverSet;
       }
