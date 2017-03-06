@@ -7,6 +7,11 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
+import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.MAX_HTTP_PACKET_HEADER_SIZE;
+import static java.lang.Integer.valueOf;
+import static java.lang.System.getProperty;
+import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
@@ -31,9 +36,11 @@ import javax.net.ssl.SSLContext;
 import org.mule.api.CompletionHandler;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -72,6 +79,8 @@ public class GrizzlyHttpClient implements HttpClient
 {
 
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
+
+    public static final String CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.client.headerSectionSize";
 
     private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
@@ -203,6 +212,7 @@ public class GrizzlyHttpClient implements HttpClient
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
         //Grizzly now decompresses encoded responses, this flag maintains the previous behaviour
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.DECOMPRESS_RESPONSE, Boolean.FALSE);
+        providerConfig.addProperty(MAX_HTTP_PACKET_HEADER_SIZE, retrieveMaximumHeaderSectionSize());
         builder.setAsyncHttpClientProviderConfig(providerConfig);
     }
 
@@ -514,4 +524,17 @@ public class GrizzlyHttpClient implements HttpClient
         }
 
     }
+
+    private int retrieveMaximumHeaderSectionSize()
+    {
+        try
+        {
+            return valueOf(getProperty(CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE, String.valueOf(DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE)));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("Invalid value %s for %s configuration.", getProperty(CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE), CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE)), e);
+        }
+    }
+
 }
