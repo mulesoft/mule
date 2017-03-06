@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTP" host="0.0.0.0" port="${port}"/>
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${port}"/>
+
+    <flow name="testFlowRequester">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/in"/>
+        <set-attachment attachmentName="someJson"
+                        value="#[new java.io.ByteArrayInputStream('{ \'Test attachment\' }'.getBytes('UTF-8'))]"
+                        contentType="#['text/json']"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/" method="POST"/>
+    </flow>
+
+    <flow name="testFlowListener">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/"/>
+        <vm:outbound-endpoint path="out"/>
+    </flow>
+
+</mule>

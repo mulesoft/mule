@@ -104,7 +104,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             }
         }
 
-        if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY))
+        if (!outboundProperties.contains(MuleProperties.CONTENT_TYPE_PROPERTY) && event.getMessage().getPayload() != NullPayload.getInstance())
         {
             DataType<?> dataType = event.getMessage().getDataType();
             if (!MimeTypes.ANY.equals(dataType.getMimeType()))
