@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.modules</groupId>
+        <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
@@ -16,96 +16,96 @@
 
     <dependencies>
         <!-- TODO(gfernandes) MULE-10509 migrate http to depend on sockets extension -->
+        <!--<dependency>-->
+            <!--<groupId>org.mule.runtime</groupId>-->
+            <!--<artifactId>mule-module-sockets</artifactId>-->
+            <!--<classifier>mule-plugin</classifier>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-sockets</artifactId>
-            <classifier>mule-plugin</classifier>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-xml-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-jbossts</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-management</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-scripting-jruby</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-schedulers</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-security</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-tomcat</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-tooling-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
         
         <!-- Services APIs -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-oauth-api</artifactId>
             <version>${project.version}</version>
         </dependency>

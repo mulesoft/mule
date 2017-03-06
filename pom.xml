@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!-- Version -->
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.mule</groupId>
+    <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
     <version>4.0-SNAPSHOT</version>
@@ -310,22 +310,22 @@
                 <version>${xmlSerializerVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-api</artifactId>
                 <version>${muleApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-metadata-model-xml</artifactId>
                 <version>${muleMetadataModelVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-metadata-model-java</artifactId>
                 <version>${muleMetadataModelVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-metadata-model-json</artifactId>
                 <version>${muleMetadataModelVersion}</version>
             </dependency>
@@ -1241,17 +1241,17 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.mule.modules</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-module-dsl-api</artifactId>
                 <version>${muleDslApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule.extensions</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-extensions-api</artifactId>
                 <version>${muleExtensionsApiVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.mule.extensions</groupId>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-extensions-api-persistence</artifactId>
                 <version>${muleExtensionsApiVersion}</version>
             </dependency>
@@ -1824,13 +1824,13 @@
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.plugins</groupId>
+                    <groupId>org.mule.runtime</groupId>
                     <artifactId>mule-app-plugins-maven-plugin</artifactId>
                     <version>${mule.app.plugins.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.extensions</groupId>
+                    <groupId>org.mule.runtime</groupId>
                     <artifactId>mule-extensions-maven-plugin</artifactId>
                     <version>${mule.extensions.maven.plugin.version}</version>
                     <extensions>true</extensions>

@@ -51,23 +51,23 @@
     <dependencies>
         <!-- Mule Container dependencies -->
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -80,7 +80,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -94,7 +94,7 @@
         <!-- Services -->
         <!--TODO: MULE-10837-->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -142,7 +142,7 @@
         </dependency>
         <!-- Test dependencies -->
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>

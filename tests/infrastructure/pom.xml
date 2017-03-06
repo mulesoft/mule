@@ -18,7 +18,7 @@
 
 	<dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -27,7 +27,7 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-launcher</artifactId>
             <version>${project.version}</version>
         </dependency>

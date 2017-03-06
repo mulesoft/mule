@@ -32,13 +32,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
@@ -57,7 +57,7 @@
         </dependency>
         <!-- Include all Mule Modules -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
@@ -65,7 +65,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -129,13 +129,13 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -143,7 +143,7 @@
 
         <!-- Test jars -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-security</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
@@ -258,7 +258,7 @@
         </dependency>
         <!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -338,7 +338,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-deployment-model-impl</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>

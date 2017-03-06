@@ -27,12 +27,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.extensions</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
             <scope>provided</scope>
         </dependency>
