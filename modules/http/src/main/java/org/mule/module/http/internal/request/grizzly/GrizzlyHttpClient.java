@@ -7,12 +7,18 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
+import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.MAX_HTTP_PACKET_HEADER_SIZE;
+import static java.lang.Integer.valueOf;
+import static java.lang.System.getProperty;
+import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.HttpAuthentication;
@@ -65,6 +71,8 @@ public class GrizzlyHttpClient implements HttpClient
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
 
     private Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
+
+    public static final String CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.client.headerSectionSize";
 
     private static final List<String> SPECIAL_CUSTOM_HEADERS = Arrays.asList(
             CONTENT_DISPOSITION.toLowerCase(),
@@ -195,6 +203,7 @@ public class GrizzlyHttpClient implements HttpClient
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER, compositeTransportCustomizer);
         //Grizzly now decompresses encoded responses, this flag maintains the previous behaviour
         providerConfig.addProperty(GrizzlyAsyncHttpProviderConfig.Property.DECOMPRESS_RESPONSE, Boolean.FALSE);
+        providerConfig.addProperty(MAX_HTTP_PACKET_HEADER_SIZE, retrieveMaximumHeaderSectionSize());
         builder.setAsyncHttpClientProviderConfig(providerConfig);
     }
 
@@ -261,7 +270,6 @@ public class GrizzlyHttpClient implements HttpClient
         if (authentication != null && authentication instanceof DefaultHttpAuthentication)
         {
             DefaultHttpAuthentication defaultHttpAuthentication = (DefaultHttpAuthentication)authentication;
-
             Realm.RealmBuilder realmBuilder = new Realm.RealmBuilder()
                         .setPrincipal(defaultHttpAuthentication.getUsername())
                         .setPassword(defaultHttpAuthentication.getPassword())
@@ -404,4 +412,17 @@ public class GrizzlyHttpClient implements HttpClient
     {
         asyncHttpClient.close();
     }
+
+    private int retrieveMaximumHeaderSectionSize()
+    {
+        try
+        {
+            return valueOf(getProperty(CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE, String.valueOf(DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE)));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("Invalid value %s for %s configuration.", getProperty(CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE), CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE)), e);
+        }
+    }
+
 }
