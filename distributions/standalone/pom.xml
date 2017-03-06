@@ -205,10 +205,6 @@
             <classifier>mule-plugin</classifier>
         </dependency>
 
-        <!-- Include DataWeave Plugin -->
-        <!-- The scope provided is to avoid adding its dependencies in lib/opt -->
-
-
         <!-- Include all Mule Services -->
         <dependency>
             <groupId>org.mule.services</groupId>
