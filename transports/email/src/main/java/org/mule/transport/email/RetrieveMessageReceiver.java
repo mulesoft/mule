@@ -8,11 +8,16 @@ package org.mule.transport.email;
 
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
+
+import static org.mule.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.execution.ExecutionCallback;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ReceiveException;
@@ -186,11 +191,21 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                                         processedMessages.add(messages[i]);
                                     }
                                 }
-                                routeMessage(message);
+
+                                final MuleMessage routedMessage = message;
+                                createErrorHandlingExecutionTemplate(getEndpoint().getMuleContext(), null)
+                                        .execute(new ExecutionCallback<MuleEvent>()
+                                        {
+                                            @Override
+                                            public MuleEvent process() throws Exception
+                                            {
+                                                return routeMessage(routedMessage);
+                                            }
+                                        });
                             }
                             catch (org.mule.api.MessagingException e)
                             {
-                                //Already handled by TransactionTemplate
+                                //Already handled by ErrorHandlingExecutionTemplate
                             }
                             catch (Exception e)
                             {
