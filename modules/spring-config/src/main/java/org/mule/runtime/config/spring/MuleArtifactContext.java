@@ -317,7 +317,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         if (componentModel.getNameAttribute() != null) {
           createdComponentModels.add(componentModel.getNameAttribute());
         }
-        beanDefinitionFactory.resolveComponentRecursively(applicationModel.getRootComponentModel(), componentModel,
+        beanDefinitionFactory.resolveComponentRecursively(componentModel.getParent(), componentModel,
                                                           beanFactory,
                                                           (resolvedComponentModel, registry) -> {
                                                             if (resolvedComponentModel.isRoot()) {
