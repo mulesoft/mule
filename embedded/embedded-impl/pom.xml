@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-module-embedded-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${muleEmbeddedApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
