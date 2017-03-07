@@ -21,7 +21,7 @@
     </flow>
 
     <flow name="quartz-statefulFlow">
-        <vm:inbound-endpoint path="quartz.in"/>
+        <vm:inbound-endpoint path="quartz.in" exchange-pattern="request-response"/>
 
         <component>
             <singleton-object class="org.mule.transport.quartz.QuartzStatefulScheduledDispatchTestCase$BlockingComponent"/>
