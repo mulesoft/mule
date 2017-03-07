@@ -174,10 +174,10 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                 .withParameter(STREAMING_STRATEGY_PARAMETER_NAME,
                                newObjectValue()
                                    .ofType(REPEATABLE_IN_MEMORY_STREAM_ALIAS)
-                                   .withParameter("bufferSizeIncrement", "256")
+                                   .withParameter("bufferSizeIncrement", "8")
                                    .withParameter("bufferUnit", "KB")
-                                   .withParameter("initialBufferSize", "512")
-                                   .withParameter("maxInMemorySize", "0")
+                                   .withParameter("initialBufferSize", "51")
+                                   .withParameter("maxInMemorySize", "1000")
                                    .build())
                 .getDeclaration())
             .getDeclaration())
