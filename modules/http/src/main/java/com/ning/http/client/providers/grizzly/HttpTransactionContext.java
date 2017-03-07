@@ -40,7 +40,8 @@ import org.glassfish.grizzly.websockets.ProtocolHandler;
  *
  * @author Grizzly team
  *
- * This is a modified version from the original file from AHC.
+ * This is a modified version from the original file from AHC. {@link #getAsyncHandler()} has been modified to prevent
+ * {@link NullPointerException}'s if the {@link java.util.concurrent.Future} is null.
  */
 public final class HttpTransactionContext {
     private static final Attribute<HttpTransactionContext> REQUEST_STATE_ATTR =
@@ -171,6 +172,8 @@ public final class HttpTransactionContext {
 
     /**
      * Handle the situation where future is null and return null.
+     *
+     * Modified to prevent {@link NullPointerException}'s if the {@link java.util.concurrent.Future} is null.
      *
      * @return async handler
      */
