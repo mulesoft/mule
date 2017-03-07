@@ -8,27 +8,41 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppPluginsFolderPath;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedLibsFolderPath;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_JSON_LOCATION;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
+import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
+import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
+import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
  * Creates Mule Application files.
  */
-public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<ApplicationFileBuilder> {
+public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFileBuilder> {
 
-  private List<ArtifactPluginFileBuilder> plugins = new LinkedList<>();
   private Properties properties = new Properties();
   private Properties deployProperties = new Properties();
 
@@ -69,7 +83,6 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
    */
   public ApplicationFileBuilder(String id, ApplicationFileBuilder source) {
     super(id, source);
-    this.plugins.addAll(source.plugins);
     this.properties.putAll(source.properties);
     this.deployProperties.putAll(source.deployProperties);
   }
@@ -88,7 +101,7 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
   public ApplicationFileBuilder definedBy(String configFile) {
     checkImmutable();
     checkArgument(!StringUtils.isEmpty(configFile), "Config file cannot be empty");
-    this.resources.add(new ZipResource(configFile, DEFAULT_CONFIGURATION_RESOURCE));
+    this.resources.add(new ZipResource(configFile, "mule" + File.separator + DEFAULT_CONFIGURATION_RESOURCE));
 
     return this;
   }
@@ -139,20 +152,6 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
   }
 
   /**
-   * Adds an application plugin to the application.
-   *
-   * @param plugin builder defining the plugin. Non null.
-   * @return the same builder instance
-   */
-  public ApplicationFileBuilder containingPlugin(ArtifactPluginFileBuilder plugin) {
-    checkImmutable();
-    checkArgument(plugin != null, "Plugin cannot be null");
-    this.plugins.add(plugin);
-
-    return this;
-  }
-
-  /**
    * Adds a jar file to the application plugin lib folder.
    *
    * @param jarFile jar file from a external file or test resource.
@@ -172,26 +171,56 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
   }
 
   @Override
-  protected List<ZipResource> getCustomResources() {
+  protected List<ZipResource> doGetCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
 
-    for (ArtifactPluginFileBuilder plugin : plugins) {
-      customResources
-          .add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(),
-                               getAppPluginsFolderPath() + plugin.getArtifactFile().getName()));
-    }
-
     final ZipResource appProperties =
-        createPropertiesFile(this.properties, DEFAULT_APP_PROPERTIES_RESOURCE);
+        createPropertiesFile(this.properties, DEFAULT_APP_PROPERTIES_RESOURCE,
+                             "classes" + File.separator + DEFAULT_APP_PROPERTIES_RESOURCE);
+
     if (appProperties != null) {
       customResources.add(appProperties);
     }
 
-    final ZipResource deployProperties = createPropertiesFile(this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
-    if (deployProperties != null) {
-      customResources.add(deployProperties);
-    }
-
+    Object redeploymentEnabled = deployProperties.get(PROPERTY_REDEPLOYMENT_ENABLED);
+    Object configResources = deployProperties.get(PROPERTY_CONFIG_RESOURCES);
+    File applicationDescriptor = createApplicationJsonDescriptorFile(
+                                                                     ofNullable(((String) deployProperties
+                                                                         .get(PROPERTY_DOMAIN))),
+                                                                     redeploymentEnabled == null
+                                                                         ? empty()
+                                                                         : ofNullable(Boolean
+                                                                             .valueOf((String) redeploymentEnabled)),
+                                                                     Optional.ofNullable((String) configResources),
+                                                                     ofNullable((String) properties.get(EXPORTED_RESOURCES)));
+    customResources.add(new ZipResource(applicationDescriptor.getAbsolutePath(), MULE_APPLICATION_JSON_LOCATION));
     return customResources;
+  }
+
+  private File createApplicationJsonDescriptorFile(Optional<String> domain, Optional<Boolean> redeploymentEnabled,
+                                                   Optional<String> configResources, Optional<String> exportedResources) {
+    File applicationDescriptor = new File(getTempFolder(), getArtifactId() + "application.json");
+    applicationDescriptor.deleteOnExit();
+    MuleApplicationModel.MuleApplicationModelBuilder muleApplicationModelBuilder =
+        new MuleApplicationModel.MuleApplicationModelBuilder();
+    muleApplicationModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
+    domain.ifPresent(muleApplicationModelBuilder::setDomain);
+    redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
+    configResources.ifPresent(configs -> {
+      String[] configFiles = configs.split(",");
+      muleApplicationModelBuilder.setConfigs(asList(configFiles));
+    });
+    muleApplicationModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
+    exportedResources.ifPresent(resources -> {
+      muleApplicationModelBuilder.withClassLoaderModelDescriber().addProperty(EXPORTED_RESOURCES, resources.split(","));
+    });
+    muleApplicationModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    String applicationDescriptorContent = new MuleApplicationModelJsonSerializer().serialize(muleApplicationModelBuilder.build());
+    try (FileWriter fileWriter = new FileWriter(applicationDescriptor)) {
+      fileWriter.write(applicationDescriptorContent);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+    return applicationDescriptor;
   }
 }

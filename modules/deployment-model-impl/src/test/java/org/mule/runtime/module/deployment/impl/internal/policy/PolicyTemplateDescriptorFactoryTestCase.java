@@ -17,6 +17,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
@@ -94,14 +96,14 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     applicationPluginRepository = mock(ArtifactPluginRepository.class);
     when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
 
-    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
-    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
 
-    when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, BundleDescriptorLoader.class))
+    when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenReturn(new PropertiesBundleDescriptorLoader());
-    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, BundleDescriptorLoader.class))
+    when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
   }
 

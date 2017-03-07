@@ -9,10 +9,16 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.core.util.JarUtils.getUrlsWithinJar;
+import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
@@ -23,7 +29,9 @@ import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -40,19 +48,16 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoade
 import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
  * Creates {@link ArtifactPluginDescriptor} instances
@@ -84,31 +89,77 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   }
 
   @Override
-  public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {
-    ArtifactPluginDescriptor artifactPluginDescriptor;
-    final File mulePluginJsonFile = new File(pluginFolder, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON);
-    if (mulePluginJsonFile.exists()) {
-      artifactPluginDescriptor = loadFromJsonDescriptor(pluginFolder, mulePluginJsonFile);
-    } else {
-      // TODO(fernandezlautaro): MULE-11092 once implemented, drop this.
-      artifactPluginDescriptor = loadFromPluginProperties(pluginFolder);
+  public ArtifactPluginDescriptor create(File pluginJarFile) throws ArtifactDescriptorCreateException {
+    try {
+      checkArgument(pluginJarFile.isDirectory() || pluginJarFile.getName().endsWith(".jar")
+          || pluginJarFile.getName().endsWith(".zip"),
+                    "provided file is not a plugin: " + pluginJarFile.getAbsolutePath());
+      Optional<byte[]> jsonDescriptorContentOptional =
+          loadFileContentFrom(pluginJarFile, MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON);
+      return jsonDescriptorContentOptional
+          .map(jsonDescriptorContent -> loadFromJsonDescriptor(pluginJarFile, new String(jsonDescriptorContent)))
+          .orElseGet(() -> {
+            Optional<byte[]> pluginPropertiesFileContentOptional;
+            try {
+              pluginPropertiesFileContentOptional = loadFileContentFrom(pluginJarFile, PLUGIN_PROPERTIES);
+              return loadFromPluginProperties(pluginJarFile, pluginPropertiesFileContentOptional);
+            } catch (IOException e) {
+              throw new MuleRuntimeException(e);
+            }
+          });
+    } catch (ArtifactDescriptorCreateException e) {
+      throw e;
+    } catch (IOException e) {
+      throw new ArtifactDescriptorCreateException(e);
     }
-    return artifactPluginDescriptor;
   }
 
-  private ArtifactPluginDescriptor loadFromPluginProperties(File pluginFolder) {
-    final String pluginName = pluginFolder.getName();
-    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginName);
+  private ArtifactPluginDescriptor loadFromPluginProperties(File pluginJarFile,
+                                                            Optional<byte[]> pluginPropertiesContentOptional) {
+    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginJarFile.getName().replace(".zip", ""));
+
     BundleDescriptor defaultPluginBundleDescriptor = null;
-    descriptor.setRootFolder(pluginFolder);
 
     ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
 
-    final File pluginPropsFile = new File(pluginFolder, PLUGIN_PROPERTIES);
-    if (pluginPropsFile.exists()) {
-      Properties props;
+    Properties props = null;
+
+    if (pluginJarFile.getName().endsWith(".zip") || pluginJarFile.isDirectory()) {
+      File zipPluginFolder = pluginJarFile;
       try {
-        props = loadProperties(pluginPropsFile.toURI().toURL());
+        if (!pluginJarFile.isDirectory()) {
+          zipPluginFolder = new File(getContainerAppPluginsFolder(), pluginJarFile.getName().replace(".zip", ""));
+          unzip(pluginJarFile, zipPluginFolder);
+        }
+
+        // TODO MULE-11849 Convert data weave into a service or server plugin - only DW is being bundled with dependencies
+        classLoaderModelBuilder.containing(zipPluginFolder.toURI().toURL());
+        File libsFolder = new File(zipPluginFolder, "lib");
+        String[] libs = libsFolder.list((dir, name) -> name.endsWith(".jar"));
+        if (libs != null) {
+          for (String lib : libs) {
+            classLoaderModelBuilder.containing(new File(libsFolder, lib).toURI().toURL());
+          }
+        }
+
+        File pluginPropertiesFile = new File(zipPluginFolder, "plugin.properties");
+        if (pluginPropertiesFile.exists()) {
+          try (FileInputStream fileInputStream = new FileInputStream(pluginPropertiesFile)) {
+            byte[] pluginPropertiesContent = IOUtils.toByteArray(fileInputStream);
+            pluginPropertiesContentOptional = of(pluginPropertiesContent);
+          }
+        }
+      } catch (IOException e) {
+        throw new MuleRuntimeException(e);
+      }
+
+    } else {
+      loadUrlsToClassLoaderModelBuilder(pluginJarFile, classLoaderModelBuilder);
+    }
+
+    if (pluginPropertiesContentOptional.isPresent()) {
+      try {
+        props = loadProperties(new ByteArrayInputStream(pluginPropertiesContentOptional.get()));
       } catch (IOException e) {
         throw new ArtifactDescriptorCreateException("Cannot read plugin.properties file", e);
       }
@@ -127,7 +178,6 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
         defaultPluginBundleDescriptor = createBundleDescriptor(pluginBundle);
       }
     }
-    loadUrlsToClassLoaderModelBuilder(pluginFolder, classLoaderModelBuilder);
 
     descriptor.setClassLoaderModel(classLoaderModelBuilder.build());
     if (defaultPluginBundleDescriptor == null) {
@@ -141,21 +191,18 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
    * Given a {@code pluginFolder} as a starting point, it will add a the root folder of it and every JAR file {@link URL}s into
    * the {@link ClassLoaderModelBuilder}.
    *
-   * @param pluginFolder plugin's location
+   * @param pluginJarFile plugin's location
    * @param classLoaderModelBuilder builder of the {@link ClassLoaderModel}
    */
-  private void loadUrlsToClassLoaderModelBuilder(File pluginFolder, ClassLoaderModelBuilder classLoaderModelBuilder) {
+  private void loadUrlsToClassLoaderModelBuilder(File pluginJarFile, ClassLoaderModelBuilder classLoaderModelBuilder) {
     try {
-      classLoaderModelBuilder.containing(pluginFolder.toURI().toURL());
-      final File libDir = new File(pluginFolder, "lib");
-      if (libDir.exists()) {
-        final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(".jar"));
-        for (File jar : jars) {
-          classLoaderModelBuilder.containing(jar.toURI().toURL());
-        }
+      classLoaderModelBuilder.containing(pluginJarFile.toURI().toURL());
+      List<URL> urls = getUrlsWithinJar(pluginJarFile, "lib");
+      for (URL url : urls) {
+        classLoaderModelBuilder.containing(url);
       }
-    } catch (MalformedURLException e) {
-      throw new ArtifactDescriptorCreateException("Failed to create plugin descriptor " + pluginFolder);
+    } catch (Exception e) {
+      throw new ArtifactDescriptorCreateException("Failed to create plugin descriptor " + pluginJarFile, e);
     }
   }
 
@@ -207,17 +254,16 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
         .setClassifier(MULE_PLUGIN_CLASSIFIER).setType(EXTENSION_BUNDLE_TYPE).build();
   }
 
-  private ArtifactPluginDescriptor loadFromJsonDescriptor(File pluginFolder, File mulePluginJsonFile) {
-    final MulePluginModel mulePluginModel = getMulePluginJsonDescriber(mulePluginJsonFile);
+  private ArtifactPluginDescriptor loadFromJsonDescriptor(File pluginJarFile, String jsonDescriptorContent) {
+    final MulePluginModel mulePluginModel = getMulePluginJsonDescriber(jsonDescriptorContent);
 
     final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(mulePluginModel.getName());
-    descriptor.setRootFolder(pluginFolder);
 
     mulePluginModel.getClassLoaderModelLoaderDescriptor().ifPresent(classLoaderModelLoaderDescriptor -> {
-      descriptor.setClassLoaderModel(getClassLoaderModel(pluginFolder, classLoaderModelLoaderDescriptor));
+      descriptor.setClassLoaderModel(getClassLoaderModel(pluginJarFile, classLoaderModelLoaderDescriptor));
     });
 
-    descriptor.setBundleDescriptor(getBundleDescriptor(pluginFolder, mulePluginModel));
+    descriptor.setBundleDescriptor(getBundleDescriptor(pluginJarFile, mulePluginModel));
 
     mulePluginModel.getExtensionModelLoaderDescriptor().ifPresent(extensionModelDescriptor -> {
       final LoaderDescriber loaderDescriber = new LoaderDescriber(extensionModelDescriptor.getId());
@@ -232,7 +278,8 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     BundleDescriptorLoader bundleDescriptorLoader;
     try {
       bundleDescriptorLoader =
-          descriptorLoaderRepository.get(mulePluginModel.getBundleDescriptorLoader().getId(), BundleDescriptorLoader.class);
+          descriptorLoaderRepository.get(mulePluginModel.getBundleDescriptorLoader().getId(), PLUGIN,
+                                         BundleDescriptorLoader.class);
     } catch (LoaderNotFoundException e) {
       throw new ArtifactDescriptorCreateException(invalidBundleDescriptorLoaderIdError(pluginFolder, mulePluginModel
           .getBundleDescriptorLoader()));
@@ -245,19 +292,20 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     }
   }
 
-  private ClassLoaderModel getClassLoaderModel(File pluginFolder, MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor) {
+  private ClassLoaderModel getClassLoaderModel(File pluginJarFile,
+                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor) {
     ClassLoaderModelLoader classLoaderModelLoader;
     try {
       classLoaderModelLoader =
-          descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), ClassLoaderModelLoader.class);
+          descriptorLoaderRepository.get(classLoaderModelLoaderDescriptor.getId(), PLUGIN, ClassLoaderModelLoader.class);
     } catch (LoaderNotFoundException e) {
-      throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(pluginFolder,
+      throw new ArtifactDescriptorCreateException(invalidClassLoaderModelIdError(pluginJarFile,
                                                                                  classLoaderModelLoaderDescriptor));
     }
 
     final ClassLoaderModel classLoaderModel;
     try {
-      classLoaderModel = classLoaderModelLoader.load(pluginFolder, classLoaderModelLoaderDescriptor.getAttributes());
+      classLoaderModel = classLoaderModelLoader.load(pluginJarFile, classLoaderModelLoaderDescriptor.getAttributes());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
@@ -278,12 +326,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
                   pluginFolder.getAbsolutePath());
   }
 
-  private MulePluginModel getMulePluginJsonDescriber(File jsonFile) {
-    try (InputStream stream = new FileInputStream(jsonFile)) {
-      return new MulePluginModelJsonSerializer().deserialize(IOUtils.toString(stream));
-    } catch (IOException e) {
-      throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s'", jsonFile.getAbsolutePath()),
-                                         e);
-    }
+  private MulePluginModel getMulePluginJsonDescriber(String jsonDescriptorContent) {
+    return new MulePluginModelJsonSerializer().deserialize(jsonDescriptorContent);
   }
 }

@@ -47,6 +47,10 @@ public class BundleDescriptor {
     return classifier;
   }
 
+  public boolean isPlugin() {
+    return classifier.map(classifier -> classifier.equals("mule-plugin")).orElse(false);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

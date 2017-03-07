@@ -65,7 +65,7 @@ public class TestServicesUtils {
                    getResourceFile("/org/mule/service/http/MockHttpServiceProvider.java", tempFolder))
         .compile("mule-module-service-mock-http-1.0-SNAPSHOT.jar");
 
-    return new ServiceFileBuilder("HTTP Service")
+    return new ServiceFileBuilder("http-service")
         .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.http.MockHttpServiceProvider")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }

@@ -12,6 +12,8 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 
+import org.mule.runtime.api.meta.MuleVersion;
+
 import java.io.File;
 
 public class ArtifactDescriptor {
@@ -20,6 +22,7 @@ public class ArtifactDescriptor {
   private File rootFolder;
   private ClassLoaderModel classLoaderModel = NULL_CLASSLOADER_MODEL;
   private BundleDescriptor bundleDescriptor;
+  private MuleVersion minMuleVersion;
 
   /**
    * Creates a new descriptor for a named artifact
@@ -45,6 +48,20 @@ public class ArtifactDescriptor {
     }
 
     this.rootFolder = rootFolder;
+  }
+
+  /**
+   * @return the minimal mule version required to run this artifact
+   */
+  public MuleVersion getMinMuleVersion() {
+    return minMuleVersion;
+  }
+
+  /**
+   * @param minMuleVersion the minimal mule version required to run this artifact
+   */
+  public void setMinMuleVersion(MuleVersion minMuleVersion) {
+    this.minMuleVersion = minMuleVersion;
   }
 
   public ClassLoaderModel getClassLoaderModel() {

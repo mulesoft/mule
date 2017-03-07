@@ -30,23 +30,16 @@ public class ArtifactPluginDescriptorLoader {
    * Load a {@code ArtifactPluginDescriptor} from a file with the resource of an artifact plugin.
    *
    * @param pluginZip the artifact plugin zip file
-   * @param unpackDestination the destination to use to unpack the zip file
    * @return the plugin {@code ArtifactPluginDescriptor}
    * @throws IOException if there was a problem trying to read the artifact plugin zip file or using the {@code unpackDestination}
    *         location
    */
-  public ArtifactPluginDescriptor load(File pluginZip, File unpackDestination) throws IOException {
+  public ArtifactPluginDescriptor load(File pluginZip) throws IOException {
     //TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips
     checkArgument(pluginZip != null, "plugin zip cannot be null");
-    checkArgument(unpackDestination != null, "unpack destination cannot be null");
     checkArgument(pluginZip.getName().endsWith("zip") || pluginZip.getName().endsWith("jar"),
                   "plugin zip must be a zip file ending with .zip or .jar, but the file name was " + pluginZip.getAbsolutePath());
-
-    final String pluginName = pluginZip.getName().substring(0, pluginZip.getName().length() - 4);
-    // must unpack as there's no straightforward way for a ClassLoader to use a jar within another jar/zip
-    final File tmpDir = new File(unpackDestination, pluginName);
-    unzip(pluginZip, tmpDir);
-    return artifactPluginDescriptorFactory.create(tmpDir);
+    return artifactPluginDescriptorFactory.create(pluginZip);
   }
 
 }

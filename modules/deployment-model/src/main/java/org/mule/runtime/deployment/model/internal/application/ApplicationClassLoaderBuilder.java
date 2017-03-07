@@ -15,7 +15,6 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
@@ -42,15 +41,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * {@code artifactClassLoaderBuilder} is used for building the common parts of artifacts.
    *
    * @param artifactClassLoaderFactory factory for the classloader specific to the artifact resource and classes
-   * @param artifactPluginRepository repository of plugins contained by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders.
-   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public ApplicationClassLoaderBuilder(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
-                                       ArtifactPluginRepository artifactPluginRepository,
-                                       ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                       PluginDependenciesResolver pluginDependenciesResolver) {
-    super(artifactPluginRepository, artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+                                       ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
+    super(artifactPluginClassLoaderFactory);
 
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
   }
@@ -96,7 +91,7 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
   }
 
   /**
-   * @param domainId name of the domain where the application  is deployed. Non empty.
+   * @param domainId name of the domain where the application is deployed. Non empty.
    * @param applicationName name of the application. Non empty.
    * @return the unique identifier for the application in the container.
    */

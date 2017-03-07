@@ -9,7 +9,7 @@ package org.mule.runtime.deployment.model.internal.plugin;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Resolves resolves plugin dependencies to obtain a proper initialization order.
@@ -23,5 +23,5 @@ public interface PluginDependenciesResolver {
    * @return a non null list containing the plugins in resolved order.
    * @throws PluginResolutionError if at least a plugin cannot be resolved.
    */
-  List<ArtifactPluginDescriptor> resolve(List<ArtifactPluginDescriptor> descriptors);
+  Set<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> descriptors);
 }

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
@@ -50,6 +51,11 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
     loadUrls(classLoaderModelBuilder, artifactFolder);
 
     return classLoaderModelBuilder.build();
+  }
+
+  @Override
+  public boolean supportsArtifactType(ArtifactType artifactType) {
+    return true;
   }
 
   private void loadUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder, File artifactFolder)

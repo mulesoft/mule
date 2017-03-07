@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
-import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
@@ -71,7 +71,7 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
   public DomainFileBuilder definedBy(String configFile) {
     checkImmutable();
     checkArgument(!StringUtils.isEmpty(configFile), "Config file cannot be empty");
-    this.resources.add(new ZipResource(configFile, DOMAIN_CONFIG_FILE_LOCATION));
+    this.resources.add(new ZipResource(configFile, "mule" + File.separator + DOMAIN_CONFIG_FILE));
 
     return this;
   }
@@ -114,7 +114,8 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
       customResources.add(new ZipResource(applicationFile.getAbsolutePath(), "apps/" + applicationFile.getName()));
     }
 
-    final ZipResource deployProperties = createPropertiesFile(this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
+    final ZipResource deployProperties =
+        createPropertiesFile(this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
     if (deployProperties != null) {
       customResources.add(deployProperties);
     }
@@ -124,6 +125,6 @@ public class DomainFileBuilder extends AbstractArtifactFileBuilder<DomainFileBui
 
   @Override
   public String getConfigFile() {
-    return DOMAIN_CONFIG_FILE_LOCATION;
+    return DOMAIN_CONFIG_FILE;
   }
 }

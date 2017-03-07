@@ -23,7 +23,6 @@ import java.util.List;
  */
 public class TemporaryArtifactClassLoaderBuilderFactory {
 
-  private final ArtifactPluginRepository applicationPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
@@ -38,7 +37,6 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
   public TemporaryArtifactClassLoaderBuilderFactory(ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
                                                     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> artifactClassLoaderFactory,
                                                     PluginDependenciesResolver pluginDependenciesResolver) {
-    this.applicationPluginRepository = new EmptyArtifactPluginRepository();
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
@@ -50,9 +48,8 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    * @return a new instance of {@code ArtifactClassLoaderBuilder}
    */
   public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory,
-                                                   artifactClassLoaderFactory,
-                                                   pluginDependenciesResolver);
+    return new TemporaryArtifactClassLoaderBuilder(artifactPluginClassLoaderFactory,
+                                                   artifactClassLoaderFactory);
   }
 
   /**

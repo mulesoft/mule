@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mule</artifactId>
+        <groupId>org.mule</groupId>
+        <version>4.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mule-bom</artifactId>
+    <version>4.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Mule Runtime BOM</name>
+    <description>Mule runtime modules for BOMs</description>
+
+
+    <modules>
+        <module>runtime-api</module>
+        <module>runtime-impl</module>
+    </modules>
+
+</project>

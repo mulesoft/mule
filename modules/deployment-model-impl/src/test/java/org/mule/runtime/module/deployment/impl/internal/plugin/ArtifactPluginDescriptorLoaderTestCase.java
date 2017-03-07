@@ -10,9 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.util.FileUtils.createFile;
 import static org.mule.tck.ZipUtils.compress;
-
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -46,20 +43,20 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
   @Test
   public void nullPluginZip() throws IOException {
     expectedException.expect(IllegalArgumentException.class);
-    pluginDescriptorLoader.load(null, pluginsFolder.getRoot());
+    pluginDescriptorLoader.load(null);
   }
 
   @Test
   public void nullUnpackDestination() throws IOException {
     expectedException.expect(IllegalArgumentException.class);
-    pluginDescriptorLoader.load(pluginsFolder.getRoot(), null);
+    pluginDescriptorLoader.load(pluginsFolder.getRoot());
   }
 
   @Test
   public void loadAFileNonZipFile() throws IOException {
     expectedException.expect(IllegalArgumentException.class);
     File nonZipFile = createFile(new File(pluginsFolder.getRoot(), "test").getAbsolutePath());
-    pluginDescriptorLoader.load(nonZipFile, pluginsFolder.getRoot());
+    pluginDescriptorLoader.load(nonZipFile);
   }
 
   @Test
@@ -67,9 +64,8 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
     String pluginName = "plugin";
     File plugin = pluginsFolder.newFile(pluginName + ".zip");
     compress(plugin, new ZipUtils.ZipResource[] {});
-    File unpackDestination = pluginsFolder.newFolder("destination");
-    pluginDescriptorLoader.load(plugin, unpackDestination);
-    verify(artifactPluginDescriptorFactory).create(new File(unpackDestination, pluginName));
+    pluginDescriptorLoader.load(plugin);
+    verify(artifactPluginDescriptorFactory).create(plugin);
   }
 
 }

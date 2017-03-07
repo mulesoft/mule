@@ -9,9 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
-import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 
@@ -23,28 +21,19 @@ import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoade
 public class ApplicationClassLoaderBuilderFactory {
 
   private final DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory;
-  private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
-  private PluginDependenciesResolver pluginDependenciesResolver;
 
   /**
    * Creates an {@code ApplicationClassLoaderBuilderFactory} to create {@code ApplicationClassLoaderBuilder} instances.
    *
    * @param applicationClassLoaderFactory factory for the class loader of the artifact resources and classes
-   * @param artifactPluginRepository repository for artifact plugins provided by the runtime
    * @param artifactPluginClassLoaderFactory creates artifact plugin class loaders. Non null.
-   * @param pluginDependenciesResolver resolves artifact plugin dependencies. Non null
    */
   public ApplicationClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory,
-                                              ArtifactPluginRepository artifactPluginRepository,
-                                              ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory,
-                                              PluginDependenciesResolver pluginDependenciesResolver) {
+                                              ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory) {
     checkArgument(artifactPluginClassLoaderFactory != null, "artifactPluginClassLoaderFactory cannot be null");
-    checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     this.applicationClassLoaderFactory = applicationClassLoaderFactory;
-    this.artifactPluginRepository = artifactPluginRepository;
     this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
-    this.pluginDependenciesResolver = pluginDependenciesResolver;
   }
 
   /**
@@ -53,8 +42,7 @@ public class ApplicationClassLoaderBuilderFactory {
    * @return a {@code ApplicationClassLoaderBuilder} instance.
    */
   public ApplicationClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new ApplicationClassLoaderBuilder(applicationClassLoaderFactory, artifactPluginRepository,
-                                             artifactPluginClassLoaderFactory, pluginDependenciesResolver);
+    return new ApplicationClassLoaderBuilder(applicationClassLoaderFactory, artifactPluginClassLoaderFactory);
   }
 
 }

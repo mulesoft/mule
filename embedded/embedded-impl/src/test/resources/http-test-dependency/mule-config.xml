@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:listener-config name="httpListenerConfig">
+        <httpn:listener-connection host="0.0.0.0" port="${httpPort}"/>
+    </httpn:listener-config>
+
+    <flow name="main">
+        <httpn:listener path="/" config-ref="httpListenerConfig"/>
+        <set-payload value="#[mel:Thread.currentThread().getContextClassLoader().loadClass('org.mobicents.xcap.client.impl.XcapClientImpl').getName()]"/>
+    </flow>
+</mule>

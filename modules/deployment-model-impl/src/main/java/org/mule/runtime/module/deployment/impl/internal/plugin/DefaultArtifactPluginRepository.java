@@ -7,24 +7,18 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.io.File.separator;
-import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.io.FileUtils.forceDelete;
-import static org.apache.commons.io.FilenameUtils.removeExtension;
-import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPluginsFolder;
-import static org.mule.runtime.core.util.FileUtils.unzip;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,29 +67,9 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
   private List<ArtifactPluginDescriptor> collectContainerApplicationPluginDescriptors() throws IOException {
     File[] containerPlugins = getContainerAppPluginsFolder().listFiles();
     if (containerPlugins != null) {
-      unzipPluginsIfNeeded();
       return createApplicationPluginDescriptors();
     } else {
       return EMPTY_LIST;
-    }
-  }
-
-  /**
-   * Iterates the list of zip files in container application plugin folder, unzip them and once the plugin is expanded it deletes
-   * the zip from the container app plugins folder.
-   *
-   * @throws IOException
-   */
-  private void unzipPluginsIfNeeded() throws IOException {
-    for (File pluginZipFile : getContainerAppPluginsFolder()
-        //TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files
-        .listFiles((FileFilter) new SuffixFileFilter(asList(".zip", ".jar"), INSENSITIVE))) {
-      String pluginName = removeExtension(pluginZipFile.getName());
-
-      final File pluginFolderExpanded = new File(getContainerAppPluginsFolder(), separator + pluginName);
-      unzip(pluginZipFile, pluginFolderExpanded);
-
-      forceDelete(pluginZipFile);
     }
   }
 
@@ -108,9 +82,8 @@ public class DefaultArtifactPluginRepository implements ArtifactPluginRepository
   private List<ArtifactPluginDescriptor> createApplicationPluginDescriptors() {
     List<ArtifactPluginDescriptor> pluginDescriptors = new LinkedList<>();
 
-    for (File pluginExpandedFolder : getContainerAppPluginsFolder()
-        .listFiles((FileFilter) DIRECTORY)) {
-      final ArtifactPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(pluginExpandedFolder);
+    for (File plguinJarFile : getContainerAppPluginsFolder().listFiles()) {
+      final ArtifactPluginDescriptor appPluginDescriptor = pluginDescriptorFactory.create(plguinJarFile);
       pluginDescriptors.add(appPluginDescriptor);
     }
 

@@ -9,12 +9,21 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.io.File.separator;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.REPOSITORY;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.core.util.FileUtils;
@@ -26,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -43,26 +53,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    */
   public ArtifactPluginFileBuilder(String id) {
     super(id);
-  }
-
-  /**
-   * Creates a new builder from another instance.
-   *
-   * @param source instance used as template to build the new one. Non null.
-   */
-  public ArtifactPluginFileBuilder(ArtifactPluginFileBuilder source) {
-    super(source);
-  }
-
-  /**
-   * Create a new builder from another instance and different ID.
-   *
-   * @param id artifact identifier. Non empty.
-   * @param source instance used as template to build the new one. Non null.
-   */
-  public ArtifactPluginFileBuilder(String id, ArtifactPluginFileBuilder source) {
-    super(id, source);
-    this.properties.putAll(source.properties);
+    withClassifier(MULE_PLUGIN_CLASSIFIER);
   }
 
   @Override
@@ -88,7 +79,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   /**
    * Adds a describer into the plugin describer file.
    *
-   * @param mulePluginModel the describer to store under {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
+   * @param mulePluginModel the describer to store under
+   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} file
    * @return the same builder instance
    */
   public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
@@ -126,65 +118,29 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
     return getThis();
   }
 
-  /**
-   * Adds a resource file to the application {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder.
-   *
-   * @param resourceFile resource file from a external file or test resource.
-   * @return the same builder instance
-   */
-  public ArtifactPluginFileBuilder containingMuleArtifactResource(String resourceFile, String alias) {
-    checkImmutable();
-    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, MULE_ARTIFACT_FOLDER + "/" + alias));
-    return this;
-  }
-
-  /**
-   * Adds a resource file to the application {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER} folder.
-   *
-   * @param resourceFile resource file from a external file or test resource.
-   * @param alias relative path of the artifact to "install" in the plugin's {@link ArtifactPluginDescriptor#REPOSITORY}
-   *              folder, it must respect the Maven repository format. E.g.: /org/mule/modules/mule-module-ble/4.0-SNAPSHOT/mule-module-ble-4.0-SNAPSHOT.jar
-   * @return the same builder instance
-   */
-  public ArtifactPluginFileBuilder containingRepositoryResource(String resourceFile, String alias) {
-    checkImmutable();
-    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, REPOSITORY + "/" + alias));
-    return this;
-  }
-
-  /**
-   * Adds a dependency against another plugin
-   *
-   * @param pluginName name of the plugin to be dependent. Non empty.
-   * @return the same builder instance
-   */
-  public ArtifactPluginFileBuilder dependingOn(String pluginName) {
-    checkImmutable();
-    checkArgument(!isEmpty(pluginName), "Plugin name cannot be empty");
-    String plugins = properties.getProperty(PLUGIN_DEPENDENCIES);
-    if (isEmpty(plugins)) {
-      plugins = pluginName;
-    } else {
-      plugins = plugins + ", " + pluginName;
-    }
-
-    properties.setProperty(PLUGIN_DEPENDENCIES, plugins);
-
-    return this;
-  }
-
   @Override
   protected List<ZipResource> getCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
 
     if (!properties.isEmpty()) {
-      final File applicationPropertiesFile = new File(getTempFolder(), PLUGIN_PROPERTIES);
-      applicationPropertiesFile.deleteOnExit();
-      createPropertiesFile(applicationPropertiesFile, properties);
 
-      customResources.add(new ZipResource(applicationPropertiesFile.getAbsolutePath(), PLUGIN_PROPERTIES));
+      final MulePluginModel.MulePluginModelBuilder builder = new MulePluginModel.MulePluginModelBuilder();
+      builder.setName(getArtifactId())
+          .setMinMuleVersion("4.0.0");
+      MuleArtifactLoaderDescriptorBuilder classLoaderModelDescriber = builder.withClassLoaderModelDescriber()
+          .setId(MAVEN);
+      if (properties.containsKey(EXPORTED_CLASS_PACKAGES_PROPERTY)) {
+        classLoaderModelDescriber.addProperty(EXPORTED_PACKAGES,
+                                              ((String) properties.get(EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
+      }
+      if (properties.containsKey(EXPORTED_RESOURCE_PROPERTY)) {
+        classLoaderModelDescriber.addProperty(EXPORTED_RESOURCES,
+                                              ((String) properties.get(EXPORTED_RESOURCE_PROPERTY)).split(","));
+      }
+
+      builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+
+      mulePluginModel = builder.build();
     }
 
     if (mulePluginModel != null) {
@@ -193,7 +149,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
 
       String jsonDescriber = new MulePluginModelJsonSerializer().serialize(mulePluginModel);
       try {
-        FileUtils.writeStringToFile(jsonDescriptorFile, jsonDescriber);
+        writeStringToFile(jsonDescriptorFile, jsonDescriber);
       } catch (IOException e) {
         throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
       }
@@ -206,5 +162,15 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   @Override
   public String getConfigFile() {
     return null;
+  }
+
+  @Override
+  protected String getFileExtension() {
+    return ".jar";
+  }
+
+  @Override
+  protected Optional<MuleArtifactLoaderDescriptor> getBundleDescriptorLoader() {
+    return ofNullable(mulePluginModel != null ? mulePluginModel.getBundleDescriptorLoader() : null);
   }
 }

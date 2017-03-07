@@ -20,6 +20,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -42,7 +43,10 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
 
   private final PolicyTemplateClassLoaderBuilderFactory classLoaderBuilderFactory =
       mock(PolicyTemplateClassLoaderBuilderFactory.class);
-  private final PolicyTemplateFactory policyTemplateFactory = new DefaultPolicyTemplateFactory(classLoaderBuilderFactory);
+  private final PluginDependenciesResolver pluginDependenciesResolver =
+      mock(PluginDependenciesResolver.class);
+  private final PolicyTemplateFactory policyTemplateFactory =
+      new DefaultPolicyTemplateFactory(classLoaderBuilderFactory, pluginDependenciesResolver);
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

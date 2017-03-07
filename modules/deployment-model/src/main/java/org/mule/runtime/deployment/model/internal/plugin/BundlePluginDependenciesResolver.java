@@ -9,6 +9,9 @@ package org.mule.runtime.deployment.model.internal.plugin;
 
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -19,6 +22,7 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,25 +57,25 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   @Override
-  public List<ArtifactPluginDescriptor> resolve(List<ArtifactPluginDescriptor> descriptors) {
+  public Set<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> descriptors) {
 
-    List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
+    Set<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
 
     verifyPluginExportedPackages(resolvedPlugins);
 
     return resolvedPlugins;
   }
 
-  private List<ArtifactPluginDescriptor> resolvePluginsDependencies(List<ArtifactPluginDescriptor> descriptors) {
+  private Set<ArtifactPluginDescriptor> resolvePluginsDependencies(Set<ArtifactPluginDescriptor> descriptors) {
     Set<BundleDescriptor> knownPlugins =
         descriptors.stream().map(ArtifactPluginDescriptor::getBundleDescriptor).collect(Collectors.toSet());
     descriptors = getArtifactsWithDependencies(descriptors, knownPlugins);
 
-
-    descriptors.sort((d1, d2) -> (d1.getName().compareTo(d2.getName())));
+    List<ArtifactPluginDescriptor> sortedDescriptors = new ArrayList<>(descriptors);
+    sortedDescriptors.sort((d1, d2) -> (d1.getName().compareTo(d2.getName())));
 
     List<ArtifactPluginDescriptor> resolvedPlugins = new LinkedList<>();
-    List<ArtifactPluginDescriptor> unresolvedPlugins = new LinkedList<>(descriptors);
+    List<ArtifactPluginDescriptor> unresolvedPlugins = new LinkedList<>(sortedDescriptors);
 
     boolean continueResolution = true;
 
@@ -99,10 +103,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       throw new PluginResolutionError(createResolutionErrorMessage(unresolvedPlugins, resolvedPlugins));
     }
 
-    return resolvedPlugins;
+    return new HashSet<>(resolvedPlugins);
   }
 
-  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
+  private void verifyPluginExportedPackages(Set<ArtifactPluginDescriptor> plugins) {
     final Map<String, List<String>> exportedPackages = new HashMap<>();
 
     boolean error = false;
@@ -134,17 +138,25 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    * @return the plugins that were obtained initially plus all the ones that were found.
    * @throws DependencyNotFoundException if any dependency wasn't found properly
    */
-  private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
-                                                                      Set<BundleDescriptor> visited) {
+  private Set<ArtifactPluginDescriptor> getArtifactsWithDependencies(Set<ArtifactPluginDescriptor> pluginDescriptors,
+                                                                     Set<BundleDescriptor> visited) {
     if (!pluginDescriptors.isEmpty()) {
-      List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
+      Set<ArtifactPluginDescriptor> foundDependencies = new HashSet<>();
       pluginDescriptors.stream()
           .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
+          .filter(pluginDescriptor -> pluginDescriptor.getBundleDescriptor().isPlugin())
           .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
               .forEach(dependency -> {
-                if (!isResolvedDependency(visited, dependency.getDescriptor())) {
-                  File mulePluginLocation = dependenciesProvider.resolve(dependency.getDescriptor());
-                  foundDependencies.add(artifactDescriptorFactory.create(new File(mulePluginLocation.toURI())));
+                if (isPlugin(dependency) && !isResolvedDependency(visited, dependency.getDescriptor())) {
+                  File mulePluginLocation;
+                  if (dependency.getBundleUrl() != null) {
+                    mulePluginLocation = new File(dependency.getBundleUrl().getFile());
+                  } else {
+                    mulePluginLocation = dependenciesProvider.resolve(dependency.getDescriptor());
+                  }
+                  ArtifactPluginDescriptor artifactPluginDescriptor = artifactDescriptorFactory.create(mulePluginLocation);
+                  artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
+                  foundDependencies.add(artifactPluginDescriptor);
                   visited.add(dependency.getDescriptor());
                 }
               }));
@@ -152,6 +164,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       pluginDescriptors.addAll(getArtifactsWithDependencies(foundDependencies, visited));
     }
     return pluginDescriptors;
+  }
+
+  private boolean isPlugin(BundleDependency dependency) {
+    return dependency.getDescriptor().isPlugin();
   }
 
   private void sanitizeExportedPackages(ArtifactPluginDescriptor pluginDescriptor,
@@ -191,7 +207,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       builder.append("\nPlugin: ").append(unresolvedPlugin.getName()).append(" missing dependencies:");
       List<BundleDependency> missingDependencies = new ArrayList<>();
       for (BundleDependency dependency : unresolvedPlugin.getClassLoaderModel().getDependencies()) {
-        if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().get())) {
+        Optional<String> classifierOptional = dependency.getDescriptor().getClassifier();
+        if (classifierOptional.isPresent() && MULE_PLUGIN_CLASSIFIER.equals(classifierOptional.get())) {
           final ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(dependency, resolvedPlugins);
           if (dependencyDescriptor == null) {
             missingDependencies.add(dependency);
@@ -252,7 +269,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     boolean resolvedDependency = true;
 
     for (BundleDependency dependency : pluginDependencies) {
-      if (findArtifactPluginDescriptor(dependency, resolvedPlugins) == null) {
+      if (dependency.getDescriptor().isPlugin()
+          && findArtifactPluginDescriptor(dependency, resolvedPlugins) == null) {
         resolvedDependency = false;
         break;
       }

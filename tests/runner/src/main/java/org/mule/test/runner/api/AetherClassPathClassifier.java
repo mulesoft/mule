@@ -160,8 +160,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Finds direct dependencies declared with classifier {@value #MULE_SERVICE_CLASSIFIER} and {@code provided} scope.
-   * Creates a List of {@link ArtifactUrlClassification} for each service including their {@code compile} scope dependencies.
+   * Finds direct dependencies declared with classifier {@value #MULE_SERVICE_CLASSIFIER} and {@code provided} scope. Creates a
+   * List of {@link ArtifactUrlClassification} for each service including their {@code compile} scope dependencies.
    * <p/>
    * {@value #SERVICE_PROVIDER_CLASS_NAME} will be used as {@link ArtifactClassLoader#getArtifactId()}
    * <p/>
@@ -319,9 +319,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Creates the {@link Set} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies.
-   * If the rootArtifact is a {@link ArtifactClassificationType#MODULE} it will use its managed dependencies, other case it
-   * collects managed dependencies for each direct dependencies selected for Container.
+   * Creates the {@link Set} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies. If
+   * the rootArtifact is a {@link ArtifactClassificationType#MODULE} it will use its managed dependencies, other case it collects
+   * managed dependencies for each direct dependencies selected for Container.
    *
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
@@ -357,10 +357,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Gets the direct dependencies filter to be used when collecting Container dependencies.
-   * If the rootArtifact is a {@link ArtifactClassificationType#MODULE} it will include
-   * {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE} dependencies too if not just
-   * {@value org.eclipse.aether.util.artifact.JavaScopes#PROVIDED}.
+   * Gets the direct dependencies filter to be used when collecting Container dependencies. If the rootArtifact is a
+   * {@link ArtifactClassificationType#MODULE} it will include {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE}
+   * dependencies too if not just {@value org.eclipse.aether.util.artifact.JavaScopes#PROVIDED}.
    *
    * @param rootArtifactType the {@link ArtifactClassificationType} for rootArtifact
    * @return {@link Predicate} for selecting direct dependencies for the Container.
@@ -368,7 +367,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private Predicate<Dependency> getContainerDirectDependenciesFilter(ArtifactClassificationType rootArtifactType) {
     return rootArtifactType.equals(MODULE)
         ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
-        : directDep -> directDep.getScope().equals(PROVIDED);
+        : directDep -> directDep.getScope().equals(PROVIDED)
+            || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER);
   }
 
   /**
@@ -500,7 +500,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   /**
    * Classifies an {@link Artifact} recursively. {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE} dependencies will be
-   * resolved for building the {@link URL}'s for the class loader. Once classified the node is added to {@link Map} of artifactsClassified.
+   * resolved for building the {@link URL}'s for the class loader. Once classified the node is added to {@link Map} of
+   * artifactsClassified.
    *
    * @param artifactToClassify {@link Artifact} that represents the artifact to be classified
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
@@ -591,8 +592,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier specified.
    *
    * @param directDependencies {@link List} of direct {@link Dependency}
-   * @return {@link List} of {@link Artifact}s for those dependencies classified as with the give classifier, can be
-   *         empty.
+   * @return {@link List} of {@link Artifact}s for those dependencies classified as with the give classifier, can be empty.
    */
   private List<Artifact> filterArtifacts(List<Dependency> directDependencies, Predicate<Dependency> filter) {
     return directDependencies.stream()
@@ -664,7 +664,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Finds the plugin shared lib {@link Dependency} from the direct dependencies of the  rootArtifact.
+   * Finds the plugin shared lib {@link Dependency} from the direct dependencies of the rootArtifact.
    *
    * @param pluginSharedLibCoords Maven coordinates that define the plugin shared lib artifact
    * @param rootArtifact {@link Artifact} that defines the current artifact that requested to build this class loaders
@@ -695,7 +695,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private Artifact createPluginArtifact(String pluginCoords, Artifact rootArtifact, List<Dependency> directDependencies) {
     Optional<Dependency> pluginDependency = discoverDependency(pluginCoords, rootArtifact, directDependencies);
-    if (!pluginDependency.isPresent() || !pluginDependency.get().getScope().equals(PROVIDED)) {
+    if (!pluginDependency.isPresent()) {
       throw new IllegalStateException("Plugin '" + pluginCoords + "' in order to be resolved has to be declared as " + PROVIDED +
           " dependency of your Maven project (" + rootArtifact + ")");
     }
@@ -763,7 +763,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    *
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   *@param rootArtifactType {@link ArtifactClassificationType} for rootArtifact  @return {@link URL}s for application class loader
+   * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
    */
   private List<URL> buildApplicationUrlClassification(ClassPathClassifierContext context,
                                                       List<Dependency> directDependencies,

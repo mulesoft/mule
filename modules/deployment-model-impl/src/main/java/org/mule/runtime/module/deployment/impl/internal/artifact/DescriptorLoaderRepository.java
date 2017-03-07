@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.DescriptorLoader;
 
 import java.util.Optional;
@@ -25,5 +26,5 @@ public interface DescriptorLoaderRepository {
    * @returns a non null {@link Optional} loader of the given class and ID
    * @throws LoaderNotFoundException if there is no registered loader of type {@link T} with the provided ID.
    */
-  <T extends DescriptorLoader> T get(String id, Class<T> loaderClass) throws LoaderNotFoundException;
+  <T extends DescriptorLoader> T get(String id, ArtifactType artifactType, Class<T> loaderClass) throws LoaderNotFoundException;
 }

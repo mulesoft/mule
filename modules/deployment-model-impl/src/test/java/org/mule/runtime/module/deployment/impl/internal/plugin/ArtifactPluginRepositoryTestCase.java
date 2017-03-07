@@ -66,20 +66,6 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void unzipPluginZipFileCreateDescriptor() throws Exception {
-    File zipPlugin = createPluginZipFile(pluginsLibFolder, PLUGIN_NAME);
-
-    final List<ArtifactPluginDescriptor> descriptorList = applicationPluginRepository.getContainerArtifactPluginDescriptors();
-
-    assertThat(descriptorList.size(), is(1));
-    ArtifactPluginDescriptor descriptor = descriptorList.get(0);
-    assertThat(descriptor.getName(), is(PLUGIN_NAME));
-
-    assertThat(zipPlugin.exists(), is(false));
-    assertThat(new File(pluginsLibFolder, descriptor.getName()).exists(), is(true));
-  }
-
-  @Test
   public void loadPluginAlreadyUnzippedCreateDescriptor() throws Exception {
     File pluginFolder = createPluginFolder(pluginsLibFolder, PLUGIN_NAME);
 

@@ -8,13 +8,16 @@
 package org.mule.runtime.module.artifact.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Optional.empty;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mule.tck.ZipUtils.compress;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
@@ -24,6 +27,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -34,7 +38,9 @@ import java.util.Properties;
  *
  * @param <T> class of the implementation builder
  */
-public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFileBuilder<T>> implements TestArtifactDescriptor {
+public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFileBuilder<T>>
+    extends AbstractDependencyFileBuilder<T>
+    implements TestArtifactDescriptor {
 
   private final String fileName;
   private final String id;
@@ -49,6 +55,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    * @param upperCaseInExtension whether the extension is in uppercase
    */
   public AbstractArtifactFileBuilder(String id, boolean upperCaseInExtension) {
+    super(id);
     checkArgument(!isEmpty(id), "ID cannot be empty");
     this.id = id;
     this.fileName = upperCaseInExtension ? (id + ".ZIP") : (id + ".zip");
@@ -61,6 +68,15 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    */
   public AbstractArtifactFileBuilder(String id) {
     this(id, false);
+  }
+
+  /**
+   * Template method to redefine the file extension
+   *
+   * @return the file extension of the file name for the artifact.
+   */
+  protected String getFileExtension() {
+    return ".zip";
   }
 
   /**
@@ -125,11 +141,6 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     return getThis();
   }
 
-  /**
-   * @return current instance. Used just to avoid compilation warnings.
-   */
-  protected abstract T getThis();
-
   @Override
   public String getId() {
     return id;
@@ -158,9 +169,10 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
       tempFile.deleteOnExit();
 
       if (corrupted) {
-        buildBrokenZipFile(tempFile);
+        buildBrokenJarFile(tempFile);
       } else {
         final List<ZipResource> zipResources = new LinkedList<>(resources);
+        zipResources.add(new ZipResource(getArtifactPomFile().getAbsolutePath(), getArtifactFileBundledPomPath()));
         zipResources.addAll(getCustomResources());
         compress(tempFile, zipResources.toArray(new ZipResource[0]));
       }
@@ -175,15 +187,17 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     assertThat("Cannot change attributes once the artifact file was built", artifactFile, is(nullValue()));
   }
 
-  protected ZipResource createPropertiesFile(Properties props, String propertiesFileName) {
+  protected ZipResource createPropertiesFile(Properties props, String propertiesFileName, String zipAlias) {
     ZipResource result = null;
 
     if (!props.isEmpty()) {
-      final File applicationPropertiesFile = new File(getTempFolder(), propertiesFileName);
+      File classesFolder = new File(getTempFolder(), "classes");
+      classesFolder.mkdirs();
+      final File applicationPropertiesFile = new File(classesFolder, propertiesFileName);
       applicationPropertiesFile.deleteOnExit();
       createPropertiesFile(applicationPropertiesFile, props);
 
-      result = new ZipResource(applicationPropertiesFile.getAbsolutePath(), propertiesFileName);
+      result = new ZipResource(applicationPropertiesFile.getAbsolutePath(), zipAlias);
     }
 
     return result;
@@ -198,11 +212,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     }
   }
 
-  protected String getTempFolder() {
-    return System.getProperty("java.io.tmpdir");
-  }
-
-  private void buildBrokenZipFile(File tempFile) throws UncheckedIOException {
+  private void buildBrokenJarFile(File tempFile) throws UncheckedIOException {
     try {
       FileUtils.write(tempFile, "This content represents invalid compressed data");
     } catch (IOException e) {
@@ -210,5 +220,45 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     }
   }
 
+  /**
+   * @return a collection with custom {@link ZipResource}s to add to the artifact file.
+   */
   protected abstract List<ZipResource> getCustomResources();
+
+  /**
+   * @return the descriptor loader for the artifact.
+   */
+  protected Optional<MuleArtifactLoaderDescriptor> getBundleDescriptorLoader() {
+    return empty();
+  }
+
+  @Override
+  public String getGroupId() {
+    return (String) getBundleDescriptorLoader().map(descriptorLoader -> descriptorLoader.getAttributes().get("groupId"))
+        .orElse(super.getGroupId());
+  }
+
+  @Override
+  public String getArtifactId() {
+    return (String) getBundleDescriptorLoader().map(descriptorLoader -> descriptorLoader.getAttributes().get("artifactId"))
+        .orElse(super.getArtifactId());
+  }
+
+  @Override
+  public String getClassifier() {
+    return (String) getBundleDescriptorLoader().map(descriptorLoader -> descriptorLoader.getAttributes().get("classifier"))
+        .orElse(super.getClassifier());
+  }
+
+  @Override
+  public String getType() {
+    return (String) getBundleDescriptorLoader().map(descriptorLoader -> descriptorLoader.getAttributes().get("type"))
+        .orElse(super.getType());
+  }
+
+  @Override
+  public String getVersion() {
+    return (String) getBundleDescriptorLoader().map(descriptorLoader -> descriptorLoader.getAttributes().get("version"))
+        .orElse(super.getVersion());
+  }
 }

@@ -14,4 +14,6 @@ package org.mule.runtime.module.artifact.descriptor;
  */
 public interface ClassLoaderModelLoader extends DescriptorLoader<ClassLoaderModel> {
 
+
+
 }

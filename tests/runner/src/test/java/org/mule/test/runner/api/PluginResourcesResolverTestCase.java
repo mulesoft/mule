@@ -21,10 +21,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
@@ -48,7 +50,6 @@ import org.mockito.Matchers;
 @SmallTest
 public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
 
-  private static final String MULE_PLUGIN = "mule-plugin";
   private static final String ARTIFACT_EXPORT_RESOURCES_KEY = "artifact.export.resources";
   private static final String ARTIFACT_EXPORT_CLASS_PACKAGES_KEY = "artifact.export.classPackages";
 
@@ -108,13 +109,13 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   @Test
   public void resolvePluginResourcesForMuleExtensionPlugin() throws Exception {
     ExtensionManifestBuilder builder = new ExtensionManifestBuilder()
-        .setName(MULE_PLUGIN)
+        .setName(MULE_PLUGIN_CLASSIFIER)
         .setDescription(JUNIT_MOCK_EXTENSION_MANIFEST_DESCRIPTION)
         .setMinMuleVersion(new MuleVersion(VERSION))
         .setVersion(SNAPSHOT_VERSION)
         .addExportedPackages(newArrayList(ORG_MULE_TEST_RUNNER, ORG_MULE_TEST_RUNNER_API))
         .addExportedResources(newArrayList(META_INF_RESOURCE_PROPERTIES, META_INF_ANOTHER_RESOURCE_PROPERTIES));
-    builder.withDescriber().setId(MULE_PLUGIN);
+    builder.withDescriber().setId(MULE_PLUGIN_CLASSIFIER);
 
     ExtensionManifest extensionManifest = builder.build();
     String manifestXml = new ExtensionManifestXmlSerializer().serialize(extensionManifest);
@@ -135,7 +136,8 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   }
 
   private PluginUrlClassification newPluginUrlClassification(List<URL> urls) {
-    return new PluginUrlClassification(MULE_PLUGIN, urls, Collections.<Class>emptyList(), Collections.<String>emptyList());
+    return new PluginUrlClassification(MULE_PLUGIN_CLASSIFIER, urls, Collections.<Class>emptyList(),
+                                       Collections.<String>emptyList());
   }
 
   private void assertResolvedResources(PluginUrlClassification original, PluginUrlClassification resolved) {
