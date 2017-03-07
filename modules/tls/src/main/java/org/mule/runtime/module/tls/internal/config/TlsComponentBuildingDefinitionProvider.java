@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class TlsComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
-  private static final String TLS_NAMESPACE = "tls";
+  public static final String TLS_NAMESPACE = "tls";
   private static final String CONTEXT = "context";
   private static final String KEYSTORE = "key-store";
   private static final String TRUSTSTORE = "trust-store";
