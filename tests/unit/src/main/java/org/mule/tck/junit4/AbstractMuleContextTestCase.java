@@ -220,6 +220,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<>();
+        builders.add(new TestServicesConfigurationBuilder());
         builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
         builders.add(getBuilder());
         addBuilders(builders);
