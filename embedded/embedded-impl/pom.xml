@@ -20,12 +20,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-embedded-api</artifactId>
             <version>${muleEmbeddedApiVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-runtime-impl-bom</artifactId>
             <version>${project.version}</version>
         </dependency>
