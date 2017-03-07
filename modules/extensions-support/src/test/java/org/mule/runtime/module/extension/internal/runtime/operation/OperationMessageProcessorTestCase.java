@@ -44,11 +44,14 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
+import com.mulesoft.weave.el.WeaveExpressionExecutor;
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -245,6 +248,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor = createOperationMessageProcessor();
 
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
+    when(context.getRegistry().lookupObject(ExpressionExecutor.class)).thenReturn(new WeaveExpressionExecutor());
     doReturn(new DefaultExpressionManager(context)).when(context).getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);

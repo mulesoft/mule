@@ -11,6 +11,8 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+
+import com.mulesoft.weave.el.WeaveExpressionExecutor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,7 +27,7 @@ import java.util.List;
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.
  * <p>
  * This is to be used only in tests that do not leverage the service injection mechanism.
- * 
+ *
  * @since 4.0
  */
 public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder {
@@ -33,6 +35,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   private static final String MOCK_HTTP_SERVICE = "mockHttpService";
 
   final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+  final WeaveExpressionExecutor weaveExpressionExecutor = new WeaveExpressionExecutor();
   private boolean mockHttpService;
 
   public TestServicesConfigurationBuilder() {
@@ -47,6 +50,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
+    registry.registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
     if (mockHttpService) {
       registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
     }
