@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.module.tls.internal.config;
 
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -8,49 +14,50 @@ import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
  * @since 4.0
  */
 public class TrustStoreConfig implements TlsContextTrustStoreConfiguration {
-    private String path;
-    private String password;
-    private String type;
-    private String algorithm;
-    private boolean insecure;
 
-    public String getPath() {
-        return path;
-    }
+  private String path;
+  private String password;
+  private String type;
+  private String algorithm;
+  private boolean insecure;
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+  public String getPath() {
+    return path;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public void setPath(String path) {
+    this.path = path;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public String getType() {
-        return type;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public String getAlgorithm() {
-        return algorithm;
-    }
+  public void setType(String type) {
+    this.type = type;
+  }
 
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
-    }
+  public String getAlgorithm() {
+    return algorithm;
+  }
 
-    public boolean isInsecure() {
-        return insecure;
-    }
+  public void setAlgorithm(String algorithm) {
+    this.algorithm = algorithm;
+  }
 
-    public void setInsecure(boolean insecure) {
-        this.insecure = insecure;
-    }
+  public boolean isInsecure() {
+    return insecure;
+  }
+
+  public void setInsecure(boolean insecure) {
+    this.insecure = insecure;
+  }
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.module.tls.internal.config;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
@@ -18,44 +24,46 @@ import java.util.List;
  */
 public class TlsComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
-    private static final String TLS_NAMESPACE = "tls";
-    private static final String CONTEXT = "context";
-    private static final String KEYSTORE = "key-store";
-    private static final String TRUSTSTORE = "trust-store";
+  private static final String TLS_NAMESPACE = "tls";
+  private static final String CONTEXT = "context";
+  private static final String KEYSTORE = "key-store";
+  private static final String TRUSTSTORE = "trust-store";
 
-    private static ComponentBuildingDefinition.Builder baseDefinition =
-        new ComponentBuildingDefinition.Builder().withNamespace(TLS_NAMESPACE);
+  private static ComponentBuildingDefinition.Builder baseDefinition =
+      new ComponentBuildingDefinition.Builder().withNamespace(TLS_NAMESPACE);
 
-    @Override public void init() {
+  @Override
+  public void init() {
 
-    }
+  }
 
-    @Override public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
-        LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+    LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
 
-        ComponentBuildingDefinition.Builder baseStore = baseDefinition.copy()
-            .withSetterParameterDefinition("path", fromSimpleParameter("path").build())
-            .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
-            .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
-            .withSetterParameterDefinition("algorithm", fromSimpleParameter("algorithm").build());
+    ComponentBuildingDefinition.Builder baseStore = baseDefinition.copy()
+        .withSetterParameterDefinition("path", fromSimpleParameter("path").build())
+        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
+        .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
+        .withSetterParameterDefinition("algorithm", fromSimpleParameter("algorithm").build());
 
-        componentBuildingDefinitions
-            .add(baseStore.copy().withIdentifier(KEYSTORE).withTypeDefinition(fromType(KeyStoreConfig.class))
-                 .withSetterParameterDefinition("alias", fromSimpleParameter("alias").build())
-                 .withSetterParameterDefinition("keyPassword", fromSimpleParameter("keyPassword").build()).build());
+    componentBuildingDefinitions
+        .add(baseStore.copy().withIdentifier(KEYSTORE).withTypeDefinition(fromType(KeyStoreConfig.class))
+            .withSetterParameterDefinition("alias", fromSimpleParameter("alias").build())
+            .withSetterParameterDefinition("keyPassword", fromSimpleParameter("keyPassword").build()).build());
 
-        componentBuildingDefinitions
-            .add(baseStore.copy().withIdentifier(TRUSTSTORE).withTypeDefinition(fromType(TrustStoreConfig.class))
-                 .withSetterParameterDefinition("insecure", fromSimpleParameter("insecure").build()).build());
+    componentBuildingDefinitions
+        .add(baseStore.copy().withIdentifier(TRUSTSTORE).withTypeDefinition(fromType(TrustStoreConfig.class))
+            .withSetterParameterDefinition("insecure", fromSimpleParameter("insecure").build()).build());
 
-        componentBuildingDefinitions
-            .add(baseDefinition.copy().withIdentifier(CONTEXT).withTypeDefinition(fromType(DefaultTlsContextFactory.class))
-                .withObjectFactoryType(DefaultTlsContextFactoryObjectFactory.class)
-                .withSetterParameterDefinition("enabledProtocols", fromSimpleParameter("enabledProtocols").build())
-                .withSetterParameterDefinition("enabledCipherSuites", fromSimpleParameter("enabledCipherSuites").build())
-                .withSetterParameterDefinition("keyStore", fromChildConfiguration(KeyStoreConfig.class).build())
-                .withSetterParameterDefinition("trustStore", fromChildConfiguration(TrustStoreConfig.class).build()).build());
+    componentBuildingDefinitions
+        .add(baseDefinition.copy().withIdentifier(CONTEXT).withTypeDefinition(fromType(DefaultTlsContextFactory.class))
+            .withObjectFactoryType(DefaultTlsContextFactoryObjectFactory.class)
+            .withSetterParameterDefinition("enabledProtocols", fromSimpleParameter("enabledProtocols").build())
+            .withSetterParameterDefinition("enabledCipherSuites", fromSimpleParameter("enabledCipherSuites").build())
+            .withSetterParameterDefinition("keyStore", fromChildConfiguration(KeyStoreConfig.class).build())
+            .withSetterParameterDefinition("trustStore", fromChildConfiguration(TrustStoreConfig.class).build()).build());
 
-        return componentBuildingDefinitions;
-    }
+    return componentBuildingDefinitions;
+  }
 }
