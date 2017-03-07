@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.services</groupId>
         <artifactId>mule-services</artifactId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <name>OAuth Service Implementation</name>
