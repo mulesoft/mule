@@ -30,7 +30,6 @@
              <classifier>mule-service</classifier>
              <scope>provided</scope>
          </dependency>
-
          <dependency>
              <groupId>org.mule.runtime</groupId>
              <artifactId>mule-core</artifactId>

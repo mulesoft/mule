@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.modules.schedulers.config;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -23,17 +29,19 @@ public class SchedulersComponentBuildingDefinitionProvider implements ComponentB
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(SCHEDULERS_NAMESPACE);
 
-  @Override public void init() {
+  @Override
+  public void init() {
 
   }
 
-  @Override public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+  @Override
+  public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
     LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions = new LinkedList<>();
 
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(CRON).withTypeDefinition(fromType(CronScheduler.class))
-             .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
-             .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());
+            .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
+            .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());
 
     return componentBuildingDefinitions;
   }
