@@ -25,6 +25,7 @@ import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObj
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -150,9 +151,9 @@ public class DeclarationElementModelFactoryTestCase {
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
     when(source.getSuccessCallback()).thenReturn(empty());
     when(source.getErrorCallback()).thenReturn(empty());
-
     when(operation.getName()).thenReturn(OPERATION_NAME);
     when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    visitableMock(operation, source);
 
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
