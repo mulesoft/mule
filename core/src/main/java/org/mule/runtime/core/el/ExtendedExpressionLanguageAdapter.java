@@ -39,7 +39,7 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
                                            MVELExpressionLanguage mvelExpressionLanguage) {
     this.dataWeaveExpressionLanguage = dataWeaveExpressionLanguage;
     this.mvelExpressionLanguage = mvelExpressionLanguage;
-    forceMel = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false")) || !dataWeaveExpressionLanguage.isEnabled();
+    forceMel = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
   }
 
   public boolean isForceMel() {
