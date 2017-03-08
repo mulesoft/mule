@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,18 @@ public class ExpressionSplitter extends AbstractSplitter
             {
                 messages.add(new DefaultMuleMessage(nodeList.item(i), muleContext));
             }
+            return messages;
+        }
+        else if (result instanceof Iterator)
+        {
+            Iterator iterator = (Iterator) result;
+            List<MuleMessage> messages = new ArrayList<>();
+
+            while (iterator.hasNext())
+            {
+                messages.add(new DefaultMuleMessage(iterator.next(), muleContext));
+            }
+
             return messages;
         }
         else if (result == null)
