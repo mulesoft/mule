@@ -57,6 +57,13 @@
             <version>1.4.9</version>
             <scope>test</scope>
         </dependency>
+        <!-- Used by test case. Needs to be populated in maven report. -->
+        <dependency>
+            <groupId>org.mobicents</groupId>
+            <artifactId>xcap-client-api</artifactId>
+            <version>3.0.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
