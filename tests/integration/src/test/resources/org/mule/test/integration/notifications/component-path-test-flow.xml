@@ -36,10 +36,10 @@
 
     <flow name="flowWithErrorHandler">
         <choice>
-            <when expression="#[executeFailingComponent == true]">
+            <when expression="#[mel:executeFailingComponent == true]">
                 <test:component throwException="true" />
             </when>
-            <when expression="#[wrong expression]">
+            <when expression="#[mel:wrong expression]">
                 <logger/>
             </when>
         </choice>
