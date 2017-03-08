@@ -15,8 +15,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -30,9 +34,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
@@ -126,12 +132,13 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
 
   @Test
   @Description("Tests that cron schedule parameters are honored")
-  public void cronRepeats() {
+  public void cronRepeats() throws SchedulerException {
     List<Long> startTimes = new ArrayList<>();
     List<Long> endTimes = new ArrayList<>();
 
     final CountDownLatch latch = new CountDownLatch(3);
 
+    final String everyTwoSeconds = "0/2 * * ? * *";
     final ScheduledFuture<?> scheduled = executor.scheduleWithCronExpression(() -> {
       startTimes.add(System.nanoTime());
       try {
@@ -141,23 +148,25 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
       }
       latch.countDown();
       endTimes.add(System.nanoTime());
-    }, "0/2 * * ? * *");
+    }, everyTwoSeconds);
 
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    // Use the second run to measure. The first one is off, maybe due to initialization of quartz stuff
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(2) - endTimes.get(1)), closeTo(1800, DELTA_MILLIS));
+    verify(sharedQuartzScheduler).scheduleJob(any(JobDetail.class), argThat(new CronTriggerMatcher(everyTwoSeconds)));
+    assertThat(NANOSECONDS.toMillis(startTimes.get(2) - endTimes.get(1)),
+               greaterThanOrEqualTo(1800L - DELTA_MILLIS));
   }
 
   @Test
   @Description("Tests that cron schedule parameters are honored even if the task takes longer than the interval")
-  public void cronExceeds() {
+  public void cronExceeds() throws SchedulerException {
     List<Long> startTimes = new ArrayList<>();
     List<Long> endTimes = new ArrayList<>();
 
-    final CountDownLatch latch = new CountDownLatch(3);
+    final CountDownLatch latch = new CountDownLatch(2);
 
+    final String everySecond = "0/1 * * ? * *";
     final ScheduledFuture<?> scheduled = executor.scheduleWithCronExpression(() -> {
       startTimes.add(System.nanoTime());
       try {
@@ -167,12 +176,12 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
       }
       latch.countDown();
       endTimes.add(System.nanoTime());
-    }, "0/1 * * ? * *");
+    }, everySecond);
 
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    // Use the second run to measure. The first one is off, maybe due to initialization of quartz stuff
+    verify(sharedQuartzScheduler).scheduleJob(any(JobDetail.class), argThat(new CronTriggerMatcher(everySecond)));
     assertThat((double) NANOSECONDS.toMillis(startTimes.get(2) - endTimes.get(1)), closeTo(0, DELTA_MILLIS));
   }
 
@@ -219,6 +228,31 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
       assertThat(StoresTimeZoneJob.getTimeZone(), is(timeZone));
       return true;
     }));
+  }
+
+  private static final class CronTriggerMatcher extends TypeSafeMatcher<CronTrigger> {
+
+    final String cronExpression;// = "0/2 * * ? * *";
+    final TimeZone timeZone;
+
+    public CronTriggerMatcher(String cronExpression) {
+      this(cronExpression, getDefault());
+    }
+
+    public CronTriggerMatcher(String cronExpression, TimeZone timeZone) {
+      this.cronExpression = cronExpression;
+      this.timeZone = timeZone;
+    }
+
+    @Override
+    public void describeTo(org.hamcrest.Description description) {
+      description.appendText("Parameters of scheduleJob call didn't match");
+    }
+
+    @Override
+    protected boolean matchesSafely(CronTrigger item) {
+      return item.getCronExpression().equals(cronExpression) && item.getTimeZone().equals(timeZone);
+    }
   }
 
   public static class StoresTimeZoneJob extends QuartzCronJob implements Job {

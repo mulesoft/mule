@@ -14,12 +14,19 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.service.scheduler.ThreadType.CUSTOM;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+
+import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +42,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.InOrder;
 import org.quartz.SchedulerException;
 
 import ru.yandex.qatools.allure.annotations.Description;
@@ -44,8 +52,8 @@ import ru.yandex.qatools.allure.annotations.Features;
 @Features("Scheduler Task Scheduling")
 public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCase {
 
-  private static final int TASK_DURATION_MILLIS = 200;
-  private static final int TEST_DELAY_MILLIS = 1000;
+  private static final long TASK_DURATION_MILLIS = 200;
+  private static final long TEST_DELAY_MILLIS = 1000;
 
   private Function<DefaultSchedulerScheduleTestCase, ScheduledExecutorService> executorFactory;
 
@@ -433,8 +441,9 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)),
-               closeTo(TEST_DELAY_MILLIS - TASK_DURATION_MILLIS, DELTA_MILLIS));
+    verify(sharedScheduledExecutor).scheduleAtFixedRate(any(), eq(0L), eq(TEST_DELAY_MILLIS), eq(MILLISECONDS));
+    assertThat(NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)),
+               greaterThanOrEqualTo(TEST_DELAY_MILLIS - TASK_DURATION_MILLIS - DELTA_MILLIS));
   }
 
   @Test
@@ -465,6 +474,8 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   @Test
   @Description("Tests that scheduleAtFixedDelay parameters are honored")
   public void fixedDelayRepeats() {
+    assumeThat(executor, instanceOf(Scheduler.class));
+
     List<Long> startTimes = new ArrayList<>();
     List<Long> endTimes = new ArrayList<>();
 
@@ -484,7 +495,11 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
     assertThat(awaitLatch(latch), is(true));
     scheduled.cancel(true);
 
-    assertThat((double) NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)), closeTo(TEST_DELAY_MILLIS, DELTA_MILLIS));
+    InOrder inOrder = inOrder(sharedScheduledExecutor);
+    inOrder.verify(sharedScheduledExecutor).schedule(any(Runnable.class), eq(0L), eq(MILLISECONDS));
+    inOrder.verify(sharedScheduledExecutor).schedule(any(Runnable.class), eq(TEST_DELAY_MILLIS), eq(MILLISECONDS));
+    assertThat(NANOSECONDS.toMillis(startTimes.get(1) - endTimes.get(0)),
+               greaterThanOrEqualTo(TEST_DELAY_MILLIS - DELTA_MILLIS));
   }
 
   @Override
@@ -500,7 +515,6 @@ public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCa
   }
 
   protected ScheduledExecutorService createScheduledSameThreadExecutor() {
-    return new DefaultScheduler(DefaultSchedulerScheduleTestCase.class.getSimpleName(), sharedExecutor, 1,
-                                sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
+    return super.createExecutor();
   }
 }

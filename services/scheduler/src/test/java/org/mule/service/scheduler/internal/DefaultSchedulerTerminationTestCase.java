@@ -509,6 +509,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     final Scheduler executor = (Scheduler) createExecutor();
 
     final CountDownLatch latch = new CountDownLatch(1);
+    final CountDownLatch finallyLatch = new CountDownLatch(2);
 
     AtomicReference<Thread> taskThread = new AtomicReference<>();
     AtomicReference<Thread> pendingTaskThread = new AtomicReference<>();
@@ -520,6 +521,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
         if (currentThread().isInterrupted()) {
           taskThread.set(currentThread());
         }
+        finallyLatch.countDown();
       }
     });
     executor.submit(() -> {
@@ -529,14 +531,17 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
         if (currentThread().isInterrupted()) {
           pendingTaskThread.set(currentThread());
         }
+        finallyLatch.countDown();
       }
     });
 
     executor.stop(2, SECONDS);
 
+    finallyLatch.await(2, SECONDS);
+    assertThat(taskThread.get(), is(not(nullValue())));
+    assertThat(pendingTaskThread.get(), is(nullValue()));
+
     new PollingProber(100, 10).check(new JUnitLambdaProbe(() -> {
-      assertThat(taskThread.get(), is(not(nullValue())));
-      assertThat(pendingTaskThread.get(), is(nullValue()));
       assertThat(executor, terminatedMatcher);
       return true;
     }));
