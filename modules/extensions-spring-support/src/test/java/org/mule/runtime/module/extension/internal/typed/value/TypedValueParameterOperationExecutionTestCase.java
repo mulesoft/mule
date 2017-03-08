@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.typed.value;
 
-import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import org.junit.After;
-import org.junit.Test;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
@@ -24,6 +21,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.After;
+import org.junit.Test;
 
 public class TypedValueParameterOperationExecutionTestCase extends AbstractTypedValueTestCase {
 
@@ -162,7 +162,7 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
     assertTypedValue(value.getBrandName(), "string", APPLICATION_JSON, UTF8);
-    assertTypedValue(value.getWeight(), 5, ANY, null);
+    assertTypedValue(value.getWeight(), 5, APPLICATION_JAVA, UTF8);
   }
 
   @Test
