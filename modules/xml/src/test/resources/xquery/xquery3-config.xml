@@ -91,11 +91,11 @@
 
 
     <flow name="inputGotFromXpath3">
-    	<set-variable variableName="books" value="#[xpath3('/', message.payloadAs(String), 'NODE')]" />
+    	<set-variable variableName="books" value="#[mel:xpath3('/', message.payloadAs(String), 'NODE')]" />
     	<set-variable variableName="document" value="#[payload]" />
         <mxml:xquery-transformer>
             <!--  set in order to pass variable as node dom -->
-            <mxml:context-property key="books" value="#[flowVars['books'].getFirstChild()]" /> 
+            <mxml:context-property key="books" value="#[mel:flowVars['books'].getFirstChild()]" />
 
             <mxml:xquery-text>
                 <![CDATA[

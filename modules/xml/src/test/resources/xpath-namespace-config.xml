@@ -11,7 +11,7 @@
     </mulexml:namespace-manager>
 
     <flow name="xpathWithNamespace">
-        <expression-transformer expression="xpath3('/soap:Envelope/soap:Body/mule:echo/mule:echo')" />
+        <expression-transformer expression="mel:xpath3('/soap:Envelope/soap:Body/mule:echo/mule:echo')" />
     </flow>
 
 </mule>
