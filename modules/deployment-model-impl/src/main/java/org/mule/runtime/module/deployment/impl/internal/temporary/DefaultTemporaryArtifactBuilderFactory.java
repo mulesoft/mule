@@ -163,7 +163,8 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
                                                                              this.artifactPluginDescriptors.stream()
                                                                                  .filter(artifactDescriptor -> artifactDescriptor
                                                                                      .getName()
-                                                                                     .equals(artifactDescriptor.getName()))
+                                                                                     .equals(artifactClassLoader
+                                                                                         .getArtifactDescriptor().getName()))
                                                                                  .findFirst().get(),
                                                                              artifactClassLoader))
               .collect(toList());
@@ -171,6 +172,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
           artifactContextBuilder = ArtifactContextBuilder.newBuilder().setArtifactType(DOMAIN)
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(temporaryContextClassLoader)
               .setServiceRepository(muleArtifactResourcesRegistry.getServiceManager())
+              .setExtensionModelLoaderRepository(muleArtifactResourcesRegistry.getExtensionModelLoaderManager())
               .setArtifactDeclaration(artifactDeclaration).setMuleContextListener(createMuleContextListener())
               .setClassLoaderRepository(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
 
