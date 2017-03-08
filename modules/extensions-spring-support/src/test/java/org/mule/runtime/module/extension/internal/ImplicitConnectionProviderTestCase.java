@@ -57,7 +57,7 @@ public class ImplicitConnectionProviderTestCase extends ExtensionFunctionalTestC
   public static class ImplicitConnectionProvider implements ConnectionProvider<Counter> {
 
     @Parameter
-    @Optional(defaultValue = "#[flowVars.number]")
+    @Optional(defaultValue = "#[number]")
     private int number;
 
     @Override
