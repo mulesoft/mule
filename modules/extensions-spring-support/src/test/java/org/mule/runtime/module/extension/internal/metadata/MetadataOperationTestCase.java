@@ -451,6 +451,9 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     ObjectType objectType = (ObjectType) type;
     assertThat(objectType.getFields(), hasSize(2));
     objectType.getFields().forEach(f -> assertThat(f.getKey().getName().getLocalPart(), isOneOf(TIRES, BRAND)));
+    Optional<MetadataKey> metadataKeyOptional = result.get().getMetadataAttributes().getKey();
+    assertThat(metadataKeyOptional.isPresent(), is(true));
+    assertThat(metadataKeyOptional.get().getId(), is(CAR));
   }
 
   @Test
