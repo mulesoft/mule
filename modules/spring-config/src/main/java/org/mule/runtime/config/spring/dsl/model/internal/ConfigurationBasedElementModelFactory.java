@@ -586,17 +586,18 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier inMemoryStream = newIdentifier(IN_MEMORY_STREAM_ALIAS, paramDsl.getNamespace());
-        ComponentIdentifier repeatableMemoryStream = newIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS, paramDsl.getNamespace());
-        ComponentIdentifier repeatableFileStream = newIdentifier(REPEATABLE_FILE_STORE_STREAM_ALIAS, paramDsl.getNamespace());
-
         ComponentConfiguration streaming = null;
-        if (nested.containsKey(inMemoryStream)) {
-          streaming = nested.get(inMemoryStream);
-        } else if (nested.containsKey(repeatableMemoryStream)) {
-          streaming = nested.get(repeatableMemoryStream);
-        } else if (nested.containsKey(repeatableFileStream)) {
-          streaming = nested.get(repeatableFileStream);
+        for (ComponentIdentifier componentIdentifier : nested.keySet()) {
+          if (componentIdentifier.getName().equals(IN_MEMORY_STREAM_ALIAS)) {
+            streaming = nested.get(componentIdentifier);
+            break;
+          } else if (componentIdentifier.getName().equals(REPEATABLE_IN_MEMORY_STREAM_ALIAS)) {
+            streaming = nested.get(componentIdentifier);
+            break;
+          } else if (componentIdentifier.getName().equals(REPEATABLE_FILE_STORE_STREAM_ALIAS)) {
+            streaming = nested.get(componentIdentifier);
+            break;
+          }
         }
 
         if (streaming != null) {
