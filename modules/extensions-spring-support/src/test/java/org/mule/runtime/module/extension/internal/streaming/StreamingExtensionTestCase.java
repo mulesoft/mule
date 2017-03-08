@@ -26,8 +26,10 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-11881")
 public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
