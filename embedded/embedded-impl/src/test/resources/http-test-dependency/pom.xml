@@ -25,6 +25,12 @@
             <artifactId>xcap-client-api</artifactId>
             <version>3.0.2</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
