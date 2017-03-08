@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -54,13 +55,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -191,6 +192,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationModel.getOutput())
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));
     mockExecutorFactory(operationModel, operationExecutorFactory);
+    visitableMock(operationModel);
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(
                                                                                        of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory
                                                                                            .getDefault().createTypeLoader()
@@ -279,6 +281,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     });
 
     when(connectionManagerAdapter.getConnection(anyString())).thenReturn(null);
+    when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     messageProcessor = setUpOperationMessageProcessor();
   }
 

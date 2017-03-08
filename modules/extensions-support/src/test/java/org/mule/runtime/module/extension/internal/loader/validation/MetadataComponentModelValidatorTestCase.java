@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -239,6 +240,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
         new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
+
+    visitableMock(operationModel, sourceModel);
 
     dictionaryType = typeBuilder.objectType()
         .id(HashMap.class.getName())

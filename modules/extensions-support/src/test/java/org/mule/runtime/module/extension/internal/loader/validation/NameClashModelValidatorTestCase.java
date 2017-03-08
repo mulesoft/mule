@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -162,6 +163,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceModel.getModelProperty(any())).thenReturn(empty());
     when(sourceModel.getErrorCallback()).thenReturn(empty());
     when(sourceModel.getSuccessCallback()).thenReturn(empty());
+
+    visitableMock(operationModel);
   }
 
   private void mockModelProperties(EnrichableModel model) {
@@ -343,7 +346,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
                                                        of(sourceCallbackModel), empty(), false, false,
-                                                       null, emptySet());
+                                                       null, emptySet(), emptySet());
 
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
