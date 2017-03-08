@@ -7,14 +7,20 @@
 package org.mule.runtime.module.scripting.transformer;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.module.scripting.component.Scriptable;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.runtime.module.scripting.component.Scriptable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase {
 
+  @Override
+  protected boolean mockExprExecutorService() {
+    return true;
+  }
+
+  @Override
   public Transformer getTransformer() throws Exception {
     Scriptable script = new Scriptable(muleContext);
     script.setScriptEngineName("groovy");
@@ -29,6 +35,7 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
     return transformer;
   }
 
+  @Override
   public Transformer getRoundTripTransformer() throws Exception {
     Scriptable script = new Scriptable(muleContext);
     script.setScriptFile("ListToString.groovy");
@@ -43,10 +50,12 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
     return transformer;
   }
 
+  @Override
   public Object getTestData() {
     return "this is groovy!";
   }
 
+  @Override
   public Object getResultData() {
     List<String> list = new ArrayList<String>(3);
     list.add("this");

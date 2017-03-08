@@ -22,6 +22,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
@@ -41,6 +42,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -54,7 +56,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  ExtendedExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() {

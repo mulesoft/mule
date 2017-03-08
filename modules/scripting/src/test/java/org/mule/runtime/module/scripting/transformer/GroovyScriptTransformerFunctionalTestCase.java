@@ -23,6 +23,11 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   }
 
   @Override
+  protected boolean mockExprExecutorService() {
+    return true;
+  }
+
+  @Override
   protected String getConfigFile() {
     return "groovy-transformer-config-flow.xml";
   }

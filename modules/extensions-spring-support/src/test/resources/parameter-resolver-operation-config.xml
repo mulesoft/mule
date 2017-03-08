@@ -39,7 +39,7 @@
     </flow>
 
     <flow name="processWeapon">
-        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <set-payload value="#[mel:new org.mule.test.heisenberg.extension.model.Ricin()]"/>
         <expression-component><![CDATA[mel:payload.microgramsPerKilo = 100L]]></expression-component>
         <heisenberg:process-weapon weapon="#[payload]"/>
     </flow>
@@ -49,7 +49,7 @@
     </flow>
 
     <flow name="processWeaponWithDefaultValue">
-        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <set-payload value="#[mel:new org.mule.test.heisenberg.extension.model.Ricin()]"/>
         <expression-component><![CDATA[mel:payload.microgramsPerKilo = 100L]]></expression-component>
         <heisenberg:process-weapon-with-default-value/>
     </flow>

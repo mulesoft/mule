@@ -10,6 +10,11 @@ import org.junit.Test;
 
 public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunctionalTestCase {
 
+  @Override
+  protected boolean mockExprExecutorService() {
+    return true;
+  }
+
   @Test
   public void inlineScriptMutateProperty() throws Exception {
     flowRunner("inlineScriptMutateProperty").withPayload("").withOutboundProperty("foo", "bar").run();
