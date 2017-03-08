@@ -49,6 +49,11 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
   private ConnectionElementDeclaration listenerConnection;
   private ConnectionElementDeclaration requestConnection;
 
+  @Override
+  protected String getConfigFile() {
+    return "integration-multi-config-dsl-app.xml";
+  }
+
   @Before
   public void createAppDeclaration() {
 

@@ -17,10 +17,15 @@ import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER
 import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.IN_MEMORY_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -570,6 +575,36 @@ class ConfigurationBasedElementModelFactory {
         }
         return;
 
+      case DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME:
+        if (!isBlank(parameters.get(DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME))) {
+          groupElementBuilder.containing(DslElementModel.builder()
+              .withModel(paramModel)
+              .withDsl(paramDsl)
+              .withValue(parameters.get(DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME))
+              .build());
+        }
+        return;
+
+      case STREAMING_STRATEGY_PARAMETER_NAME:
+        ComponentConfiguration streaming = null;
+        for (ComponentIdentifier componentIdentifier : nested.keySet()) {
+          if (componentIdentifier.getName().equals(IN_MEMORY_STREAM_ALIAS)) {
+            streaming = nested.get(componentIdentifier);
+            break;
+          } else if (componentIdentifier.getName().equals(REPEATABLE_IN_MEMORY_STREAM_ALIAS)) {
+            streaming = nested.get(componentIdentifier);
+            break;
+          } else if (componentIdentifier.getName().equals(REPEATABLE_FILE_STORE_STREAM_ALIAS)) {
+            streaming = nested.get(componentIdentifier);
+            break;
+          }
+        }
+
+        if (streaming != null) {
+          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, streaming));
+        }
+        return;
+
       case TLS_PARAMETER_NAME:
         ComponentConfiguration tls = nested.get(getIdentifier(paramDsl).get());
         if (tls != null) {
@@ -583,8 +618,6 @@ class ConfigurationBasedElementModelFactory {
         }
 
         return;
-
-      default:
     }
 
   }
@@ -594,11 +627,11 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private DslElementModel newElementModel(ParameterModel paramModel, DslElementSyntax paramDsl,
-                                          ComponentConfiguration redelivery) {
+                                          ComponentConfiguration configuration) {
     return DslElementModel.builder()
         .withModel(paramModel)
         .withDsl(paramDsl)
-        .withConfig(redelivery)
+        .withConfig(configuration)
         .build();
   }
 
