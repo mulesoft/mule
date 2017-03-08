@@ -34,6 +34,11 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     applicationModel = loadApplicationModel();
   }
 
+  @Override
+  protected String getConfigFile() {
+    return "integration-multi-config-dsl-app.xml";
+  }
+
   @Test
   public void defaultValueResolution() throws Exception {
     ComponentConfiguration config = getAppElement(applicationModel, DB_CONFIG);

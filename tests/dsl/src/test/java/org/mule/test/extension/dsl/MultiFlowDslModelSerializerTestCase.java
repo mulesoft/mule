@@ -30,15 +30,14 @@ import org.w3c.dom.Element;
 
 public class MultiFlowDslModelSerializerTestCase extends AbstractElementModelTestCase {
 
-  public static final String SEND_PAYLOAD_FLOW = "send-payload";
-  public static final String BRIDGE_FLOW = "bridge";
-  public static final String BRIDGE_RECEIVER_FLOW = "bridge-receiver";
+  private static final String BRIDGE_RECEIVER_FLOW = "bridge-receiver";
+  private static final String SEND_PAYLOAD_FLOW = "send-payload";
+  private static final String BRIDGE_FLOW = "bridge";
   private Element sendPayload;
   private Element bridge;
   private Element receiver;
   private String expectedAppXml;
   private DslSyntaxResolver jmsDslResolver;
-  private ExtensionModel jmsModel;
 
   @Override
   protected String getConfigFile() {
@@ -68,7 +67,7 @@ public class MultiFlowDslModelSerializerTestCase extends AbstractElementModelTes
 
   @Test
   public void modelLoaderFromComponentConfiguration() throws Exception {
-    jmsModel = muleContext.getExtensionManager().getExtension("JMS")
+    ExtensionModel jmsModel = muleContext.getExtensionManager().getExtension("JMS")
         .orElseThrow(() -> new IllegalStateException("Missing Extension JMS"));
     jmsDslResolver = DslSyntaxResolver.getDefault(jmsModel, dslContext);
 
@@ -184,11 +183,14 @@ public class MultiFlowDslModelSerializerTestCase extends AbstractElementModelTes
   private void assertConnectionLoaded(DslElementModel<ConfigurationModel> config) {
     assertThat(config.getContainedElements().size(), is(2));
     assertThat(config.findElement("active-mq-connection").isPresent(), is(true));
-    assertThat(config.findElement("active-mq-connection").get().getContainedElements().size(), is(1));
+    assertThat(config.findElement("active-mq-connection").get().getContainedElements().size(), is(2));
   }
 
   private ParameterModel findParameter(String name, ParameterizedModel model) {
     return model.getAllParameterModels().stream().filter(p -> p.getName().equals(name)).findFirst().get();
   }
 
+  protected String getExpectedSchemaLocation() {
+    return "http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+  }
 }

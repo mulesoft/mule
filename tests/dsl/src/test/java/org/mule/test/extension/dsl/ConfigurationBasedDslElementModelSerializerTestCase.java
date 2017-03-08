@@ -9,8 +9,8 @@ package org.mule.test.extension.dsl;
 import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.io.IOException;
 
@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 
 public class ConfigurationBasedDslElementModelSerializerTestCase extends AbstractElementModelTestCase {
 
+  public static final int SOCKETS_SEND_RECEIVE_PATH = 5;
   private Element flow;
   private String expectedAppXml;
 
@@ -37,6 +38,11 @@ public class ConfigurationBasedDslElementModelSerializerTestCase extends Abstrac
   @Before
   public void loadExpectedResult() throws IOException {
     expectedAppXml = getResourceAsString(getConfigFile(), getClass());
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "integration-multi-config-dsl-app.xml";
   }
 
   @Test
@@ -58,6 +64,7 @@ public class ConfigurationBasedDslElementModelSerializerTestCase extends Abstrac
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(DB_BULK_INSERT_PATH))));
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(REQUESTER_PATH))));
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(DB_INSERT_PATH))));
+    flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(SOCKETS_SEND_RECEIVE_PATH))));
 
     doc.getDocumentElement().appendChild(flow);
 
