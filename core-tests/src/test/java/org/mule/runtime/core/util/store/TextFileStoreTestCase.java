@@ -43,56 +43,56 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTimedExpiry() throws Exception {
     // entryTTL=3 and expiryInterval=1 will cause background expiry
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timedTimeExpiry", 3000, 1000);
 
     // store entries in quick succession
     storeObjects("1", "2", "3");
 
     // they should still be alive at this point
-    assertObjectsInStore("timed.dat", "1", "2", "3");
+    assertObjectsInStore("timedTimeExpiry.dat", "1", "2", "3");
 
     // wait until the entry TTL has been exceeded
-    Thread.sleep(4000);
+    Thread.sleep(6000);
 
     // make sure all values are gone
-    assertObjectsExpired("timed.dat", "1", "2", "3");
+    assertObjectsExpired("timedTimeExpiry.dat", "1", "2", "3");
   }
 
   @Test
   public void testTimedExpiryWithRestart() throws Exception {
     // entryTTL=3 and expiryInterval=1 will cause background expiry
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timedExpiryWithRestart", 3000, 1000);
 
     // store entries in quick succession
     storeObjects("1", "2", "3");
 
     // they should still be alive at this point
-    assertObjectsInStore("timed.dat", "1", "2", "3");
+    assertObjectsInStore("timedExpiryWithRestart.dat", "1", "2", "3");
 
     store.dispose();
 
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timedExpiryWithRestart", 3000, 1000);
 
-    assertObjectsInStore("timed.dat", "1", "2", "3");
+    assertObjectsInStore("timedExpiryWithRestart.dat", "1", "2", "3");
 
     // wait until the entry TTL has been exceeded
-    Thread.sleep(4000);
+    Thread.sleep(6000);
 
     // make sure all values are gone
-    assertObjectsExpired("timed.dat", "1", "2", "3");
+    assertObjectsExpired("timedExpiryWithRestart.dat", "1", "2", "3");
 
     store.dispose();
 
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timedExpiryWithRestart", 3000, 1000);
 
     // make sure all values are gone
-    assertObjectsExpired("timed.dat", "1", "2", "3");
+    assertObjectsExpired("timedExpiryWithRestart.dat", "1", "2", "3");
   }
 
   @Test
   public void testTimedExpiryWithObjects() throws Exception {
     // entryTTL=3 and expirationInterval=1 will cause background expiry
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timedExpiryWithObjects", 3000, 1000);
   }
 
   @Test
