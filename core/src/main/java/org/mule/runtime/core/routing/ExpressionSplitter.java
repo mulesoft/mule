@@ -17,6 +17,7 @@ import org.mule.runtime.core.expression.ExpressionConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,11 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
       ((Iterable<?>) result).iterator()
           .forEachRemaining(value -> messages
               .add(Event.builder(event).message(InternalMessage.builder().payload(value).build()).build()));
+      return messages;
+    } else if (result instanceof Iterator<?>) {
+      List<Event> messages = new ArrayList<>();
+      ((Iterator) result).forEachRemaining(value -> messages
+          .add(Event.builder(event).message(InternalMessage.builder().payload(value).build()).build()));
       return messages;
     } else if (result instanceof Map<?, ?>) {
       List<Event> list = new LinkedList<>();
