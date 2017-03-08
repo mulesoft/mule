@@ -25,6 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
@@ -94,7 +95,11 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     when(operationModel.requiresConnection()).thenReturn(true);
+    when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
+    when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+
     when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
+    visitableMock(operationModel);
 
 
     expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
