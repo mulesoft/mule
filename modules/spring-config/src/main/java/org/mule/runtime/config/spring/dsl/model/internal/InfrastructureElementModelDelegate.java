@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.INFRASTRUCTURE_P
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
@@ -50,6 +51,10 @@ class InfrastructureElementModelDelegate {
     switch (declaration.getName()) {
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         createReconnectionStrategy(declaration, parameterModel, paramDsl, parentConfig, parentElement);
+        return;
+
+      case STREAMING_STRATEGY_PARAMETER_NAME:
+        createStreamingStrategy(declaration, parameterModel, paramDsl, parentConfig, parentElement);
         return;
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
@@ -143,6 +148,18 @@ class InfrastructureElementModelDelegate {
         ? RECONNECT_ELEMENT_IDENTIFIER : RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 
     cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, elementName);
+  }
+
+  private void createStreamingStrategy(ParameterElementDeclaration declaration,
+                                       ParameterModel parameterModel,
+                                       DslElementSyntax paramDsl,
+                                       ComponentConfiguration.Builder parentConfig,
+                                       DslElementModel.Builder parentElement) {
+
+    ParameterObjectValue objectValue = (ParameterObjectValue) declaration.getValue();
+    checkArgument(!isBlank(objectValue.getTypeId()), "Missing declaration of which streaming strategy to use");
+
+    cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, objectValue.getTypeId());
   }
 
   private void cloneDeclarationToElement(ParameterModel parameterModel, DslElementSyntax paramDsl,
