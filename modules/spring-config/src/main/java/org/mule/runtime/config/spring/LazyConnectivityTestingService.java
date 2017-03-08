@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.config.spring;
 
+import static com.google.common.base.Throwables.getCausalChain;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
@@ -40,7 +42,13 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
       if (e.getCause() instanceof NoSuchComponentModelException) {
         throw new ObjectNotFoundException(location.toString());
       }
-      return unknownFailureResponse(e);
+      return getCausalChain(e).stream()
+          .filter(exception -> exception.getClass().equals(ConnectionException.class)
+              && ((ConnectionException) exception).getErrorType().isPresent())
+          .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
+                                    (Exception) exception))
+          .findFirst()
+          .orElse(unknownFailureResponse(e));
     } catch (Exception e) {
       return unknownFailureResponse(e);
     }
