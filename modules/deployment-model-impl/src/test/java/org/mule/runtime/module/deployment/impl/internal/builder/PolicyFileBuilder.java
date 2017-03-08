@@ -28,7 +28,6 @@ import java.util.List;
  */
 public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> {
 
-  private List<ArtifactPluginFileBuilder> plugins = new LinkedList<>();
   private MulePolicyModel mulePolicyModel;
 
   public PolicyFileBuilder(String id) {
@@ -65,12 +64,6 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
   protected List<ZipResource> doGetCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
 
-    for (ArtifactPluginFileBuilder plugin : plugins) {
-      customResources
-          .add(new ZipResource(plugin.getArtifactFile().getAbsolutePath(),
-                               "plugins/" + plugin.getArtifactFile().getName()));
-    }
-
     if (mulePolicyModel != null) {
       final File jsonDescriptorFile = new File(getTempFolder(), META_INF + separator + MULE_POLICY_JSON);
       jsonDescriptorFile.deleteOnExit();
@@ -86,17 +79,4 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
     return customResources;
   }
 
-  /**
-   * Adds an application plugin to the policy template.
-   *
-   * @param plugin builder defining the plugin. Non null.
-   * @return the same builder instance
-   */
-  public PolicyFileBuilder containingPlugin(ArtifactPluginFileBuilder plugin) {
-    checkImmutable();
-    checkArgument(plugin != null, "Plugin cannot be null");
-    this.plugins.add(plugin);
-
-    return this;
-  }
 }

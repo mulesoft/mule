@@ -118,7 +118,8 @@ final public class EmbeddedContainerFactory {
   static ClassLoader createEmbeddedImplClassLoader(ClassLoader parentClassLoader, Repository repository, String muleVersion)
       throws ArtifactResolutionException, MalformedURLException {
     ArtifactRequest embeddedImplArtifactRequest =
-        new ArtifactRequest().setArtifact(new DefaultArtifact("org.mule", "mule-module-embedded-impl", "jar", muleVersion));
+        new ArtifactRequest()
+            .setArtifact(new DefaultArtifact("org.mule.runtime", "mule-module-embedded-impl", "jar", muleVersion));
     ArtifactResult artifactResult = repository.getSystem().resolveArtifact(repository.getSession(), embeddedImplArtifactRequest);
 
     PreorderNodeListGenerator preorderNodeListGenerator =

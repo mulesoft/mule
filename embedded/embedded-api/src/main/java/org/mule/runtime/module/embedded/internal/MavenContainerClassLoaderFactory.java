@@ -29,7 +29,7 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 // TODO MULE-11925 Improve MavenContainerClassLoaderFactory so it can work in terms of Dependency instead of URLs
 public class MavenContainerClassLoaderFactory {
 
-  private static final String CONTAINER_BOM_GROUP_ID = "org.mule";
+  private static final String CONTAINER_BOM_GROUP_ID = "org.mule.runtime";
   private static final String CONTAINER_BOM_ARTIFACT_ID = "mule-runtime-impl-bom";
 
   private final Repository repository;
