@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
@@ -34,16 +35,11 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import com.google.common.collect.ImmutableList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
@@ -51,16 +47,22 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +73,12 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -102,6 +110,12 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel extension1ConfigurationModel;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ConnectionProviderModel connectionProviderModel;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock
   private OperationModel extension1OperationModel;
@@ -163,6 +177,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockInterceptors(extension1ConfigurationModel, null);
     when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
+    when(extension1ConfigurationModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel));
+    when(connectionProviderModel.getAllParameterModels()).thenReturn(emptyList());
+    when(connectionProviderModel.getModelProperty(ConnectionProviderFactoryModelProperty.class))
+        .thenReturn(Optional.of(new ConnectionProviderFactoryModelProperty(mock(ConnectionProviderFactory.class))));
     mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 
@@ -186,6 +204,11 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     registerExtensions(extensionModel1, extensionModel2, extensionModel3WithRepeatedName);
 
     stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
+
+    ConnectionManagerAdapter connectionManagerAdapter = mock(ConnectionManagerAdapter.class);
+    when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
+    when(muleContext.getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER))
+        .thenReturn(connectionManagerAdapter);
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {
@@ -266,7 +289,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
       return null;
     }).when(registry).registerObject(anyString(), anyObject());
-
     ConfigurationInstance configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
     joinerLatch.countDown();
     assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));

@@ -24,7 +24,7 @@ import java.util.function.BooleanSupplier;
  *
  * @since 4.0
  */
-class ResolverUtils {
+public class ResolverUtils {
 
   private ResolverUtils() {
 
@@ -36,7 +36,8 @@ class ResolverUtils {
     return getExpressionBasedValueResolver(expression, fieldType, muleContext);
   }
 
-  static ValueResolver<?> getExpressionBasedValueResolver(String expression, MetadataType metadataType, MuleContext muleContext) {
+  public static ValueResolver<?> getExpressionBasedValueResolver(String expression, MetadataType metadataType,
+                                                                 MuleContext muleContext) {
     return getExpressionBasedValueResolver(expression,
                                            () -> isTypedValue(metadataType),
                                            () -> isParameterResolver(metadataType),

@@ -40,7 +40,8 @@ public interface ConfigurationProviderFactory {
                                                            ConfigurationModel configurationModel,
                                                            ResolverSet resolverSet,
                                                            ConnectionProviderValueResolver connectionProviderResolver,
-                                                           DynamicConfigPolicy dynamicConfigPolicy)
+                                                           DynamicConfigPolicy dynamicConfigPolicy,
+                                                           MuleContext muleContext)
       throws Exception;
 
 

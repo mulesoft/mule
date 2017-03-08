@@ -81,7 +81,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                                             configurationModel,
                                                                             resolverSet,
                                                                             connectionProviderResolver,
-                                                                            getDynamicConfigPolicy());
+                                                                            getDynamicConfigPolicy(),
+                                                                            muleContext);
       } else {
         configurationProvider = configurationProviderFactory
             .createStaticConfigurationProvider(name,

@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import java.util.Optional;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
  * Creates {@link ConnectionProvider} instances which can be implicitly derived from a given {@link ExtensionModel}.
@@ -21,8 +22,8 @@ import org.mule.runtime.core.api.MuleContext;
 public interface ImplicitConnectionProviderFactory {
 
   /**
-   * Creates a new {@link ConnectionProvider} based on the {@link ConnectionProviderModel} available to the
-   * {@code extensionModel} and {@code configurationModel}
+   * Creates a new {@link ConnectionProvider} based on the {@link ConnectionProviderModel} available to the {@code extensionModel}
+   * and {@code configurationModel}
    *
    * @param configName the name of the configuration that will own the returned {@link ConnectionProvider}
    * @oaram extensionModel the {@link ExtensionModel} which owns the {@code configurationModel}
@@ -34,8 +35,16 @@ public interface ImplicitConnectionProviderFactory {
    * @throws IllegalArgumentException if the {@code extensionModel} doesn't have any {@link ConnectionProviderModel} which can be
    *         used implicitly
    */
-  <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName,
-                                                             ExtensionModel extensionModel,
-                                                             ConfigurationModel configurationModel,
-                                                             Event event, MuleContext muleContext);
+  <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName, Event event);
+
+  /**
+   * @return whether the {@link ResolverSet} used for resolving the {@link ConnectionProvider} is dynamic or not.
+   */
+  boolean isDynamic();
+
+  /**
+   * @return the {@link ResolverSet} used for resolving the {@link ConnectionProvider} parameters
+   */
+  Optional<ResolverSet> getResolverSet();
+
 }

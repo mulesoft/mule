@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,6 +32,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -68,6 +70,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   @Mock
   private ResolverSet resolverSet;
 
+  @Mock
+  private OperationModel operationModel;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ResolverSetResult resolverSetResult;
 
@@ -81,13 +86,14 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   public void before() throws Exception {
     mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
     mockInterceptors(configurationModel, null);
-    when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+    when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
 
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
     when(extensionModel.getSourceModels()).thenReturn(ImmutableList.of());
-    when(extensionModel.getOperationModels()).thenReturn(ImmutableList.of());
-
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    when(operationModel.requiresConnection()).thenReturn(true);
     when(resolverSet.resolve(event)).thenReturn(resolverSetResult);
 
 
@@ -96,7 +102,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
-                                                connectionProviderResolver, expirationPolicy);
+                                                connectionProviderResolver, expirationPolicy, muleContext);
 
     super.before();
     provider.initialise();
