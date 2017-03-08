@@ -76,7 +76,7 @@ public class EmbeddedContainerFactoryTestCase {
                          applicationProperties, enableTestDependencies);
 
     EmbeddedContainer embeddedContainer =
-        EmbeddedContainerFactory.create("4.0-SNAPSHOT", containerFolder.newFolder().toURI().toURL(), application);
+        EmbeddedContainerFactory.create("4.0.0-SNAPSHOT", containerFolder.newFolder().toURI().toURL(), application);
 
     embeddedContainer.start();
 

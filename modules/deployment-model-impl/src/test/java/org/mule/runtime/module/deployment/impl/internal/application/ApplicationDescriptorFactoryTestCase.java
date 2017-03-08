@@ -297,7 +297,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("mule-module-sockets") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
-            bundleDependency.getDescriptor().getVersion().equals("4.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("4.0.0-SNAPSHOT");
       }
     };
   }
@@ -322,7 +322,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("mule-module-http-ext") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
-            bundleDependency.getDescriptor().getVersion().equals("4.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("4.0.0-SNAPSHOT");
       }
     };
   }

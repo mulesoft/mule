@@ -17,9 +17,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
@@ -41,6 +41,7 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -100,6 +101,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenReturn(new FileSystemPolicyClassLoaderModelLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
+    when(descriptorLoaderRepository.get(MAVEN, POLICY, ClassLoaderModelLoader.class))
+        .thenReturn(new DeployableMavenClassLoaderModelLoader());
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenReturn(new PropertiesBundleDescriptorLoader());
@@ -166,14 +169,15 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void readsPlugin() throws Exception {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+    MulePolicyModelBuilder policyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
+    policyModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
 
     ArtifactPluginFileBuilder plugin1 = new ArtifactPluginFileBuilder("plugin1");
     ArtifactPluginFileBuilder plugin2 = new ArtifactPluginFileBuilder("plugin2");
 
-    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).describedBy(mulePolicyModelBuilder.build())
-        .containingPlugin(plugin1).containingPlugin(plugin2);
+    PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).describedBy(policyModelBuilder.build())
+        .dependingOn(plugin1).dependingOn(plugin2);
 
     File tempFolder = createTempFolder();
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
