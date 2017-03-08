@@ -17,6 +17,11 @@ import org.junit.Test;
 public class GroovyRegistryLookupTestCase extends FunctionalTestCase {
 
   @Override
+  protected boolean mockExprExecutorService() {
+    return true;
+  }
+
+  @Override
   protected String getConfigFile() {
     return "groovy-registry-lookup-config.xml";
   }

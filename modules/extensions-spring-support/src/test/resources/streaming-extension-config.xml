@@ -97,7 +97,7 @@
     </flow>
 
     <sub-flow name="castSpell">
-        <expression-component>
+        <expression-component>mel:
             org.mule.runtime.module.extension.internal.streaming.StreamingExtensionTestCase.addSpell(payload)
         </expression-component>
     </sub-flow>

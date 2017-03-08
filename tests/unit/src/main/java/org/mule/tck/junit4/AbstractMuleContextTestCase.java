@@ -258,7 +258,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   // This shouldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    builders.add(new TestServicesConfigurationBuilder(mockHttpService()));
+    builders.add(new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService()));
   }
 
   /**
@@ -268,6 +268,16 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected boolean mockHttpService() {
     return true;
+  }
+
+  /**
+   * Defines if a mock should be used for the {@link ExpressionExecutor}. If {@code false} an implementation will need to be
+   * provided.
+   *
+   * @return whether or not the {@link ExpressionExecutor} should be mocked.
+   */
+  protected boolean mockExprExecutorService() {
+    return false;
   }
 
   /**

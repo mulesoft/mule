@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
+import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,6 +20,8 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
+
+import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.List;
 
@@ -33,24 +35,34 @@ import java.util.List;
 public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder {
 
   private static final String MOCK_HTTP_SERVICE = "mockHttpService";
+  private static final String MOCK_EXPR_EXECUTOR = "mockExpressionExecutor";
 
-  final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
-  final WeaveExpressionExecutor weaveExpressionExecutor = new WeaveExpressionExecutor();
+  private final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
   private boolean mockHttpService;
+  private boolean mockExpressionExecutor;
 
   public TestServicesConfigurationBuilder() {
-    this(true);
+    this(true, true);
   }
 
-  public TestServicesConfigurationBuilder(boolean mockHttpService) {
+  public TestServicesConfigurationBuilder(boolean mockHttpService, boolean mockExpressionExecutor) {
     this.mockHttpService = mockHttpService;
+    this.mockExpressionExecutor = mockExpressionExecutor;
   }
 
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
-    registry.registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
+
+    if (mockExpressionExecutor) {
+      ExpressionExecutor expressionExecutor = mock(ExpressionExecutor.class);
+      registry.registerObject(MOCK_EXPR_EXECUTOR, expressionExecutor);
+    } else {
+      final WeaveExpressionExecutor exprExecutor = new WeaveExpressionExecutor();
+      registry.registerObject(exprExecutor.getName(), exprExecutor);
+    }
+
     if (mockHttpService) {
       registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
     }

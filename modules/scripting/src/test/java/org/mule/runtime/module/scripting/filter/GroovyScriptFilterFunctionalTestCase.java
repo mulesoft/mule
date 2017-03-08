@@ -27,6 +27,11 @@ public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase {
   }
 
   @Override
+  protected boolean mockExprExecutorService() {
+    return true;
+  }
+
+  @Override
   protected String getConfigFile() {
     return "groovy-filter-config-flow.xml";
   }
