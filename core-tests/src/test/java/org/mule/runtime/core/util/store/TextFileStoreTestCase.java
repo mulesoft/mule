@@ -12,15 +12,24 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
+
+  private static final int TTL = 3000;
+  private static final int EXPIRY_INTERVAL = 1000;
+  // Add some time to account for the durations of the expiry process, since it is scheduled with fixed delay
+  private static final int POLL_TIMEOUT = TTL + EXPIRY_INTERVAL + 1000;
 
   public static final String DIR = ".mule/temp";
   TextFileObjectStore store;
@@ -43,7 +52,7 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTimedExpiry() throws Exception {
     // entryTTL=3 and expiryInterval=1 will cause background expiry
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timed", TTL, EXPIRY_INTERVAL);
 
     // store entries in quick succession
     storeObjects("1", "2", "3");
@@ -52,16 +61,21 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
     assertObjectsInStore("timed.dat", "1", "2", "3");
 
     // wait until the entry TTL has been exceeded
-    Thread.sleep(4000);
-
-    // make sure all values are gone
-    assertObjectsExpired("timed.dat", "1", "2", "3");
+    new PollingProber(POLL_TIMEOUT, 500).check(new JUnitLambdaProbe(() -> {
+      // make sure all values are gone
+      try {
+        assertObjectsExpired("timed.dat", "1", "2", "3");
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+      return true;
+    }));
   }
 
   @Test
   public void testTimedExpiryWithRestart() throws Exception {
     // entryTTL=3 and expiryInterval=1 will cause background expiry
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timed", TTL, EXPIRY_INTERVAL);
 
     // store entries in quick succession
     storeObjects("1", "2", "3");
@@ -71,19 +85,24 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
 
     store.dispose();
 
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timed", TTL, EXPIRY_INTERVAL);
 
     assertObjectsInStore("timed.dat", "1", "2", "3");
 
     // wait until the entry TTL has been exceeded
-    Thread.sleep(4000);
-
-    // make sure all values are gone
-    assertObjectsExpired("timed.dat", "1", "2", "3");
+    new PollingProber(POLL_TIMEOUT, 500).check(new JUnitLambdaProbe(() -> {
+      // make sure all values are gone
+      try {
+        assertObjectsExpired("timed.dat", "1", "2", "3");
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+      return true;
+    }));
 
     store.dispose();
 
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timed", TTL, EXPIRY_INTERVAL);
 
     // make sure all values are gone
     assertObjectsExpired("timed.dat", "1", "2", "3");
@@ -92,13 +111,13 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTimedExpiryWithObjects() throws Exception {
     // entryTTL=3 and expirationInterval=1 will cause background expiry
-    createObjectStore("timed", 3000, 1000);
+    createObjectStore("timed", TTL, EXPIRY_INTERVAL);
   }
 
   @Test
   public void testMaxSize() throws Exception {
     // entryTTL=-1 means we will have to expire manually
-    createObjectStore("bounded", -1, 1000);
+    createObjectStore("bounded", -1, EXPIRY_INTERVAL);
 
     storeObjects("1", "2", "3");
 
@@ -106,9 +125,14 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
 
     // sleep a bit to make sure that entries are not expired, even though the expiry
     // thread is running every second
-    Thread.sleep(3000);
-
-    assertObjectsInStore("bounded.dat", "1", "2", "3");
+    new PollingProber(POLL_TIMEOUT, 500).check(new JUnitLambdaProbe(() -> {
+      try {
+        assertObjectsInStore("bounded.dat", "1", "2", "3");
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+      return true;
+    }));
 
     // exceed threshold
     storeObjects("4");

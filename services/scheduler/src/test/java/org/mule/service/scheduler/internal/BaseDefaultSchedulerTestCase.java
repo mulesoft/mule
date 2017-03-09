@@ -12,6 +12,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
 import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -61,13 +62,14 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
     sharedExecutor =
         new ThreadPoolExecutor(1, 1, 0, SECONDS, new ArrayBlockingQueue<>(1), new NamedThreadFactory(this.getClass().getName()));
 
-    sharedScheduledExecutor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(this.getClass().getName() + "_sched"));
+    sharedScheduledExecutor =
+        spy(new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(this.getClass().getName() + "_sched")));
     sharedScheduledExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
     sharedScheduledExecutor.setRemoveOnCancelPolicy(true);
 
     StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     schedulerFactory.initialize(defaultQuartzProperties());
-    sharedQuartzScheduler = schedulerFactory.getScheduler();
+    sharedQuartzScheduler = spy(schedulerFactory.getScheduler());
     sharedQuartzScheduler.start();
   }
 
@@ -83,12 +85,12 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
   @After
   public void after() throws SchedulerException, InterruptedException {
-    sharedExecutor.shutdownNow();
     sharedScheduledExecutor.shutdownNow();
     sharedQuartzScheduler.shutdown(true);
+    sharedExecutor.shutdownNow();
 
-    sharedExecutor.awaitTermination(5, SECONDS);
     sharedScheduledExecutor.awaitTermination(5, SECONDS);
+    sharedExecutor.awaitTermination(5, SECONDS);
   }
 
   protected void assertTerminationIsNotDelayed(final ScheduledExecutorService executor) throws InterruptedException {
