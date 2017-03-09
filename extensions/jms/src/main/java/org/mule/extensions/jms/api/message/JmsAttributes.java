@@ -35,6 +35,6 @@ public interface JmsAttributes extends Attributes {
   /**
    * @return the session Id required to ACK a {@link Message} that was consumed using {@link AckMode#MANUAL}
    */
-  Optional<String> getAckId();
+  String getAckId();
 
 }

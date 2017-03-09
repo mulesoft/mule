@@ -6,6 +6,7 @@
  */
 package org.mule.extensions.jms.api.exception;
 
+import static org.mule.extensions.jms.api.exception.JmsErrors.DESTINATION_NOT_FOUND;
 import static org.mule.extensions.jms.api.exception.JmsErrors.ILLEGAL_BODY;
 import static org.mule.extensions.jms.api.exception.JmsErrors.PUBLISHING;
 import org.mule.extensions.jms.api.config.JmsConfig;
@@ -35,6 +36,7 @@ public class JmsPublisherErrorTypeProvider implements ErrorTypeProvider {
     return ImmutableSet.<ErrorTypeDefinition>builder()
         .add(PUBLISHING)
         .add(ILLEGAL_BODY)
+        .add(DESTINATION_NOT_FOUND)
         .build();
   }
 }

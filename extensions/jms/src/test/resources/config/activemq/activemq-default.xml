@@ -6,7 +6,9 @@
       http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
 
     <jmsn:config name="config">
-        <jmsn:active-mq-connection/>
+        <jmsn:active-mq-connection>
+            <jmsn:factory-configuration maxRedelivery="${max.redelivery}"/>
+        </jmsn:active-mq-connection>
     </jmsn:config>
 
 </mule>

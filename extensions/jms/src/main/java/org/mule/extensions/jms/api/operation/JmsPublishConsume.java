@@ -8,9 +8,12 @@ package org.mule.extensions.jms.api.operation;
 
 import static java.lang.String.format;
 import static org.mule.extensions.jms.api.config.AckMode.AUTO;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.evaluateMessageAck;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveMessageContentType;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
+import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
+import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
@@ -39,19 +42,18 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-
-import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.Topic;
-
-import org.slf4j.Logger;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Operation that allows the user to send a message to a JMS {@link Destination} and waits for a response
@@ -91,12 +93,15 @@ public class JmsPublishConsume {
                                                           defaultValue = "MILLISECONDS") @Summary("Time unit to be used in the maximumWaitTime configuration") TimeUnit maximumWaitUnit,
                                                       @Placement(
                                                           order = 2) @ParameterGroup(
-                                                              name = "Publish Configuration") JmsPublishParameters overrides)
+                                                              name = "Publish Configuration") JmsPublishParameters overrides,
+                                                      @Optional @Summary("The content type of the consumed message body") @Example(EXAMPLE_CONTENT_TYPE) String contentType,
+                                                      @Optional @Summary("The encoding of the consumed message body") @Example(EXAMPLE_ENCODING) String encoding)
       throws JmsExtensionException {
 
     JmsSession session;
     Message message;
     ConsumerType replyConsumerType;
+
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Begin publish");
@@ -137,7 +142,7 @@ public class JmsPublishConsume {
 
       if (received != null) {
         ackMode = resolveOverride(config.getConsumerConfig().getAckMode(), ackMode);
-        evaluateMessageAck(connection, ackMode, session, received);
+        evaluateMessageAck(ackMode, session, received, config.getSessionManager(), null);
       }
 
       if (LOGGER.isDebugEnabled()) {
@@ -145,8 +150,9 @@ public class JmsPublishConsume {
       }
 
       return resultFactory.createResult(received, connection.getJmsSupport().getSpecification(),
-                                        resolveMessageContentType(message, config.getContentType()),
-                                        config.getEncoding(),
+                                        resolveOverride(resolveMessageContentType(received, config.getContentType()),
+                                                        contentType),
+                                        resolveOverride(resolveMessageEncoding(received, config.getEncoding()), encoding),
                                         session.getAckId());
     } catch (Exception e) {
       LOGGER.error("An error occurred while listening for the reply: ", e);

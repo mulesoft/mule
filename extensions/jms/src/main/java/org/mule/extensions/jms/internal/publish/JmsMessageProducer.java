@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;

@@ -7,13 +7,7 @@
 
     <flow name="subscriber">
         <jmsn:listener config-ref="config" destination="#[destination]"/>
-        <flow-ref name="onIncomingConnection"/>
+        <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>
-
-    <sub-flow name="onIncomingConnection">
-        <expression-component>mel:
-            new org.mule.extensions.jms.test.JmsAbstractTestCase$OnIncomingConnection().onCall(message)
-        </expression-component>
-    </sub-flow>
 
 </mule>
