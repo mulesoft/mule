@@ -8,9 +8,11 @@ package org.mule.module.oauth2.internal.authorizationcode.functional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
@@ -22,6 +24,10 @@ import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContex
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import com.github.tomakehurst.wiremock.client.ValueMatchingStrategy;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +41,8 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
     public static final String RESOURCE_RESULT = "resource result";
     public static final String REFRESHED_ACCESS_TOKEN = "rbBQLgJXBEYo83K4Fqs4guasdfsdfa";
 
+    @Rule
+    public SystemProperty originalPayload = new SystemProperty("payload.original", TEST_PAYLOAD);
     @Rule
     public SystemProperty localAuthorizationUrl = new SystemProperty("local.authorization.url", String.format("http://localhost:%d/authorization", localHostPort.getNumber()));
     @Rule
@@ -68,6 +76,8 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
                                     .withRequestBody(containing(OAuthConstants.REFRESH_TOKEN_PARAMETER + "=" + URLEncoder.encode(REFRESH_TOKEN, StandardCharsets.UTF_8.name())))
                                     .withRequestBody(containing(OAuthConstants.CLIENT_SECRET_PARAMETER + "=" + URLEncoder.encode(clientSecret.getValue(), StandardCharsets.UTF_8.name())))
                                     .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
+        
+        wireMockRule.verify(2, postRequestedFor(urlEqualTo(RESOURCE_PATH)).withRequestBody(equalTo(TEST_PAYLOAD)));
     }
 
     protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName, String userId, int resourceFailureStatusCode, int tokenFailureStatusCode) throws Exception

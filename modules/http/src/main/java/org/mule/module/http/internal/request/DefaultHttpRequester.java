@@ -351,12 +351,14 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             }
         }
 
+        Object originalPayload = muleEvent.getMessage().getPayload();
         httpResponseToMuleEvent.convert(muleEvent, response);
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
         if (resendRequest(muleEvent, retryCount, authentication))
         {
             consumePayload(muleEvent);
+            muleEvent.getMessage().setPayload(originalPayload);
             muleEvent = innerProcess(muleEvent, 0);
         }
         else
