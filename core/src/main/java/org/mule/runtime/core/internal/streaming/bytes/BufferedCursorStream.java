@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.min;
 import org.mule.runtime.api.streaming.CursorStream;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ public final class BufferedCursorStream extends BaseCursorStream {
    */
   @Override
   protected int doRead() throws IOException {
-    if (reloadLocalBufferIfEmpty(1) > 0) {
+    if (reloadLocalBufferIfEmpty() > 0) {
       int read = unsigned((int) memoryBuffer.get());
       position++;
       return read;
@@ -85,7 +84,7 @@ public final class BufferedCursorStream extends BaseCursorStream {
     int read = 0;
 
     while (true) {
-      int remaining = reloadLocalBufferIfEmpty(len);
+      int remaining = reloadLocalBufferIfEmpty();
       if (remaining == -1) {
         return read == 0 ? -1 : read;
       }
@@ -104,10 +103,10 @@ public final class BufferedCursorStream extends BaseCursorStream {
     }
   }
 
-  private int reloadLocalBufferIfEmpty(int len) {
+  private int reloadLocalBufferIfEmpty() {
     if (!memoryBuffer.hasRemaining()) {
       memoryBuffer.clear();
-      int read = streamBuffer.get(memoryBuffer, position, min(localBufferSize, len));
+      int read = streamBuffer.get(memoryBuffer, position, localBufferSize);
       if (read > 0) {
         memoryBuffer.flip();
         return read;

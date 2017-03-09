@@ -13,13 +13,6 @@
         <marvel:read-stream />
     </flow>
 
-    <flow name="rewind">
-        <flow-ref name="toStream" />
-        <marvel:read-stream target="firstRead" />
-        <marvel:seek-stream position="0" />
-        <marvel:read-stream target="secondRead" />
-    </flow>
-
     <flow name="consumeGeneratedStream">
         <!-- flow refs are intentional to force a flow.process() -->
         <flow-ref name="toStream" />

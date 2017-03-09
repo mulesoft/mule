@@ -117,20 +117,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   }
 
   @Test
-  public void rewindWhileStreamNotFullyConsumed() throws Exception {
-    withCursor(cursor -> {
-      byte[] dest = new byte[halfDataLength];
-      cursor.read(dest, 0, halfDataLength);
-      assertThat(toString(dest), equalTo(data.substring(0, halfDataLength)));
-      cursor.seek(0);
-      dest = new byte[data.length()];
-      cursor.read(dest, 0, dest.length);
-      assertThat(toString(dest), equalTo(data));
-    });
-
-  }
-
-  @Test
   public void partialReadWithOffsetOnSingleCursor() throws Exception {
     byte[] dest = new byte[halfDataLength + 2];
 
