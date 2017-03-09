@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+	<spring:beans>
+		<spring:import resource="sftp-properties.xml" />
+	</spring:beans>
+
+	<sftp:endpoint name="sftpEndpoint" host="${SFTP_HOST}" user="${USER1_NAME}"
+		password="${USER1_PASSWORD}" port="${SFTP_PORT}" path="/~"
+		exchange-pattern="request-response" responseTimeout="10000" />
+
+	<vm:connector name="VM" validateConnections="true">
+		<service-overrides sessionHandler="org.mule.session.SerializeAndEncodeSessionHandler" />
+	</vm:connector>
+
+	<flow name="mainFlow">
+		<vm:inbound-endpoint path="main" exchange-pattern="request-response"
+			connector-ref="VM" />
+		<vm:outbound-endpoint path="in" exchange-pattern="request-response" />
+	</flow>
+		
+	<flow name="inner">
+		<vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+		<set-session-variable value="test" variableName="sessionVar" />
+		<sftp:outbound-endpoint ref="sftpEndpoint"
+			responseTimeout="10000" />
+	</flow>
+
+</mule>
