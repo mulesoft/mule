@@ -6,31 +6,41 @@
  */
 package org.mule.util;
 
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {
-    private boolean expired = false;
+    
+    private static final int EXPIRE_TIME = 300;
+    private static final int EXPIRE_INTERVAL = 100;
+    // Add some time to account for the durations of the expiry process, since it is scheduled with fixed delay
+    private static final int EXPIRE_TIMEOUT = EXPIRE_TIME + EXPIRE_INTERVAL + 100;
+    private static final long DELTA_TIME = 10;
 
+    private boolean expired = false;
+    private long expiredTime = -1;
+    
     private ExpiryMonitor monitor;
 
     @Before
     public void doSetUp() throws Exception
     {
         expired = false;
-        monitor = new ExpiryMonitor("test", 100, null, false);
+        monitor = new ExpiryMonitor("test", EXPIRE_INTERVAL, null, false);
     }
 
     @After
@@ -47,17 +57,17 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
             @Override
             public void expired()
             {
-                expired = true;
+                expire();
             }
         };
-        monitor.addExpirable(300, TimeUnit.MILLISECONDS, e);
-        new PollingProber(800, 50).check(new JUnitProbe()
+        monitor.addExpirable(EXPIRE_TIME, MILLISECONDS, e);
+        new PollingProber(EXPIRE_TIMEOUT, 50).check(new JUnitProbe()
         {
             @Override
             public boolean test()
             {
-                assertTrue(expired);
-                assertTrue(!monitor.isRegistered(e));
+                assertThat(expired, is(true));
+                assertThat(monitor.isRegistered(e), is(false));
                 return true;
             }
         });
@@ -71,22 +81,24 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
             @Override
             public void expired()
             {
-                expired = true;
+                expire();
             }
         };
-        monitor.addExpirable(800, TimeUnit.MILLISECONDS, e);
-        Thread.sleep(300);
-        assertTrue(!expired);
-        new PollingProber(800, 50).check(new JUnitProbe()
+        long startTime = currentTimeMillis();
+        monitor.addExpirable(EXPIRE_TIME, MILLISECONDS, e);
+        monitor.run();
+        assertThat(expired, is(false));
+        new PollingProber(EXPIRE_TIMEOUT, 50).check(new JUnitProbe()
         {
             @Override
             public boolean test()
             {
-                assertTrue(expired);
-                assertTrue(!monitor.isRegistered(e));
+                assertThat(expired, is(true));
+                assertThat(monitor.isRegistered(e), is(false));
                 return true;
             }
         });
+        assertThat(expiredTime - startTime, greaterThanOrEqualTo(EXPIRE_TIME - DELTA_TIME));
     }
 
     @Test
@@ -97,25 +109,27 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
             @Override
             public void expired()
             {
-                expired = true;
+                expire();
             }
         };
-        monitor.addExpirable(600, TimeUnit.MILLISECONDS, e);
-        Thread.sleep(200);
-        assertTrue(!expired);
+        monitor.addExpirable(EXPIRE_TIME, MILLISECONDS, e);
+        monitor.run();
+        assertThat(expired, is(false));
+        long startTime = currentTimeMillis();
         monitor.resetExpirable(e);
-        Thread.sleep(200);
+        monitor.run();
         assertTrue(!expired);
         new PollingProber(600, 50).check(new JUnitProbe()
         {
             @Override
             public boolean test()
             {
-                assertTrue(expired);
-                assertTrue(!monitor.isRegistered(e));
+                assertThat(expired, is(true));
+                assertThat(monitor.isRegistered(e), is(false));
                 return true;
             }
         });
+        assertThat(expiredTime - startTime, greaterThanOrEqualTo(EXPIRE_TIME - DELTA_TIME));
     }
 
     @Test
@@ -126,24 +140,22 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
             @Override
             public void expired()
             {
-                expired = true;
+                expire();
             }
         };
-        monitor.addExpirable(1000, TimeUnit.MILLISECONDS, e);
-        Thread.sleep(200);
-        assertTrue(!expired);
-        Thread.sleep(200);
+        monitor.addExpirable(EXPIRE_TIME, MILLISECONDS, e);
+        monitor.run();
+        assertThat(expired, is(false));
         monitor.removeExpirable(e);
-        new PollingProber(600, 50).check(new JUnitProbe()
-        {
-            @Override
-            public boolean test()
-            {
-                assertTrue(!expired);
-                assertTrue(!monitor.isRegistered(e));
-                return true;
-            }
-        });
+        
+        Thread.sleep(EXPIRE_TIMEOUT);
+        assertThat(expired, is(false));
+        assertThat(monitor.isRegistered(e), is(false));
     }
 
+    private void expire()
+    {
+        expiredTime = currentTimeMillis();
+        expired = true;
+    }
 }
