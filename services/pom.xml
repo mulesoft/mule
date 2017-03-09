@@ -21,5 +21,6 @@
         <module>scheduler</module>
         <module>oauth</module>
         <module>services-all</module>
+        <module>soap</module>
     </modules>
 </project>

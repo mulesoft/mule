@@ -11,6 +11,14 @@
         </wsc:connection>
     </wsc:config>
 
+    <wsc:config name="con2">
+        <wsc:connection wsdlLocation="http://www.webservicex.com/globalweather.asmx?WSDL" service="GlobalWeather" port="GlobalWeatherSoap"/>
+    </wsc:config>
+
+    <flow name="flowFalopa">
+        <wsc:consume config-ref="con2" operation="GetCitiesByCountry"/>
+    </flow>
+
     <flow name="downloadAttachment">
         <wsc:consume config-ref="attachmentsConfig" operation="downloadAttachment">
             <wsc:message>
@@ -24,7 +32,7 @@
             <wsc:message>
                 <wsc:body>#[payload]</wsc:body>
                 <wsc:attachments>
-                    #[{ attachment: { id: "SomeId", content: "Some Content" } as Object { class : "org.mule.extension.ws.api.SoapAttachment" } } ]
+                    #[{ attachment: { id: "SomeId", content: "Some Content" } as Object { class : "org.mule.extension.SoapAttachment" } } ]
                 </wsc:attachments>
             </wsc:message>
         </wsc:consume>

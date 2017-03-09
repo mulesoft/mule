@@ -1,0 +1,36 @@
+<definitions xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="http://service.ws.extension.mule.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://service.ws.extension.mule.org/" name="TestService">
+    <types>
+        <xsd:schema>
+            <xsd:import namespace="http://service.ws.extension.mule.org/" schemaLocation="http://localhost:8083/test?xsd=1"/>
+        </xsd:schema>
+    </types>
+    <message name="echo">
+        <part name="parameters" element="tns:echo"/>
+    </message>
+    <message name="echoResponse">
+        <part name="parameters" element="tns:echoResponse"/>
+    </message>
+    <portType name="Soap12Service">
+        <operation name="echo">
+            <input wsam:Action="echo12Operation" message="tns:echo"/>
+            <output wsam:Action="http://service.ws.extension.mule.org/Soap12Service/echoResponse" message="tns:echoResponse"/>
+        </operation>
+    </portType>
+    <binding name="TestPortBinding" type="tns:Soap12Service">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="echo">
+            <soap12:operation soapAction="echo12Operation"/>
+            <input>
+                <soap12:body use="literal"/>
+            </input>
+            <output>
+                <soap12:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="TestService">
+        <port name="TestPort" binding="tns:TestPortBinding">
+            <soap12:address location="http://localhost:8083/test"/>
+        </port>
+    </service>
+</definitions>

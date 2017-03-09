@@ -46,6 +46,7 @@
         <module>tomcat</module>
         <module>tooling-support</module>
         <module>xml</module>
+        <module>soap-api</module>
     </modules>
 
     <build>
