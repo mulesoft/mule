@@ -76,6 +76,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     for (GlobalBindingContextProvider contextProvider : contextProviders) {
       expressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
     }
+    if (forceMel) {
+      logger.warn("Forcing MEL as the default expression language.");
+    }
   }
 
   @Override

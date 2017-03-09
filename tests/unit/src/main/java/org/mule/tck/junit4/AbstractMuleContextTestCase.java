@@ -221,8 +221,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<>();
         builders.add(new SimpleConfigurationBuilder(getStartUpProperties()));
-        builders.add(getBuilder());
         addBuilders(builders);
+        builders.add(getBuilder());
         MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
         DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
         String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();

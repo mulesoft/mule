@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAU
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

@@ -7,13 +7,11 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
@@ -31,9 +29,9 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
@@ -94,10 +92,6 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                      TypedValue value) {
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
-  }
-
-  public boolean isEnabled() {
-    return expressionExecutor != null;
   }
 
   private TypedValue evaluate(String expression, BindingContext context) {
