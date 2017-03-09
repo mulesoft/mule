@@ -152,17 +152,17 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
 
         String xml =
-                "<node1>" +
-                     "<subnode1>sub node 1 original value</subnode1>" +
-                     "<subnode2>sub node 2 original value</subnode2>" +
-                 "</node1>";
+            "<node1>" +
+                "<subnode1>sub node 1 original value</subnode1>" +
+                "<subnode2>sub node 2 original value</subnode2>" +
+                "</node1>";
 
         String param = "sub node 2 cool new value";
 
         String expectedTransformedxml =
-                "<node1>" +
-                    "<subnode1>sub node 1 original value</subnode1>" +
-                    "<subnode2>" + param + "</subnode2>" +
+            "<node1>" +
+                "<subnode1>sub node 1 original value</subnode1>" +
+                "<subnode2>" + param + "</subnode2>" +
                 "</node1>";
 
         String xsl = someXslText();
@@ -195,16 +195,66 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     private String someXslText()
     {
         return "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"2.0\"" +
-             " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
-             " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
-             "<xsl:param name=\"param1\"/>" +
-             "<xsl:template match=\"@*|node()\">" +
-                 "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
-             "</xsl:template>" +
-                 "<xsl:template match=\"/node1/subnode2/text()\">" +
-                 "<xsl:value-of select=\"$param1\"/>" +
-             "</xsl:template>" +
-         "</xsl:stylesheet>";
+            " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
+            " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
+            "<xsl:param name=\"param1\"/>" +
+            "<xsl:template match=\"@*|node()\">" +
+            "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
+            "</xsl:template>" +
+            "<xsl:template match=\"/node1/subnode2/text()\">" +
+            "<xsl:value-of select=\"$param1\"/>" +
+            "</xsl:template>" +
+            "</xsl:stylesheet>";
+    }
+
+    private String someXslTextWithCData()
+    {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +
+            "   version=\"1.0\">\n" +
+            "   \n" +
+            "   <xsl:output cdata-section-elements=\"b\"/>\n" +
+            "   \n" +
+            "   <xsl:template match=\"@*|node()\">\n" +
+            "      <xsl:copy>\n" +
+            "         <xsl:apply-templates select=\"@*|node()\"/>\n" +
+            "      </xsl:copy>\n" +
+            "   </xsl:template>\n" +
+            "</xsl:stylesheet>";
+    }
+
+    @Test
+    public void testTransformWithCData() throws Exception
+    {
+        String expectedTransformedxml =
+            "<a>\n"
+                + "    <b><![CDATA[<c>hello</c>]]></b>\n"
+                + "</a>";
+
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + expectedTransformedxml;
+
+        String xsl = someXslTextWithCData();
+
+        XsltTransformer transformer = new XsltTransformer();
+
+        transformer.setMuleContext(muleContext);
+        transformer.setReturnDataType(DataTypeFactory.STRING);
+        transformer.setMuleContext(muleContext);
+        // set stylesheet
+        transformer.setXslt(xsl);
+
+        // init transformer
+        transformer.initialise();
+
+        MuleMessage message = new DefaultMuleMessage(xml, muleContext);
+        // do transformation
+        String transformerResult = (String) transformer.transform(message);
+
+        // remove doc type and CRLFs
+        transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
+
+        assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
     }
 
     @Test
@@ -212,17 +262,17 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     {
 
         String xml =
-                "<node1>" +
-                     "<subnode1>sub node 1 original value</subnode1>" +
-                     "<subnode2>sub node 2 original value</subnode2>" +
-                 "</node1>";
+            "<node1>" +
+                "<subnode1>sub node 1 original value</subnode1>" +
+                "<subnode2>sub node 2 original value</subnode2>" +
+                "</node1>";
 
         String param = "sub node 2 cool new value";
 
         String expectedTransformedxml =
-                "<node1>" +
-                    "<subnode1>sub node 1 original value</subnode1>" +
-                    "<subnode2>" + param + "</subnode2>" +
+            "<node1>" +
+                "<subnode1>sub node 1 original value</subnode1>" +
+                "<subnode2>" + param + "</subnode2>" +
                 "</node1>";
 
         String xsl = someXslText();
@@ -295,7 +345,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         {
             xsltTransformer.initialise();
             fail("Should have thrown an exception because file '" + someNonExistentFileName
-                 + "' does not exist.");
+                     + "' does not exist.");
         }
         catch (InitialisationException e)
         {
@@ -314,14 +364,14 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
             assertNotNull(xsltTransformer.getXslt());
             String someTextThatIsInTheXslFile = "My CD Collection";
             assertTrue("Should contain the text '" + someTextThatIsInTheXslFile + "', because it is in the '"
-                       + VALID_XSL_FILENAME + "' file that we are setting.", xsltTransformer.getXslt()
-                .contains(
-                someTextThatIsInTheXslFile));
+                           + VALID_XSL_FILENAME + "' file that we are setting.", xsltTransformer.getXslt()
+                           .contains(
+                               someTextThatIsInTheXslFile));
         }
         catch (InitialisationException e)
         {
             fail("Should NOT have thrown an exception because file '" + VALID_XSL_FILENAME
-                 + "' DOES exist.");
+                     + "' DOES exist.");
         }
     }
 
