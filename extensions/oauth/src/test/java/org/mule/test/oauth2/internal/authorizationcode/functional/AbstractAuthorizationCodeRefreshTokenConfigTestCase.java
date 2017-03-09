@@ -8,6 +8,7 @@ package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -39,6 +40,8 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
   public static final String RESOURCE_RESULT = "resource result";
   public static final String REFRESHED_ACCESS_TOKEN = "rbBQLgJXBEYo83K4Fqs4guasdfsdfa";
 
+  @Rule
+  public SystemProperty originalPayload = new SystemProperty("payload.original", TEST_PAYLOAD);
   @Rule
   public SystemProperty localAuthorizationUrl =
       new SystemProperty("local.authorization.url",
@@ -76,6 +79,8 @@ public abstract class AbstractAuthorizationCodeRefreshTokenConfigTestCase extend
         .withRequestBody(containing(REFRESH_TOKEN_PARAMETER + "=" + encode(REFRESH_TOKEN, UTF_8.name())))
         .withRequestBody(containing(CLIENT_SECRET_PARAMETER + "=" + encode(clientSecret.getValue(), UTF_8.name())))
         .withRequestBody(containing(GRANT_TYPE_PARAMETER + "=" + encode(GRANT_TYPE_REFRESH_TOKEN, UTF_8.name()))));
+
+    wireMockRule.verify(2, postRequestedFor(urlEqualTo(RESOURCE_PATH)).withRequestBody(equalTo(TEST_PAYLOAD)));
   }
 
   protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName,

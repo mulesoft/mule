@@ -29,6 +29,7 @@
     </httpn:request-config>
 
     <flow name="testFlow">
+        <set-payload value="${payload.original}"/>
         <httpn:request host="localhost" port="${oauth.server.port}" path="/resource" method="POST"
                       config-ref="requestConfig"/>
         <object-to-string-transformer />

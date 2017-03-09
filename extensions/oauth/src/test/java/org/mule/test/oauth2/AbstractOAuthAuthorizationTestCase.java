@@ -94,8 +94,6 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   public SystemProperty localCallbackUrl =
       new SystemProperty("local.callback.url",
                          format("%s://localhost:%d%s", getProtocol(), localHostPort.getNumber(), localCallbackPath.getValue()));
-  @Rule
-  public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
   private ExtensionsClient client;
 
