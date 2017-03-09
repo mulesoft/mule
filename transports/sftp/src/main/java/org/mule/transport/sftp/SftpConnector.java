@@ -26,6 +26,7 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.ObjectPool;
@@ -637,5 +638,12 @@ public class SftpConnector extends AbstractConnector
     public void disconnect() throws Exception
     {
         setConnected(false);
+    }
+    
+    @Override
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
+    {
+        return defaultIfEmpty(endpoint.getName(),
+                endpoint.getEndpointURI().getAddress());
     }
 }
