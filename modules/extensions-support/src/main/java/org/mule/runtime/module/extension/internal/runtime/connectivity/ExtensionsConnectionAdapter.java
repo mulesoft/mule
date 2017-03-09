@@ -70,7 +70,7 @@ public class ExtensionsConnectionAdapter {
 
     final Optional<ConfigurationInstance> configuration = executionContext.getConfiguration();
     Optional<ConnectionProvider> connectionProvider = configuration
-        .map(config -> config.getConnectionProvider())
+        .map(ConfigurationInstance::getConnectionProvider)
         .map(Optional::get);
 
     if (!connectionProvider.isPresent()) {

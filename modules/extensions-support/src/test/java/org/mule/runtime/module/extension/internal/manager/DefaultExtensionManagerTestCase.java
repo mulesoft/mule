@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -175,7 +176,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(extension1ConfigurationModel.getName()).thenReturn(EXTENSION1_CONFIG_NAME);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
     mockInterceptors(extension1ConfigurationModel, null);
-    when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of());
+    when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of(extension1OperationModel));
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel));
     when(connectionProviderModel.getAllParameterModels()).thenReturn(emptyList());
@@ -197,6 +198,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(extension1ConfigurationProvider.getExtensionModel()).thenReturn(extensionModel1);
     when(extension1ConfigurationProvider.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
 
+    visitableMock(extension1OperationModel);
     mockExecutorFactory(extension1OperationModel, executorFactory);
     when(executorFactory.createExecutor(extension1OperationModel)).thenReturn(executor);
 
@@ -260,7 +262,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getConfigurationThroughDefaultConfig() throws Exception {
     registerConfigurationProvider();
 
-    ConfigurationInstance configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    ConfigurationInstance configInstance =
+        extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
     assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
   }
 
@@ -268,7 +271,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
-    ConfigurationInstance configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    ConfigurationInstance configInstance =
+        extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
     assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
   }
 
@@ -284,12 +288,13 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     doAnswer(invocation -> {
       when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class))
           .thenReturn(asList((ConfigurationProvider) invocation.getArguments()[1]));
-      new Thread(() -> extensionsManager.getConfiguration(extensionModel1, event)).start();
+      new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
 
       return null;
     }).when(registry).registerObject(anyString(), anyObject());
-    ConfigurationInstance configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    ConfigurationInstance configurationInstance =
+        extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
     joinerLatch.countDown();
     assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
     assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
@@ -300,7 +305,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
     makeExtension1ConfigurationNotImplicit();
 
-    extensionsManager.getConfiguration(extensionModel1, event);
+    extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
   }
 
   @Test

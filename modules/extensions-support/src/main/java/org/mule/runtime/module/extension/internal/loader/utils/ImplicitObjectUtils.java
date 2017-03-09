@@ -17,8 +17,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.List;
-
 /**
  * Utilities for creating object with implicit values based on a {@link ParameterizedModel}
  *
@@ -37,7 +35,6 @@ public final class ImplicitObjectUtils {
    * @param muleContext        the Mule node.
    * @return a {@link ResolverSet}
    */
-  // TODO - MULE-11610 : Implicit resolvers doesn't use the same resolving mechanism that for a defined element
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     ResolverSet resolverSet = new ResolverSet();
     ParametersResolver parametersResolver =
@@ -61,27 +58,5 @@ public final class ImplicitObjectUtils {
     }
 
     return resolverSet;
-  }
-
-  /**
-   * Returns the first item in the {@code models} {@link List} that can be used implicitly.
-   * <p>
-   * A {@link ParameterizedModel} is consider to be implicit when all its {@link ParameterModel}s are either optional or have a
-   * default value
-   *
-   * @param models a {@link List} of {@code T}
-   * @param <T>    the generic type of the items in the {@code models}. It's a type which is assignable from
-   *               {@link ParameterizedModel}
-   * @return one of the items in {@code models} or {@code null} if none of the models are implicit
-   */
-  public static <T extends ParameterizedModel> T getFirstImplicit(List<T> models) {
-    return models.stream()
-        .filter(ImplicitObjectUtils::canBeUsedImplicitly)
-        .findFirst()
-        .orElse(null);
-  }
-
-  private static boolean canBeUsedImplicitly(ParameterizedModel parameterizedModel) {
-    return parameterizedModel.getAllParameterModels().stream().noneMatch(p -> p.isRequired() && p.getDefaultValue() == null);
   }
 }

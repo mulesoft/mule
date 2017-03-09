@@ -27,11 +27,13 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +52,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class ExtensionRegistry {
 
-  private final LoadingCache<ExtensionModel, List<ConfigurationProvider>> providersByExtension =
-      CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, List<ConfigurationProvider>>() {
+  private final LoadingCache<ExtensionModel, Multimap<ConfigurationModel, ConfigurationProvider>> providersByExtension =
+      CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, Multimap<ConfigurationModel, ConfigurationProvider>>() {
 
         @Override
-        public List<ConfigurationProvider> load(ExtensionModel key) throws Exception {
-          return registry.lookupObjects(ConfigurationProvider.class).stream()
+        public Multimap<ConfigurationModel, ConfigurationProvider> load(ExtensionModel key) throws Exception {
+          List<ConfigurationProvider> providers = registry.lookupObjects(ConfigurationProvider.class).stream()
               .filter(provider -> provider.getExtensionModel() == key).collect(new ImmutableListCollector<>());
+          Multimap multimap = HashMultimap.create();
+          providers.forEach(p -> multimap.put(p.getConfigurationModel(), p));
+          return multimap;
         }
       });
 
@@ -127,8 +132,20 @@ final class ExtensionRegistry {
    * @param extensionModel a registered {@link ExtensionModel}
    * @return an immutable {@link List}. Might be empty but will never be {@code null}
    */
-  List<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel) {
-    return providersByExtension.getUnchecked(extensionModel);
+  Collection<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel) {
+    return providersByExtension.getUnchecked(extensionModel).values();
+  }
+
+  /**
+   * Returns all the {@link ConfigurationProvider configuration providers} associated to a given {@link ConfigurationModel configuration
+   * model} owned by the {@code extensionModel}.
+   *
+   * @param extensionModel a registered {@link ExtensionModel}
+   * @return an immutable {@link List}. Might be empty but will never be {@code null}
+   */
+  Collection<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel,
+                                                              ConfigurationModel configurationModel) {
+    return providersByExtension.getUnchecked(extensionModel).get(configurationModel);
   }
 
   /**

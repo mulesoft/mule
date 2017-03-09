@@ -19,6 +19,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -40,6 +41,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
   private final ExtensionManager parentExtensionManager = mock(ExtensionManager.class);
   private final ExtensionManager childExtensionManager = mock(ExtensionManager.class);
+  private final OperationModel operationModel = mock(OperationModel.class);
 
   @Rule
   public ExpectedException expectedException = none();
@@ -102,10 +104,12 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
-    when(childExtensionManager.getConfigurationProvider(childExtension)).thenReturn(of(childConfigurationProvider));
-    when(parentExtensionManager.getConfigurationProvider(childExtension)).thenReturn(empty());
+    when(childExtensionManager.getConfigurationProvider(childExtension, operationModel))
+        .thenReturn(of(childConfigurationProvider));
+    when(parentExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
 
-    Optional<ConfigurationProvider> configurationProvider = extensionManager.getConfigurationProvider(childExtension);
+    Optional<ConfigurationProvider> configurationProvider =
+        extensionManager.getConfigurationProvider(childExtension, operationModel);
 
     assertThat(configurationProvider.get(), is(childConfigurationProvider));
   }
@@ -121,10 +125,12 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
     ConfigurationProvider parentConfigurationProvider = mock(ConfigurationProvider.class);
-    when(parentExtensionManager.getConfigurationProvider(parentExtension)).thenReturn(of(parentConfigurationProvider));
-    when(childExtensionManager.getConfigurationProvider(parentExtension)).thenReturn(empty());
+    when(parentExtensionManager.getConfigurationProvider(parentExtension, operationModel))
+        .thenReturn(of(parentConfigurationProvider));
+    when(childExtensionManager.getConfigurationProvider(parentExtension, operationModel)).thenReturn(empty());
 
-    Optional<ConfigurationProvider> configurationProvider = extensionManager.getConfigurationProvider(parentExtension);
+    Optional<ConfigurationProvider> configurationProvider =
+        extensionManager.getConfigurationProvider(parentExtension, operationModel);
 
     assertThat(configurationProvider.get(), is(parentConfigurationProvider));
   }
@@ -222,10 +228,11 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
     when(childConfigurationProvider.get(event)).thenReturn(configurationInstance);
-    when(childExtensionManager.getConfigurationProvider(childExtension)).thenReturn(of(childConfigurationProvider));
-    when(parentExtensionManager.getConfigurationProvider(childExtension)).thenReturn(empty());
+    when(childExtensionManager.getConfigurationProvider(childExtension, operationModel))
+        .thenReturn(of(childConfigurationProvider));
+    when(parentExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
 
-    ConfigurationInstance configuration = extensionManager.getConfiguration(childExtension, event);
+    ConfigurationInstance configuration = extensionManager.getConfiguration(childExtension, operationModel, event);
 
     assertThat(configuration, is(configurationInstance));
   }
@@ -244,11 +251,11 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
     when(childConfigurationProvider.get(event)).thenReturn(configurationInstance);
-    when(childExtensionManager.getConfigurationProvider(childExtension)).thenReturn(empty());
-    when(parentExtensionManager.getConfigurationProvider(childExtension)).thenReturn(empty());
+    when(childExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
+    when(parentExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
 
     expectedException.expect(IllegalArgumentException.class);
-    extensionManager.getConfiguration(childExtension, event);
+    extensionManager.getConfiguration(childExtension, operationModel, event);
   }
 
   @Test

@@ -286,7 +286,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     Object defaultConfigInstance = new Object();
     when(configurationInstance.getValue()).thenReturn(defaultConfigInstance);
-    when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
+    when(extensionManager.getConfiguration(extensionModel, operationModel, event)).thenReturn(configurationInstance);
 
     ArgumentCaptor<ExecutionContext> operationContextCaptor = ArgumentCaptor.forClass(ExecutionContext.class);
     messageProcessor.process(event);

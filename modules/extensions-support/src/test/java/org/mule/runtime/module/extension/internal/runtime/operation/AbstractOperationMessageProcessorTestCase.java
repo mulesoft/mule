@@ -265,9 +265,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     mockSubTypes(extensionModel);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
     when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
-    when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
+    when(extensionManager.getConfiguration(extensionModel, operationModel, event)).thenReturn(configurationInstance);
     when(configurationProvider.get(anyObject())).thenReturn(configurationInstance);
-    when(extensionManager.getConfigurationProvider(extensionModel)).thenReturn(of(configurationProvider));
+    when(extensionManager.getConfigurationProvider(extensionModel, operationModel)).thenReturn(of(configurationProvider));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
     when(mockPolicyManager.createOperationPolicy(any(), any(), any(), any())).thenAnswer(invocationOnMock -> {

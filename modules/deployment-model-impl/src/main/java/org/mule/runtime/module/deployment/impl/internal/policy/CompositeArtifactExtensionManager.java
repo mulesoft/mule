@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -75,9 +76,10 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
   }
 
   @Override
-  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, Event event) {
+  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+                                                Event event) {
 
-    Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel);
+    Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel, componentModel);
     if (provider.isPresent()) {
       return provider.get().get(event);
     }
@@ -85,17 +87,6 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
     throw new IllegalArgumentException(format(
                                               "There is no registered configuration provider for extension '%s'",
                                               extensionModel.getName()));
-  }
-
-  @Override
-  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel) {
-    Optional<ConfigurationProvider> configurationProvider = childExtensionManager.getConfigurationProvider(extensionModel);
-
-    if (!configurationProvider.isPresent()) {
-      configurationProvider = parentExtensionManager.getConfigurationProvider(extensionModel);
-    }
-
-    return configurationProvider;
   }
 
   @Override
@@ -108,6 +99,18 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
     }
 
     return configurationProvider;
+  }
+
+  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
+    Optional<ConfigurationProvider> configurationModel =
+        childExtensionManager.getConfigurationProvider(extensionModel, componentModel);
+
+    if (!configurationModel.isPresent()) {
+      configurationModel =
+          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);;
+    }
+
+    return configurationModel;
   }
 
   @Override

@@ -7,21 +7,28 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -33,6 +40,7 @@ import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
@@ -41,10 +49,13 @@ import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfi
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -62,6 +73,8 @@ import org.slf4j.LoggerFactory;
 public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
+  public static final String TOO_MANY_CONFIGS =
+      "Too many configs of type '%s' were found. Please specify one which one should be used.";
 
   private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory =
       new DefaultImplicitConfigurationProviderFactory();
@@ -137,42 +150,45 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Override
   public ConfigurationInstance getConfiguration(String configurationProviderName, Event muleEvent) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
-        .orElseThrow(() -> new IllegalArgumentException(String
-            .format(
-                    "There is no registered configurationProvider under name '%s'",
-                    configurationProviderName)));
+        .orElseThrow(() -> new IllegalArgumentException(
+                                                        format(
+                                                               "There is no registered configurationProvider under name '%s'",
+                                                               configurationProviderName)));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, Event muleEvent) {
-    Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel);
+  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+                                                Event muleEvent) {
+
+    Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel, componentModel);
     if (provider.isPresent()) {
       return provider.get().get(muleEvent);
     }
 
-    createImplicitConfiguration(extensionModel, muleEvent);
-    return getConfiguration(extensionModel, muleEvent);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel) {
-    List<ConfigurationProvider> providers = extensionRegistry.getConfigurationProviders(extensionModel);
-
-    int matches = providers.size();
-
-    if (matches == 1) {
-      return Optional.of(providers.get(0));
-    } else if (matches > 1) {
-      throw new TooManyConfigsException("Too many configs found", extensionModel, matches);
+    Optional<ConfigurationModel> configurationModel =
+        getConfigurationModelForExtension(extensionModel, getConfigurationForComponent(extensionModel,
+                                                                                       componentModel));
+    if (!configurationModel.isPresent()) {
+      return null;
     }
 
-    return Optional.empty();
+    createImplicitConfiguration(extensionModel, configurationModel.get(), muleEvent);
+    return getConfiguration(extensionModel, componentModel, muleEvent);
+  }
+
+  @Override
+  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
+    Optional<ConfigurationModel> config = getConfigurationModelForExtension(extensionModel,
+                                                                            getConfigurationForComponent(extensionModel,
+                                                                                                         componentModel));
+    if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
+      throw new IllegalStateException("No config-ref was specified for component '%s' of extension '%s'. Please specify which to use");
+    }
+
+    return config.map(c -> getConfigurationProvider(extensionModel, c)).orElse(empty());
   }
 
   /**
@@ -184,15 +200,69 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     return extensionRegistry.getConfigurationProvider(configurationProviderName);
   }
 
-  private void createImplicitConfiguration(ExtensionModel extensionModel, Event muleEvent) {
+  private void createImplicitConfiguration(ExtensionModel extensionModel, ConfigurationModel implicitConfigurationModel,
+                                           Event muleEvent) {
     synchronized (extensionModel) {
       // check that another thread didn't beat us to create the instance
-      if (extensionRegistry.getConfigurationProviders(extensionModel).isEmpty()) {
+      if (extensionRegistry.getConfigurationProviders(extensionModel, implicitConfigurationModel).isEmpty()) {
         registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
+                                                                                                               implicitConfigurationModel,
                                                                                                                muleEvent,
                                                                                                                muleContext));
       }
     }
+  }
+
+  private Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
+                                                                   ConfigurationModel configurationModel) {
+    Collection<ConfigurationProvider> providers = extensionRegistry.getConfigurationProviders(extensionModel, configurationModel);
+
+    int matches = providers.size();
+
+    if (matches == 1) {
+      return providers.stream().findFirst();
+    } else if (matches > 1) {
+      throw new TooManyConfigsException("Too many configs of type '" + configurationModel.getName() + "' found for ",
+                                        extensionModel, configurationModel, matches);
+    }
+
+    return empty();
+  }
+
+  private Optional<ConfigurationModel> getConfigurationModelForExtension(ExtensionModel extensionModel,
+                                                                         Set<ConfigurationModel> assignableConfigurationModels) {
+    Reference<ConfigurationModel> selectedConfig = new Reference<>();
+
+    List<ConfigurationModel> registeredProviders = extensionRegistry.getConfigurationProviders(extensionModel).stream()
+        .map(ConfigurationProvider::getConfigurationModel).collect(Collectors.toList());
+
+    assignableConfigurationModels.forEach(c -> {
+      List<ConfigurationModel> candidateConfigs =
+          registeredProviders.stream().filter(r -> Objects.equals(r.getName(), c.getName())).collect(Collectors.toList());
+
+      if (candidateConfigs.size() == 1) {
+        if (selectedConfig.get() == null) {
+          selectedConfig.set(c);
+        } else {
+          throw new TooManyConfigsException(format(TOO_MANY_CONFIGS, c.getName()), extensionModel, c, 2);
+        }
+      } else if (candidateConfigs.size() > 1) {
+        throw new TooManyConfigsException(format(TOO_MANY_CONFIGS, c.getName()), extensionModel, c, candidateConfigs.size());
+      }
+    });
+
+    if (selectedConfig.get() == null) {
+      List<ConfigurationModel> implicitConfigurationModels =
+          assignableConfigurationModels.stream().filter(ExtensionModelUtils::canBeUsedImplicitly).collect(Collectors.toList());
+
+      if (implicitConfigurationModels.size() == 1) {
+        selectedConfig.set(implicitConfigurationModels.get(0));
+      } else if (implicitConfigurationModels.size() > 1) {
+        throw new IllegalStateException(format("No configuration can be inferred por extension '%s'", extensionModel.getName()));
+      }
+    }
+
+    return ofNullable(selectedConfig.get());
   }
 
   /**
@@ -235,8 +305,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
       stopIfNeeded(configuration);
       disposeIfNeeded(configuration, LOGGER);
     } catch (Exception e) {
-      LOGGER.error(String.format("Could not dispose expired dynamic config of key '%s' and type %s", key,
-                                 configuration.getClass().getName()),
+      LOGGER.error(format("Could not dispose expired dynamic config of key '%s' and type %s", key,
+                          configuration.getClass().getName()),
                    e);
     }
   }

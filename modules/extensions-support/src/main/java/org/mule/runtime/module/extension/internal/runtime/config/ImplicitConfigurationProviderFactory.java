@@ -29,6 +29,8 @@ public interface ImplicitConfigurationProviderFactory {
    * @return a {@link ConfigurationProvider}
    * @throws IllegalStateException if it's not possible to create an implicit configuration automatically
    */
-  ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel, Event muleEvent,
+  ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel,
+                                                            ConfigurationModel implicitConfigurationModel,
+                                                            Event muleEvent,
                                                             MuleContext muleContext);
 }

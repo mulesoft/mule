@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
-import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.getFirstImplicit;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
