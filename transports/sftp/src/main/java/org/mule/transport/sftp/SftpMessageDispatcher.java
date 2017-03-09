@@ -16,10 +16,13 @@
 
 package org.mule.transport.sftp;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.AbstractMessageDispatcher;
+import org.mule.transport.NullPayload;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.io.ByteArrayInputStream;
@@ -209,6 +212,9 @@ public class SftpMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         doDispatch(event);
-        return event.getMessage();
+        return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
+
     }
+
+
 }
