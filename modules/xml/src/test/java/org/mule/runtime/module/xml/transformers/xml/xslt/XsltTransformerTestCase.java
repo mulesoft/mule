@@ -180,6 +180,55 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase {
         + "</xsl:stylesheet>";
   }
 
+  private String someXslTextWithCData() {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +
+        "   version=\"1.0\">\n" +
+        "   \n" +
+        "   <xsl:output cdata-section-elements=\"b\"/>\n" +
+        "   \n" +
+        "   <xsl:template match=\"@*|node()\">\n" +
+        "      <xsl:copy>\n" +
+        "         <xsl:apply-templates select=\"@*|node()\"/>\n" +
+        "      </xsl:copy>\n" +
+        "   </xsl:template>\n" +
+        "</xsl:stylesheet>";
+  }
+
+  @Test
+  public void testTransformWithCData() throws Exception {
+    String expectedTransformedxml =
+        "<a>\n"
+            + "    <b><![CDATA[<c>hello</c>]]></b>\n"
+            + "</a>";
+
+    String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        + expectedTransformedxml;
+
+    String xsl = someXslTextWithCData();
+
+    XsltTransformer transformer = new XsltTransformer();
+
+    transformer.setMuleContext(muleContext);
+    transformer.setReturnDataType(DataType.STRING);
+    transformer.setMuleContext(muleContext);
+    // set stylesheet
+    transformer.setXslt(xsl);
+
+    // init transformer
+    transformer.initialise();
+
+    InternalMessage message = InternalMessage.builder().payload(xml).build();
+    // do transformation
+    String transformerResult = (String) transformer.transform(message);
+
+    // remove doc type and CRLFs
+    transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
+
+    assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
+  }
+
+
   @Test
   public void testTransformWithDynamicParam() throws Exception {
 
