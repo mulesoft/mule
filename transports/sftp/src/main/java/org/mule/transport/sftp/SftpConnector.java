@@ -26,21 +26,18 @@ import org.mule.transport.sftp.notification.SftpNotifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
- * <code>SftpConnector</code> sends and receives file messages over sftp using jsch
- * library Improves on SFTP with VFS Connector in the following ways: 1. Streams
- * files instead of reading them into memory. The SftpMessageReceiver is a
- * "non-materializing stream receiver" which does not read the file to memory. The
- * SftpMessageDispatcher also never materializes the stream and delegates the jsch
- * library for materialization. 3. Uses jsch library directly instead of using VFS as
- * middle-man. 3. More explicit connection lifefecyle management. 4. Leverages sftp
- * stat to determine if a file size changes (simpler and also less memory intensive)
+ * <code>SftpConnector</code> sends and receives file messages over sftp using jsch library Improves on SFTP with VFS
+ * Connector in the following ways: 1. Streams files instead of reading them into memory. The SftpMessageReceiver is a
+ * "non-materializing stream receiver" which does not read the file to memory. The SftpMessageDispatcher also never
+ * materializes the stream and delegates the jsch library for materialization. 3. Uses jsch library directly instead of
+ * using VFS as middle-man. 3. More explicit connection lifefecyle management. 4. Leverages sftp stat to determine if a
+ * file size changes (simpler and also less memory intensive)
  */
 public class SftpConnector extends AbstractConnector
 {
@@ -106,8 +103,7 @@ public class SftpConnector extends AbstractConnector
     private String preferredAuthenticationMethods;
 
     /**
-     * Should the file be kept if an error occurs when writing the file on the
-     * outbound endpoint?
+     * Should the file be kept if an error occurs when writing the file on the outbound endpoint?
      */
     private Boolean keepFileOnError;
 
@@ -117,9 +113,8 @@ public class SftpConnector extends AbstractConnector
     private int maxConnectionPoolSize;
 
     /**
-     * Value that can be set via the System property
-     * 'mule.sftp.transport.maxConnectionPoolSize'. If it's set the value is used
-     * instead of <i>maxConnectionPoolSize</i>
+     * Value that can be set via the System property 'mule.sftp.transport.maxConnectionPoolSize'. If it's set the value
+     * is used instead of <i>maxConnectionPoolSize</i>
      */
     private static final Integer overrideMaxConnectionPoolSize;
 
@@ -319,6 +314,7 @@ public class SftpConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.transport.AbstractConnector#doConnect()
      */
     @Override
@@ -329,6 +325,7 @@ public class SftpConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.transport.AbstractConnector#doDisconnect()
      */
     @Override
@@ -339,6 +336,7 @@ public class SftpConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.transport.AbstractConnector#doDispose()
      */
     @Override
@@ -349,6 +347,7 @@ public class SftpConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.transport.AbstractConnector#doInitialise()
      */
     @Override
@@ -362,6 +361,7 @@ public class SftpConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.transport.AbstractConnector#doStart()
      */
     @Override
@@ -372,6 +372,7 @@ public class SftpConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.mule.transport.AbstractConnector#doStop()
      */
     @Override
@@ -587,9 +588,8 @@ public class SftpConnector extends AbstractConnector
     }
 
     /**
-     * @return the max connection pool size. If the system parameter
-     *         mule.sftp.transport.maxConnectionPoolSize is set, that value will be
-     *         used instead.
+     * @return the max connection pool size. If the system parameter mule.sftp.transport.maxConnectionPoolSize is set,
+     *         that value will be used instead.
      */
     public int getMaxConnectionPoolSize()
     {
@@ -618,14 +618,14 @@ public class SftpConnector extends AbstractConnector
     public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
     {
         validateAuthenticationMethods(preferredAuthenticationMethods);
-        
+
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 
 
-    //Since SFTP does not have any connection at the connector level and
-    //since we need to fix SFTP connection at the inbound level we just let
-    //each receiver to do it's own reconnection.
+    // Since SFTP does not have any connection at the connector level and
+    // since we need to fix SFTP connection at the inbound level we just let
+    // each receiver to do it's own reconnection.
     @Override
     public void connect() throws Exception
     {
@@ -639,11 +639,5 @@ public class SftpConnector extends AbstractConnector
     {
         setConnected(false);
     }
-    
-    @Override
-    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
-    {
-        return defaultIfEmpty(endpoint.getName(),
-                endpoint.getEndpointURI().getAddress());
-    }
+
 }
