@@ -64,8 +64,6 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
     public SystemProperty oauthServerPortNumber = new SystemProperty("oauth.server.port", String.valueOf(oauthServerPort.getNumber()));
     @Rule
     public SystemProperty redirectUrl = new SystemProperty("redirect.url", String.format("%s://localhost:%d/redirect", getProtocol(), localHostPort.getNumber()));
-    @Rule
-    public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
     protected String getProtocol()
     {
