@@ -14,10 +14,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.message.ErrorTypeBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -61,18 +64,26 @@ public class TemporaryArtifactConnectivityTestingServiceTestCase extends Abstrac
     when(mockTemporaryArtifact.isStarted()).thenReturn(false);
     doThrow(MuleRuntimeException.class).when(mockTemporaryArtifact).start();
 
-    expectedException.expect(MuleRuntimeException.class);
-    connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
+    assertThat(connectionResult.isValid(), is(false));
+    assertThat(connectionResult.getException(), instanceOf(MuleRuntimeException.class));
   }
 
   @Test
   public void connectionExceptionDuringArtifactStartup() throws MuleException {
     when(mockTemporaryArtifact.isStarted()).thenReturn(false);
-    doThrow(ConnectionException.class).when(mockTemporaryArtifact).start();
+    doThrow(new RuntimeException(new ConnectionException("error", new RuntimeException(), ErrorTypeBuilder.builder()
+        .namespace(CORE_NAMESPACE_NAME)
+        .identifier(CRITICAL_IDENTIFIER)
+        .build())))
+            .when(mockTemporaryArtifact).start();
 
     ConnectionValidationResult connectionResult = connectivityTestingService.testConnection(COMPONENT_IDENTIFIER);
     assertThat(connectionResult.isValid(), is(false));
     assertThat(connectionResult.getException(), instanceOf(ConnectionException.class));
+    assertThat(connectionResult.getErrorType().isPresent(), is(true));
+    assertThat(connectionResult.getErrorType().get().getNamespace(), is(CORE_NAMESPACE_NAME));
+    assertThat(connectionResult.getErrorType().get().getIdentifier(), is(CRITICAL_IDENTIFIER));
   }
 
 }
