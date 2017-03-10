@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
 
-    <jmsn:config name="config">
-        <jmsn:generic-connection>
-            <jmsn:connection-factory>
-                <jmsn:jndi-connection-factory connectionFactoryJndiName="jms/connectionFactory"
+    <jms:config name="config">
+        <jms:generic-connection>
+            <jms:connection-factory>
+                <jms:jndi-connection-factory connectionFactoryJndiName="jms/connectionFactory"
                                              lookupDestination="ALWAYS">
-                    <jmsn:name-resolver-builder jndiInitialContextFactory="org.mule.extensions.jms.test.infra.JmsJndiTestContextFactory"/>
-                </jmsn:jndi-connection-factory>
-            </jmsn:connection-factory>
-        </jmsn:generic-connection>
-    </jmsn:config>
+                    <jms:name-resolver-builder jndiInitialContextFactory="org.mule.extensions.jms.test.infra.JmsJndiTestContextFactory"/>
+                </jms:jndi-connection-factory>
+            </jms:connection-factory>
+        </jms:generic-connection>
+    </jms:config>
 
 </mule>

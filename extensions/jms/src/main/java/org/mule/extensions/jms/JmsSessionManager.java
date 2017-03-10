@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.exception.JmsAckException;
+import org.mule.extensions.jms.api.exception.JmsSessionRecoverException;
 import org.mule.extensions.jms.api.source.JmsListener;
 import org.mule.extensions.jms.api.source.JmsListenerLock;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ public class JmsSessionManager {
     }
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Registered Message for Session AckId [%s]", ackId));
+      LOGGER.debug("Registered Message for Session AckId [" + ackId + "]");
     }
   }
 
@@ -60,16 +61,14 @@ public class JmsSessionManager {
    * @param ackId the id associated to the {@link Session} that should be ACKed
    * @throws JMSException if an error occurs during the ack
    */
-  public void doAck(String ackId) throws JMSException {
-    SessionInformation sessionInformation = pendingSessions.get(ackId);
-
-    if (sessionInformation == null) {
-      throw new JmsAckException(format("No pending acknowledgement with ackId [%s] exists in this Connection", ackId));
-    }
+  public void ack(String ackId) throws JMSException {
+    SessionInformation sessionInformation = getSessionInformation(ackId)
+        .orElseThrow(() -> new JmsAckException(format("No pending acknowledgement with ackId [%s] exists in this Connection",
+                                                      ackId)));
 
     sessionInformation.getMessage().acknowledge();
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Acknowledged Message for Session with AckId [%s]", ackId));
+      LOGGER.debug("Acknowledged Message for Session with AckId [" + ackId + "]");
     }
   }
 
@@ -80,11 +79,9 @@ public class JmsSessionManager {
    * @throws JMSException if an error occurs during recovering the session
    */
   public void recoverSession(String ackId) throws JMSException {
-    SessionInformation sessionInformation = pendingSessions.get(ackId);
-
-    if (sessionInformation == null) {
-      throw new JmsAckException(format("No pending session with ackId [%s] exists in this Connection", ackId));
-    }
+    SessionInformation sessionInformation = getSessionInformation(ackId)
+        .orElseThrow(() -> new JmsSessionRecoverException("No pending session with ackId [" + ackId
+            + "] exists in this Connection"));
 
     Session session = sessionInformation.getSession();
 
@@ -96,8 +93,12 @@ public class JmsSessionManager {
 
     session.recover();
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Recovered session for AckId [%s]", ackId));
+      LOGGER.debug("Recovered session for AckId [ " + ackId + "]");
     }
+  }
+
+  private Optional<SessionInformation> getSessionInformation(String ackId) {
+    return ofNullable(pendingSessions.get(ackId));
   }
 
   private class SessionInformation {

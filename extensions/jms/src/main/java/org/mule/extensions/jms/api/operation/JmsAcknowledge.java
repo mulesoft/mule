@@ -49,10 +49,10 @@ public final class JmsAcknowledge {
   public void ack(@Summary("The AckId of the Message to ACK") String ackId) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.error("Performing ACK on session: " + ackId);
+        LOGGER.debug("Performing ACK on session: " + ackId);
       }
 
-      sessionManager.doAck(ackId);
+      sessionManager.ack(ackId);
 
     } catch (Exception e) {
       LOGGER.error(format("An error occurred while acking a message with ID [%s]: ", ackId), e);
@@ -72,7 +72,7 @@ public final class JmsAcknowledge {
   public void recoverSession(String ackId) {
     try {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.error("Recovering session: " + ackId);
+        LOGGER.debug("Recovering session: " + ackId);
       }
 
       sessionManager.recoverSession(ackId);

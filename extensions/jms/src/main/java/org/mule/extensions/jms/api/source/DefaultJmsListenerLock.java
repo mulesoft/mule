@@ -6,6 +6,7 @@
  */
 package org.mule.extensions.jms.api.source;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 
@@ -30,7 +31,11 @@ public class DefaultJmsListenerLock implements JmsListenerLock {
    */
   @Override
   public void lock() {
-    semaphore.acquireUninterruptibly();
+    try {
+      semaphore.acquire();
+    } catch (InterruptedException e) {
+      throw new MuleRuntimeException(createStaticMessage("The JMS Listener Lock has been interrupted."), cause);
+    }
     if (isFailure) {
       throw new MuleRuntimeException(cause);
     }

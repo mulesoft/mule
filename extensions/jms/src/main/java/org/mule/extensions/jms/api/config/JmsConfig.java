@@ -9,12 +9,10 @@ package org.mule.extensions.jms.api.config;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extensions.jms.JmsExtension;
-import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.operation.JmsConsume;
 import org.mule.extensions.jms.api.operation.JmsPublish;
 import org.mule.extensions.jms.api.operation.JmsPublishConsume;
 import org.mule.extensions.jms.api.source.JmsListener;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -26,7 +24,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-import javax.inject.Inject;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.Topic;
@@ -40,12 +37,6 @@ import javax.jms.Topic;
 @Operations({JmsConsume.class, JmsPublish.class, JmsPublishConsume.class})
 @Sources({JmsListener.class})
 public class JmsConfig {
-
-  @Inject
-  private JmsSessionManager sessionManager;
-
-  @Inject
-  private MuleContext muleContext;
 
   /**
    * The encoding of the {@link Message} {@code body} to consume if the message doesn't communicate it
@@ -84,10 +75,6 @@ public class JmsConfig {
   @Placement(tab = "Producer")
   private JmsProducerConfig producerConfig;
 
-  public JmsSessionManager getSessionManager() {
-    return sessionManager;
-  }
-
   public String getContentType() {
     return contentType;
   }
@@ -104,7 +91,4 @@ public class JmsConfig {
     return producerConfig;
   }
 
-  public String getDefaultEncoding() {
-    return muleContext.getConfiguration().getDefaultEncoding();
-  }
 }

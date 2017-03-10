@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
              http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="publisher">
         <set-payload value="#[payload]" mimeType="application/json"/>
-        <jmsn:publish config-ref="config" destination="${destination}"/>
+        <jms:publish config-ref="config" destination="${destination}">
+            <jms:message-builder >
+            </jms:message-builder>
+        </jms:publish>
         <logger level="DEBUG" message="#[payload]"/>
     </flow>
 
     <flow name="listener" initialState="started">
-        <jmsn:listener config-ref="config" destination="${destination}" ackMode="${ack.mode}"/>
+        <jms:listener config-ref="config" destination="${destination}" ackMode="${ack.mode}"/>
         <logger level="DEBUG" message="#[payload]"/>
         <set-variable variableName="action" value="#[%output application/java --- payload.action]" mimeType="application/java"/>
         <flow-ref name="saveMessage" />
         <choice>
             <when expression="#[variables.action == 'ACK']">
                 <logger level="DEBUG" message="ACKNOWLEDGING SESSION"/>
-                <jmsn:ack ackId="#[attributes.ackId]"/>
+                <jms:ack ackId="#[attributes.ackId]"/>
             </when>
             <when expression="#[variables.action == 'EXPLODE']">
                 <logger level="DEBUG" message="THROWING EXCEPTION"/>
@@ -29,7 +32,7 @@
             </when>
             <when expression="#[variables.action == 'RECOVER']">
                 <logger level="DEBUG" message="RECOVERING SESSION"/>
-                <jmsn:recover-session ackId="#[attributes.ackId]"/>
+                <jms:recover-session ackId="#[attributes.ackId]"/>
             </when>
             <otherwise>
                 <logger level="DEBUG" message="Nothing to do"/>
@@ -43,11 +46,11 @@
 
     <flow name="doManualAck">
         <logger level="DEBUG" message="ACKNOWLEDGING SESSION"/>
-        <jmsn:ack ackId="#[payload]"/>
+        <jms:ack ackId="#[payload]"/>
     </flow>
 
     <flow name="recoverSession">
         <logger level="DEBUG" message="RECOVERING SESSION"/>
-        <jmsn:recover-session ackId="#[payload]"/>
+        <jms:recover-session ackId="#[payload]"/>
     </flow>
 </mule>

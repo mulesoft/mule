@@ -17,6 +17,7 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageC
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
@@ -34,7 +35,6 @@ import org.mule.extensions.jms.internal.support.Jms102bSupport;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -78,7 +78,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   private final JmsResultFactory resultFactory = new JmsResultFactory();
 
   @Inject
-  private SchedulerService schedulerService;
+  private JmsSessionManager sessionManager;
 
   @UseConfig
   private JmsConfig config;
@@ -222,7 +222,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
       Message message = messageBuilder.build(connection.getJmsSupport(), session.get(), config);
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Message built, sending message to %s", destinationName));
+        LOGGER.debug("Message built, sending message to " + destinationName);
       }
 
       JmsSession replySession = connection.createSession(AUTO, replyToTopic);
@@ -253,7 +253,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   private void evaluateAckAction(SourceCallback<Object, JmsAttributes> sourceCallback, JmsSession session, Message message,
                                  JmsListenerLock jmsLock) {
     try {
-      evaluateMessageAck(ackMode, session, message, config.getSessionManager(), jmsLock);
+      evaluateMessageAck(ackMode, session, message, sessionManager, jmsLock);
     } catch (JMSException e) {
       LOGGER.error("An error occurred while processing an incoming message: ", e);
       sourceCallback.onSourceException(e);

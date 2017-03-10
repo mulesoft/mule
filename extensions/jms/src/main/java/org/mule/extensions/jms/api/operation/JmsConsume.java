@@ -14,6 +14,7 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageC
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
@@ -39,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -54,6 +56,9 @@ public final class JmsConsume {
   private static final Logger LOGGER = getLogger(JmsConsume.class);
 
   private final JmsResultFactory resultFactory = new JmsResultFactory();
+
+  @Inject
+  private JmsSessionManager sessionManager;
 
   /**
    * Operation that allows the user to consume a single {@link Message} from a given {@link Destination}.
@@ -113,7 +118,7 @@ public final class JmsConsume {
       Message received = consumer.consume(maximumWaitUnit.toMillis(maximumWait));
 
       if (received != null) {
-        evaluateMessageAck(ackMode, session, received, config.getSessionManager(), null);
+        evaluateMessageAck(ackMode, session, received, sessionManager, null);
         // If no explicit content type was provided to the operation, fallback to the
         // one communicated in the message properties. Finally if no property was set,
         // use the default one provided by the config

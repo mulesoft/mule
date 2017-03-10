@@ -151,7 +151,7 @@ public class MessageBuilder {
       setContentTypeProperty(message, body.getDataType());
     }
     if (sendEncoding) {
-      setEncodingProperty(message, body.getDataType(), config.getDefaultEncoding());
+      setEncodingProperty(message, body.getDataType(), config.getEncoding());
     }
 
     return message;

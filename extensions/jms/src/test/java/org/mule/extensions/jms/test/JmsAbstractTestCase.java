@@ -36,7 +36,7 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
 
   private static final Logger LOGGER = getLogger(JmsAbstractTestCase.class);
 
-  protected static final String NAMESPACE = "JMSN";
+  protected static final String NAMESPACE = "JMS";
   protected static final String DESTINATION_VAR = "destination";
   protected static final String MAXIMUM_WAIT_VAR = "maximumWait";
 

@@ -15,6 +15,7 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageC
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
@@ -48,6 +49,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -65,6 +67,10 @@ public class JmsPublishConsume {
 
   private static final Logger LOGGER = getLogger(JmsPublishConsume.class);
   private JmsResultFactory resultFactory = new JmsResultFactory();
+
+  @Inject
+  private JmsSessionManager sessionManager;
+
 
   /**
    * Operation that allows the user to send a message to a JMS {@link Destination} and waits for a response
@@ -114,7 +120,7 @@ public class JmsPublishConsume {
       replyConsumerType = setReplyDestination(messageBuilder, session, jmsSupport, message);
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Message built, sending message to [%s]", destination));
+        LOGGER.debug("Message built, sending message to [" + destination + "]");
       }
 
       Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, false);
@@ -142,7 +148,7 @@ public class JmsPublishConsume {
 
       if (received != null) {
         ackMode = resolveOverride(config.getConsumerConfig().getAckMode(), ackMode);
-        evaluateMessageAck(ackMode, session, received, config.getSessionManager(), null);
+        evaluateMessageAck(ackMode, session, received, sessionManager, null);
       }
 
       if (LOGGER.isDebugEnabled()) {

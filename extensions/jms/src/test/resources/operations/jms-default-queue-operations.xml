@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="publisher">
-        <jmsn:publish config-ref="config" destination="#[destination]"/>
+        <jms:publish config-ref="config" destination="#[destination]"/>
     </flow>
 
     <flow name="consumer">
-        <jmsn:consume config-ref="config" destination="#[destination]" maximumWait="#[mel:maximumWait]"/>
+        <jms:consume config-ref="config" destination="#[destination]" maximumWait="#[mel:maximumWait]"/>
     </flow>
 
 </mule>
