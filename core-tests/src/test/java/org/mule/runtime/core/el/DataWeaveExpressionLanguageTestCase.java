@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
@@ -38,6 +39,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -48,7 +50,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -58,6 +62,9 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
 
   private DataWeaveExpressionLanguage expressionLanguage =
       new DataWeaveExpressionLanguage(Thread.currentThread().getContextClassLoader());
+
+  @Rule
+  public ExpectedException expectedEx = ExpectedException.none();
 
   @Test
   public void stringExpression() throws Exception {
@@ -87,6 +94,21 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
 
     TypedValue result = expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(sameInstance(error)));
+  }
+
+  @Test
+  public void errorMessageContainsDataweaveExceptionCauseMessage() throws Exception {
+    Error error = mock(Error.class);
+    Optional opt = Optional.of(error);
+    Event event = getEventWithError(opt);
+    doReturn(testEvent().getMessage()).when(event).getMessage();
+    String expressionThatThrowsException = "payload + 'foo'";
+
+    expectedEx.expect(ExpressionRuntimeException.class);
+    expectedEx.expectMessage(containsString("Type mismatch for '+' function"));
+    expectedEx.expectMessage(containsString("evaluating expression: \"" + expressionThatThrowsException));
+
+    expressionLanguage.evaluate(expressionThatThrowsException, event, BindingContext.builder().build());
   }
 
   @Test

@@ -11,6 +11,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -72,7 +73,9 @@ import javax.activation.DataHandler;
 import javax.activation.MimeType;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -98,6 +101,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     this.variant = variant;
     OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
   }
+
+  @Rule
+  public ExpectedException expectedEx = ExpectedException.none();
 
   @Before
   public void setupMVEL() throws InitialisationException {
@@ -400,6 +406,17 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
       assertEquals(ExpressionRuntimeException.class, e.getClass());
       assertEquals(PropertyAccessException.class, e.getCause().getClass());
     }
+  }
+
+  @Test
+  public void expressionExceptionHasMvelCauseMessage() throws InitialisationException {
+    String expressionWhichThrowsError = "doesntExist";
+
+    expectedEx.expect(ExpressionRuntimeException.class);
+    expectedEx.expectMessage(containsString("Error: unresolvable property or identifier: " + expressionWhichThrowsError));
+    expectedEx.expectMessage(containsString("evaluating expression: \"" + expressionWhichThrowsError + "\""));
+
+    evaluate(expressionWhichThrowsError);
   }
 
   @Test
