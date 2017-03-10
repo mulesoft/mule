@@ -147,7 +147,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
 
           // Just add the "classes" folder in order to avoid issues when looking for log4j configuration
           final File classes = new File(artifactRootFolder, "classes");
-          if (!classes.mkdir()) {
+          if (!classes.exists() && !classes.mkdir()) {
             throw new MuleRuntimeException(createStaticMessage("Couldn't create classes folder for temporary application"));
           }
           temporaryArtifactClassLoaderBuilder.addUrl(classes.toURI().toURL());

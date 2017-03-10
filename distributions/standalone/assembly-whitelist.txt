@@ -161,22 +161,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-service-oauth-api-${productVersion}.jar
 
 #
-# /plugins
-#
-/mule-standalone-${productVersion}/plugins
-/mule-standalone-${productVersion}/plugins/mule-module-db-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-file-extension-common-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-validation-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-http-ext-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-oauth-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}-mule-plugin.jar
-
-#
 # /services
 #
 /mule-standalone-${productVersion}/services

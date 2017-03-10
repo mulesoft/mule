@@ -191,7 +191,8 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
     try {
       final ArtifactDescriptorResult artifactDescriptorResult =
           repositoryState.getSystem().readArtifactDescriptor(repositoryState.getSession(),
-                                                             new ArtifactDescriptorRequest(defaultArtifact, null, null));
+                                                             new ArtifactDescriptorRequest(defaultArtifact, null, null)
+                                                                 .setRepositories(collectRemoteRepositories()));
       List<Dependency> dependencies = artifactDescriptorResult.getDependencies();
       List<Dependency> dependenciesWithExclusions = new ArrayList<>();
       dependencies.stream()
