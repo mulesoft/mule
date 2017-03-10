@@ -57,18 +57,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-sockets</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-http-ext</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -113,6 +101,7 @@
             <artifactId>jetty-server</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Dependencies needed for the test runner -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
@@ -132,6 +121,20 @@
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-file-extension-common</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-file</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <classifier>mule-plugin</classifier>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

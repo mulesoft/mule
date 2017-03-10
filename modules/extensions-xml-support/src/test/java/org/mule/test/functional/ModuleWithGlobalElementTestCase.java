@@ -10,18 +10,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.extension.http.api.request.validator.ResponseValidatorException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.io.IOException;
-import java.util.Base64;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -29,6 +17,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mule.extension.http.api.request.validator.ResponseValidatorException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.tck.junit4.rule.DynamicPort;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Base64;
 
 public class ModuleWithGlobalElementTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -87,7 +85,7 @@ public class ModuleWithGlobalElementTestCase extends AbstractXmlExtensionMuleArt
 
   /**
    * Really simple handler for basic authentication where the user and pass, once decoded, must match the path of the request.
-   * For example: "/basic-aith/userLP/passLP" request must have an "Authorization" header with "userLP:passLP" encoded in Base64
+   * For example: "/basic-auth/userLP/passLP" request must have an "Authorization" header with "userLP:passLP" encoded in Base64
    * to return 200, otherwise it will be 401 (unauthorized)
    */
   private class SimpleBasicAuthentication extends AbstractHandler {
