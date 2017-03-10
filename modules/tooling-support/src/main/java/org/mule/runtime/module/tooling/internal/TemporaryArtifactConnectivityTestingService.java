@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.base.Throwables.getCausalChain;
-import static com.google.common.collect.FluentIterable.from;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.component.location.Location;
@@ -54,10 +52,13 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
         } catch (InitialisationException | ConfigurationException e) {
           return failure(e.getMessage(), e);
         } catch (Exception e) {
-          if (from(getCausalChain(e)).filter(instanceOf(ConnectionException.class)).first().isPresent()) {
-            return failure(e.getMessage(), e);
-          }
-          throw new MuleRuntimeException(e);
+          return getCausalChain(e).stream()
+              .filter(exception -> exception.getClass().equals(ConnectionException.class)
+                  && ((ConnectionException) exception).getErrorType().isPresent())
+              .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
+                                        (Exception) exception))
+              .findFirst()
+              .orElse(failure(e.getMessage(), e));
         }
       }
       return temporaryArtifact.getConnectivityTestingService().testConnection(location);
