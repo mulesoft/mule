@@ -194,6 +194,13 @@
             <artifactId>mule-services-all</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
+            <exclusions>
+                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <exclusion>
+                    <artifactId>mule-service-weave</artifactId>
+                    <groupId>org.mule.services</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
