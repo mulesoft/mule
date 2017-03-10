@@ -22,6 +22,7 @@ import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateExcep
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +34,7 @@ import java.util.Optional;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -108,6 +110,23 @@ public class MavenUtils {
     }
     return model;
   }
+
+  /**
+   * Updates the pom file from an artifact.
+   * 
+   * @param artifactFolder the artifact folder
+   * @param model the new pom model
+   */
+  public static void updateArtifactPom(File artifactFolder, Model model) {
+    final File mulePluginPom = lookupPomFromMavenLocation(artifactFolder);
+    MavenXpp3Writer writer = new MavenXpp3Writer();
+    try (FileOutputStream outputStream = new FileOutputStream(mulePluginPom)) {
+      writer.write(outputStream, model);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
 
   private static File lookupPomFromMavenLocation(File artifactFolder) {
     File mulePluginPom = null;

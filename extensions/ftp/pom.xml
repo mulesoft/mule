@@ -26,7 +26,6 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file-extension-common</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-plugin</classifier>
         </dependency>
 
