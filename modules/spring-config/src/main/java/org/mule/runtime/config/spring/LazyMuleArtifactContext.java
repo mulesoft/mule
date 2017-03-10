@@ -119,10 +119,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   @Override
   public void initializeComponent(Location location) {
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
-      if (muleContext.getConfigurationComponentLocator().find(location).isPresent()) {
-        return;
-      }
-
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
 

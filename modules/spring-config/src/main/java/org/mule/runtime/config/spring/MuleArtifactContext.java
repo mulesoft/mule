@@ -483,9 +483,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   public void initializeComponent(Location location) {
-    if (muleContext.getConfigurationComponentLocator().find(location).isPresent()) {
-      return;
-    }
     MinimalApplicationModelGenerator minimalApplicationModelGenerator =
         new MinimalApplicationModelGenerator(this.applicationModel, componentBuildingDefinitionRegistry);
     ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
