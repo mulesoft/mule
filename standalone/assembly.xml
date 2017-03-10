@@ -81,11 +81,6 @@
                 <include>mule-*-src.zip</include>
             </includes>
         </fileSet>
-
-        <fileSet>
-            <directory>${project.build.directory}/plugins</directory>
-            <outputDirectory>plugins</outputDirectory>
-        </fileSet>
     </fileSets>
 
     <!--
