@@ -26,6 +26,7 @@ import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import org.apache.commons.collections.Transformer;
+import reactor.core.publisher.Mono;
 
 /**
  * Provides a fluent API for running events through flows.
@@ -169,13 +170,13 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
     return () -> {
       Event event = getOrBuildEvent();
+      streamingManager.registerEventContext(event.getContext());
       try {
         Event result = flow.process(event);
         event.getContext().success(result);
         return result;
       } catch (Exception e) {
         event.getContext().error(e);
-        streamingManager.error(event);
         throw e;
       }
     };

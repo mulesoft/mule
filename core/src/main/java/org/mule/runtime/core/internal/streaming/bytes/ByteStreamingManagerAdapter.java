@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 
 /**
@@ -39,18 +39,9 @@ public interface ByteStreamingManagerAdapter extends ByteStreamingManager {
   void onClose(CursorStreamAdapter cursor);
 
   /**
-   * Invoked when the given {@code event} was successfully processed. The manager will determine
-   * is such event had any streaming resources allocated and if they're ready to be reclaimed.
+   * Register an {@link EventContext} so that the streaming manager can react to event context completion and clean up resources.
    *
-   * @param event the event which was successfully terminated
+   * @param eventContext event context to be registered
    */
-  void success(Event event);
-
-  /**
-   * Invoked when the given {@code event} was successfully processed. The manager will determine
-   * is such event had any streaming resources allocated and if they're ready to be reclaimed.
-   *
-   * @param event the event which was successfully terminated
-   */
-  void error(Event event);
+  void registerEventContext(EventContext eventContext);
 }

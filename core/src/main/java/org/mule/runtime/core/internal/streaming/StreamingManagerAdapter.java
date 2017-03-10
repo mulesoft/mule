@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.streaming.StreamingManager;
 
 /**
@@ -17,16 +17,12 @@ import org.mule.runtime.core.streaming.StreamingManager;
  */
 public interface StreamingManagerAdapter extends StreamingManager {
 
-  /**
-   * Invoked when the given {@code event} has been successfully completed
-   * @param event a completed {@link Event}
-   */
-  void success(Event event);
 
   /**
-   * Invoked when the given {@code event} has been completed in error
-   * @param event a completed {@link Event}
+   * Register an {@link EventContext} so that the streaming manager can react to event context completion and clean up resources.
+   *
+   * @param eventContext event context to be registered
    */
-  void error(Event event);
+  void registerEventContext(EventContext eventContext);
 
 }

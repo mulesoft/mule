@@ -91,6 +91,7 @@ public class ModuleFlowProcessingPhase
 
 
       Event templateEvent = createEvent(template, messageProcessContext, sourceIdentifier);
+      streamingManager.registerEventContext(templateEvent.getContext());
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
@@ -109,16 +110,6 @@ public class ModuleFlowProcessingPhase
             .doOnError(MessagingException.class, errorConsumer)
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                        throwable -> LOGGER.error("Unhandled exception processing request" + throwable))
-            .doAfterTerminate((event, e) -> {
-              if (event == null) {
-                event = eventReference.get();
-              }
-              if (e != null) {
-                streamingManager.error(event);
-              } else {
-                streamingManager.success(event);
-              }
-            })
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);

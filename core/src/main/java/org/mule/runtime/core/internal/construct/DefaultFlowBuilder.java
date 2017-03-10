@@ -203,16 +203,13 @@ public class DefaultFlowBuilder implements Builder {
             createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
         Event result = executionTemplate.execute(() -> pipeline.process(newEvent));
         newEvent.getContext().success(result);
-        streamingManager.success(result);
         return createReturnEventForParentFlowConstruct(result, event);
       } catch (MessagingException e) {
         e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
         newEvent.getContext().error(e);
-        streamingManager.error(newEvent);
         throw e;
       } catch (Exception e) {
         newEvent.getContext().error(e);
-        streamingManager.error(newEvent);
         resetRequestContextEvent(event);
         throw new DefaultMuleException(CoreMessages.createStaticMessage("Flow execution exception"), e);
       }
@@ -228,15 +225,13 @@ public class DefaultFlowBuilder implements Builder {
             } else {
               Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
               sink.accept(request);
-              return Mono.from(request.getContext())
+              return Mono.from(request.getContext().getResponsePublisher())
                   .map(r -> {
                     Event result = createReturnEventForParentFlowConstruct(r, event);
-                    streamingManager.success(result);
                     return result;
                   })
                   .mapError(MessagingException.class, me -> {
                     me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
-                    streamingManager.error(event);
                     return me;
                   })
                   .otherwiseIfEmpty(fromCallable(() -> {

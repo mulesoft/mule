@@ -262,7 +262,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return from(publisher)
                 .doOnNext(assertStarted())
                 .doOnNext(event -> sink.accept(event))
-                .flatMap(event -> Mono.from(event.getContext()));
+                .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
           }
         }
       });
@@ -280,34 +280,21 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(this, pipeline))
-        .doOnNext(response -> {
-          response.getContext().success(response);
-          streamingManager.success(response);
-        })
+        .doOnNext(response -> response.getContext().success(response))
         .doOnError(MessagingException.class, handleError())
-        .doOnError(EventDroppedException.class, ede -> {
-          ede.getEvent().getContext().success();
-          streamingManager.error(ede.getEvent());
-        })
+        .doOnError(EventDroppedException.class, ede -> ede.getEvent().getContext().success())
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                    throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
   }
 
   private Consumer<MessagingException> handleError() {
     if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof SchedulerMessageSource) {
-      return me -> {
-        me.getEvent().getContext().error(me);
-        streamingManager.error(me.getEvent());
-      };
+      return me -> me.getEvent().getContext().error(me);
     } else {
       return me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
-          .doOnNext(event -> {
-            event.getContext().success(event);
-            streamingManager.success(event);
-          })
+          .doOnNext(event -> event.getContext().success(event))
           .doOnError(throwable -> {
             me.getEvent().getContext().error(throwable);
-            streamingManager.error(me.getEvent());
           })
           .subscribe();
     }

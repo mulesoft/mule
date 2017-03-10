@@ -11,10 +11,11 @@ import static org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamin
 import static org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager.Status.NORMAL;
 import static org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager.Status.SURVIVOR;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.CursorStream;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
@@ -145,35 +146,20 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void success(Event event) {
-    terminated(event, false);
+  public void registerEventContext(EventContext eventContext) {
+    from(eventContext.getCompletionPublisher()).doFinally(signal -> terminated(eventContext)).subscribe();
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void error(Event event) {
-    terminated(event, true);
-  }
-
-  private void terminated(Event event, boolean error) {
-    if (!event.getContext().isStreaming()) {
+  private void terminated(EventContext rootContext) {
+    if (!rootContext.isStreaming()) {
       return;
     }
-
-    EventContext rootContext = getRoot(event.getContext());
-    if (rootContext.isTerminated()) {
-      EventStreamingState state = registry.getIfPresent(rootContext.getId());
-      if (state != null) {
-        if (state.terminate(error) == DISPOSABLE) {
-          state.dispose();
-          registry.invalidate(rootContext.getId());
-        }
+    EventStreamingState state = registry.getIfPresent(rootContext.getId());
+    if (state != null) {
+      if (state.terminate() == DISPOSABLE) {
+        state.dispose();
+        registry.invalidate(rootContext.getId());
       }
     }
   }
@@ -188,16 +174,9 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
         .orElse(eventContext.getId());
   }
 
-  private EventContext getRoot(EventContext eventContext) {
-    return eventContext.getParentContext()
-        .map(this::getRoot)
-        .orElse(eventContext);
-  }
-
   enum Status {
     NORMAL, SURVIVOR, DISPOSABLE
   }
-
 
   private class EventStreamingState {
 
@@ -217,29 +196,20 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
       cursors.getUnchecked(adapter);
     }
 
-    private Status terminate(boolean error) {
+    private Status terminate() {
       if (cursors.size() == 0) {
         status = DISPOSABLE;
       } else {
         boolean allCursorsClosed = true;
-        if (error) {
-          cursors.asMap().forEach((provider, cursors) -> {
-            closeProvider(provider);
-            closeAll(cursors);
-          });
-        } else {
-          for (Map.Entry<CursorStreamProviderAdapter, List<CursorStreamAdapter>> entry : cursors.asMap().entrySet()) {
-            closeProvider(entry.getKey());
-            final List<CursorStreamAdapter> cursors = entry.getValue();
-            if (!cursors.isEmpty()) {
-              allCursorsClosed = allCursorsClosed && cursors.stream().allMatch(CursorStream::isClosed);
-            }
+        for (Map.Entry<CursorStreamProviderAdapter, List<CursorStreamAdapter>> entry : cursors.asMap().entrySet()) {
+          closeProvider(entry.getKey());
+          final List<CursorStreamAdapter> cursors = entry.getValue();
+          if (!cursors.isEmpty()) {
+            allCursorsClosed = allCursorsClosed && cursors.stream().allMatch(CursorStream::isClosed);
           }
         }
-
         status = allCursorsClosed ? DISPOSABLE : SURVIVOR;
       }
-
       return status;
     }
 

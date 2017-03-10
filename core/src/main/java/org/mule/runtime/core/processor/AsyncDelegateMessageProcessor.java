@@ -24,7 +24,9 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -130,7 +132,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Event updateEventForAsync(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    Event newEvent = Event.builder(event).replyToHandler(null).build();
+    Event newEvent = Event.builder(DefaultEventContext.child(event.getContext()), event).replyToHandler(null).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(newEvent);
     return newEvent;

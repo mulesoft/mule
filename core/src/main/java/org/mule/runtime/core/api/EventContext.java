@@ -26,7 +26,7 @@ import org.reactivestreams.Publisher;
  * @see Event
  * @since 4.0
  */
-public interface EventContext extends Publisher<Event> {
+public interface EventContext {
 
   /**
    * Unique time-based id (UUID) for this {@link EventContext}.
@@ -121,11 +121,6 @@ public interface EventContext extends Publisher<Event> {
   Optional<EventContext> getParentContext();
 
   /**
-   * @return Whether {@code this} context and all its childs have been completed
-   */
-  boolean isTerminated();
-
-  /**
    * Indicates that the owning {@link Event} is involved in at least one streaming operation
    */
   void streaming();
@@ -134,4 +129,8 @@ public interface EventContext extends Publisher<Event> {
    * @return Whether {@code this} context or any of its childs is taking part in a streaming operation
    */
   boolean isStreaming();
+
+  Publisher<Event> getResponsePublisher();
+
+  Publisher<Void> getCompletionPublisher();
 }

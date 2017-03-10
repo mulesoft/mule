@@ -12,6 +12,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
@@ -67,19 +68,9 @@ public class DefaultStreamingManager implements StreamingManagerAdapter, Initial
     return byteStreamingManager;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void success(Event event) {
-    byteStreamingManager.success(event);
+  public void registerEventContext(EventContext eventContext) {
+    byteStreamingManager.registerEventContext(eventContext);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void error(Event event) {
-    byteStreamingManager.error(event);
-  }
 }

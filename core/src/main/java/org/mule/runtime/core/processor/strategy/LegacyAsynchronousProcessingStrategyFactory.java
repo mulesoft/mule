@@ -98,6 +98,8 @@ public class LegacyAsynchronousProcessingStrategyFactory implements ProcessingSt
               .onErrorResumeWith(EventDroppedException.class, mde -> empty())
               .doOnError(UNEXPECTED_EXCEPTION_PREDICATE, exception -> LOGGER.error("Unhandled exception in async processing.",
                                                                                    exception))
+              .doOnNext(event -> request.getContext().success(event))
+              .doOnError(throwable -> request.getContext().error(throwable))
               .subscribe());
     }
 

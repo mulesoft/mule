@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -26,10 +27,8 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-11881")
 public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
@@ -92,7 +91,6 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   public void seek() throws Exception {
     doSeek("seekStream");
   }
-
 
   @Test
   public void rewind() throws Exception {
