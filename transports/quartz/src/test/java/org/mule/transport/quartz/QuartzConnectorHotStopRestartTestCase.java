@@ -29,7 +29,7 @@ public class QuartzConnectorHotStopRestartTestCase extends FunctionalTestCase
     public void testStopRestartConnectorShouldPauseAndRestartJob() throws Exception
     {
         QuartzConnector connector = muleContext.getRegistry().lookupObject(QUARTZ_CONNECTOR_NAME);
-        QuartzMessageReceiver receiver = (QuartzMessageReceiver) connector.getReceivers().get("quartz://QuartzJob");
+        QuartzMessageReceiver receiver = (QuartzMessageReceiver) connector.getReceivers().get("endpoint.quartz.QuartzJob");
 
         // Initially the scheduler must be started
         assertThat(FALSE, equalTo(connector.getQuartzScheduler().isShutdown()));
