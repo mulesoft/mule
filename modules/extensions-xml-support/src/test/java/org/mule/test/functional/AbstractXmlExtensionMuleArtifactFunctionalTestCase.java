@@ -29,7 +29,10 @@ import java.util.Map;
  * @since 4.0
  */
 @ArtifactClassLoaderRunnerConfig(
-    plugins = {"org.mule.modules:mule-module-http-ext", "org.mule.modules:mule-module-sockets"},
+    plugins = {"org.mule.modules:mule-module-http-ext",
+        "org.mule.modules:mule-module-sockets",
+        "org.mule.modules:mule-module-file",
+        "org.mule.modules:mule-module-file-extension-common"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
@@ -54,7 +57,6 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
         extensionManager = (DefaultExtensionManager) muleContext.getExtensionManager();
         initialiseIfNeeded(extensionManager, muleContext);
 
-        ClassLoader pluginClassLoader = getClass().getClassLoader();
         Map<String, Object> params = new HashMap<>();
         params.put(XmlExtensionModelLoader.RESOURCE_XML, getModulePath());
 

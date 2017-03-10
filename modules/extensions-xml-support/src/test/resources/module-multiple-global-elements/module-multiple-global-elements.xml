@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-multiple-global-elements"
+        minMuleVersion="4.0.0"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:file="http://www.mulesoft.org/schema/mule/file"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <property name="workingDir" type="string"/>
+    <property name="filenamePattern" type="string"/>
+
+    <file:config name="file">
+        <file:connection workingDir="#[property.workingDir]" />
+    </file:config>
+    <file:matcher name="globalMatcher" directory="true" filenamePattern="#[property.filenamePattern]" />
+
+    <operation name="list">
+        <parameters>
+            <parameter name="path" type="string"/>
+        </parameters>
+        <body>
+            <!-- TODO MULE-11946: appending "-configPatternA" until the MacroExpansionModuleModel it's smarter enough to also replace the matchWith attribute with the expanded configuration's name. The matchWith's value should be globalMatcher and not globalMatcher-configPatternA -->
+            <file:list directoryPath="#[param.path]" config-ref="file" matchWith="globalMatcher-configPatternA"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

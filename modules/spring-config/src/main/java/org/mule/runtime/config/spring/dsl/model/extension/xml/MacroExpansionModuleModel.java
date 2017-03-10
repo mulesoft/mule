@@ -140,7 +140,7 @@ public class MacroExpansionModuleModel {
 
   private void createConfigRefEffectiveModel(Map<String, ExtensionModel> extensionManager) {
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
-      HashMap<Integer, List<ComponentModel>> componentModelsToReplaceByIndex = new HashMap<>();
+      HashMap<ComponentModel, List<ComponentModel>> componentModelsToReplaceByIndex = new HashMap<>();
 
       for (int i = 0; i < componentModel.getInnerComponents().size(); i++) {
         ComponentModel configRefModel = componentModel.getInnerComponents().get(i);
@@ -149,12 +149,13 @@ public class MacroExpansionModuleModel {
         if (extensionModel != null) {
           List<ComponentModel> replacementGlobalElements =
               createGlobalElementsInstance(configRefModel, extensionModel);
-          componentModelsToReplaceByIndex.put(i, replacementGlobalElements);
+          componentModelsToReplaceByIndex.put(configRefModel, replacementGlobalElements);
         }
       }
-      for (Map.Entry<Integer, List<ComponentModel>> entry : componentModelsToReplaceByIndex.entrySet()) {
-        componentModel.getInnerComponents().addAll(entry.getKey(), entry.getValue());
-        componentModel.getInnerComponents().remove(entry.getKey() + entry.getValue().size());
+      for (Map.Entry<ComponentModel, List<ComponentModel>> entry : componentModelsToReplaceByIndex.entrySet()) {
+        final int componentModelIndex = componentModel.getInnerComponents().indexOf(entry.getKey());
+        componentModel.getInnerComponents().addAll(componentModelIndex, entry.getValue());
+        componentModel.getInnerComponents().remove(componentModelIndex + entry.getValue().size());
       }
     });
   }
@@ -220,8 +221,8 @@ public class MacroExpansionModuleModel {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
     }
     ComponentModel processorChainModel = processorChainBuilder.build();
-    for (ComponentModel processoChainModelChild : processorChainModel.getInnerComponents()) {
-      processoChainModelChild.setParent(processorChainModel);
+    for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
+      processorChainModelChild.setParent(processorChainModel);
     }
     return processorChainModel;
   }
