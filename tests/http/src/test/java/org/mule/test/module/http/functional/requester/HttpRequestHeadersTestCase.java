@@ -66,7 +66,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
     assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
   }
 
-  @Ignore("Setting a headers expression and single elements is not currently supported: Builders meant to be replaced by DW.")
+  @Ignore("MULE-11606: Support a way to have DW handle multimaps")
   @Test
   public void overridesHeaders() throws Exception {
     Map<String, String> params = new HashMap<>();

@@ -20,13 +20,13 @@
 
     <flow name="queryParamMap">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:query-params>#[mel:params]</httpn:query-params>
+            <httpn:query-params>#[params]</httpn:query-params>
         </httpn:request>
     </flow>
 
     <flow name="multipleQueryParam">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:query-params>#[mel:params]</httpn:query-params>
+            <httpn:query-params>#[params ++ {'testName1':'testValue1'}]</httpn:query-params>
         </httpn:request>
     </flow>
 
