@@ -13,6 +13,7 @@
         <scheduler>
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
         </scheduler>
+        <set-payload value="testString"/>
         <component class="org.mule.test.modules.schedulers.cron.StoppedCronSchedulerTestCase$FooComponent"/>
     </flow>
 </mule>

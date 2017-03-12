@@ -14,7 +14,7 @@
         <scheduler>
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
         </scheduler>
-        <logger message="Logger started"/>
+        <set-payload value="testString"/>
         <component class="org.mule.test.modules.schedulers.cron.SynchronousSchedulerTestCase$FooComponent"/>
     </flow>
 

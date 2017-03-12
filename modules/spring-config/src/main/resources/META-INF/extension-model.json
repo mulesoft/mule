@@ -1943,7 +1943,7 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler",
+                  "typeId": "org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler",
                   "classInformation": {
                     "hasDefaultConstructor": true,
                     "isInterface": false,

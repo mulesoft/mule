@@ -152,7 +152,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).getIdentifier(),
-               is(buildFromStringRepresentation("mule:poll")));
+               is(buildFromStringRepresentation("mule:scheduler")));
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).isEnabled(), is(true));
   }
 
