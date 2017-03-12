@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -531,7 +530,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
   public void testPollFlowRef() throws Exception {
     InternalMessage message = muleContext.getClient().request("test://poll2-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    assertEquals("pollappendout", getPayloadAsString(message));
+    assertEquals("nullpollappendout", getPayloadAsString(message));
   }
 
   @Test
@@ -552,19 +551,6 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
         .build());
     assertEquals("abcd", result.getMessageAsString(muleContext));
   }
-
-  @Test
-  public void testCustomMessageSourceInComposite() throws Exception {
-    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("customMessageSourceInComposite");
-    CompositeMessageSource compositeSource = (CompositeMessageSource) flow.getMessageSource();
-    TestMessageSource source = (TestMessageSource) compositeSource.getSources().get(0);
-
-    Event result = source.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of("a"))
-        .build());
-    assertEquals("abcd", result.getMessageAsString(muleContext));
-  }
-
 
   public static class TestMessageSource implements MessageSource {
 

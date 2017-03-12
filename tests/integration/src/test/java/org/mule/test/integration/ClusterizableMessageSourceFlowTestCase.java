@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.connector.PollingController;
+import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
@@ -41,8 +41,8 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
 
   @Test
   public void doesNotStartsWhenSecondaryNode() throws Exception {
-    TestPollingController pollingController = new TestPollingController();
-    ((DefaultMuleContext) muleContext).setPollingController(pollingController);
+    TestSchedulerController pollingController = new TestSchedulerController();
+    ((DefaultMuleContext) muleContext).setSchedulerController(pollingController);
     muleContext.start();
 
     Flow test1 = muleContext.getRegistry().get("test1");
@@ -53,8 +53,8 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
 
   @Test
   public void startsWhenNodeBecomePrimary() throws Exception {
-    TestPollingController pollingController = new TestPollingController();
-    ((DefaultMuleContext) muleContext).setPollingController(pollingController);
+    TestSchedulerController pollingController = new TestSchedulerController();
+    ((DefaultMuleContext) muleContext).setSchedulerController(pollingController);
 
     muleContext.start();
 
@@ -71,12 +71,12 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     assertEquals("TEST", response.getPayload().getValue());
   }
 
-  private class TestPollingController implements PollingController {
+  private class TestSchedulerController implements SchedulerController {
 
     boolean isPrimary;
 
     @Override
-    public boolean isPrimaryPollingInstance() {
+    public boolean isPrimarySchedulingInstance() {
       return isPrimary;
     }
   }

@@ -6,10 +6,8 @@
       http://www.mulesoft.org/schema/mule/simple http://www.mulesoft.org/schema/mule/simple/current/mule-simple.xsd">
 
     <flow name="main">
-        <poll frequency="10000">
-            <set-payload value=""/>
-        </poll>
-
+        <scheduler frequency="10000"/>
+        <set-payload value=""/>
         <simple:print-message/>
         <echo-component/>
     </flow>

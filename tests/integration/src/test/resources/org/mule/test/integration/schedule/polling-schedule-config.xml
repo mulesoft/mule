@@ -12,30 +12,29 @@
     </flow>
 
     <flow name="pollfoo">
-        <poll doc:name="watermark">
+        <scheduler doc:name="watermark">
             <fixed-frequency-scheduler frequency="${frequency.millis}"/>
-            <flow-ref name="echo"/>
-        </poll>
+        </scheduler>
+        <flow-ref name="echo"/>
         <component class="org.mule.test.integration.schedule.PollScheduleTestCase$FooComponent"/>
     </flow>
 
     <flow name="pollbar" processingStrategy="synchronous">
-        <poll frequency="1000" >
-            <static-component>
-                <return-data>bar</return-data>
-            </static-component>
-        </poll>
+        <scheduler frequency="1000"/>
+        <static-component>
+            <return-data>bar</return-data>
+        </static-component>
         <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
     </flow>
 
     <flow name="pollbarNever">
-        <poll>
+        <scheduler>
             <!-- Will not run unless my test takes 200 days -->
             <fixed-frequency-scheduler frequency="${frequency.days}" timeUnit="DAYS" startDelay="200"/>
-            <static-component>
-                <return-data>barNever</return-data>
-            </static-component>
-        </poll>
+        </scheduler>
+        <static-component>
+            <return-data>barNever</return-data>
+        </static-component>
         <component class="org.mule.test.integration.schedule.PollScheduleTestCase$BarComponent" />
     </flow>
 </mule>

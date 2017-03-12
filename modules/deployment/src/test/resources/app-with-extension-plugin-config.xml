@@ -8,10 +8,8 @@
     <hello:config name="default" message="Hello from app!!!"/>
 
     <flow name="main">
-        <poll frequency="1000">
-            <set-payload value=""/>
-        </poll>
-
+        <scheduler frequency="1000"/>
+        <set-payload value=""/>
         <hello:print-message/>
     </flow>
 </mule>

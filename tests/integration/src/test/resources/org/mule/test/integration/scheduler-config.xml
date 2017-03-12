@@ -11,38 +11,37 @@
     </flow>
 
     <flow name="pollfoo" processingStrategy="asynchronous">
-        <poll>
+        <scheduler>
             <fixed-frequency-scheduler frequency="1000" timeUnit="MILLISECONDS"/>
-            <flow-ref name="echo"/>
-        </poll>
-        <component class="org.mule.test.integration.PollingTestCase$FooComponent"/>
+        </scheduler>
+        <flow-ref name="echo"/>
+        <component class="org.mule.test.integration.SchedulerTestCase$FooComponent"/>
     </flow>
 
     <flow name="pollbar" processingStrategy="synchronous">
-        <poll frequency="1000">
-            <static-component>
-                <return-data>bar</return-data>
-            </static-component>
-        </poll>
-        <component class="org.mule.test.integration.PollingTestCase$BarComponent" />
+        <scheduler frequency="1000"/>
+        <static-component>
+            <return-data>bar</return-data>
+        </static-component>
+        <component class="org.mule.test.integration.SchedulerTestCase$BarComponent" />
     </flow>
 
     <flow name="pollbarNever">
-        <poll>
+        <scheduler>
             <!-- Will not run unless my test takes 200 days -->
             <fixed-frequency-scheduler frequency="4" timeUnit="DAYS" startDelay="200"/>
-            <static-component>
-                <return-data>barNever</return-data>
-            </static-component>
-        </poll>
-        <component class="org.mule.test.integration.PollingTestCase$BarComponent" />
+        </scheduler>
+        <static-component>
+            <return-data>barNever</return-data>
+        </static-component>
+        <component class="org.mule.test.integration.SchedulerTestCase$BarComponent" />
     </flow>
 
     <flow name="pollWithRequestContextEvent">
-        <poll>
+        <scheduler>
             <fixed-frequency-scheduler frequency="1000" />
-            <custom-processor class="org.mule.test.integration.PollingTestCase$EventWireTrap" />
-        </poll>
+        </scheduler>
+        <custom-processor class="org.mule.test.integration.SchedulerTestCase$EventWireTrap" />
         <logger message="hello" />
     </flow>
 

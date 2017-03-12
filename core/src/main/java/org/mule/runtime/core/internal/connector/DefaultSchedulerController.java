@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.internal.connector;
 
-import org.mule.runtime.core.api.connector.PollingController;
+import org.mule.runtime.core.api.connector.SchedulerController;
 
 /**
- * By default, polling is alwaus enabled.
+ * By default, scheduler is always enabled.
  */
-public class DefaultPollingController implements PollingController {
+public class DefaultSchedulerController implements SchedulerController {
 
   @Override
-  public boolean isPrimaryPollingInstance() {
+  public boolean isPrimarySchedulingInstance() {
     return true;
   }
 }

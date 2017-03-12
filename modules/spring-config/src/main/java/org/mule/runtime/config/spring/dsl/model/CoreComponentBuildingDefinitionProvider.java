@@ -77,11 +77,10 @@ import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
+import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.factories.streaming.FileStoreCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
@@ -111,7 +110,6 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
@@ -170,10 +168,9 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
-import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
-import org.mule.runtime.core.source.polling.PollingMessageSource;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
-import org.mule.runtime.core.source.polling.watermark.Watermark;
+import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.transaction.TransactionType;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
@@ -260,7 +257,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String CHOICE = "choice";
   private static final String OTHERWISE = "otherwise";
   private static final String ALL = "all";
-  private static final String POLL = "poll";
+  private static final String SCHEDULER = "scheduler";
   private static final String REQUEST_REPLY = "request-reply";
   private static final String ERROR_TYPE_MATCHER = "errorTypeMatcher";
   private static final String TYPE = "type";
@@ -559,11 +556,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(POLL)
-        .withTypeDefinition(fromType(PollingMessageSource.class)).withObjectFactoryType(PollingMessageSourceFactoryBean.class)
-        .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SCHEDULER)
+        .withTypeDefinition(fromType(SchedulerMessageSource.class))
+        .withObjectFactoryType(SchedulingMessageSourceFactoryBean.class)
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
-        .withSetterParameterDefinition("override", fromChildConfiguration(MessageProcessorPollingOverride.class).build())
         .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class).build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("fixed-frequency-scheduler")
@@ -571,14 +567,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("watermark")
-        .withSetterParameterDefinition("variable", fromSimpleParameter("variable").build())
-        .withSetterParameterDefinition("defaultExpression", fromSimpleParameter("default-expression").build())
-        .withSetterParameterDefinition("updateExpression", fromSimpleParameter("update-expression").build())
-        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
-        .withSetterParameterDefinition("selector", fromSimpleParameter("selector").build())
-        .withSetterParameterDefinition("selectorExpression", fromSimpleParameter("selector-expression").build())
-        .withTypeDefinition(fromType(Watermark.class)).withObjectFactoryType(WatermarkFactoryBean.class).build());
 
     ComponentBuildingDefinition.Builder baseReconnectDefinition = baseDefinition.copy()
         .withTypeDefinition(fromType(RetryPolicyTemplate.class)).withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)

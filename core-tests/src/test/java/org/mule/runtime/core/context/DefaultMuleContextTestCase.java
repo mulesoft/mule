@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.api.connector.PollingController;
+import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
@@ -167,7 +167,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void overriddenMulePollingController() throws Exception {
     createMuleContext();
-    context.getRegistry().registerObject(OBJECT_POLLING_CONTROLLER, (PollingController) () -> false);
+    context.getRegistry().registerObject(OBJECT_POLLING_CONTROLLER, (SchedulerController) () -> false);
     context.start();
     assertThat(context.isPrimaryPollingInstance(), is(false));
   }

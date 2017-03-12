@@ -11,10 +11,10 @@
 
 
     <flow name="pollfoo" processingStrategy="synchronous">
-        <poll>
+        <scheduler>
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
-            <logger message="Logger started"/>
-        </poll>
+        </scheduler>
+        <logger message="Logger started"/>
         <component class="org.mule.test.modules.schedulers.cron.SynchronousSchedulerTestCase$FooComponent"/>
     </flow>
 

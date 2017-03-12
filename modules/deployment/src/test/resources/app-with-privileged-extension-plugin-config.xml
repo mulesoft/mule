@@ -8,10 +8,8 @@
     <privileged:config name="default" message="Privileged plugin!!!"/>
 
     <flow name="main">
-        <poll frequency="1000">
-            <set-payload value=""/>
-        </poll>
-
+        <scheduler frequency="1000"/>
+        <set-payload value=""/>
         <privileged:print-message/>
     </flow>
 </mule>

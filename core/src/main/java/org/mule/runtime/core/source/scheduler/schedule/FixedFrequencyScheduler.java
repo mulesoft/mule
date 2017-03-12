@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.source.polling.schedule;
+package org.mule.runtime.core.source.scheduler.schedule;
 
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
- *
- * @since 3.5.0, moved from {@link org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory}.
  */
 public class FixedFrequencyScheduler extends PeriodicScheduler {
 

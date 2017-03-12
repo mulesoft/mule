@@ -51,7 +51,7 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor.LogLevel;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.routing.AggregationStrategy;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

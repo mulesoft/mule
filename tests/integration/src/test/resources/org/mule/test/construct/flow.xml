@@ -337,17 +337,16 @@
     </flow>
 
     <flow name="poll">
-        <poll frequency="3000">
-            <append-string-transformer message=" Hello foo" />
-        </poll>
+        <scheduler frequency="3000"/>
+        <set-payload value="#['']"/>
+        <append-string-transformer message=" Hello foo" />
         <append-string-transformer message="out" />
         <test:queue name="poll-out"/>
     </flow>
 
     <flow name="poll2">
-        <poll frequency="3000">
-            <flow-ref name="pollappend"/>
-        </poll>
+        <scheduler frequency="3000"/>
+        <flow-ref name="pollappend"/>
         <append-string-transformer message="out" />
         <test:queue name="poll2-out"/>
     </flow>
@@ -381,19 +380,5 @@
         </custom-source>
         <append-string-transformer message="c" />
     </flow>
-
-   <flow name="customMessageSourceInComposite">
-        <composite-source>
-            <custom-source class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$TestMessageSource">
-                <spring:property name="appendBefore" value="b"/>
-                <spring:property name="appendAfter" value="d"/>
-            </custom-source>
-            <poll>
-                <flow-ref name="pollappend"/>
-            </poll>        
-        </composite-source>
-        <append-string-transformer message="c" />
-    </flow>
-
 
 </mule>

@@ -14,12 +14,11 @@ import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBe
 import org.mule.runtime.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.FileQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
-import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
+import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -162,7 +161,7 @@ import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
@@ -402,13 +401,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("composite-source",
                                  new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
 
-    registerBeanDefinitionParser("poll", new ChildEmbeddedDefinitionParser(PollingMessageSourceFactoryBean.class));
+    registerBeanDefinitionParser("scheduler", new ChildEmbeddedDefinitionParser(SchedulingMessageSourceFactoryBean.class));
     registerBeanDefinitionParser("fixed-frequency-scheduler",
                                  new ChildDefinitionParser("scheduler", FixedFrequencyScheduler.class));
 
-
-    // Poll overrides
-    registerBeanDefinitionParser("watermark", new ChildDefinitionParser("override", WatermarkFactoryBean.class));
 
     registerBeanDefinitionParser("entry-point-resolver-set",
                                  new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));

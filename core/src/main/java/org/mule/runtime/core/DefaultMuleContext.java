@@ -60,7 +60,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.ConnectException;
-import org.mule.runtime.core.api.connector.PollingController;
+import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
@@ -101,7 +101,7 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
-import org.mule.runtime.core.internal.connector.DefaultPollingController;
+import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
@@ -200,7 +200,7 @@ public class DefaultMuleContext implements MuleContext {
    */
   protected SystemExceptionHandler exceptionListener;
 
-  private PollingController pollingController = new DefaultPollingController();
+  private SchedulerController schedulerController = new DefaultSchedulerController();
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
 
@@ -833,13 +833,13 @@ public class DefaultMuleContext implements MuleContext {
     return clusterConfiguration.getClusterNodeId();
   }
 
-  public void setPollingController(PollingController pollingController) {
-    this.pollingController = pollingController;
+  public void setSchedulerController(SchedulerController schedulerController) {
+    this.schedulerController = schedulerController;
   }
 
   @Override
   public boolean isPrimaryPollingInstance() {
-    return pollingController.isPrimaryPollingInstance();
+    return schedulerController.isPrimarySchedulingInstance();
   }
 
   @Override
@@ -934,9 +934,9 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   private void overridePollingController() {
-    PollingController overriddenPollingController = getRegistry().get(OBJECT_POLLING_CONTROLLER);
-    if (overriddenPollingController != null) {
-      this.pollingController = overriddenPollingController;
+    SchedulerController overriddenSchedulerController = getRegistry().get(OBJECT_POLLING_CONTROLLER);
+    if (overriddenSchedulerController != null) {
+      this.schedulerController = overriddenSchedulerController;
     }
   }
 
