@@ -9,7 +9,6 @@ package org.mule.runtime.core;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -18,13 +17,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.util.SerializationUtils;
-import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,11 +40,11 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext parent = create(getTestFlow(muleContext), "");
 
     Event event = testEvent();
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionNotDone(parent);
     parent.success(event);
 
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponse(parent, event);
+    assertCompletionDone(parent);
   }
 
   @Test
@@ -62,7 +55,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     parent.success();
 
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
+    assertNullResponse(parent);
     assertThat(from(parent.getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
   }
 
@@ -73,12 +66,12 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext parent = create(getTestFlow(muleContext), "");
 
     RuntimeException exception = new RuntimeException();
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionNotDone(parent);
     parent.error(exception);
 
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertCompletionDone(parent);
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
+    assertResponseNotDone(parent);
 
     expectedException.expect(is(exception));
     from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
@@ -95,15 +88,15 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     child.success(event);
 
-    assertThat(from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponse(child, event);
+    assertCompletionDone(child);
     // Child completion does not complete parent
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionNotDone(parent);
 
     parent.success(event);
 
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponse(parent, event);
+    assertCompletionDone(parent);
   }
 
   @Test
@@ -116,18 +109,18 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     Event event = testEvent();
     parent.success(event);
 
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
+    assertResponse(parent, event);
     // Parent context does not complete because it still has uncompleted children
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionNotDone(parent);
+    assertCompletionNotDone(child);
 
     child.success(event);
 
-    assertThat(from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponse(child, event);
+    assertCompletionDone(child);
 
     // Now child contexts are complete, parent completes
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertCompletionDone(parent);
   }
 
   @Test
@@ -140,11 +133,11 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     child.success();
     parent.success();
 
-    assertThat(from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertNullResponse(child);
+    assertCompletionDone(child);
 
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertNullResponse(parent);
+    assertCompletionDone(parent);
   }
 
   @Test
@@ -156,16 +149,16 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     parent.success();
 
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertNullResponse(parent);
+    assertCompletionNotDone(parent);
+    assertCompletionNotDone(child);
 
     child.success();
 
-    assertThat(from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
+    assertNullResponse(child);
 
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertCompletionDone(child);
+    assertCompletionDone(parent);
   }
 
   @Test
@@ -179,11 +172,11 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     child.error(exception);
     parent.error(exception);
 
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponseNotDone(child);
+    assertCompletionDone(child);
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponseNotDone(parent);
+    assertCompletionDone(parent);
 
   }
 
@@ -197,14 +190,14 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     RuntimeException exception = new RuntimeException();
     parent.error(exception);
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertResponseNotDone(parent);
+    assertCompletionNotDone(parent);
+    assertCompletionNotDone(child);
 
     child.error(exception);
 
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertCompletionDone(parent);
+    assertCompletionDone(parent);
 
     expectedException.expect(is(exception));
     from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
@@ -229,12 +222,12 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
       parent.success(event);
 
-      assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
-      assertThat(from(child1.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
-      assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(true));
+      assertCompletionNotDone(child1);
+      assertResponse(child1, event);
+      assertCompletionDone(child1);
 
-      assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
-      assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(true));
+      assertResponse(parent, event);
+      assertCompletionDone(child1);
     } finally {
       testScheduler.shutdown();
     }
@@ -248,39 +241,39 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext child = DefaultEventContext.child(parent);
     EventContext grandchild = DefaultEventContext.child(child);
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertResponseDone(parent);
+    assertCompletionNotDone(parent);
+    assertResponseDone(child);
+    assertCompletionNotDone(child);
+    assertResponseDone(grandchild);
+    assertCompletionNotDone(grandchild);
 
     grandchild.success();
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponseDone(parent);
+    assertCompletionNotDone(parent);
+    assertResponseDone(child);
+    assertCompletionNotDone(child);
+    assertResponseNotDone(grandchild);
+    assertCompletionDone(grandchild);
 
     child.success();
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponseDone(parent);
+    assertCompletionNotDone(parent);
+    assertResponseNotDone(child);
+    assertCompletionDone(child);
+    assertResponseNotDone(grandchild);
+    assertCompletionDone(grandchild);
 
     parent.success();
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponseNotDone(parent);
+    assertCompletionDone(parent);
+    assertResponseNotDone(child);
+    assertCompletionDone(child);
+    assertResponseNotDone(grandchild);
+    assertCompletionDone(grandchild);
 
   }
 
@@ -292,39 +285,39 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext child = DefaultEventContext.child(parent);
     EventContext grandchild = DefaultEventContext.child(child);
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertResponseDone(parent);
+    assertCompletionNotDone(parent);
+    assertResponseDone(child);
+    assertCompletionNotDone(child);
+    assertResponseDone(grandchild);
+    assertCompletionNotDone(grandchild);
 
     parent.success();
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertResponseNotDone(parent);
+    assertCompletionNotDone(parent);
+    assertResponseDone(child);
+    assertCompletionNotDone(child);
+    assertResponseDone(grandchild);
+    assertCompletionNotDone(grandchild);
 
     child.success();
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertResponseNotDone(parent);
+    assertCompletionNotDone(parent);
+    assertResponseNotDone(child);
+    assertCompletionNotDone(child);
+    assertResponseDone(grandchild);
+    assertCompletionNotDone(grandchild);
 
     grandchild.success();
 
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertResponseNotDone(parent);
+    assertCompletionDone(parent);
+    assertResponseNotDone(child);
+    assertCompletionDone(child);
+    assertResponseNotDone(grandchild);
+    assertCompletionDone(grandchild);
   }
 
   @Test
@@ -343,27 +336,51 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     grandchild1.success();
     grandchild2.success();
 
-    assertThat(from(grandchild1.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild2.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionDone(grandchild1);
+    assertCompletionDone(grandchild2);
+    assertCompletionNotDone(child1);
+    assertCompletionNotDone(parent);
 
     child1.success();
-    assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionDone(child1);
+    assertCompletionNotDone(parent);
 
     grandchild3.success();
     grandchild4.success();
     child2.success();
 
-    assertThat(from(grandchild3.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(grandchild4.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(child2.getCompletionPublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertCompletionDone(grandchild3);
+    assertCompletionDone(grandchild4);
+    assertCompletionDone(child2);
+    assertCompletionNotDone(parent);
 
     parent.success();
 
+    assertCompletionDone(parent);
+  }
+
+  private void assertResponse(EventContext parent, Event event) {
+    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
+  }
+
+  private void assertNullResponse(EventContext child) {
+    assertThat(from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
+  }
+
+  private void assertResponseDone(EventContext parent) {
+    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
+  }
+
+  private void assertResponseNotDone(EventContext parent) {
+    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
+  }
+
+  private void assertCompletionDone(EventContext parent) {
     assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+  }
+
+  private void assertCompletionNotDone(EventContext child1) {
+    assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
   }
 
 }

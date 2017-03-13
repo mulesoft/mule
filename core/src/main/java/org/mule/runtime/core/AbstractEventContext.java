@@ -43,7 +43,6 @@ abstract class AbstractEventContext implements EventContext {
   private transient Disposable completionSubscriberDisposable;
   private final List<EventContext> childContexts = new LinkedList<>();
   private boolean streaming = false;
-  private final Object lock = new Object();
 
   public AbstractEventContext() {
     initCompletionProcessor();
@@ -53,17 +52,15 @@ abstract class AbstractEventContext implements EventContext {
     responseProcessor = MonoProcessor.create();
     completionProcessor = MonoProcessor.create();
     completionProcessor.doFinally(e -> LOGGER.debug(this + " execution completed.")).subscribe();
+    // When there are no child contexts response triggers completion directly.
     completionSubscriberDisposable = responseProcessor.then().doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
-  @Override
-  public List<EventContext> getChildContexts() {
-    return unmodifiableList(childContexts);
-  }
-
   void addChildContext(EventContext childContext) {
-    synchronized (lock) {
+    synchronized (this) {
       childContexts.add(childContext);
+      // When a new child is added dispose existing subscription that triggers completion processor and re-subscribe adding child
+      // completion condition.
       completionSubscriberDisposable.dispose();
       completionSubscriberDisposable = responseProcessor.otherwise(throwable -> empty()).and(getChildCompletionPublisher()).then()
           .doOnEach(s -> s.accept(completionProcessor)).subscribe();
@@ -81,7 +78,7 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public final void success() {
-    synchronized (lock) {
+    synchronized (this) {
       LOGGER.debug(this + " response completed with no result.");
       responseProcessor.onComplete();
     }
@@ -92,7 +89,7 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public final void success(Event event) {
-    synchronized (lock) {
+    synchronized (this) {
       LOGGER.debug(this + " response completed with result.");
       responseProcessor.onNext(event);
     }
@@ -103,7 +100,7 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public final void error(Throwable throwable) {
-    synchronized (lock) {
+    synchronized (this) {
       LOGGER.debug(this + " response completed with error.");
       responseProcessor.onError(throwable);
     }

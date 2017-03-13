@@ -224,6 +224,8 @@ public class DefaultFlowBuilder implements Builder {
               return just(event).handle(nullSafeMap(checkedFunction(request -> processBlockingSynchronous(request))));
             } else {
               Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+              // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
+              // response publisher to operate of the result of flow processing before returning
               sink.accept(request);
               return Mono.from(request.getContext().getResponsePublisher())
                   .map(r -> {

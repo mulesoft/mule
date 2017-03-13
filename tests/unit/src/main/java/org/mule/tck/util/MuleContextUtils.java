@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.util.UUID;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
@@ -38,9 +37,8 @@ public class MuleContextUtils {
   public static MuleContext mockMuleContext() {
     final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
-    StreamingManagerAdapter streamingManager = mock(StreamingManagerAdapter.class, RETURNS_DEEP_STUBS);
+    StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      when(muleContext.getRegistry().lookupObject(StreamingManagerAdapter.class)).thenReturn(streamingManager);
       when(muleContext.getRegistry().lookupObject(StreamingManager.class)).thenReturn(streamingManager);
     } catch (RegistrationException e) {
       throw new RuntimeException(e);

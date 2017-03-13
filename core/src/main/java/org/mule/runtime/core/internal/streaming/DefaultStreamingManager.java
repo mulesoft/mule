@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
@@ -25,7 +26,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class DefaultStreamingManager implements StreamingManagerAdapter, Initialisable, Disposable {
+public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultStreamingManager.class);
 
@@ -66,11 +67,6 @@ public class DefaultStreamingManager implements StreamingManagerAdapter, Initial
   @Override
   public ByteStreamingManager forBytes() {
     return byteStreamingManager;
-  }
-
-  @Override
-  public void registerEventContext(EventContext eventContext) {
-    byteStreamingManager.registerEventContext(eventContext);
   }
 
 }

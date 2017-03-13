@@ -32,11 +32,11 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -63,10 +63,10 @@ public class ModuleFlowProcessingPhase
 
   private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 
-  private final StreamingManagerAdapter streamingManager;
+  private final StreamingManager streamingManager;
   private final PolicyManager policyManager;
 
-  public ModuleFlowProcessingPhase(PolicyManager policyManager, StreamingManagerAdapter streamingManager) {
+  public ModuleFlowProcessingPhase(PolicyManager policyManager, StreamingManager streamingManager) {
     this.policyManager = policyManager;
     this.streamingManager = streamingManager;
   }
@@ -91,7 +91,6 @@ public class ModuleFlowProcessingPhase
 
 
       Event templateEvent = createEvent(template, messageProcessContext, sourceIdentifier);
-      streamingManager.registerEventContext(templateEvent.getContext());
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {

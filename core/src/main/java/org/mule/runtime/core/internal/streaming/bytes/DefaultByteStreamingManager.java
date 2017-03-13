@@ -118,8 +118,19 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
    */
   @Override
   public void onOpen(CursorStreamProviderAdapter provider) {
+    registerEventContext(getRoot(provider.getCreatorEvent().getContext()));
     registry.getUnchecked(getEventId(provider)).addProvider(provider);
     statistics.incrementOpenProviders();
+  }
+
+  private void registerEventContext(EventContext eventContext) {
+    from(eventContext.getCompletionPublisher()).doFinally(signal -> terminated(eventContext)).subscribe();
+  }
+
+  private EventContext getRoot(EventContext eventContext) {
+    return eventContext.getParentContext()
+        .map(this::getRoot)
+        .orElse(eventContext);
   }
 
   /**
@@ -144,11 +155,6 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
       state.dispose();
       registry.invalidate(eventId);
     }
-  }
-
-  @Override
-  public void registerEventContext(EventContext eventContext) {
-    from(eventContext.getCompletionPublisher()).doFinally(signal -> terminated(eventContext)).subscribe();
   }
 
   private void terminated(EventContext rootContext) {

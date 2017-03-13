@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -196,10 +195,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected Event createMuleEvent(InternalMessage message) throws MuleException {
-    Event event = baseEventBuilder(message).build();
-    muleContext.getRegistry().lookupObject(StreamingManagerAdapter.class).registerEventContext(event.getContext());
-    return event;
-
+    return baseEventBuilder(message).build();
   }
 
   private org.mule.runtime.core.api.Event.Builder baseEventBuilder(InternalMessage message) {

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
 
 /**
@@ -38,10 +37,4 @@ public interface ByteStreamingManagerAdapter extends ByteStreamingManager {
    */
   void onClose(CursorStreamAdapter cursor);
 
-  /**
-   * Register an {@link EventContext} so that the streaming manager can react to event context completion and clean up resources.
-   *
-   * @param eventContext event context to be registered
-   */
-  void registerEventContext(EventContext eventContext);
 }

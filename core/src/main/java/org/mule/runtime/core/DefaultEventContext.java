@@ -8,27 +8,20 @@ package org.mule.runtime.core;
 
 import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.OffsetTime;
-import java.util.List;
 import java.util.Optional;
-
-import org.reactivestreams.Subscriber;
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * Default immutable implementation of {@link EventContext}.
@@ -211,11 +204,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     public String toString() {
       return getClass().getSimpleName() + " { id: " + parent.getId() + "; correlationId: " + parent.getCorrelationId()
           + "; flowName: " + parent.getOriginatingFlowName() + " }";
-    }
-
-    @Override
-    public List<EventContext> getChildContexts() {
-      return emptyList();
     }
 
     @Override

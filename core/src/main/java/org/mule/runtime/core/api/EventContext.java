@@ -110,12 +110,8 @@ public interface EventContext {
   boolean isCorrelationIdFromSource();
 
   /**
-   * @return An immutable list with all the child context which were produced from {@code this} instance
-   */
-  List<EventContext> getChildContexts();
-
-  /**
    * Returns {@code this} context's parent if it has one
+   * 
    * @return {@code this} context's parent or {@link Optional#empty()} if it doesn't have one
    */
   Optional<EventContext> getParentContext();
@@ -130,7 +126,21 @@ public interface EventContext {
    */
   boolean isStreaming();
 
+
+  /**
+   * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext}.
+   * Any asynchronous processing initiated as part of processing the request {@link Event} maybe still be in process.
+   *
+   * @return publisher that completes when this {@link EventContext} instance has a response of error.
+   */
   Publisher<Event> getResponsePublisher();
 
+  /**
+   * A {@link Publisher<Void>} that completes when a this {@link EventContext} and all child {@link EventContext}'s have
+   * completed. In practice this means that this {@link Publisher<Void>} completes once all branches of execution have completed
+   * regardless of is they are synchronous or asynchronous. This {@link Publisher} will never complete with an error.
+   *
+   * @return publisher that completes when this {@link EventContext} and all child context have completed.
+   */
   Publisher<Void> getCompletionPublisher();
 }
