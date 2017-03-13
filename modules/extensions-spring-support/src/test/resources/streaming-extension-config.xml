@@ -38,9 +38,7 @@
     <flow name="seekStreamTx">
         <block transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="toStream" />
-            <!--<marvel:to-stream />-->
             <marvel:seek-stream position="#[position]" />
-            <!--<flow-ref name="seekStream" />-->
         </block>
     </flow>
 

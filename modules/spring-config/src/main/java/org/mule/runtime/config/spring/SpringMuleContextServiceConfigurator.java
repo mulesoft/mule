@@ -43,6 +43,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERIALIZER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
@@ -89,6 +90,7 @@ import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.policy.DefaultPolicyManager;
@@ -111,8 +113,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -125,13 +127,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * {@code MuleContext#getCustomizationService}.
  * <p>
  * This class takes cares of registering bean definitions for each of the provided services so dependency injection can be
- * properly done through the use of {@link javax.inject.Inject}.
+ * properly done through the use of {@link Inject}.
  *
  * @since 4.0
  */
 class SpringMuleContextServiceConfigurator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SpringMuleContextServiceConfigurator.class);
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
   private final OptionalObjectsController optionalObjectsController;
@@ -210,6 +211,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(OBJECT_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class))
+      .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
@@ -229,9 +231,9 @@ class SpringMuleContextServiceConfigurator {
   void createArtifactServices() {
     registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
     defaultContextServices.entrySet().stream()
-        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)).forEach(service -> {
-          registerBeanDefinition(service.getKey(), service.getValue());
-        });
+        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP))
+        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
+
     createBootstrapBeanDefinitions();
     createLocalObjectStoreBeanDefinitions();
     createQueueStoreBeanDefinitions();
@@ -253,12 +255,11 @@ class SpringMuleContextServiceConfigurator {
     }
   }
 
-  private void registerBeanDefinition(String serviceId, BeanDefinition defaultBeanDefinition) {
-    BeanDefinition beanDefinition = defaultBeanDefinition;
-    Optional<CustomService> customServiceOptional = customizationService.getOverriddenService(serviceId);
-    if (customServiceOptional.isPresent()) {
-      beanDefinition = getCustomServiceBeanDefinition(customServiceOptional.get());
-    }
+  private void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
+    beanDefinition = customizationService.getOverriddenService(serviceId)
+        .map(this::getCustomServiceBeanDefinition)
+        .orElse(beanDefinition);
+
     beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
   }
 
@@ -344,7 +345,7 @@ class SpringMuleContextServiceConfigurator {
   private void createBootstrapBeanDefinitions() {
     try {
       SpringRegistryBootstrap springRegistryBootstrap =
-          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, beanDefinitionRegistry);
+          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition);
       springRegistryBootstrap.initialise();
     } catch (InitialisationException e) {
       throw new RuntimeException(e);

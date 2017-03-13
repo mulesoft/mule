@@ -53,12 +53,12 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   private final int halfDataLength;
   private final int bufferSize;
-  private final ScheduledExecutorService executorService;
+  protected final ScheduledExecutorService executorService;
 
   private CursorStreamProvider streamProvider;
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
-  private ByteBufferManager bufferManager = new PoolingByteBufferManager();
+  protected ByteBufferManager bufferManager = new PoolingByteBufferManager();
 
   public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
     super(dataSize);
@@ -67,14 +67,18 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     halfDataLength = data.length() / 2;
     final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
 
+    streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
+
+    resetLatches();
+  }
+
+  protected CursorStreamProvider createStreamProvider(int bufferSize, int maxBufferSize, ByteArrayInputStream dataStream) {
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),
                                        new DataSize(bufferSize / 2, BYTE),
                                        new DataSize(maxBufferSize, BYTE));
 
-    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager, mock(Event.class));
-
-    resetLatches();
+    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, mock(Event.class));
   }
 
   @After

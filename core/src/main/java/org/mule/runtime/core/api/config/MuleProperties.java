@@ -167,11 +167,10 @@ public class MuleProperties {
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
   public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
+  public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
-  public static final String DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY = "_muleDefaultTlsContextFactoryBuilder";
 
   // Not currently used as these need to be instance variables of the MuleContext.
-  public static final String OBJECT_WORK_MANAGER = "_muleWorkManager";
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
 
   /**

@@ -104,7 +104,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    * @return the amount of bytes read
    * @throws IOException
    */
-  protected abstract int consumeForwardData(ByteBuffer buffer) throws IOException;
+  public abstract int consumeForwardData(ByteBuffer buffer) throws IOException;
 
   /**
    * Re obtains information which has already been consumed and this buffer is keeping somehow. This method will be invoked
@@ -116,7 +116,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    * @param length        the amount of information to read
    * @return the amount of bytes actually read
    */
-  protected abstract int getBackwardsData(ByteBuffer dest, Range requiredRange, int length);
+  public abstract int getBackwardsData(ByteBuffer dest, Range requiredRange, int length);
 
   /**
    * @return Whether this buffer can be expanded
@@ -153,14 +153,14 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   /**
    * Template method to support the {@link #close()} operation
    */
-  protected abstract void doClose();
+  public abstract void doClose();
 
   /**
    * Looses the reference to the {@link #stream}, {@link #streamChannel} and {@link #buffer} so that invoking
    * the {@link #close()} method does not close them. This is useful when the stream is going to continue
    * buffering through a different instance.
    */
-  protected void yield() {
+  public void yield() {
     streamChannel = null;
     stream = null;
     buffer = null;
@@ -236,7 +236,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   /**
    * Releases the lock obtained through {@link #acquireBufferLock()}
    */
-  protected void releaseBufferLock() {
+  public void releaseBufferLock() {
     try {
       bufferLock.unlock();
     } catch (IllegalMonitorStateException e) {
@@ -247,14 +247,14 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   /**
    * Acquires an exclusive lock to the {@link #buffer}
    */
-  protected void acquireBufferLock() {
+  public void acquireBufferLock() {
     bufferLock.lock();
   }
 
   /**
    * @return the {@link #buffer}
    */
-  protected ByteBuffer getBuffer() {
+  public ByteBuffer getBuffer() {
     return buffer;
   }
 
@@ -340,10 +340,10 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
     ByteBuffer src = buffer.duplicate();
 
     final int newPosition;
-    if (requiredRange.start >= buffer.limit()) {
-      newPosition = toIntExact(requiredRange.start - bufferRange.start);
+    if (requiredRange.getStart() >= buffer.limit()) {
+      newPosition = toIntExact(requiredRange.getStart() - bufferRange.getStart());
     } else {
-      newPosition = toIntExact(requiredRange.start);
+      newPosition = toIntExact(requiredRange.getStart());
     }
 
     src.position(newPosition);

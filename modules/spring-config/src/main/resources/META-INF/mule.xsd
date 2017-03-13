@@ -5153,40 +5153,13 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="repeatable-file-store-stream" type="repeatableFileStoreStreamType" substitutionGroup="abstract-streaming-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                //TODO: ADD docs
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="repeatableFileStoreStreamType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="maxInMemorySize" type="substitutableDecimal" use="optional" default="256">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then
-                            it will start to buffer the content on disk. Default value is 256 KB.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="bufferUnit" type="dataUnitType" use="optional" default="KB">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The unit in which maxInMemorySize is expressed
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                //TODO: ADD docs
+                This configurations uses an in-memory buffer to provide repeatable access to any input stream.
+                It uses a buffer with an initial buffer size, which can be expanded up to a configurable threshold.
+                This is the most performant way of providing repeatable access, as long as the size of all the concurrent
+                stream contents fits into memory
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

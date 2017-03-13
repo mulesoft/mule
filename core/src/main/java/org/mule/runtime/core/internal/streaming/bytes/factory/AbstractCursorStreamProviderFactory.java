@@ -29,7 +29,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
+public abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
 
   private final ByteStreamingManagerAdapter streamingManager;
   private final ByteBufferManager bufferManager;
@@ -40,7 +40,7 @@ abstract class AbstractCursorStreamProviderFactory implements CursorStreamProvid
    * @param streamingManager the manager which will track the produced providers.
    * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  AbstractCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager, ByteBufferManager bufferManager) {
+  protected AbstractCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager, ByteBufferManager bufferManager) {
     this.streamingManager = streamingManager;
     this.bufferManager = bufferManager;
   }

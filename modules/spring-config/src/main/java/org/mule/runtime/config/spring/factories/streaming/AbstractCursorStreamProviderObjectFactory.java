@@ -13,7 +13,7 @@ import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
 import javax.inject.Inject;
 
-abstract class AbstractCursorStreamProviderObjectFactory<T extends CursorStreamProviderFactory>
+public abstract class AbstractCursorStreamProviderObjectFactory<T extends CursorStreamProviderFactory>
     extends AbstractAnnotatedObjectFactory<T> {
 
   @Inject

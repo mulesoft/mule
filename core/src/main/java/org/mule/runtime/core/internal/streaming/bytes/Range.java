@@ -22,10 +22,10 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-class Range {
+public final class Range {
 
-  final long start;
-  final long end;
+  private final long start;
+  private final long end;
 
   /**
    * Creates a new instance
@@ -111,5 +111,13 @@ class Range {
    */
   protected boolean isEmpty() {
     return start == end;
+  }
+
+  public long getStart() {
+    return start;
+  }
+
+  public long getEnd() {
+    return end;
   }
 }
