@@ -7,14 +7,16 @@
 package org.mule.runtime.module.extension.internal.streaming;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
+import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -87,6 +89,17 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void seek() throws Exception {
     doSeek("seekStream");
+  }
+
+
+  @Test
+  public void rewind() throws Exception {
+    Event result = flowRunner("rewind").withPayload(data).run();
+    Message firstRead = (Message) result.getVariable("firstRead").getValue();
+    Message secondRead = (Message) result.getVariable("secondRead").getValue();
+
+    assertThat(firstRead.getPayload().getValue(), equalTo(data));
+    assertThat(secondRead.getPayload().getValue(), equalTo(data));
   }
 
   @Test
