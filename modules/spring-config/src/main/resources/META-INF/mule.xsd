@@ -5236,36 +5236,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="repeatable-file-store-stream" type="repeatableFileStoreStreamType" substitutionGroup="abstract-streaming-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                //TODO: ADD docs
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="repeatableFileStoreStreamType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="maxInMemorySize" type="substitutableDecimal" use="optional" default="256">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then
-                            it will start to buffer the content on disk. Default value is 256 KB.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="bufferUnit" type="dataUnitType" use="optional" default="KB">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The unit in which maxInMemorySize is expressed
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
         <xsd:annotation>
             <xsd:documentation>
