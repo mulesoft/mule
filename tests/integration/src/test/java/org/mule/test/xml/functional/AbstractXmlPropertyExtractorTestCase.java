@@ -6,6 +6,7 @@
  */
 package org.mule.test.xml.functional;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -38,6 +39,6 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractInteg
   public void testError() throws Exception {
     MessagingException e = flowRunner("test").withPayload(getErrorMessage()).runExpectingException();
     assertThat(e.getMessage(),
-               is("Execution of the expression \"payload.childBean.value\" failed. (org.mule.runtime.core.api.expression.ExpressionRuntimeException)."));
+               containsString("evaluating expression: \"payload.childBean.value\". (org.mule.runtime.core.api.expression.ExpressionRuntimeException)."));
   }
 }
