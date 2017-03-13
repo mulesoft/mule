@@ -80,10 +80,10 @@ class InfrastructureElementModelDelegate {
           public void visitSimpleValue(String value) {
             parentConfig.withParameter(declaration.getName(), value);
             parentElement.containing(DslElementModel.builder()
-                                       .withModel(parameterModel)
-                                       .withDsl(paramDsl)
-                                       .withValue(value)
-                                       .build());
+                .withModel(parameterModel)
+                .withDsl(paramDsl)
+                .withValue(value)
+                .build());
           }
         });
     }
