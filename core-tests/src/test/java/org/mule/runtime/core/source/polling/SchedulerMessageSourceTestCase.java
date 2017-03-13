@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -19,6 +19,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
+import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -74,6 +77,13 @@ public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Test
   public void setExecutionClassLoader() throws Exception {
     ClassLoader executionClassLoader = mock(ClassLoader.class);
+    Reference<ClassLoader> notificationClassloader = new Reference<>();
+    muleContext.getNotificationManager().addInterfaceToType(ConnectorMessageNotificationListener.class,
+                                                            ConnectorMessageNotification.class);
+    muleContext.getNotificationManager()
+        .addListener((ConnectorMessageNotificationListener<ConnectorMessageNotification>) notification -> {
+          notificationClassloader.set(Thread.currentThread().getContextClassLoader());
+        });
     muleContext.setExecutionClassLoader(executionClassLoader);
 
     schedulerMessageSource = createMessageSource();
@@ -84,6 +94,8 @@ public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase 
     schedulerMessageSource.poll();
 
     assertThat(flow.event, notNullValue());
+    assertThat(notificationClassloader.get(), notNullValue());
+    assertThat(notificationClassloader.get(), is(executionClassLoader));
   }
 
   private SchedulerMessageSource createMessageSource() throws Exception {
