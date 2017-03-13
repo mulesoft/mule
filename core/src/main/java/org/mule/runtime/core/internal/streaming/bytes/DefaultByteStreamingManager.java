@@ -123,6 +123,12 @@ public class DefaultByteStreamingManager implements ByteStreamingManagerAdapter,
     statistics.incrementOpenProviders();
   }
 
+  /*
+   * Duplicate registration will occur if cursors are opened in multiple child flows or processing branches. This means terminate
+   * will fire multiple times sequentially during completion of the parent EventContext. After the first terminate all other
+   * invocation will literally be no-ops. This is preferred to introducing contention here given multiple thread may be opening
+   * cursors concurrently.
+   */
   private void registerEventContext(EventContext eventContext) {
     from(eventContext.getCompletionPublisher()).doFinally(signal -> terminated(eventContext)).subscribe();
   }
