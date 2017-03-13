@@ -337,7 +337,9 @@
     </flow>
 
     <flow name="poll">
-        <scheduler frequency="3000"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="3000"/>
+        </scheduler>
         <set-payload value="#['']"/>
         <append-string-transformer message=" Hello foo" />
         <append-string-transformer message="out" />
@@ -345,7 +347,9 @@
     </flow>
 
     <flow name="poll2">
-        <scheduler frequency="3000"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="3000"/>
+        </scheduler>
         <flow-ref name="pollappend"/>
         <append-string-transformer message="out" />
         <test:queue name="poll2-out"/>

@@ -20,7 +20,9 @@
     </flow>
 
     <flow name="pollbar" processingStrategy="synchronous">
-        <scheduler frequency="1000"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="1000"/>
+        </scheduler>
         <static-component>
             <return-data>bar</return-data>
         </static-component>

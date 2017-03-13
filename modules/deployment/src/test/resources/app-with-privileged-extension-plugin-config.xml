@@ -8,7 +8,9 @@
     <privileged:config name="default" message="Privileged plugin!!!"/>
 
     <flow name="main">
-        <scheduler frequency="1000"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="1000"/>
+        </scheduler>
         <set-payload value=""/>
         <privileged:print-message/>
     </flow>

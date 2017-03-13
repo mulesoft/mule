@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -30,7 +32,7 @@ import org.junit.Test;
 public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   @Test
-  public void emptyStringResponseFromNestedMP() throws Exception {
+  public void simplePoll() throws Exception {
 
     SchedulerMessageSource schedulerMessageSource = createMessageSource();
 
@@ -39,7 +41,7 @@ public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     schedulerMessageSource.poll();
 
-    assertNotNull(flow.event);
+    assertThat(flow.event, notNullValue());
   }
 
   @Test
@@ -81,7 +83,7 @@ public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     schedulerMessageSource.poll();
 
-    assertNotNull(flow.event);
+    assertThat(flow.event, notNullValue());
   }
 
   private SchedulerMessageSource createMessageSource() throws Exception {

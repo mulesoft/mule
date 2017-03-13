@@ -28,7 +28,9 @@
     <!-- This uses the polling HTTP connector every 30 seconds -->
 
     <flow name="pollingUMO_authenticated">
-        <scheduler frequency="2000"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="2000"/>
+        </scheduler>
         <httpn:request path="/" config-ref="secureRequestConfig">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="0..599"/>
@@ -39,7 +41,9 @@
     </flow>
 
     <flow name="pollingUMO_not_authenticated">
-        <scheduler frequency="2000"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="2000"/>
+        </scheduler>
         <httpn:request path="/" config-ref="requestConfig">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="0..599"/>

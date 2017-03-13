@@ -9,7 +9,9 @@
 
 
     <flow name="dbServerService">
-        <scheduler frequency="100"/>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="100"/>
+        </scheduler>
         <db:select config-ref="dbConfig">
             <db:parameterized-query>select * from Planet</db:parameterized-query>
         </db:select>
