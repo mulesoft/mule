@@ -77,7 +77,7 @@ import org.junit.rules.TemporaryFolder;
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
-  public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on blocking read";
+  public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
   public TemporaryFolder workingDirectory = new TemporaryFolder();
 

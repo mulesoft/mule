@@ -10,8 +10,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
   private PolicyManager policyManager;
 
   @Inject
-  private StreamingManagerAdapter streamingManager;
+  private StreamingManager streamingManager;
 
   @Override
   public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {

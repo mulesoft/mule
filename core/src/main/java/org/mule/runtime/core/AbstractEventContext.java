@@ -7,11 +7,27 @@
 package org.mule.runtime.core;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.message.DefaultMessageBuilder;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoProcessor;
 
 /**
  * Base class for implementations of {@link EventContext}
@@ -20,17 +36,41 @@ import java.util.List;
  */
 abstract class AbstractEventContext implements EventContext {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
+
+  private transient MonoProcessor<Event> responseProcessor;
+  private transient MonoProcessor<Void> completionProcessor;
+  private transient Disposable completionSubscriberDisposable;
   private final List<EventContext> childContexts = new LinkedList<>();
-  private boolean completed = false;
   private boolean streaming = false;
 
-  @Override
-  public List<EventContext> getChildContexts() {
-    return unmodifiableList(childContexts);
+  public AbstractEventContext() {
+    initCompletionProcessor();
+  }
+
+  private void initCompletionProcessor() {
+    responseProcessor = MonoProcessor.create();
+    completionProcessor = MonoProcessor.create();
+    completionProcessor.doFinally(e -> LOGGER.debug(this + " execution completed.")).subscribe();
+    // When there are no child contexts response triggers completion directly.
+    completionSubscriberDisposable = responseProcessor.then().doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   void addChildContext(EventContext childContext) {
-    childContexts.add(childContext);
+    synchronized (this) {
+      childContexts.add(childContext);
+      // When a new child is added dispose existing subscription that triggers completion processor and re-subscribe adding child
+      // completion condition.
+      completionSubscriberDisposable.dispose();
+      completionSubscriberDisposable = responseProcessor.otherwise(throwable -> empty()).and(getChildCompletionPublisher()).then()
+          .doOnEach(s -> s.accept(completionProcessor)).subscribe();
+    }
+  }
+
+  private Mono<Void> getChildCompletionPublisher() {
+    return when(childContexts.stream()
+        .map(eventContext -> from(eventContext.getCompletionPublisher()).otherwise(throwable -> empty()))
+        .collect(toList()));
   }
 
   /**
@@ -38,8 +78,10 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public final void success() {
-    completed = true;
-    doSuccess();
+    synchronized (this) {
+      LOGGER.debug(this + " response completed with no result.");
+      responseProcessor.onComplete();
+    }
   }
 
   /**
@@ -47,8 +89,10 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public final void success(Event event) {
-    completed = true;
-    doSuccess(event);
+    synchronized (this) {
+      LOGGER.debug(this + " response completed with result.");
+      responseProcessor.onNext(event);
+    }
   }
 
   /**
@@ -56,31 +100,10 @@ abstract class AbstractEventContext implements EventContext {
    */
   @Override
   public final void error(Throwable throwable) {
-    completed = true;
-    doError(throwable);
-  }
-
-  /**
-   * Template method to support the {@link #success()} method
-   */
-  protected abstract void doSuccess();
-
-  /**
-   * Template method to support the {@link #success(Event)} method
-   */
-  protected abstract void doSuccess(Event event);
-
-  /**
-   * Template method to support the {@link #error(Throwable)} method
-   */
-  protected abstract void doError(Throwable throwable);
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isTerminated() {
-    return completed ? childContexts.stream().allMatch(EventContext::isTerminated) : false;
+    synchronized (this) {
+      LOGGER.debug(this + " response completed with error.");
+      responseProcessor.onError(throwable);
+    }
   }
 
   /**
@@ -102,4 +125,20 @@ abstract class AbstractEventContext implements EventContext {
 
     return childContexts.isEmpty() ? false : childContexts.stream().anyMatch(EventContext::isStreaming);
   }
+
+  @Override
+  public Publisher<Event> getResponsePublisher() {
+    return responseProcessor;
+  }
+
+  @Override
+  public Publisher<Void> getCompletionPublisher() {
+    return completionProcessor;
+  }
+
+  private void readObject(ObjectInputStream in) throws Exception {
+    in.defaultReadObject();
+    initCompletionProcessor();
+  }
+
 }

@@ -32,11 +32,11 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -63,10 +63,10 @@ public class ModuleFlowProcessingPhase
 
   private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 
-  private final StreamingManagerAdapter streamingManager;
+  private final StreamingManager streamingManager;
   private final PolicyManager policyManager;
 
-  public ModuleFlowProcessingPhase(PolicyManager policyManager, StreamingManagerAdapter streamingManager) {
+  public ModuleFlowProcessingPhase(PolicyManager policyManager, StreamingManager streamingManager) {
     this.policyManager = policyManager;
     this.streamingManager = streamingManager;
   }
@@ -109,16 +109,6 @@ public class ModuleFlowProcessingPhase
             .doOnError(MessagingException.class, errorConsumer)
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                        throwable -> LOGGER.error("Unhandled exception processing request" + throwable))
-            .doAfterTerminate((event, e) -> {
-              if (event == null) {
-                event = eventReference.get();
-              }
-              if (e != null) {
-                streamingManager.error(event);
-              } else {
-                streamingManager.success(event);
-              }
-            })
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);

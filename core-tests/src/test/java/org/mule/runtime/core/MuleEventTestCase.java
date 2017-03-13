@@ -45,7 +45,7 @@ import org.junit.rules.ExpectedException;
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
-  private static String TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE = "Timeout on blocking read";
+  private static String TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -205,7 +205,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // fails with timeout.
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
-    from(before.getContext()).blockMillis(BLOCK_TIMEOUT);
+    from(before.getContext().getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
   }
 
   @Test
@@ -235,7 +235,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
 
     // Publisher is conserved after serialization so attempting to obtain result via before event is successful.
-    assertThat(from(before.getContext()).block(), equalTo(result));
+    assertThat(from(before.getContext().getResponsePublisher()).block(), equalTo(result));
 
     // Cache entry is removed on deserialization
     assertThat(((Pipeline) before.getFlowConstruct()).getSerializationEventContextCache().get(before.getContext().getId()),

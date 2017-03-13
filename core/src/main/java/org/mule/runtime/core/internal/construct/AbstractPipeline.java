@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -63,6 +62,7 @@ import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrat
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.streaming.StreamingManager;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -89,7 +89,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected MessageProcessorChain pipeline;
 
   protected final SchedulerService schedulerService;
-  protected StreamingManagerAdapter streamingManager;
+  protected StreamingManager streamingManager;
 
   protected List<Processor> messageProcessors = Collections.emptyList();
 
@@ -234,7 +234,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doInitialise();
 
     initialiseProcessingStrategy();
-    streamingManager = muleContext.getRegistry().lookupObject(StreamingManagerAdapter.class);
+    streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
 
     pipeline = createPipeline();
 
@@ -262,7 +262,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return from(publisher)
                 .doOnNext(assertStarted())
                 .doOnNext(event -> sink.accept(event))
-                .flatMap(event -> Mono.from(event.getContext()));
+                .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
           }
         }
       });
@@ -280,34 +280,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(this, pipeline))
-        .doOnNext(response -> {
-          response.getContext().success(response);
-          streamingManager.success(response);
-        })
+        // After flow processing complete EventContext with response event, null event or error (after error handing).
+        .doOnNext(response -> response.getContext().success(response))
         .doOnError(MessagingException.class, handleError())
-        .doOnError(EventDroppedException.class, ede -> {
-          ede.getEvent().getContext().success();
-          streamingManager.error(ede.getEvent());
-        })
+        .doOnError(EventDroppedException.class, ede -> ede.getEvent().getContext().success())
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                    throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
   }
 
   private Consumer<MessagingException> handleError() {
     if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof SchedulerMessageSource) {
-      return me -> {
-        me.getEvent().getContext().error(me);
-        streamingManager.error(me.getEvent());
-      };
+      return me -> me.getEvent().getContext().error(me);
     } else {
       return me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
-          .doOnNext(event -> {
-            event.getContext().success(event);
-            streamingManager.success(event);
-          })
+          .doOnNext(event -> event.getContext().success(event))
           .doOnError(throwable -> {
             me.getEvent().getContext().error(throwable);
-            streamingManager.error(me.getEvent());
           })
           .subscribe();
     }

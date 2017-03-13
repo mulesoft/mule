@@ -8,9 +8,9 @@ package org.mule.runtime.core;
 
 import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -19,14 +19,9 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.OffsetTime;
-import java.util.List;
 import java.util.Optional;
-
-import org.reactivestreams.Subscriber;
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * Default immutable implementation of {@link EventContext}.
@@ -36,8 +31,6 @@ import reactor.core.publisher.MonoProcessor;
 public final class DefaultEventContext extends AbstractEventContext implements Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
-
-  private transient MonoProcessor<Event> monoProcessor = MonoProcessor.create();
 
   /**
    * Builds a new execution context with the given parameters.
@@ -152,41 +145,15 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  protected void doSuccess() {
-    monoProcessor.onComplete();
-  }
-
-  @Override
-  protected void doSuccess(Event event) {
-    monoProcessor.onNext(event);
-  }
-
-  @Override
-  protected void doError(Throwable messagingException) {
-    monoProcessor.onError(messagingException);
-  }
-
-  @Override
   public String toString() {
-    return "DefaultMessageExecutionContext { id: " + id + "; correlationId: " + correlationId + "; flowName: " + flowName
+    return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: " + flowName
         + "; serverId: " + serverId + " }";
-  }
-
-  private void readObject(ObjectInputStream in) throws Exception {
-    in.defaultReadObject();
-    monoProcessor = MonoProcessor.create();
-  }
-
-  @Override
-  public void subscribe(Subscriber<? super Event> s) {
-    monoProcessor.subscribe(s);
   }
 
   private static class ChildEventContext extends AbstractEventContext implements Serializable {
 
     private static final long serialVersionUID = 1054412872901205234L;
 
-    private transient MonoProcessor<Event> monoProcessor = MonoProcessor.create();
     private final EventContext parent;
 
     private ChildEventContext(EventContext parent) {
@@ -234,38 +201,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    protected void doSuccess() {
-      monoProcessor.onComplete();
-    }
-
-    @Override
-    protected void doSuccess(Event event) {
-      monoProcessor.onNext(event);
-    }
-
-    @Override
-    protected void doError(Throwable throwable) {
-      monoProcessor.onError(throwable);
-    }
-
-    @Override
     public String toString() {
-      return parent.toString();
-    }
-
-    private void readObject(ObjectInputStream in) throws Exception {
-      in.defaultReadObject();
-      monoProcessor = MonoProcessor.create();
-    }
-
-    @Override
-    public void subscribe(Subscriber<? super Event> s) {
-      monoProcessor.subscribe(s);
-    }
-
-    @Override
-    public List<EventContext> getChildContexts() {
-      return emptyList();
+      return getClass().getSimpleName() + " { id: " + parent.getId() + "; correlationId: " + parent.getCorrelationId()
+          + "; flowName: " + parent.getOriginatingFlowName() + " }";
     }
 
     @Override

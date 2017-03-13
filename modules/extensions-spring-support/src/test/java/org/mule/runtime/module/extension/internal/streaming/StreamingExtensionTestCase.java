@@ -11,11 +11,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.streaming.StreamingManagerAdapter;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -26,10 +27,8 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-11881")
 public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
@@ -42,7 +41,7 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private String data = randomAlphabetic(2048);
-  private StreamingManagerAdapter streamingManagerAdapter;
+  private StreamingManager streamingManager;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -56,7 +55,7 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
 
   @Override
   protected void doSetUp() throws Exception {
-    streamingManagerAdapter = muleContext.getRegistry().lookupObject(StreamingManagerAdapter.class);
+    streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
   }
 
   @Override
@@ -92,7 +91,6 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   public void seek() throws Exception {
     doSeek("seekStream");
   }
-
 
   @Test
   public void rewind() throws Exception {
@@ -146,7 +144,7 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertAllStreamingResourcesClosed() {
-    ByteStreamingStatistics stats = streamingManagerAdapter.forBytes().getByteStreamingStatistics();
+    ByteStreamingStatistics stats = streamingManager.forBytes().getByteStreamingStatistics();
     new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
       assertThat("There're still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
       assertThat("There're still open cursors", stats.getOpenCursorsCount(), is(0));
