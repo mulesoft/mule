@@ -16,6 +16,7 @@
     <modules>
         <module>embedded-api</module>
         <module>embedded-impl</module>
+        <module>embedded-test</module>
     </modules>
 
 </project>
