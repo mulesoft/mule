@@ -427,9 +427,9 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     protected void registerFlowConstructServices() throws NotCompliantMBeanException, MBeanRegistrationException,
         InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (AbstractFlowConstruct flowConstruct : muleContext.getRegistry().lookupObjects(AbstractFlowConstruct.class))
+        for (String  rawName : muleContext.getRegistry().lookupByType(AbstractFlowConstruct.class).keySet())
         {
-            final String rawName = flowConstruct.getName();
+            AbstractFlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(rawName);
             final String name = jmxSupport.escape(rawName);
             final String jmxName = String.format("%s:type=%s,name=%s", jmxSupport.getDomainName(muleContext, !containerMode), flowConstruct.getConstructType(), name);
             ObjectName on = jmxSupport.getObjectName(jmxName);
