@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -47,6 +48,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
@@ -68,6 +70,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
@@ -146,7 +149,7 @@ public class BeanDefinitionFactory {
   public BeanDefinition resolveComponentRecursively(ComponentModel parentComponentModel, ComponentModel componentModel,
                                                     BeanDefinitionRegistry registry,
                                                     BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor,
-                                                    BiFunction<Element, BeanDefinition, BeanDefinition> oldParsingMechanism) {
+                                                    BiFunction<Element, BeanDefinition, Either<BeanDefinition, BeanReference>> oldParsingMechanism) {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
@@ -155,10 +158,16 @@ public class BeanDefinitionFactory {
             resolveComponentRecursively(componentModel, innerComponent, registry, componentModelPostProcessor,
                                         oldParsingMechanism);
           } else {
-            AbstractBeanDefinition oldBeanDefinition =
-                (AbstractBeanDefinition) oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
-            oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
-            innerComponent.setBeanDefinition(oldBeanDefinition);
+            Either<BeanDefinition, BeanReference> oldParseResult =
+                oldParsingMechanism.apply((Element) from(innerComponent).getNode(), null);
+
+            if (oldParseResult.isLeft()) {
+              AbstractBeanDefinition oldBeanDefinition = (AbstractBeanDefinition) oldParseResult.getLeft();
+              oldBeanDefinition = adaptFilterBeanDefinitions(componentModel, oldBeanDefinition);
+              innerComponent.setBeanDefinition(oldBeanDefinition);
+            } else if (oldParseResult.isRight()) {
+              innerComponent.setBeanReference(oldParseResult.getRight());
+            }
           }
         }
       }

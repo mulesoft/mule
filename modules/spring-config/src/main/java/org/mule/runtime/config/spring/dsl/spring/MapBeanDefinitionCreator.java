@@ -17,7 +17,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 
 /**
- * {@code BeanDefinitionCreator} that handles components that define a mp in the configuration.
+ * {@code BeanDefinitionCreator} that handles components that define a map in the configuration.
  *
  * <p>
  * 

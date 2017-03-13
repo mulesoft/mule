@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 
@@ -29,7 +30,13 @@ import org.springframework.beans.factory.support.ManagedList;
  * <pre>
  *  <parsers-test:simple-type-entry key="key1" value="1"/>
  * </pre>
- * 
+ *
+ * or
+ *
+ * <pre>
+ *  <parsers-test:simple-type-entry key="key1" value-ref="anotherDefinition"/>
+ * </pre>
+ *
  * or
  * 
  * <pre>
@@ -43,6 +50,7 @@ import org.springframework.beans.factory.support.ManagedList;
 public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String ENTRY_TYPE_KEY_PARAMETER_NAME = "key";
+  private static final String ENTRY_TYPE_VALUE_REF_PARAMETER_NAME = "value-ref";
 
   @Override
   boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
@@ -58,6 +66,27 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
     final Object key = componentModel.getParameters().get(ENTRY_TYPE_KEY_PARAMETER_NAME);
     Object keyBeanDefinition = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
+
+
+    Object value = null;
+    if (componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME) != null) {
+      value = getValue(objectTypeVisitor, componentModel, componentBuildingDefinition);
+    } else if (componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
+      value = new RuntimeBeanReference(componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
+    } else {
+      throw new RuntimeException("Unknown bean type");
+    }
+
+    AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
+        .addConstructorArgValue(value).getBeanDefinition();
+
+    componentModel.setBeanDefinition(beanDefinition);
+    return true;
+
+  }
+
+  private Object getValue(ObjectTypeVisitor objectTypeVisitor, ComponentModel componentModel,
+                          ComponentBuildingDefinition componentBuildingDefinition) {
     Object value;
     Class valueType = objectTypeVisitor.getMapEntryType().get().getValueType();
     if (isSimpleType(valueType) || componentModel.getInnerComponents().isEmpty()) {
@@ -82,11 +111,6 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
       BeanDefinition beanDefinition = childComponentModel.getBeanDefinition();
       value = beanDefinition != null ? beanDefinition : childComponentModel.getBeanReference();
     }
-    AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
-        .addConstructorArgValue(value).getBeanDefinition();
-
-    componentModel.setBeanDefinition(beanDefinition);
-    return true;
-
+    return value;
   }
 }

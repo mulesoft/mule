@@ -17,12 +17,4 @@ import org.mule.runtime.api.meta.AnnotatedObject;
  */
 public interface AnnotatedObjectFactory<T> extends ObjectFactory<T>, AnnotatedObject {
 
-  /**
-   * Method to be implemented instead of {@link ObjectFactory#getObject()}.
-   *
-   * @return the domain object
-   * @throws Exception if any failure occurs building the object
-   */
-  T doGetObject() throws Exception;
-
 }
