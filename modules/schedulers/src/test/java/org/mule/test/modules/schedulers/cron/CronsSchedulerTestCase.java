@@ -15,7 +15,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -97,8 +97,8 @@ public class CronsSchedulerTestCase extends MuleArtifactFunctionalTestCase {
   private void runSchedulersOnce() throws Exception {
     Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
     MessageSource flowSource = flow.getMessageSource();
-    if (flowSource instanceof PollingMessageSource) {
-      ((PollingMessageSource) flowSource).performPoll();
+    if (flowSource instanceof SchedulerMessageSource) {
+      ((SchedulerMessageSource) flowSource).performPoll();
     }
   }
 

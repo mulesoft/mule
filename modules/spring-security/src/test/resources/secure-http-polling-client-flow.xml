@@ -28,25 +28,27 @@
     <!-- This uses the polling HTTP connector every 30 seconds -->
 
     <flow name="pollingUMO_authenticated">
-        <poll frequency="2000">
-            <httpn:request path="/" config-ref="secureRequestConfig">
-                <httpn:response-validator>
-                    <httpn:success-status-code-validator values="0..599"/>
-                </httpn:response-validator>
-            </httpn:request>
-        </poll>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="2000"/>
+        </scheduler>
+        <httpn:request path="/" config-ref="secureRequestConfig">
+            <httpn:response-validator>
+                <httpn:success-status-code-validator values="0..599"/>
+            </httpn:response-validator>
+        </httpn:request>
         <object-to-string-transformer />
         <test:queue name="toclient"/>
     </flow>
 
     <flow name="pollingUMO_not_authenticated">
-        <poll frequency="2000">
-            <httpn:request path="/" config-ref="requestConfig">
-                <httpn:response-validator>
-                    <httpn:success-status-code-validator values="0..599"/>
-                </httpn:response-validator>
-            </httpn:request>
-        </poll>
+        <scheduler>
+            <fixed-frequency-scheduler frequency="2000"/>
+        </scheduler>
+        <httpn:request path="/" config-ref="requestConfig">
+            <httpn:response-validator>
+                <httpn:success-status-code-validator values="0..599"/>
+            </httpn:response-validator>
+        </httpn:request>
         <object-to-string-transformer />
         <test:queue name="toclient2"/>
     </flow>

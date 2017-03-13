@@ -62,7 +62,7 @@ import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrat
 import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
-import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -294,7 +294,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   private Consumer<MessagingException> handleError() {
-    if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof PollingMessageSource) {
+    if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof SchedulerMessageSource) {
       return me -> {
         me.getEvent().getContext().error(me);
         streamingManager.error(me.getEvent());

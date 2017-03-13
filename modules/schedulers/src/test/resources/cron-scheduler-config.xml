@@ -18,21 +18,21 @@
     </flow>
 
     <flow name="pollfoo">
-        <poll doc:name="watermark">
+        <scheduler doc:name="watermark">
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
-            <flow-ref name="echo"/>
-        </poll>
+        </scheduler>
+        <flow-ref name="echo"/>
         <component class="org.mule.test.modules.schedulers.cron.CronsSchedulerTestCase$FooComponent"/>
     </flow>
 
 
     <flow name="pollbar" processingStrategy="synchronous">
-        <poll>
+        <scheduler>
             <schedulers:cron-scheduler expression="${expression.property}"/>
-            <static-component>
-                <return-data>bar</return-data>
-            </static-component>
-        </poll>
+        </scheduler>
+        <static-component>
+            <return-data>bar</return-data>
+        </static-component>
        <component class="org.mule.test.modules.schedulers.cron.CronsSchedulerTestCase$BarComponent"/>
     </flow>
 

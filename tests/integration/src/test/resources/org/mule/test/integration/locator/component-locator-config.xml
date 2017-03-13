@@ -5,9 +5,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="myFlow">
-        <poll>
-            <set-payload value="value"/>
-        </poll>
+        <scheduler/>
         <logger/>
         <set-payload value="anotherValue"/>
         <async>

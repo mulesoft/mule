@@ -4,9 +4,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="flowWithSource">
-        <poll>
-            <logger/>
-        </poll>
+        <scheduler/>
         <set-payload value="a value"/>
     </flow>
 

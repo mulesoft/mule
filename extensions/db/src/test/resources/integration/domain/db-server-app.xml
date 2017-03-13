@@ -9,12 +9,12 @@
 
 
     <flow name="dbServerService">
-        <poll frequency="100">
-            <db:select config-ref="dbConfig">
-                <db:parameterized-query>select * from Planet</db:parameterized-query>
-            </db:select>
-        </poll>
-
+        <scheduler>
+            <fixed-frequency-scheduler frequency="100"/>
+        </scheduler>
+        <db:select config-ref="dbConfig">
+            <db:parameterized-query>select * from Planet</db:parameterized-query>
+        </db:select>
         <test:queue name="out"/>
     </flow>
 

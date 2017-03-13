@@ -12,14 +12,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.source.polling.PollingMessageSource;
+import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class PollingTestCase extends AbstractIntegrationTestCase {
+public class SchedulerTestCase extends AbstractIntegrationTestCase {
 
   private static List<String> foo;
   private static List<String> bar;
@@ -45,7 +46,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/integration/polling-config.xml";
+    return "org/mule/test/integration/scheduler-config.xml";
   }
 
   @Test
@@ -54,13 +55,25 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     for (FlowConstruct flowConstruct : muleContext.getRegistry().lookupFlowConstructs()) {
       Flow flow = (Flow) flowConstruct;
       MessageSource flowSource = flow.getMessageSource();
-      if (flowSource instanceof PollingMessageSource) {
+      if (flowSource instanceof SchedulerMessageSource) {
         schedulers++;
       }
     }
     assertEquals(4, schedulers);
 
-    Thread.sleep(5000);
+    new PollingProber(100, RECEIVE_TIMEOUT).check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return foo.size() > 0 && bar.size() > 0 && events.size() > 0;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "One of foo, bar or event is empty.";
+      }
+    });
+
     synchronized (foo) {
       assertTrue(foo.size() > 0);
       for (String s : foo) {

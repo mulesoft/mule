@@ -4,10 +4,10 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="main">
-        <poll frequency="1000">
-            <set-payload value="Hello!!"/>
-        </poll>
-
+        <scheduler>
+            <fixed-frequency-scheduler frequency="1000"/>
+        </scheduler>
+        <set-payload value="Hello!!"/>
         <component class="org.foo.EchoTest"/>
     </flow>
 </mule>

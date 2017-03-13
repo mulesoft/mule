@@ -8,19 +8,15 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
-import org.mule.runtime.core.source.polling.PollingMessageSource;
-import org.mule.runtime.core.source.polling.schedule.FixedFrequencyScheduler;
+import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
-public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<PollingMessageSource>
+public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<SchedulerMessageSource>
     implements MuleContextAware {
 
   protected PeriodicScheduler scheduler;
-  protected Processor messageProcessor;
-  protected MessageProcessorPollingOverride override;
   protected Long frequency;
   private MuleContext muleContext;
 
@@ -28,14 +24,6 @@ public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObjectFact
     FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
     factory.setFrequency(frequency);
     return factory;
-  }
-
-  public void setMessageProcessor(Processor messageProcessor) {
-    this.messageProcessor = messageProcessor;
-  }
-
-  public void setOverride(MessageProcessorPollingOverride override) {
-    this.override = override;
   }
 
   public void setFrequency(Long frequency) {
@@ -48,10 +36,9 @@ public class PollingMessageSourceFactoryBean extends AbstractAnnotatedObjectFact
 
 
   @Override
-  public PollingMessageSource doGetObject() throws Exception {
+  public SchedulerMessageSource doGetObject() throws Exception {
     scheduler = scheduler == null ? defaultScheduler() : scheduler;
-    override = override != null ? this.override : new MessageProcessorPollingOverride.NullOverride();
-    return new PollingMessageSource(muleContext, messageProcessor, override, scheduler);
+    return new SchedulerMessageSource(muleContext, scheduler);
   }
 
   @Override

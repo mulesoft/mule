@@ -10,10 +10,10 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="pollfoo" processingStrategy="synchronous" initialState="stopped">
-        <poll>
+        <scheduler>
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
-            <logger message="Logger started"/>
-        </poll>
+        </scheduler>
+        <set-payload value="testString"/>
         <component class="org.mule.test.modules.schedulers.cron.StoppedCronSchedulerTestCase$FooComponent"/>
     </flow>
 </mule>

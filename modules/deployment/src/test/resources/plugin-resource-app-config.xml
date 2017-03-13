@@ -8,10 +8,10 @@
     <context:property-placeholder location="pluginResource.properties"/>
 
     <flow name="main">
-        <poll frequency="1000">
-            <set-payload value="${pluginDefinedProperty}"/>
-        </poll>
-
+        <scheduler>
+            <fixed-frequency-scheduler frequency="1000"/>
+        </scheduler>
+        <set-payload value="${pluginDefinedProperty}"/>
         <echo-component/>
     </flow>
 </mule>

@@ -38,6 +38,9 @@ public final class CursorStreamUtils {
    * @throws MuleException
    */
   public static Event withCursoredEvent(Event event, CheckedFunction<Event, Event> f) throws MuleException {
+    if (event.getMessage().getPayload() == null) {
+      return event;
+    }
     Reference<Throwable> exception = new Reference<>();
     CheckedFunction<Event, Event> function = new CheckedFunction<Event, Event>() {
 

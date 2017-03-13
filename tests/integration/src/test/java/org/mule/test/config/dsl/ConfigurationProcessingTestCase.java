@@ -40,6 +40,6 @@ public class ConfigurationProcessingTestCase extends AbstractIntegrationTestCase
     assertThat(flow, notNullValue());
     assertThat(flow.getMessageSource(), notNullValue());
     assertThat(flow.getMessageProcessors(), notNullValue());
-    assertThat(flow.getMessageProcessors().size(), is(3));
+    assertThat(flow.getMessageProcessors().size(), is(4));
   }
 }
