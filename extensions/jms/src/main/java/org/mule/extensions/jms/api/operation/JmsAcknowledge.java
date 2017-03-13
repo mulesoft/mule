@@ -7,6 +7,8 @@
 package org.mule.extensions.jms.api.operation;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
@@ -41,12 +43,13 @@ public final class JmsAcknowledge {
    * As per JMS Spec, performing an ACK over a single {@link Message} automatically works as an ACK for all the {@link Message}s
    * produced in the same {@link JmsSession}.
    *
-   *  @param ackId The AckId of the Message to ACK
+   * @param ackId The AckId of the Message to ACK
    * @throws JmsAckException if the {@link JmsSession} or {@link JmsConnection} were closed, or if the ID doesn't belong
    * to a session of the current connection
    */
   @Throws(JmsAckErrorTypeProvider.class)
   public void ack(@Summary("The AckId of the Message to ACK") String ackId) {
+    checkArgument(!isBlank(ackId), "The AckId can not be null or empty");
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Performing ACK on session: " + ackId);
@@ -70,6 +73,7 @@ public final class JmsAcknowledge {
    */
   @Throws(JmsSessionRecoverErrorTypeProvider.class)
   public void recoverSession(String ackId) {
+    checkArgument(!isBlank(ackId), "The AckId can not be null or empty");
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Recovering session: " + ackId);

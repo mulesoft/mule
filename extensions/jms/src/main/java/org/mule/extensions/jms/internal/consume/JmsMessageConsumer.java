@@ -9,15 +9,14 @@ package org.mule.extensions.jms.internal.consume;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.apache.commons.lang.time.StopWatch;
 import org.mule.extensions.jms.api.exception.JmsTimeoutException;
+import org.slf4j.Logger;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-
-import org.apache.commons.lang.time.StopWatch;
-import org.slf4j.Logger;
 
 /**
  * Wrapper implementation of a JMS {@link MessageConsumer}

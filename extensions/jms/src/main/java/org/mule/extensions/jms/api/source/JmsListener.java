@@ -47,7 +47,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -90,42 +89,56 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
   private JmsSupport jmsSupport;
 
+  /**
+   * The name of the Destination from where the Message should be consumed
+   */
   @Parameter
   @XmlHints(allowReferences = false)
-  @Summary("The name of the Destination from where the Message should be consumed")
   private String destination;
 
+  /**
+   * The Type of the Consumer that should be used for the provided destination
+   */
   @Parameter
   @Optional
-  @Summary("The Type of the Consumer that should be used for the provided destination")
   private ConsumerType consumerType;
 
+  /**
+   * The Session ACK mode to use when consuming a message
+   */
   @Parameter
   @Optional
-  @Summary("The Session ACK mode to use when consuming a message")
   private AckMode ackMode;
 
+  /**
+   * JMS selector to be used for filtering incoming messages
+   */
   @Parameter
   @Optional
-  @Summary("JMS selector to be used for filtering incoming messages")
   private String selector;
 
+  /**
+   * The content type of the message body
+   */
   @Parameter
   @Optional
   @Example(EXAMPLE_CONTENT_TYPE)
-  @Summary("The content type of the message body")
   private String contentType;
 
+  /**
+   * The encoding of the message body
+   */
   @Parameter
   @Optional
   @Example(EXAMPLE_ENCODING)
-  @Summary("The encoding of the message body")
   private String encoding;
 
+  /**
+   * This makes the message listener to work synchronously, only one message at a time will be consumed, delivered
+   * and waited to be processed in the flow.
+   */
   @Parameter
   @Optional(defaultValue = "true")
-  @Summary("This makes the message listener to work synchronously, only one message at a time will be consumed, delivered" +
-      " and waited to be processed in the flow.")
   private boolean synchronous;
 
   private JmsListenerLock jmsLock;

@@ -92,6 +92,7 @@ public class JmsPublishConsume {
                                                           allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
                                                       @Optional @NullSafe @Placement(
                                                           order = 1) @Summary("A builder for the message that will be published") MessageBuilder messageBuilder,
+                                                      //TODO - MULE-11962 : Limit ACK Modes for PublishConsume operation
                                                       @Optional AckMode ackMode,
                                                       @Optional(
                                                           defaultValue = "10000") @Summary("Maximum time to wait for a response before timeout") long maximumWait,

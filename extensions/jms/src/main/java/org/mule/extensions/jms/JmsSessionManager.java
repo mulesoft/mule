@@ -6,12 +6,9 @@
  */
 package org.mule.extensions.jms;
 
-import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.exception.JmsAckException;
-import org.mule.extensions.jms.api.exception.JmsSessionRecoverException;
 import org.mule.extensions.jms.api.source.JmsListener;
 import org.mule.extensions.jms.api.source.JmsListenerLock;
 import org.slf4j.Logger;
@@ -62,13 +59,21 @@ public class JmsSessionManager {
    * @throws JMSException if an error occurs during the ack
    */
   public void ack(String ackId) throws JMSException {
-    SessionInformation sessionInformation = getSessionInformation(ackId)
-        .orElseThrow(() -> new JmsAckException(format("No pending acknowledgement with ackId [%s] exists in this Connection",
-                                                      ackId)));
+    Optional<SessionInformation> optionalSession = getSessionInformation(ackId);
 
-    sessionInformation.getMessage().acknowledge();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Acknowledged Message for Session with AckId [" + ackId + "]");
+    if (optionalSession.isPresent()) {
+      optionalSession.get().getMessage().acknowledge();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Acknowledged Message for Session with AckId [" + ackId + "]");
+      }
+    } else {
+      //TODO - MULE-11963 : Improve error message for JmsAcknowledgement operations when the SessionInformation doesn't exist anymore
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("The session could not be acknowledged. This may be due to: \n " +
+            "- The session has been already acknowledged\n" +
+            "- The session has been recovered\n " +
+            "- The given 'ackId' :  [" + ackId + "] is invalid.");
+      }
     }
   }
 
@@ -79,26 +84,35 @@ public class JmsSessionManager {
    * @throws JMSException if an error occurs during recovering the session
    */
   public void recoverSession(String ackId) throws JMSException {
-    SessionInformation sessionInformation = getSessionInformation(ackId)
-        .orElseThrow(() -> new JmsSessionRecoverException("No pending session with ackId [" + ackId
-            + "] exists in this Connection"));
+    Optional<SessionInformation> optionalSession = getSessionInformation(ackId);
+    if (optionalSession.isPresent()) {
+      SessionInformation sessionInformation = optionalSession.get();
 
-    Session session = sessionInformation.getSession();
+      sessionInformation.getJmsListenerLock().ifPresent(lock -> {
+        if (lock.isLocked()) {
+          lock.unlock();
+        }
+      });
 
-    sessionInformation.getJmsListenerLock().ifPresent(lock -> {
-      if (lock.isLocked()) {
-        lock.unlock();
+      sessionInformation.getSession().recover();
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Recovered session for AckId [ " + ackId + "]");
       }
-    });
-
-    session.recover();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Recovered session for AckId [ " + ackId + "]");
+    } else {
+      if (LOGGER.isDebugEnabled()) {
+        //TODO - MULE-11963 : Improve error message for JmsAcknowledgement operations when the SessionInformation doesn't exist anymore
+        LOGGER.debug("The session could not be recovered, this could be due to: \n" +
+            "- The session has been already recovered\n" +
+            "- The all session messages has been already acknowledged\n" +
+            "- The given 'ackId' : [" + ackId + "] is invalid");
+      }
     }
+
   }
 
   private Optional<SessionInformation> getSessionInformation(String ackId) {
-    return ofNullable(pendingSessions.get(ackId));
+    return ofNullable(pendingSessions.remove(ackId));
   }
 
   private class SessionInformation {
