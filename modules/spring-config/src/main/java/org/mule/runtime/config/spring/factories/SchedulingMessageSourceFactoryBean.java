@@ -16,18 +16,14 @@ import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<SchedulerMessageSource>
     implements MuleContextAware {
 
+  private static final long DEFAULT_FREQUENCY = 1000l;
   protected PeriodicScheduler scheduler;
-  protected Long frequency;
   private MuleContext muleContext;
 
   private FixedFrequencyScheduler defaultScheduler() {
     FixedFrequencyScheduler factory = new FixedFrequencyScheduler();
-    factory.setFrequency(frequency);
+    factory.setFrequency(DEFAULT_FREQUENCY);
     return factory;
-  }
-
-  public void setFrequency(Long frequency) {
-    this.frequency = frequency;
   }
 
   public void setScheduler(PeriodicScheduler scheduler) {
