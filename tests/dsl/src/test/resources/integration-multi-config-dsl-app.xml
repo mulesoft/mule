@@ -18,7 +18,7 @@
     </db:config>
 
     <httpn:listener-config name="httpListener" basePath="/">
-        <httpn:listener-connection host="localhost" port="49019" protocol="HTTPS">
+        <httpn:listener-connection host="localhost" port="49019" protocol="HTTPS" disableValidation="true">
             <tls:context>
                 <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>

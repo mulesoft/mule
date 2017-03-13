@@ -11,6 +11,7 @@ import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlo
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -84,6 +85,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
             .withRefName("httpListener")
             .withParameter("basePath", "/")
             .withConnection(http.newConnection("listener-connection")
+                .withParameter(DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME, "true")
                 .withParameter(TLS_PARAMETER_NAME, newObjectValue()
                     .withParameter("key-store", newObjectValue()
                         .withParameter("path", "ssltest-keystore.jks")

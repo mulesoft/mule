@@ -74,11 +74,18 @@ class InfrastructureElementModelDelegate {
         return;
 
       default:
-        addSimpleParameter(declaration, parentConfig);
-        parentElement.containing(DslElementModel.builder()
-            .withModel(parameterModel)
-            .withDsl(paramDsl)
-            .build());
+        declaration.getValue().accept(new ParameterValueVisitor() {
+
+          @Override
+          public void visitSimpleValue(String value) {
+            parentConfig.withParameter(declaration.getName(), value);
+            parentElement.containing(DslElementModel.builder()
+                .withModel(parameterModel)
+                .withDsl(paramDsl)
+                .withValue(value)
+                .build());
+          }
+        });
     }
   }
 
@@ -197,17 +204,6 @@ class InfrastructureElementModelDelegate {
           }
 
         }));
-  }
-
-  private void addSimpleParameter(ParameterElementDeclaration declaration,
-                                  final ComponentConfiguration.Builder parentConfig) {
-    declaration.getValue().accept(new ParameterValueVisitor() {
-
-      @Override
-      public void visitSimpleValue(String value) {
-        parentConfig.withParameter(declaration.getName(), value);
-      }
-    });
   }
 
 }
