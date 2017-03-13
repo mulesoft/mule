@@ -7,13 +7,10 @@
 package org.mule.extensions.jms.internal.message;
 
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.JmsHeaders;
 import org.mule.extensions.jms.api.message.JmsMessageProperties;
-
-import java.util.Optional;
 
 /**
  * Default implementation of {@link JmsAttributes}
@@ -52,8 +49,8 @@ class DefaultJmsAttributes implements JmsAttributes {
    * {@inheritDoc}
    */
   @Override
-  public Optional<String> getAckId() {
-    return ofNullable(ackId);
+  public String getAckId() {
+    return ackId;
   }
 
   /**
@@ -92,8 +89,5 @@ class DefaultJmsAttributes implements JmsAttributes {
       checkArgument(headers != null, "No JmsHeaders were provided, but they are required for the JmsAttributes");
       return new DefaultJmsAttributes(properties, headers, ackId);
     }
-
   }
-
-
 }

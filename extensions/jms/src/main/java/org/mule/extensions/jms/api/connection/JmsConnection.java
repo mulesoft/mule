@@ -6,27 +6,20 @@
  */
 package org.mule.extensions.jms.api.connection;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.mule.extensions.jms.api.config.AckMode.MANUAL;
 import static org.mule.extensions.jms.api.config.AckMode.TRANSACTED;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.destination.ConsumerType;
-import org.mule.extensions.jms.api.exception.JmsAckException;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.publish.JmsMessageProducer;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import org.slf4j.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -39,8 +32,8 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
-
-import org.slf4j.Logger;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A Connection for the JmsExtension
@@ -53,7 +46,6 @@ public final class JmsConnection implements Stoppable, Disposable {
 
   private final JmsSupport jmsSupport;
   private final Connection connection;
-  private final Map<String, Message> pendingAckSessions = new HashMap<>();
   private final List<JmsMessageConsumer> createdConsumers = new LinkedList<>();
   private final List<JmsMessageProducer> createdProducers = new LinkedList<>();
   private final List<JmsSession> createdSessions = new LinkedList<>();
@@ -86,7 +78,6 @@ public final class JmsConnection implements Stoppable, Disposable {
 
     if (ackMode.equals(MANUAL)) {
       String ackId = randomAlphanumeric(16);
-      pendingAckSessions.put(ackId, null);
       wrapper = new JmsSession(session, ackId);
     } else {
       wrapper = new JmsSession(session);
@@ -136,43 +127,6 @@ public final class JmsConnection implements Stoppable, Disposable {
   }
 
   /**
-   * Registers the {@link Message} to the {@link Session} using the {@code ackId} in order to being
-   * able later to perform a {@link AckMode#MANUAL} ACK
-   *
-   * @param ackId   the id associated to the {@link Session} used to create the {@link Message}
-   * @param message the {@link Message} to use for executing the {@link Message#acknowledge}
-   * @throws IllegalArgumentException if no Session was registered with the given AckId
-   */
-  public void registerMessageForAck(String ackId, Message message) {
-    checkArgument(pendingAckSessions.containsKey(ackId),
-                  format("Ack pending Messages can only be registered for Sessions created with this Connection, "
-                      + "but AckId [%s] was never declared", ackId));
-
-    pendingAckSessions.put(ackId, message);
-
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Registered Message for Session AckId [%s]", ackId));
-    }
-  }
-
-  /**
-   * Executes the {@link Message#acknowledge} on the latest {@link Message} associated to the {@link Session}
-   * identified by the {@code ackId}
-   *
-   * @param ackId the id associated to the {@link Session} that should be ACKed
-   * @throws JMSException if an error occurs during the ack
-   */
-  public void doAck(String ackId) throws JMSException {
-
-    Message message = pendingAckSessions.get(ackId);
-    if (message == null) {
-      throw new JmsAckException(format("No pending acknowledgement with ackId [%s] exists in this Connection", ackId));
-    }
-
-    message.acknowledge();
-  }
-
-  /**
    * Temporarily stops a connection's delivery of incoming messages. Delivery
    * can be restarted using the connection's {@code start} method. When
    * the connection is stopped, delivery to all the connection's message
@@ -207,7 +161,6 @@ public final class JmsConnection implements Stoppable, Disposable {
 
       releaseResources();
       connection.close();
-      pendingAckSessions.clear();
     } catch (javax.jms.IllegalStateException ex) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Ignoring Connection state exception - assuming already closed: ", ex);
@@ -236,7 +189,7 @@ public final class JmsConnection implements Stoppable, Disposable {
     }
 
     List<JmsSession> closed = createdSessions.stream()
-        .filter(session -> !session.getAckId().isPresent() || pendingAckSessions.get(session.getAckId().get()) == null)
+        .filter(session -> !session.getAckId().isPresent())
         .peek(this::closeQuietly)
         .collect(toList());
 

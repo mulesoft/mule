@@ -8,7 +8,6 @@ package org.mule.extensions.jms.api.exception;
 
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.error.MuleErrors;
 
 import java.util.Optional;
 
@@ -19,7 +18,11 @@ import java.util.Optional;
  */
 public enum JmsErrors implements ErrorTypeDefinition<JmsErrors> {
 
-  PUBLISHING, CONSUMING, ILLEGAL_BODY(PUBLISHING), ACK(CONSUMING), TIMEOUT(CONSUMING), DESTINATION_NOT_FOUND;
+  PUBLISHING, ILLEGAL_BODY(PUBLISHING),
+
+  CONSUMING, ACK(CONSUMING), TIMEOUT(CONSUMING), SESSION_RECOVER(CONSUMING),
+
+  DESTINATION_NOT_FOUND;
 
   private ErrorTypeDefinition<?> parentErrortype;
 

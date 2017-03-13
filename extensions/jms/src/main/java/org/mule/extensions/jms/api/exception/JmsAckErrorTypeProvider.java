@@ -7,19 +7,17 @@
 package org.mule.extensions.jms.api.exception;
 
 import static org.mule.extensions.jms.api.exception.JmsErrors.ACK;
-import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.api.operation.JmsAck;
+import com.google.common.collect.ImmutableSet;
+import org.mule.extensions.jms.api.operation.JmsAcknowledge;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
 /**
- * Errors that can be thrown in the {@link JmsAck#ack(JmsConnection, String)} operation.
+ * Errors that can be thrown in the {@link JmsAcknowledge#ack(String)} operation.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class JmsAckErrorTypeProvider implements ErrorTypeProvider {
 

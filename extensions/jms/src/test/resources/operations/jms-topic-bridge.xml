@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="send-payload">
-        <jmsn:publish config-ref="config" destination="#[initialDestination]" destinationType="TOPIC">
-            <jmsn:message-builder>
-                <jmsn:properties>
+        <jms:publish config-ref="config" destination="#[initialDestination]" destinationType="TOPIC">
+            <jms:message-builder>
+                <jms:properties>
                     #[{(initialProperty): propertyValue}]
-                </jmsn:properties>
-            </jmsn:message-builder>
-        </jmsn:publish>
+                </jms:properties>
+            </jms:message-builder>
+        </jms:publish>
     </flow>
 
     <flow name="bridge">
-        <jmsn:consume config-ref="config" destination="#[initialDestination]" maximumWait="1000">
-            <jmsn:consumer-type>
-                <jmsn:topic-consumer isShared="true" subscriptionName="subsName"/>
-            </jmsn:consumer-type>
-        </jmsn:consume>
-        <jmsn:publish config-ref="config" destination="#[finalDestination]" destinationType="TOPIC">
-            <jmsn:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
-                <jmsn:body>#[bridgePrefix ++ payload]</jmsn:body>
-                <jmsn:properties>#[attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jmsn:properties>
-            </jmsn:message-builder>
-        </jmsn:publish>
+        <jms:consume config-ref="config" destination="#[initialDestination]" maximumWait="1000">
+            <jms:consumer-type>
+                <jms:topic-consumer isShared="true" subscriptionName="subsName"/>
+            </jms:consumer-type>
+        </jms:consume>
+        <jms:publish config-ref="config" destination="#[finalDestination]" destinationType="TOPIC">
+            <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
+                <jms:body>#[bridgePrefix ++ payload]</jms:body>
+                <jms:properties>#[attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jms:properties>
+            </jms:message-builder>
+        </jms:publish>
     </flow>
 
     <flow name="bridge-receiver">
-        <jmsn:consume config-ref="config" destination="#[finalDestination]" maximumWait="1000">
-            <jmsn:consumer-type>
-                <jmsn:topic-consumer/>
-            </jmsn:consumer-type>
-        </jmsn:consume>
+        <jms:consume config-ref="config" destination="#[finalDestination]" maximumWait="1000">
+            <jms:consumer-type>
+                <jms:topic-consumer/>
+            </jms:consumer-type>
+        </jms:consume>
     </flow>
 
 </mule>

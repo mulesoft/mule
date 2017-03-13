@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <spring:bean name="customConnectionFactory" class="org.mule.extensions.jms.test.infra.JmsTestConnectionFactory"/>
 
-    <jmsn:config name="config">
-        <jmsn:generic-connection connectionFactory="customConnectionFactory"
+    <jms:config name="config">
+        <jms:generic-connection connectionFactory="customConnectionFactory"
                                  username="user" password="pass" clientId="myclient"
                                  specification="JMS_1_1" disableValidation="false">
-            <jmsn:caching-strategy>
-                <jmsn:no-caching/>
-            </jmsn:caching-strategy>
-        </jmsn:generic-connection>
-    </jmsn:config>
+            <jms:caching-strategy>
+                <jms:no-caching/>
+            </jms:caching-strategy>
+        </jms:generic-connection>
+    </jms:config>
 
 </mule>

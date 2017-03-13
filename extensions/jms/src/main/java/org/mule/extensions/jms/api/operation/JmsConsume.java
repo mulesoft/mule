@@ -7,10 +7,14 @@
 package org.mule.extensions.jms.api.operation;
 
 import static java.lang.String.format;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.evaluateMessageAck;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveMessageContentType;
-import static org.mule.extensions.jms.internal.common.JmsOperationCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
+import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
+import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
+import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
@@ -31,16 +35,16 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.slf4j.Logger;
 
-import java.util.concurrent.TimeUnit;
-
+import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-
-import org.slf4j.Logger;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Operation that allows the user to consume a single {@link Message} from a given {@link Destination}
@@ -52,6 +56,9 @@ public final class JmsConsume {
   private static final Logger LOGGER = getLogger(JmsConsume.class);
 
   private final JmsResultFactory resultFactory = new JmsResultFactory();
+
+  @Inject
+  private JmsSessionManager sessionManager;
 
   /**
    * Operation that allows the user to consume a single {@link Message} from a given {@link Destination}.
@@ -79,8 +86,8 @@ public final class JmsConsume {
                                                @Optional @Summary("The Type of the Consumer that should be used for the provided destination") ConsumerType consumerType,
                                                @Optional @Summary("The Session ACK mode to use when consuming a message") AckMode ackMode,
                                                @Optional @Summary("JMS selector to be used for filtering incoming messages") String selector,
-                                               @Optional @Summary("The content type of the message body") String contentType,
-                                               @Optional @Summary("The encoding of the message body") String encoding,
+                                               @Optional @Summary("The content type of the message body") @Example(EXAMPLE_CONTENT_TYPE) String contentType,
+                                               @Optional @Summary("The encoding of the message body") @Example(EXAMPLE_ENCODING) String encoding,
                                                @Optional(
                                                    defaultValue = "10000") @Summary("Maximum time to wait for a message to arrive before timeout") Long maximumWait,
                                                @Optional(
@@ -92,7 +99,6 @@ public final class JmsConsume {
     consumerType = resolveOverride(consumerConfig.getConsumerType(), consumerType);
     ackMode = resolveOverride(consumerConfig.getAckMode(), ackMode);
     selector = resolveOverride(consumerConfig.getSelector(), selector);
-    encoding = resolveOverride(config.getEncoding(), encoding);
 
     try {
       if (LOGGER.isDebugEnabled()) {
@@ -112,12 +118,12 @@ public final class JmsConsume {
       Message received = consumer.consume(maximumWaitUnit.toMillis(maximumWait));
 
       if (received != null) {
-        evaluateMessageAck(connection, ackMode, session, received);
+        evaluateMessageAck(ackMode, session, received, sessionManager, null);
         // If no explicit content type was provided to the operation, fallback to the
         // one communicated in the message properties. Finally if no property was set,
         // use the default one provided by the config
-        contentType = resolveOverride(resolveMessageContentType(received, config.getContentType()),
-                                      contentType);
+        contentType = resolveOverride(resolveMessageContentType(received, config.getContentType()), contentType);
+        encoding = resolveOverride(resolveMessageEncoding(received, config.getEncoding()), encoding);
       }
 
       return resultFactory.createResult(received, jmsSupport.getSpecification(),

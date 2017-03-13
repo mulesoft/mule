@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <flow name="publisher">
+        <jms:publish config-ref="config" destination="${destination}"/>
+        <logger level="DEBUG" message="#[payload]"/>
+    </flow>
+
+    <flow name="publishConsumer">
+        <jms:publish-consume destination="${destination}">
+            <jms:message-builder >
+                <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
+            </jms:message-builder>
+        </jms:publish-consume>
+    </flow>
+
+    <flow name="publishConsumer-with-override">
+        <jms:publish-consume destination="${destination}" contentType="text/json" encoding="US-ASCII">
+            <jms:message-builder >
+                <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
+            </jms:message-builder>
+        </jms:publish-consume>
+    </flow>
+
+    <flow name="consumer">
+        <jms:consume destination="${destination}"/>
+    </flow>
+
+    <flow name="listener" initialState="stopped">
+        <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
+    </flow>
+
+    <flow name="consumer-with-override">
+        <jms:consume destination="${destination}" contentType="text/json" encoding="US-ASCII"/>
+    </flow>
+
+    <flow name="listener-with-override" initialState="stopped">
+        <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO" contentType="text/json" encoding="US-ASCII"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
+    </flow>
+
+</mule>

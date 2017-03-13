@@ -8,6 +8,7 @@ package org.mule.extensions.jms.api.exception;
 
 import static org.mule.extensions.jms.api.exception.JmsErrors.ACK;
 import static org.mule.extensions.jms.api.exception.JmsErrors.CONSUMING;
+import static org.mule.extensions.jms.api.exception.JmsErrors.DESTINATION_NOT_FOUND;
 import static org.mule.extensions.jms.api.exception.JmsErrors.ILLEGAL_BODY;
 import static org.mule.extensions.jms.api.exception.JmsErrors.PUBLISHING;
 import static org.mule.extensions.jms.api.exception.JmsErrors.TIMEOUT;
@@ -27,10 +28,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Errors that can be thrown in the
- * {@link JmsPublishConsume#publishConsume(JmsConfig, JmsConnection, String, MessageBuilder, AckMode, long, TimeUnit, JmsPublishParameters)}
+ * {@link JmsPublishConsume#publishConsume(JmsConfig, JmsConnection, String, MessageBuilder, AckMode, long, TimeUnit, JmsPublishParameters, String, String)}
  * operation operation.
  *
- * @since 1.0
+ * @since 4.0
  */
 public class JmsPublishConsumeErrorTypeProvider implements ErrorTypeProvider {
 
@@ -41,6 +42,7 @@ public class JmsPublishConsumeErrorTypeProvider implements ErrorTypeProvider {
         .add(ILLEGAL_BODY)
         .add(CONSUMING)
         .add(TIMEOUT)
+        .add(DESTINATION_NOT_FOUND)
         .add(ACK)
         .build();
   }

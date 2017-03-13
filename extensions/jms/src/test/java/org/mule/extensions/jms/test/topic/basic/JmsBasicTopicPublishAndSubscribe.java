@@ -11,19 +11,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Is.is;
+import static org.mule.extensions.jms.test.JmsMessageStorage.pollMuleMessage;
+import static org.mule.extensions.jms.test.JmsMessageStorage.receivedMessages;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
 public abstract class JmsBasicTopicPublishAndSubscribe extends JmsAbstractTestCase {
 
-  public static final String DEFAULT_OPERATIONS_CONFIG = "operations/jms-default-topic-operations.xml";
-  public static final String SUBSCRIBER_CONFIG = "source/jms-default-topic-subscribe.xml";
-  public static final String LISTENER_DESTINATION = "topicSubscriberDestinationToOnIncomingConnection";
+  static final String DEFAULT_OPERATIONS_CONFIG = "operations/jms-default-topic-operations.xml";
+  static final String SUBSCRIBER_CONFIG = "source/jms-default-topic-subscribe.xml";
+  private static final String LISTENER_DESTINATION = "topicSubscriberDestinationToOnIncomingConnection";
 
   @Before
   public void setDestination() {
@@ -34,8 +35,8 @@ public abstract class JmsBasicTopicPublishAndSubscribe extends JmsAbstractTestCa
   public void publishOnce() throws Exception {
     final String payload = "My Message";
     publish(payload);
-    assertThat(receiveIncomingMessage(), hasPayload(equalTo(payload)));
-    assertThat(receivedMessages.isEmpty(), is(true));
+    assertThat(pollMuleMessage(), hasPayload(equalTo(payload)));
+    assertThat(receivedMessages(), is(0));
   }
 
   @Test
@@ -45,8 +46,8 @@ public abstract class JmsBasicTopicPublishAndSubscribe extends JmsAbstractTestCa
       publish(m);
     }
 
-    messages.forEach(payload -> assertThat(receiveIncomingMessage(), hasPayload(isIn(messages))));
-    assertThat(receivedMessages.isEmpty(), is(true));
+    messages.forEach(payload -> assertThat(pollMuleMessage(), hasPayload(isIn(messages))));
+    assertThat(receivedMessages(), is(0));
   }
 
   @Test
@@ -58,17 +59,17 @@ public abstract class JmsBasicTopicPublishAndSubscribe extends JmsAbstractTestCa
       publish(m);
     }
 
-    firstMessages.forEach(payload -> assertThat(receiveIncomingMessage(), hasPayload(isIn(firstMessages))));
+    firstMessages.forEach(payload -> assertThat(pollMuleMessage(), hasPayload(isIn(firstMessages))));
 
-    assertThat(receivedMessages.isEmpty(), is(true));
+    assertThat(receivedMessages(), is(0));
 
     for (String m : secondMessages) {
       publish(m);
     }
 
-    secondMessages.forEach(payload -> assertThat(receiveIncomingMessage(), hasPayload(isIn(secondMessages))));
+    secondMessages.forEach(payload -> assertThat(pollMuleMessage(), hasPayload(isIn(secondMessages))));
 
-    assertThat(receivedMessages.isEmpty(), is(true));
+    assertThat(receivedMessages(), is(0));
   }
 
 }

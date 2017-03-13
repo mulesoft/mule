@@ -7,19 +7,23 @@
 package org.mule.extensions.jms.api.operation;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.exception.JmsAckErrorTypeProvider;
 import org.mule.extensions.jms.api.exception.JmsAckException;
+import org.mule.extensions.jms.api.exception.JmsSessionRecoverErrorTypeProvider;
+import org.mule.extensions.jms.api.exception.JmsSessionRecoverException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-
-import javax.jms.Message;
-
 import org.slf4j.Logger;
+
+import javax.inject.Inject;
+import javax.jms.Message;
 
 
 /**
@@ -27,33 +31,31 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public final class JmsAck {
+public final class JmsAcknowledge {
 
-  private static final Logger LOGGER = getLogger(JmsAck.class);
+  private static final Logger LOGGER = getLogger(JmsAcknowledge.class);
+
+  @Inject
+  private JmsSessionManager sessionManager;
 
   /**
    * Allows the user to perform an ACK when the {@link AckMode#MANUAL} mode is elected while consuming the {@link Message}.
    * As per JMS Spec, performing an ACK over a single {@link Message} automatically works as an ACK for all the {@link Message}s
    * produced in the same {@link JmsSession}.
-   * <p>
-   * The {@code ackId} must refer to a {@link JmsSession} created using the current {@link JmsConnection}.
-   * If the {@link JmsSession} or {@link JmsConnection} were closed, the ACK will fail.
-   * If the {@code ackId} does not belong to a {@link JmsSession} created using the current {@link JmsConnection}
    *
-   * @param connection the {@link JmsConnection} that created the {@link JmsSession} over which the ACK will be performed
-   * @param ackId the {@link JmsSession#getAckId}
+   * @param ackId The AckId of the Message to ACK
    * @throws JmsAckException if the {@link JmsSession} or {@link JmsConnection} were closed, or if the ID doesn't belong
    * to a session of the current connection
    */
   @Throws(JmsAckErrorTypeProvider.class)
-  public void ack(@Connection JmsConnection connection, @Summary("The AckId of the Message to ACK") String ackId) {
-
+  public void ack(@Summary("The AckId of the Message to ACK") String ackId) {
+    checkArgument(!isBlank(ackId), "The AckId can not be null or empty");
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Performing ACK on session: " + ackId);
       }
 
-      connection.doAck(ackId);
+      sessionManager.ack(ackId);
 
     } catch (Exception e) {
       LOGGER.error(format("An error occurred while acking a message with ID [%s]: ", ackId), e);
@@ -61,4 +63,29 @@ public final class JmsAck {
     }
   }
 
+  /**
+   * Allows the user to perform a session recover when the {@link AckMode#MANUAL} mode is elected while consuming the
+   * {@link Message}.
+   * As per JMS Spec, performing a session recover automatically will redeliver all the consumed messages that had not being
+   * acknowledged before this recover.
+   *
+   * @param ackId The AckId of the Message Session to recover
+   */
+  @Throws(JmsSessionRecoverErrorTypeProvider.class)
+  public void recoverSession(String ackId) {
+    checkArgument(!isBlank(ackId), "The AckId can not be null or empty");
+    try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Recovering session: " + ackId);
+      }
+
+      sessionManager.recoverSession(ackId);
+
+    } catch (Exception e) {
+      LOGGER.error(format("An error occurred while recovering the session with ID [%s]: ", ackId), e);
+      throw new JmsSessionRecoverException(format("An error occurred while trying to perform an recover on Session with ID [%s]: ",
+                                                  ackId),
+                                           e);
+    }
+  }
 }

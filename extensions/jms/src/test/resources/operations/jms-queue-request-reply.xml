@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="request-reply-explicit-destination">
-        <jmsn:publish-consume config-ref="config" destination="#[destination]">
-            <jmsn:message-builder>
-                <jmsn:reply-to destination="#[replyToDestination]" destinationType="QUEUE"/>
-            </jmsn:message-builder>
-        </jmsn:publish-consume>
+        <jms:publish-consume config-ref="config" destination="#[destination]">
+            <jms:message-builder>
+                <jms:reply-to destination="#[replyToDestination]" destinationType="QUEUE"/>
+            </jms:message-builder>
+        </jms:publish-consume>
     </flow>
 
     <flow name="request-reply-temp-destination">
-        <jmsn:publish-consume config-ref="config" destination="#[destination]"/>
+        <jms:publish-consume config-ref="config" destination="#[destination]"/>
     </flow>
 
 </mule>

@@ -11,25 +11,29 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extensions.jms.api.config.AckMode.MANUAL;
 import static org.mule.extensions.jms.api.config.AckMode.NONE;
 import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_CONTENT_TYPE_JMS_PROPERTY;
+import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_ENCODING_JMS_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.exception.JmsAckException;
+import org.mule.extensions.jms.api.source.JmsListenerLock;
+import org.slf4j.Logger;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-
-import org.slf4j.Logger;
 
 /**
  * Utility class for Jms Operations
  *
  * @since 4.0
  */
-public final class JmsOperationCommons {
+public final class JmsCommons {
 
-  private static final Logger LOGGER = getLogger(JmsOperationCommons.class);
+  private static final Logger LOGGER = getLogger(JmsCommons.class);
+
+  public static final String EXAMPLE_ENCODING = "UTF-8";
+  public static final String EXAMPLE_CONTENT_TYPE = "application/json";
 
   public static String resolveMessageContentType(Message message, String defaultType) {
     try {
@@ -42,19 +46,30 @@ public final class JmsOperationCommons {
     }
   }
 
+  public static String resolveMessageEncoding(Message message, String defaultType) {
+    try {
+      String contentType = message.getStringProperty(BODY_ENCODING_JMS_PROPERTY);
+      return isBlank(contentType) ? defaultType : contentType;
+    } catch (JMSException e) {
+      LOGGER.warn(format("Failed to read the Message ContentType from its properties. A default value of [%s] will be used.",
+                         defaultType));
+      return defaultType;
+    }
+  }
+
   public static <T> T resolveOverride(T configValue, T operationValue) {
     return operationValue == null ? configValue : operationValue;
   }
 
-  public static void evaluateMessageAck(JmsConnection connection, AckMode ackMode, JmsSession session,
-                                        Message received)
+  public static void evaluateMessageAck(AckMode ackMode, JmsSession session, Message receivedMessage,
+                                        JmsSessionManager messageSessionManager, JmsListenerLock jmsLock)
       throws JMSException {
     try {
       if (ackMode.equals(NONE)) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Automatically performing an ACK over the message, since AckMode was NONE");
         }
-        received.acknowledge();
+        receivedMessage.acknowledge();
 
       } else if (ackMode.equals(MANUAL)) {
         if (LOGGER.isDebugEnabled()) {
@@ -63,10 +78,10 @@ public final class JmsOperationCommons {
         String id = session.getAckId()
             .orElseThrow(() -> new IllegalArgumentException("An AckId is required when MANUAL AckMode is set"));
 
-        connection.registerMessageForAck(id, received);
+        messageSessionManager.registerMessageForAck(id, receivedMessage, session.get(), jmsLock);
       }
     } catch (JMSException e) {
-      throw new JmsAckException("An error occurred while acking message", e);
+      throw new JmsAckException("An error occurred while acknowledging the message", e);
     }
   }
 

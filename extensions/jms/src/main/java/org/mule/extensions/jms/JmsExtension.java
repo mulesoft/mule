@@ -21,12 +21,14 @@ import org.mule.extensions.jms.api.destination.QueueConsumer;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
 import org.mule.extensions.jms.api.exception.JmsErrors;
 import org.mule.extensions.jms.api.exception.JmsExceptionHandler;
+import org.mule.extensions.jms.api.operation.JmsAcknowledge;
 import org.mule.extensions.jms.internal.connection.provider.GenericConnectionProvider;
 import org.mule.extensions.jms.internal.connection.provider.activemq.ActiveMQConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.OnException;
+import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
@@ -44,9 +46,10 @@ import javax.jms.ConnectionFactory;
  * @since 4.0
  */
 @Extension(name = "JMS")
-@Xml(prefix = "jmsn")
+@Xml(prefix = "jms")
 @Configurations({JmsConfig.class})
 @ConnectionProviders({GenericConnectionProvider.class, ActiveMQConnectionProvider.class})
+@Operations(JmsAcknowledge.class)
 @SubTypeMapping(
     baseType = ConsumerType.class, subTypes = {QueueConsumer.class, TopicConsumer.class})
 @SubTypeMapping(

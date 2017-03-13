@@ -27,12 +27,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.slf4j.Logger;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.Message;
-
-import org.slf4j.Logger;
 
 /**
  * Operation that allows the user to send a message to a JMS {@link Destination}
@@ -42,7 +41,6 @@ import org.slf4j.Logger;
 public final class JmsPublish {
 
   private static final Logger LOGGER = getLogger(JmsPublish.class);
-
 
   /**
    * Operation that allows the user to send a {@link Message} to a JMS {@link Destination

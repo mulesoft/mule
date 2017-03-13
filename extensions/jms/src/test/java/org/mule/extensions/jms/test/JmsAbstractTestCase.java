@@ -8,78 +8,60 @@ package org.mule.extensions.jms.test;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.extensions.jms.test.JmsMessageStorage.cleanUpQueue;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.junit.Rule;
 import org.mule.extensions.jms.api.destination.JmsDestination;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.JmsHeaders;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.el.context.MessageContext;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.slf4j.Logger;
+import ru.yandex.qatools.allure.annotations.Features;
 
+import java.util.Map;
+
+@Features("JMS Extension")
 @ArtifactClassLoaderRunnerConfig(testInclusions = {"org.apache.activemq:artemis-jms-client"})
 public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final Logger LOGGER = getLogger(JmsAbstractTestCase.class);
 
-  protected static final String NAMESPACE = "JMSN";
+  protected static final String NAMESPACE = "JMS";
   protected static final String DESTINATION_VAR = "destination";
   protected static final String MAXIMUM_WAIT_VAR = "maximumWait";
 
   protected static final String PUBLISHER_FLOW = "publisher";
   protected static final String CONSUMER_FLOW = "consumer";
+  protected static final String LISTENER_FLOW = "listener";
 
   protected static final int TIMEOUT_MILLIS = 5000;
   protected static final int POLL_DELAY_MILLIS = 100;
-  protected static List<Message> receivedMessages = new LinkedList<>();
-
+  protected static final String MAX_REDELIVERY = "max.redelivery";
   protected String destination;
   protected long maximumWait = 10000;
+
+  @Rule
+  public SystemProperty maxRedelivery = new SystemProperty(MAX_REDELIVERY, "0");
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
     super.doSetUpBeforeMuleContextCreation();
-    receivedMessages = new CopyOnWriteArrayList<>();
   }
 
   @Override
   protected void doTearDown() throws Exception {
-    receivedMessages = null;
+    cleanUpQueue();
   }
-
-  protected Message receiveIncomingMessage() {
-    PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    Reference<Message> messageHolder = new Reference<>();
-    prober.check(new JUnitLambdaProbe(() -> {
-      if (!receivedMessages.isEmpty()) {
-        messageHolder.set(receivedMessages.remove(0));
-        return true;
-      }
-      return false;
-    }));
-    return messageHolder.get();
-  }
-
 
   protected String newDestination(String name) {
     return name + currentTimeMillis();
@@ -149,24 +131,7 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
     assertThat(actual.getDestinationType(), equalTo(expected.getDestinationType()));
   }
 
-  protected <T> T getPayload(InternalMessage firstMessage) {
-    return (T) firstMessage.getPayload().getValue();
-  }
-
   protected String getReplyDestination(InternalMessage firstMessage) {
     return ((JmsAttributes) firstMessage.getAttributes()).getHeaders().getJMSReplyTo().getDestination();
-  }
-
-  public static class OnIncomingConnection {
-
-    @SuppressWarnings("unused")
-    public Object onCall(MessageContext messageContext) {
-      Message message = Message.builder().payload(messageContext.getPayload())
-          .mediaType(messageContext.getDataType().getMediaType()).attributes(messageContext.getAttributes()).build();
-      LOGGER.debug("Adding message with payload: " + message.getPayload().getValue());
-      receivedMessages.add(message);
-
-      return messageContext;
-    }
   }
 }

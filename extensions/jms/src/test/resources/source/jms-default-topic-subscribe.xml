@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="default-topic-subscriber">
-        <jmsn:listener config-ref="config" destination="topicSubscriberDestinationToOnIncomingConnection">
-            <jmsn:consumer-type>
-                <jmsn:topic-consumer/>
-            </jmsn:consumer-type>
-        </jmsn:listener>
-        <expression-component>mel:
-            new org.mule.extensions.jms.test.JmsAbstractTestCase$OnIncomingConnection().onCall(message)
-        </expression-component>
+        <jms:listener config-ref="config" destination="topicSubscriberDestinationToOnIncomingConnection">
+            <jms:consumer-type>
+                <jms:topic-consumer/>
+            </jms:consumer-type>
+        </jms:listener>
+        <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
         <set-payload value="Message Stored"/>
     </flow>
 

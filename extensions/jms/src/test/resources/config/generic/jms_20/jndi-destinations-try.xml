@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
-    <jmsn:config name="config">
-        <jmsn:generic-connection specification="JMS_2_0">
-            <jmsn:connection-factory>
-                <jmsn:jndi-connection-factory connectionFactoryJndiName="ConnectionFactory" lookupDestination="TRY_ALWAYS">
-                    <jmsn:name-resolver-builder
+    <jms:config name="config">
+        <jms:generic-connection specification="JMS_2_0">
+            <jms:connection-factory>
+                <jms:jndi-connection-factory connectionFactoryJndiName="ConnectionFactory" lookupDestination="TRY_ALWAYS">
+                    <jms:name-resolver-builder
                             jndiInitialContextFactory="org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
                             jndiProviderUrl="vm://localhost">
-                        <jmsn:provider-properties>
-                            <jmsn:provider-property key="connectionFactory.ConnectionFactory"
+                        <jms:provider-properties>
+                            <jms:provider-property key="connectionFactory.ConnectionFactory"
                                                     value="vm://localhost"/>
-                        </jmsn:provider-properties>
-                    </jmsn:name-resolver-builder>
-                </jmsn:jndi-connection-factory>
-            </jmsn:connection-factory>
-        </jmsn:generic-connection>
-    </jmsn:config>
+                        </jms:provider-properties>
+                    </jms:name-resolver-builder>
+                </jms:jndi-connection-factory>
+            </jms:connection-factory>
+        </jms:generic-connection>
+    </jms:config>
 
 </mule>
