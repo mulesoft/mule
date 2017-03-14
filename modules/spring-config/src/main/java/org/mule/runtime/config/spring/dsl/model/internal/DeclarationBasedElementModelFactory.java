@@ -695,7 +695,7 @@ class DeclarationBasedElementModelFactory {
 
     return builder()
         .withName(fieldDsl.getElementName())
-        .withPrefix(fieldDsl.getNamespace())
+        .withNamespace(fieldDsl.getNamespace())
         .build();
   }
 

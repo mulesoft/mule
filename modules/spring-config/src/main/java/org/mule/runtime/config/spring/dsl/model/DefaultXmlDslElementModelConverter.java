@@ -187,7 +187,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
           } else {
             Optional<ComponentConfiguration> config = e.getConfiguration();
             config.ifPresent(c -> {
-              if (c.getIdentifier().getPrefix().contains(TLS_PREFIX)) {
+              if (c.getIdentifier().getNamespace().contains(TLS_PREFIX)) {
                 element.appendChild(createTLS(c));
               } else {
                 element.appendChild(clone(c));

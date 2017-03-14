@@ -301,8 +301,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void executeWithPolicy() throws Exception {
     ComponentIdentifier componentIdentifier =
-        ComponentIdentifier.builder().withPrefix(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
-    when(extensionModel.getName()).thenReturn(componentIdentifier.getPrefix());
+        ComponentIdentifier.builder().withNamespace(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
+    when(extensionModel.getName()).thenReturn(componentIdentifier.getNamespace());
     when(operationModel.getName()).thenReturn(componentIdentifier.getName());
 
     messageProcessor.process(event);

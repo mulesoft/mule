@@ -98,31 +98,31 @@ public abstract class Errors {
   public static final class ComponentIdentifiers {
 
     public static final ComponentIdentifier ANY =
-        builder().withPrefix(CORE_NAMESPACE).withName(ANY_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE).withName(ANY_IDENTIFIER).build();
     public static final ComponentIdentifier CRITICAL =
-        builder().withPrefix(CORE_NAMESPACE).withName(CRITICAL_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE).withName(CRITICAL_IDENTIFIER).build();
     public static final ComponentIdentifier TRANSFORMATION =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier EXPRESSION =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier REDELIVERY_EXHAUSTED = builder()
-        .withPrefix(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
+        .withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier RETRY_EXHAUSTED = builder()
-        .withPrefix(CORE_NAMESPACE_NAME).withName(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
+        .withNamespace(CORE_NAMESPACE_NAME).withName(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier ROUTING =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(ROUTING_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(ROUTING_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier CONNECTIVITY =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(CONNECTIVITY_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONNECTIVITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SECURITY =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
 
 
     public static final ComponentIdentifier UNKNOWN =
-        builder().withPrefix(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
 
   }
 }

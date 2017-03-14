@@ -90,7 +90,7 @@ class ConfigurationBasedElementModelFactory {
 
     Optional<Map.Entry<ExtensionModel, DslSyntaxResolver>> entry =
         resolvers.entrySet().stream()
-            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getPrefix()))
+            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getNamespace()))
             .findFirst();
 
     if (!entry.isPresent()) {
@@ -536,7 +536,7 @@ class ConfigurationBasedElementModelFactory {
     if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
       return Optional.of(builder()
           .withName(dsl.getElementName())
-          .withPrefix(dsl.getNamespace())
+          .withNamespace(dsl.getNamespace())
           .build());
     }
 
@@ -624,7 +624,7 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private ComponentIdentifier newIdentifier(String name, String ns) {
-    return ComponentIdentifier.builder().withName(name).withPrefix(ns).build();
+    return ComponentIdentifier.builder().withName(name).withNamespace(ns).build();
   }
 
   private DslElementModel newElementModel(ParameterModel paramModel, DslElementSyntax paramDsl,

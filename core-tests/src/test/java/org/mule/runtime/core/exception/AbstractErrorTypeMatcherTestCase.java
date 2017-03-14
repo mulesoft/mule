@@ -26,11 +26,11 @@ public abstract class AbstractErrorTypeMatcherTestCase extends AbstractMuleConte
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     anyErrorType = errorTypeRepository.getAnyErrorType();
     ComponentIdentifier transformationIdentifier =
-        ComponentIdentifier.builder().withName(TRANSFORMATION_ERROR_IDENTIFIER).withPrefix(CORE_NAMESPACE_NAME)
+        ComponentIdentifier.builder().withName(TRANSFORMATION_ERROR_IDENTIFIER).withNamespace(CORE_NAMESPACE_NAME)
             .build();
     transformationErrorType = errorTypeRepository.lookupErrorType(transformationIdentifier).get();
     ComponentIdentifier expressionIdentifier =
-        ComponentIdentifier.builder().withName(EXPRESSION_ERROR_IDENTIFIER).withPrefix(CORE_NAMESPACE_NAME).build();
+        ComponentIdentifier.builder().withName(EXPRESSION_ERROR_IDENTIFIER).withNamespace(CORE_NAMESPACE_NAME).build();
     expressionErrorType = errorTypeRepository.lookupErrorType(expressionIdentifier).get();
   }
 

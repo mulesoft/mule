@@ -176,7 +176,7 @@ public class ModuleFlowProcessingPhase
       throws MuleException {
     Message message = template.getMessage();
     Event templateEvent =
-        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getPrefix()))
+        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
             .message(message).build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {

@@ -30,7 +30,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final ComponentIdentifier FILTER_REFERENCE_IDENTIFIER =
-      builder().withPrefix(CORE_NAMESPACE).withName(FILTER_REFERENCE_ELEMENT).build();
+      builder().withNamespace(CORE_NAMESPACE).withName(FILTER_REFERENCE_ELEMENT).build();
 
   @Override
   public boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
