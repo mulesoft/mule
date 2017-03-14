@@ -53,7 +53,7 @@ public class CredentialsMaskUtil
     /**
      * Masks password in input
      * 
-     * @param input input for password to be masked
+     * @param input credentials for password to be masked
      * @param pattern password pattern
      * 
      * @return input with password masked
@@ -66,7 +66,7 @@ public class CredentialsMaskUtil
     /**
      * Masks user and password in input
      * 
-     * @param input input for user and password to be masked
+     * @param input credentials for user and password to be masked
      * @param passwordPattern password pattern
      * @param userPattern user pattern
      * 
