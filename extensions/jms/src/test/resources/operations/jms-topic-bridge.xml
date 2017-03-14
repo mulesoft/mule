@@ -21,14 +21,13 @@
             <jms:consumer-type>
                 <jms:topic-consumer />
             </jms:consumer-type>
-            <jms:response>
-                <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
-                    <jms:body>#["bridged_" ++ payload]</jms:body>
-                    <jms:properties>#[attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jms:properties>
-                </jms:message-builder>
-            </jms:response>
         </jms:listener>
-        <logger level="DEBUG" message="#[payload]"/>
+        <jms:publish destination="${finalDestination}" destinationType="TOPIC">
+            <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
+                <jms:body>#["bridged_" ++ payload]</jms:body>
+                <jms:properties>#[attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jms:properties>
+            </jms:message-builder>
+        </jms:publish>
     </flow>
 
     <flow name="final-listener">
