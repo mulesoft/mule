@@ -8,7 +8,7 @@
 package org.mule.module.db.internal.domain.connection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -24,7 +24,12 @@ import org.junit.Test;
 public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
 {
 
+    private final String EXPECTED_EXCEPTION_MESSAGE = "jdbc:<<credentials>>@localhost.com;user=<<user>>;password=<<credentials>>;";
+
+    private final String EXCEPTION_MESSAGE = "jdbc:oracle:thin:a_visible_user/a_visible_password@localhost.com;user=usuario;password=password;";
+
     private final SimpleConnectionFactory connectionFactory = new SimpleConnectionFactory(null);
+
     private final DataSource dataSource = mock(DataSource.class);
 
     @Test
@@ -43,6 +48,22 @@ public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
         when(dataSource.getConnection()).thenThrow(new RuntimeException());
 
         connectionFactory.create(dataSource);
+    }
+    
+    @Test(expected = ConnectionCreationException.class)
+    public void failsOnConnectionThenLogWithoutCredentials() throws Exception
+    {
+        when(dataSource.getConnection()).thenThrow(new RuntimeException(EXCEPTION_MESSAGE));
+
+        try
+        {
+            connectionFactory.create(dataSource);
+        }
+        catch (ConnectionCreationException e)
+        {
+            assertThat(e.getMessage(), equalTo(EXPECTED_EXCEPTION_MESSAGE));
+            throw e;
+        }
     }
 
     @Test(expected = ConnectionCreationException.class)
