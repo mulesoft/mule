@@ -167,7 +167,6 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
                 .append('@').append(id)
                 .append("[status=").append(statusName)
                 .append(", key=").append(key)
-                .append(", resource=").append(resource)
                 .append("]").toString();
     }
 
