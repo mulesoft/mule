@@ -27,6 +27,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -211,6 +212,29 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   }
 
   @Test
+  public void consumeByChunksShorterThanBufferSize() throws Exception {
+    withCursor(cursor -> assertThat(readByChunks(cursor, bufferSize / 2), equalTo(data)));
+  }
+
+  @Test
+  public void consumeByChunksWhichOverlapWithBuffer() throws Exception {
+    StringBuilder accumulator = new StringBuilder();
+    withCursor(cursor -> {
+
+      // read a chunk which is significantly smalled than the buffer size
+      int chunkSize = bufferSize / 2;
+      byte[] buffer = new byte[chunkSize];
+      int read = cursor.read(buffer, 0, chunkSize);
+      append(buffer, read, accumulator);
+
+      // read the rest at bigger chunk rates
+      accumulator.append(readByChunks(cursor, bufferSize));
+    });
+
+    assertThat(accumulator.toString(), equalTo(data));
+  }
+
+  @Test
   public void getSliceWhichStartsInCurrentSegmentButEndsInTheNext() throws Exception {
     if (data.length() < bufferSize) {
       // this test only makes sense for off heap streams
@@ -277,6 +301,24 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private void withCursor(CheckedConsumer<CursorStream> consumer) throws IOException {
     try (CursorStream cursor = streamProvider.openCursor()) {
       consumer.accept(cursor);
+    }
+  }
+
+  private String readByChunks(InputStream stream, int chunkSize) throws IOException {
+    int read;
+    StringBuilder accumulator = new StringBuilder();
+    do {
+      byte[] buffer = new byte[chunkSize];
+      read = stream.read(buffer, 0, chunkSize);
+      append(buffer, read, accumulator);
+    } while (read > 0);
+
+    return accumulator.toString();
+  }
+
+  private void append(byte[] buffer, int read, StringBuilder accumulator) {
+    for (int i = 0; i < read; i++) {
+      accumulator.append((char) buffer[i]);
     }
   }
 }
