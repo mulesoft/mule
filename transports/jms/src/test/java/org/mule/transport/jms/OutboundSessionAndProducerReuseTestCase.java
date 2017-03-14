@@ -349,6 +349,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     @Test
     public void send() throws Exception
     {
+        muleContext.start();
         connector.initialise();
         connector.connect();
         connector.start();
