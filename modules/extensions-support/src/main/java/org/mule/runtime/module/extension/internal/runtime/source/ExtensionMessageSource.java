@@ -262,7 +262,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       @Override
       public ComponentIdentifier getSourceIdentifier() {
-        return builder().withPrefix(getExtensionModel().getName().toLowerCase())
+        return builder().withNamespace(getExtensionModel().getName().toLowerCase())
             .withName(sourceModel.getName()).build();
       }
 

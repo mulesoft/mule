@@ -104,7 +104,7 @@ public class BeanDefinitionFactory {
    */
   private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
-          .add(builder().withPrefix(CORE_NAMESPACE).withName(QUEUE_STORE).build())
+          .add(builder().withNamespace(CORE_NAMESPACE).withName(QUEUE_STORE).build())
           .add(MULE_PROPERTIES_IDENTIFIER)
           .add(MULE_PROPERTY_IDENTIFIER)
           .add(SPRING_ENTRY_IDENTIFIER)

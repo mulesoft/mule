@@ -31,7 +31,7 @@ public interface DslElementModelFactory {
    * Provides a default implementation of the {@link DslElementModelFactory}
    *
    * @param context the {@link DslResolvingContext} to be used when performing a
-   *        {@link org.mule.runtime.api.component.ComponentIdentifier#getPrefix namespace} or
+   *        {@link org.mule.runtime.api.component.ComponentIdentifier#getNamespace namespace} or
    *        {@link ElementDeclaration#getName} based lookup for a given {@link ExtensionModel}.
    * @return a default implementation of the {@link DslElementModelFactory}
    */

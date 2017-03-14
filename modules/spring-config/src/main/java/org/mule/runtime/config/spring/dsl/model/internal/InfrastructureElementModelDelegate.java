@@ -111,7 +111,7 @@ class InfrastructureElementModelDelegate {
 
         ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
             .withIdentifier(builder()
-                .withPrefix("tls")
+                .withNamespace("tls")
                 .withName(TLS_CONTEXT_ELEMENT_IDENTIFIER)
                 .build());
 
@@ -127,7 +127,7 @@ class InfrastructureElementModelDelegate {
               public void visitObjectValue(ParameterObjectValue objectValue) {
                 ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
                     .withIdentifier(builder()
-                        .withPrefix("tls")
+                        .withNamespace("tls")
                         .withName(name)
                         .build());
 
@@ -175,7 +175,7 @@ class InfrastructureElementModelDelegate {
 
     ComponentConfiguration.Builder redeliveryConfig = ComponentConfiguration.builder()
         .withIdentifier(builder()
-            .withPrefix(CORE_NAMESPACE)
+            .withNamespace(CORE_NAMESPACE)
             .withName(elementName)
             .build());
 

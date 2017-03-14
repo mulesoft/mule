@@ -61,7 +61,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER = builder()
       .withName(NameUtils.hyphenize(OPERATION_NAME))
-      .withPrefix(EXTENSION_PREFIX)
+      .withNamespace(EXTENSION_PREFIX)
       .build();
 
   private static final ErrorModel MULE_CONNECTIVITY_ERROR =
@@ -147,9 +147,9 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     errorsRegistrant.registerErrors(extensionModel);
 
     Optional<ErrorType> optionalOAuthType = typeRepository.lookupErrorType(builder()
-        .withName(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE).withPrefix(EXTENSION_PREFIX).build());
+        .withName(OAUTH_TEST_CONNECTIVITY_ERROR_TYPE).withNamespace(EXTENSION_PREFIX).build());
     Optional<ErrorType> optionalConnectivityType = typeRepository.lookupErrorType(builder()
-        .withName(TEST_CONNECTIVITY_ERROR_TYPE).withPrefix(EXTENSION_PREFIX).build());
+        .withName(TEST_CONNECTIVITY_ERROR_TYPE).withNamespace(EXTENSION_PREFIX).build());
 
     assertThat(optionalOAuthType.isPresent(), is(true));
     assertThat(optionalConnectivityType.isPresent(), is(true));

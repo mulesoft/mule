@@ -246,7 +246,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     List<ErrorTypeMatcher> matchers = new LinkedList<>();
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(SECURITY).get()));
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(builder()
-        .withPrefix(HTTP_NAMESPACE.toUpperCase())
+        .withNamespace(HTTP_NAMESPACE.toUpperCase())
         .withName(RESPONSE_VALIDATION.name())
         .build()).get()));
     return matchers;

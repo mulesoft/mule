@@ -23,7 +23,7 @@ import org.junit.Test;
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =
-      builder().withPrefix("http").withName("listener").build();
+      builder().withNamespace("http").withName("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
   private static final String FLOW_NAME = "flow-name";
@@ -42,7 +42,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   @Test
   public void doesNotSupportHttpRequester() {
     assertThat(factory
-        .supportsSourceIdentifier(ComponentIdentifier.builder().withPrefix("http").withName("request").build()),
+        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("http").withName("request").build()),
                is(false));;
   }
 

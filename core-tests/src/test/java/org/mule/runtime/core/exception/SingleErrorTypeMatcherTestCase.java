@@ -44,7 +44,7 @@ public class SingleErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTest
   @Test
   public void matchChild() {
     ComponentIdentifier customTransformerIdentifier =
-        ComponentIdentifier.builder().withName("custom").withPrefix(CORE_NAMESPACE_NAME).build();
+        ComponentIdentifier.builder().withName("custom").withNamespace(CORE_NAMESPACE_NAME).build();
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     ErrorType customTransformerErrorType = errorTypeRepository.addErrorType(customTransformerIdentifier, transformationErrorType);
     ErrorTypeMatcher transformationMatcher = new SingleErrorTypeMatcher(transformationErrorType);
