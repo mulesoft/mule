@@ -481,6 +481,18 @@
         </xsd:choice>
     </xsd:group>
 
+    <xsd:group name="messageProcessorOrMixedContentMessageProcessor">
+        <xsd:choice>
+            <xsd:element ref="abstract-message-processor">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        A message processor
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:group>
+    
     <xsd:element name="processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
