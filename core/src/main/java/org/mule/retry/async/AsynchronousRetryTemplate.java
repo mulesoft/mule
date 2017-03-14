@@ -38,8 +38,8 @@ public class AsynchronousRetryTemplate implements RetryPolicyTemplate
     {
         if (workManager == null)
         {
-            throw new IllegalStateException(
-                "Cannot schedule a work till the workManager is initialized. Probably the connector hasn't been initialized yet");
+            throw new IllegalArgumentException(
+                "This component doesn't support asynchronous retry policies.");
         }
 
         RetryWorker worker = new RetryWorker(delegate, callback, workManager, startLatch);
