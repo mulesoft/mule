@@ -10,6 +10,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -19,14 +21,11 @@ import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Element;
 
 public class MultiFlowDslModelSerializerTestCase extends AbstractElementModelTestCase {
 
@@ -181,7 +180,7 @@ public class MultiFlowDslModelSerializerTestCase extends AbstractElementModelTes
   }
 
   private void assertConnectionLoaded(DslElementModel<ConfigurationModel> config) {
-    assertThat(config.getContainedElements().size(), is(2));
+    assertThat(config.getContainedElements().size(), is(1));
     assertThat(config.findElement("active-mq-connection").isPresent(), is(true));
     assertThat(config.findElement("active-mq-connection").get().getContainedElements().size(), is(2));
   }
@@ -191,6 +190,6 @@ public class MultiFlowDslModelSerializerTestCase extends AbstractElementModelTes
   }
 
   protected String getExpectedSchemaLocation() {
-    return "http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+    return "http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
   }
 }
