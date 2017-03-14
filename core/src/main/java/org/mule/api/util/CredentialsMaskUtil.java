@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /**
  * Utils to mask credentials
  */
-public class CredentialsMaskUtil
+public final class CredentialsMaskUtil
 {
 
     public static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");

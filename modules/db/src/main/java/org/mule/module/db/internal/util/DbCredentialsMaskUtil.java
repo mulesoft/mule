@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Utils to mask credentials in connection strings
  */
-public class DbCredentialsMaskUtil
+public final class DbCredentialsMaskUtil
 {
 
     private static final Pattern CREDENTIALS_PATTERN_PREFIX = compile(":([^\\s@]+)");
