@@ -146,21 +146,12 @@ public final class FileOperations extends BaseFileSystemOperations {
   /**
    * Copies the file at the {@code sourcePath} into the {@code targetPath}.
    * <p>
-   * To support pass-through scenarios, the {@code sourcePath} attribute is optional. If not provided, then the current
-   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
-   * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
-   * thrown.
-   * <p>
    * If {@code targetPath} doesn't exists, and neither does its parent, then an attempt will be made to create depending on the
    * value of the {@code createParentFolder} argument. If such argument is {@false}, then an {@link IllegalArgumentException} will
    * be thrown.
    * <p>
    * If the target file already exists, then it will be overwritten if the {@code overwrite} argument is {@code true}. Otherwise,
    * {@link IllegalArgumentException} will be thrown.
-   * <p>
-   * It is also possible to use the {@code targetPath} to specify that the copied file should also be renamed. For example, if
-   * {@code sourcePath} has the value <i>a/b/test.txt</i> and {@code targetPath} is assigned to <i>a/c/test.json</i>, then the
-   * file will indeed be copied to the <i>a/c/</i> directory but renamed as <i>test.json</i>
    * <p>
    * As for the {@code sourcePath}, it can either be a file or a directory. If it points to a directory, then it will be copied
    * recursively.
@@ -184,21 +175,12 @@ public final class FileOperations extends BaseFileSystemOperations {
   /**
    * Moves the file at the {@code sourcePath} into the {@code targetPath}.
    * <p>
-   * To support pass-through scenarios, the {@code sourcePath} attribute is optional. If not provided, then the current
-   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
-   * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
-   * thrown.
-   * <p>
    * If {@code targetPath} doesn't exists, and neither does its parent, then an attempt will be made to create depending on the
    * value of the {@code createParentFolder} argument. If such argument is {@code false}, then an {@link IllegalArgumentException}
    * will be thrown.
    * <p>
    * If the target file already exists, then it will be overwritten if the {@code overwrite} argument is {@code true}. Otherwise,
    * {@link IllegalArgumentException} will be thrown.
-   * <p>
-   * It is also possible to use the {@code targetPath} to specify that the moved file should also be renamed. For example, if
-   * {@code sourcePath} has the value <i>a/b/test.txt</i> and {@code targetPath} is assigned to <i>a/c/test.json</i>, then the
-   * file will indeed be copied to the <i>a/c/</i> directory but renamed as <i>test.json</i>
    * <p>
    * As for the {@code sourcePath}, it can either be a file or a directory. If it points to a directory, then it will be moved
    * recursively.
@@ -222,11 +204,6 @@ public final class FileOperations extends BaseFileSystemOperations {
 
   /**
    * Deletes the file pointed by {@code path}, provided that it's not locked
-   * <p>
-   * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
-   * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
-   * thrown.
    *
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path       the path to the file to be deleted
@@ -240,11 +217,6 @@ public final class FileOperations extends BaseFileSystemOperations {
 
   /**
    * Renames the file pointed by {@code path} to the name provided on the {@code to} parameter
-   * <p>
-   * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
-   * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
-   * thrown.
    * <p>
    * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will be thrown if this
    * precondition is not honored.
