@@ -6,8 +6,9 @@
       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="send-payload">
-        <jms:publish config-ref="config" destination="#[initialDestination]" destinationType="TOPIC">
+        <jms:publish config-ref="config" destination="${initialDestination}" destinationType="TOPIC">
             <jms:message-builder>
+                <jms:reply-to destination="${finalDestination}" destinationType="TOPIC"/>
                 <jms:properties>
                     #[{(initialProperty): propertyValue}]
                 </jms:properties>
@@ -15,26 +16,27 @@
         </jms:publish>
     </flow>
 
-    <flow name="bridge">
-        <jms:consume config-ref="config" destination="#[initialDestination]" maximumWait="1000">
+    <flow name="listener">
+        <jms:listener destination="${initialDestination}" ackMode="AUTO">
             <jms:consumer-type>
-                <jms:topic-consumer isShared="true" subscriptionName="subsName"/>
+                <jms:topic-consumer />
             </jms:consumer-type>
-        </jms:consume>
-        <jms:publish config-ref="config" destination="#[finalDestination]" destinationType="TOPIC">
+        </jms:listener>
+        <jms:publish destination="${finalDestination}" destinationType="TOPIC">
             <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
-                <jms:body>#[bridgePrefix ++ payload]</jms:body>
+                <jms:body>#["bridged_" ++ payload]</jms:body>
                 <jms:properties>#[attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jms:properties>
             </jms:message-builder>
         </jms:publish>
     </flow>
 
-    <flow name="bridge-receiver">
-        <jms:consume config-ref="config" destination="#[finalDestination]" maximumWait="1000">
+    <flow name="final-listener">
+        <jms:listener destination="${finalDestination}" ackMode="AUTO">
             <jms:consumer-type>
-                <jms:topic-consumer/>
+                <jms:topic-consumer />
             </jms:consumer-type>
-        </jms:consume>
+        </jms:listener>
+        <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>
 
 </mule>

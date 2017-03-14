@@ -7,13 +7,12 @@
 package org.mule.extensions.jms.test.topic.integration;
 
 import static java.util.Arrays.asList;
-import org.mule.test.runner.RunnerDelegateTo;
-
-import java.util.Collection;
-
 import org.junit.runners.Parameterized;
+import org.mule.test.runner.RunnerDelegateTo;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
+
+import java.util.Collection;
 
 
 @RunnerDelegateTo(Parameterized.class)
