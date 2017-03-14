@@ -67,8 +67,8 @@ public class AbstractBenchmark {
   public MuleContext createMuleContextWithServices() throws MuleException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builderList = new ArrayList<>();
-    builderList.add(new DefaultsConfigurationBuilder());
     builderList.add(new BasicRuntimeServicesConfigurationBuilder());
+    builderList.add(new DefaultsConfigurationBuilder());
     return muleContextFactory.createMuleContext(builderList.toArray(new ConfigurationBuilder[] {}));
   }
 
