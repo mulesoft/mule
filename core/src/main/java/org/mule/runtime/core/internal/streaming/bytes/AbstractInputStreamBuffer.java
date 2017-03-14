@@ -193,6 +193,11 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
         return copy(dest, requiredRange);
       }
 
+      int overlap = handlePartialOverlap(dest, requiredRange);
+      if (overlap > 0) {
+        return overlap;
+      }
+
       if (bufferRange.isAhead(requiredRange)) {
         return getBackwardsData(dest, requiredRange, length);
       }
@@ -201,7 +206,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
         while (!streamFullyConsumed && bufferRange.isBehind(requiredRange)) {
           try {
             if (reloadBuffer() > 0) {
-              int overlap = handlePartialOverlap(dest, requiredRange);
+              overlap = handlePartialOverlap(dest, requiredRange);
               if (overlap > 0) {
                 return overlap;
               }
