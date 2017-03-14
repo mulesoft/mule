@@ -29,7 +29,7 @@ public class ExpressionBenchmarkAssertionTestCase extends AbstractBenchmarkAsser
 
   @Test
   public void evaluatePayloadDW() {
-    // DW numbers are significantly below MEL currently but by adding assertions we avoid any regressions
+    // TODO MULE-11971 DW numbers are significantly below MEL currently but by adding assertions we avoid any regressions
     runAndAssertBenchmark(SimpleExpressionBenchmark.class, "evaluatePayload", 1, singletonMap(EXPRESSION_PARAM,
                                                                                               new String[] {
                                                                                                   "payload"}),
