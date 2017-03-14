@@ -26,6 +26,7 @@ public class PropertyComponentUtils {
   private static final String VALUE_PARAMETER_NAME = "value";
   private static final String PROPERTY_NAME_MULE_PROPERTY_ATTRIBUTE = "key";
   private static final String PROPERTY_NAME_SPRING_PROPERTY_ATTRIBUTE = "name";
+  private static final String PROPERTY_NAME_PROPERTY_ATTRIBUTE = "properties";
   private static final String REFERENCE_MULE_PROPERTY_ATTRIBUTE = "value-ref";
   private static final String REFERENCE_SPRING_PROPERTY_ATTRIBUTE = "ref";
 
@@ -46,7 +47,12 @@ public class PropertyComponentUtils {
       } else {
         value = propertyComponentModel.getParameters().get(VALUE_PARAMETER_NAME);
       }
-      propertyValue = new PropertyValue(propertyComponentModel.getParameters().get(nameKey), value);
+      if (!propertyComponentModel.getParameters().containsKey(nameKey)) {
+        propertyValue = new PropertyValue(PROPERTY_NAME_PROPERTY_ATTRIBUTE,
+                                          new RuntimeBeanReference(propertyComponentModel.getParameters().get("ref")));
+      } else {
+        propertyValue = new PropertyValue(propertyComponentModel.getParameters().get(nameKey), value);
+      }
     } else if (propertyComponentModel.getInnerComponents().get(0).getIdentifier().getName().equals("map")) {
       ComponentModel springMap = propertyComponentModel.getInnerComponents().get(0);
       ManagedMap<String, Object> propertiesMap = new ManagedMap<>();

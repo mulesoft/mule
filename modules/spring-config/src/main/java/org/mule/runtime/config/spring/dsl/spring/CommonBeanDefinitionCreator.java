@@ -10,16 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DEFAULT_ES_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.*;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
@@ -243,7 +234,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .stream()
         .filter(innerComponent -> {
           ComponentIdentifier identifier = innerComponent.getIdentifier();
-          return identifier.equals(SPRING_PROPERTY_IDENTIFIER) || identifier.equals(MULE_PROPERTY_IDENTIFIER);
+          return identifier.equals(SPRING_PROPERTY_IDENTIFIER) || identifier.equals(MULE_PROPERTY_IDENTIFIER)
+              || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
         })
         .forEach(propertyComponentModel -> {
           PropertyValue propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
