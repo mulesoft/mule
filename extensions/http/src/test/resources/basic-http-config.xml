@@ -22,6 +22,7 @@
                 #[mel:['query' : 'param']]
             </httpn:query-params>
         </httpn:request>
+        <object-to-string-transformer />
     </flow>
 
     <flow name="server">
