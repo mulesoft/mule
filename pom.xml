@@ -1093,11 +1093,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.santuario</groupId>
-                <artifactId>xmlsec</artifactId>
-                <version>${xmlSecurityVersion}</version>
-            </dependency>
-            <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-jmx</artifactId>
                 <version>${mx4jVersion}</version>
