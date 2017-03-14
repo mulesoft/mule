@@ -10,10 +10,12 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.transport.NullPayload;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -111,6 +113,15 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void resolveNullableStringWithObjectReturnValue()
+    {
+        AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
+        attributeEvaluator.initialize(mockExpressionManager);
+        when(mockExpressionManager.evaluate(Mockito.anyString(), Mockito.any(MuleEvent.class))).thenReturn(NullPayload.getInstance());
+        assertThat(attributeEvaluator.resolveNullableStringValue(mockMuleEvent), nullValue());
+    }
+
+    @Test
     public void resolveIntegerWithNumericStringValue()
     {
         AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[expression]");
@@ -170,6 +181,7 @@ public class AttributeEvaluatorTestCase extends AbstractMuleTestCase
         assertThat(nullAttributeEvaluator.resolveValue(mockMuleEvent), nullValue());
         assertThat(nullAttributeEvaluator.resolveIntegerValue(mockMuleEvent), nullValue());
         assertThat(nullAttributeEvaluator.resolveStringValue(mockMuleEvent), nullValue());
+        assertThat(nullAttributeEvaluator.resolveNullableStringValue(mockMuleEvent), nullValue());
     }
 
 }

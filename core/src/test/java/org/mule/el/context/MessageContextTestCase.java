@@ -6,9 +6,13 @@
  */
 package org.mule.el.context;
 
+import static java.lang.Boolean.TRUE;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -154,11 +158,11 @@ public class MessageContextTestCase extends AbstractELTestCase
     public void nullPayloadTest() throws Exception
     {
         MuleMessage mockMessage = Mockito.mock(MuleMessage.class);
-        Mockito.when(mockMessage.getPayload()).thenReturn(NullPayload.getInstance());
-        assertEquals(true, evaluate("message.payload == null", mockMessage));
-        assertEquals(true, evaluate("payload == null", mockMessage));
-        assertEquals(false, evaluate("message.payload is NullPayload", mockMessage));
-        assertEquals(true, evaluate("message.payload == empty", mockMessage));
+        when(mockMessage.getPayload()).thenReturn(NullPayload.getInstance());
+        assertThat((Boolean) evaluate("null == message.payload", mockMessage), is(TRUE));
+        assertThat((Boolean) evaluate("message.payload == null", mockMessage), is(TRUE));
+        assertThat((Boolean) evaluate("payload == null", mockMessage), is(TRUE));
+        assertThat((Boolean) evaluate("message.payload == empty", mockMessage), is(TRUE));
     }
 
 }

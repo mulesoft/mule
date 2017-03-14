@@ -10,7 +10,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.transport.NullPayload;
 
 import java.util.Map;
 
@@ -84,16 +83,7 @@ public class MessageContext
 
     public Object getPayload()
     {
-        if (NullPayload.getInstance().equals(message.getPayload()))
-        {
-            // Return null for NullPayload because MEL user doesn't not know what NullPayload is and to allow
-            // them to use null check (#[payload == null])
-            return null;
-        }
-        else
-        {
-            return message.getPayload();
-        }
+        return message.getPayload();
     }
 
     public <T> T payloadAs(Class<T> type) throws TransformerException

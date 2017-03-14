@@ -8,6 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.transport.NullPayload.NULL_PAYLOAD_STRING;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -105,7 +106,7 @@ public class ChoiceExceptionStrategyTestCase extends FunctionalTestCase
     @Test
     public void testMatchesCorrectExceptionUsingNoCause() throws Exception
     {
-        callVmAndThrowException(new ResolverException(CoreMessages.createStaticMessage("")), "{NullPayload}");
+        callVmAndThrowException(new ResolverException(CoreMessages.createStaticMessage("")), NULL_PAYLOAD_STRING);
     }
 
     @Test

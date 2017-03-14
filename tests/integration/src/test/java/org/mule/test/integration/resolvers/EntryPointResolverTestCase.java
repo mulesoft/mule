@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static org.mule.transport.NullPayload.NULL_PAYLOAD_STRING;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -163,7 +165,7 @@ public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCa
 
         try
         {
-            doTest("reflection2", new Object[]{new Integer(42), null}, "{NullPayload}");
+            doTest("reflection2", new Object[]{new Integer(42), null}, NULL_PAYLOAD_STRING);
         }
         catch (Exception e)
         {

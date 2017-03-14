@@ -6,6 +6,8 @@
  */
 package org.mule.transformer.simple;
 
+import static org.mule.transport.NullPayload.NULL_PAYLOAD_STRING;
+
 import org.mule.RequestContext;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
@@ -13,6 +15,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -58,6 +61,10 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         else if (src instanceof byte[])
         {
             output = createStringFromByteArray((byte[]) src, outputEncoding);
+        }
+        else if (src instanceof NullPayload)
+        {
+            output = NULL_PAYLOAD_STRING;
         }
         else
         {
@@ -121,11 +128,13 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         }
     }
 
+    @Override
     public int getPriorityWeighting()
     {
         return priorityWeighting;
     }
 
+    @Override
     public void setPriorityWeighting(int priorityWeighting)
     {
         this.priorityWeighting = priorityWeighting;
