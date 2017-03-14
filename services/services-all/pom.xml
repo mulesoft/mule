@@ -45,6 +45,12 @@
             <type>zip</type>
         </dependency>
         <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-soap</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
             <artifactId>mule-service-weave</artifactId>
             <groupId>org.mule.services</groupId>
             <version>${weaveVersion}</version>
