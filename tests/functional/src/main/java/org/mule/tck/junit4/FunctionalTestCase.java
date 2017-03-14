@@ -28,6 +28,7 @@ import org.mule.construct.AbstractPipeline;
 import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -345,6 +346,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase
     {
         Flow flow = lookupFlowConstruct(flowName);
         SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
+        flow.setProcessingStrategy(new NonBlockingProcessingStrategy());
         event = new DefaultMuleEvent(event, event.getFlowConstruct(), nullReplyToHandler, null, false);
         MuleEvent result = flow.process(event);
 
