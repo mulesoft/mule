@@ -20,20 +20,20 @@
 
     <flow name="headerMap">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:headers>#[mel:headers]</httpn:headers>
+            <httpn:headers>#[headers]</httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="headerOverride">
         <httpn:request config-ref="config" path="testPath">
-            <httpn:headers>#[mel:headers]</httpn:headers>
+            <httpn:headers>#[headers ++ {'testName1':'testValue1'}]</httpn:headers>
         </httpn:request>
     </flow>
 
     <flow name="httpHeaders">
         <httpn:request config-ref="config" path="testPath">
             <httpn:headers>
-                #[mel:['http.scheme' : 'testValue1']]
+                #[{'http.scheme' : 'testValue1'}]
             </httpn:headers>
         </httpn:request>
     </flow>
@@ -41,7 +41,7 @@
     <flow name="connectionHeader">
         <httpn:request config-ref="config" path="testPath">
             <httpn:headers>
-                #[mel:['Connection' : 'close']]
+                #[{'Connection' : 'close'}]
             </httpn:headers>
         </httpn:request>
     </flow>

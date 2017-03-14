@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getUserLibFolder;
 import org.mule.runtime.core.api.MuleContext;
@@ -68,8 +69,16 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
       doBody("Security model: " + SecurityUtils.getSecurityModel());
     }
     if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
+      listServicesIfPresent();
       listPatchesIfPresent();
       listMuleSystemProperties();
+    }
+  }
+
+  private void listServicesIfPresent() {
+    File servicesDirectory = getServicesFolder();
+    if (servicesDirectory != null && servicesDirectory.exists()) {
+      listItems(asList(servicesDirectory.list()), "Mule services:");
     }
   }
 

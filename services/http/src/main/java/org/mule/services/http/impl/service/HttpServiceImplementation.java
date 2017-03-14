@@ -32,7 +32,7 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   private static final Logger logger = LoggerFactory.getLogger(HttpServiceImplementation.class);
 
-  private final SchedulerService schedulerService;
+  protected final SchedulerService schedulerService;
 
   private HttpListenerConnectionManager connectionManager;
 
@@ -49,7 +49,6 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   @Override
   public HttpClientFactory getClientFactory() {
-    // DNS round robin should be achieve by using another client
     return config -> new GrizzlyHttpClient(config, schedulerService);
   }
 

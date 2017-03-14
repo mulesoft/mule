@@ -39,7 +39,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
   }
 
-  @Ignore("Setting a queryParams expression and single elements is not currently supported: Builders meant to be replaced by DW.")
+  @Ignore("MULE-11606: Support a way to have DW handle multimaps")
   @Test
   public void queryParamsOverride() throws Exception {
     Map<String, String> params = new HashMap<>();

@@ -28,7 +28,7 @@
         <processor ref="sensingRequestResponseProcessor" />
 
         <httpn:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]" parseResponse="false">
-            <httpn:headers>#[attributes.headers]</httpn:headers>
+            <httpn:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</httpn:headers>
             <httpn:query-params>#[attributes.queryParams]</httpn:query-params>
         </httpn:request>
 
