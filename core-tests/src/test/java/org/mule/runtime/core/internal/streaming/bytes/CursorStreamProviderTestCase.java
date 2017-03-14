@@ -19,7 +19,6 @@ import org.mule.runtime.api.streaming.CursorStream;
 import org.mule.runtime.api.streaming.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.streaming.bytes.FileStoreCursorStreamConfig;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.core.util.func.CheckedRunnable;
@@ -47,9 +46,8 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        {"In Memory Without expansion", KB_256, MB_1, MB_1},
-        {"In Memory With expansion", KB_256, MB_1, MB_2},
-        {"File Store", MB_2, KB_256, KB_256}
+        {"Fits into memory", KB_256, MB_1, MB_1},
+        {"Doesn't fit in memory", MB_1, KB_256, MB_2},
     });
   }
 
@@ -69,20 +67,12 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     halfDataLength = data.length() / 2;
     final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
 
-    if (dataSize <= bufferSize) {
-      InMemoryCursorStreamConfig config =
-          new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),
-                                         new DataSize(bufferSize / 2, BYTE),
-                                         new DataSize(maxBufferSize, BYTE));
+    InMemoryCursorStreamConfig config =
+        new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),
+                                       new DataSize(bufferSize / 2, BYTE),
+                                       new DataSize(maxBufferSize, BYTE));
 
-      streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager, mock(Event.class));
-    } else {
-      streamProvider = new FileStoreCursorStreamProvider(dataStream,
-                                                         new FileStoreCursorStreamConfig(new DataSize(maxBufferSize, BYTE)),
-                                                         mock(Event.class),
-                                                         bufferManager,
-                                                         executorService);
-    }
+    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager, mock(Event.class));
 
     resetLatches();
   }
@@ -235,9 +225,31 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   }
 
   @Test
+  public void getSliceWhichStartsBehindInCurrentSegmentButEndsInTheCurrent() throws Exception {
+    if (data.length() < bufferSize) {
+      // this test only makes sense for larger than memory streams
+      return;
+    }
+
+    int len = bufferSize + 20;
+    byte[] dest = new byte[len];
+
+    withCursor(cursor -> {
+      assertThat(cursor.read(dest, 0, len), is(len));
+      assertThat(toString(dest), equalTo(data.substring(len)));
+
+      final int position = bufferSize - 30;
+      cursor.seek(position);
+      assertThat(cursor.read(dest, 0, len), is(len));
+
+      assertThat(toString(dest), equalTo(data.substring(position, position + len)));
+    });
+  }
+
+  @Test
   public void getSliceWhichStartsInCurrentSegmentButEndsInTheNext() throws Exception {
     if (data.length() < bufferSize) {
-      // this test only makes sense for off heap streams
+      // this test only makes sense for larger than memory streams
       return;
     }
 

@@ -97,6 +97,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
       return true;
     }
 
-    return maxBufferSize.toBytes() <= getExpandedBufferSize(bufferSizeIncrement.toBytes());
+    return getExpandedBufferSize(bufferSizeIncrement.toBytes()) <= maxBufferSize.toBytes();
   }
 }
