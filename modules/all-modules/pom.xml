@@ -44,11 +44,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-http</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-jbossts</artifactId>
             <version>${project.version}</version>
         </dependency>
