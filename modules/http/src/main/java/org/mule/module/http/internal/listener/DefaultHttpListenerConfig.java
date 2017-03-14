@@ -119,6 +119,12 @@ public class DefaultHttpListenerConfig implements HttpListenerConfig, Initialisa
     }
 
     @Override
+    public String resolvePath(String listenerPath)
+    {
+        return getFullListenerPath(listenerPath).getResolvedPath();
+    }
+
+    @Override
     public synchronized void initialise() throws InitialisationException
     {
         if (initialised)

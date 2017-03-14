@@ -34,6 +34,12 @@ public interface HttpListenerConfig extends Startable, Stoppable
     boolean hasTlsConfig();
 
     /**
+     * @param listenerPath path of the listener to be resolved
+     * @return the full listener path including the base path
+     */
+    String resolvePath(String listenerPath);
+
+    /**
       * @return the port in which the config is listening for request.
      */
     public int getPort();
