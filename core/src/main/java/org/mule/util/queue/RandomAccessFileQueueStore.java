@@ -283,7 +283,7 @@ class RandomAccessFileQueueStore
         {
             if (getSize() > 0)
             {
-                queueFileProvider.getRandomAccessFile().seek(fileTotalSpace);
+                queueFileProvider.getRandomAccessFile().seek(queueFileProvider.getRandomAccessFile().length());
             }
             long filePointer = queueFileProvider.getRandomAccessFile().getFilePointer();
             int totalBytesRequired = CONTROL_DATA_SIZE + data.length;
