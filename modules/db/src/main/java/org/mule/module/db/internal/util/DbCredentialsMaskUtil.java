@@ -12,22 +12,28 @@ import static org.mule.api.util.CredentialsMaskUtil.maskUrlPattern;
 
 import java.util.regex.Pattern;
 
-public class DBCredentialsMaskUtil
+/**
+ * Utils to mask credentials in connection strings
+ */
+public class DbCredentialsMaskUtil
 {
 
-    public static final Pattern CREDENTIALS_PATTERN_PREFIX = compile(":([^\\s@]+)");
+    private static final Pattern CREDENTIALS_PATTERN_PREFIX = compile(":([^\\s@]+)");
+
+    private DbCredentialsMaskUtil()
+    {
+
+    }
 
     /**
      * Masks credentials in input prefixed
      * 
-     * @param input credentials for user and password to be masked
-     * 
-     * @return input with user and password masked
+     * @param connectionString credentials for user and password to be masked
+     * @return connectionString with user and password masked
      */
-    public static String maskUrlCredentialsPrefixed(String input)
+    public static String maskUrlCredentialsPrefixed(String connectionString)
     {
-        String inputMasked = maskUrlPattern(input, CREDENTIALS_PATTERN_PREFIX, PASSWORD_MASK);
-        return inputMasked;
+        return maskUrlPattern(connectionString, CREDENTIALS_PATTERN_PREFIX, PASSWORD_MASK);
     }
 
 }

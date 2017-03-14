@@ -9,13 +9,15 @@ package org.mule.module.db.test.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.module.db.internal.util.DBCredentialsMaskUtil.maskUrlCredentialsPrefixed;
+import static org.mule.module.db.internal.util.DbCredentialsMaskUtil.maskUrlCredentialsPrefixed;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Test;
 
-public class DBCredentialsMaskUtilTestCase extends AbstractMuleTestCase
+@SmallTest
+public class DbCredentialsMaskUtilTestCase extends AbstractMuleTestCase
 {
     private static final String URL_TEST_PREFIXED = "jdbc:oracle:thin:a_visible_user/a_visible_password@localhost:49161:xe;";
 

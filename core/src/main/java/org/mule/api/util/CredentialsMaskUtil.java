@@ -13,6 +13,9 @@ import static java.util.regex.Pattern.compile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utils to mask credentials
+ */
 public class CredentialsMaskUtil
 {
 
@@ -28,11 +31,15 @@ public class CredentialsMaskUtil
     private static final String USER_URL_PREFIX = "user=";
     private static final String PASSWORD_URL_PREFIX = "password=";
 
+    private CredentialsMaskUtil()
+    {
+
+    }
+
     /**
-     * Masks url credentials
+     * Masks URL credentials
      * 
      * @param input input for credentials to be masked
-     * 
      * @return input with password masked
      */
     public static String maskPasswords(String input)
@@ -55,7 +62,6 @@ public class CredentialsMaskUtil
      * 
      * @param input credentials for password to be masked
      * @param pattern password pattern
-     * 
      * @return input with password masked
      */
     public static String maskUrlPassword(String input, Pattern pattern)
@@ -69,7 +75,6 @@ public class CredentialsMaskUtil
      * @param input credentials for user and password to be masked
      * @param passwordPattern password pattern
      * @param userPattern user pattern
-     * 
      * @return input with user and password masked
      */
     public static String maskUrlUserAndPassword(String input, Pattern passwordPattern, Pattern userPattern)
@@ -82,7 +87,6 @@ public class CredentialsMaskUtil
      * Masks password attribute
      * 
      * @param password password to be masked
-     * 
      * @return password masked
      */
     public static String maskPasswordAttribute(String password)
@@ -90,12 +94,27 @@ public class CredentialsMaskUtil
         return format(PASSWORD_ATTRIBUTE_MASK, password);
     }
 
+    /**
+     * Masks pattern in input
+     * 
+     * @param input credentials for user and password to be masked
+     * @param passwordPattern password pattern
+     * @param mask mask to use
+     * @return credentials masked
+     */
     public static String maskUrlPattern(String input, Pattern pattern, String mask)
     {
         return maskUrlPattern(input, pattern, mask, "");
     }
 
-    public static String maskUrlPattern(String input, Pattern pattern, String mask, String prefix)
+    /**
+     * @param input credentials for user and password to be masked
+     * @param passwordPattern password pattern
+     * @param mask mask to use
+     * @param prefix prefix in credentials
+     * @return credentials masked
+     */
+    private static String maskUrlPattern(String input, Pattern pattern, String mask, String prefix)
     {
         Matcher matcher = pattern.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)

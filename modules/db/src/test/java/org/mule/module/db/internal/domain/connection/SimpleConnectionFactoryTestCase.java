@@ -53,7 +53,7 @@ public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
     @Test(expected = ConnectionCreationException.class)
     public void failsOnConnectionThenLogWithoutCredentials() throws Exception
     {
-        when(dataSource.getConnection()).thenThrow(new RuntimeException(EXCEPTION_MESSAGE));
+        when(dataSource.getConnection()).thenThrow(new ConnectionCreationException(EXCEPTION_MESSAGE));
 
         try
         {
