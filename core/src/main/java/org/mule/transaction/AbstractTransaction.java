@@ -6,6 +6,8 @@
  */
 package org.mule.transaction;
 
+import static java.lang.System.identityHashCode;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
@@ -61,7 +63,7 @@ public abstract class AbstractTransaction implements Transaction
 
     public void begin() throws TransactionException
     {
-        logger.debug("Beginning transaction");
+        logger.debug("Beginning transaction " + identityHashCode(this));
         doBegin();
         TransactionCoordination.getInstance().bindTransaction(this);
         fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_BEGAN, getApplicationName()));
@@ -71,7 +73,7 @@ public abstract class AbstractTransaction implements Transaction
     {
         try
         {
-            logger.debug("Committing transaction " + this);
+            logger.debug("Committing transaction " + identityHashCode(this));
 
             if (isRollbackOnly())
             {
@@ -91,7 +93,7 @@ public abstract class AbstractTransaction implements Transaction
     {
         try
         {
-            logger.debug("Rolling back transaction");
+            logger.debug("Rolling back transaction " + identityHashCode(this));
             setRollbackOnly();
             doRollback();
             fireNotification(new TransactionNotification(this, TransactionNotification.TRANSACTION_ROLLEDBACK, getApplicationName()));
