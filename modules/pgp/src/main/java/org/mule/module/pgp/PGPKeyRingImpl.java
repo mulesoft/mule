@@ -7,10 +7,11 @@
 package org.mule.module.pgp;
 
 import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
+
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.module.pgp.exception.MissingSecretPGPKeyException;
 import org.mule.util.IOUtils;
 import org.mule.util.SecurityUtils;
 
@@ -57,7 +58,6 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
 
             readPublicKeyRing();
-            readPrivateKeyBundle();
         }
         catch (Exception e)
         {
@@ -91,11 +91,16 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private void readPrivateKeyBundle() throws Exception
     {
+        if (getSecretKeyRingFileName() == null)
+        {
+            throw new MissingSecretPGPKeyException("No secret key ring filename defined");
+        }
+        
         InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
         PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
         in.close();
         secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
-        
+
         if (secretKey == null)
         {
             StringBuilder message = new StringBuilder();
@@ -113,8 +118,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
                     message.append('\n');
                 }
             }
-            throw new InitialisationException(PGPMessages.noSecretKeyFoundButAvailable(message.toString()),
-                this);
+            throw new MissingSecretPGPKeyException(message.toString());
         }
     }
 
@@ -148,8 +152,13 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.secretPassphrase = value;
     }
 
-    public PGPSecretKey getSecretKey()
+    public PGPSecretKey getSecretKey() throws Exception
     {
+        if (secretKey == null)
+        {
+            readPrivateKeyBundle();
+        }
+
         return secretKey;
     }
 

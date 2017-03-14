@@ -13,7 +13,7 @@ public interface PGPKeyRing
 {
     public abstract String getSecretPassphrase();
 
-    public abstract PGPSecretKey getSecretKey();
+    public abstract PGPSecretKey getSecretKey() throws Exception;
 
     public abstract PGPPublicKey getPublicKey(String principalId);
 }
