@@ -14,4 +14,10 @@ public interface InputQueryParam extends QueryParam
 {
 
     Object getValue();
+
+    /**
+     * @return true if the parameter has a defined value in the query template.
+     */
+    boolean hasValue();
+
 }

@@ -55,7 +55,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         {
             QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
 
-            if (param == null && ((DefaultInputQueryParam) templateParam).isDbInParam())
+            if (param == null && templateParam instanceof InputQueryParam && ! ( (InputQueryParam) templateParam).hasValue())
             {
                 throw new IllegalArgumentException(buildNotDefinedInParamErrorMessage(templateParam.getName()));
             }
@@ -139,7 +139,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
     private Object checkNullValue(Object value)
     {
-        if (value instanceof String && ("null".equals(value) || "NULL".equals(value)))
+        if (value instanceof String && ("null".equals(value)))
         {
             return null;
         }
@@ -161,7 +161,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
     private String buildNotDefinedInParamErrorMessage(String name)
     {
-        return format("Parameter with name %s, used in the query text, does not match any defined query parameter name.", name);
+        return format("Parameter with name %s, used in the query text, does not match any defined query parameter name defined in the query template.", name);
     }
 
 }

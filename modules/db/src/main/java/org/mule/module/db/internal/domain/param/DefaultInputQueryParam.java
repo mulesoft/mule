@@ -14,23 +14,23 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
 
     private final Object value;
 
-    private final boolean isDbParam;
+    private final boolean hasValue;
 
     public DefaultInputQueryParam(int index, DbType type, Object value)
     {
-        this(index, type, value, null, false);
+        this(index, type, value, null);
     }
 
     public DefaultInputQueryParam(int index, DbType type, Object value, String name)
     {
-        this(index, type, value, name, false);
+        this(index, type, value, name, value != null);
     }
 
-    public DefaultInputQueryParam(int index, DbType type, Object value, String name, boolean isDbParam)
+    private DefaultInputQueryParam(int index, DbType type, Object value, String name, boolean hasValue)
     {
         super(index, type, name);
         this.value = value;
-        this.isDbParam = isDbParam;
+        this.hasValue = hasValue;
     }
 
     @Override
@@ -39,13 +39,10 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
         return value;
     }
 
-    /**
-     * @return true if the InputQueryParam references a param that must be defined through a <db:in-param> element in the configuration file.
-     * false if the InputQueryParam is defined through a literal or a MEL expression
-     */
-    public boolean isDbInParam()
+    @Override
+    public boolean hasValue()
     {
-        return isDbParam;
+        return hasValue;
     }
 
 }

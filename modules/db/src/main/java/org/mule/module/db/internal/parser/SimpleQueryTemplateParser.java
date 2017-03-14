@@ -213,7 +213,7 @@ public class SimpleQueryTemplateParser implements QueryTemplateParser
                     {
                         sqlToUse = sqlToUse + "?";
                         parameter = sqlText.substring(tokenStart + 1, tokenEnd);
-                        QueryParam inputParam = new DefaultInputQueryParam(paramIndex++, UnknownDbType.getInstance(), null, parameter, true);
+                        QueryParam inputParam = new DefaultInputQueryParam(paramIndex++, UnknownDbType.getInstance(), null, parameter);
                         parameterList.add(inputParam);
                     }
                     tokenStart = tokenEnd;
