@@ -65,6 +65,11 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     }
 
     @Test
+    public void failedOnStart() throws Exception {
+
+    }
+
+    @Test
     public void stopped() throws Exception
     {
         muleContext.start();
