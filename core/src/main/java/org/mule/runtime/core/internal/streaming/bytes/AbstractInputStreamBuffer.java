@@ -193,13 +193,13 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
         return copy(dest, requiredRange);
       }
 
+      if (bufferRange.isAhead(requiredRange)) {
+        return getBackwardsData(dest, requiredRange, length);
+      }
+
       int overlap = handlePartialOverlap(dest, requiredRange);
       if (overlap > 0) {
         return overlap;
-      }
-
-      if (bufferRange.isAhead(requiredRange)) {
-        return getBackwardsData(dest, requiredRange, length);
       }
 
       if (consumeStreamIfNecessary) {
