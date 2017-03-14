@@ -2063,6 +2063,15 @@
                 <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
             </properties>
         </profile>
+        <profile>
+            <id>jdk8+</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <xDocLint>'-Xdoclint:none'</xDocLint>
+            </properties>
+        </profile>
 
         <!-- C.I. staged build profiles -->
         <profile>
