@@ -25,4 +25,10 @@ public interface LockProvider
      */
     Lock createLock(String lockId);
 
+    /**
+     * Destroys a previously created {@link Lock} using {@link #createLock}
+     * 
+     * @param lock {@link Lock} instance previously created
+     */
+    void destroyLock(Lock lock);
 }

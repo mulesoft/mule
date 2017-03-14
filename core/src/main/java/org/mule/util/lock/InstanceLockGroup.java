@@ -58,11 +58,12 @@ public class InstanceLockGroup implements LockGroup
             if (lockEntry != null)
             {
                 lockEntry.decrementLockCount();
+                lockEntry.getLock().unlock();
                 if (!lockEntry.hasPendingLocks())
                 {
                     locks.remove(key);
+                    lockProvider.destroyLock(lockEntry.getLock());
                 }
-                lockEntry.getLock().unlock();
             }
             lockAccessMonitor.notifyAll();
         }
@@ -95,6 +96,7 @@ public class InstanceLockGroup implements LockGroup
                 if (!lockEntry.hasPendingLocks())
                 {
                     locks.remove(lockId);
+                    lockProvider.destroyLock(lockEntry.getLock());
                 }
             }
         }
@@ -128,6 +130,7 @@ public class InstanceLockGroup implements LockGroup
                 if (!lockEntry.hasPendingLocks())
                 {
                     locks.remove(lockId);
+                    lockProvider.destroyLock(lockEntry.getLock());
                 }
             }
         }
@@ -191,6 +194,10 @@ public class InstanceLockGroup implements LockGroup
     {
         synchronized (lockAccessMonitor)
         {
+            for (LockEntry lockEntry : locks.values())
+            {
+                lockProvider.destroyLock(lockEntry.getLock());
+            }
             locks.clear();
         }
     }

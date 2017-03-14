@@ -9,6 +9,8 @@ package org.mule.util.lock;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
@@ -26,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
 
 public class InstanceLockGroupTestCase extends AbstractMuleTestCase
 {
@@ -71,8 +72,14 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase
         {
             instanceLockGroup.lock("lockId");
         }
+        for (int i = 0; i < lockTimes - 1; i++)
+        {
+            instanceLockGroup.unlock("lockId");
+        }
+        verify(mockLockProvider, times(1)).createLock("lockId");
+        verify(mockLockProvider, times(0)).destroyLock(Mockito.any(Lock.class));
         instanceLockGroup.unlock("lockId");
-        Mockito.verify(mockLockProvider, VerificationModeFactory.times(1)).createLock("lockId");
+        verify(mockLockProvider, times(1)).destroyLock(Mockito.any(Lock.class));
     }
 
 
