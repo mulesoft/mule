@@ -48,13 +48,11 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
-import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.BodyDeferringAsyncHandler;
-import com.ning.http.client.HttpResponseBodyPart;
-import com.ning.http.client.HttpResponseHeaders;
-import com.ning.http.client.HttpResponseStatus;
+import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
@@ -66,15 +64,14 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLContext;
 
@@ -263,17 +260,31 @@ public class GrizzlyHttpClient implements HttpClient
     @Override
     public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException
     {
+
         Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
-        PipedOutputStream outPipe = new PipedOutputStream();
-        PipedInputStream inPipe = new PipedInputStream(outPipe);
-        BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
-        asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
+        ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
         try
         {
-            Response response = asyncHandler.getResponse();
-            return createMuleResponse(response, inPipe);
+            // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
+            // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
+            Response response = future.get();
+
+            // Under high load, sometimes the get() method returns null. Retrying once fixes the problem (see MULE-8712).
+            if (response == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Null response returned by async client");
+                }
+                response = future.get();
+            }
+            return createMuleResponse(response);
         }
-        catch (IOException e)
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+        catch (ExecutionException e)
         {
             if (e.getCause() instanceof TimeoutException)
             {
@@ -288,10 +299,6 @@ public class GrizzlyHttpClient implements HttpClient
                 throw new IOException(e);
             }
         }
-        catch (InterruptedException e)
-        {
-            throw new IOException(e);
-        }
     }
 
     @Override
@@ -300,9 +307,8 @@ public class GrizzlyHttpClient implements HttpClient
     {
         try
         {
-            PipedOutputStream outPipe = new PipedOutputStream();
             asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
-                                           new WorkManagerSourceBodyDeferringAsyncHandler(completionHandler, workManager, outPipe));
+                                           new WorkManagerSourceAsyncCompletionHandler(completionHandler, workManager));
         }
         catch (Exception e)
         {
@@ -310,12 +316,45 @@ public class GrizzlyHttpClient implements HttpClient
         }
     }
 
-    private HttpResponse createMuleResponse(Response response, InputStream inputStream) throws IOException
+    private class WorkManagerSourceAsyncCompletionHandler extends AsyncCompletionHandler<Response> implements WorkManagerSource
+    {
+
+        private CompletionHandler<HttpResponse, Exception> completionHandler;
+        private WorkManager workManager;
+
+        WorkManagerSourceAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler,
+                                                WorkManager workManager)
+        {
+            this.completionHandler = completionHandler;
+            this.workManager = workManager;
+        }
+
+        @Override
+        public Response onCompleted(Response response) throws Exception
+        {
+            completionHandler.onCompletion(createMuleResponse(response));
+            return null;
+        }
+
+        @Override
+        public void onThrowable(Throwable t)
+        {
+            completionHandler.onFailure((Exception) t);
+        }
+
+        @Override
+        public WorkManager getWorkManager() throws MuleException
+        {
+            return workManager;
+        }
+    }
+
+    private HttpResponse createMuleResponse(Response response) throws IOException
     {
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
         responseBuilder.setStatusCode(response.getStatusCode());
         responseBuilder.setReasonPhrase(response.getStatusText());
-        responseBuilder.setEntity(new InputStreamHttpEntity(inputStream));
+        responseBuilder.setEntity(new InputStreamHttpEntity(response.getResponseBodyAsStream()));
 
         if (response.hasResponseHeaders())
         {
@@ -505,111 +544,6 @@ public class GrizzlyHttpClient implements HttpClient
     public void stop()
     {
         asyncHttpClient.close();
-    }
-
-    private class WorkManagerSourceBodyDeferringAsyncHandler implements AsyncHandler<Response>, WorkManagerSource
-    {
-        private volatile Response response;
-        private final OutputStream output;
-        private final InputStream input;
-        private final WorkManager workManager;
-        private final CompletionHandler<HttpResponse, Exception> completionHandler;
-        private final Response.ResponseBuilder responseBuilder = new Response.ResponseBuilder();
-        private final AtomicBoolean handled = new AtomicBoolean(false);
-
-        public WorkManagerSourceBodyDeferringAsyncHandler(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output) throws IOException
-        {
-            this.output = output;
-            this.workManager = workManager;
-            this.completionHandler = completionHandler;
-            this.input = new PipedInputStream(output);
-        }
-
-        public void onThrowable(Throwable t)
-        {
-            try
-            {
-                closeOut();
-            }
-            catch (IOException e)
-            {
-                // ignore
-            }
-            if (!handled.getAndSet(true))
-            {
-                completionHandler.onFailure((Exception) t);
-            }
-        }
-
-        public STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception
-        {
-            responseBuilder.reset();
-            responseBuilder.accumulate(responseStatus);
-            return STATE.CONTINUE;
-        }
-
-        public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception
-        {
-            responseBuilder.accumulate(headers);
-            return STATE.CONTINUE;
-        }
-
-        public STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception
-        {
-            //body arrived, can handle the partial response
-            handleIfNecessary();
-            bodyPart.writeTo(output);
-            return STATE.CONTINUE;
-        }
-
-        protected void closeOut() throws IOException
-        {
-            try
-            {
-                output.flush();
-            }
-            finally
-            {
-                output.close();
-            }
-        }
-
-        public Response onCompleted() throws IOException
-        {
-            //there may have been no body, handle partial response
-            handleIfNecessary();
-            closeOut();
-            return null;
-        }
-
-        @Override
-        public WorkManager getWorkManager() throws MuleException
-        {
-            return workManager;
-        }
-
-        private void handleIfNecessary()
-        {
-            if (!handled.getAndSet(true))
-            {
-                response = responseBuilder.build();
-                workManager.execute(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            completionHandler.onCompletion(createMuleResponse(response, input));
-                        }
-                        catch (IOException e)
-                        {
-                            completionHandler.onFailure(e);
-                        }
-                    }
-                });
-            }
-        }
     }
 
     @Override
