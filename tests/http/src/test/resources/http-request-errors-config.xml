@@ -7,11 +7,11 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:request-config name="simpleConfig">
-        <httpn:request-connection host="localhost"/>
+        <httpn:request-connection host="localhost" port="#[port]"/>
     </httpn:request-config>
 
     <flow name="handled">
-        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="1000" port="#[port]"/>
+        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="1000"/>
         <error-handler>
             <on-error-continue type="HTTPN:BAD_REQUEST">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Bad Request']"/>
@@ -59,7 +59,7 @@
     </flow>
 
     <flow name="unhandled">
-        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="500" port="#[port]"/>
+        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="500"/>
     </flow>
 
 </mule>

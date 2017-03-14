@@ -14,5 +14,6 @@ package org.mule.test.module.http.functional;
 public interface HttpConnectorAllureConstants {
 
   String HTTP_CONNECTOR_FEATURE = "HTTP Connector";
+  String HTTP_REQUEST_URL_STORY = "Request URL";
 
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+
+    <!--TODO: MULE-11762 - This should not be required but otherwise the wrong implicit config will be created. -->
+    <httpn:request-config name="zaraza"/>
+
+    <flow name="simpleRequest">
+        <httpn:request url="http://localhost:${httpPort}/test/test" method="POST">
+            <httpn:headers>
+                #[{"key" : "value"}]
+            </httpn:headers>
+        </httpn:request>
+    </flow>
+
+    <flow name="expressionRequest">
+        <httpn:request url="#[url]" method="PUT"/>
+    </flow>
+
+    <flow name="queryParamsRequest">
+        <httpn:request url="http://localhost:${httpPort}/test?query=param" method="GET">
+            <httpn:query-params>#[queryParams]</httpn:query-params>
+        </httpn:request>
+    </flow>
+
+    <flow name="uriParamsRequest">
+        <httpn:request url="http://localhost:${httpPort}/{1}/{2}" method="DELETE">
+            <httpn:uri-params>
+                #[{"1" : "first", "2" : "second"}]
+            </httpn:uri-params>
+        </httpn:request>
+    </flow>
+
+</mule>

@@ -43,7 +43,10 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Test
   public void acceptsInvalidCertificateIfInsecure() throws Exception {
-    final Event res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
+    final Event res = flowRunner("testRequestToInsecure")
+        .withPayload(TEST_PAYLOAD)
+        .withVariable("port", port1.getNumber())
+        .run();
     assertThat(res.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
@@ -51,6 +54,9 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
   public void rejectsInvalidCertificateIfSecure() throws Exception {
     expectedError.expectCause(instanceOf(IOException.class));
     expectedError.expectCause(hasMessage(containsString("Remotely close")));
-    flowRunner("testRequestToSecure").withPayload("data").run();
+    flowRunner("testRequestToSecure")
+        .withPayload("data")
+        .withVariable("port", port2.getNumber())
+        .run();
   }
 }
