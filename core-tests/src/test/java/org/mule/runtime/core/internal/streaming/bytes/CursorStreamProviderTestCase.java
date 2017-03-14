@@ -236,7 +236,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
     withCursor(cursor -> {
       assertThat(cursor.read(dest, 0, len), is(len));
-      assertThat(toString(dest), equalTo(data.substring(len)));
+      assertThat(toString(dest), equalTo(data.substring(0, len)));
 
       final int position = bufferSize - 30;
       cursor.seek(position);
