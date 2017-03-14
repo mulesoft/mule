@@ -135,8 +135,11 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
       statusName = "*undefined*";
     }
 
-    return new StringBuilder().append(getClass().getName()).append('@').append(id).append("[status=").append(statusName)
-        .append(", key=").append(key).append(", resource=").append(resource).append("]").toString();
+    return new StringBuilder().append(getClass().getName())
+        .append('@').append(id)
+        .append("[status=").append(statusName)
+        .append(", key=").append(key)
+        .append("]").toString();
   }
 
   @Override
