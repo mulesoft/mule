@@ -19,6 +19,7 @@ public class CredentialsMaskUtil
     public static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
     public static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
     public static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"]*)\"");
+    public static final Pattern CREDENTIALS_PATTERN_PREFIX = compile(":([^\\s@]+)");
     public static final Pattern PASSWORD_PATTERN_NO_QUOTES = compile("password=([^\\s;]+)");
     public static final Pattern USER_PATTERN_NO_QUOTES = compile("user=([^\\s;]+)");
     public static final String PASSWORD_MASK = "<<credentials>>";
@@ -27,7 +28,7 @@ public class CredentialsMaskUtil
 
     private static final String USER_URL_PREFIX = "user=";
     private static final String PASSWORD_URL_PREFIX = "password=";
-    
+
     /**
      * masks url credentials
      * 
@@ -79,6 +80,19 @@ public class CredentialsMaskUtil
     }
 
     /**
+     * masks credentials in input prefixed
+     * 
+     * @param input input for user and password to be masked
+     * 
+     * @return input with user and password masked
+     */
+    public static String maskUrlCredentialsPrefixed(String input)
+    {
+        String inputMasked = maskUrlPattern(input, CREDENTIALS_PATTERN_PREFIX, PASSWORD_MASK);
+        return inputMasked;
+    }
+
+    /**
      * masks password attribute
      * 
      * @param password password to be masked
@@ -90,11 +104,13 @@ public class CredentialsMaskUtil
         return format(PASSWORD_ATTRIBUTE_MASK, password);
     }
 
-    private static String maskUrlPattern(String input, Pattern pattern, String mask) {
+    private static String maskUrlPattern(String input, Pattern pattern, String mask)
+    {
         return maskUrlPattern(input, pattern, mask, "");
     }
-    
-    private static String maskUrlPattern(String input, Pattern pattern, String mask, String prefix) {
+
+    private static String maskUrlPattern(String input, Pattern pattern, String mask, String prefix)
+    {
         Matcher matcher = pattern.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)
         {
