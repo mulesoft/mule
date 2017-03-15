@@ -607,6 +607,16 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testInvoke5() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        message.setOutboundProperty("one", "header1val");
+        assertEquals("testinvoke5test2invoke5recieved", muleContext.getClient()
+            .send("vm://invoke5-in", message)
+            .getPayloadAsString());
+    }
+
+    @Test
     public void testEnrichWithAttributes() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);

@@ -13,6 +13,7 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
+import java.util.List;
 
 public class StringAppendTransformer extends AbstractTransformer
 {
@@ -63,6 +64,23 @@ public class StringAppendTransformer extends AbstractTransformer
     public static String append(String append, String msg)
     {
         return msg + append;
+    }
+
+    public Object transformArray(List<String> args, List<String> args2) throws TransformerException
+    {
+        StringBuffer buffer = new StringBuffer();
+
+        for (String arg : args)
+        {
+            buffer.append(arg);
+        }
+
+        for (String arg : args2)
+        {
+            buffer.append(arg);
+        }
+
+        return transform(buffer.toString());
     }
 
     public String getMessage()

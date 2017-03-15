@@ -292,7 +292,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
 
     public void setArgumentExpressionsString(String arguments)
     {
-        this.arguments = Arrays.asList(arguments.split("\\s*,\\s*"));
+        this.arguments = Arrays.asList(arguments.split("\\s*,(?=[^\\]]*(?:\\[|$))\\s*"));
     }
 
     public void setArguments(List<?> arguments)
