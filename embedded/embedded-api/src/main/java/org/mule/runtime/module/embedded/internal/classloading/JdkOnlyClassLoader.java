@@ -16,7 +16,7 @@ public class JdkOnlyClassLoader extends FilteringClassLoader {
   public static final Set<String> BOOT_PACKAGES =
       ImmutableSet.of("java", "javax.smartcardio",
                       // Java EE
-                      "javax.resource", "javax.servlet", "javax.ws", "javax.mail", "javax.inject", "org.apache.xerces",
+                      "javax.resource", "javax.servlet", "javax.ws", "javax.inject", "org.apache.xerces",
                       "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j", "org.dom4j",
                       "com.sun", "sun", "org.mule.mvel2",
                       "org.codehaus.groovy",
