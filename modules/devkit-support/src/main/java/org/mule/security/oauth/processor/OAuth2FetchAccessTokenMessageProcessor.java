@@ -7,6 +7,10 @@
 package org.mule.security.oauth.processor;
 
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+import static org.mule.security.oauth.OAuthProperties.DEFAULT_EVENT_STATE_TEMPLATE_SUFFIX;
+import static org.mule.security.oauth.OAuthProperties.EVENT_ID_REGEX;
+import static org.mule.security.oauth.OAuthProperties.EVENT_STATE_REGEX_SUFFIX;
+import static org.mule.security.oauth.OAuthProperties.ORIGINAL_STATE_REGEX;
 
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
@@ -35,16 +39,24 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 {
 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2FetchAccessTokenMessageProcessor.class);
-    private static final Pattern EVENT_ID_PATTERN = Pattern.compile("<<MULE_EVENT_ID=([\\w-]*)>>");
-    private static final Pattern ORIGINAL_STATE_PATTERN = Pattern.compile("<<MULE_EVENT_ID=[\\w-]*>>(.*)");
 
+    private final Pattern EVENT_ID_PATTERN ;
+    private final Pattern ORIGINAL_STATE_PATTERN ;
     private OAuth2Manager<OAuth2Adapter> oauthManager;
 
     public OAuth2FetchAccessTokenMessageProcessor(OAuth2Manager<OAuth2Adapter> oauthManager,
                                                   String accessTokenId)
     {
+        this(oauthManager, accessTokenId, DEFAULT_EVENT_STATE_TEMPLATE_SUFFIX);
+    }
+
+    public OAuth2FetchAccessTokenMessageProcessor(OAuth2Manager<OAuth2Adapter> oauthManager,
+                                                  String accessTokenId, String suffix)
+    {
         this.oauthManager = oauthManager;
         this.setAccessTokenId(accessTokenId);
+        EVENT_ID_PATTERN = Pattern.compile(EVENT_ID_REGEX + suffix);
+        ORIGINAL_STATE_PATTERN = Pattern.compile(ORIGINAL_STATE_REGEX + suffix + EVENT_STATE_REGEX_SUFFIX);
     }
 
     /**
@@ -99,7 +111,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         return restoredEvent;
     }
 
-    private MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
+    protected MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
         String state = getState(event);
         if (StringUtils.isEmpty(state))

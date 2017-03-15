@@ -7,6 +7,10 @@
 
 package org.mule.security.oauth.processor;
 
+import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.security.oauth.OAuthProperties.BASE_EVENT_STATE_TEMPLATE;
+import static org.mule.security.oauth.OAuthProperties.DEFAULT_EVENT_STATE_TEMPLATE_SUFFIX;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -49,7 +53,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
             }
         }
 
-        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(module, accessTokenId);
+        FetchAccessTokenMessageProcessor fetchAccessTokenMessageProcessor = new OAuth2FetchAccessTokenMessageProcessor(module, accessTokenId, getSuffix());
 
         this.startCallback(module, fetchAccessTokenMessageProcessor);
 
@@ -66,7 +70,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     /**
      * Starts the OAuth authorization process
-     * 
+     *
      * @param event MuleEvent to be processed
      * @throws Exception
      */
@@ -97,7 +101,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     private void setState(Map<String, String> extraParameters, MuleEvent event)
     {
-        String state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId());
+        String state = String.format(BASE_EVENT_STATE_TEMPLATE + getSuffix(), event.getId());
 
         if (this.getState() != null)
         {
@@ -175,6 +179,15 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
         {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Override this method when it's necessary override the separator of Ids.
+     * @return the value of CUSTOM_SUFFIX_PROPERTY if it was defined, DEFAULT_EVENT_STATE_SUFFIX otherwise.
+     */
+    protected String getSuffix()
+    {
+        return DEFAULT_EVENT_STATE_TEMPLATE_SUFFIX;
     }
 
 }
