@@ -262,18 +262,20 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getConfigurationThroughDefaultConfig() throws Exception {
     registerConfigurationProvider();
 
-    ConfigurationInstance configInstance =
+    Optional<ConfigurationInstance> configInstance =
         extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
-    assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
+    assertThat(configInstance.isPresent(), is(true));
+    assertThat(configInstance.get().getValue(), is(sameInstance(this.configInstance)));
   }
 
   @Test
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
-    ConfigurationInstance configInstance =
+    Optional<ConfigurationInstance> configInstance =
         extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
-    assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
+    assertThat(configInstance.isPresent(), is(true));
+    assertThat(configInstance.get().getValue(), is(sameInstance(this.configInstance)));
   }
 
   @Test
@@ -293,11 +295,12 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
       return null;
     }).when(registry).registerObject(anyString(), anyObject());
-    ConfigurationInstance configurationInstance =
+    Optional<ConfigurationInstance> configurationInstance =
         extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
     joinerLatch.countDown();
+    assertThat(configurationInstance.isPresent(), is(true));
     assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
-    assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
+    assertThat(configurationInstance.get().getValue(), is(sameInstance(configInstance)));
   }
 
   @Test(expected = IllegalStateException.class)

@@ -151,9 +151,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Override
   public ConfigurationInstance getConfiguration(String configurationProviderName, Event muleEvent) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
-        .orElseThrow(() -> new IllegalArgumentException(
-                                                        format(
-                                                               "There is no registered configurationProvider under name '%s'",
+        .orElseThrow(() -> new IllegalArgumentException(format("There is no registered configurationProvider under name '%s'",
                                                                configurationProviderName)));
   }
 
@@ -162,9 +160,10 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
    */
   @Override
   public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                Event muleEvent) {
+                                                          Event muleEvent) {
 
-    ConfigurationInstance instance = getConfigurationProvider(extensionModel, componentModel).map(p -> p.get(muleEvent)).orElse(null);
+    ConfigurationInstance instance =
+        getConfigurationProvider(extensionModel, componentModel).map(p -> p.get(muleEvent)).orElse(null);
     if (instance != null) {
       return of(instance);
     }

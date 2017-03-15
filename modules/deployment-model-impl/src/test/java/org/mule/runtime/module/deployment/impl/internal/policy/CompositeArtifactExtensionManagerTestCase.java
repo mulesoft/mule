@@ -232,9 +232,9 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
         .thenReturn(of(childConfigurationProvider));
     when(parentExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
 
-    ConfigurationInstance configuration = extensionManager.getConfiguration(childExtension, operationModel, event);
-
-    assertThat(configuration, is(configurationInstance));
+    Optional<ConfigurationInstance> configuration = extensionManager.getConfiguration(childExtension, operationModel, event);
+    assertThat(configuration.isPresent(), is(true));
+    assertThat(configuration.get(), is(configurationInstance));
   }
 
   @Test

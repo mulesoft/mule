@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -76,12 +77,12 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
   }
 
   @Override
-  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                Event event) {
+  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+                                                          Event event) {
 
     Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel, componentModel);
     if (provider.isPresent()) {
-      return provider.get().get(event);
+      return ofNullable(provider.get().get(event));
     }
 
     throw new IllegalArgumentException(format(

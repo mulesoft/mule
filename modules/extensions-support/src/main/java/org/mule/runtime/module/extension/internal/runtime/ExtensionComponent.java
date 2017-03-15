@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -14,6 +15,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -34,6 +36,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -84,6 +87,7 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
   private final ConfigurationProvider configurationProvider;
   private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
+  private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
   protected final ClassLoader classLoader;
 
   private CursorStreamProviderFactory cursorStreamProviderFactory;
@@ -301,6 +305,10 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
    * @return a configuration instance for the current component with a given {@link Event}
    */
   protected Optional<ConfigurationInstance> getConfiguration(Event event) {
+    if (!requiresConfig.get()) {
+      return empty();
+    }
+
     if (isConfigurationSpecified()) {
       return of(configurationProvider)
           .map(provider -> ofNullable(provider.get(event)))
@@ -328,6 +336,10 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
 
   private boolean isConfigurationSpecified() {
     return configurationProvider != null;
+  }
+
+  private boolean computeRequiresConfig() {
+    return requiresConfig(extensionModel, componentModel);
   }
 
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {

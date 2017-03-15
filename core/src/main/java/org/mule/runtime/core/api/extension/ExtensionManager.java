@@ -72,9 +72,8 @@ public interface ExtensionManager {
    */
   ConfigurationInstance getConfiguration(String configurationProviderName, Event event);
 
-
   /**
-   * Returns a {@link ConfigurationInstance} for the given {@code extensionModel}.
+   * Returns a {@link ConfigurationInstance} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
    * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to try and determine the
    * instance to be returned:
@@ -96,7 +95,7 @@ public interface ExtensionManager {
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
    * @param muleEvent the current Event
-   * @return a {@link ConfigurationInstance}
+   * @return an {@link Optional} for a {@link ConfigurationInstance}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
   Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel, Event muleEvent);
@@ -116,7 +115,7 @@ public interface ExtensionManager {
    * Locates and returns (if there is any) a suitable {@link ConfigurationProvider} for the given {@link ComponentModel}.
    * 
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
-   * @param
+   * @param componentModel the {@link ComponentModel} for which a configuration is wanted
    * @return an {@link Optional} {@link ConfigurationProvider}
    */
   Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
