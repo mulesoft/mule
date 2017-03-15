@@ -189,7 +189,6 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.8.5.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.39.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.11.jar
 /mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
@@ -202,11 +201,6 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.29.jar
 /mule-standalone-${productVersion}/lib/opt/gson-2.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.4-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
@@ -235,7 +229,6 @@
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.3.jar
-/mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/maven-aether-provider-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-artifact-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-builder-support-3.3.9.jar

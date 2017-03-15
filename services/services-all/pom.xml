@@ -43,6 +43,45 @@
             <artifactId>mule-service-http</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <exclusions>
+                <!-- Runtime Dependencies-->
+                <exclusion>
+                    <groupId>org.mule.runtime</groupId>
+                    <artifactId>mule-service-http-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.runtime</groupId>
+                    <artifactId>mule-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.runtime</groupId>
+                    <artifactId>mule-module-tls</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-servlet_3.0_spec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.grizzly</groupId>
+                    <artifactId>grizzly-http-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.grizzly</groupId>
+                    <artifactId>connection-pool</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ning</groupId>
+                    <artifactId>async-http-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.grizzly</groupId>
+                    <artifactId>grizzly-websockets</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
