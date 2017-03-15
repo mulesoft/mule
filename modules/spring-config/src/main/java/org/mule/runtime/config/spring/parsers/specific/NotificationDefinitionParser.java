@@ -49,7 +49,7 @@ import org.w3c.dom.Element;
 public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser {
 
   private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS =
-      "org.mule.compatibility.core.context.notification.EndpointMessageNotification";
+      "com.mulesoft.mule.compatibility.core.context.notification.EndpointMessageNotification";
   private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS =
       "com.mulesoft.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener";
   public static final Map EVENT_MAP;
