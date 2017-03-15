@@ -58,9 +58,9 @@ import java.util.Optional;
 public class NotificationConfig extends AbstractAnnotatedObject {
 
   private static final String ENDPOINT_MESSAGE_NOTIFICATION_CLASS =
-      "org.mule.compatibility.core.context.notification.EndpointMessageNotification";
+      "com.mulesoft.mule.compatibility.core.context.notification.EndpointMessageNotification";
   private static final String ENDPOINT_MESSAGE_NOTIFICATION_LISTENER_CLASS =
-      "org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener";
+      "com.mulesoft.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener";
   private static final Map<String, String> EVENT_MAP;
   private static final Map<String, String> INTERFACE_MAP;
 
