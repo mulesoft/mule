@@ -166,18 +166,37 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     requireNonNull(command);
 
     final RunnableFuture<?> task = new RunnableRepeatableFutureDecorator<>(() -> super.newTaskFor(command, null), t -> {
-      if (!t.isCancelled()) {
-        scheduledExecutor.schedule(schedulableTask(t), delay, unit);
-      } else {
-        taskFinished(t);
-      }
+      fixedDelayWrapUp(t, delay, unit);
     }, currentThread().getContextClassLoader(), this, command.getClass().getName(), idGenerator.getAndIncrement());
 
     final ScheduledFutureDecorator<?> scheduled =
-        new ScheduledFutureDecorator<>(scheduledExecutor.schedule(schedulableTask(task), initialDelay, unit), task);
+        new ScheduledFutureDecorator<>(scheduledExecutor.schedule(reschedulableTask(task, delay, unit), initialDelay, unit),
+                                       task);
 
     putTask(task, scheduled);
     return scheduled;
+  }
+
+  private <T> Runnable reschedulableTask(RunnableFuture<T> task, long delay, TimeUnit unit) {
+    return () -> {
+      try {
+        executor.execute(task);
+      } catch (RejectedExecutionException e) {
+        // Just log. Do not rethrow so the periodic job is not cancelled
+        logger.warn(e.getClass().getName() + " scheduling next execution of task " + task.toString() + ". Message was: "
+            + e.getMessage());
+
+        fixedDelayWrapUp(task, delay, unit);
+      }
+    };
+  }
+
+  private void fixedDelayWrapUp(RunnableFuture<?> task, long delay, TimeUnit unit) {
+    if (!task.isCancelled()) {
+      scheduledExecutor.schedule(reschedulableTask(task, delay, unit), delay, unit);
+    } else {
+      taskFinished(task);
+    }
   }
 
   @Override
