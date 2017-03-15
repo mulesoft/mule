@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getId;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -47,6 +48,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -284,7 +286,7 @@ class DeclarationBasedElementModelFactory {
           .collect(joining(","));
 
       throw new IllegalArgumentException(
-                                         format("The parameter%s [%s] were declared but they do not exist in the associated model",
+                                         format("The parameter [%s] were declared but they do not exist in the associated model",
                                                 missing));
     }
   }
@@ -328,6 +330,8 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       public void visitSimpleValue(String value) {
+        checkArgument(paramDsl.supportsAttributeDeclaration() || isContent(parameterModel) || isText(parameterModel),
+                      "Simple values can only be declared for parameters of simple type, or those with Content role");
         createSimpleParameter(value, paramDsl, parentConfig, parentElement, parameterModel);
       }
 
@@ -525,17 +529,25 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       public void visitSimpleValue(String value) {
-        ComponentConfiguration item = ComponentConfiguration.builder()
-            .withIdentifier(asIdentifier(itemDsl))
-            .withParameter(VALUE_ATTRIBUTE_NAME, value)
-            .build();
+        itemDsl.getContainedElement(VALUE_ATTRIBUTE_NAME)
+            .ifPresent(valueDsl -> {
+              ComponentConfiguration item = ComponentConfiguration.builder()
+                  .withIdentifier(asIdentifier(itemDsl))
+                  .withParameter(VALUE_ATTRIBUTE_NAME, value)
+                  .build();
 
-        parentConfig.withNestedComponent(item);
-        parentElement.containing(DslElementModel.builder()
-            .withModel(itemValueType)
-            .withDsl(itemDsl)
-            .withConfig(item)
-            .build());
+              parentConfig.withNestedComponent(item);
+              parentElement.containing(DslElementModel.builder()
+                  .withModel(itemValueType)
+                  .withDsl(itemDsl)
+                  .withConfig(item)
+                  .containing(DslElementModel.builder()
+                      .withModel(itemValueType)
+                      .withDsl(valueDsl)
+                      .withValue(value)
+                      .build())
+                  .build());
+            });
       }
 
       @Override
@@ -696,6 +708,10 @@ class DeclarationBasedElementModelFactory {
         .withName(fieldDsl.getElementName())
         .withNamespace(fieldDsl.getNamespaceUri())
         .build();
+  }
+
+  private boolean isText(ParameterModel parameter) {
+    return parameter.getLayoutModel().map(LayoutModel::isText).orElse(false);
   }
 
 }
