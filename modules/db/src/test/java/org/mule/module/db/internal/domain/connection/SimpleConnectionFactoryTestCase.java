@@ -9,6 +9,7 @@ package org.mule.module.db.internal.domain.connection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -49,8 +50,7 @@ public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
 
         connectionFactory.create(dataSource);
     }
-    
-    @Test(expected = ConnectionCreationException.class)
+
     public void failsOnConnectionThenLogWithoutCredentials() throws Exception
     {
         when(dataSource.getConnection()).thenThrow(new ConnectionCreationException(EXCEPTION_MESSAGE));
@@ -58,11 +58,11 @@ public class SimpleConnectionFactoryTestCase extends AbstractMuleTestCase
         try
         {
             connectionFactory.create(dataSource);
+            fail("An exception was expected to be raised when the connection is created.");
         }
         catch (ConnectionCreationException e)
         {
             assertThat(e.getMessage(), equalTo(EXPECTED_EXCEPTION_MESSAGE));
-            throw e;
         }
     }
 

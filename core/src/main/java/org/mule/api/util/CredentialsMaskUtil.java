@@ -70,17 +70,17 @@ public final class CredentialsMaskUtil
     }
 
     /**
-     * Masks user and password in input
+     * Masks user and password in text
      * 
-     * @param input credentials for user and password to be masked
+     * @param textToMask text for user and password to be masked
      * @param passwordPattern password pattern
      * @param userPattern user pattern
-     * @return input with user and password masked
+     * @return text masked
      */
-    public static String maskUrlUserAndPassword(String input, Pattern passwordPattern, Pattern userPattern)
+    public static String maskUserAndPassword(String textToMask, Pattern passwordPattern, Pattern userPattern)
     {
-        String inputMasked = maskUrlPattern(input, passwordPattern, PASSWORD_MASK, PASSWORD_URL_PREFIX);
-        return maskUrlPattern(inputMasked, userPattern, USER_MASK, USER_URL_PREFIX);
+        String textMasked = maskUrlPattern(textToMask, passwordPattern, PASSWORD_MASK, PASSWORD_URL_PREFIX);
+        return maskUrlPattern(textMasked, userPattern, USER_MASK, USER_URL_PREFIX);
     }
 
     /**
@@ -95,33 +95,26 @@ public final class CredentialsMaskUtil
     }
 
     /**
-     * Masks pattern in input
+     * Masks pattern in text
      * 
-     * @param input credentials for user and password to be masked
-     * @param passwordPattern password pattern
+     * @param textToMask text to be masked
+     * @param pattern pattern to find the tokens to be masked
      * @param mask mask to use
-     * @return credentials masked
+     * @return masked text
      */
-    public static String maskUrlPattern(String input, Pattern pattern, String mask)
+    public static String maskUrlPattern(String textToMask, Pattern pattern, String mask)
     {
-        return maskUrlPattern(input, pattern, mask, "");
+        return maskUrlPattern(textToMask, pattern, mask, "");
     }
 
-    /**
-     * @param input credentials for user and password to be masked
-     * @param passwordPattern password pattern
-     * @param mask mask to use
-     * @param prefix prefix in credentials
-     * @return credentials masked
-     */
-    private static String maskUrlPattern(String input, Pattern pattern, String mask, String prefix)
+    private static String maskUrlPattern(String textToMask, Pattern pattern, String mask, String prefix)
     {
-        Matcher matcher = pattern.matcher(input);
+        Matcher matcher = pattern.matcher(textToMask);
         if (matcher.find() && matcher.groupCount() > 0)
         {
-            input = input.replaceAll(prefix + matcher.group(1), prefix + mask);
+            textToMask = textToMask.replaceAll(prefix + matcher.group(1), prefix + mask);
         }
-        return input;
+        return textToMask;
 
     }
 }

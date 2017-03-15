@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.api.util.CredentialsMaskUtil.PASSWORD_PATTERN_NO_QUOTES;
 import static org.mule.api.util.CredentialsMaskUtil.USER_PATTERN_NO_QUOTES;
-import static org.mule.api.util.CredentialsMaskUtil.maskUrlUserAndPassword;
+import static org.mule.api.util.CredentialsMaskUtil.maskUserAndPassword;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -26,7 +26,7 @@ public class CredentialsMaskUtilTestCase extends AbstractMuleTestCase
     @Test
     public void whenUrlWithUserAndPasswordMaskUserPassword()
     {
-        String maskedUrl = maskUrlUserAndPassword(URL_TEST, PASSWORD_PATTERN_NO_QUOTES, USER_PATTERN_NO_QUOTES);
+        String maskedUrl = maskUserAndPassword(URL_TEST, PASSWORD_PATTERN_NO_QUOTES, USER_PATTERN_NO_QUOTES);
         assertThat(maskedUrl, equalTo(EXPECTED_URL_TEST_MASKED));
     }
 

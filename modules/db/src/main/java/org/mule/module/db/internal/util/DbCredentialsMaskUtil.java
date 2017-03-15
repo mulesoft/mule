@@ -26,7 +26,7 @@ public final class DbCredentialsMaskUtil
     }
 
     /**
-     * Masks credentials in input prefixed
+     * Masks credentials in connectionToString prefixed
      * 
      * @param connectionString credentials for user and password to be masked
      * @return connectionString with user and password masked
