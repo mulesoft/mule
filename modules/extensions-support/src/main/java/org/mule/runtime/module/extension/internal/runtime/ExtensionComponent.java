@@ -311,7 +311,7 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
 
     return extensionManager.getConfigurationProvider(extensionModel, componentModel)
         .map(provider -> ofNullable(provider.get(event)))
-        .orElseGet(() -> ofNullable(extensionManager.getConfiguration(extensionModel, componentModel, event)));
+        .orElseGet(() -> extensionManager.getConfiguration(extensionModel, componentModel, event));
   }
 
   protected CursorStreamProviderFactory getCursorStreamProviderFactory() {

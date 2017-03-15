@@ -99,7 +99,7 @@ public interface ExtensionManager {
    * @return a {@link ConfigurationInstance}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
-  ConfigurationInstance getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel, Event muleEvent);
+  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel, Event muleEvent);
 
   /**
    * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the

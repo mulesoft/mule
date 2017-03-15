@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -160,23 +161,23 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
                                                 Event muleEvent) {
 
-    Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel, componentModel);
-    if (provider.isPresent()) {
-      return provider.get().get(muleEvent);
+    ConfigurationInstance instance = getConfigurationProvider(extensionModel, componentModel).map(p -> p.get(muleEvent)).orElse(null);
+    if (instance != null) {
+      return of(instance);
     }
 
     Optional<ConfigurationModel> configurationModel =
         getConfigurationModelForExtension(extensionModel, getConfigurationForComponent(extensionModel,
                                                                                        componentModel));
-    if (!configurationModel.isPresent()) {
-      return null;
+    if (configurationModel.isPresent()) {
+      createImplicitConfiguration(extensionModel, configurationModel.get(), muleEvent);
+      return getConfiguration(extensionModel, componentModel, muleEvent);
     }
 
-    createImplicitConfiguration(extensionModel, configurationModel.get(), muleEvent);
-    return getConfiguration(extensionModel, componentModel, muleEvent);
+    return empty();
   }
 
   @Override
