@@ -192,7 +192,7 @@
         <muleDslApiVersion>1.0.0-M5-RC-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-M5-RC-SNAPSHOT</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <muleApiVersion>1.0.0-M5-RC-SNAPSHOT</muleApiVersion>
+        <muleApiVersion>1.0.0-M5</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-M5-RC-SNAPSHOT</muleMetadataModelVersion>
         <muleMvelVersion>2.1.9-MULE-010</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
