@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -77,7 +75,7 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
     } else if (componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
       value = new RuntimeBeanReference(componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
     } else {
-      throw new MuleRuntimeException(createStaticMessage("Unknown bean type for map entry"));
+      // MULE-11984: Check that generated map entries are not empty
     }
 
     AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
