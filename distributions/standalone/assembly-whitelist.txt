@@ -175,7 +175,7 @@
 /mule-standalone-${productVersion}/plugins/mule-module-oauth-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-wsc-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/plugins/mule-module-jms-${productVersion}-mule-plugin.jar
-/mule-standalone-${productVersion}/plugins/mule-plugin-weave-4.0.0-M5-RC-SNAPSHOT-dist.zip
+/mule-standalone-${productVersion}/plugins/mule-plugin-weave-4.0.0-M5-dist.zip
 
 #
 # /services
