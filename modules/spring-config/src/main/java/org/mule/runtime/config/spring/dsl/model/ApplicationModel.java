@@ -26,6 +26,7 @@ import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SO
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
+import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -39,8 +40,9 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-
-import com.google.common.collect.ImmutableSet;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,10 +56,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -688,7 +686,7 @@ public class ApplicationModel {
     }
   }
 
-  private void executeOnEveryFlow(final Consumer<ComponentModel> task) {
+  public void executeOnEveryFlow(final Consumer<ComponentModel> task) {
     for (ComponentModel muleComponentModel : muleComponentModels) {
       for (ComponentModel componentModel : muleComponentModel.getInnerComponents()) {
         if (ApplicationModel.FLOW_IDENTIFIER.equals(componentModel.getIdentifier())) {

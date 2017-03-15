@@ -32,7 +32,8 @@ import java.util.Map;
     plugins = {"org.mule.modules:mule-module-http-ext",
         "org.mule.modules:mule-module-sockets",
         "org.mule.modules:mule-module-file",
-        "org.mule.modules:mule-module-file-extension-common"},
+        "org.mule.modules:mule-module-file-extension-common",
+        "org.mule.modules:mule-module-jms"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 

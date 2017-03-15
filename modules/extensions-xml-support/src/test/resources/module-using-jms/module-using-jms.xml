@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-using-jms"
+        minMuleVersion="4.0.0"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:jmsn="http://www.mulesoft.org/schema/mule/jmsn"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/jmsn http://www.mulesoft.org/schema/mule/jmsn/current/mule-jmsn.xsd">
+
+    <jmsn:jms-producer-config name="templateProducerConfig"/>
+    <jmsn:config name="jmsConfig" producerConfig="templateProducerConfig">
+        <jmsn:active-mq-connection/>
+    </jmsn:config>
+
+    <operation name="do-publish">
+        <parameters>
+            <parameter name="destination" type="string"/>
+            <parameter name="content" type="string"/>
+        </parameters>
+        <body>
+            <jmsn:publish config-ref="jmsConfig" destination="#[param.destination]">
+                <jmsn:message-builder>
+                    <jmsn:body>#[param.content]</jmsn:body>
+                </jmsn:message-builder>
+            </jmsn:publish>
+        </body>
+        <output type="void"/>
+    </operation>
+
+    <operation name="do-consume">
+        <parameters>
+            <parameter name="destination" type="string"/>
+        </parameters>
+        <body>
+            <jmsn:consume config-ref="jmsConfig" destination="#[param.destination]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>
