@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
@@ -189,6 +191,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     reset(muleContext.getSchedulerService());
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(of(mock(Attributes.class)));
+
+    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager());
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
@@ -390,8 +394,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     initialise();
     messageSource.start();
 
-    verify(muleContext.getSchedulerService()).ioScheduler();
-    verify(muleContext.getSchedulerService()).cpuLightScheduler();
     verify(source).onStart(sourceCallback);
     verify(muleContext.getInjector()).inject(source);
   }

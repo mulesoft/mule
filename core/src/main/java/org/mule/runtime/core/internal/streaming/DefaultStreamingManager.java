@@ -11,16 +11,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
+import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
-import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 
 import javax.inject.Inject;
 
@@ -36,7 +34,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Inject
   private MuleContext muleContext;
 
-  private ByteBufferManager bufferFactory;
+  private ByteBufferManager bufferManager;
   private ByteStreamingManagerAdapter byteStreamingManager;
   private boolean initialised = false;
 
@@ -46,10 +44,14 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Override
   public void initialise() throws InitialisationException {
     if (!initialised) {
-      bufferFactory = new PoolingByteBufferManager();
-      byteStreamingManager = new DefaultByteStreamingManager(bufferFactory, schedulerService.ioScheduler(), muleContext);
+      bufferManager = new PoolingByteBufferManager();
+      byteStreamingManager = createByteStreamingManager();
       initialised = true;
     }
+  }
+
+  protected ByteStreamingManagerAdapter createByteStreamingManager() {
+    return new DefaultByteStreamingManager(bufferManager, schedulerService.ioScheduler(), muleContext);
   }
 
   /**
@@ -58,7 +60,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Override
   public void dispose() {
     disposeIfNeeded(byteStreamingManager, LOGGER);
-    disposeIfNeeded(bufferFactory, LOGGER);
+    disposeIfNeeded(bufferManager, LOGGER);
   }
 
   /**
@@ -69,4 +71,15 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     return byteStreamingManager;
   }
 
+  protected ByteBufferManager getBufferManager() {
+    return bufferManager;
+  }
+
+  protected SchedulerService getSchedulerService() {
+    return schedulerService;
+  }
+
+  protected MuleContext getMuleContext() {
+    return muleContext;
+  }
 }

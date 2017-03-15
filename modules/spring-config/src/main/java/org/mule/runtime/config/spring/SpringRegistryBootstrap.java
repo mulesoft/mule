@@ -27,6 +27,7 @@ import org.mule.runtime.core.config.bootstrap.TransformerBootstrapProperty;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -43,7 +44,7 @@ import org.springframework.context.ApplicationContext;
 public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implements Initialisable {
 
   private OptionalObjectsController optionalObjectsController;
-  private BeanDefinitionRegistry beanDefinitionRegistry;
+  private BiConsumer<String, BeanDefinition> beanDefinitionRegister;
 
   /**
    * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
@@ -51,14 +52,14 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
    * @param muleContext the {@code MuleContext} of the artifact.
    * @param optionalObjectsController a controller for objects that may be optional. When an object can be optional and mule it's
    *        not able to create it, then it gets ignored.
-   * @param beanDefinitionRegistry the spring bean definition registry where the bean definitions gets stored
+   * @param beanDefinitionRegister a {@link BiConsumer} on which the bean definitions are registered
    */
   public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext,
                                  OptionalObjectsController optionalObjectsController,
-                                 BeanDefinitionRegistry beanDefinitionRegistry) {
+                                 BiConsumer<String, BeanDefinition> beanDefinitionRegister) {
     super(artifactType, muleContext);
     this.optionalObjectsController = optionalObjectsController;
-    this.beanDefinitionRegistry = beanDefinitionRegistry;
+    this.beanDefinitionRegister = beanDefinitionRegister;
   }
 
   @Override
@@ -152,7 +153,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
   }
 
   private void doRegisterObject(String key, BeanDefinitionBuilder builder) {
-    beanDefinitionRegistry.registerBeanDefinition(key, builder.getBeanDefinition());
+    beanDefinitionRegister.accept(key, builder.getBeanDefinition());
   }
 
   private void registerInstance(String key, Object value) {
@@ -160,9 +161,4 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     builder.addConstructorArgValue(value);
     doRegisterObject(key, builder);
   }
-
-  protected OptionalObjectsController getOptionalObjectsController() {
-    return optionalObjectsController;
-  }
-
 }

@@ -25,14 +25,6 @@ public interface ByteStreamingManager {
   CursorStreamProviderFactory getInMemoryCursorStreamProviderFactory(InMemoryCursorStreamConfig config);
 
   /**
-   * Creates a {@link CursorStreamProviderFactory} which buffers in disk
-   *
-   * @param config the configuration for the produced {@link CursorStreamProvider} instances
-   * @return a new {@link CursorStreamProviderFactory}
-   */
-  CursorStreamProviderFactory getFileStoreCursorStreamProviderFactory(FileStoreCursorStreamConfig config);
-
-  /**
    * Creates a null object implementation of {@link CursorStreamProviderFactory}
    *
    * @return a new {@link CursorStreamProviderFactory}

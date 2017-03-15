@@ -50,12 +50,12 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    * {@inheritDoc}
    */
   @Override
-  protected void doClose() {
+  public void doClose() {
     // no - op
   }
 
   @Override
-  protected int getBackwardsData(ByteBuffer dest, Range requiredRange, int length) {
+  public int getBackwardsData(ByteBuffer dest, Range requiredRange, int length) {
     return copy(dest, requiredRange);
   }
 
@@ -66,7 +66,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    * @throws StreamingBufferSizeExceededException if the buffer is not big enough and cannot be expanded
    */
   @Override
-  protected int consumeForwardData(ByteBuffer buffer) throws IOException {
+  public int consumeForwardData(ByteBuffer buffer) throws IOException {
     if (!buffer.hasRemaining()) {
       buffer = expandBuffer(buffer.capacity());
     }

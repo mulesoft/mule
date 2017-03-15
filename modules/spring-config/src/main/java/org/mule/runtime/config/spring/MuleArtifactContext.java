@@ -21,7 +21,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVIT
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -61,8 +60,6 @@ import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
@@ -178,10 +175,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
     return new XmlConfigurationDocumentLoader();
-  }
-
-  private ErrorTypeLocator createComponentErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
-    return createDefaultErrorTypeLocator(errorTypeRepository);
   }
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {
