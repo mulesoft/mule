@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.MapEntry;
 import org.mule.runtime.dsl.api.component.TypeDefinition.MapEntryType;
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 
@@ -29,7 +33,13 @@ import org.springframework.beans.factory.support.ManagedList;
  * <pre>
  *  <parsers-test:simple-type-entry key="key1" value="1"/>
  * </pre>
- * 
+ *
+ * or
+ *
+ * <pre>
+ *  <parsers-test:simple-type-entry key="key1" value-ref="anotherDefinition"/>
+ * </pre>
+ *
  * or
  * 
  * <pre>
@@ -43,6 +53,7 @@ import org.springframework.beans.factory.support.ManagedList;
 public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private static final String ENTRY_TYPE_KEY_PARAMETER_NAME = "key";
+  private static final String ENTRY_TYPE_VALUE_REF_PARAMETER_NAME = "value-ref";
 
   @Override
   boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
@@ -58,6 +69,27 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
     final Object key = componentModel.getParameters().get(ENTRY_TYPE_KEY_PARAMETER_NAME);
     Object keyBeanDefinition = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
+
+
+    Object value = null;
+    if (componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME) != null) {
+      value = getValue(objectTypeVisitor, componentModel, componentBuildingDefinition);
+    } else if (componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
+      value = new RuntimeBeanReference(componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
+    } else {
+      throw new MuleRuntimeException(createStaticMessage("Unknown bean type for map entry"));
+    }
+
+    AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
+        .addConstructorArgValue(value).getBeanDefinition();
+
+    componentModel.setBeanDefinition(beanDefinition);
+    return true;
+
+  }
+
+  private Object getValue(ObjectTypeVisitor objectTypeVisitor, ComponentModel componentModel,
+                          ComponentBuildingDefinition componentBuildingDefinition) {
     Object value;
     Class valueType = objectTypeVisitor.getMapEntryType().get().getValueType();
     if (isSimpleType(valueType) || componentModel.getInnerComponents().isEmpty()) {
@@ -82,11 +114,6 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
       BeanDefinition beanDefinition = childComponentModel.getBeanDefinition();
       value = beanDefinition != null ? beanDefinition : childComponentModel.getBeanReference();
     }
-    AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
-        .addConstructorArgValue(value).getBeanDefinition();
-
-    componentModel.setBeanDefinition(beanDefinition);
-    return true;
-
+    return value;
   }
 }

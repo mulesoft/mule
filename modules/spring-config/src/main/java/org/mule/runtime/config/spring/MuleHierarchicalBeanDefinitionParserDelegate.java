@@ -23,6 +23,10 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_R
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.util.XMLUtils.isLocalName;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -30,6 +34,7 @@ import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
@@ -50,6 +55,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -109,6 +117,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         ArrayUtils.isEmpty(elementValidators) ? ImmutableList.<ElementValidator>of() : ImmutableList.copyOf(elementValidators);
   }
 
+  private Either<BeanDefinition, BeanReference> parseDefinitionOrReference(Element element, BeanDefinition parent) {
+    if (isLocalName(element, REF_ELEMENT)) {
+      RuntimeBeanNameReference beanNameReference = (RuntimeBeanNameReference) parseIdRefElement(element);
+      RuntimeBeanReference beanReference = new RuntimeBeanReference(beanNameReference.getBeanName());
+      return right(beanReference);
+    } else {
+      return left(parseCustomElement(element, parent));
+    }
+  }
+
   @Override
   public BeanDefinition parseCustomElement(Element element, BeanDefinition parent) {
     if (logger.isDebugEnabled()) {
@@ -159,7 +177,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                                                               // Here it will always be a nested element. We use a fake bean
                                                               // definition so it does not try to validate the ID if it thinks is
                                                               // a global element
-                                                              return parseCustomElement(mpElement, BeanDefinitionBuilder
+                                                              return parseDefinitionOrReference(mpElement, BeanDefinitionBuilder
                                                                   .genericBeanDefinition().getBeanDefinition());
                                                             });
           // Do not iterate since this iteration is done iside the resolve component going through childrens
@@ -363,7 +381,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     // these are only called if they are at a "top level" - if they are nested inside
     // other spring elements then spring will handle them itself
 
-    if (SpringXMLUtils.isLocalName(element, BEANS)) {
+    if (isLocalName(element, BEANS)) {
       // the delegate doesn't support the full spring schema, but it seems that
       // we can invoke the DefaultBeanDefinitionDocumentReader via registerBeanDefinitions
       // but we need to create a new DOM document from the element first
@@ -377,7 +395,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
       return parent;
     }
 
-    else if (SpringXMLUtils.isLocalName(element, PROPERTY_ELEMENT)) {
+    else if (isLocalName(element, PROPERTY_ELEMENT)) {
       parsePropertyElement(element, parent);
       return parent;
     }
@@ -401,7 +419,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     // parseSetElement(element, bd);
     // }
 
-    else if (SpringXMLUtils.isLocalName(element, BEAN_ELEMENT)) {
+    else if (isLocalName(element, BEAN_ELEMENT)) {
       BeanDefinitionHolder holder = parseBeanDefinitionElement(element, parent);
       registerBeanDefinitionHolder(holder);
       return holder.getBeanDefinition();

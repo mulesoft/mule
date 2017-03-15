@@ -47,6 +47,14 @@ public abstract class AbstractAnnotatedObjectFactory<T> implements AnnotatedObje
     annotations.putAll(newAnnotations);
   }
 
+  /**
+   * Method to be implemented instead of {@link ObjectFactory#getObject()}.
+   *
+   * @return the domain object
+   * @throws Exception if any failure occurs building the object
+   */
+  public abstract T doGetObject() throws Exception;
+
   @Override
   public T getObject() throws Exception {
     T annotatedInstance = doGetObject();
