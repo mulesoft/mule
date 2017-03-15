@@ -20,8 +20,8 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-embedded-impl</artifactId>
-            <version>${project.version}</version>
+            <artifactId>mule-module-embedded-api</artifactId>
+            <version>${muleEmbeddedApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

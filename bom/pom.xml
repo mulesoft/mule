@@ -13,7 +13,6 @@
     <name>Mule Runtime BOM</name>
     <description>Mule runtime modules for BOMs</description>
 
-
     <modules>
         <module>runtime-api</module>
         <module>runtime-impl</module>
