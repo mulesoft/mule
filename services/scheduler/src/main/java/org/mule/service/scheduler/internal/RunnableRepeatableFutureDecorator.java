@@ -6,10 +6,8 @@
  */
 package org.mule.service.scheduler.internal;
 
-import static java.lang.Thread.currentThread;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RunnableFuture;
@@ -76,37 +74,28 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
       return;
     }
 
-    long startTime = beforeRun();
     task = taskSupplier.get();
-    final Thread currentThread = Thread.currentThread();
-    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-    currentThread.setContextClassLoader(classLoader);
 
-    try {
-      running = true;
-      task.run();
-      task.get();
-    } catch (ExecutionException e) {
-      logger.error("Uncaught throwable in task " + toString(), e);
-    } catch (CancellationException e) {
-      logger.trace("Task " + toString() + " cancelled");
-    } catch (InterruptedException e) {
-      currentThread().interrupt();
-    } finally {
-      wrapUp();
-      if (logger.isTraceEnabled()) {
-        logger.trace("Task " + this.toString() + " finished after " + (System.nanoTime() - startTime) + " nanoseconds");
-      }
+    doRun(task, classLoader);
+  }
 
-      currentThread.setContextClassLoader(currentClassLoader);
-    }
+  @Override
+  protected long beforeRun() {
+    running = true;
+    return super.beforeRun();
   }
 
   @Override
   protected void wrapUp() {
-    wrapUpCallback.accept(this);
     running = false;
-    super.wrapUp();
+    try {
+      wrapUpCallback.accept(this);
+    } catch (Exception e) {
+      logger.error("Exception wrapping up execution of " + task.toString(), e);
+      throw e;
+    } finally {
+      super.wrapUp();
+    }
   }
 
   @Override

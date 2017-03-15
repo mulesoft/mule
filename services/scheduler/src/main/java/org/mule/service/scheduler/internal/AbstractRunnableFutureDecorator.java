@@ -6,12 +6,15 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
 
 import org.slf4j.Logger;
@@ -64,6 +67,35 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     }
     started = true;
     return startTime;
+  }
+
+  protected void doRun(RunnableFuture<V> task, ClassLoader classLoader) {
+    long startTime = beforeRun();
+
+    final Thread currentThread = currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(classLoader);
+
+    try {
+      task.run();
+      task.get();
+    } catch (ExecutionException e) {
+      logger.error("Uncaught throwable in task " + toString(), e);
+    } catch (CancellationException e) {
+      logger.trace("Task " + toString() + " cancelled");
+    } catch (InterruptedException e) {
+      currentThread.interrupt();
+    } finally {
+      try {
+        wrapUp();
+      } finally {
+        if (logger.isTraceEnabled()) {
+          logger.trace("Task " + this.toString() + " finished after " + (nanoTime() - startTime) + " nanoseconds");
+        }
+
+        currentThread.setContextClassLoader(currentClassLoader);
+      }
+    }
   }
 
   protected void wrapUp() {
