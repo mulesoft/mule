@@ -23,6 +23,9 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_R
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.util.XMLUtils.isLocalName;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -115,12 +118,12 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
   }
 
   private Either<BeanDefinition, BeanReference> parseDefinitionOrReference(Element element, BeanDefinition parent) {
-    if (SpringXMLUtils.isLocalName(element, REF_ELEMENT)) {
+    if (isLocalName(element, REF_ELEMENT)) {
       RuntimeBeanNameReference beanNameReference = (RuntimeBeanNameReference) parseIdRefElement(element);
       RuntimeBeanReference beanReference = new RuntimeBeanReference(beanNameReference.getBeanName());
-      return Either.right(beanReference);
+      return right(beanReference);
     } else {
-      return Either.left(parseCustomElement(element, parent));
+      return left(parseCustomElement(element, parent));
     }
   }
 
@@ -378,7 +381,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     // these are only called if they are at a "top level" - if they are nested inside
     // other spring elements then spring will handle them itself
 
-    if (SpringXMLUtils.isLocalName(element, BEANS)) {
+    if (isLocalName(element, BEANS)) {
       // the delegate doesn't support the full spring schema, but it seems that
       // we can invoke the DefaultBeanDefinitionDocumentReader via registerBeanDefinitions
       // but we need to create a new DOM document from the element first
@@ -392,7 +395,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
       return parent;
     }
 
-    else if (SpringXMLUtils.isLocalName(element, PROPERTY_ELEMENT)) {
+    else if (isLocalName(element, PROPERTY_ELEMENT)) {
       parsePropertyElement(element, parent);
       return parent;
     }
@@ -416,7 +419,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     // parseSetElement(element, bd);
     // }
 
-    else if (SpringXMLUtils.isLocalName(element, BEAN_ELEMENT)) {
+    else if (isLocalName(element, BEAN_ELEMENT)) {
       BeanDefinitionHolder holder = parseBeanDefinitionElement(element, parent);
       registerBeanDefinitionHolder(holder);
       return holder.getBeanDefinition();
