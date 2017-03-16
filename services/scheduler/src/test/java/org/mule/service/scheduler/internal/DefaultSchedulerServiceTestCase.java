@@ -11,6 +11,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -32,11 +33,13 @@ import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Before;
@@ -249,6 +252,43 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Description("Tests that periodic tasks scheduled to a busy Scheduler are skipped but the job continues executing.")
+  public void rejectionPolicyScheduledPeriodic()
+      throws MuleException, InterruptedException, ExecutionException, TimeoutException {
+    Scheduler sourceScheduler = service.customScheduler(config().withMaxConcurrentTasks(2));
+    Scheduler targetScheduler = service.cpuLightScheduler();
+
+    Latch latch = new Latch();
+
+    Future<Object> submit = sourceScheduler.submit(threadsConsumer(targetScheduler, latch));
+
+    try {
+      submit.get(1, SECONDS);
+      fail();
+    } catch (ExecutionException e) {
+      assertThat(e.getCause(), instanceOf(SchedulerBusyException.class));
+    }
+
+    CountDownLatch scheduledTaskLatch = new CountDownLatch(2);
+    AtomicReference<ScheduledFuture> scheduledTask = new AtomicReference<ScheduledFuture>(null);
+
+    sourceScheduler.submit(() -> {
+      scheduledTask.set(targetScheduler.scheduleWithFixedDelay(() -> {
+        scheduledTaskLatch.countDown();
+      }, 0, 1, SECONDS));
+      return null;
+    });
+
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      assertThat(scheduledTask.get().isDone(), is(true));
+      return true;
+    }));
+    latch.countDown();
+
+    assertThat(scheduledTaskLatch.await(5, SECONDS), is(true));
+  }
+
+  @Test
   @Description("Tests that tasks dispatched from a Custom scheduler thread to a busy Scheduler waits for execution.")
   public void rejectionPolicyCustom() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
     Scheduler sourceScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
@@ -313,5 +353,4 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
       return null;
     };
   }
-
 }
