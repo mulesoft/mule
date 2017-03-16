@@ -229,6 +229,7 @@
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.3.jar
+/mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/maven-aether-provider-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-artifact-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-builder-support-3.3.9.jar
