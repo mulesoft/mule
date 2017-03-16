@@ -759,7 +759,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="generic-config" type="DatabaseConfigType"
+    <xsd:element name="generic-config" type="abstractUserAndPasswordDatabaseConfigType"
                  substitutionGroup="abstract-config">
         <xsd:annotation>
             <xsd:documentation>
