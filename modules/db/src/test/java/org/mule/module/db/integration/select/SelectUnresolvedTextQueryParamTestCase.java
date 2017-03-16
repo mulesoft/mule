@@ -21,7 +21,7 @@ public class SelectUnresolvedTextQueryParamTestCase extends AbstractConfiguratio
     }
 
     @Test
-    public void requires() throws Exception
+    public void testRequiresDefinedParameter() throws Exception
     {
         assertConfigurationError("Able to define a query text with a not defined param", "name");
     }

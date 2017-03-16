@@ -23,14 +23,9 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
 
     public DefaultInputQueryParam(int index, DbType type, Object value, String name)
     {
-        this(index, type, value, name, value != null);
-    }
-
-    private DefaultInputQueryParam(int index, DbType type, Object value, String name, boolean hasValue)
-    {
         super(index, type, name);
         this.value = value;
-        this.hasValue = hasValue;
+        this.hasValue = value != null;
     }
 
     @Override

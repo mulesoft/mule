@@ -18,14 +18,9 @@ public class DefaultInOutQueryParam extends AbstractQueryParam implements InOutQ
 
     public DefaultInOutQueryParam(int index, DbType type, String name, Object value)
     {
-        this(index,type, name, value, value != null);
-    }
-
-    private DefaultInOutQueryParam(int index, DbType type, String name, Object value, boolean hasValue)
-    {
         super(index, type, name);
-        this.hasValue = hasValue;
         this.value = value;
+        this.hasValue = value != null;
     }
 
     @Override

@@ -16,7 +16,7 @@ public interface InputQueryParam extends QueryParam
     Object getValue();
 
     /**
-     * @return true if the parameter has a defined value in the query template.
+     * @return true if the parameter has a defined value in the query template, false otherwise.
      */
     boolean hasValue();
 

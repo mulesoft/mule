@@ -9,6 +9,7 @@ package org.mule.module.db.internal.config.domain.query;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.mule.module.db.internal.util.ValueEvaluator.checkNullValue;
 import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultOutputQueryParam;
@@ -55,7 +56,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         {
             QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
 
-            if (param == null && templateParam instanceof InputQueryParam && ! ( (InputQueryParam) templateParam).hasValue())
+            if (param == null && templateParam instanceof InputQueryParam && !((InputQueryParam) templateParam).hasValue())
             {
                 throw new IllegalArgumentException(buildNotDefinedInParamErrorMessage(templateParam.getName()));
             }
@@ -101,7 +102,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         DbType paramType = templateParam.getType();
         if (!(queryParam.getType() instanceof UnknownDbType))
         {
-            paramType = queryParam.getType();
+           paramType = queryParam.getType();
         }
 
         if (queryParam instanceof InOutQueryParam)
@@ -137,16 +138,6 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         return null;
     }
 
-    private Object checkNullValue(Object value)
-    {
-        if (value instanceof String && ("null".equals(value)))
-        {
-            return null;
-        }
-
-        return value;
-    }
-
     @Override
     public Class<?> getObjectType()
     {
@@ -161,7 +152,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
     private String buildNotDefinedInParamErrorMessage(String name)
     {
-        return format("Parameter with name %s, used in the query text, does not match any defined query parameter name defined in the query template.", name);
+        return format("Parameter with name '%s', used in the query text, does not match any defined query parameter name defined in the query template", name);
     }
 
 }
