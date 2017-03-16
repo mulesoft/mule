@@ -11,7 +11,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.FutureTask;
@@ -19,15 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.quartz.SchedulerException;
 
 public class RunnableRepeatableFutureDecoratorTestCase extends BaseDefaultSchedulerTestCase {
-
-  @Rule
-  public ExpectedException expected = none();
 
   private DefaultScheduler scheduler;
 
@@ -58,13 +52,10 @@ public class RunnableRepeatableFutureDecoratorTestCase extends BaseDefaultSchedu
           throw new WrapUpException();
         }, taskClassloader, scheduler, "testTask", -1);
 
-    expected.expect(WrapUpException.class);
-    try {
-      taskDecorator.run();
-    } finally {
-      assertThat(taskDecorator.isStarted(), is(false));
-      assertThat(currentThread().getContextClassLoader(), not(taskClassloader));
-    }
+    taskDecorator.run();
+
+    assertThat(taskDecorator.isStarted(), is(false));
+    assertThat(currentThread().getContextClassLoader(), not(taskClassloader));
   }
 
   @Test

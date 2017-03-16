@@ -69,6 +69,15 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     return startTime;
   }
 
+  /**
+   * Performas the required bookkeeping before and after running the task, as well as setting the appropriate context for the
+   * task.
+   * <p>
+   * Any {@link Exception} thrown as part of the task processing or bookkeeping is handled by this method and not rethrown.
+   * 
+   * @param task the task to run
+   * @param classLoader the classloader to put in the context of the task when run
+   */
   protected void doRun(RunnableFuture<V> task, ClassLoader classLoader) {
     long startTime = beforeRun();
 
@@ -82,12 +91,15 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     } catch (ExecutionException e) {
       logger.error("Uncaught throwable in task " + toString(), e);
     } catch (CancellationException e) {
+      // Log instead of rethrow to avoid flooding the logger with stack traces of cancellation, which may be very common.
       logger.trace("Task " + toString() + " cancelled");
     } catch (InterruptedException e) {
       currentThread.interrupt();
     } finally {
       try {
         wrapUp();
+      } catch (Exception e) {
+        logger.error("Exception wrapping up execution of " + task.toString(), e);
       } finally {
         if (logger.isTraceEnabled()) {
           logger.trace("Task " + this.toString() + " finished after " + (nanoTime() - startTime) + " nanoseconds");
@@ -98,7 +110,7 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
     }
   }
 
-  protected void wrapUp() {
+  protected void wrapUp() throws Exception {
     started = false;
     clearAllThreadLocals();
   }

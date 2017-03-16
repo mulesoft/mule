@@ -86,13 +86,10 @@ class RunnableRepeatableFutureDecorator<V> extends AbstractRunnableFutureDecorat
   }
 
   @Override
-  protected void wrapUp() {
+  protected void wrapUp() throws Exception {
     running = false;
     try {
       wrapUpCallback.accept(this);
-    } catch (Exception e) {
-      logger.error("Exception wrapping up execution of " + task.toString(), e);
-      throw e;
     } finally {
       super.wrapUp();
     }

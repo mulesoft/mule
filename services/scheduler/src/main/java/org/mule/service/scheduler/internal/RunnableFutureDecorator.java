@@ -57,7 +57,7 @@ class RunnableFutureDecorator<V> extends AbstractRunnableFutureDecorator<V> {
   }
 
   @Override
-  protected void wrapUp() {
+  protected void wrapUp() throws Exception {
     scheduler.taskFinished(this);
     super.wrapUp();
   }
