@@ -25,6 +25,9 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.collections.Transformer;
 
 /**
@@ -77,6 +80,18 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   /**
+   * Run {@link Flow} as a task of a given {@link Scheduler}.
+   *
+   * @param scheduler the scheduler to use to run the {@link Flow}.
+   * @return this {@link FlowRunner}
+   * @see {@link org.mule.runtime.core.api.scheduler.SchedulerService}
+   */
+  public FlowRunner withScheduler(Scheduler scheduler) {
+    this.scheduler = scheduler;
+    return this;
+  }
+
+  /**
    * Runs the specified flow with the provided event and configuration, and performs a {@link FlowAssert#verify(String))}
    * afterwards.
    * 
@@ -116,7 +131,17 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    */
   public Event runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    Event response = txExecutionTemplate.execute(getFlowRunCallback(flow));
+    Event response;
+    if (scheduler == null) {
+      response = txExecutionTemplate.execute(getFlowRunCallback(flow));
+    } else {
+      try {
+        response = scheduler.submit(() -> txExecutionTemplate.execute(getFlowRunCallback(flow))).get();
+      } catch (ExecutionException executionException) {
+        Throwable cause = executionException.getCause();
+        throw cause instanceof Exception ? (Exception) cause : new RuntimeException(cause);
+      }
+    }
 
     for (String flowNameToVerify : flowNamesToVerify) {
       FlowAssert.verify(flowNameToVerify);

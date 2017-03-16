@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -103,7 +104,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
                                                                    Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
                                                                    MessagingExceptionHandler messagingExceptionHandler) {
       return publisher -> from(publisher)
-          .flatMap(event -> just(event).transform(pipelineFunction).subscribeOn(Schedulers.fromExecutorService(ioScheduler)),
+          .flatMap(event -> just(event).transform(pipelineFunction).subscribeOn(fromExecutorService(ioScheduler)),
                    concurrency);
     }
 
