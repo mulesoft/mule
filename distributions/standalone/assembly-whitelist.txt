@@ -135,7 +135,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-xml-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-deployment-${productVersion}.jar
@@ -190,7 +189,6 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.8.5.jar
-/mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.39.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.11.jar
 /mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
@@ -203,11 +201,6 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-j2ee-connector_1.5_spec-2.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-servlet_3.0_spec-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.29.jar
-/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.29.jar
 /mule-standalone-${productVersion}/lib/opt/gson-2.6.2.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.4-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
