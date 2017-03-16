@@ -107,6 +107,7 @@
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <classifier>mule-plugin</classifier>
         </dependency>
 
         <dependency>
@@ -121,6 +122,7 @@
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <classifier>mule-plugin</classifier>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -132,6 +134,13 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jms</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
             <classifier>mule-plugin</classifier>

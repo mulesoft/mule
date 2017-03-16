@@ -17,13 +17,12 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -111,24 +110,23 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     @Override
     protected Event doProcess(Event event) throws MuleException {
       Event eventResponse = super.doProcess(createEventWithParameters(event));
-
-      if (!returnsVoid) {
-        event = createNewEventFromJustMessage(event, eventResponse);
-      }
-      return event;
+      return processResult(event, eventResponse);
     }
 
     @Override
     public Publisher<Event> apply(Publisher<Event> publisher) {
+      return from(publisher)
+          .concatMap(request -> just(request)
+              .map(this::createEventWithParameters)
+              .transform(super::apply)
+              .map(eventResult -> processResult(request, eventResult)));
+    }
+
+    private Event processResult(Event originalEvent, Event chainEvent) {
       if (!returnsVoid) {
-        return from(publisher)
-            .concatMap(request -> just(request)
-                .map(this::createEventWithParameters)
-                .transform(super::apply)
-                .map(result -> createNewEventFromJustMessage(request, result)));
-      } else {
-        return publisher;
+        originalEvent = createNewEventFromJustMessage(originalEvent, chainEvent);
       }
+      return originalEvent;
     }
 
     private Event createNewEventFromJustMessage(Event request, Event response) {

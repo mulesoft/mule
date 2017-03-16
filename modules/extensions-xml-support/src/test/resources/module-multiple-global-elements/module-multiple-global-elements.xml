@@ -13,7 +13,7 @@
     <property name="filenamePattern" type="string"/>
 
     <file:config name="file">
-        <file:connection workingDir="#[property.workingDir]" />
+        <file:connection workingDir="#[property.workingDir]"/>
     </file:config>
     <file:matcher name="globalMatcher" directory="true" filenamePattern="#[property.filenamePattern]" />
 
@@ -22,8 +22,7 @@
             <parameter name="path" type="string"/>
         </parameters>
         <body>
-            <!-- TODO MULE-11946: appending "-configPatternA" until the MacroExpansionModuleModel it's smarter enough to also replace the matchWith attribute with the expanded configuration's name. The matchWith's value should be globalMatcher and not globalMatcher-configPatternA -->
-            <file:list directoryPath="#[param.path]" config-ref="file" matchWith="globalMatcher-configPatternA"/>
+            <file:list directoryPath="#[param.path]" config-ref="file" matchWith="globalMatcher"/>
         </body>
         <output type="string"/>
     </operation>
