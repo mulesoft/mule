@@ -70,12 +70,11 @@ public class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
 
 
     Object value = null;
-    if (componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME) != null) {
-      value = getValue(objectTypeVisitor, componentModel, componentBuildingDefinition);
-    } else if (componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
+    // MULE-11984: Check that generated map entries are not empty
+    if (componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
       value = new RuntimeBeanReference(componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
     } else {
-      // MULE-11984: Check that generated map entries are not empty
+      value = getValue(objectTypeVisitor, componentModel, componentBuildingDefinition);
     }
 
     AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
