@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;

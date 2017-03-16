@@ -8,18 +8,17 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
+import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 import org.mule.runtime.module.service.ServiceRepository;
 
 /**
  * Configures available {@link Service} instances in an artifact's {@link MuleContext} in order to resolve injectable
  * dependencies.
  */
-public class ContainerServicesMuleContextConfigurator implements MuleContextServiceConfigurator {
+public class ContainerServicesMuleContextConfigurator implements ServiceConfigurator {
 
   private final ServiceRepository serviceRepository;
 

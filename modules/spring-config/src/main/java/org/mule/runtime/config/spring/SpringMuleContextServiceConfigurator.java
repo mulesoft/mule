@@ -50,6 +50,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAUL
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
@@ -57,8 +58,6 @@ import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.spring.processors.MuleObjectNameProcessor;
 import org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholderProcessor;
 import org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor;
-import org.mule.runtime.core.api.CustomService;
-import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
@@ -84,6 +83,8 @@ import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
+import org.mule.runtime.core.internal.config.CustomService;
+import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
@@ -96,6 +97,7 @@ import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.policy.DefaultPolicyManager;
 import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
@@ -136,7 +138,7 @@ class SpringMuleContextServiceConfigurator {
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
   private final OptionalObjectsController optionalObjectsController;
-  private final CustomizationService customizationService;
+  private final CustomServiceRegistry customServiceRegistry;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
 
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES =
@@ -221,7 +223,7 @@ class SpringMuleContextServiceConfigurator {
                                               BeanDefinitionRegistry beanDefinitionRegistry,
                                               SpringConfigurationComponentLocator componentLocator) {
     this.muleContext = muleContext;
-    this.customizationService = muleContext.getCustomizationService();
+    this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
     this.artifactType = artifactType;
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
@@ -230,6 +232,8 @@ class SpringMuleContextServiceConfigurator {
 
   void createArtifactServices() {
     registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
+    loadServiceConfigurators();
+
     defaultContextServices.entrySet().stream()
         .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP))
         .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
@@ -241,8 +245,14 @@ class SpringMuleContextServiceConfigurator {
     createCustomServices();
   }
 
+  private void loadServiceConfigurators() {
+    new SpiServiceRegistry()
+        .lookupProviders(ServiceConfigurator.class, Thread.currentThread().getContextClassLoader())
+        .forEach(customizer -> customizer.configure(customServiceRegistry));
+  }
+
   private void createCustomServices() {
-    final Map<String, CustomService> customServices = customizationService.getCustomServices();
+    final Map<String, CustomService> customServices = customServiceRegistry.getCustomServices();
     for (String serviceName : customServices.keySet()) {
       if (beanDefinitionRegistry.containsBeanDefinition(serviceName)) {
         throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
@@ -256,7 +266,7 @@ class SpringMuleContextServiceConfigurator {
   }
 
   private void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
-    beanDefinition = customizationService.getOverriddenService(serviceId)
+    beanDefinition = customServiceRegistry.getOverriddenService(serviceId)
         .map(this::getCustomServiceBeanDefinition)
         .orElse(beanDefinition);
 
@@ -293,7 +303,7 @@ class SpringMuleContextServiceConfigurator {
   }
 
   private void createQueueManagerBeanDefinitions() {
-    if (customizationService.getOverriddenService(OBJECT_QUEUE_MANAGER).isPresent()) {
+    if (customServiceRegistry.getOverriddenService(OBJECT_QUEUE_MANAGER).isPresent()) {
       registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class)
           .addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition());
     } else {
@@ -304,12 +314,14 @@ class SpringMuleContextServiceConfigurator {
   private void createLocalObjectStoreBeanDefinitions() {
     AtomicBoolean anyBaseStoreWasRedefined = new AtomicBoolean(false);
     OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME.entrySet().forEach(objectStoreLocal -> {
-      customizationService.getOverriddenService(objectStoreLocal.getKey()).ifPresent(customService -> {
-        beanDefinitionRegistry.registerAlias(objectStoreLocal.getKey(), objectStoreLocal.getValue());
+      customServiceRegistry.getOverriddenService(objectStoreLocal.getKey()).ifPresent(customService -> {
         customService.getServiceClass().ifPresent(serviceClass -> {
           anyBaseStoreWasRedefined.set(true);
+          final BeanDefinition defaultBeanDefinition = defaultContextServices.get(objectStoreLocal.getKey());
           beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getValue(),
-                                                        defaultContextServices.get(objectStoreLocal.getKey()));
+                                                        defaultBeanDefinition);
+          beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getKey(),
+                                                        defaultBeanDefinition);
         });
       });
     });

@@ -83,6 +83,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -3501,7 +3502,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class));
+        verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class), any(CustomizationService.class));
         return true;
       }
 

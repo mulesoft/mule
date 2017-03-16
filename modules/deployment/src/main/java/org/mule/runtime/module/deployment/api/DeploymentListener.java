@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.api;
 
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -75,7 +76,7 @@ public interface DeploymentListener {
    * @param artifactName name of the application that owns the mule context
    * @param context mule context for the application being deployed
    */
-  default void onMuleContextCreated(String artifactName, MuleContext context) {
+  default void onMuleContextCreated(String artifactName, MuleContext context, CustomizationService customizationService) {
 
   }
 

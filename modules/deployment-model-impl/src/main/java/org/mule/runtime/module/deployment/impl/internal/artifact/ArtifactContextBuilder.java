@@ -19,6 +19,7 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -33,7 +34,6 @@ import org.mule.runtime.core.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
-import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
@@ -94,7 +94,7 @@ public class ArtifactContextBuilder {
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
   private PolicyProvider policyProvider;
-  private List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
+  private List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   private ExtensionManagerFactory extensionManagerFactory;
 
   private ArtifactContextBuilder() {}
@@ -309,7 +309,7 @@ public class ArtifactContextBuilder {
    * @param serviceConfigurator used to configure the create context. Non null.
    * @return the builder
    */
-  public ArtifactContextBuilder withServiceConfigurator(MuleContextServiceConfigurator serviceConfigurator) {
+  public ArtifactContextBuilder withServiceConfigurator(ServiceConfigurator serviceConfigurator) {
     checkState(serviceConfigurator != null, SERVICE_CONFIGURATOR_CANNOT_BE_NULL);
     this.serviceConfigurators.add(serviceConfigurator);
     return this;

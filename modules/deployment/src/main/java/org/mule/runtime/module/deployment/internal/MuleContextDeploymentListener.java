@@ -25,7 +25,7 @@ public class MuleContextDeploymentListener implements MuleContextListener {
 
   @Override
   public void onCreation(MuleContext context) {
-    deploymentListener.onMuleContextCreated(appName, context);
+    deploymentListener.onMuleContextCreated(appName, context, context.getCustomizationService());
   }
 
   @Override
