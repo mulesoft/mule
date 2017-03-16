@@ -70,7 +70,7 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
   }
 
   /**
-   * Performas the required bookkeeping before and after running the task, as well as setting the appropriate context for the
+   * Performs the required bookkeeping before and after running the task, as well as setting the appropriate context for the
    * task.
    * <p>
    * Any {@link Exception} thrown as part of the task processing or bookkeeping is handled by this method and not rethrown.
