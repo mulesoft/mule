@@ -20,18 +20,18 @@
 
     <flow name="commitLocalTx">
         <tx:verify-no-transaction config-ref="localTx1"/>
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun config-ref="localTx1"/>
-        </block>
+        </try>
         <tx:verify-transaction-commited config-ref="localTx1"/>
     </flow>
 
     <flow name="rollbackLocalTx">
         <tx:verify-no-transaction config-ref="localTx1"/>
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun config-ref="localTx1"/>
             <tx:fail/>
-        </block>
+        </try>
         <error-handler>
             <on-error-continue>
                 <tx:verify-transaction-rolledback config-ref="localTx1"/>
@@ -41,23 +41,23 @@
 
     <flow name="executeTransactionless">
         <tx:verify-no-transaction config-ref="localTx1"/>
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <tx:get-connection transactionalAction="NOT_SUPPORTED" config-ref="localTx1"/>
-        </block>
+        </try>
     </flow>
 
     <flow name="localTxDoesntSupportMultipleResources">
-        <block transactionalAction="ALWAYS_BEGIN" >
+        <try transactionalAction="ALWAYS_BEGIN" >
             <tx:verify-transaction-begun config-ref="localTx1"/>
             <tx:verify-transaction-begun config-ref="localTx2"/>
-        </block>
+        </try>
     </flow>
 
     <flow name="localTxSupportsMultipleOperationsFromSameResource">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun config-ref="localTx1"/>
             <tx:verify-transaction-begun config-ref="localTx1"/>
-        </block>
+        </try>
         <tx:verify-transaction-commited config-ref="localTx1"/>
     </flow>
 </mule>

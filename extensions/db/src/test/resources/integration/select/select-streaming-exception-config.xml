@@ -12,14 +12,14 @@
     </flow>
 
     <flow name="selectExceptionClosesPreviousResultSets">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <dbn:select config-ref="pooledJdbcConfig" target="planets" streaming="true">
                 <dbn:sql>select * from PLANET order by ID</dbn:sql>
             </dbn:select>
             <dbn:select config-ref="pooledJdbcConfig">
                 <dbn:sql>select * from NOT_EXISTS order by ID</dbn:sql>
             </dbn:select>
-        </block>
+        </try>
         <set-payload value="#[mel:true]"/>
         <error-handler>
             <on-error-continue>

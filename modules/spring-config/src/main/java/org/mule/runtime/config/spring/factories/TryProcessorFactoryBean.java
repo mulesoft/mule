@@ -4,23 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.processor;
+package org.mule.runtime.config.spring.factories;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
+import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
+import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionType;
@@ -28,34 +28,39 @@ import org.mule.runtime.core.transaction.TransactionType;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.beans.factory.FactoryBean;
+
 /**
- * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a transaction. If the
- * {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
- * {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
+ * Generates an object that wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a
+ * transaction. If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the
+ * next {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
  *
  * @since 4.0
  */
-public class BlockMessageProcessor extends TransactionalInterceptingMessageProcessor
-    implements Lifecycle, MuleContextAware {
+public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements FactoryBean {
 
   protected List messageProcessors;
+  protected MessagingExceptionHandler exceptionListener;
   protected String transactionalAction;
   private TransactionType transactionType;
-  private MessageProcessorChain delegate;
 
   @Override
-  public Event process(Event event) throws MuleException {
-    return delegate.process(event);
+  public Class getObjectType() {
+    return MessageProcessorChain.class;
+  }
+
+  public void setMessageProcessors(List messageProcessors) {
+    this.messageProcessors = messageProcessors;
   }
 
   @Override
-  public void initialise() throws InitialisationException {
+  public Object getObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'transaction' child processor chain");
     TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
+    txProcessor.setAnnotations(getAnnotations());
     txProcessor.setExceptionListener(this.exceptionListener);
     txProcessor.setTransactionConfig(createTransactionConfig(this.transactionalAction, this.transactionType));
-    transactionConfig.setFactory(getTransactionFactory());
     builder.chain(txProcessor);
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
@@ -69,11 +74,13 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
         ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
       }
     }
-    delegate = builder.build();
-  }
+    return new AbstractMessageProcessorChain(singletonList(builder.build())) {
 
-  protected TransactionFactory getTransactionFactory() {
-    return new DelegateTransactionFactory();
+      @Override
+      public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+        // Ignore. Instead exception listener configured on block is used.AsyncDelegateMessageProcessor.java
+      }
+    };
   }
 
   protected MuleTransactionConfig createTransactionConfig(String action, TransactionType type) {
@@ -98,8 +105,13 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
     throw new IllegalArgumentException(String.format("No factory available for transaction type %s", type));
   }
 
-  public void setMessageProcessors(List messageProcessors) {
-    this.messageProcessors = messageProcessors;
+  @Override
+  public boolean isSingleton() {
+    return false;
+  }
+
+  public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
+    this.exceptionListener = exceptionListener;
   }
 
   public void setTransactionalAction(String action) {

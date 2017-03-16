@@ -72,7 +72,6 @@ import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
-import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
@@ -81,6 +80,7 @@ import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactory
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
+import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
@@ -103,6 +103,7 @@ import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -139,7 +140,6 @@ import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
-import org.mule.runtime.core.processor.BlockMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
@@ -248,7 +248,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String WIRE_TAP = "wire-tap";
   private static final String ENRICHER = "enricher";
   private static final String ASYNC = "async";
-  private static final String BLOCK = "block";
+  private static final String TRY = "try";
   private static final String UNTIL_SUCCESSFUL = "until-successful";
   private static final String FOREACH = "foreach";
   private static final String FIRST_SUCCESSFUL = "first-successful";
@@ -472,8 +472,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(BLOCK).withTypeDefinition(fromType(BlockMessageProcessor.class))
-            .withObjectFactoryType(BlockMessageProcessorFactoryBean.class)
+        .add(baseDefinition.copy().withIdentifier(TRY).withTypeDefinition(fromType(MessageProcessorChain.class))
+            .withObjectFactoryType(TryProcessorFactoryBean.class)
             .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).build())

@@ -36,10 +36,10 @@
     </flow>
     
     <flow name="seekStreamTx">
-        <block transactionalAction="BEGIN_OR_JOIN">
+        <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="toStream" />
             <marvel:seek-stream position="#[position]" />
-        </block>
+        </try>
     </flow>
 
     <flow name="toStream">
@@ -61,11 +61,11 @@
 
     <flow name="bytesCasterInTx" initialState="stopped">
         <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
-        <block transactionalAction="BEGIN_OR_JOIN">
+        <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="assertPayloadIsStreamProvider" />
             <object-to-string-transformer />
             <flow-ref name="castSpell" />
-        </block>
+        </try>
     </flow>
 
     
@@ -85,9 +85,9 @@
     </flow>
 
     <flow name="crashCarTx">
-        <block transactionalAction="BEGIN_OR_JOIN">
+        <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="crashCar" />
-        </block>
+        </try>
     </flow>
 
     <flow name="doCrash">

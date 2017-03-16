@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.handlers;
 
 import org.mule.runtime.config.spring.factories.AggregationStrategyDefinitionParser;
-import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
+import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
@@ -389,7 +389,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
     registerBeanDefinitionParser("transactional",
-                                 new ChildDefinitionParser("messageProcessor", BlockMessageProcessorFactoryBean.class));
+                                 new ChildDefinitionParser("messageProcessor", TryProcessorFactoryBean.class));
     registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor", LoggerMessageProcessor.class));
     registerMuleBeanDefinitionParser("expression-component",
                                      new ExpressionComponentDefintionParser("messageProcessor",

@@ -48,15 +48,15 @@
                 <validation:is-false expression="false"/>
             </on-error-continue>
             <on-error-propagate>
-                <block>
+                <try>
                     <validation:is-true expression="true"/>
-                </block>
+                </try>
             </on-error-propagate>
         </error-handler>
     </flow>
 
     <flow name="flowWithBlockWithErrorHandler">
-        <block>
+        <try>
             <test:component throwException="true" />
             <error-handler>
                 <on-error-continue>
@@ -64,7 +64,7 @@
                     <validation:is-true expression="true"/>
                 </on-error-continue>
             </error-handler>
-        </block>
+        </try>
     </flow>
 
     <flow name="flowWithSource">

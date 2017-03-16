@@ -35,13 +35,13 @@
     </flow>
 
     <sub-flow name="obtainClobValue">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select description from Planet where name = 'Pluto'</db:sql>
             </db:select>
             <!-- Get the CLOB field value -->
             <set-payload value="#[mel:payload.get(0).get('DESCRIPTION')]"/>
             <component class="org.mule.extension.db.integration.ClobToString"/>
-        </block>
+        </try>
     </sub-flow>
 </mule>

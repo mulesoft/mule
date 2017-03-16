@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="in-flow">
-        <block transactionalAction="BEGIN_OR_JOIN">
+        <try transactionalAction="BEGIN_OR_JOIN">
             <test:component throwException="true"
                 exceptionToThrow="java.lang.RuntimeException" />
             <error-handler>
@@ -16,7 +16,7 @@ http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/tes
                     <flow-ref name="dlq-out"/>
                 </on-error-continue>
             </error-handler>
-        </block>
+        </try>
     </flow>
 
     <flow name="dlq-out">

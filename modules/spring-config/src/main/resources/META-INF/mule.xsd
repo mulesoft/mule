@@ -853,7 +853,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="block" type="abstractTransactional" substitutionGroup="abstract-message-processor">
+    <xsd:element name="try" type="abstractTransactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Processes the nested list of message processors, within a transaction and with it's own error handler if required.
