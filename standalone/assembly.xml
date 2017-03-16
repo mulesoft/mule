@@ -150,7 +150,6 @@
                 <include>org.mule.runtime:mule-module-extensions-support</include>
                 <include>org.mule.runtime:mule-module-extensions-spring-support</include>
                 <include>org.mule.runtime:mule-module-extensions-xml-support</include>
-                <include>org.mule.runtime:mule-module-http</include>
                 <include>org.mule.runtime:mule-module-jbossts</include>
                 <include>org.mule.runtime:mule-module-management</include>
                 <include>org.mule.runtime:mule-module-repository</include>
@@ -220,7 +219,6 @@
                 <exclude>org.mule.runtime:mule-module-extensions-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-xml-support</exclude>
-                <exclude>org.mule.runtime:mule-module-http</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
                 <exclude>org.mule.modules:mule-module-email</exclude>
                 <exclude>org.mule.modules:mule-module-wsc</exclude>
