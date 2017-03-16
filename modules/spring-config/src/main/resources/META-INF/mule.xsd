@@ -5794,9 +5794,13 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <!-- mapType has ref attribute to allow decoupling from spring, using
+         mule 4 parsing mechanism -->
     <xsd:complexType name="mapType">
         <xsd:complexContent>
-            <xsd:extension base="spring:mapType"/>
+            <xsd:extension base="spring:mapType">
+                <xsd:attribute name="ref" type="xsd:string" />
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
