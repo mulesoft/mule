@@ -21,7 +21,6 @@ import org.junit.Test;
 
 public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
 {
-
     @Override
     protected String getConfigFile()
     {
@@ -76,11 +75,11 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         try
         {
             runFlow("invalidKnownHostsInConnector");
-            fail("Expected IOException: java.io.FileNotFoundException");
+            fail("Expected IOException: UnknownHostKey");
         }
         catch (MessagingException e)
         {
-            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: java.io.FileNotFoundException:"));
+            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
         }
     }
 
@@ -90,11 +89,11 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         try
         {
             runFlow("invalidKnownHostsInEndpoint");
-            fail("Expected IOException: java.io.FileNotFoundException");
+            fail("Expected IOException: UnknownHostKey");
         }
         catch (MessagingException e)
         {
-            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: java.io.FileNotFoundException:"));
+            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
         }
     }
 
