@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -286,7 +287,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     Object defaultConfigInstance = new Object();
     when(configurationInstance.getValue()).thenReturn(defaultConfigInstance);
-    when(extensionManager.getConfiguration(extensionModel, event)).thenReturn(configurationInstance);
+    when(extensionManager.getConfiguration(extensionModel, operationModel, event)).thenReturn(of(configurationInstance));
 
     ArgumentCaptor<ExecutionContext> operationContextCaptor = ArgumentCaptor.forClass(ExecutionContext.class);
     messageProcessor.process(event);

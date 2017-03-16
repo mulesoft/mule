@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -35,7 +37,6 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -43,11 +44,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -55,7 +56,6 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
-import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
@@ -310,16 +310,16 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
     }
 
     if (isConfigurationSpecified()) {
-      return findConfigurationProvider()
-          .map(provider -> Optional.of(provider.get(event)))
+      return of(configurationProvider)
+          .map(provider -> ofNullable(provider.get(event)))
           .orElseThrow(() -> new IllegalModelDefinitionException(format(
                                                                         "Flow '%s' contains a reference to config '%s' but it doesn't exists",
                                                                         flowConstruct.getName(), configurationProvider)));
     }
 
-    return Optional.of(getConfigurationProviderByModel()
-        .map(provider -> provider.get(event))
-        .orElseGet(() -> extensionManager.getConfiguration(extensionModel, event)));
+    return extensionManager.getConfigurationProvider(extensionModel, componentModel)
+        .map(provider -> ofNullable(provider.get(event)))
+        .orElseGet(() -> extensionManager.getConfiguration(extensionModel, componentModel, event));
   }
 
   protected CursorStreamProviderFactory getCursorStreamProviderFactory() {
@@ -327,32 +327,19 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
   }
 
   private Optional<ConfigurationProvider> findConfigurationProvider() {
-    if (requiresConfig.get()) {
-      return isConfigurationSpecified()
-          ? of(configurationProvider)
-          : getConfigurationProviderByModel();
+    if (isConfigurationSpecified()) {
+      return of(configurationProvider);
     }
 
-    return empty();
-  }
-
-  private boolean computeRequiresConfig() {
-    return requiresConfig(extensionModel, componentModel);
-  }
-
-  private Optional<ConfigurationProvider> getConfigurationProviderByModel() {
-    try {
-      return extensionManager.getConfigurationProvider(extensionModel);
-    } catch (TooManyConfigsException e) {
-      throw new IllegalStateException(format(
-                                             "No config-ref was specified for component '%s' of extension '%s', but %d are registered. Please specify which to use",
-                                             componentModel.getName(), extensionModel.getName(), e.getConfigsCount()),
-                                      e);
-    }
+    return extensionManager.getConfigurationProvider(extensionModel, componentModel);
   }
 
   private boolean isConfigurationSpecified() {
     return configurationProvider != null;
+  }
+
+  private boolean computeRequiresConfig() {
+    return requiresConfig(extensionModel, componentModel);
   }
 
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
@@ -364,10 +351,6 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
                                                                    configurationProvider)),
                                         this);
     }
-  }
-
-  protected ConfigurationProvider getConfigurationProvider() {
-    return configurationProvider;
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();

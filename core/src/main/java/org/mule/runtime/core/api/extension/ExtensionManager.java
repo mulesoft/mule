@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
@@ -71,21 +72,20 @@ public interface ExtensionManager {
    */
   ConfigurationInstance getConfiguration(String configurationProviderName, Event event);
 
-
   /**
-   * Returns a {@link ConfigurationInstance} for the given {@code extensionModel}.
+   * Returns a {@link ConfigurationInstance} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
    * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to try and determine the
    * instance to be returned:
    * <ul>
-   * <li>If <b>one</b> {@link ConfigurationProvider} is registered, capable of handing configurations of the given
-   * {@code extensionModel}, then that provider is used</li>
+   * <li>If <b>one</b> (and only one) {@link ConfigurationProvider} is registered, capable of handing configurations of the given
+   * {@code componentModel}, then that provider is used</li>
    * <li>If more than one {@link ConfigurationProvider} meeting the criteria above is found, then a {@link IllegalStateException}
    * is thrown</li>
    * <li>If no such {@link ConfigurationProvider} is registered, then an attempt will be made to locate a
    * {@link ConfigurationModel} for which an implicit configuration can be inferred. A model can be considered implicit if all its
-   * parameters are either optional or provide a default value. If such a model is found, then a {@link ConfigurationProvider} is
-   * created and registered for that model.</li>
+   * parameters are either optional or provide a default value. If such a model is found and it is unique, then a
+   * {@link ConfigurationProvider} is created and registered for that model.</li>
    * <li>If none of the above conditions is met, then an {@link IllegalStateException} is thrown</li>
    * </ul>
    * <p>
@@ -93,22 +93,12 @@ public interface ExtensionManager {
    * updated for the returned {@link ConfigurationInstance}
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
-   * @param event the current Event
-   * @return a {@link ConfigurationInstance}
+   * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
+   * @param muleEvent the current Event
+   * @return an {@link Optional} for a {@link ConfigurationInstance}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
-  ConfigurationInstance getConfiguration(ExtensionModel extensionModel, Event event);
-
-  /**
-   * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
-   * {@link #getConfiguration(ExtensionModel, Event)} method.
-   * <p>
-   * This means that the returned provider will be located using the same set of rules as the aforementioned method
-   *
-   * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
-   * @return an {@link Optional} {@link ConfigurationProvider}
-   */
-  Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel);
+  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel, Event muleEvent);
 
   /**
    * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
@@ -122,8 +112,18 @@ public interface ExtensionManager {
   Optional<ConfigurationProvider> getConfigurationProvider(String configurationProviderName);
 
   /**
+   * Locates and returns (if there is any) a suitable {@link ConfigurationProvider} for the given {@link ComponentModel}.
+   * 
+   * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
+   * @param componentModel the {@link ComponentModel} for which a configuration is wanted
+   * @return an {@link Optional} {@link ConfigurationProvider}
+   */
+  Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
+                                                           ComponentModel componentModel);
+
+  /**
    * Registered the given {@link ConfigurationProvider} which should be later be used to serve invocations to
-   * {@link #getConfigurationProvider(ExtensionModel)} and {@link #getConfiguration(String, Event)}
+   * {@link #getConfigurationProvider(ExtensionModel, ComponentModel)} and {@link #getConfiguration(String, Event)}
    *
    * @param configurationProvider a {@link ConfigurationProvider}
    */
