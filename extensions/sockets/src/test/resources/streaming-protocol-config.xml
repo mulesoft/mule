@@ -28,7 +28,7 @@
 
     <flow name="tcp-listen">
         <sockets:socket-listener config-ref="tcp-listener">
-            <in-memory-stream />
+            <non-repeatable-stream />
         </sockets:socket-listener>
         <component>
             <!-- This component knows how to look for EOF -->

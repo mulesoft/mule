@@ -5205,7 +5205,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="in-memory-stream" type="inMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
+    <xsd:element name="non-repeatable-stream" type="nonRepeatableStreamType" substitutionGroup="abstract-streaming-strategy">
         <xsd:annotation>
             <xsd:documentation>
                 This configuration allows the input stream to be read only once. It will not allow to seek randomly
@@ -5215,7 +5215,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="inMemoryStreamType">
+    <xsd:complexType name="nonRepeatableStreamType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType" />
         </xsd:complexContent>
