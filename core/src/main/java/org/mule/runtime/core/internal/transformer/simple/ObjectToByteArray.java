@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;

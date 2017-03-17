@@ -93,6 +93,10 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-message-metadata-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-json</artifactId>
         </dependency>
         <dependency>

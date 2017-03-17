@@ -9,10 +9,10 @@ package org.mule.runtime.core.streaming;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.mule.runtime.core.internal.streaming.object.Consumer;
-import org.mule.runtime.core.internal.streaming.object.ConsumerIterator;
-import org.mule.runtime.core.internal.streaming.object.ListConsumer;
-import org.mule.runtime.core.internal.streaming.object.Producer;
+import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
+import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
+import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.size.SmallTest;
 

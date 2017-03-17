@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -21,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -51,7 +50,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private ConfigurationProvider configurationProvider;
   private RetryPolicyTemplate retryPolicyTemplate;
-  private CursorStreamProviderFactory cursorStreamProviderFactory;
+  private CursorProviderFactory cursorProviderFactory;
 
   @Inject
   private ConnectionManagerAdapter connectionManager;
@@ -80,7 +79,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                    getSourceFactory(nonCallbackParameters, responseCallbackParameters, errorCallbackParameters),
                                    configurationProvider,
                                    getRetryPolicyTemplate(),
-                                   cursorStreamProviderFactory,
+                                   cursorProviderFactory,
                                    muleContext.getExtensionManager());
     try {
       muleContext.getInjector().inject(messageSource);
@@ -146,7 +145,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     this.configurationProvider = configurationProvider;
   }
 
-  public void setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+  public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
+    this.cursorProviderFactory = cursorProviderFactory;
   }
 }

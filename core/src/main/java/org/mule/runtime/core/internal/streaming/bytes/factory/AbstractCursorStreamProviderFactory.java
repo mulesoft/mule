@@ -7,14 +7,14 @@
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
 import static org.mule.runtime.core.api.functional.Either.left;
-import org.mule.runtime.api.streaming.CursorStream;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.internal.streaming.CursorManager;
+import org.mule.runtime.core.internal.streaming.CursorProviderHandle;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
-import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
-import org.mule.runtime.core.internal.streaming.bytes.CursorStreamAdapter;
-import org.mule.runtime.core.internal.streaming.bytes.CursorStreamProviderAdapter;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 
 import java.io.IOException;
@@ -24,24 +24,24 @@ import java.io.InputStream;
  * Base implementation of {@link CursorStreamProviderFactory} which contains all the base behaviour and template
  * methods.
  * <p>
- * It interacts with the {@link ByteStreamingManagerAdapter} in order to track all allocated resources and make
+ * It interacts with the {@link CursorManager} in order to track all allocated resources and make
  * sure they're properly disposed of once they're no longer necessary.
  *
  * @since 4.0
  */
 public abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
 
-  private final ByteStreamingManagerAdapter streamingManager;
+  private final CursorManager cursorManager;
   private final ByteBufferManager bufferManager;
 
   /**
    * Creates a new instance
    *
-   * @param streamingManager the manager which will track the produced providers.
+   * @param cursorManager the manager which will track the produced providers.
    * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  protected AbstractCursorStreamProviderFactory(ByteStreamingManagerAdapter streamingManager, ByteBufferManager bufferManager) {
-    this.streamingManager = streamingManager;
+  protected AbstractCursorStreamProviderFactory(CursorManager cursorManager, ByteBufferManager bufferManager) {
+    this.cursorManager = cursorManager;
     this.bufferManager = bufferManager;
   }
 
@@ -50,14 +50,14 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    */
   @Override
   public final Either<CursorStreamProvider, InputStream> of(Event event, InputStream inputStream) {
-    if (inputStream instanceof CursorStreamAdapter) {
-      return left(((CursorStreamAdapter) inputStream).getProvider());
+    if (inputStream instanceof CursorStream) {
+      return left((CursorStreamProvider) ((CursorStream) inputStream).getProvider());
     }
 
-    Either<CursorStreamProviderAdapter, InputStream> value = resolve(inputStream, event);
+    Either<CursorStreamProvider, InputStream> value = resolve(inputStream, event);
     return value.mapLeft(provider -> {
-      streamingManager.onOpen(provider);
-      return new ManagedCursorStreamProvider(provider);
+      CursorProviderHandle handle = cursorManager.track(provider, event);
+      return new ManagedCursorStreamProvider(handle);
     });
   }
 
@@ -75,22 +75,29 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    * @param event
    * @return
    */
-  protected abstract Either<CursorStreamProviderAdapter, InputStream> resolve(InputStream inputStream, Event event);
+  protected abstract Either<CursorStreamProvider, InputStream> resolve(InputStream inputStream, Event event);
 
   private class ManagedCursorStreamProvider implements CursorStreamProvider {
 
-    private final CursorStreamProviderAdapter delegate;
+    private final CursorStreamProvider delegate;
+    private final CursorProviderHandle cursorProviderHandle;
 
-    public ManagedCursorStreamProvider(CursorStreamProviderAdapter delegate) {
-      this.delegate = delegate;
+    private ManagedCursorStreamProvider(CursorProviderHandle cursorProviderHandle) {
+      this.delegate = (CursorStreamProvider) cursorProviderHandle.getCursorProvider();
+      this.cursorProviderHandle = cursorProviderHandle;
     }
 
     @Override
     public CursorStream openCursor() {
-      CursorStreamAdapter cursor = (CursorStreamAdapter) delegate.openCursor();
-      streamingManager.onOpen(cursor);
+      CursorStream cursor = delegate.openCursor();
+      cursorManager.onOpen(cursor, cursorProviderHandle);
 
-      return new ManagedCursorStreamDecorator(cursor);
+      return new ManagedCursorDecorator(cursor, cursorProviderHandle);
+    }
+
+    @Override
+    public void releaseResources() {
+      delegate.releaseResources();
     }
 
     @Override
@@ -104,13 +111,14 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
     }
   }
 
+  private class ManagedCursorDecorator extends CursorStream {
 
-  private class ManagedCursorStreamDecorator extends CursorStream {
+    private final CursorStream delegate;
+    private final CursorProviderHandle cursorProviderHandle;
 
-    private final CursorStreamAdapter delegate;
-
-    private ManagedCursorStreamDecorator(CursorStreamAdapter delegate) {
+    private ManagedCursorDecorator(CursorStream delegate, CursorProviderHandle cursorProviderHandle) {
       this.delegate = delegate;
+      this.cursorProviderHandle = cursorProviderHandle;
     }
 
     @Override
@@ -118,7 +126,7 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
       try {
         delegate.close();
       } finally {
-        streamingManager.onClose(delegate);
+        cursorManager.onClose(delegate, cursorProviderHandle);
       }
     }
 
@@ -133,8 +141,28 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
     }
 
     @Override
-    public boolean isClosed() {
-      return delegate.isClosed();
+    public boolean isFullyConsumed() {
+      return delegate.isFullyConsumed();
+    }
+
+    @Override
+    public boolean canBeReleased() {
+      return delegate.canBeReleased();
+    }
+
+    @Override
+    public boolean isReleased() {
+      return delegate.isReleased();
+    }
+
+    @Override
+    public void release() {
+      delegate.release();
+    }
+
+    @Override
+    public CursorProvider getProvider() {
+      return delegate.getProvider();
     }
 
     @Override

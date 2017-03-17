@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -19,21 +20,21 @@ import java.util.List;
 public class SourceResultAdapter {
 
   private final Result result;
-  private final CursorStreamProviderFactory cursorStreamProviderFactory;
+  private final CursorProviderFactory cursorProviderFactory;
   private final boolean isCollection;
 
   /**
    * Creates a new instance
    *
    * @param result                      the source result
-   * @param cursorStreamProviderFactory the {@link CursorStreamProviderFactory} used by the source
+   * @param cursorProviderFactory the {@link CursorStreamProviderFactory} used by the source
    * @param isCollection                whether the {@code result} represents a {@link List} of messages.
    */
   public SourceResultAdapter(Result result,
-                             CursorStreamProviderFactory cursorStreamProviderFactory,
+                             CursorProviderFactory cursorProviderFactory,
                              boolean isCollection) {
     this.result = result;
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    this.cursorProviderFactory = cursorProviderFactory;
     this.isCollection = isCollection;
   }
 
@@ -47,8 +48,8 @@ public class SourceResultAdapter {
   /**
    * @return The {@link CursorStreamProviderFactory} used by the source
    */
-  public CursorStreamProviderFactory getCursorStreamProviderFactory() {
-    return cursorStreamProviderFactory;
+  public CursorProviderFactory getCursorProviderFactory() {
+    return cursorProviderFactory;
   }
 
   /**

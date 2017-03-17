@@ -187,12 +187,12 @@ public class ModuleFlowProcessingPhase
       if (resultValue instanceof Collection && adapter.isCollection()) {
         message = toMessage(Result.<Collection<Message>, Attributes>builder()
             .output(toMessageCollection((Collection<Result>) resultValue, result.getMediaType().orElse(ANY),
-                                        adapter.getCursorStreamProviderFactory(), templateEvent))
+                                        adapter.getCursorProviderFactory(), templateEvent))
             .attributes(NULL_ATTRIBUTES)
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
       } else {
-        message = toMessage(result, result.getMediaType().orElse(ANY), adapter.getCursorStreamProviderFactory(), templateEvent);
+        message = toMessage(result, result.getMediaType().orElse(ANY), adapter.getCursorProviderFactory(), templateEvent);
       }
 
       templateEvent = Event.builder(templateEvent).message(message).build();

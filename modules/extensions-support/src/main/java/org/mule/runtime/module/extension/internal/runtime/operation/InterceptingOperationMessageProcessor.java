@@ -19,8 +19,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -47,10 +47,10 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
   public InterceptingOperationMessageProcessor(ExtensionModel extensionModel, OperationModel operationModel,
                                                ConfigurationProvider configurationProvider, String target,
                                                ResolverSet resolverSet,
-                                               CursorStreamProviderFactory cursorStreamProviderFactory,
+                                               CursorProviderFactory cursorProviderFactory,
                                                ExtensionManager extensionManager,
                                                PolicyManager policyManager) {
-    super(extensionModel, operationModel, configurationProvider, target, resolverSet, cursorStreamProviderFactory,
+    super(extensionModel, operationModel, configurationProvider, target, resolverSet, cursorProviderFactory,
           extensionManager, policyManager);
   }
 

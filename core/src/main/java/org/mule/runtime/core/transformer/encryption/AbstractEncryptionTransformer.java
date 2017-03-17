@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformer.encryption;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;

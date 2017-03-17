@@ -11,16 +11,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
-import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
+import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
 import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.streaming.StreamingStatistics;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-
-import javax.inject.Inject;
+import org.mule.runtime.core.streaming.objects.ObjectStreamingManager;
 
 import org.slf4j.Logger;
 
@@ -28,14 +26,11 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   private static final Logger LOGGER = getLogger(DefaultStreamingManager.class);
 
-  @Inject
-  private SchedulerService schedulerService;
-
-  @Inject
-  private MuleContext muleContext;
-
   private ByteBufferManager bufferManager;
-  private ByteStreamingManagerAdapter byteStreamingManager;
+  private ByteStreamingManager byteStreamingManager;
+  private ObjectStreamingManager objectStreamingManager;
+  private CursorManager cursorManager;
+  private MutableStreamingStatistics statistics;
   private boolean initialised = false;
 
   /**
@@ -44,14 +39,21 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Override
   public void initialise() throws InitialisationException {
     if (!initialised) {
+      statistics = new MutableStreamingStatistics();
+      cursorManager = new CursorManager(statistics);
       bufferManager = new PoolingByteBufferManager();
       byteStreamingManager = createByteStreamingManager();
+      objectStreamingManager = createObjectStreamingManager();
       initialised = true;
     }
   }
 
-  protected ByteStreamingManagerAdapter createByteStreamingManager() {
-    return new DefaultByteStreamingManager(bufferManager, schedulerService.ioScheduler(), muleContext);
+  protected ByteStreamingManager createByteStreamingManager() {
+    return new DefaultByteStreamingManager(cursorManager, bufferManager);
+  }
+
+  protected ObjectStreamingManager createObjectStreamingManager() {
+    return new DefaultObjectStreamingManager();
   }
 
   /**
@@ -60,7 +62,11 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Override
   public void dispose() {
     disposeIfNeeded(byteStreamingManager, LOGGER);
+    disposeIfNeeded(objectStreamingManager, LOGGER);
     disposeIfNeeded(bufferManager, LOGGER);
+    disposeIfNeeded(cursorManager, LOGGER);
+
+    initialised = false;
   }
 
   /**
@@ -71,15 +77,27 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     return byteStreamingManager;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ObjectStreamingManager forObjects() {
+    return objectStreamingManager;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public StreamingStatistics getStreamingStatistics() {
+    return statistics;
+  }
+
+  protected CursorManager getCursorManager() {
+    return cursorManager;
+  }
+
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
-  }
-
-  protected SchedulerService getSchedulerService() {
-    return schedulerService;
-  }
-
-  protected MuleContext getMuleContext() {
-    return muleContext;
   }
 }

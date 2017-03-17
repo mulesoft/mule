@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.bytes;
+package org.mule.runtime.core.internal.streaming;
 
-import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
+import org.mule.runtime.core.streaming.StreamingStatistics;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Default implementation of {@link ByteStreamingStatistics}
+ * Mutable implementation of {@link StreamingStatistics}
  *
  * @since 4.0
  */
-public class DefaultByteStreamingStatistics implements ByteStreamingStatistics {
+public class MutableStreamingStatistics implements StreamingStatistics {
 
   private final AtomicInteger openProviders = new AtomicInteger(0);
   private final AtomicInteger openCursors = new AtomicInteger(0);

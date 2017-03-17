@@ -11,7 +11,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;

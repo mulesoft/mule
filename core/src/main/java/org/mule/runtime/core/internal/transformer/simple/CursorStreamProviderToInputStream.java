@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.CURSOR_STREAM_PROVIDER;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;

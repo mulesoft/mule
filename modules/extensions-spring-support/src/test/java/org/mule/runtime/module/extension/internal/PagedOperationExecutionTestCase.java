@@ -15,7 +15,7 @@ import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLV
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.internal.streaming.object.ConsumerIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 

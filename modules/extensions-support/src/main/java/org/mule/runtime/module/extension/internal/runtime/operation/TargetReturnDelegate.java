@@ -10,7 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
@@ -34,9 +34,9 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
    */
   TargetReturnDelegate(String target,
                        ComponentModel componentModel,
-                       CursorStreamProviderFactory cursorStreamProviderFactory,
+                       CursorProviderFactory cursorProviderFactory,
                        MuleContext muleContext) {
-    super(componentModel, cursorStreamProviderFactory, muleContext);
+    super(componentModel, cursorProviderFactory, muleContext);
     this.target = target;
   }
 

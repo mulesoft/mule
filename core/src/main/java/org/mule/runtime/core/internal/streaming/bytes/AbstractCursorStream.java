@@ -6,42 +6,29 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
 import java.io.IOException;
 
 /**
- * Base class for implementations of {@link CursorStreamAdapter}.
+ * Base class for implementations of {@link CursorStream}.
  * <p>
  * Provides template methods and enforces default behavior.
  *
  * @since 4.0
  */
-abstract class BaseCursorStream extends CursorStreamAdapter {
+abstract class AbstractCursorStream extends CursorStream {
 
-  private final CursorStreamProviderAdapter provider;
-  private boolean closed = false;
-  private boolean disposed = false;
-  protected long position = 0;
+  private final CursorStreamProvider provider;
   private long mark = 0;
+  private boolean fullyConsumed = false;
+  private boolean released = false;
+  protected long position = 0;
 
-  /**
-   * Creates a new instance
-   *
-   * @param provider the provider which opened this cursor
-   */
-  public BaseCursorStream(CursorStreamProviderAdapter provider) {
-    checkArgument(provider != null, "provider cannot be null");
+  public AbstractCursorStream(CursorStreamProvider provider) {
     this.provider = provider;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public CursorStreamProviderAdapter getProvider() {
-    return provider;
   }
 
   /**
@@ -58,8 +45,57 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
   @Override
   public void seek(long position) throws IOException {
     assertNotDisposed();
+    fullyConsumed = false;
     this.position = position;
-    closed = false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isFullyConsumed() {
+    return fullyConsumed;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean canBeReleased() {
+    return fullyConsumed || released;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isReleased() {
+    return released;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public synchronized final void release() {
+    if (!released) {
+      doRelease();
+      released = true;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CursorStreamProvider getProvider() {
+    return provider;
+  }
+
+  protected abstract void doRelease();
+
+  protected void assertNotDisposed() {
+    checkState(!released, "Stream is closed");
   }
 
   /**
@@ -67,10 +103,9 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
    */
   @Override
   public final void close() throws IOException {
-    closed = true;
-    if (!disposed) {
-      disposed = true;
-      dispose();
+    if (!released) {
+      released = true;
+      release();
     }
   }
 
@@ -82,7 +117,7 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
   @Override
   public final int read() throws IOException {
     assertNotDisposed();
-    return handleAutoClose(doRead());
+    return handleFullyConsumed(doRead());
   }
 
   /**
@@ -99,7 +134,7 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
     assertNotDisposed();
-    return handleAutoClose(doRead(b, off, len));
+    return handleFullyConsumed(doRead(b, off, len));
   }
 
   /**
@@ -120,7 +155,7 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
    */
   @Override
   public final long skip(long n) throws IOException {
-    seek(position + n);
+    seek(getPosition() + n);
     return n;
   }
 
@@ -150,31 +185,13 @@ abstract class BaseCursorStream extends CursorStreamAdapter {
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isClosed() {
-    return closed || disposed;
-  }
-
-  /**
-   * Releases all the resources held by {@code this} cursor, but not the ones held
-   * by the provider that created it. After being disposed, a cursor is no longer usable.
-   */
-  protected abstract void dispose();
-
-  protected void assertNotDisposed() {
-    checkState(!disposed, "Stream is closed");
-  }
-
   protected int unsigned(int value) {
     return value & 0xff;
   }
 
-  private int handleAutoClose(int read) {
+  private int handleFullyConsumed(int read) {
     if (read < 0) {
-      closed = true;
+      fullyConsumed = true;
     }
 
     return read;

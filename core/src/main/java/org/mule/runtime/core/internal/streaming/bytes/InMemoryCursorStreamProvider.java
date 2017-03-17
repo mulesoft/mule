@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.api.streaming.CursorStream;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.InputStream;
 
 /**
- * An implementation of {@link AbstractCursorStreamProviderAdapter} which yields
+ * An implementation of {@link AbstractCursorStreamProvider} which yields
  * cursors that only use memory for buffering
  *
  * @since 4.0
  */
-public class InMemoryCursorStreamProvider extends AbstractCursorStreamProviderAdapter {
+public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
 
   private final InMemoryStreamBuffer buffer;
   private final int bufferSize;
@@ -29,13 +28,11 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProviderAd
    * @param wrappedStream the stream to buffer from
    * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param event         the {@link Event} in which streaming is taking place
    */
   public InMemoryCursorStreamProvider(InputStream wrappedStream,
                                       InMemoryCursorStreamConfig config,
-                                      ByteBufferManager bufferManager,
-                                      Event event) {
-    super(wrappedStream, bufferManager, event);
+                                      ByteBufferManager bufferManager) {
+    super(wrappedStream, bufferManager);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
     bufferSize = config.getInitialBufferSize().toBytes();
   }
@@ -45,8 +42,9 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProviderAd
    */
   @Override
   protected CursorStream doOpenCursor() {
-    return new BufferedCursorStream(buffer, getBufferManager(), bufferSize, this);
+    return new BufferedCursorStream(buffer, this, getBufferManager(), bufferSize);
   }
+
 
   /**
    * {@inheritDoc}

@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Iterator;
@@ -29,16 +29,16 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   private final Iterator<Result> delegate;
   private final MediaType mediaType;
-  private final CursorStreamProviderFactory cursorStreamProviderFactory;
+  private final CursorProviderFactory cursorProviderFactory;
   private final Event event;
 
   ResultToMessageIterator(Iterator<Result> delegate,
                           MediaType mediaType,
-                          CursorStreamProviderFactory cursorStreamProviderFactory,
+                          CursorProviderFactory cursorProviderFactory,
                           Event event) {
     this.delegate = delegate;
     this.mediaType = mediaType;
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    this.cursorProviderFactory = cursorProviderFactory;
     this.event = event;
   }
 
@@ -50,7 +50,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), mediaType, cursorStreamProviderFactory, event);
+    return toMessage(delegate.next(), mediaType, cursorProviderFactory, event);
   }
 
   @Override
@@ -60,6 +60,6 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType, cursorStreamProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType, cursorProviderFactory, event)));
   }
 }

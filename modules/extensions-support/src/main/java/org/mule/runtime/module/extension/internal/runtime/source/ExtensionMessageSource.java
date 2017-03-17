@@ -33,12 +33,12 @@ import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -84,9 +84,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                 SourceAdapterFactory sourceAdapterFactory,
                                 ConfigurationProvider configurationProvider,
                                 RetryPolicyTemplate retryPolicyTemplate,
-                                CursorStreamProviderFactory cursorStreamProviderFactory,
+                                CursorProviderFactory cursorProviderFactory,
                                 ExtensionManager managerAdapter) {
-    super(extensionModel, sourceModel, configurationProvider, cursorStreamProviderFactory, managerAdapter);
+    super(extensionModel, sourceModel, configurationProvider, cursorProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
@@ -134,7 +134,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setProcessContextSupplier(this::createProcessingContext)
-        .setCursorStreamProviderFactory(getCursorStreamProviderFactory())
+        .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();
   }

@@ -15,7 +15,7 @@ import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.extension.socket.internal.TcpInputStream;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 import java.io.IOException;

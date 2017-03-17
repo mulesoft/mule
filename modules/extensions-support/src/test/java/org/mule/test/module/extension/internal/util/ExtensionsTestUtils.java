@@ -27,8 +27,6 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_ATTRIBUTES_FIELD_NAME;
-import static org.mule.runtime.module.extension.internal.util.TypesFactory.MESSAGE_PAYLOAD_FIELD_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -38,6 +36,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
+import org.mule.metadata.message.MessageMetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -56,12 +55,12 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
-import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.internal.streaming.bytes.ByteStreamingManagerAdapter;
-import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -167,12 +166,12 @@ public final class ExtensionsTestUtils {
   }
 
   public static void assertMessageType(MetadataType type, MetadataType payloadType, MetadataType attributesType) {
-    assertThat(type, is(instanceOf(ObjectType.class)));
+    assertThat(type, is(instanceOf(MessageMetadataType.class)));
     assertThat(getTypeId(type).get(), is(Message.class.getName()));
 
-    ObjectType messageType = (ObjectType) type;
-    assertThat(messageType.getFieldByName(MESSAGE_PAYLOAD_FIELD_NAME).get().getValue(), equalTo(payloadType));
-    assertThat(messageType.getFieldByName(MESSAGE_ATTRIBUTES_FIELD_NAME).get().getValue(), equalTo(attributesType));
+    MessageMetadataType messageType = (MessageMetadataType) type;
+    assertThat(messageType.getPayloadType().get(), equalTo(payloadType));
+    assertThat(messageType.getAttributesType().get(), equalTo(attributesType));
   }
 
   public static ParameterModel getParameter(String name, Class<?> type) {
@@ -358,15 +357,15 @@ public final class ExtensionsTestUtils {
 
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory(MuleContext muleContext) {
     try {
-      return muleContext.getRegistry().lookupObject(StreamingManager.class).forBytes().getDefaultCursorStreamProviderFactory();
+      return muleContext.getRegistry().lookupObject(StreamingManager.class).forBytes().getDefaultCursorProviderFactory();
     } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }
   }
 
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory() {
-    return new InMemoryCursorStreamProviderFactory(mock(ByteStreamingManagerAdapter.class),
-                                                   InMemoryCursorStreamConfig.getDefault(),
-                                                   new SimpleByteBufferManager());
+    return new InMemoryCursorStreamProviderFactory(mock(CursorManager.class),
+                                                   new SimpleByteBufferManager(),
+                                                   InMemoryCursorStreamConfig.getDefault());
   }
 }

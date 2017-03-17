@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import static org.mule.runtime.core.internal.streaming.bytes.CursorStreamUtils.withCursoredEvent;
+import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;

@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -81,7 +81,7 @@ public class SchemaGenerator {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
       Marshaller marshaller = jaxbContext.createMarshaller();
-      NamespaceFilter outFilter = new NamespaceFilter(CORE_PREFIX, DEFAULT_NAMESPACE_URI_MASK, true);
+      NamespaceFilter outFilter = new NamespaceFilter(CORE_PREFIX, CORE_NAMESPACE, true);
       OutputFormat format = new OutputFormat();
       format.setIndent(true);
       format.setNewlines(true);

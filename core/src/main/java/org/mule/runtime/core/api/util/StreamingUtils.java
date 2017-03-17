@@ -4,36 +4,35 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.bytes;
+package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.Exceptions.unwrap;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.streaming.CursorStream;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.func.CheckedFunction;
 
 /**
- * Utilities for handling {@link CursorStream} instances
+ * Utilities for handling {@link Cursor} instances
  *
  * @since 4.0
  */
-public final class CursorStreamUtils {
+public final class StreamingUtils {
 
   /**
    * Executes the given function {@code f} considering that the given {@code event} might have
-   * a {@link CursorStreamProvider} as payload. In that case, this method obtains a cursor from the provider
+   * a {@link CursorProvider} as payload. In that case, this method obtains a cursor from the provider
    * and executes the function.
-   *
+   * <p>
    * Closing the opened cursor, handling exceptions and return values are all taken care of by this utility
    * method.
    *
    * @param event an {@link Event}
-   * @param f the function to execute
+   * @param f     the function to execute
    * @return the output {@link Event}
    * @throws MuleException
    */
@@ -57,12 +56,12 @@ public final class CursorStreamUtils {
     };
 
     Object payload = event.getMessage().getPayload().getValue();
-    CursorStreamProvider cursorStreamProvider = null;
-    CursorStream cursor = null;
+    CursorProvider cursorProvider = null;
+    Cursor cursor = null;
     try {
-      if (payload instanceof CursorStreamProvider) {
-        cursorStreamProvider = (CursorStreamProvider) payload;
-        cursor = cursorStreamProvider.openCursor();
+      if (payload instanceof CursorProvider) {
+        cursorProvider = (CursorProvider) payload;
+        cursor = cursorProvider.openCursor();
         event = replacePayload(event, cursor);
       }
 
@@ -71,12 +70,14 @@ public final class CursorStreamUtils {
       if (value == null) {
         handlePossibleException(exception);
       } else if (value.getMessage().getPayload().getValue() == cursor) {
-        value = replacePayload(value, cursorStreamProvider);
+        value = replacePayload(value, cursorProvider);
       }
 
       return value;
     } finally {
-      closeQuietly(cursor);
+      if (cursor != null) {
+        cursor.release();
+      }
     }
   }
 
@@ -95,5 +96,5 @@ public final class CursorStreamUtils {
     }
   }
 
-  private CursorStreamUtils() {}
+  private StreamingUtils() {}
 }

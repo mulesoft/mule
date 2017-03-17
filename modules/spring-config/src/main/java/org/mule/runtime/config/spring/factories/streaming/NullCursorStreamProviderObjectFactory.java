@@ -9,10 +9,10 @@ package org.mule.runtime.config.spring.factories.streaming;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 
 public class NullCursorStreamProviderObjectFactory
-    extends AbstractCursorStreamProviderObjectFactory<CursorStreamProviderFactory> {
+    extends AbstractCursorProviderObjectFactory<CursorStreamProviderFactory> {
 
   @Override
   public CursorStreamProviderFactory doGetObject() throws Exception {
-    return streamingManager.forBytes().getNullCursorStreamProviderFactory();
+    return streamingManager.forBytes().getNullCursorProviderFactory();
   }
 }

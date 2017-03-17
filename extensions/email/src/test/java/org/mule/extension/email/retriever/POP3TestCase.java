@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.core.internal.streaming.object.ConsumerIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;

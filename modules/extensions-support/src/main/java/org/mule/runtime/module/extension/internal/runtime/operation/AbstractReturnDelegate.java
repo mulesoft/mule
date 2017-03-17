@@ -9,24 +9,23 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
+import static org.mule.runtime.core.util.message.MessageUtils.valueOrStreamProvider;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import static org.mule.runtime.core.util.message.MessageUtils.valueOrStreamProvider;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Optional;
@@ -38,8 +37,8 @@ import java.util.Optional;
  * updated payload but also the proper {@link DataType} and attributes.
  * <p>
  * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}.
- * For any of this cases, it also allows specifying a {@link CursorStreamProviderFactory} which will transform {@link InputStream}
- * values into {@link CursorStreamProvider} instances. As said before, this is also applied then the value is a message or list of
+ * For any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload
+ * values into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of
  * them
  *
  * @since 4.0
@@ -48,21 +47,21 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private final boolean returnsListOfMessages;
-  private final CursorStreamProviderFactory cursorStreamProviderFactory;
+  private final CursorProviderFactory cursorProviderFactory;
 
   /**
    * Creates a new instance
    *
-   * @param componentModel              the component which produces the return value
-   * @param cursorStreamProviderFactory the {@link CursorStreamProviderFactory} to use when a message payload is an {@link InputStream}. Can be {@code null}
-   * @param muleContext                 the {@link MuleContext} of the owning application
+   * @param componentModel        the component which produces the return value
+   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be {@code null}
+   * @param muleContext           the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
-                                   CursorStreamProviderFactory cursorStreamProviderFactory,
+                                   CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
     returnsListOfMessages = returnsListOfMessages(componentModel);
     this.muleContext = muleContext;
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    this.cursorProviderFactory = cursorProviderFactory;
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
@@ -70,13 +69,13 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     final Event event = operationContext.getEvent();
 
     if (value instanceof Result) {
-      return MessageUtils.toMessage((Result) value, mediaType, cursorStreamProviderFactory, event);
+      return MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
     } else {
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toMessageCollection((Collection<Result>) value, mediaType, cursorStreamProviderFactory, event);
+        value = toMessageCollection((Collection<Result>) value, mediaType, cursorProviderFactory, event);
       }
       return Message.builder()
-          .payload(valueOrStreamProvider(value, cursorStreamProviderFactory, event).getValue().orElse(null))
+          .payload(valueOrStreamProvider(value, cursorProviderFactory, event).getValue().orElse(null))
           .mediaType(mediaType)
           .attributes(NULL_ATTRIBUTES).build();
     }

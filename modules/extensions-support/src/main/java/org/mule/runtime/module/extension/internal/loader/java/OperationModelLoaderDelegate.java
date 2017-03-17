@@ -8,10 +8,12 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -27,12 +29,12 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
@@ -42,12 +44,14 @@ import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOp
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * Helper class for declaring operations through a {@link JavaModelLoaderDelegate}
+ *
  * @since 4.0
  */
 final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
@@ -111,11 +115,21 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       processOperationConnectivity(operation, operationMethod);
 
       if (!processNonBlockingOperation(operation, operationMethod)) {
-        operation.blocking(true).withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
-        operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, loader.getTypeLoader()));
-        processInterceptingOperation(operationMethod, operation);
 
-        addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
+        operation.blocking(true);
+        operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, loader.getTypeLoader()));
+
+        if (isAutoPaging(operationMethod)) {
+          operation.withOutput().ofType(new BaseTypeBuilder(JAVA).arrayType()
+              .id(Iterator.class.getName())
+              .of(getMethodReturnType(method, loader.getTypeLoader()))
+              .build());
+
+          addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
+        } else {
+          operation.withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
+          processInterceptingOperation(operationMethod, operation);
+        }
       }
 
       addExecutionType(operation, operationMethod);
@@ -217,16 +231,18 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void addPagedOperationModelProperty(MethodElement operationMethod, OperationDeclarer operation,
                                               boolean supportsConfig) {
-    if (PagingProvider.class.isAssignableFrom(operationMethod.getReturnType())) {
-      if (!supportsConfig) {
-        throw new IllegalOperationModelDefinitionException(format(
-                                                                  "Paged operation '%s' is defined at the extension level but it requires a config, since connections "
-                                                                      + "are required for paging",
-                                                                  operationMethod.getName()));
-      }
-      operation.withModelProperty(new PagedOperationModelProperty());
-      operation.requiresConnection(true);
+    if (!supportsConfig) {
+      throw new IllegalOperationModelDefinitionException(format(
+                                                                "Paged operation '%s' is defined at the extension level but it requires a config, since connections "
+                                                                    + "are required for paging",
+                                                                operationMethod.getName()));
     }
+    operation.withModelProperty(new PagedOperationModelProperty());
+    operation.requiresConnection(true);
+  }
+
+  private boolean isAutoPaging(MethodElement operationMethod) {
+    return PagingProvider.class.isAssignableFrom(operationMethod.getReturnType());
   }
 
   private boolean isExtensible() {

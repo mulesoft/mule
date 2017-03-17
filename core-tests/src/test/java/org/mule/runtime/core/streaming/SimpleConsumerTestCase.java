@@ -11,10 +11,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
-import org.mule.runtime.core.internal.streaming.object.ClosedConsumerException;
-import org.mule.runtime.core.internal.streaming.object.Consumer;
-import org.mule.runtime.core.internal.streaming.object.Producer;
-import org.mule.runtime.core.internal.streaming.object.SimpleConsumer;
+import org.mule.runtime.core.internal.streaming.object.iterator.ClosedConsumerException;
+import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
+import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
+import org.mule.runtime.core.internal.streaming.object.iterator.SimpleConsumer;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

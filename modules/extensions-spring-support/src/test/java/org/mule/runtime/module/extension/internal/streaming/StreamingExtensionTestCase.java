@@ -17,7 +17,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.bytes.ByteStreamingStatistics;
+import org.mule.runtime.core.streaming.StreamingStatistics;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -144,7 +144,7 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertAllStreamingResourcesClosed() {
-    ByteStreamingStatistics stats = streamingManager.forBytes().getByteStreamingStatistics();
+    StreamingStatistics stats = streamingManager.getStreamingStatistics();
     new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
       assertThat("There're still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
       assertThat("There're still open cursors", stats.getOpenCursorsCount(), is(0));

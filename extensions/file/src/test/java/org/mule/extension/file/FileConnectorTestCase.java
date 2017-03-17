@@ -15,7 +15,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
