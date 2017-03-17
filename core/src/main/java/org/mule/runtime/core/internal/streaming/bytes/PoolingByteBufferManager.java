@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
+  private static final long ONE_MINUTE = MINUTES.toMillis(1);
 
   private final LoadingCache<Integer, ObjectPool<ByteBuffer>> pools = CacheBuilder.newBuilder()
       .expireAfterAccess(1, MINUTES)
@@ -99,8 +100,8 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
     config.maxActive = -1;
     config.maxWait = DEFAULT_MAX_WAIT;
     config.whenExhaustedAction = WHEN_EXHAUSTED_GROW;
-    config.minEvictableIdleTimeMillis = 1000 * 60 * 5;
-    config.timeBetweenEvictionRunsMillis = 1000 * 60 * 5;
+    config.minEvictableIdleTimeMillis = ONE_MINUTE;
+    config.timeBetweenEvictionRunsMillis = ONE_MINUTE;
     config.testOnBorrow = false;
     config.testOnReturn = false;
     config.testWhileIdle = false;

@@ -51,6 +51,7 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_DATA_UNIT;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_INCREMENT_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_SIZE;
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_MAX_BUFFER_SIZE;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -1183,7 +1184,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                 .build())
         .withConstructorParameterDefinition(
                                             fromSimpleParameter("maxInMemorySize")
-                                                .withDefaultValue(0)
+                                                .withDefaultValue(DEFAULT_STREAMING_MAX_BUFFER_SIZE)
                                                 .build())
         .withConstructorParameterDefinition(
                                             fromSimpleParameter("bufferUnit", value -> DataUnit.valueOf((String) value))

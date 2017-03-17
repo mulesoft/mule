@@ -18,7 +18,7 @@
             </when>
             <otherwise>
                 <file:read path="#[path]">
-                    <in-memory-stream />
+                    <non-repeatable-stream />
                 </file:read>
             </otherwise>
         </choice>
@@ -26,7 +26,7 @@
 
     <flow name="readWithLock">
         <file:read path="#[path]" lock="true">
-            <in-memory-stream />
+            <non-repeatable-stream />
         </file:read>
     </flow>
 

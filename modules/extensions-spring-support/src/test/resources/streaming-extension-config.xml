@@ -48,7 +48,7 @@
 
     <flow name="toSimpleStream">
         <marvel:to-stream>
-            <in-memory-stream />
+            <non-repeatable-stream />
         </marvel:to-stream>
     </flow>
 
@@ -72,7 +72,7 @@
 
     <flow name="bytesCasterWithoutStreaming" initialState="stopped">
         <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain">
-            <in-memory-stream />
+            <non-repeatable-stream />
         </marvel:bytes-caster>
         <flow-ref name="assertPayloadIsNotStreamProvider" />
         <object-to-string-transformer />

@@ -19,7 +19,7 @@
             </when>
             <otherwise>
                 <ftp:read path="#[path]">
-                    <in-memory-stream />
+                    <non-repeatable-stream />
                 </ftp:read>
             </otherwise>
         </choice>
@@ -27,7 +27,7 @@
 
     <flow name="readWithLock" processingStrategy="synchronous">
         <ftp:read path="files/hello.json" lock="true">
-            <in-memory-stream />
+            <non-repeatable-stream />
         </ftp:read>
     </flow>
 
