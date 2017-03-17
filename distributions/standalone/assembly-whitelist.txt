@@ -154,7 +154,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tomcat-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tooling-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-010.jar
 /mule-standalone-${productVersion}/lib/mule/mule-service-http-api-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-service-oauth-api-${productVersion}.jar
@@ -254,8 +253,6 @@
 /mule-standalone-${productVersion}/lib/opt/reactor-core-3.0.5.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.10.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
-/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-15.jar
-/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-15-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/snakeyaml-1.15.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-4.1.9.RELEASE.jar
@@ -269,16 +266,9 @@
 /mule-standalone-${productVersion}/lib/opt/spring-ldap-core-2.0.2.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/stax-api-1.0.1.jar
-/mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
-/mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/uuid-3.4.0.jar
-/mule-standalone-${productVersion}/lib/opt/woodstox-core-asl-4.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.6.0.jar
-/mule-standalone-${productVersion}/lib/opt/xmlpull-1.1.3.1.jar
-/mule-standalone-${productVersion}/lib/opt/xpp3_min-1.1.3.4.O.jar
-/mule-standalone-${productVersion}/lib/opt/xstream-1.4.9.jar
-/mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yecht-1.1-jruby.jar
 
 #

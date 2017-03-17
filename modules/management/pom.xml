@@ -31,11 +31,6 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-xml</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
         </dependency>

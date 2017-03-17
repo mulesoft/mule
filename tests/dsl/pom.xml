@@ -122,12 +122,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-xml</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>

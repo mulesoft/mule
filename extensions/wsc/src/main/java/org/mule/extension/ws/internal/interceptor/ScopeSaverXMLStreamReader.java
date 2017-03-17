@@ -7,7 +7,7 @@
 package org.mule.extension.ws.internal.interceptor;
 
 
-import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+import org.mule.extension.ws.internal.xml.stax.DelegateXMLStreamReader;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -162,7 +162,6 @@
                 <include>org.mule.runtime:mule-module-tls</include>
                 <include>org.mule.runtime:mule-module-tomcat</include>
                 <include>org.mule.runtime:mule-module-tooling-support</include>
-                <include>org.mule.runtime:mule-module-xml</include>
 
                 <!-- Shared libs -->
                 <include>org.mule.mvel:mule-mvel2</include>
@@ -243,7 +242,6 @@
                 <exclude>org.mule.runtime:mule-module-tls</exclude>
                 <exclude>org.mule.runtime:mule-module-tomcat</exclude>
                 <exclude>org.mule.runtime:mule-module-tooling-support</exclude>
-                <exclude>org.mule.runtime:mule-module-xml</exclude>
 
                 <!-- lib/plugins (these artifacts are zip type) -->
                 <!--//TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips-->

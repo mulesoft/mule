@@ -8,6 +8,7 @@ package org.mule.runtime.module.management.agent;
 
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleHome;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,7 +21,6 @@ import org.mule.runtime.module.management.mbean.MBeanServerFactory;
 import org.mule.runtime.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.runtime.module.management.support.JmxSupport;
 import org.mule.runtime.module.management.support.JmxSupportFactory;
-import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -33,7 +33,9 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
@@ -41,8 +43,6 @@ import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management, statistics and configuration viewing of a Mule
@@ -102,13 +102,7 @@ public class Mx4jAgent extends AbstractAgent {
     adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
 
     // Set the XSLT Processor with any local overrides
-    XSLTProcessor processor;
-    try {
-      processor = new XSLTProcessor();
-    } catch (TransformerFactoryConfigurationError e) {
-      System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
-      processor = new XSLTProcessor();
-    }
+    XSLTProcessor processor = new XSLTProcessor();
 
     if (StringUtils.isNotBlank(xslFilePath)) {
       processor.setFile(xslFilePath.trim());

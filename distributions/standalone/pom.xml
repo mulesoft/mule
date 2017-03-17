@@ -240,29 +240,24 @@
         <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
-            <version>${xmlApisVersion}</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>${xercesVersion}</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
-            <version>${xmlSerializerVersion}</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
         </dependency>
 
         <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>${antVersion}</version>
 
         </dependency>
 
@@ -276,7 +271,6 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>${javaMailVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>

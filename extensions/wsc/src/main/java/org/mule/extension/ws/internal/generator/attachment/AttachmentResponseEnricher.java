@@ -8,15 +8,16 @@ package org.mule.extension.ws.internal.generator.attachment;
 
 import static java.lang.String.format;
 import static org.mule.extension.ws.internal.util.WscMetadataTypeUtils.getAttachmentFields;
+
 import org.mule.extension.ws.api.WscMultipartPayload;
 import org.mule.extension.ws.api.exception.InvalidWsdlException;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.extension.ws.internal.introspection.OutputTypeIntrospecterDelegate;
 import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
+import org.mule.extension.ws.internal.xml.util.XMLUtils;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.runtime.module.xml.util.XMLUtils;
 
 import java.util.List;
 
@@ -26,9 +27,8 @@ import org.apache.cxf.message.Exchange;
 import org.w3c.dom.Document;
 
 /**
- * Abstract implementation for a response enricher that removes a node for each sent attachment to the obtained SOAP
- * response and moving all the attachment data to the attachments returned as a {@link WscMultipartPayload} in the
- * {@link ConsumeOperation}.
+ * Abstract implementation for a response enricher that removes a node for each sent attachment to the obtained SOAP response and
+ * moving all the attachment data to the attachments returned as a {@link WscMultipartPayload} in the {@link ConsumeOperation}.
  *
  * @since 4.0
  */
@@ -37,8 +37,8 @@ public abstract class AttachmentResponseEnricher {
   /**
    * {@inheritDoc}
    * <p>
-   * Modifies the SOAP response to avoid attachment content in the response body and make decouple the attachment handling so
-   * the user can have a better experience.
+   * Modifies the SOAP response to avoid attachment content in the response body and make decouple the attachment handling so the
+   * user can have a better experience.
    */
   public String enrich(Document response, WsdlIntrospecter introspecter, TypeLoader loader, String operation, Exchange exchange) {
     Part outputPart = introspecter.getBodyPart(operation, new OutputTypeIntrospecterDelegate())

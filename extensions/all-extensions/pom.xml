@@ -259,6 +259,14 @@
                     <artifactId>cxf-rt-frontend-simple</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>net.sf.saxon</groupId>
+                    <artifactId>Saxon-HE</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.java.dev.stax-utils</groupId>
+                    <artifactId>stax-utils</artifactId>
+                </exclusion>
+				<exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>

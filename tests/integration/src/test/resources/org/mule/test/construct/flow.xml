@@ -78,7 +78,7 @@
     </flow>
     
     <flow name="split-no-parts">
-        <splitter expression="#[mel:xpath3('//Order/item', payload, 'NODESET')]"/>
+        <splitter expression="#[%output application/java --- payload..Order.item]"/>
     </flow>
 
     <flow name="split-aggregate-singleton-list">

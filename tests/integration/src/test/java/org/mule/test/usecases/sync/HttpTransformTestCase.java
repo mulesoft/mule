@@ -12,9 +12,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
-import org.mule.runtime.api.metadata.DataType;
+
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpService;
@@ -35,9 +34,6 @@ import org.junit.Test;
 public class HttpTransformTestCase extends AbstractIntegrationTestCase {
 
   @Rule
-  public DynamicPort httpPort1 = new DynamicPort("port1");
-
-  @Rule
   public DynamicPort httpPort2 = new DynamicPort("port2");
 
   @Rule
@@ -46,20 +42,6 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
   @Override
   protected String getConfigFile() {
     return "org/mule/test/usecases/sync/http-transform-flow.xml";
-  }
-
-  @Test
-  public void testTransform() throws Exception {
-    HttpRequest httpRequest = HttpRequest.builder().setUri(format("http://localhost:%d/RemoteService", httpPort1.getNumber()))
-        .setEntity(new ByteArrayHttpEntity("payload".getBytes())).setMethod(POST).build();
-    HttpResponse httpResponse = httpClient.send(httpRequest, RECEIVE_TIMEOUT, false, null);
-
-    GZipUncompressTransformer transformer = new GZipUncompressTransformer();
-    transformer.setMuleContext(muleContext);
-    transformer.setReturnDataType(DataType.STRING);
-    byte[] byteArray = IOUtils.toByteArray(((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream());
-    String result = (String) transformer.transform(byteArray);
-    assertThat(result, is("<string>payload</string>"));
   }
 
   @Test

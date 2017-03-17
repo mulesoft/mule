@@ -7,7 +7,7 @@
 package org.mule.services.soap.impl.interceptor;
 
 
-import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+import org.mule.services.soap.impl.xml.stax.DelegateXMLStreamReader;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,6 +9,7 @@ package org.mule.extension.ws.internal;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+
 import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.api.WscAttributes;
@@ -21,6 +22,7 @@ import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
 import org.mule.extension.ws.internal.metadata.MessageBuilderResolver;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
 import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
+import org.mule.extension.ws.internal.xml.util.XMLUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -32,7 +34,6 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.module.xml.util.XMLUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -73,8 +74,8 @@ public class ConsumeOperation {
    * Consumes an operation from a SOAP Web Service.
    *
    * @param connection the connection resolved to execute the operation.
-   * @param operation  the name of the web service operation that aims to invoke.
-   * @param message    the constructed SOAP message to perform the request.
+   * @param operation the name of the web service operation that aims to invoke.
+   * @param message the constructed SOAP message to perform the request.
    */
   @OnException(WscExceptionEnricher.class)
   @Throws(ConsumeErrorTypeProvider.class)
@@ -82,7 +83,7 @@ public class ConsumeOperation {
   public Result<Object, WscAttributes> consume(@UseConfig WebServiceConsumer config,
                                                @Connection WscConnection connection,
                                                @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                               //TODO MULE-11235
+                                               // TODO MULE-11235
                                                @NullSafe @Optional @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
       throws SoapFaultException {
     Map<String, SoapAttachment> attachments = message.getAttachments();

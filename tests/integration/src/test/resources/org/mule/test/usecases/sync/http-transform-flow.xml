@@ -2,17 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans" 
-      xmlns:xm="http://www.mulesoft.org/schema/mule/xml" 
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <httpn:listener-config name="listenerConfig1">
-		<httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
     <httpn:listener-config name="listenerConfig2">
     	<httpn:listener-connection host="localhost" port="${port2}"/>
     </httpn:listener-config>
@@ -23,18 +18,7 @@
     <byte-array-to-string-transformer name="ByteArrayToString"/>
     <byte-array-to-serializable-transformer name="ByteArrayToSerializable"/>
     <serializable-to-byte-array-transformer name="SerializableToByteArray"/>
-    <xm:object-to-xml-transformer name="ObjectToXml"/>
     <gzip-compress-transformer name="Compress"/>
-
-    <flow name="HttpService">
-        <httpn:listener path="RemoteService" config-ref="listenerConfig1"/>
-        <transformer ref="ByteArrayToString"/>
-        <response>
-            <transformer ref="ObjectToXml"/>
-            <transformer ref="Compress"/>
-        </response>
-        <echo-component/>
-    </flow>
 
     <flow name="HttpService2">
         <httpn:listener path="RemoteService" config-ref="listenerConfig2"/>
