@@ -68,6 +68,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
         createFtpServerDir("rollbackOnException");
     }
 
+    @Ignore("TODO: flaky MULE-11999")
     @Test
     public void testNoException() throws Exception
     {
@@ -91,6 +92,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
         });
     }
 
+    @Ignore("TODO: flaky MULE-11999")
     @Test
     public void testTransformerException() throws Exception
     {
@@ -117,6 +119,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
         });
     }
 
+    @Ignore("TODO: flaky MULE-11999")
     @Test
     public void testRouterException() throws Exception
     {
@@ -143,6 +146,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
         });
     }
 
+    @Ignore("TODO: flaky MULE-11999")
     @Test
     public void testComponentException() throws Exception
     {
@@ -167,6 +171,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
         });
     }
 
+    @Ignore("TODO: flaky MULE-11999")
     @Test
     public void testCatchExceptionStrategyConsumesMessage() throws Exception
     {
@@ -191,6 +196,7 @@ public class InboundMessageLossFlowTestCase extends AbstractFtpServerTestCase
         });
     }
 
+    @Ignore("TODO: flaky MULE-11999")
     @Test
     public void testDefaultExceptionStrategyConsumesMessage() throws Exception
     {
