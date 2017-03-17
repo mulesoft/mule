@@ -189,7 +189,7 @@
         <log4jVersion>2.5</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
-        <muleDslApiVersion>1.0.0-M5</muleDslApiVersion>
+        <muleDslApiVersion>1.0.0-M5-RC-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-M5</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-M5</muleApiVersion>
