@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <db:query name="selectQuery">
+        <db:input-parameters>
+            #[mel:['name' : payload]]
+        </db:input-parameters>
+        <db:sql>select * from PLANET where name = :name</db:sql>
+    </db:query>
+
+    <db:config name="dbConfig">
+        <db:derby-connection database="target/muleEmbeddedDB" create="true">
+            <db:pooling-profile maxPoolSize="10"/>
+            <db:connection-properties>
+                <db:connection-property key="first" value="propertyOne"/>
+                <db:connection-property key="second" value="propertyTwo"/>
+            </db:connection-properties>
+        </db:derby-connection>
+    </db:config>
+
+    <httpn:listener-config name="httpListener" basePath="/">
+        <httpn:listener-connection host="localhost" port="49019" protocol="HTTPS">
+            <tls:context>
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </httpn:listener-connection>
+    </httpn:listener-config>
+
+    <httpn:request-config name="httpRequester">
+        <httpn:request-connection host="localhost" port="49020">
+            <httpn:authentication>
+                <httpn:basic-authentication username="user" password="pass"/>
+            </httpn:authentication>
+            <httpn:client-socket-properties>
+                <sockets:tcp-client-socket-properties connectionTimeout="1000" keepAlive="true"
+                                                      receiveBufferSize="1024" sendBufferSize="1024"
+                                                      clientTimeout="1000" linger="1000" />
+            </httpn:client-socket-properties>
+        </httpn:request-connection>
+    </httpn:request-config>
+
+    <flow name="testFlow" initialState="stopped">
+        <httpn:listener config-ref="httpListener" path="testBuilder">
+            <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
+            <reconnect blocking="true" count="1" frequency="0"/>
+            <httpn:response>
+                <httpn:headers>
+                    #[mel:['content-type' : 'text/plain']]
+                </httpn:headers>
+            </httpn:response>
+        </httpn:listener>
+
+        <choice>
+            <when expression="#[true]">
+                <db:bulk-insert>
+                    <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
+                    <db:parameter-types>
+                        <db:parameter-type key="name" type="VARCHAR" />
+                        <db:parameter-type key="position" type="INTEGER" />
+                    </db:parameter-types>
+                </db:bulk-insert>
+            </when>
+            <otherwise>
+                <logger message="#[payload]"/>
+            </otherwise>
+        </choice>
+
+        <db:bulk-insert>
+            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
+            <db:parameter-types>
+                <db:parameter-type key="name" type="VARCHAR" />
+                <db:parameter-type key="position" type="INTEGER" />
+            </db:parameter-types>
+        </db:bulk-insert>
+
+        <httpn:request config-ref="httpRequester" path="/nested" method="POST"/>
+
+        <db:insert config-ref="dbConfig">
+            <db:sql>INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)</db:sql>
+            <db:parameter-types>
+                <db:parameter-type key="description" type="CLOB"/>
+            </db:parameter-types>
+            <db:input-parameters>
+                #[mel:['description' : payload]]
+            </db:input-parameters>
+        </db:insert>
+
+        <sockets:send-and-receive target="myVar">
+            <repeatable-in-memory-stream bufferSizeIncrement="8"
+                                         bufferUnit="KB"
+                                         initialBufferSize="51"
+                                         maxInMemorySize="1000"/>
+        </sockets:send-and-receive>
+    </flow>
+
+</mule>

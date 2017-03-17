@@ -12,10 +12,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -23,6 +19,10 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isP
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getId;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -38,6 +38,9 @@ import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValue;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.ParameterizedElementDeclaration;
+import org.mule.runtime.api.app.declaration.RouteElementDeclaration;
+import org.mule.runtime.api.app.declaration.RouterElementDeclaration;
+import org.mule.runtime.api.app.declaration.ScopeElementDeclaration;
 import org.mule.runtime.api.app.declaration.SourceElementDeclaration;
 import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ParameterListValue;
@@ -51,6 +54,9 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.operation.RouteModel;
+import org.mule.runtime.api.meta.model.operation.RouterModel;
+import org.mule.runtime.api.meta.model.operation.ScopeModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -127,6 +133,28 @@ class DeclarationBasedElementModelFactory {
       }
 
       @Override
+      protected void onScope(HasOperationModels owner, ScopeModel model) {
+        if (equalsName.apply(model)) {
+          checkArgument(declaration instanceof ScopeElementDeclaration,
+                        format("Found an Scope with the given name, but expected a '%s'",
+                               declaration.getClass().getName()));
+          elementModel.set(createScopeElement(model, (ScopeElementDeclaration) declaration));
+          stop();
+        }
+      }
+
+      @Override 
+      protected void onRouter(HasOperationModels owner, RouterModel model) {
+        if (equalsName.apply(model)) {
+          checkArgument(declaration instanceof RouterElementDeclaration,
+                        format("Found an Router with the given name, but expected a '%s'",
+                               declaration.getClass().getName()));
+          elementModel.set(createRouterElement(model, (RouterElementDeclaration) declaration));
+          stop();
+        }
+      }
+
+      @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
         if (equalsName.apply(model)) {
           checkArgument(declaration instanceof SourceElementDeclaration,
@@ -182,6 +210,71 @@ class DeclarationBasedElementModelFactory {
     DslElementModel.Builder<? extends ComponentModel> element =
         createParameterizedElementModel(model, configDsl, componentDeclaration, configuration);
     return element.withConfig(configuration.build()).build();
+  }
+
+  private DslElementModel<? extends ComponentModel> createRouterElement(RouterModel model,
+                                                                           RouterElementDeclaration routerDeclaration) {
+    DslElementSyntax configDsl = dsl.resolve(model);
+    ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
+      .withIdentifier(asIdentifier(configDsl));
+
+    if (routerDeclaration.getConfigRef() != null) {
+      configuration.withParameter(CONFIG_ATTRIBUTE_NAME, routerDeclaration.getConfigRef());
+    }
+
+    DslElementModel.Builder<? extends ComponentModel> element =
+      createParameterizedElementModel(model, configDsl, routerDeclaration, configuration);
+
+    routerDeclaration.getRoutes().forEach(routeDeclaration -> model.getRouteModels().stream()
+      .filter(routeModel -> routeDeclaration.getName().equals(routeModel.getName()))
+    .findFirst()
+      .ifPresent(routeModel -> element.containing(crateRouteElement(routeModel, routeDeclaration))));
+
+    return element.withConfig(configuration.build()).build();
+  }
+
+  private DslElementModel<? extends ComponentModel> createScopeElement(ScopeModel model,
+                                                                        ScopeElementDeclaration scopeDeclaration) {
+    DslElementSyntax configDsl = dsl.resolve(model);
+    ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
+      .withIdentifier(asIdentifier(configDsl));
+
+    if (scopeDeclaration.getConfigRef() != null) {
+      configuration.withParameter(CONFIG_ATTRIBUTE_NAME, scopeDeclaration.getConfigRef());
+    }
+
+    DslElementModel.Builder<? extends ComponentModel> element =
+      createParameterizedElementModel(model, configDsl, scopeDeclaration, configuration);
+
+    RouteElementDeclaration routeDeclaration = scopeDeclaration.getRoute();
+    if (routeDeclaration != null){
+      element.containing(crateRouteElement(model.getRouteModel(), routeDeclaration));
+    }
+
+    return element.withConfig(configuration.build()).build();
+  }
+
+  private DslElementModel<? extends RouteModel> crateRouteElement(RouteModel model, RouteElementDeclaration routeDeclaration) {
+    DslElementSyntax routeDsl = dsl.resolve(model);
+    ComponentConfiguration.Builder routeConfiguration = ComponentConfiguration.builder()
+      .withIdentifier(asIdentifier(routeDsl));
+
+    DslElementModel.Builder<? extends RouteModel> routeElement =
+      createParameterizedElementModel(model, routeDsl, routeDeclaration, routeConfiguration);
+
+    ExtensionModel routerOwner = currentExtension;
+    DslSyntaxResolver routerDslResolver = dsl;
+    routeDeclaration.getComponents().forEach( componentDeclaration -> {
+      create(componentDeclaration)
+        .ifPresent(componentElement -> {
+          componentElement.getConfiguration().ifPresent(routeConfiguration::withNestedComponent);
+          routeElement.containing(componentElement);
+        });
+      currentExtension = routerOwner;
+      dsl = routerDslResolver;
+    });
+
+    return routeElement.withConfig(routeConfiguration.build()).build();
   }
 
   private DslElementModel createTopLevelElement(ObjectType model, TopLevelParameterDeclaration declaration) {

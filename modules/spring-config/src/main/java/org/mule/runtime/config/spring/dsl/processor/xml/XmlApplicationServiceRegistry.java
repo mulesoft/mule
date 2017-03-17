@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
 import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
@@ -21,7 +22,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * //TODO
+ * Custom service that extends the list of {@link XmlNamespaceInfoProvider}s discovered
+ * using a {@link ServiceRegistry} with a {@link XmlNamespaceInfoProvider} providing information
+ * of the namespaces for the {@link ExtensionModel extensions} in the current context.
+ *
+ * @since 4.0
  */
 public class XmlApplicationServiceRegistry extends AbstractServiceRegistry {
 
@@ -43,6 +48,9 @@ public class XmlApplicationServiceRegistry extends AbstractServiceRegistry {
     extensionsXmlInfoProvider = new StaticXmlNamespaceInfoProvider(extensionNamespaces);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {
     Collection<T> providers = delegate.lookupProviders(providerClass, classLoader);

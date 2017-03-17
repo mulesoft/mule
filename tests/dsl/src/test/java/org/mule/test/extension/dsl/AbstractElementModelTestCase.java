@@ -19,6 +19,7 @@ import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -30,12 +31,17 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,7 +84,12 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
   @Before
   public void setup() throws Exception {
-    dslContext = DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions());
+    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
+    String core = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
+    ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
+
+    dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
+                                                  .addAll(extensions).add(coreModel).build());
     modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
@@ -181,9 +192,6 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
     DOMSource source = new DOMSource(doc);
-
-    StreamResult result = new StreamResult(new java.io.File("dslSerialization.xml"));
-    transformer.transform(source, result);
 
     StringWriter writer = new StringWriter();
     transformer.transform(source, new StreamResult(writer));

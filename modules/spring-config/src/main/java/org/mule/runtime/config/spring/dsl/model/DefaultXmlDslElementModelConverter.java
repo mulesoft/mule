@@ -12,6 +12,8 @@ import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
@@ -72,8 +74,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   @Override
   public Element asXml(DslElementModel elementModel) {
     Object model = elementModel.getModel();
-    checkArgument(model instanceof ConfigurationModel || model instanceof ComponentModel,
-                  "The element must be either a ConfigurationModel or a ComponentModel");
+    checkArgument(model instanceof ConfigurationModel || model instanceof ComponentModel || model instanceof MetadataType,
+                  "The element must be either a MetadataType, ConfigurationModel or a ComponentModel");
 
     DslElementSyntax dsl = elementModel.getDsl();
     Element componentRoot = createElement(dsl, elementModel.getConfiguration());
@@ -160,10 +162,16 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Element createElement(String name, String prefix, String namespace) {
-    doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                            "xmlns:" + prefix, namespace);
+    if (!prefix.equals(CORE_PREFIX)){
+      doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
+                                              "xmlns:" + prefix, namespace);
+      return doc.createElementNS(namespace, prefix + ":" + name);
+    } else {
+      doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
+                                              "xmlns", CORE_NAMESPACE);
+      return doc.createElementNS(CORE_NAMESPACE, name);
+    }
 
-    return doc.createElementNS(namespace, prefix + ":" + name);
   }
 
   private boolean isInfrastructure(DslElementModel elementModel) {
