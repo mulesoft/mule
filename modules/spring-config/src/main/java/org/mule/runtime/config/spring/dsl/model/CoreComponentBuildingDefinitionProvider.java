@@ -52,6 +52,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMIN
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_INCREMENT_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_STREAMING_MAX_BUFFER_SIZE;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_STREAM;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -1171,7 +1173,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
     buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("repeatable-in-memory-stream")
+        .withIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS)
         .withTypeDefinition(fromType(CursorStreamProviderFactory.class))
         .withObjectFactoryType(InMemoryCursorStreamProviderObjectFactory.class)
         .withConstructorParameterDefinition(
@@ -1192,7 +1194,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     buildingDefinitions.add(baseDefinition.copy()
-        .withIdentifier("in-memory-stream")
+        .withIdentifier(NON_REPEATABLE_STREAM)
         .withTypeDefinition(fromType(CursorStreamProviderFactory.class))
         .withObjectFactoryType(NullCursorStreamProviderObjectFactory.class)
         .build());
