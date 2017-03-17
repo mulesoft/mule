@@ -70,7 +70,7 @@
         </db:insert>
 
         <sockets:send-and-receive target="myVar">
-         <non-repeatable-stream bufferSizeIncrement="8"
+         <repeatable-in-memory-stream bufferSizeIncrement="8"
                                       bufferUnit="KB"
                                       initialBufferSize="51"
                                       maxInMemorySize="1000"/>
