@@ -551,11 +551,11 @@ class ConfigurationBasedElementModelFactory {
     switch (paramModel.getName()) {
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
-                                                        paramDsl.getNamespace());
+                                                        paramDsl.getPrefix());
 
         ComponentConfiguration config = nested.containsKey(reconnectId)
             ? nested.get(reconnectId)
-            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getNamespace()));
+            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix()));
 
         if (config != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
@@ -564,7 +564,7 @@ class ConfigurationBasedElementModelFactory {
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         ComponentConfiguration redelivery = nested.get(newIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getNamespace()));
+                                                                     paramDsl.getPrefix()));
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
         }
@@ -588,9 +588,9 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_STREAM, paramDsl.getNamespace());
-        ComponentIdentifier repeatableMemoryStream = newIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS, paramDsl.getNamespace());
-        ComponentIdentifier repeatableFileStream = newIdentifier(REPEATABLE_FILE_STORE_STREAM_ALIAS, paramDsl.getNamespace());
+        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_STREAM, paramDsl.getPrefix());
+        ComponentIdentifier repeatableMemoryStream = newIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS, paramDsl.getPrefix());
+        ComponentIdentifier repeatableFileStream = newIdentifier(REPEATABLE_FILE_STORE_STREAM_ALIAS, paramDsl.getPrefix());
 
         ComponentConfiguration streaming = null;
         if (nested.containsKey(inMemoryStream)) {

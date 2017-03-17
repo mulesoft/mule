@@ -258,8 +258,7 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
     assertElementName(wrapperElement, "client-socket-properties");
 
     DslElementModel<ObjectType> propertiesElement = getChild(wrapperElement,
-                                                             newIdentifier("tcp-client-socket-properties",
-                                                                           "http://www.mulesoft.org/schema/mule/sockets"));
+                                                             newIdentifier("tcp-client-socket-properties", "sockets"));
 
     assertElementName(propertiesElement, "tcp-client-socket-properties");
     assertThat(propertiesElement.getDsl().isWrapped(), is(true));

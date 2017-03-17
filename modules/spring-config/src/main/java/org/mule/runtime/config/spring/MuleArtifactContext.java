@@ -170,9 +170,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return new XmlConfigurationDocumentLoader();
   }
 
-  private XmlApplicationParser createApplicationParser(){
+  private XmlApplicationParser createApplicationParser() {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
-    DslResolvingContext context = extensionManager != null ? DslResolvingContext.getDefault(extensionManager.getExtensions()) : null;
+    DslResolvingContext context =
+        extensionManager != null ? DslResolvingContext.getDefault(extensionManager.getExtensions()) : null;
     return new XmlApplicationParser(new XmlApplicationServiceRegistry(serviceRegistry, context));
   }
 

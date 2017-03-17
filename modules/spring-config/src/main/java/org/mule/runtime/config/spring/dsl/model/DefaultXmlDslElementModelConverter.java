@@ -84,11 +84,12 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     return componentRoot;
   }
 
-  private String getPrefix(DslElementSyntax dsl, ComponentConfiguration configuration){
-     return configuration.getCustomAttribute(DECLARED_PREFIX).isPresent()
-       ? configuration.getCustomAttribute(DECLARED_PREFIX).get().toString()
-       : dsl.getPrefix();
+  private String getPrefix(DslElementSyntax dsl, ComponentConfiguration configuration) {
+    return configuration.getCustomAttribute(DECLARED_PREFIX).isPresent()
+        ? configuration.getCustomAttribute(DECLARED_PREFIX).get().toString()
+        : dsl.getPrefix();
   }
+
   private void writeApplicationElement(Element element, DslElementModel<?> elementModel, Element parentNode) {
 
     populateInfrastructureConfiguration(element, elementModel);
@@ -123,8 +124,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private Element createElement(DslElementSyntax dsl, Optional<ComponentConfiguration> configuration) {
     return configuration.isPresent()
-      ? createElement(dsl.getElementName(), getPrefix(dsl, configuration.get()), dsl.getNamespace())
-      : createElement(dsl);
+        ? createElement(dsl.getElementName(), getPrefix(dsl, configuration.get()), dsl.getNamespace())
+        : createElement(dsl);
   }
 
   private void setTextContentElement(Element element, DslElementModel<?> elementModel, Element parentNode) {
@@ -162,7 +163,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Element createElement(String name, String prefix, String namespace) {
-    if (!prefix.equals(CORE_PREFIX)){
+    if (!prefix.equals(CORE_PREFIX)) {
       doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
                                               "xmlns:" + prefix, namespace);
       return doc.createElementNS(namespace, prefix + ":" + name);

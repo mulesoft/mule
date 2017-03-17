@@ -6,6 +6,7 @@
  */
 package org.mule.test.extension.dsl;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newArtifact;
@@ -28,6 +29,7 @@ import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTy
 import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder.USE_SECURE_HASH;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.FlowElementDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
@@ -75,12 +77,13 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
 
     applicationDeclaration = newArtifact()
         .withGlobalParameter(db.newGlobalParameter("query")
-        .withRefName("selectQuery")
-        .withValue(newObjectValue()
-                     .withParameter("sql", "select * from PLANET where name = :name")
-                     .withParameter("inputParameters", "#[mel:['name' : payload]]")
-                     .build())
-                               .getDeclaration())
+            .withRefName("selectQuery")
+            .withValue(newObjectValue()
+                .ofType(QueryDefinition.class.getName())
+                .withParameter("sql", "select * from PLANET where name = :name")
+                .withParameter("inputParameters", "#[mel:['name' : payload]]")
+                .build())
+            .getDeclaration())
         .withConfig(db.newConfiguration("config")
             .withRefName("dbConfig")
             .withConnection(db.newConnection("derby-connection")
@@ -158,27 +161,27 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                                    .build())
                 .getDeclaration())
             .withComponent(core.newRouter("choice")
-                             .withRoute(core.newRoute("when")
-                             .withParameter("expression", "#[true]")
-                             .withComponent(db.newOperation("bulkInsert")
-                                               .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
-                                               .withParameter("parameterTypes",
-                                                              newListValue()
-                                                                .withValue(newObjectValue()
-                                                                             .withParameter("key", "name")
-                                                                             .withParameter("type", "VARCHAR").build())
-                                                                .withValue(newObjectValue()
-                                                                             .withParameter("key", "position")
-                                                                             .withParameter("type", "INTEGER").build())
-                                                                .build())
-                                               .getDeclaration())
-                                          .getDeclaration())
-                             .withRoute(core.newRoute("otherwise")
-                               .withComponent(core.newOperation("logger")
-                                 .withParameter("message", "#[payload]")
-                                                .getDeclaration())
-                                          .getDeclaration())
-                             .getDeclaration())
+                .withRoute(core.newRoute("when")
+                    .withParameter("expression", "#[true]")
+                    .withComponent(db.newOperation("bulkInsert")
+                        .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
+                        .withParameter("parameterTypes",
+                                       newListValue()
+                                           .withValue(newObjectValue()
+                                               .withParameter("key", "name")
+                                               .withParameter("type", "VARCHAR").build())
+                                           .withValue(newObjectValue()
+                                               .withParameter("key", "position")
+                                               .withParameter("type", "INTEGER").build())
+                                           .build())
+                        .getDeclaration())
+                    .getDeclaration())
+                .withRoute(core.newRoute("otherwise")
+                    .withComponent(core.newOperation("logger")
+                        .withParameter("message", "#[payload]")
+                        .getDeclaration())
+                    .getDeclaration())
+                .getDeclaration())
             .withComponent(db.newOperation("bulkInsert")
                 .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
                 .withParameter("parameterTypes",
@@ -225,11 +228,8 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
   @Test
   public void serialize() throws Exception {
     XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
-
     serializeArtifact(applicationDeclaration, converter);
-
     String serializationResult = write();
-
     compareXML(expectedAppXml, serializationResult);
   }
 
@@ -251,7 +251,7 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
     Element flow = doc.createElement("flow");
     flow.setAttribute("name", flowDeclaration.getName());
     flow.setAttribute("initialState",
-                      ((ParameterSimpleValue)flowDeclaration.getParameters().get(0).getValue()).getValue());
+                      ((ParameterSimpleValue) flowDeclaration.getParameters().get(0).getValue()).getValue());
 
     doc.getDocumentElement().appendChild(flow);
     return flow;
@@ -259,26 +259,26 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
 
   private void serializeArtifact(ArtifactDeclaration artifact, XmlDslElementModelConverter converter) {
     artifact.getGlobalParameters()
-      .forEach(declaration -> {
-        Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
-        doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
-      });
+        .forEach(declaration -> {
+          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
+          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
+        });
 
     artifact.getConfigs()
-      .forEach(declaration -> {
-        Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
-        doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
-      });
+        .forEach(declaration -> {
+          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
+          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
+        });
 
     artifact.getFlows()
-      .forEach(flowDeclaration -> {
-        Element flow = createFlowNode(flowDeclaration);
-        flowDeclaration.getComponents()
-          .forEach(component -> {
-            Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(component);
-            flow.appendChild(converter.asXml(e.orElse(null)));
-          });
-      });
+        .forEach(flowDeclaration -> {
+          Element flow = createFlowNode(flowDeclaration);
+          flowDeclaration.getComponents()
+              .forEach(component -> {
+                Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(component);
+                flow.appendChild(converter.asXml(e.orElse(null)));
+              });
+        });
   }
 
 }

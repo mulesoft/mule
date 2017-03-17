@@ -67,10 +67,10 @@ import org.w3c.dom.Element;
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final String DB_CONFIG = "dbConfig";
-  protected static final String DB_NS = "http://www.mulesoft.org/schema/mule/db";
+  protected static final String DB_NS = "db";
   protected static final String HTTP_LISTENER_CONFIG = "httpListener";
   protected static final String HTTP_REQUESTER_CONFIG = "httpRequester";
-  protected static final String HTTP_NS = "http://www.mulesoft.org/schema/mule/httpn";
+  protected static final String HTTP_NS = "httpn";
   protected static final String COMPONENTS_FLOW = "testFlow";
   protected static final int LISTENER_PATH = 0;
   protected static final int DB_BULK_INSERT_PATH = 2;
@@ -85,11 +85,12 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   @Before
   public void setup() throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    String core = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
+    String core = IOUtils
+        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
     ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
 
     dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
-                                                  .addAll(extensions).add(coreModel).build());
+        .addAll(extensions).add(coreModel).build());
     modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
@@ -171,10 +172,13 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
         .loadDocument(of(muleContext.getExtensionManager()), getConfigFile(), appIs);
 
     ConfigLine configLine = new XmlApplicationParser(
-      new XmlApplicationServiceRegistry(new SpiServiceRegistry(),
-                                        DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions())))
-        .parse(document.getDocumentElement())
-        .orElseThrow(() -> new Exception("Failed to load config"));
+                                                     new XmlApplicationServiceRegistry(new SpiServiceRegistry(),
+                                                                                       DslResolvingContext.getDefault(muleContext
+                                                                                           .getExtensionManager()
+                                                                                           .getExtensions())))
+                                                                                               .parse(document
+                                                                                                   .getDocumentElement())
+                                                                                               .orElseThrow(() -> new Exception("Failed to load config"));
 
     ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
         .addConfigFile(new ConfigFile(getConfigFile(), singletonList(configLine)))

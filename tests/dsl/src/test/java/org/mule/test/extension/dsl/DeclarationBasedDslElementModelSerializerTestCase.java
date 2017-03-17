@@ -224,10 +224,10 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
 
     artifact.getGlobalParameters()
-      .forEach(declaration -> {
-        Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
-        doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
-      });
+        .forEach(declaration -> {
+          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
+          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
+        });
 
     artifact.getConfigs()
         .forEach(declaration -> {
@@ -254,7 +254,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     Element flow = doc.createElement("flow");
     flow.setAttribute("name", flowDeclaration.getName());
     flow.setAttribute("initialState",
-                      ((ParameterSimpleValue)flowDeclaration.getParameters().get(0).getValue()).getValue());
+                      ((ParameterSimpleValue) flowDeclaration.getParameters().get(0).getValue()).getValue());
 
     doc.getDocumentElement().appendChild(flow);
     return flow;

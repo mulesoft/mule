@@ -143,7 +143,7 @@ class DeclarationBasedElementModelFactory {
         }
       }
 
-      @Override 
+      @Override
       protected void onRouter(HasOperationModels owner, RouterModel model) {
         if (equalsName.apply(model)) {
           checkArgument(declaration instanceof RouterElementDeclaration,
@@ -213,41 +213,41 @@ class DeclarationBasedElementModelFactory {
   }
 
   private DslElementModel<? extends ComponentModel> createRouterElement(RouterModel model,
-                                                                           RouterElementDeclaration routerDeclaration) {
+                                                                        RouterElementDeclaration routerDeclaration) {
     DslElementSyntax configDsl = dsl.resolve(model);
     ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
-      .withIdentifier(asIdentifier(configDsl));
+        .withIdentifier(asIdentifier(configDsl));
 
     if (routerDeclaration.getConfigRef() != null) {
       configuration.withParameter(CONFIG_ATTRIBUTE_NAME, routerDeclaration.getConfigRef());
     }
 
     DslElementModel.Builder<? extends ComponentModel> element =
-      createParameterizedElementModel(model, configDsl, routerDeclaration, configuration);
+        createParameterizedElementModel(model, configDsl, routerDeclaration, configuration);
 
     routerDeclaration.getRoutes().forEach(routeDeclaration -> model.getRouteModels().stream()
-      .filter(routeModel -> routeDeclaration.getName().equals(routeModel.getName()))
-    .findFirst()
-      .ifPresent(routeModel -> element.containing(crateRouteElement(routeModel, routeDeclaration))));
+        .filter(routeModel -> routeDeclaration.getName().equals(routeModel.getName()))
+        .findFirst()
+        .ifPresent(routeModel -> element.containing(crateRouteElement(routeModel, routeDeclaration))));
 
     return element.withConfig(configuration.build()).build();
   }
 
   private DslElementModel<? extends ComponentModel> createScopeElement(ScopeModel model,
-                                                                        ScopeElementDeclaration scopeDeclaration) {
+                                                                       ScopeElementDeclaration scopeDeclaration) {
     DslElementSyntax configDsl = dsl.resolve(model);
     ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
-      .withIdentifier(asIdentifier(configDsl));
+        .withIdentifier(asIdentifier(configDsl));
 
     if (scopeDeclaration.getConfigRef() != null) {
       configuration.withParameter(CONFIG_ATTRIBUTE_NAME, scopeDeclaration.getConfigRef());
     }
 
     DslElementModel.Builder<? extends ComponentModel> element =
-      createParameterizedElementModel(model, configDsl, scopeDeclaration, configuration);
+        createParameterizedElementModel(model, configDsl, scopeDeclaration, configuration);
 
     RouteElementDeclaration routeDeclaration = scopeDeclaration.getRoute();
-    if (routeDeclaration != null){
+    if (routeDeclaration != null) {
       element.containing(crateRouteElement(model.getRouteModel(), routeDeclaration));
     }
 
@@ -257,19 +257,19 @@ class DeclarationBasedElementModelFactory {
   private DslElementModel<? extends RouteModel> crateRouteElement(RouteModel model, RouteElementDeclaration routeDeclaration) {
     DslElementSyntax routeDsl = dsl.resolve(model);
     ComponentConfiguration.Builder routeConfiguration = ComponentConfiguration.builder()
-      .withIdentifier(asIdentifier(routeDsl));
+        .withIdentifier(asIdentifier(routeDsl));
 
     DslElementModel.Builder<? extends RouteModel> routeElement =
-      createParameterizedElementModel(model, routeDsl, routeDeclaration, routeConfiguration);
+        createParameterizedElementModel(model, routeDsl, routeDeclaration, routeConfiguration);
 
     ExtensionModel routerOwner = currentExtension;
     DslSyntaxResolver routerDslResolver = dsl;
-    routeDeclaration.getComponents().forEach( componentDeclaration -> {
+    routeDeclaration.getComponents().forEach(componentDeclaration -> {
       create(componentDeclaration)
-        .ifPresent(componentElement -> {
-          componentElement.getConfiguration().ifPresent(routeConfiguration::withNestedComponent);
-          routeElement.containing(componentElement);
-        });
+          .ifPresent(componentElement -> {
+            componentElement.getConfiguration().ifPresent(routeConfiguration::withNestedComponent);
+            routeElement.containing(componentElement);
+          });
       currentExtension = routerOwner;
       dsl = routerDslResolver;
     });
@@ -787,7 +787,7 @@ class DeclarationBasedElementModelFactory {
 
     return builder()
         .withName(fieldDsl.getElementName())
-        .withNamespace(fieldDsl.getNamespace())
+        .withNamespace(fieldDsl.getPrefix())
         .build();
   }
 
