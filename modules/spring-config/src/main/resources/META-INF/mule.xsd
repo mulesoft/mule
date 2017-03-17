@@ -5156,7 +5156,7 @@
     <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                This configurations uses an in-memory buffer to provide repeatable access to any input stream.
+                This configuration uses an in-memory buffer to provide repeatable access to any input stream.
                 It uses a buffer with an initial buffer size, which can be expanded up to a configurable threshold.
                 This is the most performant way of providing repeatable access, as long as the size of all the concurrent
                 stream contents fits into memory
@@ -5190,7 +5190,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised.
-                            A value lower or equal to zero means no limit. Defaults to zero
+                            A value lower or equal to zero means no limit. Defaults to 1024
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
