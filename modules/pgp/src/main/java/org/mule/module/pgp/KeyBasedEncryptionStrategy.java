@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKey;
 
 public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
@@ -80,8 +81,9 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
+            PGPSecretKey secretKey = this.keyManager.getSecretKey();
             StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                                                                         this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase(), provider);
+                                                                         secretKey, this.keyManager.getSecretPassphrase(), provider);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
