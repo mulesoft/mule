@@ -83,7 +83,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   private final ThreadGroup customWaitGroup = new ThreadGroup(customGroup, CUSTOM_THREADS_NAME);
 
   private final RejectedExecutionHandler byCallerThreadGroupPolicy =
-      new ByCallerThreadGroupPolicy(new HashSet<>(asList(ioGroup, customWaitGroup)), schedulerGroup);
+      new ByCallerThreadGroupPolicy(new HashSet<>(asList(ioGroup, customWaitGroup)));
 
   private ThreadPoolExecutor cpuLightExecutor;
   private ThreadPoolExecutor ioExecutor;

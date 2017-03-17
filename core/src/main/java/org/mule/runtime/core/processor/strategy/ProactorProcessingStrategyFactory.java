@@ -186,6 +186,12 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
       return scheduler -> false;
     }
 
+
+    @Override
+    public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
+      return new StreamPerEventSink(function, createOnEventConsumer());
+    }
   }
 
 }

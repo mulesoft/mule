@@ -122,8 +122,14 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
-      return new StreamPerEventSink(function, createOnEventConsumer());
+      WorkQueueProcessor<Event> processor =
+          share(ringBufferSchedulerSupplier.get(), bufferSize, waitStrategy.getReactorWaitStrategy(), false);
+      List<reactor.core.Disposable> disposables = new ArrayList<>();
+      for (int i = 0; i < subscribers; i++) {
+        disposables.add(processor.transform(function).retry().subscribe());
+      }
+      return new ReactorSink(processor.connectSink(), () -> disposables.forEach(disposable -> disposable.dispose()),
+                             createOnEventConsumer());
     }
 
     protected MuleContext getMuleContext() {
