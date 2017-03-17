@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updatesWithStruct">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select DETAILS from REGION_MANAGERS where REGION_NAME='Southwest'</db:sql>
             </db:select>
@@ -27,11 +27,11 @@
 
             <!--Obtains the UDT-->
             <set-payload value="#[mel:payload.get(0)['DETAILS']]"/>
-        </block>
+        </try>
     </flow>
 
     <flow name="updatesWithObject">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:update>
                 <db:sql>update REGION_MANAGERS set DETAILS = :details where REGION_NAME = 'Northwest'</db:sql>
                 <db:parameter-types>
@@ -48,6 +48,6 @@
 
             <!--Obtains the UDT-->
             <set-payload value="#[mel:payload.get(0)['DETAILS']]"/>
-        </block>
+        </try>
     </flow>
 </mule>

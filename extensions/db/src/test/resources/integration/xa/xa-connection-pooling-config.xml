@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="defaultQueryRequestResponse">
-        <block transactionType="XA" transactionalAction="ALWAYS_BEGIN">
+        <try transactionType="XA" transactionalAction="ALWAYS_BEGIN">
             <db:select config-ref="pooledJdbcConfig" maxRows="2">
                 <db:sql>select * from PLANET order by ID</db:sql>
             </db:select>
@@ -17,6 +17,6 @@
             <db:delete config-ref="pooledJdbcConfig" transactionalAction="NOT_SUPPORTED">
                 <db:sql>delete from PLANET where id = #[mel:payload.id]</db:sql>
             </db:delete>
-        </block>
+        </try>
     </flow>
 </mule>

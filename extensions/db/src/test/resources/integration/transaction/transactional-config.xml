@@ -17,18 +17,18 @@
     </flow>
 
     <flow name="commitAnOptionalTxUpdateIsANonTxBlock">
-        <block transactionalAction="INDIFFERENT">
+        <try transactionalAction="INDIFFERENT">
             <db:update transactionalAction="JOIN_IF_POSSIBLE">
                 <db:sql>
                     update PLANET set NAME='Mercury' where POSITION=4
                 </db:sql>
             </db:update>
             <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
-        </block>
+        </try>
     </flow>
 
     <flow name="commitNonTxUpdateInATxBlock">
-        <block transactionalAction="BEGIN_OR_JOIN">
+        <try transactionalAction="BEGIN_OR_JOIN">
             <db:update transactionalAction="NOT_SUPPORTED">
                 <db:sql>
                     update PLANET set NAME='Mercury' where POSITION=4
@@ -36,28 +36,28 @@
             </db:update>
 
             <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
-        </block>
+        </try>
     </flow>
 
     <flow name="rollbackTxUpdateInATxBlock">
-        <block transactionalAction="BEGIN_OR_JOIN">
+        <try transactionalAction="BEGIN_OR_JOIN">
             <db:update config-ref="dbConfig" transactionalAction="ALWAYS_JOIN">
                 <db:sql>
                     update PLANET set NAME='Earth' where POSITION=4
                 </db:sql>
             </db:update>
             <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
-        </block>
+        </try>
     </flow>
 
     <flow name="rollbackOptionalTxUpdateInATxBlock">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:update transactionalAction="JOIN_IF_POSSIBLE">
                 <db:sql>
                     update PLANET set NAME='Mercury' where POSITION=4
                 </db:sql>
             </db:update>
             <test:component throwException="true" exceptionToThrow="java.lang.IllegalStateException"/>
-        </block>
+        </try>
     </flow>
 </mule>

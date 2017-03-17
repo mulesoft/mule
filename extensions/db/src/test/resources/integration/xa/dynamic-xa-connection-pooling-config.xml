@@ -7,7 +7,7 @@
 
     <flow name="defaultQueryRequestResponse">
         <set-variable variableName="derbyDb" value="target/muleEmbeddedDB"/>
-        <block transactionType="XA" transactionalAction="ALWAYS_BEGIN">
+        <try transactionType="XA" transactionalAction="ALWAYS_BEGIN">
             <db:select config-ref="pooledJdbcConfig" maxRows="2">
                 <db:sql>select * from PLANET order by ID</db:sql>
             </db:select>
@@ -18,6 +18,6 @@
             <db:delete config-ref="pooledJdbcConfig" transactionalAction="NOT_SUPPORTED">
                 <db:sql>delete from PLANET where id = #[mel:payload.id]</db:sql>
             </db:delete>
-        </block>
+        </try>
     </flow>
 </mule>

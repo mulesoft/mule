@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="returnsDefaultArray">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select * from regions</db:sql>
             </db:select>
@@ -17,12 +17,12 @@
                     payload.put("ZIPS", payload.get("ZIPS").getArray())
                 </expression-component>
             </foreach>
-        </block>
+        </try>
 
     </flow>
 
     <flow name="returnsCustomArray">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select * from contacts</db:sql>
             </db:select>
@@ -33,6 +33,6 @@
                     payload.put("DETAILS", payload.get("DETAILS").getArray())
                 </expression-component>
             </foreach>
-        </block>
+        </try>
     </flow>
 </mule>

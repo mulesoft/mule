@@ -20,11 +20,11 @@
     </flow>
 
     <flow name="transactionNotResolvedAfterException">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <flow-ref name="blockWithOwnExceptionStrategy"/>
             <custom-processor
                     class="org.mule.test.integration.exceptions.OnErrorContinueFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
-        </block>
+        </try>
     </flow>
 
 </mule>

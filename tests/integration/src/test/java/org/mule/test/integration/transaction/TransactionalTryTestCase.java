@@ -19,11 +19,11 @@ import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
-public class TransactionalBlockTestCase extends AbstractIntegrationTestCase {
+public class TransactionalTryTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "transactional-block-config.xml";
+    return "transactional-try-config.xml";
   }
 
   @Test

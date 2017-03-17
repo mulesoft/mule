@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="queryAndJoin" processingStrategy="synchronous">
-        <block transactionalAction="ALWAYS_BEGIN">
+        <try transactionalAction="ALWAYS_BEGIN">
             <db:delete config-ref="pooledJdbcConfig">
                 <db:sql>delete from PLANET</db:sql>
             </db:delete>
@@ -18,6 +18,6 @@
                     <component class="org.mule.extension.db.integration.connectivity.DataSourcePoolingTestCase$JoinRequests"/>
                 </on-error-continue>
             </error-handler>
-        </block>
+        </try>
     </flow>
 </mule>
