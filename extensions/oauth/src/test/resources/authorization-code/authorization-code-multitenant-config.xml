@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
-    <oauth:token-manager-config name="multitenantConfig"/>
+    <oauth:token-manager-config name="tokenManagerConfig"/>
 
     <httpn:request-config name="requestConfig">
         <httpn:request-connection>
@@ -19,7 +19,7 @@
                         localCallbackUrl="${local.callback.url}"
                         externalCallbackUrl="${local.callback.url}"
                         localAuthorizationUrlResourceOwnerId="#[attributes.queryParams.userId]"
-                        tokenManager="multitenantConfig"
+                        tokenManager="tokenManagerConfig"
                         state="#[attributes.queryParams.state when attributes.queryParams != null otherwise '']"
                         localAuthorizationUrl="${local.authorization.url}"
                         authorizationUrl="${authorization.url}"

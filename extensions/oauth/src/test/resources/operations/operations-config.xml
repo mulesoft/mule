@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
+
+    <flow name="accessTokenFlow">
+        <oauth:access-token tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    </flow>
+
+    <flow name="refreshTokenFlow">
+        <oauth:refresh-token tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    </flow>
+
+    <flow name="expiresInFlow">
+        <oauth:expires-in tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    </flow>
+
+    <flow name="stateFlow">
+        <oauth:state tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    </flow>
+
+    <flow name="customTokenResponseParamFlow">
+        <oauth:custom-token-response-param tokenManager="tokenManagerConfig" key="#[variables.key]"/>
+    </flow>
+
+</mule>

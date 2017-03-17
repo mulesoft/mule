@@ -33,8 +33,8 @@ public abstract class AbstractClientCredentialsBasicTestCase extends AbstractOAu
       new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
 
   @Override
-  protected String getConfigFile() {
-    return "client-credentials/client-credentials-minimal-config.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {"client-credentials/client-credentials-minimal-config.xml", "operations/operations-config.xml"};
   }
 
   @Override
