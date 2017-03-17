@@ -55,7 +55,7 @@
         </error-handler>
     </flow>
 
-    <flow name="flowWithBlockWithErrorHandler">
+    <flow name="flowWithTryWithErrorHandler">
         <try>
             <test:component throwException="true" />
             <error-handler>

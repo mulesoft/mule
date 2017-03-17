@@ -96,7 +96,7 @@ public class ErrorHandlingConfigurationFailuresTestCase extends AbstractMuleTest
 
   @Test(expected = InitialisationException.class)
   public void xaTransactionalBlockNotAllowed() throws Exception {
-    loadConfiguration("org/mule/test/integration/transaction/xa-transactional-block-config.xml");
+    loadConfiguration("org/mule/test/integration/transaction/xa-transactional-try-config.xml");
   }
 
   @Test(expected = InitialisationException.class)

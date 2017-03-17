@@ -71,8 +71,8 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
                                                                                            CONFIG_FILE_NAME,
                                                                                            of(37))));
   private static final DefaultComponentLocation FLOW_WITH_BLOCK_WITH_ERROR_HANDLER =
-      new DefaultComponentLocation(of("flowWithBlockWithErrorHandler"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithBlockWithErrorHandler",
+      new DefaultComponentLocation(of("flowWithTryWithErrorHandler"),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithTryWithErrorHandler",
                                                                                            FLOW_TYPED_COMPONENT_IDENTIFIER,
                                                                                            CONFIG_FILE_NAME,
                                                                                            of(58))));
@@ -157,8 +157,8 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
       of(builder().withIdentifier(buildFromStringRepresentation("test:component")).withType(PROCESSOR).build());
   private static final Optional<TypedComponentIdentifier> ON_ERROR_PROPAGATE =
       of(builder().withIdentifier(buildFromStringRepresentation("mule:on-error-propagate")).withType(ON_ERROR).build());
-  private static final Optional<TypedComponentIdentifier> BLOCK =
-      of(builder().withIdentifier(buildFromStringRepresentation("mule:block")).withType(INTERCEPTING).build());
+  private static final Optional<TypedComponentIdentifier> TRY =
+      of(builder().withIdentifier(buildFromStringRepresentation("mule:try")).withType(PROCESSOR).build());
   private static final Optional<TypedComponentIdentifier> VALIDATION_IS_TRUE =
       of(builder().withIdentifier(buildFromStringRepresentation("validation:is-true")).withType(PROCESSOR).build());
   private static final Optional<TypedComponentIdentifier> SKELETON_SOURCE =
@@ -236,13 +236,13 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
         .appendLocationPart("errorHandler", ERROR_HANDLER, CONFIG_FILE_NAME, of(46))
         .appendLocationPart("1", ON_ERROR_PROPAGATE, CONFIG_FILE_NAME, of(50))
         .appendProcessorsPart()
-        .appendLocationPart("0", BLOCK, CONFIG_FILE_NAME, of(51)));
+        .appendLocationPart("0", TRY, CONFIG_FILE_NAME, of(51)));
     assertNextProcessorLocationIs(FLOW_WITH_ERROR_HANDLER
         .appendLocationPart("errorHandler", ERROR_HANDLER, CONFIG_FILE_NAME, of(46))
         .appendLocationPart("1", ON_ERROR_PROPAGATE, CONFIG_FILE_NAME,
                             of(50))
         .appendProcessorsPart()
-        .appendLocationPart("0", BLOCK, CONFIG_FILE_NAME, of(51))
+        .appendLocationPart("0", TRY, CONFIG_FILE_NAME, of(51))
         .appendProcessorsPart()
         .appendLocationPart("0", VALIDATION_IS_TRUE, CONFIG_FILE_NAME, of(52)));
     assertNoNextProcessorNotification();
@@ -250,10 +250,10 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
 
   @Test
   public void flowWithBlockWithErrorHandler() throws Exception {
-    flowRunner("flowWithBlockWithErrorHandler").run();
+    flowRunner("flowWithTryWithErrorHandler").run();
     DefaultComponentLocation blockLocation =
         FLOW_WITH_BLOCK_WITH_ERROR_HANDLER.appendLocationPart("processors", empty(), empty(), empty())
-            .appendLocationPart("0", BLOCK, CONFIG_FILE_NAME, of(59));
+            .appendLocationPart("0", TRY, CONFIG_FILE_NAME, of(59));
     assertNextProcessorLocationIs(blockLocation);
     assertNextProcessorLocationIs(blockLocation
         .appendProcessorsPart()
