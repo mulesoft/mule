@@ -572,7 +572,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        // TODO: switch to EE namespace
+        // TODO MULE-12001: switch to EE namespace
         findAnyMatchingChildById(declaredConfigs,
                                  REPEATABLE_FILE_STORE_STREAM_ALIAS, REPEATABLE_IN_MEMORY_STREAM_ALIAS, NON_REPEATABLE_STREAM)
                                      .ifPresent(config -> {
