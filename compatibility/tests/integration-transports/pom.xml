@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-compatibility-tests</artifactId>
-        <version>4.0.0-M5</version>
+        <version>4.0.0-M5-RC-SNAPSHOT</version>
     </parent>
     <artifactId>mule-tests-integration-transports</artifactId>
     <name>Integration Tests for Transports</name>

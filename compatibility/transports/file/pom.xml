@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>4.0.0-M5</version>
+        <version>4.0.0-M5-RC-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-file</artifactId>
     <packaging>jar</packaging>
