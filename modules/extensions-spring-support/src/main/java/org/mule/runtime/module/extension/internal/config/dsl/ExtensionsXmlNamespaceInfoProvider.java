@@ -24,9 +24,6 @@ import javax.inject.Inject;
  */
 public class ExtensionsXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
-  @Inject
-  private MuleContext context;
-
   @Override
   public Collection<XmlNamespaceInfo> getXmlNamespacesInfo() {
     return asList(new ExtensionXmlNamespaceInfo());

@@ -24,7 +24,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-// TODO MULE-11496 Delete this configuration once everything has  an ExtensionModel and can be represented with
+// TODO MULE-11496 Delete this configuration once everything has an ExtensionModel and can be represented with
 // ComponentDeclaration
 public class ComponentConfiguration {
 
