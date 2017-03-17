@@ -5,13 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.extension.internal.xml;
+package org.mule.runtime.config.spring.dsl.api.xml;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.DEFAULT_SCHEMA_LOCATION_MASK;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_NAMESPACE_SCHEMA_LOCATION;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 
 import javax.xml.namespace.QName;
 
@@ -24,22 +24,23 @@ public final class SchemaConstants {
       "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
   public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
 
-  public static final String MULE_EXTENSION_NAMESPACE = format(DEFAULT_SCHEMA_LOCATION_MASK, "extension");
+  public static final String MULE_EXTENSION_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "extension");
   public static final String MULE_EXTENSION_PREFIX = "extension";
   public static final String MULE_EXTENSION_SCHEMA_LOCATION =
       "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
 
-  public static final String MULE_TLS_NAMESPACE = format(DEFAULT_SCHEMA_LOCATION_MASK, "tls");
+  public static final String MULE_TLS_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "tls");
   public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
   public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
   public static final String GROUP_SUFFIX = "-group";
 
+
   public static final QName MULE_ABSTRACT_MESSAGE_SOURCE_TYPE =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstractMessageSourceType", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "abstractMessageSourceType", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_EXTENSION =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-extension", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "abstract-extension", CORE_PREFIX);
   public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "propertyPlaceholderType", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "propertyPlaceholderType", CORE_PREFIX);
   public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT =
       new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProvider", MULE_EXTENSION_PREFIX);
   public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE =
@@ -49,38 +50,38 @@ public final class SchemaConstants {
   public static final QName MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE =
       new QName(MULE_EXTENSION_NAMESPACE, "operationTransactionalActionType", MULE_EXTENSION_PREFIX);
   public static final QName MULE_ABSTRACT_EXTENSION_TYPE =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstractExtensionType", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "abstractExtensionType", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_OPERATOR =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-operator", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "abstract-operator", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_OPERATOR_TYPE =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstractOperatorType", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "abstractOperatorType", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_MESSAGE_SOURCE =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "abstract-message-source", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "abstract-message-source", CORE_PREFIX);
   public static final QName MULE_MESSAGE_PROCESSOR_TYPE =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "messageProcessorOrMixedContentMessageProcessor", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "messageProcessorOrMixedContentMessageProcessor", CORE_PREFIX);
   public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, TLS_CONTEXT_ELEMENT_IDENTIFIER, "tls");
 
   // TYPES
-  public static final QName SUBSTITUTABLE_INT = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableInt", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_LONG = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableLong", MULE_PREFIX);
+  public static final QName SUBSTITUTABLE_INT = new QName(CORE_NAMESPACE, "substitutableInt", CORE_PREFIX);
+  public static final QName SUBSTITUTABLE_LONG = new QName(CORE_NAMESPACE, "substitutableLong", CORE_PREFIX);
   public static final QName SUBSTITUTABLE_BOOLEAN =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableBoolean", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "substitutableBoolean", CORE_PREFIX);
   public static final QName SUBSTITUTABLE_DECIMAL =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableDecimal", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "substitutableDecimal", CORE_PREFIX);
   public static final QName SUBSTITUTABLE_DATE_TIME =
-      new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableDateTime", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_NAME = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "substitutableName", MULE_PREFIX);
-  public static final QName SUBSTITUTABLE_MAP = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "mapType", MULE_PREFIX);
+      new QName(CORE_NAMESPACE, "substitutableDateTime", CORE_PREFIX);
+  public static final QName SUBSTITUTABLE_NAME = new QName(CORE_NAMESPACE, "substitutableName", CORE_PREFIX);
+  public static final QName SUBSTITUTABLE_MAP = new QName(CORE_NAMESPACE, "mapType", CORE_PREFIX);
   public static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
-  public static final QName EXPRESSION_STRING = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionString", MULE_PREFIX);
-  public static final QName EXPRESSION_LONG = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionLong", MULE_PREFIX);
-  public static final QName EXPRESSION_BOOLEAN = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionBoolean", MULE_PREFIX);
-  public static final QName EXPRESSION_INTEGER = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionInt", MULE_PREFIX);
-  public static final QName EXPRESSION_DOUBLE = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionDouble", MULE_PREFIX);
-  public static final QName EXPRESSION_DECIMAL = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionDecimal", MULE_PREFIX);
-  public static final QName EXPRESSION_LIST = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionList", MULE_PREFIX);
-  public static final QName EXPRESSION_MAP = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionMap", MULE_PREFIX);
-  public static final QName EXPRESSION_DATE_TIME = new QName(MULE_NAMESPACE_SCHEMA_LOCATION, "expressionDateTime", MULE_PREFIX);
+  public static final QName EXPRESSION_STRING = new QName(CORE_NAMESPACE, "expressionString", CORE_PREFIX);
+  public static final QName EXPRESSION_LONG = new QName(CORE_NAMESPACE, "expressionLong", CORE_PREFIX);
+  public static final QName EXPRESSION_BOOLEAN = new QName(CORE_NAMESPACE, "expressionBoolean", CORE_PREFIX);
+  public static final QName EXPRESSION_INTEGER = new QName(CORE_NAMESPACE, "expressionInt", CORE_PREFIX);
+  public static final QName EXPRESSION_DOUBLE = new QName(CORE_NAMESPACE, "expressionDouble", CORE_PREFIX);
+  public static final QName EXPRESSION_DECIMAL = new QName(CORE_NAMESPACE, "expressionDecimal", CORE_PREFIX);
+  public static final QName EXPRESSION_LIST = new QName(CORE_NAMESPACE, "expressionList", CORE_PREFIX);
+  public static final QName EXPRESSION_MAP = new QName(CORE_NAMESPACE, "expressionMap", CORE_PREFIX);
+  public static final QName EXPRESSION_DATE_TIME = new QName(CORE_NAMESPACE, "expressionDateTime", CORE_PREFIX);
 
   // ATTRIBUTES
   public static final String USE_REQUIRED = "required";

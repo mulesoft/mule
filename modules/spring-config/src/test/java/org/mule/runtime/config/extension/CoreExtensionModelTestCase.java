@@ -12,7 +12,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -88,7 +88,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void consistentWithSchema() {
-    assertThat(coreExtensionModel.getXmlDslModel().getPrefix(), is(CORE_NAMESPACE));
+    assertThat(coreExtensionModel.getXmlDslModel().getPrefix(), is(CORE_PREFIX));
     assertThat(coreExtensionModel.getXmlDslModel().getNamespace(), is("http://www.mulesoft.org/schema/mule/core"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaLocation(),
                is("http://www.mulesoft.org/schema/mule/current/mule.xsd"));

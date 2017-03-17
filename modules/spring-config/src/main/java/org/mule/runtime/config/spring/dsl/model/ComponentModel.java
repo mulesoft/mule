@@ -9,11 +9,9 @@ package org.mule.runtime.config.spring.dsl.model;
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -26,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
@@ -55,7 +52,6 @@ public class ComponentModel {
   private Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
   private ComponentModel parent;
-  private Map<String, Object> annotations = new HashedMap();
   private List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
   private DefaultComponentLocation componentLocation;
@@ -231,21 +227,15 @@ public class ComponentModel {
     return this.schemaValueParameter.contains(parameterName);
   }
 
-  public Map<String, Object> getAnnotations() {
-    return unmodifiableMap(annotations);
-  }
-
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
   public ComponentConfiguration getConfiguration() {
     ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
-        .withIdentifier(builder()
-            .withName(this.getIdentifier().getName())
-            .withNamespace((String) this.getCustomAttributes().get(XmlCustomAttributeHandler.NAMESPACE_URI))
-            .build())
+        .withIdentifier(this.getIdentifier())
         .withValue(textContent);
 
     parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
+    customAttributes.forEach(builder::addCustomAttribute);
 
     return builder.build();
   }

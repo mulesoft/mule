@@ -7,7 +7,6 @@
 package org.mule.runtime.core.exception;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -79,7 +78,7 @@ public class ErrorTypeLocator {
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier,
                                             Class<? extends Throwable> exception) {
     ExceptionMapper exceptionMapper =
-        componentExceptionMappers.get(buildFromStringRepresentation(componentIdentifier.toString()));
+        componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
       errorType = exceptionMapper.resolveErrorType(exception);

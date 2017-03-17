@@ -28,6 +28,7 @@ import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -151,13 +152,16 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
   // Scaffolding
   protected ApplicationModel loadApplicationModel() throws Exception {
+
     InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(getConfigFile());
     checkArgument(appIs != null, "The given application was not found as resource");
 
     Document document = new XmlConfigurationDocumentLoader()
         .loadDocument(of(muleContext.getExtensionManager()), getConfigFile(), appIs);
 
-    ConfigLine configLine = new XmlApplicationParser(new SpiServiceRegistry())
+    ConfigLine configLine = new XmlApplicationParser(
+      new XmlApplicationServiceRegistry(new SpiServiceRegistry(),
+                                        DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions())))
         .parse(document.getDocumentElement())
         .orElseThrow(() -> new Exception("Failed to load config"));
 
@@ -177,6 +181,9 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
     DOMSource source = new DOMSource(doc);
+
+    StreamResult result = new StreamResult(new java.io.File("dslSerialization.xml"));
+    transformer.transform(source, result);
 
     StringWriter writer = new StringWriter();
     transformer.transform(source, new StreamResult(writer));

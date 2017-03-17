@@ -8,7 +8,6 @@ package org.mule.runtime.config.spring.dsl.processor.xml;
 
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 
 import org.w3c.dom.Node;
 
@@ -19,6 +18,7 @@ import org.w3c.dom.Node;
  */
 public class XmlCustomAttributeHandler {
 
+  public static final String DECLARED_PREFIX = "DECLARED_PREFIX";
   public static final String NAMESPACE_URI = "NAMESPACE_URI";
   public static final String XML_NODE = "XML_NODE";
   public static final String LINE_NUMBER = "LINE_NUMBER";
@@ -67,9 +67,16 @@ public class XmlCustomAttributeHandler {
     }
 
     public ConfigLineCustomAttributeStore addNode(Node node) {
+      addCustomAttributes(node);
+      return this;
+    }
+
+    private void addCustomAttributes(Node node) {
       this.builder.addCustomAttribute(XML_NODE, node);
       this.builder.addCustomAttribute(NAMESPACE_URI, node.getNamespaceURI());
-      return this;
+      if (node.getPrefix() != null) {
+        this.builder.addCustomAttribute(DECLARED_PREFIX, node.getPrefix());
+      }
     }
   }
 
@@ -102,6 +109,10 @@ public class XmlCustomAttributeHandler {
     public ComponentCustomAttributeStore addNode(Node node) {
       this.builder.addCustomAttribute(XML_NODE, node);
       this.builder.addCustomAttribute(NAMESPACE_URI, node.getNamespaceURI());
+      this.builder.addCustomAttribute(NAMESPACE_URI, node.getNamespaceURI());
+      if (node.getPrefix() != null) {
+        this.builder.addCustomAttribute(DECLARED_PREFIX, node.getPrefix());
+      }
       return this;
     }
 

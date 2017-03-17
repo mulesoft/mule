@@ -24,7 +24,7 @@ public interface XmlNamespaceInfoProvider {
    * Most likely, hand made extensions will return a single value since they only provide support for a namespace but for other
    * scenarios, like extensions build with the SDK, it may provide several values.
    *
-   * @return a collection of {@code XmlNamespaceInfo} with the relation between a namesapce and it's namespace URI in XML.
+   * @return a collection of {@code XmlNamespaceInfo} with the relation between a prefix and it's namespace URI in XML.
    */
   Collection<XmlNamespaceInfo> getXmlNamespacesInfo();
 

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
@@ -53,7 +53,7 @@ public class OperationErrorHandlingTestCase extends ExtensionFunctionalTestCase 
   @Test
   public void unrecognizedExceptionIsUnknown() throws Exception {
     expectedError
-        .expectErrorType(CORE_NAMESPACE.toUpperCase(), UNKNOWN_ERROR_IDENTIFIER)
+        .expectErrorType(CORE_PREFIX.toUpperCase(), UNKNOWN_ERROR_IDENTIFIER)
         .expectCause(instanceOf(HeisenbergException.class));
     flowRunner("unrecognizedException").run();
   }

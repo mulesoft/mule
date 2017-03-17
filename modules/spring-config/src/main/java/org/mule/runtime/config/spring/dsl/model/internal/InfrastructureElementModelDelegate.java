@@ -9,12 +9,6 @@ package org.mule.runtime.config.spring.dsl.model.internal;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.INFRASTRUCTURE_PARAMETER_NAMES;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
@@ -23,6 +17,13 @@ import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLIC
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
@@ -77,14 +78,12 @@ class InfrastructureElementModelDelegate {
         declaration.getValue().accept(new ParameterValueVisitor() {
 
           @Override
-          public void visitSimpleValue(String value) {
-            parentConfig.withParameter(declaration.getName(), value);
-            parentElement.containing(DslElementModel.builder()
-                .withModel(parameterModel)
-                .withDsl(paramDsl)
-                .withValue(value)
-                .build());
-          }
+          public void visitSimpleValue(String value) { parentConfig.withParameter(declaration.getName(), value);
+        parentElement.containing(DslElementModel.builder()
+            .withModel(parameterModel)
+            .withDsl(paramDsl)
+            .withValue(value)
+                .build());}
         });
     }
   }
@@ -111,7 +110,7 @@ class InfrastructureElementModelDelegate {
 
         ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
             .withIdentifier(builder()
-                .withNamespace("tls")
+                .withNamespace(TLS_PREFIX)
                 .withName(TLS_CONTEXT_ELEMENT_IDENTIFIER)
                 .build());
 
@@ -127,7 +126,7 @@ class InfrastructureElementModelDelegate {
               public void visitObjectValue(ParameterObjectValue objectValue) {
                 ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
                     .withIdentifier(builder()
-                        .withNamespace("tls")
+                        .withNamespace(TLS_PREFIX)
                         .withName(name)
                         .build());
 
@@ -175,7 +174,7 @@ class InfrastructureElementModelDelegate {
 
     ComponentConfiguration.Builder redeliveryConfig = ComponentConfiguration.builder()
         .withIdentifier(builder()
-            .withNamespace(CORE_NAMESPACE)
+            .withNamespace(CORE_PREFIX)
             .withName(elementName)
             .build());
 

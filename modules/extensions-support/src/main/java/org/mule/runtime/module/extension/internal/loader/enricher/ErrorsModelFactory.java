@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.ANY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  */
 class ErrorsModelFactory {
 
-  private static final String MULE = CORE_NAMESPACE.toUpperCase();
+  private static final String MULE = CORE_PREFIX.toUpperCase();
   private final String extensionNamespace;
   private final Map<String, ErrorModel> errorModelMap;
 

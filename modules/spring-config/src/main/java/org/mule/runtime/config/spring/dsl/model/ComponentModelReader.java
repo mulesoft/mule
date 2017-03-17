@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
@@ -41,9 +41,11 @@ public class ComponentModelReader {
 
   public ComponentModel extractComponentDefinitionModel(ConfigLine configLine, String configFileName) {
 
-    String namespace = configLine.getNamespace() == null ? CORE_NAMESPACE : configLine.getNamespace();
+    String namespace = configLine.getNamespace() == null ? CORE_PREFIX : configLine.getNamespace();
     ComponentModel.Builder builder = new ComponentModel.Builder()
-        .setIdentifier(builder().withNamespace(namespace).withName(configLine.getIdentifier())
+        .setIdentifier(builder()
+            .withNamespace(namespace)
+            .withName(configLine.getIdentifier())
             .build())
         .setTextContent(configLine.getTextContent())
         .setConfigFileName(configFileName)

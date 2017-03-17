@@ -12,10 +12,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -245,7 +245,6 @@ class DeclarationBasedElementModelFactory {
         .flatMap(g -> g.getParameterModels().stream())
         .collect(toList());
 
-
     List<ParameterModel> nonGroupedParameters = model.getAllParameterModels().stream()
         .filter(p -> !inlineGroupedParameters.contains(p))
         .collect(toList());
@@ -285,7 +284,7 @@ class DeclarationBasedElementModelFactory {
           .collect(joining(","));
 
       throw new IllegalArgumentException(
-                                         format("The parameter%s [%s] were declared but they do not exist in the associated model",
+                                         format("The parameters [%s] were declared but they do not exist in the associated model",
                                                 missing));
     }
   }

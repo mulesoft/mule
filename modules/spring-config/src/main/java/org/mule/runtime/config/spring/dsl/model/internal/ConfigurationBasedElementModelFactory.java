@@ -13,11 +13,11 @@ import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -90,7 +90,7 @@ class ConfigurationBasedElementModelFactory {
 
     Optional<Map.Entry<ExtensionModel, DslSyntaxResolver>> entry =
         resolvers.entrySet().stream()
-            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getNamespace()))
+            .filter(e -> e.getKey().getXmlDslModel().getPrefix().equals(identifier.getNamespace()))
             .findFirst();
 
     if (!entry.isPresent()) {
@@ -536,7 +536,7 @@ class ConfigurationBasedElementModelFactory {
     if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
       return Optional.of(builder()
           .withName(dsl.getElementName())
-          .withNamespace(dsl.getNamespace())
+          .withNamespace(dsl.getPrefix())
           .build());
     }
 

@@ -11,7 +11,7 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_CONTEXT_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLineProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -139,7 +139,7 @@ public class XmlApplicationParser {
   }
 
   private String parseNamespace(Node node) {
-    String namespace = CORE_NAMESPACE;
+    String namespace = CORE_PREFIX;
     if (node.getNodeType() != Node.CDATA_SECTION_NODE) {
       namespace = getNormalizedNamespace(node.getNamespaceURI(), node.getPrefix());
       if (namespace.equals(UNDEFINED_NAMESPACE)) {

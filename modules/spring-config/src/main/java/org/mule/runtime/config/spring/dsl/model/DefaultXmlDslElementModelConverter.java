@@ -10,14 +10,15 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.api.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -75,16 +76,17 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
                   "The element must be either a ConfigurationModel or a ComponentModel");
 
     DslElementSyntax dsl = elementModel.getDsl();
-    Element componentRoot = createElement(dsl);
-    if (!elementModel.getConfiguration().isPresent()) {
-      writeDslStructure(componentRoot, dsl);
-    } else {
-      writeApplicationElement(componentRoot, elementModel, componentRoot);
-    }
+    Element componentRoot = createElement(dsl, elementModel.getConfiguration());
+    writeApplicationElement(componentRoot, elementModel, componentRoot);
 
     return componentRoot;
   }
 
+  private String getPrefix(DslElementSyntax dsl, ComponentConfiguration configuration){
+     return configuration.getCustomAttribute(DECLARED_PREFIX).isPresent()
+       ? configuration.getCustomAttribute(DECLARED_PREFIX).get().toString()
+       : dsl.getPrefix();
+  }
   private void writeApplicationElement(Element element, DslElementModel<?> elementModel, Element parentNode) {
 
     populateInfrastructureConfiguration(element, elementModel);
@@ -107,7 +109,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
           }
 
           if (!configured.get() && innerDsl.supportsChildDeclaration()) {
-            Element childElement = createElement(innerDsl);
+            Element childElement = createElement(innerDsl, inner.getConfiguration());
             writeApplicationElement(childElement, inner, element);
           }
         });
@@ -115,6 +117,12 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     if (parentNode != element) {
       parentNode.appendChild(element);
     }
+  }
+
+  private Element createElement(DslElementSyntax dsl, Optional<ComponentConfiguration> configuration) {
+    return configuration.isPresent()
+      ? createElement(dsl.getElementName(), getPrefix(dsl, configuration.get()), dsl.getNamespace())
+      : createElement(dsl);
   }
 
   private void setTextContentElement(Element element, DslElementModel<?> elementModel, Element parentNode) {
@@ -147,26 +155,15 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     return ExtensionModelUtils.getDefaultValue(name, (MetadataType) model);
   }
 
-  private Element writeDslStructure(Element element, DslElementSyntax dsl) {
-    dsl.getAttributes().forEach(a -> element.setAttribute(a.getAttributeName(), ""));
-    dsl.getChilds().forEach(current -> {
-      Element childElement = createElement(current);
-      element.appendChild(writeDslStructure(childElement, current));
-    });
-
-    dsl.getGenerics().forEach((type, generic) -> {
-      Element childElement = createElement(generic);
-      element.appendChild(writeDslStructure(childElement, generic));
-    });
-
-    return element;
+  private Element createElement(DslElementSyntax dsl) {
+    return createElement(dsl.getElementName(), dsl.getPrefix(), dsl.getNamespace());
   }
 
-  private Element createElement(DslElementSyntax dsl) {
+  private Element createElement(String name, String prefix, String namespace) {
     doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                            "xmlns:" + dsl.getPrefix(), dsl.getNamespace());
+                                            "xmlns:" + prefix, namespace);
 
-    return doc.createElementNS(dsl.getNamespace(), dsl.getPrefix() + ":" + dsl.getElementName());
+    return doc.createElementNS(namespace, prefix + ":" + name);
   }
 
   private boolean isInfrastructure(DslElementModel elementModel) {

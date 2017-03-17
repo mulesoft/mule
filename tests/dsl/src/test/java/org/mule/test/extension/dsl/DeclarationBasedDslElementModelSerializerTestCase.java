@@ -12,6 +12,8 @@ import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newLis
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -28,7 +30,9 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.c
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.FlowElementDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
+import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.config.spring.dsl.api.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
 
@@ -70,7 +74,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
         .withConfig(db.newConfiguration("config")
             .withRefName("dbConfig")
             .withConnection(db.newConnection("derby-connection")
-                .withParameter("poolingProfile", newObjectValue()
+                .withParameter(POOLING_PROFILE_PARAMETER_NAME, newObjectValue()
                     .withParameter("maxPoolSize", "10")
                     .build())
                 .withParameter("connectionProperties", newObjectValue()
@@ -122,7 +126,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                 .getDeclaration())
             .getDeclaration())
         .withFlow(newFlow("testFlow")
-            .withInitialState("stopped")
+            .withParameter("initialState", "stopped")
             .withComponent(http.newSource("listener")
                 .withConfig("httpListener")
                 .withParameter("path", "testBuilder")
@@ -211,10 +215,38 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     compareXML(expectedAppXml, serializationResult);
   }
 
+  @Test
+  public void loadAndserialize() throws Exception {
+
+    ArtifactDeclaration artifact = XmlArtifactDeclarationLoader.getDefault(dslContext).load("integration-multi-config-dsl-app.xml");
+    XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
+
+    artifact.getConfigs()
+        .forEach(declaration -> {
+          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
+          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
+        });
+
+    artifact.getFlows()
+        .forEach(flowDeclaration -> {
+          Element flow = createFlowNode(flowDeclaration);
+          flowDeclaration.getComponents()
+              .forEach(component -> {
+                Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(component);
+                flow.appendChild(converter.asXml(e.orElse(null)));
+              });
+        });
+
+    String serializationResult = write();
+
+    compareXML(expectedAppXml, serializationResult);
+  }
+
   private Element createFlowNode(FlowElementDeclaration flowDeclaration) {
     Element flow = doc.createElement("flow");
     flow.setAttribute("name", flowDeclaration.getName());
-    flow.setAttribute("initialState", flowDeclaration.getInitialState());
+    flow.setAttribute("initialState",
+                      ((ParameterSimpleValue)flowDeclaration.getParameters().get(0).getValue()).getValue());
 
     doc.getDocumentElement().appendChild(flow);
     return flow;
