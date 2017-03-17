@@ -11,6 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 
@@ -31,7 +32,7 @@ public class ArtifactContextConfiguration {
   private Map<String, String> artifactProperties = emptyMap();
   private ArtifactType artifactType;
   private boolean enableLazyInitialization;
-  private List<MuleContextServiceConfigurator> serviceConfigurators = emptyList();
+  private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
 
   private ArtifactContextConfiguration() {}
@@ -91,9 +92,9 @@ public class ArtifactContextConfiguration {
   }
 
   /**
-   * @return list of {@link MuleContextServiceConfigurator} that may add additional services to the {@link ArtifactContext}.
+   * @return list of {@link ServiceConfigurator} that may add additional services to the {@link ArtifactContext}.
    */
-  public List<MuleContextServiceConfigurator> getServiceConfigurators() {
+  public List<ServiceConfigurator> getServiceConfigurators() {
     return serviceConfigurators;
   }
 
@@ -171,11 +172,11 @@ public class ArtifactContextConfiguration {
     }
 
     /**
-     * @param serviceConfigurators list of {@link MuleContextServiceConfigurator} that register or override services in the
+     * @param serviceConfigurators list of {@link ServiceConfigurator} that register or override services in the
      *        {@link MuleContext}.
      * @return {@code this} builder
      */
-    public ArtifactContextConfigurationBuilder setServiceConfigurators(List<MuleContextServiceConfigurator> serviceConfigurators) {
+    public ArtifactContextConfigurationBuilder setServiceConfigurators(List<ServiceConfigurator> serviceConfigurators) {
       artifactContextConfiguration.serviceConfigurators = serviceConfigurators;
       return this;
     }

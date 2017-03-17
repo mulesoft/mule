@@ -8,14 +8,14 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.CustomizationService;
-import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
+import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.module.service.ServiceRepository;
 
 /**
  * Register services implementations.
  */
-public class TestServicesMuleContextConfigurator implements MuleContextServiceConfigurator {
+public class TestServicesMuleContextConfigurator implements ServiceConfigurator {
 
   private final ServiceRepository serviceRepository;
 

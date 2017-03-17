@@ -6,7 +6,6 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 
@@ -37,25 +36,4 @@ public class ApplicationStartedDeploymentListener implements DeploymentListener 
       applicationStartedLatch.release();
     }
   }
-
-  @Override
-  public void onDeploymentFailure(String artifactName, Throwable cause) {}
-
-  @Override
-  public void onUndeploymentStart(String artifactName) {}
-
-  @Override
-  public void onUndeploymentSuccess(String artifactName) {}
-
-  @Override
-  public void onUndeploymentFailure(String artifactName, Throwable cause) {}
-
-  @Override
-  public void onMuleContextCreated(String artifactName, MuleContext context) {}
-
-  @Override
-  public void onMuleContextInitialised(String artifactName, MuleContext context) {}
-
-  @Override
-  public void onMuleContextConfigured(String artifactName, MuleContext context) {}
 }

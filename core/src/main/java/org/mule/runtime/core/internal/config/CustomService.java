@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.runtime.core.internal.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -12,9 +12,11 @@ import static java.util.Optional.of;
 import java.util.Optional;
 
 /**
- * Defines a customization of a service within the {@code MuleContext}.
+ * Defines a customization of a service.
  * <p>
  * A service can be specified by an implementation or a class that can be used to instantiate the implementation.
+ *
+ * @since 4.0
  */
 public class CustomService {
 

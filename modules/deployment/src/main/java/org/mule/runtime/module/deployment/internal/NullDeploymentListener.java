@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 
 /**
@@ -14,30 +13,4 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
  */
 public class NullDeploymentListener implements DeploymentListener {
 
-  @Override
-  public void onDeploymentStart(String artifactName) {}
-
-  @Override
-  public void onDeploymentSuccess(String appName) {}
-
-  @Override
-  public void onDeploymentFailure(String artifactName, Throwable cause) {}
-
-  @Override
-  public void onUndeploymentStart(String artifactName) {}
-
-  @Override
-  public void onUndeploymentSuccess(String artifactName) {}
-
-  @Override
-  public void onUndeploymentFailure(String artifactName, Throwable cause) {}
-
-  @Override
-  public void onMuleContextCreated(String artifactName, MuleContext context) {}
-
-  @Override
-  public void onMuleContextInitialised(String artifactName, MuleContext context) {}
-
-  @Override
-  public void onMuleContextConfigured(String artifactName, MuleContext context) {}
 }

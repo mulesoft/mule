@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListenerManager;
@@ -99,10 +100,10 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
   }
 
   @Override
-  public void onMuleContextCreated(String artifactName, MuleContext context) {
+  public void onMuleContextCreated(String artifactName, MuleContext context, CustomizationService customizationService) {
     for (DeploymentListener listener : deploymentListeners) {
       try {
-        listener.onMuleContextCreated(artifactName, context);
+        listener.onMuleContextCreated(artifactName, context, customizationService);
       } catch (Throwable t) {
         logNotificationProcessingError(artifactName, listener, "onMuleContextCreated", t);
       }

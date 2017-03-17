@@ -9,28 +9,45 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase {
 
   private static final String APP_NAME = "foo";
   private static final Exception DEPLOYMENT_EXCEPTION = new Exception("Exception on foo");
 
   private CompositeDeploymentListener compositeDeploymentListener;
+
+  @Mock
   private DeploymentListener listener1;
+
+  @Mock
   private DeploymentListener listener2;
+
+  @Mock
+  private MuleContext muleContext;
+
+  @Mock
+  private CustomizationService customizationService;
 
   @Before
   public void setUp() throws Exception {
+    when(muleContext.getCustomizationService()).thenReturn(customizationService);
     compositeDeploymentListener = new CompositeDeploymentListener();
-    listener1 = mock(DeploymentListener.class);
     compositeDeploymentListener.addDeploymentListener(listener1);
-    listener2 = mock(DeploymentListener.class);
     compositeDeploymentListener.addDeploymentListener(listener2);
   }
 
@@ -85,10 +102,10 @@ public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase {
   @Test
   public void testNotifiesMuleContextCreated() throws Exception {
     MuleContext context = mock(MuleContext.class);
-    compositeDeploymentListener.onMuleContextCreated(APP_NAME, context);
+    compositeDeploymentListener.onMuleContextCreated(APP_NAME, context, customizationService);
 
-    verify(listener1, times(1)).onMuleContextCreated(APP_NAME, context);
-    verify(listener2, times(1)).onMuleContextCreated(APP_NAME, context);
+    verify(listener1, times(1)).onMuleContextCreated(APP_NAME, context, customizationService);
+    verify(listener2, times(1)).onMuleContextCreated(APP_NAME, context, customizationService);
   }
 
   @Test

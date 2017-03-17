@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
-import org.mule.runtime.deployment.model.api.artifact.MuleContextServiceConfigurator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   protected ApplicationContext parentContext;
   protected MuleArtifactContext muleArtifactContext;
   private ArtifactType artifactType;
-  private final List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
+  private final List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
 
   public SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                        ArtifactType artifactType)
@@ -91,7 +91,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
    *
    * @param serviceConfigurator service to add. Non null.
    */
-  public void addServiceConfigurator(MuleContextServiceConfigurator serviceConfigurator) {
+  public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
     checkArgument(serviceConfigurator != null, "serviceConfigurator cannot be null");
     serviceConfigurators.add(serviceConfigurator);
   }

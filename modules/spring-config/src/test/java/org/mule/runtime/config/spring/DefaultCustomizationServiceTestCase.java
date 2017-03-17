@@ -10,7 +10,8 @@ package org.mule.runtime.config.spring;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import org.mule.runtime.core.api.CustomService;
+import org.mule.runtime.core.internal.config.CustomService;
+import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
