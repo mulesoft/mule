@@ -7,12 +7,16 @@
 
 package org.mule.module.db.internal.util;
 
-public class ValueEvaluator
+public class ValueUtils
 {
 
     private static final String NULL_VALUE = "NULL";
 
-    public static Object checkNullValue(Object value)
+    private ValueUtils()
+    {
+    }
+
+    public static Object setNullValue(Object value)
     {
         if (NULL_VALUE.equals(value))
         {

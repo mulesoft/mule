@@ -14,24 +14,16 @@ public class DefaultInOutQueryParam extends AbstractQueryParam implements InOutQ
 
     private final Object value;
 
-    private final boolean hasValue;
-
     public DefaultInOutQueryParam(int index, DbType type, String name, Object value)
     {
         super(index, type, name);
+
         this.value = value;
-        this.hasValue = value != null;
     }
 
     @Override
     public Object getValue()
     {
         return value;
-    }
-
-    @Override
-    public boolean hasValue()
-    {
-        return hasValue;
     }
 }

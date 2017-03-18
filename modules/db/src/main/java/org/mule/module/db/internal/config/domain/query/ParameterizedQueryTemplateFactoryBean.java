@@ -9,7 +9,7 @@ package org.mule.module.db.internal.config.domain.query;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.find;
-import static org.mule.module.db.internal.util.ValueEvaluator.checkNullValue;
+import static org.mule.module.db.internal.util.ValueUtils.setNullValue;
 import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultOutputQueryParam;
@@ -56,7 +56,7 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         {
             QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
 
-            if (param == null && templateParam instanceof InputQueryParam && !((InputQueryParam) templateParam).hasValue())
+            if (param == null && templateParam instanceof InputQueryParam && ((InputQueryParam) templateParam).getValue() == null)
             {
                 throw new IllegalArgumentException(buildNotDefinedInParamErrorMessage(templateParam.getName()));
             }
@@ -107,11 +107,11 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
         if (queryParam instanceof InOutQueryParam)
         {
-            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), checkNullValue(((InOutQueryParam) queryParam).getValue()));
+            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), setNullValue(((InOutQueryParam) queryParam).getValue()));
         }
         else if (queryParam instanceof InputQueryParam)
         {
-            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, checkNullValue(((InputQueryParam) queryParam).getValue()), templateParam.getName());
+            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, setNullValue(((InputQueryParam) queryParam).getValue()), templateParam.getName());
         }
         else
         {

@@ -14,8 +14,6 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
 
     private final Object value;
 
-    private final boolean hasValue;
-
     public DefaultInputQueryParam(int index, DbType type, Object value)
     {
         this(index, type, value, null);
@@ -25,7 +23,6 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
     {
         super(index, type, name);
         this.value = value;
-        this.hasValue = value != null;
     }
 
     @Override
@@ -33,11 +30,4 @@ public class DefaultInputQueryParam extends AbstractQueryParam implements InputQ
     {
         return value;
     }
-
-    @Override
-    public boolean hasValue()
-    {
-        return hasValue;
-    }
-
 }
