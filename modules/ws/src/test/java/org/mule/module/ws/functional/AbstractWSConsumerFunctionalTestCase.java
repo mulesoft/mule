@@ -7,6 +7,8 @@
 package org.mule.module.ws.functional;
 
 
+import static java.util.logging.Level.FINEST;
+import static java.util.logging.Logger.getLogger;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import org.mule.api.MuleMessage;
@@ -19,8 +21,11 @@ import org.mule.transport.NullPayload;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Rule;
+import org.junit.rules.ExternalResource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -39,6 +44,24 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
                                                            "<ns2:echoResponse xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                                                            "<text>Hello</text></ns2:echoResponse>";
 
+    @Rule
+    public ExternalResource xmlLogLevel = new ExternalResource() {
+        private Level previousLevel;
+        final private Logger xmlLogger = getLogger("com.sun.xml.bind");
+
+        @Override
+        protected void before() throws Throwable
+        {
+            previousLevel = xmlLogger.getLevel();
+            xmlLogger.setLevel(FINEST);
+        }
+
+        @Override
+        protected void after()
+        {
+            xmlLogger.setLevel(previousLevel);
+        }
+    };
 
     @Parameterized.Parameter(value = 0)
     public boolean useTransportForUris;
