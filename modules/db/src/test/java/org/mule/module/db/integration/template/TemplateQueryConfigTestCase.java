@@ -171,6 +171,12 @@ public class TemplateQueryConfigTestCase extends FunctionalTestCase
         assertEquals(2, param2.getIndex());
     }
 
+    @Test
+    public void overrideWithNullValue() throws Exception
+    {
+        doQueryFromFileTest(muleContext.getRegistry().get("testOverrideWithNullValue"), null);
+    }
+
     private void doQueryFromFileTest(Object queryTemplateBean, String paramValue)
     {
         assertTrue(queryTemplateBean instanceof QueryTemplate);
