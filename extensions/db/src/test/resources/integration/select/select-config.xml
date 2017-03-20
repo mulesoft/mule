@@ -20,14 +20,14 @@
     <flow name="expressionAndFixedParamMixed">
         <set-variable variableName="position" value="3"/>
         <db:select>
-            <db:sql>SELECT * FROM PLANET WHERE POSITION = #[mel:position] AND NAME = 'Earth'</db:sql>
+            <db:sql>#["SELECT * FROM PLANET WHERE POSITION = $(position) AND NAME = 'Earth'"]</db:sql>
         </db:select>
     </flow>
 
     <flow name="dynamicQuery">
         <set-variable variableName="tableName" value="PLANET"/>
         <db:select>
-            <db:sql>select * from #[mel:tableName] order by ID</db:sql>
+            <db:sql>#["select * from $(tableName) order by ID"]</db:sql>
         </db:select>
     </flow>
 
@@ -55,7 +55,7 @@
         <db:select>
             <db:sql>select * from PLANET where name = :name</db:sql>
             <db:input-parameters>
-                #[mel:['name' : payload]]
+                #[{'name' : payload}]
             </db:input-parameters>
         </db:select>
     </flow>
@@ -71,7 +71,7 @@
             <expression-component>mel:flowVars['records'].add(payload)</expression-component>
         </foreach>
 
-        <set-payload value="#[mel:flowVars['records']]"/>
+        <set-payload value="#[records]"/>
     </flow>
 
     <flow name="selectStreaming">

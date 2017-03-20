@@ -16,7 +16,7 @@
         <set-variable variableName="type" value="4"/>
 
         <db:update>
-            <db:sql>update PLANET set NAME='#[mel:data]' where POSITION=#[mel:type]</db:sql>
+            <db:sql>#["update PLANET set NAME='$(data)' where POSITION=$(type)"]</db:sql>
         </db:update>
     </flow>
 
@@ -24,7 +24,7 @@
         <db:update>
             <db:sql>update PLANET set NAME= :name where NAME='Mars'</db:sql>
             <db:input-parameters>
-                #[mel:['name' : payload]]
+                #[{'name' : payload}]
             </db:input-parameters>
         </db:update>
     </flow>
@@ -33,7 +33,7 @@
         <db:update>
             <db:sql>update PLANET set PICTURE = :pic where NAME='Mars'</db:sql>
             <db:input-parameters>
-                #[mel:['pic' : payload]]
+                #[{'pic' : payload}]
             </db:input-parameters>
         </db:update>
     </flow>

@@ -15,7 +15,7 @@
 
             <!-- This needs to processStatement a new connection -->
             <db:delete config-ref="pooledJdbcConfig" transactionalAction="NOT_SUPPORTED">
-                <db:sql>delete from PLANET where id = #[mel:payload.id]</db:sql>
+                <db:sql>delete from PLANET where id = #[payload.id]</db:sql>
             </db:delete>
         </try>
     </flow>

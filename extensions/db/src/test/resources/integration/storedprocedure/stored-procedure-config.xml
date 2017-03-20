@@ -27,7 +27,11 @@
         <db:stored-procedure>
             <db:sql>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</db:sql>
             <db:input-parameters>
-                #[mel:['int1' : 3, 'int2' : 4, 'int3' : 5]]
+                #[{
+                    'int1' : 3,
+                    'int2' : 4,
+                    'int3' : 5
+                }]
             </db:input-parameters>
             <db:output-parameters>
                 <db:output-parameter key="result1"/>
@@ -40,7 +44,10 @@
         <db:stored-procedure config-ref="dbConfig">
             <db:sql>{ call concatenateStrings(:s1, :s2, :result) }</db:sql>
             <db:input-parameters>
-                #[mel:['s1' : 'foo', 's2' : 'bar']]
+                #[{
+                    's1' : 'foo',
+                    's2' : 'bar'
+                }]
             </db:input-parameters>
             <db:output-parameters>
                 <db:output-parameter key="result"/>
