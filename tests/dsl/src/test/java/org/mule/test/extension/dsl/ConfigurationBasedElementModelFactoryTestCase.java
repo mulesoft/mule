@@ -261,7 +261,7 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     assertValue(elementOne.findElement("key").get(), "description");
     assertValue(elementOne.findElement("type").get(), "CLOB");
 
-    assertValue(dbElement.findElement(newIdentifier("input-parameters", DB_NS)).get(), "#[mel:['description' : payload]]");
+    assertValue(dbElement.findElement(newIdentifier("input-parameters", DB_NS)).get(), "#[{{'description' : payload}}]");
   }
 
   protected void assertRequestOperationWithFlatParameters(ComponentConfiguration requester) {
@@ -314,7 +314,7 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
 
     assertThat(responseBuilderElement.getDsl().getChild("headers").isPresent(), is(true));
     assertValue(responseBuilderElement.findElement(newIdentifier("headers", HTTP_NS)).get(),
-                "#[mel:['content-type' : 'text/plain']]");
+                "#[{{'content-type' : 'text/plain'}}]");
 
     assertValue(listenerElement.findElement("path").get(), "testBuilder");
   }

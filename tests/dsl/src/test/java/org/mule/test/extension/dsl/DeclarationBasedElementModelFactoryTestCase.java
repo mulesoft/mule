@@ -130,7 +130,7 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
                            .build())
         .withParameter("response",
                        newObjectValue()
-                           .withParameter("headers", "#[mel:['content-type' : 'text/plain']]")
+                           .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
                            .build())
         .getDeclaration();
 

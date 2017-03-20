@@ -157,7 +157,7 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                                    .build())
                 .withParameter("response",
                                newObjectValue()
-                                   .withParameter("headers", "#[mel:['content-type' : 'text/plain']]")
+                                   .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
                                    .build())
                 .getDeclaration())
             .withComponent(core.newRouter("choice")
@@ -208,7 +208,7 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                                        .withParameter("key", "description")
                                        .withParameter("type", "CLOB").build())
                                    .build())
-                .withParameter("inputParameters", "#[mel:['description' : payload]]")
+                .withParameter("inputParameters", "#[{{'description' : payload}}]")
                 .getDeclaration())
             .withComponent(sockets.newOperation("sendAndReceive")
                 .withParameter(TARGET_PARAMETER_NAME, "myVar")

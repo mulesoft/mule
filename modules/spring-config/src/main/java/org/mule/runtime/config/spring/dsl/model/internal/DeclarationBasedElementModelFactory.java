@@ -554,6 +554,7 @@ class DeclarationBasedElementModelFactory {
     ComponentConfiguration.Builder wrapperConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(paramDsl));
 
+    // TODO MULE-12002: Revisit DslSyntaxUtils as part of the API
     ObjectType nestedElementType;
     if (objectValue.getTypeId() == null || objectValue.getTypeId().trim().isEmpty() ||
         objectValue.getTypeId().equals(getId(parameterModel.getType()))) {

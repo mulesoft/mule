@@ -13,7 +13,6 @@ import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObj
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -145,7 +144,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                    .build())
                 .withParameter("response",
                                newObjectValue()
-                                   .withParameter("headers", "#[mel:['content-type' : 'text/plain']]")
+                                   .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
                                    .build())
                 .getDeclaration())
             .withComponent(db.newOperation("bulkInsert")
@@ -174,7 +173,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                        .withParameter("key", "description")
                                        .withParameter("type", "CLOB").build())
                                    .build())
-                .withParameter("inputParameters", "#[mel:['description' : payload]]")
+                .withParameter("inputParameters", "#[{{'description' : payload}}]")
                 .getDeclaration())
             .withComponent(sockets.newOperation("sendAndReceive")
                 .withParameter(TARGET_PARAMETER_NAME, "myVar")

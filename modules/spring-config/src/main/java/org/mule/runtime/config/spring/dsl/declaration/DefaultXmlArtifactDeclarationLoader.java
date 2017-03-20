@@ -188,20 +188,6 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           stop();
         }
       }
-      //
-      //@Override
-      //protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-      //  final DslElementSyntax elementDsl = dsl.resolve(model);
-      //  if (elementDsl.supportsTopLevelDeclaration() && elementDsl.getElementName().equals(configLine.getIdentifier())) {
-      //    TopLevelParameterDeclarer topLevelParameter = extensionElementsDeclarer.newGlobalParameter(model.getName());
-      //    topLevelParameter.withRefName(getDeclaredName(configLine));
-      //    model.getType().accept(
-      //      getParameterDeclarerVisitor(configLine, elementDsl, value -> artifactDeclarer
-      //        .withGlobalParameter(topLevelParameter.withValue((ParameterObjectValue) value).getDeclaration())));
-      //    artifactDeclarer.withGlobalParameter(topLevelParameter.getDeclaration());
-      //    stop();
-      //  }
-      //}
 
       private boolean declareAsConnectionProvider(ConfigurationModel model, ConfigurationElementDeclarer configurationDeclarer,
                                                   ConfigLine config) {
@@ -512,6 +498,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           .ifPresent(subType -> createObjectValueFromType(subType, objectValue, wrappedConfig,
                                                           wrappedElementResolver.resolve(subType).get()));
 
+      // TODO MULE-12002: Revisit DslSyntaxUtils as part of the API
     } else if (isExtensible(objectType)) {
       createObjectValueFromType(objectType, objectValue, wrappedConfig, wrappedElementResolver.resolve(objectType).get());
     }
@@ -520,6 +507,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private void createObjectValueFromType(ObjectType objectType, ParameterObjectValue.Builder objectValue, ConfigLine config,
                                          DslElementSyntax paramDsl) {
 
+    // TODO MULE-12002: Revisit DslSyntaxUtils as part of the API
     objectValue.ofType(getId(objectType));
     copyExplicitAttributes(config.getConfigAttributes(), objectValue);
 

@@ -7,13 +7,10 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.util.Arrays.asList;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
 import java.util.Collection;
-
-import javax.inject.Inject;
 
 
 /**

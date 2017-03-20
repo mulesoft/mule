@@ -51,7 +51,7 @@
             <reconnect blocking="true" count="1" frequency="0"/>
             <httpn:response>
                 <httpn:headers>
-                    #[mel:['content-type' : 'text/plain']]
+                    #[{{'content-type' : 'text/plain'}}]
                 </httpn:headers>
             </httpn:response>
         </httpn:listener>
@@ -87,7 +87,7 @@
                 <db:parameter-type key="description" type="CLOB"/>
             </db:parameter-types>
             <db:input-parameters>
-                #[mel:['description' : payload]]
+                #[{{'description' : payload}}]
             </db:input-parameters>
         </db:insert>
 
