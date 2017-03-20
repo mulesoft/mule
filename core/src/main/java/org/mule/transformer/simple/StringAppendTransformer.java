@@ -13,6 +13,7 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
+import java.util.List;
 
 public class StringAppendTransformer extends AbstractTransformer
 {

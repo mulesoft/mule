@@ -6,6 +6,8 @@
  */
 package org.mule.processor;
 
+import static org.mule.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
+
 import org.mule.AbstractAnnotatedObject;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -33,7 +35,6 @@ import org.mule.util.TemplateParser.PatternInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -292,7 +293,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
 
     public void setArgumentExpressionsString(String arguments)
     {
-        this.arguments = Arrays.asList(arguments.split("\\s*,\\s*"));
+        this.arguments = splitArgumentsExpression(arguments);
     }
 
     public void setArguments(List<?> arguments)

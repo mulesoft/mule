@@ -375,6 +375,11 @@
         <processor ref="invokeme-noargs"/>
     </flow>
 
+    <flow name="invokeArrayInArgs">
+        <vm:inbound-endpoint path="invokeArrayInArgs" exchange-pattern="request-response"/>
+        <invoke object-ref="test-array-appender" method="transformArray" methodArguments="#[['test', 'test']]"/>
+    </flow>
+    
     <flow name="enrichWithAttributes">
         <vm:inbound-endpoint path="enrich-in" exchange-pattern="request-response" />
         <enricher target="#[header:OUTBOUND:helloHeader]" source="#[payload]">
@@ -418,6 +423,10 @@
     <spring:bean name="pojo" class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$Pojo"/>
 
     <spring:bean name="appender" class="org.mule.transformer.simple.StringAppendTransformer">
+        <spring:constructor-arg value="recieved"/>
+    </spring:bean>
+    
+    <spring:bean name="test-array-appender" class="org.mule.test.construct.TestStringAppendTransformer">
         <spring:constructor-arg value="recieved"/>
     </spring:bean>
 
