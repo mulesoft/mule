@@ -39,8 +39,8 @@ public class OAuthOperations {
    * @param resourceOwnerId The resource owner id to invalidate. This attribute is only allowed for authorization code grant type.
    * @return access token of the oauth context retrieved by the token request.
    */
-  public String accessToken(TokenManagerConfig tokenManager,
-                            @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
+  public String retrieveAccessToken(TokenManagerConfig tokenManager,
+                                    @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
     validateResourceOwnerId(resourceOwnerId);
     return getContextForResourceOwner(tokenManager, resourceOwnerId).getAccessToken();
   }
@@ -52,8 +52,8 @@ public class OAuthOperations {
    * @param resourceOwnerId The resource owner id to invalidate. This attribute is only allowed for authorization code grant type.
    * @return refresh token of the oauth context retrieved by the token request.
    */
-  public String refreshToken(TokenManagerConfig tokenManager,
-                             @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
+  public String retrieveRefreshToken(TokenManagerConfig tokenManager,
+                                     @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
     return getContextForResourceOwner(tokenManager, resourceOwnerId).getRefreshToken();
   }
 
@@ -64,8 +64,8 @@ public class OAuthOperations {
    * @param resourceOwnerId The resource owner id to invalidate. This attribute is only allowed for authorization code grant type.
    * @return the expiration of the oauth context retrieved by the token request.
    */
-  public String expiresIn(TokenManagerConfig tokenManager,
-                          @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
+  public String retrieveExpiresIn(TokenManagerConfig tokenManager,
+                                  @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
     return getContextForResourceOwner(tokenManager, resourceOwnerId).getExpiresIn();
   }
 
@@ -76,8 +76,8 @@ public class OAuthOperations {
    * @param resourceOwnerId The resource owner id to invalidate. This attribute is only allowed for authorization code grant type.
    * @return state of the oauth context retrieved by the token request.
    */
-  public String state(TokenManagerConfig tokenManager,
-                      @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
+  public String retrieveState(TokenManagerConfig tokenManager,
+                              @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId) {
     return getContextForResourceOwner(tokenManager, resourceOwnerId).getState();
   }
 
@@ -91,9 +91,9 @@ public class OAuthOperations {
    * @see AbstractGrantType#parameterExtractors
    */
   @OutputResolver(output = TokenResponseParameterOutputResolver.class)
-  public Object customTokenResponseParam(TokenManagerConfig tokenManager,
-                                         @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId,
-                                         String key) {
+  public Object retrieveCustomTokenResponseParam(TokenManagerConfig tokenManager,
+                                                 @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID) String resourceOwnerId,
+                                                 String key) {
     return getContextForResourceOwner(tokenManager, resourceOwnerId).getTokenResponseParameters().get(key);
   }
 

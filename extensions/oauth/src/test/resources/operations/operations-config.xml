@@ -6,24 +6,25 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
-    <flow name="accessTokenFlow">
-        <oauth:access-token tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    <!-- TODO MULE-12009: once fixed, all this flows should be removed -->
+    <flow name="retrieveAccessTokenFlow">
+        <oauth:retrieve-access-token tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
     </flow>
 
-    <flow name="refreshTokenFlow">
-        <oauth:refresh-token tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    <flow name="retrieveRefreshTokenFlow">
+        <oauth:retrieve-refresh-token tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
     </flow>
 
-    <flow name="expiresInFlow">
-        <oauth:expires-in tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    <flow name="retrieveExpiresInFlow">
+        <oauth:retrieve-expires-in tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
     </flow>
 
-    <flow name="stateFlow">
-        <oauth:state tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
+    <flow name="retrieveStateFlow">
+        <oauth:retrieve-state tokenManager="tokenManagerConfig" resourceOwnerId="#[variables.resourceOwnerId]"/>
     </flow>
 
-    <flow name="customTokenResponseParamFlow">
-        <oauth:custom-token-response-param tokenManager="tokenManagerConfig" key="#[variables.key]"/>
+    <flow name="retrieveCustomTokenResponseParamFlow">
+        <oauth:retrieve-custom-token-response-param tokenManager="tokenManagerConfig" key="#[variables.key]"/>
     </flow>
 
 </mule>

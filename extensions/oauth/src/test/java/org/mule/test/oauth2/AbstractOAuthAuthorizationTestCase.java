@@ -216,15 +216,18 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   }
 
   protected void verifyTokenManagerAccessToken(String resourceOwnerId, String accessToken) throws Exception {
-    assertThat(runFlowWithResourceOwnerId("accessTokenFlow", resourceOwnerId), is(accessToken));
+    // TODO MULE-12009: once fixed, replace this flow call for the extensions call client
+    assertThat(runFlowWithResourceOwnerId("retrieveAccessTokenFlow", resourceOwnerId), is(accessToken));
   }
 
   protected void verifyTokenManagerRefreshToken() throws Exception {
-    assertThat(runFlowWithResourceOwnerId("refreshTokenFlow", DEFAULT_RESOURCE_OWNER_ID), is(REFRESH_TOKEN));
+    // TODO MULE-12009: once fixed, replace this flow call for the extensions call client
+    assertThat(runFlowWithResourceOwnerId("retrieveRefreshTokenFlow", DEFAULT_RESOURCE_OWNER_ID), is(REFRESH_TOKEN));
   }
 
   protected void verifyTokenManagerExpiresIn() throws Exception {
-    assertThat(runFlowWithResourceOwnerId("expiresInFlow", DEFAULT_RESOURCE_OWNER_ID), is(EXPIRES_IN));
+    // TODO MULE-12009: once fixed, replace this flow call for the extensions call client
+    assertThat(runFlowWithResourceOwnerId("retrieveExpiresInFlow", DEFAULT_RESOURCE_OWNER_ID), is(EXPIRES_IN));
   }
 
   protected void verifyTokenManagerState() throws Exception {
@@ -232,12 +235,15 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   }
 
   protected void verifyTokenManagerState(String resourceOwnerId, String state) throws Exception {
-    assertThat(runFlowWithResourceOwnerId("stateFlow", resourceOwnerId), is(state));
+    // TODO MULE-12009: once fixed, replace this flow call for the extensions call client
+    assertThat(runFlowWithResourceOwnerId("retrieveStateFlow", resourceOwnerId), is(state));
   }
 
   protected void verifyTokenManagerCustomParameterExtractor(String key, String expectedCustomParameterExtractor)
       throws Exception {
-    assertThat(flowRunner("customTokenResponseParamFlow").withVariable("key", key).run().getMessage().getPayload().getValue(),
+    // TODO MULE-12009: once fixed, replace this flow call for the extensions call client
+    assertThat(flowRunner("retrieveCustomTokenResponseParamFlow").withVariable("key", key).run().getMessage().getPayload()
+        .getValue(),
                is(expectedCustomParameterExtractor));
   }
 
