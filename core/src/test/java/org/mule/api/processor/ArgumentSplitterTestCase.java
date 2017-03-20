@@ -6,9 +6,10 @@
  */
 package org.mule.api.processor;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.api.processor.util.InvokerMessageProcessorUtil.splitAndMergeArgumentsExpression;
+import static org.mule.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -22,47 +23,52 @@ public class ArgumentSplitterTestCase extends AbstractMuleTestCase
     public void whenSingleMuleExpressionProcessedAsExpected()
     {
 
-        List<String> args = splitAndMergeArgumentsExpression("#[function(a)]");
-        assertThat(args.get(0), equalTo("#[function(a)]"));
-
+        List<String> args = splitArgumentsExpression("#[function(a)]");
+        assertThat(args, hasSize(1));
+        assertThat(args, hasItem("#[function(a)]"));
     }
 
     @Test
     public void whenSingleMuleExpressionWithInnerArrayProcessedAsExpected()
     {
-        List<String> args = splitAndMergeArgumentsExpression("#[function(a), [1, 2, 3]]");
-        assertThat(args.get(0), equalTo("#[function(a), [1, 2, 3]]"));
+        List<String> args = splitArgumentsExpression("#[function(a), [1, 2, 3]]");
+        assertThat(args, hasSize(1));
+        assertThat(args, hasItem("#[function(a),[1,2,3]]"));
     }
 
     @Test
     public void whenSingleMuleExpressionWithSeveralNestedArraysProcessedAsExpected()
     {
-        List<String> args = splitAndMergeArgumentsExpression("#[[[function(a), a, b, b], a], [1, 2, 3]]");
-        assertThat(args.get(0), equalTo("#[[[function(a), a, b, b], a], [1, 2, 3]]"));
+        List<String> args = splitArgumentsExpression("#[[[function(a), a, b, b], a], [1, 2, 3]]");
+        assertThat(args, hasSize(1));
+        assertThat(args, hasItem("#[[[function(a),a,b,b],a],[1,2,3]]"));
     }
 
     @Test
     public void whenMoreThanOneMuleExpressionsProcessedAsExpected()
     {
-        List<String> args = splitAndMergeArgumentsExpression("#[[[function(a), a, b, c], a]], #[1, 2, 3]");
-        assertThat(args.get(0), equalTo("#[[[function(a), a, b, c], a]]"));
-        assertThat(args.get(1), equalTo("#[1, 2, 3]"));
+        List<String> args = splitArgumentsExpression("#[[[function(a), a, b, c], a]], #[1, 2, 3]");
+        assertThat(args, hasSize(2));
+        assertThat(args, hasItem("#[[[function(a),a,b,c],a]]"));
+        assertThat(args, hasItem("#[1,2,3]"));
     }
 
     @Test
     public void whenThreeMuleExpressionsProcessedAsExpected()
     {
-        List<String> args = splitAndMergeArgumentsExpression("#[1, 2, 3], #[[[function(a), a, b, c], a]], #[[1, 2], [3, 4]]");
-        assertThat(args.get(0), equalTo("#[1, 2, 3]"));
-        assertThat(args.get(1), equalTo("#[[[function(a), a, b, c], a]]"));
-        assertThat(args.get(2), equalTo("#[[1, 2], [3, 4]]"));
+        List<String> args = splitArgumentsExpression("#[1, 2, 3], #[[[function(a), a, b, c], a]], #[[1, 2], [3, 4]]");
+        assertThat(args, hasSize(3));
+        assertThat(args, hasItem("#[1,2,3]"));
+        assertThat(args, hasItem("#[[[function(a),a,b,c],a]]"));
+        assertThat(args, hasItem("#[[1,2],[3,4]]"));
     }
 
     @Test
     public void whenValidExpressionSpacesWithinThenProcessAsExpected()
     {
-        List<String> args = splitAndMergeArgumentsExpression("      #[1, 2, 3]         ,       #[2, 3, 4] ");
-        assertThat(args.get(0), equalTo("#[1, 2, 3]"));
-        assertThat(args.get(1), equalTo("#[2, 3, 4]"));
+        List<String> args = splitArgumentsExpression("      #[1, 2, 3]         ,       #[2, 3, 4] ");
+        assertThat(args, hasSize(2));
+        assertThat(args, hasItem("#[1,2,3]"));
+        assertThat(args, hasItem("#[2,3,4]"));
     }
 }

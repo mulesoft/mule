@@ -27,20 +27,21 @@ public final class InvokerMessageProcessorUtil
      * @param arguments arguments string expression
      * @return arguments merged
      */
-    public static List<String> splitAndMergeArgumentsExpression(String arguments)
+    public static List<String> splitArgumentsExpression(String arguments)
     {
-        List<String> argumentsVerified = new ArrayList<String>();
         String[] argumentsSplitted = arguments.split("\\s*,\\s*");
         if (argumentsSplitted.length <= 1)
         {
             return Arrays.asList(argumentsSplitted);
         }
 
-        return merge(argumentsVerified, argumentsSplitted);
+        return merge(argumentsSplitted);
     }
 
-    private static List<String> merge(List<String> argumentsVerified, String[] argumentsSplitted)
+    private static List<String> merge(String[] argumentsSplitted)
     {
+        List<String> argumentsVerified = new ArrayList<String>();
+
         StringBuffer mergingArg = new StringBuffer();
         mergingArg.append(argumentsSplitted[0]);
 
@@ -49,7 +50,7 @@ public final class InvokerMessageProcessorUtil
             String arg = argumentsSplitted[index];
             if (hasToBeMerged(mergingArg))
             {
-                mergingArg.append(", " + arg);
+                mergingArg.append("," + arg);
             }
             else
             {

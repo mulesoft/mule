@@ -6,7 +6,7 @@
  */
 package org.mule.processor;
 
-import static org.mule.api.processor.util.InvokerMessageProcessorUtil.splitAndMergeArgumentsExpression;
+import static org.mule.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 
 import org.mule.AbstractAnnotatedObject;
 import org.mule.DefaultMuleEvent;
@@ -293,7 +293,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
 
     public void setArgumentExpressionsString(String arguments)
     {
-        this.arguments = splitAndMergeArgumentsExpression(arguments);
+        this.arguments = splitArgumentsExpression(arguments);
     }
 
     public void setArguments(List<?> arguments)
