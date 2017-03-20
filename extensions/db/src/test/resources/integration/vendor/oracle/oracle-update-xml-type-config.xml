@@ -7,7 +7,7 @@
 
     <flow name="updateWithXmlTypeParam">
         <db:update config-ref="dbConfig">
-            <db:parameterized-query>UPDATE Alien SET description = #[mel:payload]</db:parameterized-query>
+            <db:parameterized-query>UPDATE Alien SET description = #[payload]</db:parameterized-query>
         </db:update>
     </flow>
 </mule>

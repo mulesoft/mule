@@ -12,7 +12,7 @@
                 <db:parameter-type key="description" type="CLOB" />
             </db:parameter-types>
             <db:input-parameters>
-                #[mel:['description' : payload]]
+                #[{'description' : payload}]
             </db:input-parameters>
         </db:stored-procedure>
 

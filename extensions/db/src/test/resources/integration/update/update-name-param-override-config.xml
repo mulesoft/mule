@@ -7,14 +7,14 @@
 
     <db:query name="updateTemplate">
         <db:input-parameters>
-            #[mel:['position' : 4]]
+            #[{'position' : 4}]
         </db:input-parameters>
         <db:sql>update PLANET set NAME='Mercury' where POSITION= :position</db:sql>
     </db:query>
 
     <db:query name="overriddenUpdateParam" template="updateTemplate">
         <db:input-parameters>
-            #[mel:['position' : 2]]
+            #[{'position' : 2}]
         </db:input-parameters>
     </db:query>
 
@@ -29,20 +29,20 @@
     <flow name="inlineOverriddenParams">
         <db:update template="overriddenUpdateParam">
             <db:input-parameters>
-                #[mel:['position' : 3]]
+                #[{'position' : 3}]
             </db:input-parameters>
         </db:update>
     </flow>
 
     <flow name="inlineQuery">
         <db:update>
-            <db:sql>update PLANET set NAME='Mercury' where POSITION=#[mel:'4']</db:sql>
+            <db:sql>#["update PLANET set NAME='Mercury' where POSITION=4"]</db:sql>
         </db:update>
     </flow>
 
     <flow name="expressionParam">
         <db:update>
-            <db:sql>update PLANET set NAME='Mercury' where POSITION=#[mel:type] AND NAME = 'Earth'</db:sql>
+            <db:sql>#["update PLANET set NAME='Mercury' where POSITION=$(type) AND NAME = 'Earth'"]</db:sql>
         </db:update>
     </flow>
 </mule>
