@@ -6,9 +6,6 @@
  */
 package org.mule.test.oauth2.internal.clientcredentials.functional;
 
-import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
-
 import org.junit.Test;
 
 public class ClientCredentialsMinimalConfigTestCase extends AbstractClientCredentialsBasicTestCase {
@@ -16,10 +13,8 @@ public class ClientCredentialsMinimalConfigTestCase extends AbstractClientCreden
   @Test
   public void authenticationIsDoneOnStartup() throws Exception {
     verifyRequestDoneToTokenUrlForClientCredentials();
-
-    final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get("tokenManagerConfig");
-
-    OAuthContextFunctionAsserter.createFrom(tokenManagerConfig).assertAccessTokenIs(ACCESS_TOKEN);
+    verifyTokenManagerAccessToken();
+    verifyTokenManagerExpiresIn();
   }
 
 }

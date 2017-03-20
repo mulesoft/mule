@@ -22,22 +22,15 @@ import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
-
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.ImmutableMap;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
-import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
-
-import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
-
-import org.junit.Rule;
-import org.junit.Test;
-
-import com.github.tomakehurst.wiremock.client.WireMock;
 
 public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthorizationTestCase {
 
@@ -47,7 +40,6 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
   public static final String USER_ID_TONY = "tony";
   public static final String TONY_ACCESS_TOKEN = "abcdefghi";
   public static final String TONY_STATE = "punk";
-  public static final String MULTITENANT_CONFIG = "multitenantConfig";
   public static final String NO_STATE = null;
 
   @Rule
@@ -64,8 +56,8 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
       new SystemProperty("token.url", format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
 
   @Override
-  protected String getConfigFile() {
-    return "authorization-code/authorization-code-multitenant-config.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {"authorization-code/authorization-code-multitenant-config.xml", "operations/operations-config.xml"};
   }
 
   @Test
@@ -74,10 +66,10 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, NO_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_JOHN)
-        .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_TONY)
-        .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
+    verifyTokenManagerAccessToken(USER_ID_JOHN, JOHN_ACCESS_TOKEN);
+    verifyTokenManagerState(USER_ID_JOHN, null);
+    verifyTokenManagerAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN);
+    verifyTokenManagerState(USER_ID_TONY, null);
   }
 
   @Test
@@ -86,10 +78,10 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, TONY_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_JOHN)
-        .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(JOHN_STATE);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_TONY)
-        .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(TONY_STATE);
+    verifyTokenManagerAccessToken(USER_ID_JOHN, JOHN_ACCESS_TOKEN);
+    verifyTokenManagerState(USER_ID_JOHN, JOHN_STATE);
+    verifyTokenManagerAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN);
+    verifyTokenManagerState(USER_ID_TONY, TONY_STATE);
   }
 
   @Test
@@ -98,10 +90,10 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
     WireMock.reset();
     executeForUserWithAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN, NO_STATE);
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_JOHN)
-        .assertAccessTokenIs(JOHN_ACCESS_TOKEN).assertState(null);
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get(MULTITENANT_CONFIG), USER_ID_TONY)
-        .assertAccessTokenIs(TONY_ACCESS_TOKEN).assertState(null);
+    verifyTokenManagerAccessToken(USER_ID_JOHN, JOHN_ACCESS_TOKEN);
+    verifyTokenManagerState(USER_ID_JOHN, null);
+    verifyTokenManagerAccessToken(USER_ID_TONY, TONY_ACCESS_TOKEN);
+    verifyTokenManagerState(USER_ID_TONY, null);
   }
 
   private void executeForUserWithAccessToken(String userId, String accessToken, String state) throws IOException {

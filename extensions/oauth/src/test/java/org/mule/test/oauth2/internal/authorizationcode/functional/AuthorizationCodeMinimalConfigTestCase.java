@@ -7,9 +7,6 @@
 package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
-
-import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
-
 import org.apache.http.client.fluent.Request;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,8 +14,8 @@ import org.junit.Test;
 public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
   @Override
-  protected String getConfigFile() {
-    return "authorization-code/authorization-code-minimal-config.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {"authorization-code/authorization-code-minimal-config.xml", "operations/operations-config.xml"};
   }
 
   @Ignore("MULE-6926: flaky test")
@@ -31,8 +28,8 @@ public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizatio
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get("tokenManagerConfig"))
-        .assertAccessTokenIs(ACCESS_TOKEN).assertRefreshTokenIs(REFRESH_TOKEN);
+    verifyTokenManagerAccessToken();
+    verifyTokenManagerRefreshToken();
   }
 
 }

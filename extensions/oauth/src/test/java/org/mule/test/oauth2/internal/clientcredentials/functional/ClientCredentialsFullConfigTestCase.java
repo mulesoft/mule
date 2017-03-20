@@ -13,28 +13,24 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-
+import com.google.common.collect.ImmutableMap;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
-import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import com.google.common.collect.ImmutableMap;
-
+import java.util.Arrays;
 import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizationTestCase {
@@ -51,21 +47,25 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
   @Rule
   public SystemProperty customTokenResponseParameter2Name = new SystemProperty("custom.param.extractor2", "token-resp-param2");
 
-  private String configFile;
+  private String[] configFiles;
 
   @Override
-  protected String getConfigFile() {
-    return configFile;
+  protected String[] getConfigFiles() {
+    return configFiles;
   }
 
-  public ClientCredentialsFullConfigTestCase(String configFile) {
-    this.configFile = configFile;
+  public ClientCredentialsFullConfigTestCase(String[] configFiles) {
+    this.configFiles = configFiles;
   }
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
-                  new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
+    final String operationsConfig = "operations/operations-config.xml";
+    return Arrays
+        .asList(new Object[][] {
+            new String[] {"client-credentials/client-credentials-full-config-tls-global.xml", operationsConfig}},
+                new Object[][] {
+                    new String[] {"client-credentials/client-credentials-full-config-tls-nested.xml", operationsConfig}});
   }
 
   @Override
@@ -89,14 +89,10 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
 
   @Test
   public void customTokenResponseParametersAreCaptured() throws Exception {
-    final OAuthContextFunctionAsserter oauthContextAsserter =
-        OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get("tokenManagerConfig"));
-    oauthContextAsserter.assertAccessTokenIs(ACCESS_TOKEN);
-    oauthContextAsserter.assertExpiresInIs(EXPIRES_IN);
-    oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter1Name.getValue(),
-                                                                CUSTOM_RESPONSE_PARAMETER1_VALUE);
-    oauthContextAsserter.assertContainsCustomTokenResponseParam(customTokenResponseParameter2Name.getValue(),
-                                                                CUSTOM_RESPONSE_PARAMETER2_VALUE);
+    verifyTokenManagerAccessToken();
+    verifyTokenManagerExpiresIn();
+    verifyTokenManagerCustomParameterExtractor(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE);
+    verifyTokenManagerCustomParameterExtractor(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE);
   }
 
   @Test

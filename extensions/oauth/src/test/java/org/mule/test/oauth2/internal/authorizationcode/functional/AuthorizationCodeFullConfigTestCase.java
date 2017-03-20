@@ -29,7 +29,11 @@ import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
-
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+import com.google.common.collect.ImmutableMap;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
@@ -39,21 +43,12 @@ import org.mule.services.http.TestHttpClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
-import org.mule.test.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.test.runner.RunnerDelegateTo;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
 @RunnerDelegateTo(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase {
@@ -86,25 +81,28 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
   @Rule
   public SystemProperty customTokenResponseParameter2Name = new SystemProperty("custom.param.extractor2", "token-resp-param2");
 
-  private String configFile;
+  private String[] configFiles;
 
   @Rule
   public TestHttpClient httpClient =
       new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(() -> createClientTlsContextFactory()).build();
 
   @Override
-  protected String getConfigFile() {
-    return configFile;
+  protected String[] getConfigFiles() {
+    return configFiles;
   }
 
-  public AuthorizationCodeFullConfigTestCase(String configFile) {
-    this.configFile = configFile;
+  public AuthorizationCodeFullConfigTestCase(String[] configFiles) {
+    this.configFiles = configFiles;
   }
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[] {"authorization-code/authorization-code-full-config-tls-global.xml"},
-                         new Object[] {"authorization-code/authorization-code-full-config-tls-nested.xml"});
+    final String operationsConfig = "operations/operations-config.xml";
+    return Arrays.asList(new Object[][] {
+        new String[] {"authorization-code/authorization-code-full-config-tls-global.xml", operationsConfig}},
+                         new Object[][] {new String[] {"authorization-code/authorization-code-full-config-tls-nested.xml",
+                             operationsConfig}});
   }
 
   @Test
@@ -147,11 +145,12 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();
 
-    OAuthContextFunctionAsserter.createFrom(muleContext.getRegistry().get("tokenManagerConfig"))
-        .assertAccessTokenIs(ACCESS_TOKEN).assertExpiresInIs(EXPIRES_IN).assertRefreshTokenIs(REFRESH_TOKEN)
-        .assertState(state.getValue())
-        .assertContainsCustomTokenResponseParam(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE)
-        .assertContainsCustomTokenResponseParam(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE);
+    verifyTokenManagerAccessToken();
+    verifyTokenManagerRefreshToken();
+    verifyTokenManagerExpiresIn();
+    verifyTokenManagerState();
+    verifyTokenManagerCustomParameterExtractor(customTokenResponseParameter1Name.getValue(), CUSTOM_RESPONSE_PARAMETER1_VALUE);
+    verifyTokenManagerCustomParameterExtractor(customTokenResponseParameter2Name.getValue(), CUSTOM_RESPONSE_PARAMETER2_VALUE);
   }
 
   private TlsContextFactory createClientTlsContextFactory() {
