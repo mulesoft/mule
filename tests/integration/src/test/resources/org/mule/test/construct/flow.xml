@@ -375,9 +375,9 @@
         <processor ref="invokeme-noargs"/>
     </flow>
 
-    <flow name="invoke5">
-        <vm:inbound-endpoint path="invoke5-in" exchange-pattern="request-response"/>
-        <invoke object-ref="appender" method="transformArray" methodArguments="#[['test', 'invoke5']], #[['test2', 'invoke5']]"/>
+    <flow name="invokeArrayInArgs">
+        <vm:inbound-endpoint path="invokeArrayInArgs" exchange-pattern="request-response"/>
+        <invoke object-ref="appender" method="transformArray" methodArguments="#[['test', 'test']]"/>
     </flow>
     
     <flow name="enrichWithAttributes">

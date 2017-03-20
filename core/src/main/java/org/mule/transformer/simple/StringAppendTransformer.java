@@ -66,16 +66,11 @@ public class StringAppendTransformer extends AbstractTransformer
         return msg + append;
     }
 
-    public Object transformArray(List<String> args, List<String> args2) throws TransformerException
+    public Object transformArray(List<String> args) throws TransformerException
     {
         StringBuffer buffer = new StringBuffer();
 
         for (String arg : args)
-        {
-            buffer.append(arg);
-        }
-
-        for (String arg : args2)
         {
             buffer.append(arg);
         }

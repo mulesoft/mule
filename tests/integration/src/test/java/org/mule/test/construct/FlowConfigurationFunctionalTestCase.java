@@ -12,6 +12,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -45,6 +47,8 @@ import org.junit.Test;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
+    private static final String EXPECTED_ARRAY_IN_ARGS_RESULT = "testtestrecieved";
+
     public FlowConfigurationFunctionalTestCase()
     {
         setDisposeContextPerClass(true);
@@ -607,13 +611,12 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testInvoke5() throws Exception
+    public void testInvokeArrayInArgs() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
-        message.setOutboundProperty("one", "header1val");
-        assertEquals("testinvoke5test2invoke5recieved", muleContext.getClient()
-            .send("vm://invoke5-in", message)
-            .getPayloadAsString());
+        assertThat(muleContext.getClient()
+            .send("vm://invokeArrayInArgs", message)
+            .getPayloadAsString(), equalTo(EXPECTED_ARRAY_IN_ARGS_RESULT));
     }
 
     @Test
