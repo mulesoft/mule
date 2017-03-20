@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.regex.Pattern.DOTALL;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class AttributeEvaluator {
 
-  private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*\\]$");
+  private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*\\]$", DOTALL);
 
   private enum AttributeType {
     EXPRESSION, PARSE_EXPRESSION, STATIC_VALUE

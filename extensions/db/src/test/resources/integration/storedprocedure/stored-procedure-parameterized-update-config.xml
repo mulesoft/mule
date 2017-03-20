@@ -9,7 +9,7 @@
         <db:stored-procedure>
             <db:sql>call updateParamTestType1(:type)</db:sql>
             <db:input-parameters>
-                #[mel:['type' : payload]]
+                #[{'type' : payload}]
             </db:input-parameters>
         </db:stored-procedure>
     </flow>

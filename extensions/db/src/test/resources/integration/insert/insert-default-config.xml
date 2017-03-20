@@ -14,7 +14,7 @@
 
     <flow name="insertDynamic">
         <db:insert>
-            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, #[mel:payload])</db:sql>
+            <db:sql>#["INSERT INTO PLANET(POSITION, NAME) VALUES (777, $(payload))"]</db:sql>
         </db:insert>
     </flow>
 
@@ -22,7 +22,11 @@
         <db:insert>
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:id, :name)</db:sql>
             <db:input-parameters>
-                #[mel:['id' : id, 'name' : payload]]
+                #[
+                {
+                    'id' : id,
+                    'name' : payload
+                }]
             </db:input-parameters>
         </db:insert>
     </flow>
