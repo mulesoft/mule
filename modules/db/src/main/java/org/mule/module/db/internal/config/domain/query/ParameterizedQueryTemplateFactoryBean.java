@@ -7,7 +7,9 @@
 
 package org.mule.module.db.internal.config.domain.query;
 
+import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.mule.module.db.internal.util.ValueUtils.convertsNullStringToNull;
 import org.mule.module.db.internal.domain.param.DefaultInOutQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.module.db.internal.domain.param.DefaultOutputQueryParam;
@@ -54,7 +56,11 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
         {
             QueryParam param = findOverriddenParam(templateParam.getName(), queryParams);
 
-            if (param == null)
+            if (param == null && templateParam instanceof InputQueryParam && ((InputQueryParam) templateParam).getValue() == null)
+            {
+                throw new IllegalArgumentException(buildNotDefinedInParamErrorMessage(templateParam.getName()));
+            }
+            else if (param == null)
             {
                 resolvedParams.add(templateParam);
             }
@@ -101,11 +107,11 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
 
         if (queryParam instanceof InOutQueryParam)
         {
-            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), ((InOutQueryParam) queryParam).getValue());
+            overriddenParam = new DefaultInOutQueryParam(templateParam.getIndex(), paramType, templateParam.getName(), convertsNullStringToNull(((InOutQueryParam) queryParam).getValue()));
         }
         else if (queryParam instanceof InputQueryParam)
         {
-            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, ((InputQueryParam) queryParam).getValue(), templateParam.getName());
+            overriddenParam = new DefaultInputQueryParam(templateParam.getIndex(), paramType, convertsNullStringToNull(((InputQueryParam) queryParam).getValue()), templateParam.getName());
         }
         else
         {
@@ -143,4 +149,10 @@ public class ParameterizedQueryTemplateFactoryBean implements FactoryBean<QueryT
     {
         return false;
     }
+
+    private String buildNotDefinedInParamErrorMessage(String name)
+    {
+        return format("Parameter with name '%s', used in the query text, does not match any defined query parameter name defined in the query template", name);
+    }
+
 }

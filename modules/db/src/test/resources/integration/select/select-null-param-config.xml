@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <db:template-query name="namedParamsQueryTemplate">
+        <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = :position</db:parameterized-query>
+        <db:in-param name="position" defaultValue="4"/>
+    </db:template-query>
+
+    <flow name="overrideParamWithNullValue">
+        <inbound-endpoint address="vm://testOverrideParamWithNullValue" exchange-pattern="request-response"/>
+        <db:select config-ref="dbConfig">
+            <db:template-query-ref name="namedParamsQueryTemplate"/>
+            <db:in-param name="position" value="NULL"/>
+        </db:select>
+    </flow>
+
+    <flow name="implicitNullValue">
+        <inbound-endpoint address="vm://testImplicitNullValue" exchange-pattern="request-response"/>
+        <db:select config-ref="dbConfig">
+            <db:parameterized-query>SELECT * FROM PLANET WHERE POSITION = :position</db:parameterized-query>
+            <db:in-param name="position" value="NULL"/>
+        </db:select>
+    </flow>
+
+</mule>

@@ -5,11 +5,9 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <flow name="unresolvedNamedParam">
+    <flow name="unresolvedTextQueryParam">
         <db:select>
-            <db:parameterized-query>select * from Planet where name = :name</db:parameterized-query>
-            <db:in-param name="name" value="#[payload]"/>
-            <db:in-param name="wrongName" value="#[payload]"/>
+            <db:parameterized-query>select * from Table where name =:name</db:parameterized-query>
         </db:select>
     </flow>
 </mule>
