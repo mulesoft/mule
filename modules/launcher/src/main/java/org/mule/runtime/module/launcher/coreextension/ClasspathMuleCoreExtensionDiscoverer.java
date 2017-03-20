@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDiscoverer {
 
   public static final String CORE_EXTENSION_RESOURCE_NAME =
-      "META-INF/services/org/mule/runtime/core/config/core-extensions.properties";
+      "META-INF/org/mule/runtime/core/config/core-extensions.properties";
 
   private static Logger logger = LoggerFactory.getLogger(ClasspathMuleCoreExtensionDiscoverer.class);
   private final ArtifactClassLoader containerClassLoader;

@@ -48,7 +48,7 @@ import javax.inject.Inject;
     NumberValidationOperation.class})
 @Extensible(alias = "validator-message-processor")
 @Export(
-    resources = {"/META-INF/services/org/mule/runtime/core/i18n/validation-messages.properties"})
+    resources = {"/META-INF/org/mule/runtime/core/i18n/validation-messages.properties"})
 @ErrorTypes(ValidationErrorTypes.class)
 @OnException(ValidationExceptionEnricher.class)
 @Throws(ValidationErrorTypeProvider.class)

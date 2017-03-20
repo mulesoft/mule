@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * modules META-INF directory under
  * 
  * <pre>
- * META-INF/services/org/mule/config/
+ * META-INF/org/mule/config/
  * </pre>
  * <p/>
  * The format of this file is a simple key / value pair. i.e.
