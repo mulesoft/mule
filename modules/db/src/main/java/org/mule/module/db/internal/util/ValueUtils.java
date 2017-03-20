@@ -7,6 +7,9 @@
 
 package org.mule.module.db.internal.util;
 
+/**
+ * This class groups utility methods to modify DB parameter values.
+ */
 public class ValueUtils
 {
 
@@ -16,7 +19,12 @@ public class ValueUtils
     {
     }
 
-    public static Object setNullValue(Object value)
+    /**
+     *
+     * @param value, the value of a DB parameter.
+     * @return null if the value is a NULL String, the same value otherwise.
+     */
+    public static Object convertsNullStringToNull(Object value)
     {
         if (NULL_VALUE.equals(value))
         {

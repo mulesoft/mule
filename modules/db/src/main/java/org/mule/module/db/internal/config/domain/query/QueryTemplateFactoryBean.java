@@ -7,7 +7,7 @@
 
 package org.mule.module.db.internal.config.domain.query;
 
-import static org.mule.module.db.internal.util.ValueUtils.setNullValue;
+import static org.mule.module.db.internal.util.ValueUtils.convertsNullStringToNull;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
 import org.mule.module.db.internal.domain.param.QueryParam;
 import org.mule.module.db.internal.domain.query.QueryParamValue;
@@ -83,7 +83,7 @@ public class QueryTemplateFactoryBean extends AbstractFactoryBean<QueryTemplate>
                 value = param.getValue();
             }
 
-            DefaultInputQueryParam newParam = new DefaultInputQueryParam(param.getIndex(), param.getType(), setNullValue(value), param.getName());
+            DefaultInputQueryParam newParam = new DefaultInputQueryParam(param.getIndex(), param.getType(), convertsNullStringToNull(value), param.getName());
 
             paramDefinitions.add(newParam);
         }
