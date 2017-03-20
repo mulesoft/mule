@@ -12,6 +12,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
+import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
@@ -231,7 +232,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   }
 
   public void setArgumentExpressionsString(String arguments) {
-    this.arguments = Arrays.asList(arguments.split("\\s*,\\s*"));
+    this.arguments = splitArgumentsExpression(arguments);
   }
 
   public void setArguments(List<?> arguments) {

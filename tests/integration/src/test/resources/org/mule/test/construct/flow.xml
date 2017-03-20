@@ -284,6 +284,11 @@
     <flow name="invoke4">
         <processor ref="invokeme-noargs"/>
     </flow>
+    
+   	<flow name="invokeArrayInArgs">
+        <invoke object-ref="test-array-appender" method="transformArray" methodArguments="#[['test', 'test']]"/>
+    </flow>
+    
 
     <flow name="enrich">
         <enricher target="#[mel:message.outboundProperties.helloHeader]" source="#[mel:payload]">
@@ -326,6 +331,11 @@
     <spring:bean name="appender" class="org.mule.runtime.core.transformer.simple.StringAppendTransformer">
         <spring:constructor-arg value="recieved"/>
     </spring:bean>
+    
+   	<spring:bean name="test-array-appender" class="org.mule.test.construct.TestStringAppendTransformer">
+        <spring:constructor-arg value="recieved"/>
+    </spring:bean>
+    
 
     <flow name="loggermessage">
         <append-string-transformer message=" Hello foo" />

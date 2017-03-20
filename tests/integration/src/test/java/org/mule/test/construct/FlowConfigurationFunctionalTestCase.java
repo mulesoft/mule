@@ -18,12 +18,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.MuleMessageAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
@@ -48,6 +50,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTestCase {
+
+  private static final String EXPECTED_ARRAY_IN_ARGS_RESULT = "testtestrecieved";
 
   public FlowConfigurationFunctionalTestCase() {
     setDisposeContextPerClass(true);
@@ -458,6 +462,12 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
   public void testInvoke4() throws Exception {
     // ensure no arguments work
     flowRunner("invoke4").withPayload("0").run();
+  }
+
+  @Test
+  public void testInvokeArrayInArgs() throws Exception {
+    final InternalMessage message = flowRunner("invokeArrayInArgs").withPayload("0").run().getMessage();
+    assertThat(message.getPayload().getValue(), equalTo(EXPECTED_ARRAY_IN_ARGS_RESULT));
   }
 
   @Test
