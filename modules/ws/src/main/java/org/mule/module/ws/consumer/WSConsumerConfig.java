@@ -50,7 +50,7 @@ public class WSConsumerConfig implements MuleContextAware
     private HttpRequesterConfig connectorConfig;
     private WSSecurity security;
 
-    WSConsumerConfig()
+    public WSConsumerConfig()
     {
         String useConnectorToRetrieveWsdlValue = System.getProperty(MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL, "false");
         useConnectorToRetrieveWsdl = Boolean.parseBoolean(useConnectorToRetrieveWsdlValue);
