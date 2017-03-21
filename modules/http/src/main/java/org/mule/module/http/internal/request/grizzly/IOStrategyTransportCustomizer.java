@@ -21,23 +21,18 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
     private static final String REQUESTER_WORKER_THREAD_NAME_SUFFIX = ".worker";
 
     private final String threadNamePrefix;
-    private Integer maxWorkerPoolSize = null;
-    private Integer workerCoreSize = null;
-    private Integer maxKernelPoolSize = null;
-    private Integer kernelCoreSize = null;
+    private Integer maxWorkerPoolSize;
+    private Integer workerCoreSize;
+    private Integer maxKernelPoolSize;
+    private Integer kernelCoreSize;
 
-    public IOStrategyTransportCustomizer(String threadNamePrefix, int maxWorkerPoolSize, int workerCoreSize, int maxKernelPoolSize, int kernelCoreSize)
+    public IOStrategyTransportCustomizer(String threadNamePrefix, Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize)
     {
         this.threadNamePrefix = threadNamePrefix;
         this.maxWorkerPoolSize = maxWorkerPoolSize;
         this.workerCoreSize = workerCoreSize;
         this.maxKernelPoolSize = maxKernelPoolSize;
         this.kernelCoreSize = kernelCoreSize;
-    }
-
-    public IOStrategyTransportCustomizer(String threadNamePrefix)
-    {
-        this.threadNamePrefix = threadNamePrefix;
     }
 
     @Override
@@ -48,7 +43,6 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
 
         customizePoolSize(transport);
 
-        transport.getWorkerThreadPoolConfig().setCorePoolSize(1).setMaxPoolSize(1);
         transport.getKernelThreadPoolConfig().setPoolName(threadNamePrefix);
         transport.getWorkerThreadPoolConfig().setPoolName(threadNamePrefix + REQUESTER_WORKER_THREAD_NAME_SUFFIX);
     }
