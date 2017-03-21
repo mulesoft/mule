@@ -6,11 +6,13 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.MuleEvent;
+import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 
@@ -20,6 +22,7 @@ import org.junit.Test;
 
 public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase
 {
+    private Latch latch = new Latch();
 
     @Override
     protected String getConfigFile()
@@ -38,6 +41,13 @@ public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTe
     {
         super.writeResponse(response);
         response.addHeader(CONNECTION, CLOSE);
+        // Avoid closing the connection until the response is received
+        response.flushBuffer();
+        try {
+            latch.await(1, SECONDS);
+        } catch (InterruptedException e) {
+            // Do nothing
+        }
     }
 
     @Test
@@ -45,5 +55,6 @@ public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTe
     {
         MuleEvent response = runFlow("testFlowHttps", TEST_PAYLOAD);
         assertThat(response.getMessage().getPayloadAsString(), is(DEFAULT_RESPONSE));
+        latch.release();
     }
 }
