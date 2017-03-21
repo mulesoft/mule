@@ -31,6 +31,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 {
 
     protected abstract Class<T> getOAuthManagerClass();
+    private final static String EVENT_STATE_OVERRIDE_PROPERTY="eventStateOverrideProperty";
 
     @Override
     public final void start() throws MuleException
@@ -97,7 +98,11 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     private void setState(Map<String, String> extraParameters, MuleEvent event)
     {
-        String state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId());
+    	String eventStateProperty=OAuthProperties.EVENT_STATE_TEMPLATE;
+    	if(System.getProperty(EVENT_STATE_OVERRIDE_PROPERTY) != null){
+    		eventStateProperty=System.getProperty(EVENT_STATE_OVERRIDE_PROPERTY);
+    	}
+        String state = String.format(eventStateProperty, event.getId());
 
         if (this.getState() != null)
         {
