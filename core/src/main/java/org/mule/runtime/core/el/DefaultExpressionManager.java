@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-
 import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.Collection;
@@ -46,14 +45,16 @@ import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
-  public static final String MEL_PREFIX = "mel:";
+  public static final String DW_PREFIX = "dw";
+  public static final String MEL_PREFIX = "mel";
+  public static final String PREFIX_EXPR_SEPARATOR = ":";
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
 
   private MuleContext muleContext;
   private ExtendedExpressionLanguage expressionLanguage;
   // Default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
-  private boolean forceMel;
+  private boolean melDefault;
 
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
@@ -63,7 +64,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       final DataWeaveExpressionLanguage dataWeaveExpressionLanguage = new DataWeaveExpressionLanguage(expressionExecutor);
       final MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
       this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dataWeaveExpressionLanguage, mvelExpressionLanguage);
-      this.forceMel = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isForceMel();
+      this.melDefault = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isMelDefault();
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -76,8 +77,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     for (GlobalBindingContextProvider contextProvider : contextProviders) {
       expressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
     }
-    if (forceMel) {
-      logger.warn("Forcing MEL as the default expression language.");
+    if (melDefault) {
+      logger.warn("Using MEL as the default expression language.");
     }
   }
 
@@ -211,7 +212,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
     logger.warn("Expression parsing is deprecated, regular evaluations should be used instead.");
-    if (hasMelExpression(expression) || forceMel) {
+    if (hasMelExpression(expression) || melDefault) {
       return parser.parse(token -> {
         Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
         if (result instanceof InternalMessage) {
@@ -285,7 +286,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   private boolean hasMelExpression(String expression) {
-    return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX);
+    return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
   }
 
 }
