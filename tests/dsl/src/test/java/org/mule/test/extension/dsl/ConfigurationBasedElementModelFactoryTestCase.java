@@ -314,7 +314,7 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
 
     assertThat(responseBuilderElement.getDsl().getChild("headers").isPresent(), is(true));
     assertValue(responseBuilderElement.findElement(newIdentifier("headers", HTTP_NS)).get(),
-                "#[mel:['content-type' : 'text/plain']]");
+                "#[{'content-type' : 'text/plain'}]");
 
     assertValue(listenerElement.findElement("path").get(), "testBuilder");
   }

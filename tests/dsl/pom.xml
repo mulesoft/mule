@@ -55,6 +55,14 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-wsc</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>

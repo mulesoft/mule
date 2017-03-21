@@ -692,12 +692,11 @@ class DeclarationBasedElementModelFactory {
         .flatMap(f -> isParameterGroup(f) ? ((ObjectType) f.getValue()).getFields().stream() : of(f))
         .collect(toList());
 
-    objectValue.getParameters()
-        .forEach((name, value) -> fields.stream()
-            .filter(f -> getAlias(f).equals(name))
-            .findFirst()
-            .ifPresent(field -> objectDsl.getContainedElement(name)
-                .ifPresent(nestedDsl -> addObjectField(field.getValue(), value, nestedDsl, objectConfig, objectElement))));
+    fields.forEach(field -> objectValue.getParameters().entrySet().stream()
+        .filter(e -> getAlias(field).equals(e.getKey()))
+        .findFirst()
+        .ifPresent(e -> objectDsl.getContainedElement(e.getKey())
+            .ifPresent(nestedDsl -> addObjectField(field.getValue(), e.getValue(), nestedDsl, objectConfig, objectElement))));
   }
 
   private ComponentIdentifier asIdentifier(DslElementSyntax fieldDsl) {
