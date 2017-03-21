@@ -37,7 +37,7 @@ public class WSConsumerHttpRequesterTestCase extends AbstractWSDLServerTestCase
         Map<String, WSConsumer> consumers = muleContext.getRegistry().lookupByType(WSConsumer.class);
         // if one consumer is present in the registry, the config
         // was correctly initialized
-        assertThat(EXPECTED_NUMBER_OF_WS_CONSUMERS, equalTo(consumers.values().size()));
+        assertThat(consumers.values().size(), equalTo(EXPECTED_NUMBER_OF_WS_CONSUMERS));
     }
 
 }
