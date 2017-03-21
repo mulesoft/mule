@@ -102,6 +102,10 @@ public class GrizzlyHttpClient implements HttpClient
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
     private String threadNamePrefix;
+    private final Integer kernelCoreSize;
+    private final Integer maxKernelCoreSize;
+    private final Integer workerCoreSize;
+    private final Integer maxWorkerCoreSize;
     private String ownerName;
 
     private AsyncHttpClient asyncHttpClient;
@@ -117,6 +121,10 @@ public class GrizzlyHttpClient implements HttpClient
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
         this.threadNamePrefix = config.getThreadNamePrefix();
         this.ownerName = config.getOwnerName();
+        this.kernelCoreSize = config.getKernelCoreSize();
+        this.maxKernelCoreSize = config.getMaxKernelPoolSize();
+        this.workerCoreSize = config.getWorkerCoreSize();
+        this.maxWorkerCoreSize = config.getMaxWorkerPoolSize();
     }
 
     @Override
@@ -221,8 +229,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
-        compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer
-                                                                    (threadNamePrefix));
+        compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer(threadNamePrefix, maxWorkerCoreSize, workerCoreSize, maxKernelCoreSize, kernelCoreSize));
         compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
 
         if (clientSocketProperties != null)
