@@ -22,8 +22,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-6926")
 public class TextFileStoreTestCase extends AbstractMuleContextTestCase {
 
   private static final int TTL = 3000;
