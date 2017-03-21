@@ -62,11 +62,8 @@ public class UUIDTestCase extends AbstractMuleTestCase
     @Test
     public void testUUUIDLength() throws Exception
     {
-        for (int i = 0; i < 1000; i++)
-        {
-            String generatedId = UUID.getUUID();
-            assertThat(generatedId.length(), is(UUID.UUID_LENGTH));
-        }
+        String generatedId = UUID.getUUID();
+        assertThat(generatedId.length(), is(UUID.UUID_LENGTH));
     }
 
 }

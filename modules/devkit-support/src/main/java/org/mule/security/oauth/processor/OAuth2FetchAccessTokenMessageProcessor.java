@@ -144,7 +144,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         }
 
         InboundPropertiesDelegate properties = getPropertiesDelegate(restoredEvent);
-        String cleanedState = getExtraId(state);
+        String cleanedState = getOriginalId(state);
 
         if (cleanedState != null)
         {
@@ -227,7 +227,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     }
 
-    private String getExtraId(String state)
+    private String getOriginalId(String state)
     {
         String clusterId = getProperty(CLUSTER_NODE_ID_PROPERTY_KEY);
 
