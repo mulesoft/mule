@@ -19,20 +19,6 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
-import javax.net.ssl.SSLContext;
-
 import org.mule.api.CompletionHandler;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
@@ -58,8 +44,6 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
@@ -74,6 +58,22 @@ import com.ning.http.client.Response;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyHttpClient implements HttpClient
 {
@@ -99,6 +99,11 @@ public class GrizzlyHttpClient implements HttpClient
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
     private String threadNamePrefix;
+    private final Integer kernelCoreSize;
+    private final Integer maxKernelCoreSize;
+    private final Integer workerCoreSize;
+    private final Integer maxWorkerCoreSize;
+    private String ownerName;
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
@@ -112,6 +117,11 @@ public class GrizzlyHttpClient implements HttpClient
         this.usePersistentConnections = config.isUsePersistentConnections();
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
         this.threadNamePrefix = config.getThreadNamePrefix();
+        this.ownerName = config.getOwnerName();
+        this.kernelCoreSize = config.getKernelCoreSize();
+        this.maxKernelCoreSize = config.getMaxKernelPoolSize();
+        this.workerCoreSize = config.getWorkerCoreSize();
+        this.maxWorkerCoreSize = config.getMaxWorkerPoolSize();
     }
 
     @Override
@@ -199,8 +209,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         GrizzlyAsyncHttpProviderConfig providerConfig = new GrizzlyAsyncHttpProviderConfig();
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
-        compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer
-                                                                    (threadNamePrefix));
+        compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer(threadNamePrefix, maxWorkerCoreSize, workerCoreSize, maxKernelCoreSize, kernelCoreSize));
         compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
 
         if (clientSocketProperties != null)
