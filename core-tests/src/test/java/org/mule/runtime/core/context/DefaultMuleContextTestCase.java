@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_R
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.registry.ServiceType.EXCEPTION;
-import static org.mule.runtime.core.config.ExceptionHelper.SERVICE_ROOT;
+import static org.mule.runtime.core.config.ExceptionHelper.RESOURCE_ROOT;
 import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -83,7 +83,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception {
     URL baseUrl = DefaultMuleContextTestCase.class.getClassLoader().getResource(".");
     File file =
-        new File(baseUrl.getFile() + SERVICE_ROOT + EXCEPTION.getPath() + "/" + TEST_PROTOCOL + "-exception-mappings.properties");
+        new File(baseUrl.getFile() + RESOURCE_ROOT + EXCEPTION.getPath() + "/" + TEST_PROTOCOL
+            + "-exception-mappings.properties");
     createExceptionMappingFile(file, INITIAL_VALUE);
 
     createMuleContext();

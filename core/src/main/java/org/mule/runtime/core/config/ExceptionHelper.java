@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 public final class ExceptionHelper extends org.mule.runtime.api.exception.ExceptionHelper {
 
-  public static final String SERVICE_ROOT = "META-INF/services/";
+  public static final String RESOURCE_ROOT = "META-INF/";
 
   /**
    * This is the property to set the error code to no the message it is the property name the Transport provider uses set the set
@@ -84,7 +84,7 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
 
       J2SE_VERSION = System.getProperty("java.specification.version");
 
-      String name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/mule-exception-codes.properties";
+      String name = RESOURCE_ROOT + ServiceType.EXCEPTION.getPath() + "/mule-exception-codes.properties";
       InputStream in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
       if (in == null) {
         throw new IllegalArgumentException("Failed to load resource: " + name);
@@ -92,7 +92,7 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
       errorCodes.load(in);
       in.close();
 
-      name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/mule-exception-config.properties";
+      name = RESOURCE_ROOT + ServiceType.EXCEPTION.getPath() + "/mule-exception-config.properties";
       in = ExceptionHelper.class.getClassLoader().getResourceAsStream(name);
       if (in == null) {
         throw new IllegalArgumentException("Failed to load resource: " + name);
@@ -116,7 +116,7 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
     if (m != null) {
       return m;
     } else {
-      String name = SERVICE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
+      String name = RESOURCE_ROOT + ServiceType.EXCEPTION.getPath() + "/" + protocol + "-exception-mappings.properties";
       Properties p = PropertiesUtils.loadAllProperties(name, muleContext.getExecutionClassLoader());
       errorMappings.put(getErrorMappingCacheKey(protocol, muleContext), p);
       registerAppDisposeListener(muleContext);

@@ -264,7 +264,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
    * See if there's a preferred connector class
    */
   protected Class findConnectorClass(Class basicConnector, String transportName) {
-    String preferredPropertiesURL = "META-INF/services/org/mule/transport/preferred-" + transportName + ".properties";
+    String preferredPropertiesURL = "META-INF/org/mule/transport/preferred-" + transportName + ".properties";
     InputStream stream = AbstractMuleNamespaceHandler.class.getClassLoader().getResourceAsStream(preferredPropertiesURL);
     if (stream != null) {
       try {
