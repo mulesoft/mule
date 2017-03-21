@@ -9,6 +9,8 @@ package org.mule.test.extension.dsl;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
@@ -21,6 +23,8 @@ import org.w3c.dom.Element;
 public class ConfigurationBasedDslElementModelSerializerTestCase extends AbstractElementModelTestCase {
 
   public static final int SOCKETS_SEND_RECEIVE_PATH = 5;
+  public static final int WSC_CONSUME_PATH = 6;
+
   private Element flow;
   private String expectedAppXml;
 
@@ -65,6 +69,9 @@ public class ConfigurationBasedDslElementModelSerializerTestCase extends Abstrac
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(REQUESTER_PATH))));
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(DB_INSERT_PATH))));
     flow.appendChild(converter.asXml(resolve(componentsFlow.getNestedComponents().get(SOCKETS_SEND_RECEIVE_PATH))));
+    DslElementModel<NamedObject> resolve = resolve(componentsFlow.getNestedComponents().get(WSC_CONSUME_PATH));
+    Element element = converter.asXml(resolve);
+    flow.appendChild(element);
 
     doc.getDocumentElement().appendChild(flow);
 

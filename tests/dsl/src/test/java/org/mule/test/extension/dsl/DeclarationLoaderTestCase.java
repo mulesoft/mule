@@ -6,9 +6,6 @@
  */
 package org.mule.test.extension.dsl;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newArtifact;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newListValue;

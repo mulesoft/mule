@@ -3,9 +3,10 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <db:config name="dbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true">
@@ -43,6 +44,7 @@
             <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
             <reconnect blocking="true" count="1" frequency="0"/>
             <httpn:response>
+                <httpn:body>#[{'my': 'map'}]</httpn:body>
                 <httpn:headers>
                     #[{{'content-type' : 'text/plain'}}]
                 </httpn:headers>
@@ -75,6 +77,15 @@
                                       initialBufferSize="51"
                                       maxInMemorySize="1000"/>
         </sockets:send-and-receive>
+
+        <wsc:consume operation="GetCitiesByCountry">
+            <wsc:message>
+                <wsc:body>#[payload.body]</wsc:body>
+                <wsc:headers>#[{"headers": {con#headerIn: "Header In Value",con#headerInOut: "Header In Out Value"}]</wsc:headers>
+                <wsc:attachments>#[{}]</wsc:attachments>
+            </wsc:message>
+        </wsc:consume>
+
     </flow>
 
 </mule>
