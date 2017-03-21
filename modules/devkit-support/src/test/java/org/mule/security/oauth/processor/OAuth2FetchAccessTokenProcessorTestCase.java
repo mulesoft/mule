@@ -18,8 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
-import static org.mule.security.oauth.OAuthProperties.EVENT_STATE_TEMPLATE;
 import static org.mule.security.oauth.notification.OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END;
+import org.mule.DefaultMuleContext;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -36,7 +36,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
@@ -54,7 +53,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
 {
 
     private static final String verifier = "verifier";
-    private static final String eventId = UUID.randomUUID().toString();
+    private static final String eventId = getEventId();
 
     private String state;
     private String incomingState;
@@ -74,7 +73,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     public void setUp() throws Exception
     {
         state = "my state";
-        incomingState = String.format(EVENT_STATE_TEMPLATE + "%s", eventId, state);
+        incomingState = eventId + state;
         exception = false;
 
         restoredEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS);
@@ -102,6 +101,12 @@ public class OAuth2FetchAccessTokenProcessorTestCase
                 return (String) invocation.getArguments()[0];
             }
         });
+    }
+
+    private static String getEventId()
+    {
+        MuleContext context = new DefaultMuleContext();
+        return context.getUniqueIdString();
     }
 
     @After

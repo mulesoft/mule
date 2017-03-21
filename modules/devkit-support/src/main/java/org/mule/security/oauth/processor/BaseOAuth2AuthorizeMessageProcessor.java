@@ -97,7 +97,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     private void setState(Map<String, String> extraParameters, MuleEvent event)
     {
-        String state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId());
+        String state = event.getId();
 
         if (this.getState() != null)
         {

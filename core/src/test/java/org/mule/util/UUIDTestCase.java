@@ -17,7 +17,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 
@@ -54,6 +56,16 @@ public class UUIDTestCase extends AbstractMuleTestCase
         for (int index = 0; index < numberOfIdsToGenerate; index++)
         {
             assertEquals(Integer.valueOf(index), idsWithIndexes.get(index)[1]);
+        }
+    }
+
+    @Test
+    public void testUUUIDLength() throws Exception
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            String generatedId = UUID.getUUID();
+            assertThat(generatedId.length(), is(UUID.UUID_LENGTH));
         }
     }
 
