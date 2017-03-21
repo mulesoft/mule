@@ -65,6 +65,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     ElementDeclarer db = ElementDeclarer.forExtension("Database");
     ElementDeclarer http = ElementDeclarer.forExtension("HTTP");
     ElementDeclarer sockets = ElementDeclarer.forExtension("Sockets");
+    ElementDeclarer wsc = ElementDeclarer.forExtension("Web Service Consumer");
 
     applicationDeclaration = newArtifact()
         .withConfig(db.newConfiguration("config")
@@ -140,11 +141,12 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                    .build())
                 .withParameter("response",
                                newObjectValue()
-                                   .withParameter("headers", "#[mel:['content-type' : 'text/plain']]")
+                                   .withParameter("headers", "#[{'content-type' : 'text/plain'}]")
+                                   .withParameter("body", "#[{'my': 'map'}]")
                                    .build())
                 .getDeclaration())
             .withComponent(db.newOperation("bulkInsert")
-                .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
+
                 .withParameter("parameterTypes",
                                newListValue()
                                    .withValue(newObjectValue()
@@ -154,6 +156,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                        .withParameter("key", "position")
                                        .withParameter("type", "INTEGER").build())
                                    .build())
+                .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
                 .getDeclaration())
             .withComponent(http.newOperation("request")
                 .withConfig("httpRequester")
@@ -162,7 +165,6 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                 .getDeclaration())
             .withComponent(db.newOperation("insert")
                 .withConfig("dbConfig")
-                .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)")
                 .withParameter("parameterTypes",
                                newListValue()
                                    .withValue(newObjectValue()
@@ -170,6 +172,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                        .withParameter("type", "CLOB").build())
                                    .build())
                 .withParameter("inputParameters", "#[mel:['description' : payload]]")
+                .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)")
                 .getDeclaration())
             .withComponent(sockets.newOperation("sendAndReceive")
                 .withParameter(TARGET_PARAMETER_NAME, "myVar")
@@ -181,6 +184,15 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                    .withParameter("initialBufferSize", "51")
                                    .withParameter("maxInMemorySize", "1000")
                                    .build())
+                .getDeclaration())
+            .withComponent(wsc.newOperation("consume")
+                .withParameter("operation", "GetCitiesByCountry")
+                .withParameter("message", newObjectValue()
+                    .withParameter("attachments", "#[{}]")
+                    .withParameter("headers",
+                                   "#[{\"headers\": {con#headerIn: \"Header In Value\",con#headerInOut: \"Header In Out Value\"}]")
+                    .withParameter("body", "#[payload.body]")
+                    .build())
                 .getDeclaration())
             .getDeclaration())
         .getDeclaration();
