@@ -6,7 +6,7 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
@@ -44,7 +44,7 @@ public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTe
         // Avoid closing the connection until the response is received
         response.flushBuffer();
         try {
-            latch.await(1, SECONDS);
+            latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
         } catch (InterruptedException e) {
             // Do nothing
         }
