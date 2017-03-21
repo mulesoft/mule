@@ -13,11 +13,11 @@ import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -90,7 +90,7 @@ class ConfigurationBasedElementModelFactory {
 
     Optional<Map.Entry<ExtensionModel, DslSyntaxResolver>> entry =
         resolvers.entrySet().stream()
-            .filter(e -> e.getKey().getXmlDslModel().getNamespace().equals(identifier.getNamespace()))
+            .filter(e -> e.getKey().getXmlDslModel().getPrefix().equals(identifier.getNamespace()))
             .findFirst();
 
     if (!entry.isPresent()) {
@@ -536,7 +536,7 @@ class ConfigurationBasedElementModelFactory {
     if (dsl.supportsTopLevelDeclaration() || dsl.supportsChildDeclaration()) {
       return Optional.of(builder()
           .withName(dsl.getElementName())
-          .withNamespace(dsl.getNamespace())
+          .withNamespace(dsl.getPrefix())
           .build());
     }
 
@@ -551,11 +551,11 @@ class ConfigurationBasedElementModelFactory {
     switch (paramModel.getName()) {
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         ComponentIdentifier reconnectId = newIdentifier(RECONNECT_ELEMENT_IDENTIFIER,
-                                                        paramDsl.getNamespace());
+                                                        paramDsl.getPrefix());
 
         ComponentConfiguration config = nested.containsKey(reconnectId)
             ? nested.get(reconnectId)
-            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getNamespace()));
+            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix()));
 
         if (config != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
@@ -564,7 +564,7 @@ class ConfigurationBasedElementModelFactory {
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         ComponentConfiguration redelivery = nested.get(newIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getNamespace()));
+                                                                     paramDsl.getPrefix()));
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
         }
@@ -588,9 +588,9 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_STREAM, paramDsl.getNamespace());
-        ComponentIdentifier repeatableMemoryStream = newIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS, paramDsl.getNamespace());
-        ComponentIdentifier repeatableFileStream = newIdentifier(REPEATABLE_FILE_STORE_STREAM_ALIAS, paramDsl.getNamespace());
+        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_STREAM, paramDsl.getPrefix());
+        ComponentIdentifier repeatableMemoryStream = newIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS, paramDsl.getPrefix());
+        ComponentIdentifier repeatableFileStream = newIdentifier(REPEATABLE_FILE_STORE_STREAM_ALIAS, paramDsl.getPrefix());
 
         ComponentConfiguration streaming = null;
         if (nested.containsKey(inMemoryStream)) {

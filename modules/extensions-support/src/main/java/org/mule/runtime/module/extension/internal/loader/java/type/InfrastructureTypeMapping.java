@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import static org.mule.runtime.api.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_TLS_NAMESPACE;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;

@@ -9,14 +9,14 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;

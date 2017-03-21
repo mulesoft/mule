@@ -9,8 +9,8 @@ package org.mule.test.extension.dsl;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.api.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.api.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import org.mule.metadata.api.model.ObjectType;
@@ -261,7 +261,7 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     assertValue(elementOne.findElement("key").get(), "description");
     assertValue(elementOne.findElement("type").get(), "CLOB");
 
-    assertValue(dbElement.findElement(newIdentifier("input-parameters", DB_NS)).get(), "#[mel:['description' : payload]]");
+    assertValue(dbElement.findElement(newIdentifier("input-parameters", DB_NS)).get(), "#[{{'description' : payload}}]");
   }
 
   protected void assertRequestOperationWithFlatParameters(ComponentConfiguration requester) {
@@ -314,7 +314,7 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
 
     assertThat(responseBuilderElement.getDsl().getChild("headers").isPresent(), is(true));
     assertValue(responseBuilderElement.findElement(newIdentifier("headers", HTTP_NS)).get(),
-                "#[mel:['content-type' : 'text/plain']]");
+                "#[{{'content-type' : 'text/plain'}}]");
 
     assertValue(listenerElement.findElement("path").get(), "testBuilder");
   }

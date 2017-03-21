@@ -19,6 +19,7 @@ import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -28,13 +29,19 @@ import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,10 +67,10 @@ import org.w3c.dom.Element;
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final String DB_CONFIG = "dbConfig";
-  protected static final String DB_NS = "http://www.mulesoft.org/schema/mule/db";
+  protected static final String DB_NS = "db";
   protected static final String HTTP_LISTENER_CONFIG = "httpListener";
   protected static final String HTTP_REQUESTER_CONFIG = "httpRequester";
-  protected static final String HTTP_NS = "http://www.mulesoft.org/schema/mule/httpn";
+  protected static final String HTTP_NS = "httpn";
   protected static final String COMPONENTS_FLOW = "testFlow";
   protected static final int LISTENER_PATH = 0;
   protected static final int DB_BULK_INSERT_PATH = 2;
@@ -77,7 +84,13 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
   @Before
   public void setup() throws Exception {
-    dslContext = DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions());
+    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
+    String core = IOUtils
+        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
+    ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
+
+    dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
+        .addAll(extensions).add(coreModel).build());
     modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
@@ -151,15 +164,21 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
   // Scaffolding
   protected ApplicationModel loadApplicationModel() throws Exception {
+
     InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(getConfigFile());
     checkArgument(appIs != null, "The given application was not found as resource");
 
     Document document = new XmlConfigurationDocumentLoader()
         .loadDocument(of(muleContext.getExtensionManager()), getConfigFile(), appIs);
 
-    ConfigLine configLine = new XmlApplicationParser(new SpiServiceRegistry())
-        .parse(document.getDocumentElement())
-        .orElseThrow(() -> new Exception("Failed to load config"));
+    ConfigLine configLine = new XmlApplicationParser(
+                                                     new XmlApplicationServiceRegistry(new SpiServiceRegistry(),
+                                                                                       DslResolvingContext.getDefault(muleContext
+                                                                                           .getExtensionManager()
+                                                                                           .getExtensions())))
+                                                                                               .parse(document
+                                                                                                   .getDocumentElement())
+                                                                                               .orElseThrow(() -> new Exception("Failed to load config"));
 
     ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
         .addConfigFile(new ConfigFile(getConfigFile(), singletonList(configLine)))

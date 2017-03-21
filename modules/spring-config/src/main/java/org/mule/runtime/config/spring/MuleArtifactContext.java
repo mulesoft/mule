@@ -28,11 +28,9 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.REQUI
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
-import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
@@ -41,6 +39,7 @@ import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.spring.processors.ComponentLocatorCreatePostProcessor;
@@ -54,7 +53,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
@@ -63,16 +61,10 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
-import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-
-import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -165,7 +157,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
               .forEach(componentBuildingDefinitionRegistry::register);
         });
 
-    xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
+
+    xmlApplicationParser = createApplicationParser();
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
@@ -175,6 +168,16 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
     return new XmlConfigurationDocumentLoader();
+  }
+
+  private XmlApplicationParser createApplicationParser() {
+    ExtensionManager extensionManager = muleContext.getExtensionManager();
+
+    ServiceRegistry customRegistry = extensionManager != null
+        ? new XmlApplicationServiceRegistry(serviceRegistry, DslResolvingContext.getDefault(extensionManager.getExtensions()))
+        : serviceRegistry;
+
+    return new XmlApplicationParser(customRegistry);
   }
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {
@@ -490,39 +493,4 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return muleContext.getRegistry().get(OBJECT_METADATA_SERVICE);
   }
 
-  private class XmlServiceRegistry extends AbstractServiceRegistry {
-
-    private final ServiceRegistry delegate;
-    private final XmlNamespaceInfoProvider extensionsXmlInfoProvider;
-
-    public XmlServiceRegistry(ServiceRegistry delegate, MuleContext muleContext) {
-      this.delegate = delegate;
-      final ExtensionManager extensionManager = muleContext.getExtensionManager();
-      List<XmlNamespaceInfo> extensionNamespaces;
-      if (extensionManager != null) {
-        extensionNamespaces = extensionManager.getExtensions().stream()
-            .map(ext -> {
-              XmlDslModel xmlDslModel = ext.getXmlDslModel();
-              return xmlDslModel != null
-                  ? new StaticXmlNamespaceInfo(xmlDslModel.getNamespace(), xmlDslModel.getPrefix()) : null;
-            })
-            .filter(info -> info != null)
-            .collect(new ImmutableListCollector<>());
-      } else {
-        extensionNamespaces = ImmutableList.of();
-      }
-
-      extensionsXmlInfoProvider = new StaticXmlNamespaceInfoProvider(extensionNamespaces);
-    }
-
-    @Override
-    protected <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {
-      Collection<T> providers = delegate.lookupProviders(providerClass, classLoader);
-      if (XmlNamespaceInfoProvider.class.equals(providerClass)) {
-        providers = ImmutableList.<T>builder().addAll(providers).add((T) extensionsXmlInfoProvider).build();
-      }
-
-      return providers;
-    }
-  }
 }

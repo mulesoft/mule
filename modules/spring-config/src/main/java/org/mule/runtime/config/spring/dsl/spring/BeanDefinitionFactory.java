@@ -11,7 +11,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -107,7 +107,7 @@ public class BeanDefinitionFactory {
    */
   private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
-          .add(builder().withNamespace(CORE_NAMESPACE).withName(QUEUE_STORE).build())
+          .add(builder().withNamespace(CORE_PREFIX).withName(QUEUE_STORE).build())
           .add(MULE_PROPERTIES_IDENTIFIER)
           .add(MULE_PROPERTY_IDENTIFIER)
           .add(SPRING_ENTRY_IDENTIFIER)

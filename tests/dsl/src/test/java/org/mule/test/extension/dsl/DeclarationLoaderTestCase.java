@@ -6,6 +6,9 @@
  */
 package org.mule.test.extension.dsl;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newArtifact;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newListValue;
@@ -26,6 +29,7 @@ import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTy
 import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder.USE_SECURE_HASH;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.FlowElementDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
@@ -43,7 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
-public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractElementModelTestCase {
+public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
 
   private String expectedAppXml;
   private ArtifactDeclaration applicationDeclaration;
@@ -61,7 +65,7 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
 
   @Override
   protected String getConfigFile() {
-    return "integration-multi-config-dsl-app.xml";
+    return "loading-artifact-config-dsl-app.xml";
   }
 
   private void createAppDeclaration() {
@@ -69,8 +73,17 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     ElementDeclarer db = ElementDeclarer.forExtension("Database");
     ElementDeclarer http = ElementDeclarer.forExtension("HTTP");
     ElementDeclarer sockets = ElementDeclarer.forExtension("Sockets");
+    ElementDeclarer core = ElementDeclarer.forExtension("Mule Core");
 
     applicationDeclaration = newArtifact()
+        .withGlobalParameter(db.newGlobalParameter("query")
+            .withRefName("selectQuery")
+            .withValue(newObjectValue()
+                .ofType(QueryDefinition.class.getName())
+                .withParameter("sql", "select * from PLANET where name = :name")
+                .withParameter("inputParameters", "#[mel:['name' : payload]]")
+                .build())
+            .getDeclaration())
         .withConfig(db.newConfiguration("config")
             .withRefName("dbConfig")
             .withConnection(db.newConnection("derby-connection")
@@ -147,6 +160,28 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                                    .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
                                    .build())
                 .getDeclaration())
+            .withComponent(core.newRouter("choice")
+                .withRoute(core.newRoute("when")
+                    .withParameter("expression", "#[true]")
+                    .withComponent(db.newOperation("bulkInsert")
+                        .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
+                        .withParameter("parameterTypes",
+                                       newListValue()
+                                           .withValue(newObjectValue()
+                                               .withParameter("key", "name")
+                                               .withParameter("type", "VARCHAR").build())
+                                           .withValue(newObjectValue()
+                                               .withParameter("key", "position")
+                                               .withParameter("type", "INTEGER").build())
+                                           .build())
+                        .getDeclaration())
+                    .getDeclaration())
+                .withRoute(core.newRoute("otherwise")
+                    .withComponent(core.newOperation("logger")
+                        .withParameter("message", "#[payload]")
+                        .getDeclaration())
+                    .getDeclaration())
+                .getDeclaration())
             .withComponent(db.newOperation("bulkInsert")
                 .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
                 .withParameter("parameterTypes",
@@ -193,25 +228,8 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
   @Test
   public void serialize() throws Exception {
     XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
-
-    applicationDeclaration.getConfigs()
-        .forEach(declaration -> {
-          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
-          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
-        });
-
-    applicationDeclaration.getFlows()
-        .forEach(flowDeclaration -> {
-          Element flow = createFlowNode(flowDeclaration);
-          flowDeclaration.getComponents()
-              .forEach(component -> {
-                Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(component);
-                flow.appendChild(converter.asXml(e.orElse(null)));
-              });
-        });
-
+    serializeArtifact(applicationDeclaration, converter);
     String serializationResult = write();
-
     compareXML(expectedAppXml, serializationResult);
   }
 
@@ -222,6 +240,24 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     ArtifactDeclaration artifact = XmlArtifactDeclarationLoader.getDefault(dslContext).load(getConfigFile(), configIs);
     XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
 
+    serializeArtifact(artifact, converter);
+
+    String serializationResult = write();
+
+    compareXML(expectedAppXml, serializationResult);
+  }
+
+  private Element createFlowNode(FlowElementDeclaration flowDeclaration) {
+    Element flow = doc.createElement("flow");
+    flow.setAttribute("name", flowDeclaration.getName());
+    flow.setAttribute("initialState",
+                      ((ParameterSimpleValue) flowDeclaration.getParameters().get(0).getValue()).getValue());
+
+    doc.getDocumentElement().appendChild(flow);
+    return flow;
+  }
+
+  private void serializeArtifact(ArtifactDeclaration artifact, XmlDslElementModelConverter converter) {
     artifact.getGlobalParameters()
         .forEach(declaration -> {
           Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
@@ -243,20 +279,6 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
                 flow.appendChild(converter.asXml(e.orElse(null)));
               });
         });
-
-    String serializationResult = write();
-
-    compareXML(expectedAppXml, serializationResult);
-  }
-
-  private Element createFlowNode(FlowElementDeclaration flowDeclaration) {
-    Element flow = doc.createElement("flow");
-    flow.setAttribute("name", flowDeclaration.getName());
-    flow.setAttribute("initialState",
-                      ((ParameterSimpleValue) flowDeclaration.getParameters().get(0).getValue()).getValue());
-
-    doc.getDocumentElement().appendChild(flow);
-    return flow;
   }
 
 }

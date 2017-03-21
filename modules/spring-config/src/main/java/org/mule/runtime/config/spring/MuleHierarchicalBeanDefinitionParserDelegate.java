@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
 import static org.mule.runtime.config.spring.MuleArtifactContext.postProcessBeanDefinition;
@@ -23,6 +22,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_R
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.util.XMLUtils.isLocalName;
@@ -363,7 +364,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
   private String getNamespace(Node parentNode) {
     if (parentNode.getPrefix() == null) {
-      return parentNode.getNamespaceURI().equals("http://www.mulesoft.org/schema/mule/core") ? CORE_NAMESPACE
+      return parentNode.getNamespaceURI().equals(CORE_NAMESPACE) ? CORE_PREFIX
           : POLICY_ROOT_ELEMENT;
     } else {
       return parentNode.getPrefix();

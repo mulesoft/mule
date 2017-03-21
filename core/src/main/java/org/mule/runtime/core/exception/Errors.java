@@ -7,7 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -27,7 +27,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
  */
 public abstract class Errors {
 
-  public static final String CORE_NAMESPACE_NAME = CORE_NAMESPACE.toUpperCase();
+  public static final String CORE_NAMESPACE_NAME = CORE_PREFIX.toUpperCase();
 
   public static final class Identifiers {
 
@@ -98,9 +98,9 @@ public abstract class Errors {
   public static final class ComponentIdentifiers {
 
     public static final ComponentIdentifier ANY =
-        builder().withNamespace(CORE_NAMESPACE).withName(ANY_IDENTIFIER).build();
+        builder().withNamespace(CORE_PREFIX).withName(ANY_IDENTIFIER).build();
     public static final ComponentIdentifier CRITICAL =
-        builder().withNamespace(CORE_NAMESPACE).withName(CRITICAL_IDENTIFIER).build();
+        builder().withNamespace(CORE_PREFIX).withName(CRITICAL_IDENTIFIER).build();
     public static final ComponentIdentifier TRANSFORMATION =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier EXPRESSION =

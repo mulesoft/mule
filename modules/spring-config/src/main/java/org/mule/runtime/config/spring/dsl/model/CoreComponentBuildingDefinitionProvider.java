@@ -22,11 +22,11 @@ import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_EXHAUSTED_ACTIONS;
 import static org.mule.runtime.api.config.PoolingProfile.POOL_INITIALISATION_POLICIES;
-import static org.mule.runtime.api.dsl.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.api.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.api.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
@@ -267,7 +267,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_TYPE = "transactionType";
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
-      new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE);
+      new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
   private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
   private MuleContext muleContext;
 

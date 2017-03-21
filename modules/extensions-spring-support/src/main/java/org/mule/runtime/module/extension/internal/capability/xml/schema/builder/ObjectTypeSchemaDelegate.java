@@ -19,10 +19,10 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParam
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;

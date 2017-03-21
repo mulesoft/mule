@@ -29,6 +29,7 @@ import java.util.Optional;
 public class ComponentConfiguration {
 
   private ComponentIdentifier identifier;
+  private Map<String, Object> customAttributes = new HashMap<>();
   private Map<String, String> parameters = new HashMap<>();
   private List<ComponentConfiguration> nestedComponents = new ArrayList<>();
   private String value;
@@ -53,6 +54,15 @@ public class ComponentConfiguration {
    */
   public Optional<String> getValue() {
     return Optional.ofNullable(value);
+  }
+
+
+  /**
+   * @param name the name of the custom attribute
+   * @return the custom attribute for the given name, or {@link Optional#empty()} if none was found.
+   */
+  public Optional<Object> getCustomAttribute(String name) {
+    return Optional.ofNullable(customAttributes.get(name));
   }
 
   /**
@@ -102,6 +112,19 @@ public class ComponentConfiguration {
      */
     public Builder withValue(String textContent) {
       componentConfiguration.value = textContent;
+      return this;
+    }
+
+    /**
+     * Adds a custom attribute to the {@link ComponentConfiguration}.
+     * This custom attribute is meant to hold metadata of the configuration.
+     *
+     * @param name custom attribute name.
+     * @param value custom attribute value.
+     * @return the builder.
+     */
+    public Builder addCustomAttribute(String name, Object value) {
+      componentConfiguration.customAttributes.put(name, value);
       return this;
     }
 

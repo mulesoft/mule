@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
-      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <db:query name="selectQuery">
+        <db:input-parameters>
+            #[mel:['name' : payload]]
+        </db:input-parameters>
+        <db:sql>select * from PLANET where name = :name</db:sql>
+    </db:query>
 
     <db:config name="dbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true">
@@ -18,7 +25,7 @@
     </db:config>
 
     <httpn:listener-config name="httpListener" basePath="/">
-        <httpn:listener-connection host="localhost" port="49019" protocol="HTTPS" disableValidation="true">
+        <httpn:listener-connection disableValidation="true" host="localhost" port="49019" protocol="HTTPS">
             <tls:context>
                 <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
@@ -49,6 +56,21 @@
             </httpn:response>
         </httpn:listener>
 
+        <choice>
+            <when expression="#[true]">
+                <db:bulk-insert>
+                    <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
+                    <db:parameter-types>
+                        <db:parameter-type key="name" type="VARCHAR" />
+                        <db:parameter-type key="position" type="INTEGER" />
+                    </db:parameter-types>
+                </db:bulk-insert>
+            </when>
+            <otherwise>
+                <logger message="#[payload]"/>
+            </otherwise>
+        </choice>
+
         <db:bulk-insert>
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
             <db:parameter-types>
@@ -70,10 +92,10 @@
         </db:insert>
 
         <sockets:send-and-receive target="myVar">
-         <repeatable-in-memory-stream bufferSizeIncrement="8"
-                                      bufferUnit="KB"
-                                      initialBufferSize="51"
-                                      maxInMemorySize="1000"/>
+            <repeatable-in-memory-stream bufferSizeIncrement="8"
+                                         bufferUnit="KB"
+                                         initialBufferSize="51"
+                                         maxInMemorySize="1000"/>
         </sockets:send-and-receive>
     </flow>
 
