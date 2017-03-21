@@ -205,7 +205,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.mule.runtime</groupId>
+                        <groupId>org.mule.runtime.plugins</groupId>
                         <artifactId>mule-extensions-maven-plugin</artifactId>
                         <version>${mule.extensions.maven.plugin.version}</version>
                         <executions>
