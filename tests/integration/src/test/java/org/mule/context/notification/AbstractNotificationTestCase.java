@@ -6,14 +6,15 @@
  */
 package org.mule.context.notification;
 
-import static org.junit.Assert.fail;
-
+import org.junit.After;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.util.Iterator;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests must define a "notificationLogger" listener
@@ -25,6 +26,15 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
     public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
+    }
+
+    @After
+    public void clearNotifications()
+    {
+        if (notificationLogger != null)
+        {
+            notificationLogger.getNotifications().clear();
+        }
     }
 
     protected void assertNotifications()
