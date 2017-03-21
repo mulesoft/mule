@@ -6,10 +6,14 @@
  */
 package org.mule.extension.ws.api;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.ImmutableMap.copyOf;
+import static com.google.common.collect.ImmutableMap.of;
 import org.mule.runtime.core.message.BaseAttributes;
+import org.mule.services.soap.api.message.SoapHeader;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,14 +25,14 @@ import java.util.Map;
 public final class WscAttributes extends BaseAttributes {
 
   private final Map<String, String> protocolHeaders;
-  private final Map<String, String> soapHeaders;
+  private final List<SoapHeader> soapHeaders;
 
-  public WscAttributes(Map<String, String> soapHeaders, Map<String, String> protocolHeaders) {
-    this.soapHeaders = soapHeaders != null ? copyOf(soapHeaders) : of();
+  public WscAttributes(List<SoapHeader> soapHeaders, Map<String, String> protocolHeaders) {
+    this.soapHeaders = soapHeaders != null ? ImmutableList.copyOf(soapHeaders) : ImmutableList.of();
     this.protocolHeaders = protocolHeaders != null ? copyOf(protocolHeaders) : of();
   }
 
-  public Map<String, String> getSoapHeaders() {
+  public List<SoapHeader> getSoapHeaders() {
     return soapHeaders;
   }
 

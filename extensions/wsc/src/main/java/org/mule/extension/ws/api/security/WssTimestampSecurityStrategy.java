@@ -6,19 +6,12 @@
  */
 package org.mule.extension.ws.api.security;
 
-import static java.util.Optional.empty;
-import static org.apache.ws.security.handler.WSHandlerConstants.TIMESTAMP;
-import static org.apache.ws.security.handler.WSHandlerConstants.TTL_TIMESTAMP;
-import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
-import org.mule.extension.ws.internal.security.SecurityStrategyType;
-import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.services.soap.api.security.SecurityStrategy;
+import org.mule.services.soap.api.security.TimestampSecurityStrategy;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.0
  */
-public class WssTimestampSecurityStrategy implements SecurityStrategy {
+public class WssTimestampSecurityStrategy implements SecurityStrategyAdapter {
 
   /**
    * The time difference between creation and expiry time in seconds. After this time the message is invalid.
@@ -45,25 +38,8 @@ public class WssTimestampSecurityStrategy implements SecurityStrategy {
   @Summary("Time unit to be used in the timeToLive parameter")
   private TimeUnit timeToLiveUnit;
 
-
   @Override
-  public SecurityStrategyType securityType() {
-    return OUTGOING;
-  }
-
-  @Override
-  public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return empty();
-  }
-
-  @Override
-  public String securityAction() {
-    return TIMESTAMP;
-  }
-
-  @Override
-  public Map<String, Object> buildSecurityProperties() {
-    return ImmutableMap.<String, Object>builder().put(TTL_TIMESTAMP, String.valueOf(timeToLiveUnit.toSeconds(timeToLive)))
-        .build();
+  public SecurityStrategy getSecurityStrategy() {
+    return new TimestampSecurityStrategy(timeToLiveUnit.toSeconds(timeToLive));
   }
 }

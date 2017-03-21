@@ -1,3 +1,0 @@
-<con:fail xmlns:con="http://service.ws.extension.mule.org/">
-    <text>Fail Message</text>
-</con:fail>

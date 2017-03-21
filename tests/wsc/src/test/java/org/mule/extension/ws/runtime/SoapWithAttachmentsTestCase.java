@@ -11,8 +11,10 @@ import static org.hamcrest.core.Is.is;
 import static org.mule.extension.ws.WscTestUtils.SIMPLE_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.resourceAsString;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -30,6 +32,6 @@ public class SoapWithAttachmentsTestCase extends AttachmentsTestCase {
   @Override
   protected void assertDownloadedAttachment(Message attachmentPart) throws XMLStreamException, IOException {
     String expectedAttachmentContent = resourceAsString(SIMPLE_ATTACHMENT);
-    assertThat(attachmentPart.getPayload().getValue(), is(expectedAttachmentContent));
+    assertThat(IOUtils.toString((InputStream) attachmentPart.getPayload().getValue()), is(expectedAttachmentContent));
   }
 }

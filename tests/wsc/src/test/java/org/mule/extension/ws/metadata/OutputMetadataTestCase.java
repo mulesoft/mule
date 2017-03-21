@@ -17,9 +17,7 @@ import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
 import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
 import static org.mule.extension.ws.WscTestUtils.HEADER_OUT;
-import static org.mule.extension.ws.internal.metadata.BaseWscResolver.ATTACHMENTS_FIELD;
-import static org.mule.extension.ws.internal.metadata.BaseWscResolver.BODY_FIELD;
-import static org.mule.extension.ws.internal.metadata.BaseWscResolver.HEADERS_FIELD;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -42,6 +40,11 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Features("Web Service Consumer")
 @Stories("Metadata")
 public class OutputMetadataTestCase extends AbstractMetadataTestCase {
+
+  // TODO classloading
+  public static final String BODY_FIELD = "body";
+  public static final String HEADERS_FIELD = "headers";
+  public static final String ATTACHMENTS_FIELD = "attachments";
 
   @Test
   @Description("Checks the Output Body Metadata for an operation that returns a simple string")
@@ -120,10 +123,7 @@ public class OutputMetadataTestCase extends AbstractMetadataTestCase {
 
     ObjectFieldType body = iterator.next();
     assertThat(body.getKey().getName().getLocalPart(), is(BODY_FIELD));
-    Collection<ObjectFieldType> fields = toObjectType(body.getValue()).getFields();
-    assertThat(fields, hasSize(1));
-    MetadataType value = fields.iterator().next().getValue();
-    assertThat(toObjectType(value).getFields(), hasSize(0));
+    assertThat(body.getValue(), is(instanceOf(NullType.class)));
 
     ObjectFieldType attachments = iterator.next();
     assertThat(attachments.getKey().getName().getLocalPart(), is(ATTACHMENTS_FIELD));

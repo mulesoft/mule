@@ -20,5 +20,4 @@ public class EchoFault {
   public String getText() {
     return text;
   }
-
 }

@@ -22,20 +22,20 @@ import java.util.Map;
 public final class ImmutableSoapRequest implements SoapRequest {
 
   private final InputStream content;
-  private final Map<String, String> soapHeaders;
+  private final List<SoapHeader> soapHeaders;
   private final Map<String, String> transportHeaders;
   private final List<SoapAttachment> attachments;
   private final MediaType contentType;
   private final String operation;
 
   ImmutableSoapRequest(InputStream content,
-                       Map<String, String> soapHeaders,
+                       List<SoapHeader> soapHeaders,
                        Map<String, String> transportHeaders,
                        List<SoapAttachment> attachments,
                        MediaType contentType,
                        String operation) {
     this.content = content;
-    this.soapHeaders = unmodifiableMap(soapHeaders);
+    this.soapHeaders = unmodifiableList(soapHeaders);
     this.transportHeaders = unmodifiableMap(transportHeaders);
     this.attachments = unmodifiableList(attachments);
     this.contentType = contentType;
@@ -48,7 +48,7 @@ public final class ImmutableSoapRequest implements SoapRequest {
   }
 
   @Override
-  public Map<String, String> getSoapHeaders() {
+  public List<SoapHeader> getSoapHeaders() {
     return soapHeaders;
   }
 

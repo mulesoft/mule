@@ -15,12 +15,12 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.List;
 
 public class SoapRequestBuilder {
 
   private InputStream content;
-  private ImmutableMap.Builder<String, String> soapHeaders = ImmutableMap.builder();
+  private ImmutableList.Builder<SoapHeader> soapHeaders = ImmutableList.builder();
   private ImmutableMap.Builder<String, String> transportHeaders = ImmutableMap.builder();
   private ImmutableList.Builder<SoapAttachment> attachments = ImmutableList.builder();
   private MediaType contentType = APPLICATION_XML;
@@ -38,13 +38,13 @@ public class SoapRequestBuilder {
     return this;
   }
 
-  public SoapRequestBuilder withSoapHeaders(Map<String, String> soapHeaders) {
-    this.soapHeaders.putAll(soapHeaders);
+  public SoapRequestBuilder withSoapHeaders(List<SoapHeader> soapHeaders) {
+    this.soapHeaders.addAll(soapHeaders);
     return this;
   }
 
-  public SoapRequestBuilder withSoapHeader(String name, String value) {
-    this.soapHeaders.put(name, value);
+  public SoapRequestBuilder withSoapHeader(SoapHeader soapHeader) {
+    this.soapHeaders.add(soapHeader);
     return this;
   }
 

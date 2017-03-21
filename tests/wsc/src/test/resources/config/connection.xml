@@ -31,11 +31,13 @@
                 <wsc:body>#[req]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
         <wsc:consume config-ref="single-instance" operation="echo">
             <wsc:message>
                 <wsc:body>#[req]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="withLocalWsdlConnection">
@@ -44,6 +46,7 @@
                 <wsc:body>#[req]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="rpcConnection">

@@ -18,9 +18,7 @@ import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.runtime.api.message.Message;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.mule.services.soap.api.message.SoapHeader;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -58,10 +56,11 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
     assertSoapResponse(ECHO_HEADERS, out);
 
     WscAttributes attributes = (WscAttributes) message.getAttributes();
-    List<String> headers = new ArrayList<>(attributes.getSoapHeaders().values());
-    assertThat(headers, hasSize(2));
-    assertSoapResponse(HEADER_INOUT, headers.get(0));
-    assertSoapResponse(HEADER_OUT, headers.get(1));
+    assertThat(attributes.getSoapHeaders(), hasSize(2));
+    assertSoapResponse(HEADER_INOUT, attributes.getSoapHeaders().stream().filter(h -> h.getId().equals(HEADER_INOUT))
+        .map(SoapHeader::getValue).findFirst().get());
+    assertSoapResponse(HEADER_OUT, attributes.getSoapHeaders().stream().filter(h -> h.getId().equals(HEADER_OUT))
+        .map(SoapHeader::getValue).findFirst().get());
   }
 
   @Test

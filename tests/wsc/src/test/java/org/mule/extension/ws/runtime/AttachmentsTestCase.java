@@ -7,8 +7,10 @@
 package org.mule.extension.ws.runtime;
 
 import static java.lang.String.format;
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mule.extension.ws.WscTestUtils.ATTACHMENT_CONTENT;
 import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.UPLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.assertSimilarXml;
@@ -18,10 +20,13 @@ import static org.mule.extension.ws.WscTestUtils.getTestAttachment;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -50,7 +55,9 @@ public abstract class AttachmentsTestCase extends AbstractSoapServiceTestCase {
   public void uploadAttachment() throws Exception {
     String payload = getRequestResource(UPLOAD_ATTACHMENT);
     Message message =
-        flowRunner(UPLOAD_ATTACHMENT).withPayload(payload).withVariable("inAttachment", getTestAttachment()).run().getMessage();
+        flowRunner(UPLOAD_ATTACHMENT).withPayload(payload).withVariable("inAttachment", getTestAttachment())
+            .withVariable("attachmentContent", toInputStream(ATTACHMENT_CONTENT))
+            .withVariable("mediaType", MediaType.parse("text/html")).run().getMessage();
     assertSimilarXml((String) message.getPayload().getValue(), getResponseResource(UPLOAD_ATTACHMENT));
   }
 
@@ -75,7 +82,7 @@ public abstract class AttachmentsTestCase extends AbstractSoapServiceTestCase {
     // We need to format the expected response with the content id of the attachment.
     String name = ((PartAttributes) attachmentPart.getAttributes()).getName();
     String responseResource = format(getResponseResource(DOWNLOAD_ATTACHMENT), name);
-    assertSimilarXml((String) bodyPart.getPayload().getValue(), responseResource);
+    assertSimilarXml(IOUtils.toString((InputStream) bodyPart.getPayload().getValue()), responseResource);
   }
 
   @Step("Checks that the content of the downloaded attachment is correct")

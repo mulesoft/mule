@@ -7,23 +7,12 @@
 package org.mule.extension.ws.api.security;
 
 
-import static org.apache.ws.security.components.crypto.Merlin.LOAD_CA_CERTS;
-import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
-import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
-import static org.mule.extension.ws.api.security.config.WssStoreConfiguration.WS_CRYPTO_PROVIDER_KEY;
-import static org.mule.extension.ws.internal.security.SecurityStrategyType.INCOMING;
-import org.mule.extension.ws.api.security.config.WssTrustStoreConfiguration;
-import org.mule.extension.ws.internal.security.SecurityStrategyType;
-import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
+import org.mule.extension.ws.api.security.config.WssTrustStoreConfigurationAdapter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.ws.security.components.crypto.Merlin;
+import org.mule.services.soap.api.security.SecurityStrategy;
+import org.mule.services.soap.api.security.VerifySignatureSecurityStrategy;
+import org.mule.services.soap.api.security.config.WssTrustStoreConfiguration;
 
 
 /**
@@ -31,7 +20,7 @@ import org.apache.ws.security.components.crypto.Merlin;
  *
  * @since 4.0
  */
-public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
+public class WssVerifySignatureSecurityStrategy implements SecurityStrategyAdapter {
 
   private static final String WS_VERIFY_SIGNATURE_PROPERTIES_KEY = "verifySignatureProperties";
 
@@ -40,38 +29,13 @@ public class WssVerifySignatureSecurityStrategy implements SecurityStrategy {
    */
   @Parameter
   @Optional
-  private WssTrustStoreConfiguration trustStoreConfiguration;
+  private WssTrustStoreConfigurationAdapter trustStoreConfiguration;
 
   @Override
-  public SecurityStrategyType securityType() {
-    return INCOMING;
-  }
-
-  @Override
-  public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return java.util.Optional.empty();
-  }
-
-  @Override
-  public String securityAction() {
-    return SIGNATURE;
-  }
-
-  @Override
-  public Map<String, Object> buildSecurityProperties() {
-    Properties signatureProps = trustStoreConfiguration != null ? trustStoreConfiguration.getConfigurationProperties()
-        : getDefaultTrustStoreConfigurationProperties();
-
-    return ImmutableMap.<String, Object>builder()
-        .put(SIG_PROP_REF_ID, WS_VERIFY_SIGNATURE_PROPERTIES_KEY)
-        .put(WS_VERIFY_SIGNATURE_PROPERTIES_KEY, signatureProps)
-        .build();
-  }
-
-  private Properties getDefaultTrustStoreConfigurationProperties() {
-    Properties properties = new Properties();
-    properties.setProperty(WS_CRYPTO_PROVIDER_KEY, Merlin.class.getCanonicalName());
-    properties.setProperty(LOAD_CA_CERTS, String.valueOf(true));
-    return properties;
+  public SecurityStrategy getSecurityStrategy() {
+    WssTrustStoreConfiguration trustStoreConfig =
+        new WssTrustStoreConfiguration(trustStoreConfiguration.getStorePath(), trustStoreConfiguration.getPassword(),
+                                       trustStoreConfiguration.getType());
+    return new VerifySignatureSecurityStrategy(trustStoreConfig);
   }
 }

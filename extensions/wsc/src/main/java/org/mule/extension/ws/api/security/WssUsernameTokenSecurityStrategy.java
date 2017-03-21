@@ -7,28 +7,13 @@
 
 package org.mule.extension.ws.api.security;
 
-import static java.util.Optional.of;
-import static org.apache.ws.security.WSConstants.CREATED_LN;
-import static org.apache.ws.security.WSConstants.NONCE_LN;
-import static org.apache.ws.security.WSPasswordCallback.USERNAME_TOKEN;
-import static org.apache.ws.security.handler.WSHandlerConstants.ADD_UT_ELEMENTS;
-import static org.apache.ws.security.handler.WSHandlerConstants.PASSWORD_TYPE;
-import static org.apache.ws.security.handler.WSHandlerConstants.USER;
-import static org.mule.extension.ws.internal.security.SecurityStrategyType.OUTGOING;
-import org.mule.extension.ws.api.PasswordType;
-import org.mule.extension.ws.internal.security.SecurityStrategyType;
-import org.mule.extension.ws.internal.security.callback.WSPasswordCallbackHandler;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-import java.util.StringJoiner;
-
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.mule.services.soap.api.security.PasswordType;
+import org.mule.services.soap.api.security.SecurityStrategy;
+import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
 
 /**
  * Provides the capability to authenticate using Username and Password with a SOAP service by adding the UsernameToken
@@ -36,7 +21,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
  *
  * @since 4.0
  */
-public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
+public class WssUsernameTokenSecurityStrategy implements SecurityStrategyAdapter {
 
   /**
    * The username required to authenticate with the service.
@@ -74,42 +59,7 @@ public class WssUsernameTokenSecurityStrategy implements SecurityStrategy {
   private boolean addCreated;
 
   @Override
-  public SecurityStrategyType securityType() {
-    return OUTGOING;
-  }
-
-  @Override
-  public java.util.Optional<WSPasswordCallbackHandler> buildPasswordCallbackHandler() {
-    return of(new WSPasswordCallbackHandler(USERNAME_TOKEN,
-                                            cb -> {
-                                              if (cb.getIdentifier().equals(username)) {
-                                                cb.setPassword(password);
-                                              }
-                                            }));
-  }
-
-  @Override
-  public String securityAction() {
-    return WSHandlerConstants.USERNAME_TOKEN;
-  }
-
-  @Override
-  public Map<String, Object> buildSecurityProperties() {
-    ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-    builder.put(USER, username);
-    builder.put(PASSWORD_TYPE, passwordType.getType());
-
-    if (addCreated || addNonce) {
-      StringJoiner additionalElements = new StringJoiner(" ");
-      if (addNonce) {
-        additionalElements.add(NONCE_LN);
-      }
-      if (addCreated) {
-        additionalElements.add(CREATED_LN);
-      }
-      builder.put(ADD_UT_ELEMENTS, additionalElements.toString());
-    }
-
-    return builder.build();
+  public SecurityStrategy getSecurityStrategy() {
+    return new UsernameTokenSecurityStrategy(username, password, passwordType, addNonce, addCreated);
   }
 }

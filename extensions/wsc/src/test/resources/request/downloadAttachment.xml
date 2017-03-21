@@ -1,3 +1,0 @@
-<con:downloadAttachment xmlns:con="http://service.ws.extension.mule.org/">
-    <fileName>simpleAttachment.txt</fileName>
-</con:downloadAttachment>
