@@ -173,7 +173,7 @@ public class OAuth2AuthorizeMessageProcessorTestCase
                 public String answer(InvocationOnMock invocation) throws Throwable
                 {
                     Map<String, String> parameters = (Map<String, String>) invocation.getArguments()[0];
-                    String expectedState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, eventId)
+                    String expectedState = String.format(OAuthProperties.DEFAULT_EVENT_STATE_TEMPLATE, eventId)
                                            + state;
                     Assert.assertEquals(expectedState, URLDecoder.decode(parameters.get("state"), "UTF-8"));
                     Assert.assertEquals(customField.toLowerCase(), parameters.get("customField"));

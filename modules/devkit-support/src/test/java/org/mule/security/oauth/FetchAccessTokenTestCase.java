@@ -46,7 +46,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
         this.objectStore = new InMemoryObjectStore<Serializable>();
 
         this.event = getTestEvent("");
-        event.getMessage().setProperty("state", "<<MULE_EVENT_ID=whatever>>", PropertyScope.INBOUND);
+        event.getMessage().setProperty("state", "MULE_EVENT_ID=whatever>>", PropertyScope.INBOUND);
         this.latch = new CountDownLatch(1);
         this.exception = null;
 
