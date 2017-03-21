@@ -5,24 +5,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.storedprocedure;
+package org.mule.module.db.integration.select;
 
 import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 
-public class StoredProcedureUnresolvedNamedParamTestCase extends AbstractConfigurationErrorTestCase
+public class SelectUnresolvedTextQueryParamTestCase extends AbstractConfigurationErrorTestCase
 {
 
     @Override
     protected String getConfigFile()
     {
-        return "integration/storedprocedure/stored-procedure-unresolved-named-param-config.xml";
+        return "integration/select/select-unresolved-text-query-param-config.xml";
     }
 
     @Test
-    public void validatesNamedParameters() throws Exception
+    public void testRequiresDefinedParameter() throws Exception
     {
-        assertConfigurationError("Able to define a query with an unresolved named parameter", "type");
+        assertConfigurationError("Able to define a query text with a not defined param", "name");
     }
+
 }
