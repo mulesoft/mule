@@ -8,7 +8,6 @@ package org.mule.module.launcher;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -120,6 +119,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor incompleteAppDescriptor = new ArtifactDescriptor("incompleteApp", "/incompleteApp.zip", "/incompleteApp", "incompleteApp.zip", null);
     private static final ArtifactDescriptor waitAppDescriptor = new ArtifactDescriptor("wait-app", "/wait-app.zip", "/wait-app", "wait-app.zip", "mule-config.xml");
     private static final ArtifactDescriptor sharedPluginLibAppDescriptor = new ArtifactDescriptor("shared-plugin-lib-app", "/shared-plugin-lib-app.zip", "/shared-plugin-lib-app", "shared-plugin-lib-app.zip", "mule-config.xml");
+    private static final ArtifactDescriptor badConfigAppDescriptor = new ArtifactDescriptor("bad-config-app", "/bad-config-app.zip", "/bad-config-app", "bad-config-app", "/mule-config.xml");
 
     //Domain constants
     private static final ArtifactDescriptor brokenDomainDescriptor = new ArtifactDescriptor("brokenDomain", "/broken-domain.zip", null, "brokenDomain.zip", "/broken-config.xml");
@@ -133,7 +133,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private static final ArtifactDescriptor invalidDomainBundle = new ArtifactDescriptor("invalid-domain-bundle", "/invalid-domain-bundle.zip", null, null, null);
     private static final ArtifactDescriptor httpSharedDomainBundle = new ArtifactDescriptor("http-shared-domain", "/http-shared-domain.zip", null, null, null);
     private static final ArtifactDescriptor waitDomainDescriptor = new ArtifactDescriptor("wait-domain", "/wait-domain.zip", "/wait-domain", "wait-domain.zip", "mule-domain-config.xml");
-
     private static final ArtifactDescriptor sharedHttpDomainDescriptor = new ArtifactDescriptor("shared-http-domain", "/shared-http-domain.zip", "/shared-http-domain", "shared-http-domain.zip", "mule-domain-config.xml");
     private static final ArtifactDescriptor sharedHttpDomainBundleDescriptor = new ArtifactDescriptor("shared-http-domain", "/shared-http-domain-bundle.zip", "/shared-http-domain", "shared-http-domain.zip", "mule-domain-config.xml");
     private static final ArtifactDescriptor sharedHttpAppADescriptor = new ArtifactDescriptor("shared-http-app-a", "/shared-http-app-a.zip", "/shared-http-app-a", "shared-http-app-a.zip", "mule-config.xml");
@@ -782,6 +781,33 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {dummyAppDescriptor.id}, true);
+    }
+
+    @Test
+    public void removesZombieFilesAfterFailedAppIsDeleted() throws Exception
+    {
+        final String appName = "bad-config-app";
+
+        addPackedAppFromResource(badConfigAppDescriptor.zipPath);
+        deploymentService.start();
+
+        assertDeploymentFailure(applicationDeploymentListener, appName);
+        assertAppsDir(new String[] {}, new String[] {appName}, true);
+
+        final Map<URL, Long> startZombieMap = deploymentService.getZombieApplications();
+        assertEquals("Should be a zombie file for the app's broken XML config", 1, startZombieMap.size());
+
+        final Application app = findApp(badConfigAppDescriptor.id, 1);
+        assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
+        assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
+
+        org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
+        assertAppFolderIsDeleted(appName);
+        assertUndeploymentSuccess(applicationDeploymentListener, appName);
+
+        assertNull(deploymentService.findApplication(appName));
+        final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
+        assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
     }
 
     @Test
