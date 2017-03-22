@@ -362,7 +362,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       .definedBy("shared-a-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-domain");
   private final ApplicationFileBuilder sharedBAppFileBuilder = new ApplicationFileBuilder("shared-app-b")
       .definedBy("shared-b-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-domain");
-  private final ApplicationFileBuilder badConfigAppFileBuilder = new ApplicationFileBuilder("bad-config-app").definedBy("bad-app-config.xml");
+  private final ApplicationFileBuilder badConfigAppFileBuilder =
+      new ApplicationFileBuilder("bad-config-app").definedBy("bad-app-config.xml");
 
 
   // Domain file builders
@@ -1064,8 +1065,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void removesZombieFilesAfterFailedAppIsDeleted() throws Exception
-  {
+  public void removesZombieFilesAfterFailedAppIsDeleted() throws Exception {
     final String appName = "bad-config-app";
 
     addPackedAppFromBuilder(badConfigAppFileBuilder);
