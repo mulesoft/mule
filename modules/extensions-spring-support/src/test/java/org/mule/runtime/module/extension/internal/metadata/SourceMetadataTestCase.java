@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.mule.runtime.api.component.location.Location.builder;
+import static org.mule.runtime.module.extension.internal.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
@@ -33,16 +34,27 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
   private static final MetadataComponentDescriptorProvider<SourceModel> explicitMetadataResolver =
       MetadataService::getSourceMetadata;
 
+  private static final MetadataComponentDescriptorProvider<SourceModel> dslMetadataResolver =
+      (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);
 
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;
   }
 
+  @Override
+  protected void setProvider() {
+    if (resolutionType == EXPLICIT_RESOLUTION) {
+      provider = explicitMetadataResolver;
+    } else {
+      provider = dslMetadataResolver;
+    }
+  }
+
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
-    provider = explicitMetadataResolver;
+    setProvider();
   }
 
   @Test
@@ -66,7 +78,10 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
 
   @Test
   public void getSourceDynamicOutputMetadata() throws Exception {
-    final ComponentMetadataDescriptor<SourceModel> componentMetadata = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
+    final MetadataResult<ComponentMetadataDescriptor<SourceModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
+    assertThat(result.isSuccess(), is(true));
+    ComponentMetadataDescriptor<SourceModel> componentMetadata = result.get();
     assertExpectedOutput(componentMetadata.getModel(), personType, typeLoader.load(StringAttributes.class));
+    assertThat(componentMetadata.getMetadataAttributes().getKey().get(), is(PERSON_METADATA_KEY));
   }
 }

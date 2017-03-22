@@ -31,8 +31,6 @@ import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtil
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.TIRES;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
-import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
-import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
@@ -127,10 +125,11 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void injectComposedMetadataKeyIdInstanceInMetadataResolver() throws Exception {
     location = Location.builder().globalName(SIMPLE_MULTILEVEL_KEY_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    MetadataKey key = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SAN_FRANCISCO, CITY))).build();
+    MetadataKey key = LOCATION_MULTILEVEL_KEY;
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadataResult =
         metadataService.getOperationMetadata(location, key);
     assertSuccessResult(metadataResult);
+    assertResolvedKey(metadataResult, LOCATION_MULTILEVEL_KEY);
   }
 
   @Test
@@ -145,7 +144,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void outputAndMultipleInputWithKeyId() throws Exception {
     location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedType(getParameter(typedModel, "type"), String.class);
     assertExpectedType(getParameter(typedModel, "firstPerson"), personType, true);
@@ -157,7 +156,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void dynamicOutputWithoutContentParam() throws Exception {
     // Resolver for content and output type, no @Content param, resolves only output, with keysResolver and KeyId
     location = Location.builder().globalName(OUTPUT_ONLY_WITHOUT_CONTENT_PARAM).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -168,7 +167,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void dynamicContentWithoutOutput() throws Exception {
     // Resolver for content and output type, no return type, resolves only @Content, with key and KeyId
     location = Location.builder().globalName(CONTENT_ONLY_IGNORES_OUTPUT).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, void.class, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -178,7 +177,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void operationOutputWithoutKeyId() throws Exception {
     location = Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEY_PARAM).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "content"), Object.class);
@@ -189,7 +188,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void contentAndOutputMetadataWithoutKeyId() throws Exception {
     location =
         Location.builder().globalName(CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
@@ -199,7 +198,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void contentMetadataWithoutKeysWithKeyId() throws Exception {
     location =
         Location.builder().globalName(CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, void.class, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -210,7 +209,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void outputMetadataWithoutKeysWithKeyId() throws Exception {
     location =
         Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -221,7 +220,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void messageAttributesVoidTypeMetadata() throws Exception {
     location = Location.builder().globalName(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, ExtensionsTestUtils.TYPE_BUILDER.anyType().build(), void.class);
     assertExpectedType(getParameter(typedModel, TARGET_PARAMETER_NAME), String.class);
@@ -230,7 +229,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void messageAttributesStringTypeMetadata() throws Exception {
     location = Location.builder().globalName(MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, StringAttributes.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -240,7 +239,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void attributesDynamicPersonTypeMetadata() throws Exception {
     location = Location.builder().globalName(OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     MetadataType type = typedModel.getOutputAttributes().getType();
     assertThat(type, is(instanceOf(ObjectType.class)));
@@ -252,7 +251,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void attributesUnionTypeMetadata() throws Exception {
     location = Location.builder().globalName(OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA).addProcessorsPart()
         .addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, Shape.class, AbstractOutputAttributes.class);
 
@@ -261,7 +260,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void getContentMetadataWithKey() throws Exception {
     location = Location.builder().globalName(CONTENT_METADATA_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, typeBuilder.anyType().build(), void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -271,7 +270,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void getOutputMetadataWithKey() throws Exception {
     location = Location.builder().globalName(OUTPUT_METADATA_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
@@ -299,7 +298,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void dynamicOutputAndContentWithCache() throws Exception {
     location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     MetadataType outputType = typedModel.getOutput().getType();
     MetadataType contentType = getParameter(typedModel, "content").getType();
@@ -323,13 +322,13 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void shouldInheritOperationResolvers() throws Exception {
     location = Location.builder().globalName(SHOULD_INHERIT_OPERATION_RESOLVERS).addProcessorsPart().addIndexPart(0).build();
-    assertInheritedResolvers();
+    assertInheritedResolvers(PERSON_METADATA_KEY);
   }
 
   @Test
   public void shouldInheritExtensionResolvers() throws Exception {
     location = Location.builder().globalName(SHOULD_INHERIT_EXTENSION_RESOLVERS).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertInheritedResolvers(metadataDescriptor.getModel());
   }
 
@@ -337,7 +336,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void shouldInheritOperationParentResolvers() throws Exception {
     location =
         Location.builder().globalName(SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS).addProcessorsPart().addIndexPart(0).build();
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     assertInheritedResolvers(metadataDescriptor.getModel());
   }
 
@@ -345,15 +344,15 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void multipleCaches() throws Exception {
     // using config
     location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata();
+    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
     location = Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEY_PARAM).addProcessorsPart().addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata();
+    getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
 
     // using alternative-config
     location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG).addProcessorsPart()
         .addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata();
+    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
     MuleMetadataService metadataManager = (MuleMetadataService) muleContext.getRegistry().lookupObject(MetadataService.class);
     Map<String, ? extends MetadataCache> caches = metadataManager.getMetadataCaches();
@@ -365,7 +364,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void pagedOperationMetadataTestCase() throws Exception {
     location = Location.builder().globalName(PAGED_OPERATION_METADATA).addProcessorsPart().addIndexPart(0).build();
-    ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedType(getParameter(typedModel, "animal"), Animal.class);
   }
@@ -375,7 +374,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     // using config
     location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     metadataService.getMetadataKeys(location);
-    getSuccessComponentDynamicMetadata();
+    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
     // using alternative-config
     location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG).addProcessorsPart()
@@ -399,7 +398,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void componentWithStaticInputs() throws IOException {
     location = Location.builder().globalName(TYPE_WITH_DECLARED_SUBTYPES_METADATA).addProcessorsPart().addIndexPart(0).build();
-    ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+    ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedType(getParameter(typedModel, "plainShape"), Shape.class);
     assertExpectedType(getParameter(typedModel, "animal"), Animal.class);
@@ -437,7 +436,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     Set<MetadataKey> metadataKeys = result.get().getKeys(enumMetadataResolver).get();
     MetadataKeyMatcher[] metadataKeyMatchers = Stream.of(AnimalClade.values())
         .map(Object::toString)
-        .map(key -> metadataKeyWithId(key))
+        .map(MetadataKeyMatcher::metadataKeyWithId)
         .toArray(MetadataKeyMatcher[]::new);
 
     assertThat(metadataKeys, hasItems(metadataKeyMatchers));
@@ -479,6 +478,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
         .filter(f -> !expectedKeys.contains(f.getKey().getName().getLocalPart()))
         .findFirst();
     assertThat(missingKey.isPresent(), is(false));
+    assertResolvedKey(metadataDescriptor, LOCATION_MULTILEVEL_KEY);
   }
 
   @Test
@@ -486,12 +486,12 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     location = Location.builder().globalName(METADATA_KEY_DEFAULT_VALUE).addProcessorsPart().addIndexPart(0).build();
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);
     assertSuccessResult(result);
+    assertResolvedKey(result, CAR_KEY);
     ComponentMetadataDescriptor descriptor = result.get();
     MetadataType type = descriptor.getModel().getOutput().getType();
     assertThat(type, is(instanceOf(ObjectType.class)));
     assertThat(((ObjectType) type).getFields(), hasSize(2));
   }
-
 
   @Test
   public void operationWhichReturnsListOfMessages() throws Exception {
@@ -532,8 +532,8 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
     });
   }
 
-  private void assertInheritedResolvers() throws IOException {
-    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata();
+  private void assertInheritedResolvers(MetadataKey key) throws IOException {
+    final ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(key);
     final ComponentModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertInheritedResolvers(typedModel);

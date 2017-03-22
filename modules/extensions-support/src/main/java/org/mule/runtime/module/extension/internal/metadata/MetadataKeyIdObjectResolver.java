@@ -7,13 +7,16 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -22,16 +25,18 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -125,6 +130,58 @@ final class MetadataKeyIdObjectResolver {
     };
     type.accept(visitor);
     return visitor.getResultId();
+  }
+
+  private MetadataKeyBuilder getKeyFromField(Object resolvedKey, DeclaringMemberModelProperty declaringMemberModelProperty)
+      throws Exception {
+    return newKey(valueOf(getFieldValue(resolvedKey, declaringMemberModelProperty.getDeclaringField().getName())));
+  }
+
+  /**
+   * Given a {@link Object} representing the resolved value for a {@link MetadataKey}, generates the {@link MetadataKey} object.
+   * 
+   * @param resolvedKey
+   * @return {@link MetadataKey} reconstructed from the resolved object key
+   * @throws MetadataResolvingException
+   */
+  MetadataKey reconstructKeyFromType(Object resolvedKey) throws MetadataResolvingException {
+    if (isKeyLess()) {
+      return new NullMetadataKey();
+    }
+
+    if (keyParts.size() == 1) {
+      return newKey(valueOf(resolvedKey)).build();
+    }
+
+    Reference<MetadataKeyBuilder> rootBuilder = new Reference<>();
+    Reference<MetadataKeyBuilder> childBuilder = new Reference<>();
+    Reference<MetadataResolvingException> exceptionReference = new Reference<>();
+
+    keyParts.stream()
+        .filter(p -> p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
+        .forEach(p -> {
+          try {
+            MetadataKeyBuilder fieldBuilder =
+                getKeyFromField(resolvedKey, p.getModelProperty(DeclaringMemberModelProperty.class).get());
+            if (rootBuilder.get() == null) {
+              rootBuilder.set(fieldBuilder);
+              childBuilder.set(rootBuilder.get());
+            } else {
+              childBuilder.get().withChild(fieldBuilder);
+              childBuilder.set(fieldBuilder);
+            }
+          } catch (Exception e) {
+            exceptionReference
+                .set(new MetadataResolvingException("Could not construct Metadata Key part for parameter " + p.getName(),
+                                                    FailureCode.INVALID_METADATA_KEY, e));
+          }
+        });
+
+    if (exceptionReference.get() != null) {
+      throw exceptionReference.get();
+    }
+
+    return rootBuilder.get().build();
   }
 
   private MetadataKeyIdModelProperty findMetadataKeyIdModelProperty(ComponentModel component)
@@ -262,6 +319,11 @@ final class MetadataKeyIdObjectResolver {
   private List<ParameterModel> getMetadataKeyParts(ComponentModel componentModel) {
     return componentModel.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .sorted((p1, p2) -> {
+          Optional<MetadataKeyPartModelProperty> mk1 = p1.getModelProperty(MetadataKeyPartModelProperty.class);
+          Optional<MetadataKeyPartModelProperty> mk2 = p2.getModelProperty(MetadataKeyPartModelProperty.class);
+          return mk1.get().getOrder() - mk2.get().getOrder();
+        })
         .collect(toList());
   }
 }

@@ -18,8 +18,12 @@ import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getMetadata;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
+import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -110,6 +114,11 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String CITY = "city";
 
   protected final static MetadataKey PERSON_METADATA_KEY = newKey(PERSON).build();
+  protected static final MetadataKey CAR_KEY = newKey(CAR).build();
+  protected static final MetadataKey LOCATION_MULTILEVEL_KEY =
+      PartAwareMetadataKeyBuilder.newKey(AMERICA, CONTINENT).withChild(PartAwareMetadataKeyBuilder.newKey(USA, COUNTRY)
+          .withChild(PartAwareMetadataKeyBuilder.newKey(SAN_FRANCISCO, CITY))).build();
+
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
@@ -124,12 +133,10 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected MetadataService metadataService;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+  protected MetadataComponentDescriptorProvider provider;
 
   @Parameterized.Parameter
-  public ResolutionType resolutionType = EXPLICIT_RESOLUTION;
-
-  @Parameterized.Parameter(1)
-  public MetadataComponentDescriptorProvider provider = explicitMetadataResolver;
+  public ResolutionType resolutionType;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -139,8 +146,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        {EXPLICIT_RESOLUTION, explicitMetadataResolver},
-        {DSL_RESOLUTION, dslMetadataResolver}
+        {EXPLICIT_RESOLUTION},
+        {DSL_RESOLUTION}
     });
   }
 
@@ -149,6 +156,15 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     event = eventBuilder().message(InternalMessage.of("")).build();
     metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
+    setProvider();
+  }
+
+  protected void setProvider() {
+    if (resolutionType == EXPLICIT_RESOLUTION) {
+      provider = explicitMetadataResolver;
+    } else {
+      provider = dslMetadataResolver;
+    }
   }
 
   enum ResolutionType {
@@ -168,6 +184,9 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     MetadataResult<ComponentMetadataDescriptor<T>> componentMetadata = getComponentDynamicMetadata(key);
     String msg = componentMetadata.getFailures().stream().map(f -> "Failure: " + f.getMessage()).collect(joining(", "));
     assertThat(msg, componentMetadata.isSuccess(), is(true));
+    if (!key.getId().equals(NULL_METADATA_KEY.getId())) {
+      assertResolvedKey(componentMetadata, key);
+    }
     return componentMetadata.get();
   }
 
@@ -228,6 +247,27 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected void assertExpectedType(Typed typedModel, MetadataType expectedType, boolean isDynamic) {
     assertThat(typedModel.getType(), is(expectedType));
     assertThat(typedModel.hasDynamicType(), is(isDynamic));
+  }
+
+  protected <T extends ComponentModel> void assertResolvedKey(MetadataResult<ComponentMetadataDescriptor<T>> result,
+                                                              MetadataKey metadataKey) {
+    assertThat(result.get().getMetadataAttributes().getKey().isPresent(), is(true));
+    MetadataKey resultKey = result.get().getMetadataAttributes().getKey().get();
+    assertSameKey(metadataKey, resultKey);
+
+    MetadataKey child = metadataKey.getChilds().stream().findFirst().orElseGet(() -> null);
+    MetadataKey otherChild = resultKey.getChilds().stream().findFirst().orElseGet(() -> null);
+    while (child != null && otherChild != null) {
+      assertSameKey(child, otherChild);
+      child = child.getChilds().stream().findFirst().orElseGet(() -> null);
+      otherChild = otherChild.getChilds().stream().findFirst().orElseGet(() -> null);
+    }
+    assertThat(child == null && otherChild == null, is(true));
+  }
+
+  private void assertSameKey(MetadataKey metadataKey, MetadataKey resultKey) {
+    assertThat(resultKey.getId(), is(metadataKey.getId()));
+    assertThat(resultKey.getChilds(), hasSize(metadataKey.getChilds().size()));
   }
 
   Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
