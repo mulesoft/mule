@@ -105,7 +105,7 @@ public class ClassLoaderModel {
      */
     public ClassLoaderModelBuilder exportingPackages(Set<String> packages) {
       checkArgument(packages != null, "packages cannot be null");
-      this.packages = packages;
+      this.packages.addAll(packages);
       return this;
     }
 
@@ -117,7 +117,7 @@ public class ClassLoaderModel {
      */
     public ClassLoaderModelBuilder exportingResources(Set<String> resources) {
       checkArgument(resources != null, "resources cannot be null");
-      this.resources = resources;
+      this.resources.addAll(resources);
       return this;
     }
 
@@ -129,7 +129,7 @@ public class ClassLoaderModel {
      */
     public ClassLoaderModelBuilder dependingOn(Set<BundleDependency> dependencies) {
       checkArgument(dependencies != null, "dependencies cannot be null");
-      this.dependencies = dependencies;
+      this.dependencies.addAll(dependencies);
       return this;
     }
 

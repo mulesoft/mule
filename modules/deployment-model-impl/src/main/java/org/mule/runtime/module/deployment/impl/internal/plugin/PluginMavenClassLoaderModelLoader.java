@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -50,10 +51,9 @@ public class PluginMavenClassLoaderModelLoader extends MavenClassLoaderModelLoad
     return MAVEN;
   }
 
-  protected void loadDependencies(ClassLoaderModelBuilder classLoaderModelBuilder, DependencyResult dependencyResult,
-                                  PreorderNodeListGenerator nlg) {
+  protected Set<BundleDependency> loadDependencies(DependencyResult dependencyResult, PreorderNodeListGenerator nlg) {
     // Looking for all Mule plugin dependencies
-    final Set<BundleDependency> plugins = new HashSet<>();
+    final Set<BundleDependency> dependencies = new HashSet<>();
     dependencyResult.getArtifactResults().stream()
         .forEach(dependency -> {
           BundleDescriptor.Builder builder = new BundleDescriptor.Builder()
@@ -67,7 +67,7 @@ public class PluginMavenClassLoaderModelLoader extends MavenClassLoaderModelLoad
           }
 
           try {
-            plugins.add(new BundleDependency.Builder()
+            dependencies.add(new BundleDependency.Builder()
                 .setDescriptor(builder.build())
                 .setScope(COMPILE)
                 .setBundleUrl(dependency.getArtifact().getFile().toURL())
@@ -76,17 +76,19 @@ public class PluginMavenClassLoaderModelLoader extends MavenClassLoaderModelLoad
             throw new MuleRuntimeException(e);
           }
         });
-    classLoaderModelBuilder.dependingOn(plugins);
+    return dependencies;
   }
 
   protected void loadUrls(File pluginFolder, ClassLoaderModelBuilder classLoaderModelBuilder,
-                          DependencyResult dependencyResult, PreorderNodeListGenerator nlg) {
+                          DependencyResult dependencyResult, PreorderNodeListGenerator nlg, Set<BundleDependency> dependencies) {
     // Adding the exploded JAR root folder
     classLoaderModelBuilder.containing(getUrl(pluginFolder, pluginFolder));
 
     nlg.getArtifacts(false).stream().forEach(artifact -> {
       // Adding all needed jar's file dependencies
-      classLoaderModelBuilder.containing(getUrl(pluginFolder, artifact.getFile()));
+      if (!MULE_PLUGIN_CLASSIFIER.equals(artifact.getClassifier())) {
+        classLoaderModelBuilder.containing(getUrl(pluginFolder, artifact.getFile()));
+      }
     });
   }
 

@@ -349,7 +349,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       .definedBy("plugin-resource-app-config.xml").dependingOn(pluginWithResource);
   private final ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app")
       .definedBy("app-with-echo1-plugin-config.xml").dependingOn(echoPluginWithoutLib1)
-      .sharingLibrary(barUtils1_0JarFile.getAbsolutePath());
+      .dependingOnSharedLibrary(new JarFileBuilder("barUtils", barUtils1_0JarFile));
   private final ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder =
       new ApplicationFileBuilder("broken-app+", brokenAppFileBuilder);
   private final ApplicationFileBuilder dummyDomainApp1FileBuilder =
@@ -1605,7 +1605,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertContainerAppPluginExplodedDir(new String[] {echoPlugin.getDeployedPath()});
   }
 
-  @Ignore("MULE-11551 - Define mechanism to inform shared libraries dependencies")
   @Test
   public void deploysAppWithPluginSharedLibrary() throws Exception {
     addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
@@ -1685,6 +1684,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .containingResource("module-bye-pom.xml",
                             get("META-INF", "maven", "org.mule.extension", "mule-module-bye", MULE_PLUGIN_POM).toString())
         .describedBy(builder.build());
+
+    File artifactFile = byeXmlExtensionPlugin.getArtifactFile();
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
         .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
@@ -1856,12 +1857,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                                emptyAppFileBuilder.getId());
   }
 
-  @Ignore("MULE-11551 - Define mechanism to inform shared libraries dependencies")
   @Test
   public void deploysDomainWithSharedLibPrecedenceOverApplicationSharedLib() throws Exception {
     final String domainId = "shared-lib";
     final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app")
-        .definedBy("app-shared-lib-precedence-config.xml").sharingLibrary(barUtils2_0JarFile.getAbsolutePath())
+        .definedBy("app-shared-lib-precedence-config.xml")
+        .dependingOnSharedLibrary(new JarFileBuilder("bar-utils2", barUtils2_0JarFile))
         .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
         .deployedWith(PROPERTY_DOMAIN, domainId);
     final DomainFileBuilder domainFileBuilder =

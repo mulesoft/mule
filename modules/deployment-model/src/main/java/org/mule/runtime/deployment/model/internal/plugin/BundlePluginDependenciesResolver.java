@@ -9,9 +9,6 @@ package org.mule.runtime.deployment.model.internal.plugin;
 
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -22,7 +19,7 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -179,9 +176,19 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    pluginDescriptor.setClassLoaderModel(new ClassLoaderModelBuilder(originalClassLoaderModel)
+    pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel)
         .exportingPackages(exportedClassPackages).build());
 
+  }
+
+  private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel) {
+    ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
+        .dependingOn(originalClassLoaderModel.getDependencies())
+        .exportingResources(originalClassLoaderModel.getExportedResources());
+    for (URL url : originalClassLoaderModel.getUrls()) {
+      classLoaderModelBuilder.containing(url);
+    }
+    return classLoaderModelBuilder;
   }
 
   private Set<String> findDependencyPackageClosure(Set<BundleDependency> pluginDependencies,
