@@ -9,7 +9,9 @@ package org.mule.security.oauth;
 
 import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.utils.IdUtils.padId;
 
+import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.transport.PropertyScope;
@@ -36,6 +38,8 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
     private ObjectStore<Serializable> objectStore;
     private CountDownLatch latch;
     private Exception exception;
+    private String eventId = new DefaultMuleContext().getUniqueIdString();
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -46,7 +50,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
         this.objectStore = new InMemoryObjectStore<Serializable>();
 
         this.event = getTestEvent("");
-        event.getMessage().setProperty("state", "<<MULE_EVENT_ID=whatever>>", PropertyScope.INBOUND);
+        event.getMessage().setProperty("state",  padId(eventId), PropertyScope.INBOUND);
         this.latch = new CountDownLatch(1);
         this.exception = null;
 
@@ -68,7 +72,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
     @Test
     public void inMemoryObjectStore() throws Exception
     {
-        this.objectStore.store("whatever-authorization-event", event);
+        this.objectStore.store(eventId + "-authorization-event", event);
 
         Thread t = new Thread(this);
         t.start();

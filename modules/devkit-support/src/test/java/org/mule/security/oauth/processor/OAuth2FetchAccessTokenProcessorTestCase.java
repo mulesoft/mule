@@ -11,12 +11,16 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
-
+import static org.mule.security.oauth.notification.OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END;
+import static org.mule.utils.IdUtils.padId;
+import org.mule.DefaultMuleContext;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -29,12 +33,10 @@ import org.mule.module.http.internal.ParameterMap;
 import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 import org.mule.security.oauth.OAuthProperties;
-import org.mule.security.oauth.notification.OAuthAuthorizeNotification;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
@@ -42,7 +44,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
@@ -53,7 +54,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
 {
 
     private static final String verifier = "verifier";
-    private static final String eventId = UUID.randomUUID().toString();
+    private static final String eventId = getEventId();
 
     private String state;
     private String incomingState;
@@ -73,19 +74,19 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     public void setUp() throws Exception
     {
         state = "my state";
-        incomingState = String.format(OAuthProperties.EVENT_STATE_TEMPLATE + "%s", eventId, state);
+        incomingState = padId(eventId) + state;
         exception = false;
 
-        restoredEvent = mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        restoredEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS);
         when(restoredEvent.getMessage().getInboundProperty("http.query.params")).thenReturn(restoredParameters);
 
-        manager = mock(OAuth2Manager.class, Mockito.RETURNS_DEEP_STUBS);
+        manager = mock(OAuth2Manager.class, RETURNS_DEEP_STUBS);
         when(manager.restoreAuthorizationEvent(eventId)).thenReturn(restoredEvent);
 
         processor = new OAuth2FetchAccessTokenMessageProcessor(manager, null);
         processor.setMuleContext(muleContext);
 
-        event = mock(MuleEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        event = mock(MuleEvent.class, RETURNS_DEEP_STUBS);
         when(event.getMessage().getInvocationProperty(OAuthProperties.VERIFIER)).thenReturn(verifier);
         parameters.put("state", incomingState);
         when(event.getMessage().getInboundProperty("http.query.params")).thenReturn(parameters);
@@ -103,6 +104,12 @@ public class OAuth2FetchAccessTokenProcessorTestCase
         });
     }
 
+    private static String getEventId()
+    {
+        MuleContext context = new DefaultMuleContext();
+        return context.getUniqueIdString();
+    }
+
     @After
     public void tearDown() throws Exception
     {
@@ -111,8 +118,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
             verify(manager).restoreAuthorizationEvent(eventId);
             assertSame(RequestContext.getEvent(), restoredEvent);
             verify(muleContext).fireNotification(
-                Mockito.argThat(new OAuthNotificationMatcher(
-                    OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END, event)));
+                argThat(new OAuthNotificationMatcher(OAUTH_AUTHORIZATION_END, event)));
 
             verify(restoredEvent.getMessage()).removeProperty(OAuthProperties.HTTP_STATUS,
                 PropertyScope.OUTBOUND);
