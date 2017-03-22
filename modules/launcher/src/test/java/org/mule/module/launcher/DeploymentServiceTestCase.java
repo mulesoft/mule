@@ -822,7 +822,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.start();
 
         assertDeploymentFailure(applicationDeploymentListener, appName);
-        assertAppsDir(new String[] {}, new String[] { appName }, true);
+        assertAppsDir(new String[] {}, new String[] {appName}, true);
 
         final Map<URL, Long> startZombieMap = deploymentService.getZombieApplications();
         assertEquals("Should be a zombie file for the app's broken XML config", 1, startZombieMap.size());
