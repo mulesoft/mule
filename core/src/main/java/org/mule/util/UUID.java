@@ -14,6 +14,9 @@ package org.mule.util;
 // @ThreadSafe
 public final class UUID
 {
+
+    public final static int UUID_LENGTH = 36;
+
     private UUID()
     {
         // no go

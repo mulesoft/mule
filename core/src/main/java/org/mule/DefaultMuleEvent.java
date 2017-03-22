@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.mule.util.UUID.UUID_LENGTH;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -68,6 +69,9 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
     private static final long serialVersionUID = 1L;
 
     private static Log logger = LogFactory.getLog(DefaultMuleEvent.class);
+
+    /** EventId is concatenated with a dash character and a default clusterNodeId, which has two digits at most.**/
+    public static final int DEFAULT_LENGTH_MULE_EVENT_ID = UUID_LENGTH + 3;
 
     /** Immutable MuleEvent state **/
 
