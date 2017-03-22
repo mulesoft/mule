@@ -7,8 +7,12 @@
 
 package org.mule.module.ws.consumer;
 
-import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.glassfish.grizzly.http.server.*;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.rules.ExternalResource;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
@@ -17,15 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.NetworkListener;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
-import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
-import org.junit.ClassRule;
-import org.junit.rules.ExternalResource;
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * This tests mocks a proxy server through which a wsdl file is served.
@@ -38,8 +35,8 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
 
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
-    @ClassRule
-    public static ExternalResource myServer = new ServerResource(port);
+    @Rule
+    public ExternalResource myServer = new ServerResource(port);
 
     /**
      * JUnit rule to initialize and teardown the HTTPS server
