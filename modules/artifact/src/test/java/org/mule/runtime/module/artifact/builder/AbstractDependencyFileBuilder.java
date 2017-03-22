@@ -17,22 +17,28 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Base class for all kind of artifact that may exists in mule.
  * <p>
  * Provides all the support needed for maven.
- * 
+ *
  * @param <T> the actual type of the builder.
  */
 public abstract class AbstractDependencyFileBuilder<T extends AbstractDependencyFileBuilder<T>> {
 
+  private static final String MULE_MAVEN_PLUGIN_GROUP_ID = "org.mule.tools.maven";
+  private static final String MULE_MAVEN_PLUGIN_ARTIFACT_ID = "mule-maven-plugin";
   public static final String COMPILE_SCOPE = "compile";
   private final String artifactId;
   private final List<AbstractDependencyFileBuilder> dependencies = new ArrayList<>();
+  private final List<AbstractDependencyFileBuilder> sharedLibraries = new ArrayList<>();
   private String groupId = "org.mule.test";
   private String version = "1.0.0";
   private String type = "jar";
@@ -82,6 +88,11 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
       model.setArtifactId(getArtifactId());
       model.setVersion(getVersion());
       model.setModelVersion("4.0.0");
+      if (!sharedLibraries.isEmpty()) {
+        model.setBuild(new Build());
+        model.getBuild().setPlugins(new ArrayList<>());
+        model.getBuild().getPlugins().add(createMuleMavenPlugin());
+      }
 
       for (AbstractDependencyFileBuilder fileBuilderDependency : dependencies) {
         model.addDependency(fileBuilderDependency.getAsMavenDependency());
@@ -97,8 +108,43 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
     return artifactPomFile;
   }
 
+  private Plugin createMuleMavenPlugin() {
+    Plugin plugin = new Plugin();
+    plugin.setGroupId(MULE_MAVEN_PLUGIN_GROUP_ID);
+    plugin.setArtifactId(MULE_MAVEN_PLUGIN_ARTIFACT_ID);
+    plugin.setVersion("1.0.0");
+    Xpp3Dom configuration = new Xpp3Dom("configuration");
+    plugin.setConfiguration(configuration);
+    Xpp3Dom sharedLibrariesDom = new Xpp3Dom("sharedLibraries");
+    configuration.addChild(sharedLibrariesDom);
+    dependencies.stream().filter(sharedLibraries::contains)
+        .forEach(sharedLibrary -> {
+          Xpp3Dom sharedLibraryDom = new Xpp3Dom("sharedLibrary");
+          sharedLibrariesDom.addChild(sharedLibraryDom);
+          Xpp3Dom groupIdDom = new Xpp3Dom("groupId");
+          groupIdDom.setValue(sharedLibrary.getGroupId());
+          sharedLibraryDom.addChild(groupIdDom);
+          Xpp3Dom artifactIdDom = new Xpp3Dom("artifactId");
+          artifactIdDom.setValue(sharedLibrary.getArtifactId());
+          sharedLibraryDom.addChild(artifactIdDom);
+        });
+    return plugin;
+  }
+
   public T dependingOn(AbstractDependencyFileBuilder dependencyFileBuilder) {
     dependencies.add(dependencyFileBuilder);
+    return getThis();
+  }
+
+  /**
+   * Adds a new dependency that will be visible to other plugins within the artifact.
+   *
+   * @param dependencyFileBuilder shared dependency.
+   * @return the same builder instance
+   */
+  public T dependingOnSharedLibrary(AbstractDependencyFileBuilder dependencyFileBuilder) {
+    dependencies.add(dependencyFileBuilder);
+    sharedLibraries.add(dependencyFileBuilder);
     return getThis();
   }
 

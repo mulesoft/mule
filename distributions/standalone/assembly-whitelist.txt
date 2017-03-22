@@ -173,6 +173,7 @@
 # /lib/opt
 #
 /mule-standalone-${productVersion}/lib/opt
+/mule-standalone-${productVersion}/lib/opt/activation-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/aether-api-1.0.2.v20150114.jar
 /mule-standalone-${productVersion}/lib/opt/aether-connector-basic-1.0.2.v20150114.jar
 /mule-standalone-${productVersion}/lib/opt/aether-impl-1.0.2.v20150114.jar
@@ -210,6 +211,8 @@
 /mule-standalone-${productVersion}/lib/opt/javassist-3.7.ga.jar
 /mule-standalone-${productVersion}/lib/opt/javax.inject-1.jar
 /mule-standalone-${productVersion}/lib/opt/javax.transaction-api-1.2.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1.jar
+/mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.13.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar

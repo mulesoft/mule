@@ -39,6 +39,7 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
@@ -144,7 +145,7 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
   @Override
   public final ClassLoaderModel load(File artifactFile, Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
-    final Model model = getPomModel(artifactFile);
+    Model model = loadPomModel(artifactFile);
     final ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
     classLoaderModelBuilder
         .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
@@ -153,8 +154,9 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
     final PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
     // This adds a ton of things that not always make sense
     dependencyResult.getRoot().accept(nlg);
-    loadUrls(artifactFile, classLoaderModelBuilder, dependencyResult, nlg);
-    loadDependencies(classLoaderModelBuilder, dependencyResult, nlg);
+    Set<BundleDependency> dependencies = loadDependencies(dependencyResult, nlg);
+    classLoaderModelBuilder.dependingOn(dependencies);
+    loadUrls(artifactFile, classLoaderModelBuilder, dependencyResult, nlg, dependencies);
     return classLoaderModelBuilder.build();
   }
 
@@ -164,15 +166,15 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
    * @param artifactFile the artifact file
    * @return the pom model
    */
-  protected Model getPomModel(File artifactFile) {
+  protected Model loadPomModel(File artifactFile) {
     return getPomModelFromJar(artifactFile);
   }
 
-  protected abstract void loadDependencies(ClassLoaderModelBuilder classLoaderModelBuilder, DependencyResult dependencyResult,
-                                           PreorderNodeListGenerator nlg);
+  protected abstract Set<BundleDependency> loadDependencies(DependencyResult dependencyResult, PreorderNodeListGenerator nlg);
 
   protected abstract void loadUrls(File pluginFolder, ClassLoaderModelBuilder classLoaderModelBuilder,
-                                   DependencyResult dependencyResult, PreorderNodeListGenerator nlg);
+                                   DependencyResult dependencyResult, PreorderNodeListGenerator nlg,
+                                   Set<BundleDependency> dependencies);
 
   private DependencyResult assemblyDependenciesFromPom(File artifactFolder, Model model)
       throws InvalidDescriptorLoaderException {
@@ -281,7 +283,7 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
    * If the artifact doesn't belong to an application repository then the container repository must be used instead.
    * <p>
    * When the 'mule.mode.embedded' is enabled, then the user local repository must be used.
-   * 
+   *
    * @param artifactFile the artifact file which dependencies are being resolved.
    * @return the location of the local repository.
    */
