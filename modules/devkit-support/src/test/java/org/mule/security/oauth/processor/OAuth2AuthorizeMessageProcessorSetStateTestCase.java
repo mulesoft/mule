@@ -23,6 +23,7 @@ import org.mule.security.oauth.OAuth2Adapter;
 import org.mule.security.oauth.OAuth2Manager;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -30,26 +31,35 @@ import org.mockito.stubbing.Answer;
 
 public class OAuth2AuthorizeMessageProcessorSetStateTestCase
 {
+    private final static String otherId = "otherId";
 
     private TestAuthorizeMessageProcessor testAuthorizeMessageProcessor = new TestAuthorizeMessageProcessor();
     private MuleEvent event = mock(MuleEvent.class, RETURNS_DEEP_STUBS);
     private String processedState = null;
     private String eventId ;
-    private final String otherId = "otherId";
+    private String expectedResult = null;
 
     @Test
-    public void testSetState() throws Exception
+    public void testSetStateWithOneDigitClusterId() throws Exception
     {
-        MuleContext context = new DefaultMuleContext();
-        eventId = context.getUniqueIdString();
-        final String expectedResult = eventId + otherId;
-        setMocks();
+        setMocks("7");
+        final String expectedResult = "0" + eventId + otherId;
         testAuthorizeMessageProcessor.doProcess(event);
         assertThat(processedState, is(expectedResult));
     }
 
-    private void setMocks()
+    @Test
+    public void testSetStateWithTwoDigitClusterId() throws Exception
     {
+        setMocks("17");
+        final String expectedResult = eventId + otherId;
+        testAuthorizeMessageProcessor.doProcess(event);
+        assertThat(processedState, is(expectedResult));
+    }
+
+    private void setMocks(String clusterId)
+    {
+        eventId = clusterId + "-" + UUID.randomUUID();
         final OAuth2Manager manager = mock(OAuth2Manager.class, RETURNS_DEEP_STUBS);
         final HttpCallback callback = mock(HttpCallback.class, RETURNS_DEEP_STUBS);
         final MuleContext context = mock(MuleContext.class, RETURNS_DEEP_STUBS);

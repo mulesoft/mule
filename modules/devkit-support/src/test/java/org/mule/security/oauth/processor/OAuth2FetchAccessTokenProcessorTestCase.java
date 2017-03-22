@@ -19,6 +19,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
 import static org.mule.security.oauth.notification.OAuthAuthorizeNotification.OAUTH_AUTHORIZATION_END;
+import static org.mule.utils.IdUtils.padId;
+import static org.mule.utils.IdUtils.removePadding;
 import org.mule.DefaultMuleContext;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
@@ -73,7 +75,7 @@ public class OAuth2FetchAccessTokenProcessorTestCase
     public void setUp() throws Exception
     {
         state = "my state";
-        incomingState = eventId + state;
+        incomingState = padId(eventId) + state;
         exception = false;
 
         restoredEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS);

@@ -6,17 +6,15 @@
  */
 package org.mule.security.oauth.processor;
 
-import static java.lang.System.getProperty;
 import static org.mule.DefaultMuleEvent.DEFAULT_LENGTH_MULE_EVENT_ID;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
-import static org.mule.util.UUID.UUID_LENGTH;
+import static org.mule.utils.IdUtils.removePadding;
 
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transport.PropertyScope;
@@ -38,7 +36,6 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 {
 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2FetchAccessTokenMessageProcessor.class);
-    public static String CLUSTER_NODE_ID_PROPERTY_KEY = MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterNodeId";
 
     private OAuth2Manager<OAuth2Adapter> oauthManager;
 
@@ -104,12 +101,13 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
     protected MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
         String state = getState(event);
+
         if (StringUtils.isEmpty(state))
         {
             return event;
         }
 
-        String eventId = getEventId(state);
+        String eventId = removePadding(getEventId(state));
 
         if (StringUtils.isBlank(eventId))
         {
@@ -216,12 +214,6 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     private String getEventId(String state)
     {
-        String clusterId = getProperty(CLUSTER_NODE_ID_PROPERTY_KEY);
-
-        if (clusterId != null)
-        {
-            return state.length() >= UUID_LENGTH + clusterId.length() ? state.substring(0, UUID_LENGTH + clusterId.length() + 1) : null;
-        }
 
         return state.length() >= DEFAULT_LENGTH_MULE_EVENT_ID ? state.substring(0, DEFAULT_LENGTH_MULE_EVENT_ID) : null;
 
@@ -229,16 +221,12 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 
     private String getOriginalId(String state)
     {
-        String clusterId = getProperty(CLUSTER_NODE_ID_PROPERTY_KEY);
-
-        if (clusterId != null)
-        {
-            return state.length() >= UUID_LENGTH + clusterId.length() ? state.substring(UUID_LENGTH + clusterId.length() + 1) : null;
-        }
 
         return state.length() >= DEFAULT_LENGTH_MULE_EVENT_ID ? state.substring(DEFAULT_LENGTH_MULE_EVENT_ID) : null;
 
     }
+
+
 
     private class OldHttpTransport implements InboundPropertiesDelegate
     {

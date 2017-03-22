@@ -9,6 +9,7 @@ package org.mule.security.oauth;
 
 import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.utils.IdUtils.padId;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEvent;
@@ -49,7 +50,7 @@ public class FetchAccessTokenTestCase extends AbstractMuleContextTestCase implem
         this.objectStore = new InMemoryObjectStore<Serializable>();
 
         this.event = getTestEvent("");
-        event.getMessage().setProperty("state",  eventId , PropertyScope.INBOUND);
+        event.getMessage().setProperty("state",  padId(eventId), PropertyScope.INBOUND);
         this.latch = new CountDownLatch(1);
         this.exception = null;
 

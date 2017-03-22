@@ -70,8 +70,8 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
 
     private static Log logger = LogFactory.getLog(DefaultMuleEvent.class);
 
-    /** EventId is concatenated with a dash character and a default clusterNodeId (a zero) .**/
-    public static final int DEFAULT_LENGTH_MULE_EVENT_ID = UUID_LENGTH + 2 ;
+    /** EventId is concatenated with a dash character and a default clusterNodeId, which has two digits at most.**/
+    public static final int DEFAULT_LENGTH_MULE_EVENT_ID = UUID_LENGTH + 3;
 
     /** Immutable MuleEvent state **/
 

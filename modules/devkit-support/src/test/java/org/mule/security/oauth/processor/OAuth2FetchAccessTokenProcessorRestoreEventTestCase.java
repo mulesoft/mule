@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+import static org.mule.utils.IdUtils.padId;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -51,14 +52,12 @@ public class OAuth2FetchAccessTokenProcessorRestoreEventTestCase
     private ParameterMap parameterMap = new ParameterMap();
     protected HashMap<String, String> returnMap = null;
     protected final String randomUUID = UUID.randomUUID().toString();
-    protected String clusterId = "0";
 
 
-    @Before
-    public void setUp() throws Exception
+    public void setUp(String clusterId) throws Exception
     {
         eventId = clusterId + "-" + randomUUID;
-        String myState = eventId + otherId;
+        String myState = padId(eventId) + otherId;
         parameterMap.put("state", myState);
         when(event.getMessage().getInboundProperty("http.query.params")).thenReturn(parameterMap);
         when(restoredEvent.getMessage()).thenReturn(message);
@@ -70,6 +69,16 @@ public class OAuth2FetchAccessTokenProcessorRestoreEventTestCase
     @Test
     public void testRestoreOriginalEvent() throws Exception
     {
+        setUp("0");
+        oAuth2FetchAccessTokenMessageProcessor.restoreOriginalEvent(event);
+        assertThat(processedId, is(eventId));
+        assertThat(returnMap.get("state"), is(otherId));
+    }
+
+    @Test
+    public void testRestoreOriginalEventWithDefinedClusterId() throws Exception
+    {
+        setUp("10");
         oAuth2FetchAccessTokenMessageProcessor.restoreOriginalEvent(event);
         assertThat(processedId, is(eventId));
         assertThat(returnMap.get("state"), is(otherId));
