@@ -130,6 +130,9 @@ public class XmlApplicationParser {
         Node child = children.item(i);
         if (isTextContent(child)) {
           builder.setTextContent(child.getNodeValue());
+          if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
+            break;
+          }
         } else {
           configLineFromElement(child, builder::build).ifPresent(builder::addChild);
         }

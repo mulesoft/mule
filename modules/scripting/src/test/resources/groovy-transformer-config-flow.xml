@@ -17,8 +17,8 @@
     <!--// START SNIPPET: transformer-config -->
     <script:transformer name="stringReplaceWithParams">
         <script:script engine="groovy">
-            <property key="oldStr" value="l" />
-            <property key="newStr" value="x" />
+            <script:property key="oldStr" value="l" />
+            <script:property key="newStr" value="x" />
             <script:text>
                 return payload.toString().replaceAll("$oldStr", "$newStr")
             </script:text>

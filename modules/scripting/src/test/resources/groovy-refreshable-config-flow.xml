@@ -10,18 +10,14 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <!-- a module can allow new namespaces to be introduced.. -->
-    <scripting:lang>
-        <lang:groovy id="groovy_class_callable" refresh-check-delay="100"
-                     script-source="classpath:groovy-dynamic-script-callable.groovy"/>
-        <lang:groovy id="groovy_class_bean" refresh-check-delay="100"
-                     script-source="classpath:groovy-dynamic-script-bean.groovy"/>
-    </scripting:lang>
-
     <!-- ..or you can just drop into spring -->
     <spring:beans>
         <lang:groovy id="groovy_class_changeInterfaces" refresh-check-delay="100"
                      script-source="classpath:groovy-dynamic-script.groovy"/>
+        <lang:groovy id="groovy_class_callable" refresh-check-delay="100"
+                     script-source="classpath:groovy-dynamic-script-callable.groovy"/>
+        <lang:groovy id="groovy_class_bean" refresh-check-delay="100"
+                     script-source="classpath:groovy-dynamic-script-bean.groovy"/>
     </spring:beans>
 
     <!--
