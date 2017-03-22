@@ -142,7 +142,16 @@
         <xsd:complexContent mixed="true">
             <xsd:extension base="mule:abstractMixedContentExtensionType">
                 <xsd:sequence>
-                    <xsd:group ref="mule:propertiesGroup" minOccurs="0"/>
+                    <xsd:sequence>
+                        <xsd:element name="property" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Sets a binding for the component.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element ref="mule:properties" minOccurs="0"/>
+                    </xsd:sequence>
                     <xsd:element name="text" type="xsd:string" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>Used for embedding script code inside the XML. This is useful for simple scripts where you are just mocking up a quick application.
@@ -255,21 +264,4 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="lang" type="langType" substitutionGroup="mule:abstract-mixed-content-extension">
-        <xsd:annotation>
-            <xsd:documentation>
-                This element allows the http://www.springframework.org/schema/lang namespace to be embedded. Within this element developers can include the Spring {{lang}} namespace.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="langType">
-        <xsd:complexContent mixed="true">
-            <xsd:extension base="mule:abstractMixedContentExtensionType">
-                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:any namespace="http://www.springframework.org/schema/lang namespace" processContents="strict"
-                             minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 </xsd:schema>

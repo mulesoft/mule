@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.module.scripting.component;
 
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
-
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -30,9 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
+import java.util.List;
 
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -71,7 +69,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
   private String scriptFile;
 
   /** Parameters to be made available to the script as variables */
-  private Properties properties;
+  private List<ScriptingProperty> properties;
 
   /** The name of the JSR 223 scripting engine (e.g., "groovy") */
   private String scriptEngineName;
@@ -180,18 +178,18 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
 
   protected void populatePropertyBindings(Bindings bindings) {
     if (properties != null) {
-      bindings.putAll((Map) properties);
+      bindings.putAll(properties.stream().collect(toMap(ScriptingProperty::getKey, ScriptingProperty::getValue)));
     }
   }
 
   protected void populatePropertyBindings(Bindings bindings, Event event) {
     if (properties != null) {
-      for (Entry entry : properties.entrySet()) {
-        String value = (String) entry.getValue();
+      for (ScriptingProperty property : properties) {
+        String value = (String) property.getValue();
         if (muleContext.getExpressionManager().isExpression(value)) {
-          bindings.put((String) entry.getKey(), muleContext.getExpressionManager().parse(value, event, flow));
+          bindings.put(property.getKey(), muleContext.getExpressionManager().parse(value, event, flow));
         } else {
-          bindings.put((String) entry.getKey(), value);
+          bindings.put(property.getKey(), value);
         }
       }
     }
@@ -316,11 +314,11 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     return scriptEngineName;
   }
 
-  public Properties getProperties() {
+  public List<ScriptingProperty> getProperties() {
     return properties;
   }
 
-  public void setProperties(Properties properties) {
+  public void setProperties(List<ScriptingProperty> properties) {
     this.properties = properties;
   }
 

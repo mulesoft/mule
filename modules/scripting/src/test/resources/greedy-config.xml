@@ -11,7 +11,7 @@
                 <processor-chain>
                     <scripting:component>
                         <scripting:script file="greedy.groovy">
-                            <property key="currency" value="USD"/>
+                            <scripting:property key="currency" value="USD"/>
                         </scripting:script>
                     </scripting:component>
                 </processor-chain>
@@ -20,7 +20,7 @@
                 <processor-chain>
                     <scripting:component>
                         <scripting:script file="greedy.py">
-                            <property key="currency" value="GBP"/>
+                            <scripting:property key="currency" value="GBP"/>
                         </scripting:script>
                     </scripting:component>
                 </processor-chain>

@@ -12,9 +12,10 @@
 
     <flow name="inlineScriptMutateProperty">
         <script:component>
-            <script:script engine="groovy">
-                message = org.mule.runtime.core.api.message.InternalMessage.builder(message).addOutboundProperty('foo',
-                'bar-mutated').build()
+            <script:script engine="groovy"><![CDATA[
+            message = org.mule.runtime.core.api.message.InternalMessage.builder(message).addOutboundProperty('foo',
+            'bar-mutated').build()
+        ]]>
             </script:script>
         </script:component>
         <test:assert expression="#[mel:message.outboundProperties.foo == 'bar-mutated']"/>
@@ -23,18 +24,19 @@
     <flow name="inlineScriptAddProperty">
         <script:component>
             <script:script engine="groovy">
+                <![CDATA[
                 message = org.mule.runtime.core.api.message.InternalMessage.builder(message).addOutboundProperty('foo',
                 'bar').build()
-            </script:script>
+            ]]></script:script>
         </script:component>
         <test:assert expression="#[mel:message.outboundProperties.foo == 'bar']"/>
     </flow>
 
     <flow name="inlineScriptMutatePropertiesMap">
         <script:component>
-            <script:script engine="groovy">
+            <script:script engine="groovy"><![CDATA[
                 outbound = new HashMap()              
-             </script:script>
+             ]]></script:script>
         </script:component>
         <test:assert expression="#[mel:message.outboundProperties.foo == 'bar']"/>
         <test:assert expression="#[mel:payload instanceof HashMap]"/>
@@ -80,11 +82,11 @@
     <flow name="scriptExpressionVariables">
         <script:component>
             <script:script engine="groovy">
-                <property key="expr1" value="#[mel:flowVars.prop1]"/>
-                <property key="expr2" value="#[mel:flowVars.prop2]"/>
+                <script:property key="expr1" value="#[mel:flowVars.prop1]"/>
+                <script:property key="expr2" value="#[mel:flowVars.prop2]"/>
                 <script:text>
                         payload = expr1 + expr2
-                    </script:text>
+                </script:text>
             </script:script>
         </script:component>
         <test:assert expression="#[mel:payload == 'ReceivedA-OK']"/>
