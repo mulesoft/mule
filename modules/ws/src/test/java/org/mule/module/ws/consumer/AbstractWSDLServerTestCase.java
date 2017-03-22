@@ -7,20 +7,23 @@
 
 package org.mule.module.ws.consumer;
 
-import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.rules.ExternalResource;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
-import org.junit.ClassRule;
-import org.junit.rules.ExternalResource;
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AbstractWSDLServerTestCase extends FunctionalTestCase
 {
@@ -30,15 +33,15 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
 
     private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
 
-    @ClassRule
-    public static ExternalResource mockServer = new ServerResource(dynamicPort);
+    @Rule
+    public ExternalResource mockServer = new ServerResource(dynamicPort);
 
     /**
      * JUnit rule to initialize and teardown the http server
      */
     public static class ServerResource extends ExternalResource
     {
-        private Server server;
+        private TestServer server;
         private DynamicPort port;
 
         ServerResource(DynamicPort port)
@@ -49,7 +52,7 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
         @Override
         protected void before() throws Throwable
         {
-            server = new Server(dynamicPort.getNumber());
+            server = new TestServer(port.getNumber());
             server.start();
         }
 
@@ -70,41 +73,53 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
     /**
      * Implementation of an http fake server
      */
-    public static class Server
+    public static class TestServer
     {
 
         private int serverPort;
-        private HttpServer server;
+        private Server server;
 
-        public Server(int serverPort)
-        {
-            this.serverPort = serverPort;
-        }
+        public TestServer(int serverPort) { this.serverPort = serverPort; }
 
-        public void start() throws IOException
+        public void start() throws Exception
         {
-            server = HttpServer.createSimpleServer("/", serverPort);
-            server.getServerConfiguration().addHttpHandler(new HttpHandler()
-            {
-                public void service(Request request, Response response) throws Exception
-                {
-                    response.setContentType(APPLICATION_XML_UTF_8.toString());
-                    String contents = IOUtils.toString(this.getClass().getResourceAsStream(WSDL_FILE_LOCATION),
-                            UTF_8.name());
-                    response.setContentLength(contents.length());
-                    response.getWriter().write(contents);
-                }
-            });
+            server = new Server(serverPort);
+
+            String contentsType = APPLICATION_XML_UTF_8.toString();
+            String contents = IOUtils.toString(this.getClass().getResourceAsStream(WSDL_FILE_LOCATION), UTF_8.name());
+            server.setHandler(new TestHandler(contentsType, contents));
 
             server.start();
+
         }
 
         public void stop() throws Exception
         {
-            server.shutdownNow();
+            server.stop();
         }
 
     }
 
+    public static class TestHandler extends AbstractHandler
+    {
+
+        private final String contentsType;
+        private final String contents;
+
+        public TestHandler(String contentsType, String contents)
+        {
+            this.contentsType = contentsType;
+            this.contents = contents;
+        }
+
+        @Override
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+        {
+            response.setContentType(contentsType);
+            response.setContentLength(contents.length());
+            response.getWriter().write(contents);
+        }
+
+    }
 
 }
