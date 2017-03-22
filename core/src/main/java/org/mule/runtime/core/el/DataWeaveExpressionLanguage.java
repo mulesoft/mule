@@ -11,7 +11,10 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
+import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
+import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
@@ -55,6 +58,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
    *
    * @param bindingContext the context to register
    */
+  @Override
   public synchronized void registerGlobalContext(BindingContext bindingContext) {
     expressionExecutor.addGlobalBindings(bindingContext);
   }
@@ -140,6 +144,10 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     String sanitizedExpression = expression.startsWith(DEFAULT_EXPRESSION_PREFIX)
         ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
         : expression;
+
+    if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)) {
+      sanitizedExpression = sanitizedExpression.substring((DW_PREFIX + PREFIX_EXPR_SEPARATOR).length());
+    }
     return sanitizedExpression;
   }
 

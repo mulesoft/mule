@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import com.google.common.collect.Sets;
@@ -55,6 +56,7 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -71,6 +73,13 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
   @Test
   public void stringExpression() throws Exception {
     TypedValue result = expressionLanguage.evaluate("\"hey\"", testEvent(), BindingContext.builder().build());
+    assertThat(result.getValue(), is("hey"));
+    assertThat(result.getDataType(), is(equalTo(STRING)));
+  }
+
+  @Test
+  public void withPrefixExpression() throws Exception {
+    TypedValue result = expressionLanguage.evaluate("#[dw:\"hey\"]", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
     assertThat(result.getDataType(), is(equalTo(STRING)));
   }
