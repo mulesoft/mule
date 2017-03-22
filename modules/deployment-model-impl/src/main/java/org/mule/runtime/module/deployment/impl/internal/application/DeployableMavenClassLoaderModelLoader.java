@@ -14,6 +14,8 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModelFolder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -113,8 +115,8 @@ public class DeployableMavenClassLoaderModelLoader extends MavenClassLoaderModel
       List<Plugin> plugins = build.getPlugins();
       if (plugins != null) {
         Optional<Plugin> packagingPluginOptional =
-            plugins.stream().filter(plugin -> plugin.getArtifactId().equals("mule-maven-plugin")
-                && plugin.getGroupId().equals("org.mule.tools.maven")).findFirst();
+            plugins.stream().filter(plugin -> plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
+                && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)).findFirst();
         packagingPluginOptional.ifPresent(packagingPlugin -> {
           Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) packagingPlugin.getConfiguration()).getChild("sharedLibraries");
           if (sharedLibrariesDom != null) {

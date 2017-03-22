@@ -7,7 +7,10 @@
 package org.mule.runtime.module.artifact.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
@@ -33,9 +36,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  */
 public abstract class AbstractDependencyFileBuilder<T extends AbstractDependencyFileBuilder<T>> {
 
-  private static final String MULE_MAVEN_PLUGIN_GROUP_ID = "org.mule.tools.maven";
-  private static final String MULE_MAVEN_PLUGIN_ARTIFACT_ID = "mule-maven-plugin";
   public static final String COMPILE_SCOPE = "compile";
+  private static final String MULE_MAVEN_PLUGIN_VERSION = "1.0.0";
   private final String artifactId;
   private final List<AbstractDependencyFileBuilder> dependencies = new ArrayList<>();
   private final List<AbstractDependencyFileBuilder> sharedLibraries = new ArrayList<>();
@@ -90,8 +92,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
       model.setModelVersion("4.0.0");
       if (!sharedLibraries.isEmpty()) {
         model.setBuild(new Build());
-        model.getBuild().setPlugins(new ArrayList<>());
-        model.getBuild().getPlugins().add(createMuleMavenPlugin());
+        model.getBuild().setPlugins(singletonList(createMuleMavenPlugin()));
       }
 
       for (AbstractDependencyFileBuilder fileBuilderDependency : dependencies) {
@@ -112,7 +113,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
     Plugin plugin = new Plugin();
     plugin.setGroupId(MULE_MAVEN_PLUGIN_GROUP_ID);
     plugin.setArtifactId(MULE_MAVEN_PLUGIN_ARTIFACT_ID);
-    plugin.setVersion("1.0.0");
+    plugin.setVersion(MULE_MAVEN_PLUGIN_VERSION);
     Xpp3Dom configuration = new Xpp3Dom("configuration");
     plugin.setConfiguration(configuration);
     Xpp3Dom sharedLibrariesDom = new Xpp3Dom("sharedLibraries");
