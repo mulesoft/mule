@@ -9,16 +9,16 @@ package org.mule.runtime.module.deployment.internal;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppsDir;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.mule.runtime.module.artifact.Artifact;
 
 import java.io.File;
 import java.io.IOException;
@@ -111,7 +111,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public void undeployArtifact(String artifactId) {
     ZombieFile zombieFile = artifactZombieMap.get(artifactId);
     if ((zombieFile != null)) {
-      return;
+
+      if (zombieFile.exists()) {
+        return;
+      } else {
+        artifactZombieMap.remove(artifactId);
+      }
+
     }
 
     T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
@@ -427,6 +433,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     public boolean updatedZombieApp() {
       return originalTimestamp != file.lastModified();
+    }
+
+    public boolean exists() {
+      return file.exists();
     }
   }
 }

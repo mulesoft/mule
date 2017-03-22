@@ -362,6 +362,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       .definedBy("shared-a-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-domain");
   private final ApplicationFileBuilder sharedBAppFileBuilder = new ApplicationFileBuilder("shared-app-b")
       .definedBy("shared-b-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-domain");
+  private final ApplicationFileBuilder badConfigAppFileBuilder = new ApplicationFileBuilder("bad-config-app").definedBy("bad-app-config.xml");
+
 
   // Domain file builders
   private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -1059,6 +1061,33 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+  }
+
+  @Test
+  public void removesZombieFilesAfterFailedAppIsDeleted() throws Exception
+  {
+    final String appName = "bad-config-app";
+
+    addPackedAppFromBuilder(badConfigAppFileBuilder);
+    deploymentService.start();
+
+    assertDeploymentFailure(applicationDeploymentListener, appName);
+    assertAppsDir(new String[] {}, new String[] {appName}, true);
+
+    final Map<URL, Long> startZombieMap = deploymentService.getZombieApplications();
+    assertEquals("Should be a zombie file for the app's broken XML config", 1, startZombieMap.size());
+
+    final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
+    assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
+    assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
+
+    org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
+    assertAppFolderIsDeleted(appName);
+    assertUndeploymentSuccess(applicationDeploymentListener, appName);
+
+    assertNull(deploymentService.findApplication(appName));
+    final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
+    assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
   }
 
   @Test
