@@ -8,9 +8,12 @@ package org.mule.runtime.core.el;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.regex.Pattern.compile;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -20,6 +23,11 @@ import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Implementation of an {@link ExtendedExpressionLanguage} which adapts MVEL and DW together, deciding via a prefix whether one or
  * the other should be call. It will allow MVEL and DW to be used together in compatibility mode.
@@ -28,27 +36,27 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
  */
 public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLanguage {
 
-  //DW based expression language
-  private DataWeaveExpressionLanguage dataWeaveExpressionLanguage;
-  //MVEL based expression language
-  private MVELExpressionLanguage mvelExpressionLanguage;
+  private final Pattern EXPR_PREFIX_PATTERN = compile("^\\s*(?:(?:#\\[)?\\s*(\\w+):|\\%(\\w+) \\d).*");
 
-  private boolean forceMel = false;
+  private Map<String, ExtendedExpressionLanguage> expressionLanguages;
+
+  private boolean melDefault = false;
 
   public ExtendedExpressionLanguageAdapter(DataWeaveExpressionLanguage dataWeaveExpressionLanguage,
                                            MVELExpressionLanguage mvelExpressionLanguage) {
-    this.dataWeaveExpressionLanguage = dataWeaveExpressionLanguage;
-    this.mvelExpressionLanguage = mvelExpressionLanguage;
-    forceMel = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
+    expressionLanguages = new HashMap<>();
+    expressionLanguages.put(DW_PREFIX, dataWeaveExpressionLanguage);
+    expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
+    melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
   }
 
-  public boolean isForceMel() {
-    return forceMel;
+  public boolean isMelDefault() {
+    return melDefault;
   }
 
   @Override
   public void registerGlobalContext(BindingContext bindingContext) {
-    dataWeaveExpressionLanguage.registerGlobalContext(bindingContext);
+    expressionLanguages.get(DW_PREFIX).registerGlobalContext(bindingContext);
   }
 
   @Override
@@ -87,14 +95,29 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
   }
 
   private ExtendedExpressionLanguage selectExpressionLanguage(String expression) {
-    if (isMelExpression(expression) || forceMel) {
-      return mvelExpressionLanguage;
+    final String languagePrefix = getLanguagePrefix(expression);
+    if (isEmpty(languagePrefix)) {
+      if (melDefault) {
+        return expressionLanguages.get(MEL_PREFIX);
+      } else {
+        return expressionLanguages.get(DW_PREFIX);
+      }
     } else {
-      return dataWeaveExpressionLanguage;
+      return expressionLanguages.get(languagePrefix);
     }
   }
 
-  protected boolean isMelExpression(String expression) {
-    return expression.startsWith(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX) || expression.startsWith(MEL_PREFIX);
+  private String getLanguagePrefix(String expression) {
+    final Matcher matcher = EXPR_PREFIX_PATTERN.matcher(expression);
+    if (matcher.find()) {
+      int i = 1;
+      String currentGroup = null;
+      while (currentGroup == null) {
+        currentGroup = matcher.group(i++);
+      }
+      return currentGroup;
+    } else {
+      return null;
+    }
   }
 }
