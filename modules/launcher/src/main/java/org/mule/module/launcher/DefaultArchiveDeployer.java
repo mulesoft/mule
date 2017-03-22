@@ -120,9 +120,16 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     public void undeployArtifact(String artifactId)
     {
         ZombieFile zombieFile = artifactZombieMap.get(artifactId);
+
         if ((zombieFile != null))
         {
-            return;
+            if (zombieFile.exists()) {
+                return;
+            }
+            else
+            {
+                artifactZombieMap.remove(artifactId);
+            }
         }
 
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
@@ -515,6 +522,11 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         public boolean updatedZombieApp()
         {
             return originalTimestamp != file.lastModified();
+        }
+
+        public boolean exists()
+        {
+            return file.exists();
         }
     }
 }
