@@ -65,7 +65,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     @Override
     public boolean isUpdatedZombieArtifact(String artifactName)
     {
-        // Domains does not manage zombie artifacts
+        // Domains do not manage zombie artifacts
         return true;
     }
 
