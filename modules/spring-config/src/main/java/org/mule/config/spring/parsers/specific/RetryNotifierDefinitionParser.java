@@ -27,14 +27,7 @@ public class RetryNotifierDefinitionParser extends OptionalChildDefinitionParser
     @Override
     protected boolean isChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        if (isConfigElement(element))
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return !isConfigElement(element);
     }
 
     private boolean isConfigElement(Element element)
