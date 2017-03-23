@@ -6,6 +6,32 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarInfo;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -18,32 +44,6 @@ import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModelFolder;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
-import org.mule.runtime.module.artifact.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.util.JarInfo;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoader;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.eclipse.aether.resolution.DependencyResult;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -118,28 +118,31 @@ public class DeployableMavenClassLoaderModelLoader extends MavenClassLoaderModel
             plugins.stream().filter(plugin -> plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
                 && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)).findFirst();
         packagingPluginOptional.ifPresent(packagingPlugin -> {
-          Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) packagingPlugin.getConfiguration()).getChild("sharedLibraries");
-          if (sharedLibrariesDom != null) {
-            Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren("sharedLibrary");
-            if (sharedLibraries != null) {
-              FileJarExplorer fileJarExplorer = new FileJarExplorer();
-              for (Xpp3Dom sharedLibrary : sharedLibraries) {
-                String groupId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "groupId");
-                String artifactId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "artifactId");
-                Optional<BundleDependency> bundleDependencyOptional = dependencies.stream()
-                    .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(artifactId)
-                        && bundleDependency.getDescriptor().getGroupId().equals(groupId))
-                    .findFirst();
-                bundleDependencyOptional.map(bundleDependency -> {
-                  JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUrl());
-                  classLoaderModelBuilder.exportingPackages(jarInfo.getPackages());
-                  classLoaderModelBuilder.exportingResources(jarInfo.getResources());
-                  return bundleDependency;
-                }).orElseThrow(() -> new MuleRuntimeException(I18nMessageFactory
-                    .createStaticMessage(format(
-                                                "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
-                                                groupId,
-                                                artifactId, applicationFolder.getName()))));
+          Object configuration = packagingPlugin.getConfiguration();
+          if (configuration != null) {
+            Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) configuration).getChild("sharedLibraries");
+            if (sharedLibrariesDom != null) {
+              Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren("sharedLibrary");
+              if (sharedLibraries != null) {
+                FileJarExplorer fileJarExplorer = new FileJarExplorer();
+                for (Xpp3Dom sharedLibrary : sharedLibraries) {
+                  String groupId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "groupId");
+                  String artifactId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "artifactId");
+                  Optional<BundleDependency> bundleDependencyOptional = dependencies.stream()
+                      .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(artifactId)
+                          && bundleDependency.getDescriptor().getGroupId().equals(groupId))
+                      .findFirst();
+                  bundleDependencyOptional.map(bundleDependency -> {
+                    JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUrl());
+                    classLoaderModelBuilder.exportingPackages(jarInfo.getPackages());
+                    classLoaderModelBuilder.exportingResources(jarInfo.getResources());
+                    return bundleDependency;
+                  }).orElseThrow(() -> new MuleRuntimeException(I18nMessageFactory
+                      .createStaticMessage(format(
+                                                  "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
+                                                  groupId,
+                                                  artifactId, applicationFolder.getName()))));
+                }
               }
             }
           }
