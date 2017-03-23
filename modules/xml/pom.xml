@@ -11,6 +11,30 @@
     <name>XML Extensions</name>
     <description>Functionality for working with XML</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <javax.xml.transform.TransformerFactory>org.apache.xalan.processor.TransformerFactoryImpl</javax.xml.transform.TransformerFactory>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -59,7 +83,6 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>${jaxenVersion}</version>
             <!-- see http://jira.codehaus.org/browse/MNG-3007
                  depending on whether jaxen is resolved via dist.codehaus.org
                  or the central repo we get transitive dependencies that we
@@ -141,17 +164,23 @@
             <artifactId>xalan</artifactId>
             <version>${xalanVersion}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
             <version>${xalanVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xercesVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xmlApisVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
