@@ -43,8 +43,6 @@
         <module>tls</module>
         <module>tomcat</module>
         <module>tooling-support</module>
-        <!-- TODO Remove this module -->
-        <module>xml</module>
         <module>soap-api</module>
     </modules>
 
