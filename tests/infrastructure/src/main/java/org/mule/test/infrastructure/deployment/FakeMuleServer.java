@@ -15,11 +15,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
 
-import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.FilenameUtils;
@@ -28,10 +29,10 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.runtime.module.deployment.impl.internal.temporary.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
+import org.mule.runtime.module.deployment.impl.internal.temporary.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -59,6 +60,8 @@ public class FakeMuleServer {
   private File appsDir;
   private File domainsDir;
   private File logsDir;
+  private File policiesDir;
+  private File pluginsDir;
   private File serverPluginsDir;
   private File servicesDir;
 
@@ -227,6 +230,8 @@ public class FakeMuleServer {
     serverPluginsDir = createFolder("server-plugins");
     servicesDir = createFolder(SERVICES_FOLDER);
     domainsDir = createFolder(DOMAINS_FOLDER);
+    pluginsDir = createFolder(PLUGINS_FOLDER);
+    policiesDir = createFolder("policies");
     createFolder(DOMAINS_FOLDER + "/default");
 
     File confDir = createFolder("conf");
@@ -341,6 +346,28 @@ public class FakeMuleServer {
     copyURLToFile(resource, tempFile);
   }
 
+  /**
+   * Adds a plugin to the Mule server
+   *
+   * @param plugin plugin to add. Non null.
+   * @throws IOException
+   */
+  public void addZippedPlugin(File plugin) throws IOException {
+    addZippedPlugin(plugin.toURI().toURL());
+  }
+
+  /**
+   * Adds a plugin to the Mule server
+   *
+   * @param resource points to the plugin to add. Non null.
+   * @throws IOException
+   */
+  public void addZippedPlugin(URL resource) throws IOException {
+    String baseName = FilenameUtils.getName(resource.getPath());
+    File tempFile = new File(getPluginsDir(), baseName);
+    copyURLToFile(resource, tempFile);
+  }
+
   public File getMuleHome() {
     return muleHome;
   }
@@ -357,12 +384,24 @@ public class FakeMuleServer {
     return domainsDir;
   }
 
+  public File getPluginsDir() {
+    return pluginsDir;
+  }
+
+  public File getPoliciesDir() {
+    return policiesDir;
+  }
+
   public File getServerPluginsDir() {
     return serverPluginsDir;
   }
 
   public File getServicesDir() {
     return servicesDir;
+  }
+
+  public DeploymentService getDeploymentService() {
+    return deploymentService;
   }
 
   public void resetDeploymentListener() {
