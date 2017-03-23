@@ -13,7 +13,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.services.soap.api.message.ImmutableSoapAttachment;
+import org.mule.services.soap.api.message.SoapAttachment;
 import org.mule.services.soap.client.SoapCxfClient;
 import org.mule.services.soap.api.exception.EncodingException;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
@@ -46,12 +46,12 @@ public final class SoapAttachmentResponseEnricher extends AttachmentResponseEnri
    */
   @Override
   protected void processResponseAttachments(Document response, List<ObjectFieldType> attachments, Exchange exchange) {
-    List<ImmutableSoapAttachment> result = attachments.stream().map(a -> {
+    List<SoapAttachment> result = attachments.stream().map(a -> {
       String tagName = a.getKey().getName().getLocalPart();
       Node attachmentNode = response.getDocumentElement().getElementsByTagName(tagName).item(0);
       String decodedAttachment = decodeAttachment(tagName, attachmentNode.getTextContent());
       response.getDocumentElement().removeChild(attachmentNode);
-      return new ImmutableSoapAttachment(tagName, MediaType.ANY, new ByteArrayInputStream(decodedAttachment.getBytes()));
+      return new SoapAttachment(tagName, MediaType.ANY, new ByteArrayInputStream(decodedAttachment.getBytes()));
     }).collect(new ImmutableListCollector<>());
     exchange.put(SoapCxfClient.MULE_ATTACHMENTS_KEY, result);
   }

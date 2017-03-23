@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.api.security.config;
+package org.mule.extension.ws.internal.security.config;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -14,22 +14,16 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.services.soap.api.security.config.WssStoreConfiguration;
 
 /**
- * Default {@link WssStoreConfiguration} implementation for Key Stores, used for encryption, decryption and signing.
+ * Default {@link WssStoreConfiguration} implementation for Trust Stores, used for signature verification.
  *
  * @since 4.0
  */
-@Alias("wss-key-store-configuration")
-public class WssKeyStoreConfigurationAdapter implements WssStoreConfiguration {
+@Alias("wss-trust-store-configuration")
+public class WssTrustStoreConfigurationAdapter implements WssStoreConfiguration {
 
   @Parameter
-  @Summary("The alias of the private key to use")
-  private String alias;
-
-  @Parameter
-  @Summary("The password used to access the private key.")
-  @Optional
-  @Password
-  private String keyPassword;
+  @Summary("The location of the TrustStore file")
+  private String trustStorePath;
 
   @Parameter
   @Summary("The password to access the store.")
@@ -37,34 +31,16 @@ public class WssKeyStoreConfigurationAdapter implements WssStoreConfiguration {
   private String password;
 
   @Parameter
-  @Summary("The location of the KeyStore file")
-  private String keyStorePath;
-
-  @Parameter
   @Optional(defaultValue = "jks")
   @Summary("The type of store (jks, pkcs12, jceks, or any other)")
   private String type;
-
-  /**
-   * @return The password used to access the private key.
-   */
-  public String getKeyPassword() {
-    return keyPassword;
-  }
-
-  /**
-   * @return The alias of the private key to use.
-   */
-  public String getAlias() {
-    return alias;
-  }
 
   /**
    * {@inheritDoc}
    */
   @Override
   public String getStorePath() {
-    return keyStorePath;
+    return trustStorePath;
   }
 
   /**

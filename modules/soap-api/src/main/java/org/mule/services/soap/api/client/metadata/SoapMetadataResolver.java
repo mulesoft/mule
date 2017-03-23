@@ -32,5 +32,9 @@ public interface SoapMetadataResolver {
    */
   SoapOperationMetadata getOutputMetadata(String operation) throws MetadataResolvingException;
 
+  /**
+   * @return a {@link Set} with the {@link MetadataKey} representing the available operations in the WSDL
+   * @throws MetadataResolvingException in any error case.
+   */
   Set<MetadataKey> getMetadataKeys() throws MetadataResolvingException;
 }

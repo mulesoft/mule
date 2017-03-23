@@ -7,20 +7,25 @@
 package org.mule.services.soap.api.message;
 
 /**
- * Represents and enables the construction of a SOAP header.
+ * Represents and enables the construction of an header to be used with SOAP.
  *
  * @since 4.0
  */
-public interface SoapHeader {
+public final class SoapHeader {
 
-  /**
-   * @return the id of the header.
-   */
-  String getId();
+  private final String id;
+  private final String value;
 
-  /**
-   * @return the content of the header.
-   */
-  String getValue();
+  public SoapHeader(String id, String value) {
+    this.id = id;
+    this.value = value;
+  }
 
+  public String getId() {
+    return id;
+  }
+
+  public String getValue() {
+    return value;
+  }
 }

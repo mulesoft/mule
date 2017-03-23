@@ -14,9 +14,8 @@ import static org.mule.services.soap.api.message.SoapRequest.builder;
 import org.mule.services.soap.AbstractSoapServiceTestCase;
 import org.mule.services.soap.TestSoapClient;
 import org.mule.services.soap.api.client.SoapClient;
-import org.mule.services.soap.api.message.ImmutableSoapHeader;
-import org.mule.services.soap.api.message.ImmutableSoapRequest;
 import org.mule.services.soap.api.message.SoapHeader;
+import org.mule.services.soap.api.message.ImmutableSoapRequest;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
 
@@ -65,8 +64,8 @@ public class OperationExecutionTestCase extends AbstractSoapServiceTestCase {
   public void simpleOperationWithHeaders() throws Exception {
 
     List<SoapHeader> soapHeaders =
-        ImmutableList.<SoapHeader>builder().add(new ImmutableSoapHeader("headerIn", HEADER_IN))
-            .add(new ImmutableSoapHeader("headerInOut", HEADER_INOUT)).build();
+        ImmutableList.<SoapHeader>builder().add(new SoapHeader("headerIn", HEADER_IN))
+            .add(new SoapHeader("headerInOut", HEADER_INOUT)).build();
 
     ImmutableSoapRequest req =
         builder().withContent("<con:echoWithHeaders xmlns:con=\"http://service.soap.services.mule.org/\">\n"

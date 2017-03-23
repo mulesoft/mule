@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ws.internal.connection;
 
-import org.mule.extension.ws.api.security.SecurityStrategyAdapter;
+import org.mule.extension.ws.internal.security.SecurityStrategyAdapter;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;

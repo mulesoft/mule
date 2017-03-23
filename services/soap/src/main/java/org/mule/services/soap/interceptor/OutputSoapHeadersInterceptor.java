@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
 import org.mule.services.soap.api.exception.BadResponseException;
-import org.mule.services.soap.api.message.ImmutableSoapHeader;
+import org.mule.services.soap.api.message.SoapHeader;
 import org.mule.services.soap.api.message.SoapResponse;
 import org.mule.services.soap.client.SoapCxfClient;
 import org.mule.services.soap.util.XmlTransformationException;
@@ -18,7 +18,6 @@ import org.mule.services.soap.util.XmlTransformationUtils;
 
 import java.util.List;
 
-import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -43,9 +42,9 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
   @Override
   public void handleMessage(SoapMessage message) throws Fault {
     List<org.mule.services.soap.api.message.SoapHeader> headers =
-        message.getHeaders().stream().filter(header -> header instanceof SoapHeader).map(h -> {
+        message.getHeaders().stream().filter(header -> header instanceof org.apache.cxf.binding.soap.SoapHeader).map(h -> {
           try {
-            return new ImmutableSoapHeader(h.getName().getLocalPart(), XmlTransformationUtils.nodeToString((Node) h.getObject()));
+            return new SoapHeader(h.getName().getLocalPart(), XmlTransformationUtils.nodeToString((Node) h.getObject()));
           } catch (XmlTransformationException e) {
             throw new BadResponseException(format("Error while processing response header [%s]", h.getName()), e);
           }

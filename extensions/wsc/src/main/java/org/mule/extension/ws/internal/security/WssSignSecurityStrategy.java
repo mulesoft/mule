@@ -4,23 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.api.security;
+package org.mule.extension.ws.internal.security;
 
-import org.mule.extension.ws.api.security.config.WssKeyStoreConfigurationAdapter;
+import org.mule.extension.ws.internal.security.config.WssKeyStoreConfigurationAdapter;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.services.soap.api.security.EncryptSecurityStrategy;
 import org.mule.services.soap.api.security.SecurityStrategy;
+import org.mule.services.soap.api.security.SignSecurityStrategy;
 import org.mule.services.soap.api.security.config.WssKeyStoreConfiguration;
 
 /**
- * Verifies the signature of a SOAP response, using certificates of the trust-store in the provided TLS context.
+ * Signs the SOAP request that is being sent, using the private key of the key-store in the provided TLS context.
  *
  * @since 4.0
  */
-public class WssEncryptSecurityStrategy implements SecurityStrategyAdapter {
+public class WssSignSecurityStrategy implements SecurityStrategyAdapter {
+
+  private static final String WS_SIGN_PROPERTIES_KEY = "signProperties";
 
   /**
-   * The keystore to use when encrypting the message.
+   * The keystore to use when signing the message.
    */
   @Parameter
   private WssKeyStoreConfigurationAdapter keyStoreConfiguration;
@@ -31,6 +33,6 @@ public class WssEncryptSecurityStrategy implements SecurityStrategyAdapter {
         new WssKeyStoreConfiguration(keyStoreConfiguration.getAlias(), keyStoreConfiguration.getKeyPassword(),
                                      keyStoreConfiguration.getPassword(), keyStoreConfiguration.getStorePath(),
                                      keyStoreConfiguration.getType());
-    return new EncryptSecurityStrategy(keyStore);
+    return new SignSecurityStrategy(keyStore);
   }
 }

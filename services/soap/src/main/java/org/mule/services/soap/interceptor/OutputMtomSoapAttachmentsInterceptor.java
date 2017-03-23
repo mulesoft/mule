@@ -12,7 +12,6 @@ import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_ATTACHMENTS_KEY;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.services.soap.api.message.ImmutableSoapAttachment;
 import org.mule.services.soap.api.message.SoapAttachment;
 
 import java.io.IOException;
@@ -55,7 +54,7 @@ public class OutputMtomSoapAttachmentsInterceptor extends AbstractPhaseIntercept
     DataHandler dataHandler = attachment.getDataHandler();
     String name = dataHandler.getName() != null ? dataHandler.getName() : attachment.getId();
     try {
-      return new ImmutableSoapAttachment(name, dataHandler.getContentType(), dataHandler.getInputStream());
+      return new SoapAttachment(name, dataHandler.getContentType(), dataHandler.getInputStream());
     } catch (IOException e) {
       throw new SoapFault("Error copying received attachment [" + name + "]", e, FAULT_CODE_SERVER);
     }

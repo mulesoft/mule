@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.api.security;
+package org.mule.extension.ws.internal.security;
 
-import org.mule.extension.ws.api.security.config.WssKeyStoreConfigurationAdapter;
+import org.mule.extension.ws.internal.security.config.WssKeyStoreConfigurationAdapter;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.services.soap.api.security.DecryptSecurityStrategy;
 import org.mule.services.soap.api.security.SecurityStrategy;

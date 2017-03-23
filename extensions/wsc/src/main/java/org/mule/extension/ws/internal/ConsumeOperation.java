@@ -32,8 +32,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.exception.BadRequestException;
 import org.mule.services.soap.api.exception.SoapFaultException;
-import org.mule.services.soap.api.message.ImmutableSoapAttachment;
-import org.mule.services.soap.api.message.ImmutableSoapHeader;
+import org.mule.services.soap.api.message.SoapAttachment;
 import org.mule.services.soap.api.message.SoapHeader;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapRequestBuilder;
@@ -102,7 +101,7 @@ public class ConsumeOperation {
   private SoapRequestBuilder getSoapRequest(String operation, SoapMessageBuilder message) {
     SoapRequestBuilder requestBuilder = SoapRequest.builder();
     message.getAttachments().forEach((id, attachment) -> requestBuilder
-        .withAttachment(new ImmutableSoapAttachment(id, attachment.getContentType(), attachment.getContent())));
+        .withAttachment(new SoapAttachment(id, attachment.getContentType(), attachment.getContent())));
     requestBuilder.withOperation(operation);
     requestBuilder.withSoapHeaders(buildHeaders(message.getHeaders()));
 
@@ -123,7 +122,7 @@ public class ConsumeOperation {
       for (int i = 0; i < nodes.getLength(); i++) {
         Node currentNode = nodes.item(i);
         if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-          soapHeaders.add(new ImmutableSoapHeader(currentNode.getNodeName(), nodeToString(currentNode)));
+          soapHeaders.add(new SoapHeader(currentNode.getNodeName(), nodeToString(currentNode)));
         }
       }
     } catch (Exception e) {

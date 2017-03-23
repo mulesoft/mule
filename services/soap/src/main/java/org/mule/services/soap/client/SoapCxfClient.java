@@ -8,6 +8,8 @@ package org.mule.services.soap.client;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.exception.MuleException;
@@ -16,24 +18,24 @@ import org.mule.services.soap.api.SoapVersion;
 import org.mule.services.soap.api.client.MessageDispatcher;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
+import org.mule.services.soap.api.exception.BadRequestException;
+import org.mule.services.soap.api.exception.SoapFaultException;
+import org.mule.services.soap.api.exception.SoapServiceException;
 import org.mule.services.soap.api.message.SoapAttachment;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
-import org.mule.services.soap.api.exception.BadRequestException;
-import org.mule.services.soap.api.exception.SoapFaultException;
-import org.mule.services.soap.generator.attachment.AttachmentRequestEnricher;
-import org.mule.services.soap.generator.attachment.AttachmentResponseEnricher;
-import org.mule.services.soap.api.exception.SoapServiceException;
 import org.mule.services.soap.generator.SoapRequestGenerator;
 import org.mule.services.soap.generator.SoapResponseGenerator;
+import org.mule.services.soap.generator.attachment.AttachmentRequestEnricher;
+import org.mule.services.soap.generator.attachment.AttachmentResponseEnricher;
 import org.mule.services.soap.generator.attachment.MtomRequestEnricher;
 import org.mule.services.soap.generator.attachment.MtomResponseEnricher;
 import org.mule.services.soap.generator.attachment.SoapAttachmentRequestEnricher;
 import org.mule.services.soap.generator.attachment.SoapAttachmentResponseEnricher;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
 import org.mule.services.soap.metadata.DefaultSoapMetadataResolver;
-import org.mule.services.soap.util.XmlTransformationUtils;
 import org.mule.services.soap.util.XmlTransformationException;
+import org.mule.services.soap.util.XmlTransformationUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -42,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -57,6 +60,8 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 /**
@@ -65,6 +70,8 @@ import org.w3c.dom.Element;
  * @since 4.0
  */
 public class SoapCxfClient implements SoapClient {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SoapCxfClient.class);
 
   public static final String WSC_DISPATCHER = "mule.wsc.dispatcher";
   public static final String MULE_ATTACHMENTS_KEY = "mule.wsc.attachments";
@@ -154,7 +161,8 @@ public class SoapCxfClient implements SoapClient {
           getInvocationContext(operation, encoding, transformToCxfHeaders(headers), transformToCxfAttachments(attachments));
       return client.invoke(bop, new Object[] {payload}, ctx, exchange);
     } catch (SoapFault sf) {
-      throw new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), parseExceptionDetail(sf.getDetail()), sf.getReason(),
+      throw new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), parseExceptionDetail(sf.getDetail()).orElse(null),
+                                   sf.getReason(),
                                    sf.getNode(), sf.getRole(),
                                    sf);
     } catch (Fault f) {
@@ -163,7 +171,7 @@ public class SoapCxfClient implements SoapClient {
                                       format("Error consuming the operation [%s], the request body is not a valid XML",
                                              operation));
       }
-      throw new SoapFaultException(f.getFaultCode(), parseExceptionDetail(f.getDetail()), f);
+      throw new SoapFaultException(f.getFaultCode(), parseExceptionDetail(f.getDetail()).orElse(null), f);
     } catch (Exception e) {
       throw new SoapServiceException(format("An unexpected error occur while consuming the [%s] web service operation",
                                             operation),
@@ -250,12 +258,14 @@ public class SoapCxfClient implements SoapClient {
     return isMtom ? new MtomResponseEnricher(introspecter, loader) : new SoapAttachmentResponseEnricher(introspecter, loader);
   }
 
-  private String parseExceptionDetail(Element detail) {
+  private Optional<String> parseExceptionDetail(Element detail) {
     try {
-      return XmlTransformationUtils.nodeToString(detail);
+      return ofNullable(XmlTransformationUtils.nodeToString(detail));
     } catch (XmlTransformationException e) {
-      // Log this.
-      return null;
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Error while parsing Soap Exception detail: " + detail.toString(), e);
+      }
+      return empty();
     }
   }
 }
