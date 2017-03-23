@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 
-public class RetryNotifierDefinitionParser extends ChildDefinitionParser {
+import org.mule.runtime.config.spring.parsers.generic.OptionalChildDefinitionParser;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+
+public class RetryNotifierDefinitionParser extends OptionalChildDefinitionParser {
 
   public RetryNotifierDefinitionParser() {
     super("notifier");
@@ -17,5 +22,18 @@ public class RetryNotifierDefinitionParser extends ChildDefinitionParser {
   public RetryNotifierDefinitionParser(Class clazz) {
     super("notifier", clazz);
   }
-}
 
+
+  @Override
+  protected boolean isChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+    return !isConfigElement(element);
+  }
+
+  private boolean isConfigElement(Element element) {
+    return getAncestorBeanName(element).equals(OBJECT_MULE_CONFIGURATION);
+  }
+
+  private String getAncestorBeanName(Element element) {
+    return ((Element) ((Element) element.getParentNode()).getParentNode()).getAttribute(ATTRIBUTE_NAME);
+  }
+}
