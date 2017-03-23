@@ -193,7 +193,7 @@
         <muleExtensionsApiVersion>1.0.0-M5.1</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-M5.1</muleApiVersion>
-        <muleMetadataModelVersion>1.0.0-M5.1-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.0.0-M5.1</muleMetadataModelVersion>
         <muleMvelVersion>2.1.9-MULE-010</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
