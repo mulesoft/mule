@@ -13,6 +13,7 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.services.soap.api.client.SoapClient;
+import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
 
 /**
  * Base class for all metadata resolvers of the {@link ConsumeOperation}.
@@ -31,8 +32,9 @@ public abstract class BaseWscResolver implements NamedTypeResolver {
     return WSC_CATEGORY;
   }
 
-  protected SoapClient getConnection(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    return context.<SoapClient>getConnection()
+  protected SoapMetadataResolver getMetadataResolver(MetadataContext context)
+      throws MetadataResolvingException, ConnectionException {
+    return context.<SoapClient>getConnection().map(SoapClient::getMetadataResolver)
         .orElseThrow(() -> new MetadataResolvingException("Could not obtain connection to retrieve metadata",
                                                           CONNECTION_FAILURE));
   }

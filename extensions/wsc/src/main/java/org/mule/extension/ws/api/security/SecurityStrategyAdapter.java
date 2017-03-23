@@ -10,20 +10,15 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.services.soap.api.security.SecurityStrategy;
 
 /**
- * Base contract for classes that adds a level of security to the SOAP Protocol.
- * <p>
- * All securities have an Action Name and a Type (Whether should be applied to the SOAP request or SOAP response), and returns
- * a set of properties that needs to be set in the client to make it work.
- *
+ * Adapter interface for classes that wraps a security class for the SOAP Protocol.
+ * 
  * @since 4.0
  */
 @Alias("security-strategy")
 public interface SecurityStrategyAdapter {
 
   /**
-   * Returns the security action name that is going to be executed in the request phase (OUT interceptors).
-   *
-   * @return the request action name of {@code this} security strategy.
+   * @return the {@link SecurityStrategy} needed by the soap-service.
    */
   SecurityStrategy getSecurityStrategy();
 }

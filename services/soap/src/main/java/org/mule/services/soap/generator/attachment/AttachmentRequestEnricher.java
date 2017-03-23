@@ -6,7 +6,6 @@
  */
 package org.mule.services.soap.generator.attachment;
 
-import static org.mule.services.soap.impl.util.XmlTransformationUtils.stringToDocument;
 import static org.mule.services.soap.impl.xml.util.XMLUtils.toXml;
 
 import org.mule.metadata.api.TypeLoader;

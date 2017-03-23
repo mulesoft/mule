@@ -27,7 +27,7 @@ public final class WscAttributesResolver extends BaseWscResolver implements Attr
   @Override
   public MetadataType getAttributesType(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
-    MetadataType soapHeadersType = getConnection(context).getMetadataResolver().getOutputMetadata(operationName).getHeadersType();
+    MetadataType soapHeadersType = getMetadataResolver(context).getOutputMetadata(operationName).getHeadersType();
     ObjectTypeBuilder attributes = context.getTypeBuilder().objectType();
     attributes.addField().key(HEADERS_FIELD).value(soapHeadersType);
     ObjectTypeBuilder protocolHeaders = attributes.addField().key("protocolHeaders").value().objectType();

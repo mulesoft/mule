@@ -34,7 +34,7 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
   private static final String FAIL_FLOW = "failOperation";
 
-  // TODO WscErrors class not found
+  // TODO MULE-12038
   private static final String SOAP_FAULT = "Soap Fault";
   private static final String BAD_REQUEST = "Bad Request";
 

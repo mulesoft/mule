@@ -8,12 +8,12 @@ package org.mule.extension.ws.internal;
 
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.extension.ws.internal.xml.util.XMLUtils.nodeToString;
 import static org.mule.extension.ws.internal.xml.util.XMLUtils.toW3cDocument;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.api.WscAttributes;
 import org.mule.extension.ws.api.WscMultipartPayload;
-import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
 import org.mule.extension.ws.internal.metadata.MessageBuilderResolver;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
@@ -41,17 +41,10 @@ import org.mule.services.soap.api.message.SoapResponse;
 
 import com.google.common.collect.ImmutableList;
 
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -79,7 +72,7 @@ public class ConsumeOperation {
   @OutputResolver(output = ConsumeOutputResolver.class, attributes = WscAttributesResolver.class)
   public Result<Object, WscAttributes> consume(@Connection SoapClient connection,
                                                @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                               // TODO MULE-11235
+                                               // TODO MULE-11235 MULE-11584
                                                @NullSafe @Optional @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
       throws SoapFaultException {
     SoapRequestBuilder requestBuilder = getSoapRequest(operation, message);
@@ -106,13 +99,12 @@ public class ConsumeOperation {
     return result;
   }
 
-  private SoapRequestBuilder getSoapRequest(@MetadataKeyId(OperationKeysResolver.class) String operation,
-                                            @NullSafe @Optional @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message) {
+  private SoapRequestBuilder getSoapRequest(String operation, SoapMessageBuilder message) {
     SoapRequestBuilder requestBuilder = SoapRequest.builder();
     message.getAttachments().forEach((id, attachment) -> requestBuilder
         .withAttachment(new ImmutableSoapAttachment(id, attachment.getContentType(), attachment.getContent())));
     requestBuilder.withOperation(operation);
-    requestBuilder.withSoapHeaders(transformToCxfHeaders(message.getHeaders()));
+    requestBuilder.withSoapHeaders(buildHeaders(message.getHeaders()));
 
     if (!isBlank(message.getBody())) {
       requestBuilder.withContent(message.getBody());
@@ -120,8 +112,7 @@ public class ConsumeOperation {
     return requestBuilder;
   }
 
-  // TODO
-  private List<SoapHeader> transformToCxfHeaders(String headers) {
+  private List<SoapHeader> buildHeaders(String headers) {
     if (isBlank(headers)) {
       return Collections.emptyList();
     }
@@ -141,17 +132,5 @@ public class ConsumeOperation {
     return soapHeaders.build();
   }
 
-  static String nodeToString(Node node) {
-    try {
-      StringWriter writer = new StringWriter();
-      DOMSource source = new DOMSource(node);
-      StreamResult result = new StreamResult(writer);
-      TransformerFactory idTransformer = new SaxonTransformerFactory();
-      Transformer transformer = idTransformer.newTransformer();
-      transformer.transform(source, result);
-      return writer.toString();
-    } catch (Exception e) {
-      throw new WscException("Could not transform Node to String", e);
-    }
-  }
+
 }

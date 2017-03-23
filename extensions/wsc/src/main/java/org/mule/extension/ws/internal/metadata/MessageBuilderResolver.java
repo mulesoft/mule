@@ -37,7 +37,7 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
   @Override
   public MetadataType getInputMetadata(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
-    SoapOperationMetadata metadata = getConnection(context).getMetadataResolver().getInputMetadata(operationName);
+    SoapOperationMetadata metadata = getMetadataResolver(context).getInputMetadata(operationName);
     ObjectTypeBuilder typeBuilder = context.getTypeBuilder().objectType();
     typeBuilder.addField().key(HEADERS_FIELD).value(metadata.getHeadersType());
     typeBuilder.addField().key(BODY_FIELD).value(metadata.getBodyType());

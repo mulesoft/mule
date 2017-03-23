@@ -26,6 +26,6 @@ public class OperationKeysResolver extends BaseWscResolver implements TypeKeysRe
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    return getConnection(context).getMetadataResolver().getMetadataKeys();
+    return getMetadataResolver(context).getMetadataKeys();
   }
 }

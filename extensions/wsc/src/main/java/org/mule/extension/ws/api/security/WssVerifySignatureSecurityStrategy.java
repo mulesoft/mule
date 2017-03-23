@@ -22,8 +22,6 @@ import org.mule.services.soap.api.security.config.WssTrustStoreConfiguration;
  */
 public class WssVerifySignatureSecurityStrategy implements SecurityStrategyAdapter {
 
-  private static final String WS_VERIFY_SIGNATURE_PROPERTIES_KEY = "verifySignatureProperties";
-
   /**
    * The truststore to use to verify the signature.
    */

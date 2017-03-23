@@ -117,6 +117,7 @@ public class WscConnectionProvider implements PoolingConnectionProvider<SoapClie
    */
   @Override
   public ConnectionValidationResult validate(SoapClient client) {
+    // TODO MULE-12036
     return ConnectionValidationResult.success();
   }
 }
