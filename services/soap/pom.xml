@@ -111,6 +111,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>${guavaVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -132,6 +133,7 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
+            <version>${commonsLangVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

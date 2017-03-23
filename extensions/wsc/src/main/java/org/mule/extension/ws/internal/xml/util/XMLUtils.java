@@ -44,8 +44,10 @@ import org.xml.sax.InputSource;
 
 /**
  * General utility methods for working with XML.
+ * 
+ * @since 4.0, Copied from the removed XML module.
  */
-public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
+public class XMLUtils {
 
   /**
    * Converts a DOM to an XML string.

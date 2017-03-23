@@ -9,9 +9,6 @@ package org.mule.services.soap.impl.xml.stax;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import javanet.staxutils.StAXReaderToContentHandler;
-import javanet.staxutils.StAXSource;
-import javanet.staxutils.helpers.XMLFilterImplEx;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -24,8 +21,14 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 
+import javanet.staxutils.StAXReaderToContentHandler;
+import javanet.staxutils.StAXSource;
+import javanet.staxutils.helpers.XMLFilterImplEx;
+
 /**
  * A StaxSource which gives us access to the underlying XMLStreamReader if we are StaxCapable down the line.
+ * 
+ * @since 4.0, Copied from the removed XML module.
  */
 public class StaxSource extends StAXSource {
 
@@ -58,13 +61,14 @@ public class StaxSource extends StAXSource {
     return reader;
   }
 
-  public final class PseudoReader implements XMLReader {
+  private final class PseudoReader implements XMLReader {
 
     // we will store this value but never use it by ourselves.
     private EntityResolver entityResolver;
     private DTDHandler dtdHandler;
     private ErrorHandler errorHandler;
 
+    @Override
     public boolean getFeature(String name) throws SAXNotRecognizedException {
       if ("http://xml.org/sax/features/namespaces".equals(name)) {
         return true;
@@ -79,6 +83,7 @@ public class StaxSource extends StAXSource {
       throw new SAXNotRecognizedException(name);
     }
 
+    @Override
     public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
       if ("http://xml.org/sax/features/namespaces".equals(name)) {
         // Presently we only support namespaces==true. [Issue 9]
@@ -98,6 +103,7 @@ public class StaxSource extends StAXSource {
       }
     }
 
+    @Override
     public Object getProperty(String name) throws SAXNotRecognizedException {
       if ("http://xml.org/sax/properties/lexical-handler".equals(name)) {
         return repeater.getLexicalHandler();
@@ -106,6 +112,7 @@ public class StaxSource extends StAXSource {
       throw new SAXNotRecognizedException(name);
     }
 
+    @Override
     public void setProperty(String name, Object value) throws SAXNotRecognizedException {
       if ("http://xml.org/sax/properties/lexical-handler".equals(name)) {
         repeater.setLexicalHandler((LexicalHandler) value);
@@ -114,42 +121,52 @@ public class StaxSource extends StAXSource {
       }
     }
 
+    @Override
     public void setEntityResolver(EntityResolver resolver) {
       this.entityResolver = resolver;
     }
 
+    @Override
     public EntityResolver getEntityResolver() {
       return entityResolver;
     }
 
+    @Override
     public void setDTDHandler(DTDHandler handler) {
       this.dtdHandler = handler;
     }
 
+    @Override
     public DTDHandler getDTDHandler() {
       return dtdHandler;
     }
 
+    @Override
     public void setContentHandler(ContentHandler handler) {
       repeater.setContentHandler(handler);
     }
 
+    @Override
     public ContentHandler getContentHandler() {
       return repeater.getContentHandler();
     }
 
+    @Override
     public void setErrorHandler(ErrorHandler handler) {
       this.errorHandler = handler;
     }
 
+    @Override
     public ErrorHandler getErrorHandler() {
       return errorHandler;
     }
 
+    @Override
     public void parse(InputSource input) throws SAXException {
       parse();
     }
 
+    @Override
     public void parse(String systemId) throws SAXException {
       parse();
     }
