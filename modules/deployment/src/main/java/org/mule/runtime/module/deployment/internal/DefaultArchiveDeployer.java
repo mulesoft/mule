@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T> {
 
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
-  public static final String ZIP_FILE_SUFFIX = ".zip";
+  public static final String JAR_FILE_SUFFIX = ".jar";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
   private final ArtifactDeployer<T> deployer;
@@ -69,7 +69,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     URL url;
     File artifactZip;
     try {
-      final String artifactName = removeEndIgnoreCase(zip, ZIP_FILE_SUFFIX);
+      final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
       artifactZip = new File(artifactDir, zip);
       url = artifactZip.toURI().toURL();
       return deployPackagedArtifact(url, artifactName);
@@ -140,7 +140,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         trackArtifact(artifact);
       } catch (Throwable t) {
         File artifactArchive = new File(artifactAchivedUrl.toURI());
-        String artifactName = removeEndIgnoreCase(artifactArchive.getName(), ZIP_FILE_SUFFIX);
+        String artifactName = removeEndIgnoreCase(artifactArchive.getName(), JAR_FILE_SUFFIX);
 
         // error text has been created by the deployer already
         logDeploymentFailure(t, artifactName);

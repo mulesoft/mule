@@ -55,6 +55,11 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
   }
 
   @Override
+  protected String getFileExtension() {
+    return ".zip";
+  }
+
+  @Override
   protected ServiceFileBuilder getThis() {
     return this;
   }

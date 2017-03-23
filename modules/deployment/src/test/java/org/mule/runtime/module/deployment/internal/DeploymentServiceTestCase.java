@@ -76,6 +76,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.invocationCount;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.policyParametrization;
@@ -655,14 +656,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(applicationDeploymentListener, "broken-app");
 
-    assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
+    assertAppsDir(new String[] {"broken-app.jar"}, NONE, true);
 
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
     final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
     final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombie.getKey().getFile()).getName());
+    assertEquals("Wrong URL tagged as zombie.", "broken-app.jar", new File(zombie.getKey().getFile()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -1065,7 +1066,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void removesZombieFilesAfterFailedAppIsDeleted() throws Exception {
+  public void removesZombieFilesAfterremovesZombieFilesAfterFailedAppIsDeletedFailedAppIsDeleted() throws Exception {
     final String appName = "bad-config-app";
 
     addPackedAppFromBuilder(badConfigAppFileBuilder);
@@ -1106,19 +1107,19 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void deploysInvalidZipAppOnStartup() throws Exception {
-    addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.zip");
+    addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.jar");
 
     startDeployment();
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
     // zip stays intact, no app dir created
-    assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
+    assertAppsDir(new String[] {"app with spaces.jar"}, NONE, true);
     final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
     final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
     // Spaces are converted to %20 is returned by java file api :/
     String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
-    assertEquals("Wrong URL tagged as zombie.", "app with spaces.zip", appName);
+    assertEquals("Wrong URL tagged as zombie.", "app with spaces.jar", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -1126,24 +1127,24 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void deploysInvalidZipAppAfterStartup() throws Exception {
     startDeployment();
 
-    addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.zip");
+    addPackedAppFromBuilder(emptyAppFileBuilder, "app with spaces.jar");
 
     assertDeploymentFailure(applicationDeploymentListener, "app with spaces");
 
     // zip stays intact, no app dir created
-    assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
+    assertAppsDir(new String[] {"app with spaces.jar"}, NONE, true);
     final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
     final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
     // Spaces are converted to %20 is returned by java file api :/
     String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
-    assertEquals("Wrong URL tagged as zombie.", "app with spaces.zip", appName);
+    assertEquals("Wrong URL tagged as zombie.", "app with spaces.jar", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
   @Test
   public void deployAppNameWithZipSuffix() throws Exception {
-    final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("empty-app.zip", emptyAppFileBuilder);
+    final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("empty-app.jar", emptyAppFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -1162,9 +1163,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void deploysPackedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
-    addPackedAppFromBuilder(emptyAppFileBuilder, "1.zip");
-    addPackedAppFromBuilder(emptyAppFileBuilder, "2.zip");
-    addPackedAppFromBuilder(emptyAppFileBuilder, "3.zip");
+    addPackedAppFromBuilder(emptyAppFileBuilder, "1.jar");
+    addPackedAppFromBuilder(emptyAppFileBuilder, "2.jar");
+    addPackedAppFromBuilder(emptyAppFileBuilder, "3.jar");
 
     Map<String, Object> startupOptions = new HashMap<>();
     startupOptions.put("app", "3:1:2");
@@ -1550,7 +1551,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     installContainerPlugin(echoPluginBroken);
 
     final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).dependingOn(echoPluginWithLib1);
+        new ApplicationFileBuilder("my-app.jar", emptyAppFileBuilder).dependingOn(echoPluginWithLib1);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -1565,7 +1566,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     copyFileToContainerPluginFolder(echoPlugin.getArtifactFile(), "invalidPlugin.tar");
 
     final ApplicationFileBuilder applicationFileBuilder =
-        new ApplicationFileBuilder("my-app.zip", emptyAppFileBuilder).dependingOn(echoPlugin);
+        new ApplicationFileBuilder("my-app.jar", emptyAppFileBuilder).dependingOn(echoPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
@@ -2876,7 +2877,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
    * @throws Exception
    */
   private void installContainerPlugin(ArtifactPluginFileBuilder artifactPluginFileBuilder) throws Exception {
-    copyFileToContainerPluginFolder(artifactPluginFileBuilder.getArtifactFile(), artifactPluginFileBuilder.getId() + ".zip");
+    copyFileToContainerPluginFolder(artifactPluginFileBuilder.getArtifactFile(), artifactPluginFileBuilder.getId() + ".jar");
   }
 
   private void installContainerPluginExpanded(ArtifactPluginFileBuilder artifactPluginFileBuilder) throws Exception {
@@ -2963,7 +2964,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void doesNotRedeployDomainWithRedeploymentDisabled() throws Exception {
     addExplodedDomainFromBuilder(dummyUndeployableDomainFileBuilder, dummyUndeployableDomainFileBuilder.getId());
-    addPackedAppFromBuilder(emptyAppFileBuilder, "empty-app.zip");
+    addPackedAppFromBuilder(emptyAppFileBuilder, "empty-app.jar");
 
     startDeployment();
 
@@ -3455,7 +3456,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Checks that the invalid zip was not deployed again
     try {
-      assertDeploymentFailure(applicationDeploymentListener, "broken-app.zip");
+      assertDeploymentFailure(applicationDeploymentListener, "broken-app.jar");
       fail("Install was invoked again for the broken application file");
     } catch (AssertionError expected) {
     }
@@ -3737,7 +3738,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private void assertArtifactDir(File artifactDir, String[] expectedZips, String[] expectedArtifacts, boolean performValidation) {
-    final String[] actualZips = artifactDir.list(MuleDeploymentService.ZIP_ARTIFACT_FILTER);
+    final String[] actualZips = artifactDir.list(MuleDeploymentService.JAR_ARTIFACT_FILTER);
     if (performValidation) {
       assertArrayEquals("Invalid Mule artifact archives set", expectedZips, actualZips);
     }
@@ -3781,7 +3782,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       final File tempFile = new File(outputDir, tempFileName);
       FileUtils.copyURLToFile(url, tempFile);
       final File destFile = new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part"));
-      File deployFolder = new File(destFile.getAbsolutePath().replace(".zip", ""));
+      File deployFolder = new File(destFile.getAbsolutePath().replace(JAR_FILE_SUFFIX, ""));
       if (deployFolder.exists()) {
         // Delete META-INF folder so maven file do not get duplicated during redeployment testing.
         deleteDirectory(new File(deployFolder, "META-INF"));

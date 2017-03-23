@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
@@ -164,13 +164,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
     File domainFolder = new File(domainDeployer.getDeploymentDirectory(), domain.getArtifactName());
     File appsFolder = new File(domainFolder, DOMAIN_BUNDLE_APPS_FOLDER);
     if (appsFolder.exists()) {
-      File[] files = appsFolder.listFiles(new FilenameFilter() {
-
-        @Override
-        public boolean accept(File dir, String name) {
-          return name.endsWith(".zip");
-        }
-      });
+      File[] files = appsFolder.listFiles((dir, name) -> name.endsWith(JAR_FILE_SUFFIX));
       for (File file : files) {
         try {
           FileUtils.moveFile(file, new File(MuleContainerBootstrapUtils.getMuleAppsDir(), file.getName()));

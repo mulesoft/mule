@@ -11,7 +11,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -48,8 +48,8 @@ import org.slf4j.LoggerFactory;
 public class MuleDeploymentService implements DeploymentService {
 
   public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
-  public static final IOFileFilter ZIP_ARTIFACT_FILTER =
-      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX), FileFileFilter.FILE);
+  public static final IOFileFilter JAR_ARTIFACT_FILTER =
+      new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX), FileFileFilter.FILE);
   public static final String PARALLEL_DEPLOYMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "deployment.parallel";
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
