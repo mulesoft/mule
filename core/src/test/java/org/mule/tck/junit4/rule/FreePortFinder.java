@@ -17,6 +17,7 @@ import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
 
 /**
@@ -47,7 +48,7 @@ public class FreePortFinder
             {
                 int port = minPortNumber + random.nextInt(portRange);
                 String portFile = String.valueOf(port) + LOCK_FILE_EXTENSION;
-                FileChannel channel = FileChannel.open(Paths.get(portFile), WRITE);
+                FileChannel channel = FileChannel.open(Paths.get(portFile), CREATE, WRITE);
                 FileLock lock = channel.tryLock();
 
                 if (isPortFree(port))
