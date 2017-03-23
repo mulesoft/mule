@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.expression;
 
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -29,7 +31,6 @@ import org.mule.util.OneTimeWarning;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.dom4j.Document;
 import org.jaxen.JaxenException;
@@ -37,6 +38,8 @@ import org.jaxen.XPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Provides a base class for XPath property extractors. The XPath engine used is jaxen (http://jaxen.org) which supports
@@ -47,10 +50,13 @@ import org.w3c.dom.Node;
 @Deprecated
 public abstract class AbstractXPathExpressionEvaluator extends AbstractExpressionEvaluator implements Initialisable, Disposable, MuleContextAware
 {
+    private static final int MAX_CACHE_SIZE = Integer.getInteger(SYSTEM_PROPERTY_PREFIX + "xml.xpath.cacheSize", 256);
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractXPathExpressionEvaluator.class);
 
-    private Map<String, XPath> cache = new WeakHashMap<String, XPath>(8);
-
+    private final Map<String, XPath> cache = CacheBuilder.newBuilder().initialCapacity(8).maximumSize(MAX_CACHE_SIZE)
+            .<String, XPath>build().asMap();
+    
     private MuleContext muleContext;
     private NamespaceManager namespaceManager;
     private OneTimeWarning deprecationWarning = new OneTimeWarning(LOGGER, getDeprecationMessage());
