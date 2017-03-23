@@ -6,18 +6,12 @@
  */
 package org.mule.module.launcher.log4j2;
 
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withName;
-
 import org.mule.logging.LogConfigChangeSubject;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
 
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -54,7 +48,6 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
     private final boolean applicationClassloader;
     private final String artifactName;
     private final int ownerClassLoaderHash;
-    private final Field loggersField;
 
     MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone)
     {
@@ -80,19 +73,6 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
             artifactClassloader = false;
             applicationClassloader = false;
             artifactName = null;
-        }
-
-        // https://issues.apache.org/jira/browse/LOG4J2-1318
-        // Allow for overriding #getLogger
-        Collection<Field> candidateFields = getAllFields(LoggerContext.class, withName("loggers"));
-        if (candidateFields.size() == 1)
-        {
-            loggersField = candidateFields.iterator().next();
-            loggersField.setAccessible(true);
-        }
-        else
-        {
-            loggersField = null;
         }
     }
 
@@ -143,44 +123,6 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
                 return name;
             }
         };
-    }
-
-    private ConcurrentMap<String, Logger> lookupLoggersField()
-    {
-        try
-        {
-            return (ConcurrentMap<String, Logger>) loggersField.get(this);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Overriding to avoid a performance issue introduced in https://issues.apache.org/jira/browse/LOG4J2-1180, which
-     * doubles the pressure on the GC and thus lowering the throughput of mule applications.
-     * (https://issues.apache.org/jira/browse/LOG4J2-1318)
-     * <p>
-     * Obtains a Logger from the Context.
-     * 
-     * @param name The name of the Logger to return.
-     * @param messageFactory The message factory is used only when creating a logger, subsequent use does not change the
-     *            logger but will log a warning if mismatched.
-     * @return The Logger.
-     */
-    @Override
-    public Logger getLogger(final String name, final MessageFactory messageFactory)
-    {
-        Logger logger = lookupLoggersField().get(name);
-        if (logger != null)
-        {
-            return logger;
-        }
-
-        logger = newInstance(this, name, messageFactory);
-        final Logger prev = lookupLoggersField().putIfAbsent(name, logger);
-        return prev == null ? logger : prev;
     }
 
     protected URI getConfigFile()
