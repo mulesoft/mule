@@ -6,7 +6,6 @@
  */
 package org.mule.config.spring.handlers;
 
-import static java.lang.Boolean.TRUE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -43,7 +42,7 @@ public class RetryInGlobalConfigurationTestCase extends FunctionalTestCase
         assertThat(rn, notNullValue());
         assertThat(rn, instanceOf(ConnectNotifier.class));
 
-        assertThat(c.isConnected(), equalTo(TRUE));
-        assertThat(c.isStarted(), equalTo(TRUE));
+        assertThat(c.isConnected(), equalTo(true));
+        assertThat(c.isStarted(), equalTo(true));
     }
 }
