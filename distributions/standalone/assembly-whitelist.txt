@@ -168,7 +168,7 @@
 /mule-standalone-${productVersion}/services/mule-service-http-${productVersion}.zip
 /mule-standalone-${productVersion}/services/mule-service-oauth-${productVersion}.zip
 /mule-standalone-${productVersion}/services/mule-service-soap-${productVersion}.zip
-/mule-standalone-${productVersion}/services/mule-service-weave-4.0-+
+/mule-standalone-${productVersion}/services/mule-service-weave-4.0.0-+
 #
 # /lib/opt
 #
