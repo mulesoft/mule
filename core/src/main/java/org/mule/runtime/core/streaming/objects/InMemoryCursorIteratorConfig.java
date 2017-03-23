@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.streaming.objects;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_INCREMENT_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_MAX_BUFFER_SIZE;
@@ -20,7 +21,7 @@ public final class InMemoryCursorIteratorConfig {
 
   private final int initialBufferSize;
   private final int bufferSizeIncrement;
-  private final int maxInMemorySize;
+  private final int maxInMemoryInstances;
 
   /**
    * @return A new instance configured with default settings
@@ -34,14 +35,19 @@ public final class InMemoryCursorIteratorConfig {
   /**
    * Creates a new instance
    *
-   * @param initialBufferSize   the buffer's initial size
-   * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded
-   * @param maxInMemorySize     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
+   * @param initialBufferSize   the buffer's initial size. Must be greater than zero
+   * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero means no expansion.
+   *                            Cannot be lower than zero.
+   * @param maxInMemoryInstances     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
+   * @throws IllegalArgumentException if any of the given arguments is invalid
    */
-  public InMemoryCursorIteratorConfig(int initialBufferSize, int bufferSizeIncrement, int maxInMemorySize) {
+  public InMemoryCursorIteratorConfig(int initialBufferSize, int bufferSizeIncrement, int maxInMemoryInstances) {
+    checkArgument(initialBufferSize > 0, "initialBufferSize must be greater than zero");
+    checkArgument(bufferSizeIncrement >= 0, "bufferSizeIncrement cannot be negative");
+
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
-    this.maxInMemorySize = maxInMemorySize;
+    this.maxInMemoryInstances = maxInMemoryInstances;
   }
 
   public int getInitialBufferSize() {
@@ -52,7 +58,7 @@ public final class InMemoryCursorIteratorConfig {
     return bufferSizeIncrement;
   }
 
-  public int getMaxInMemorySize() {
-    return maxInMemorySize;
+  public int getMaxInMemoryInstances() {
+    return maxInMemoryInstances;
   }
 }

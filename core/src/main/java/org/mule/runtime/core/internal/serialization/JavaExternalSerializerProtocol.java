@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.core.internal.serialization;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.util.SerializationUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -27,6 +32,18 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
    */
   @Override
   public void serialize(Object object, OutputStream out) throws SerializationException {
+    if (object instanceof CursorStreamProvider) {
+      try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
+        doSerialize(toByteArray(cursor), out);
+      } catch (IOException e) {
+        throw new SerializationException(createStaticMessage("Could not serialize cursor stream"), e);
+      }
+    } else {
+      doSerialize(object, out);
+    }
+  }
+
+  private void doSerialize(Object object, OutputStream out) {
     validateForSerialization(object);
     SerializationUtils.serialize((Serializable) object, out);
   }
@@ -36,6 +53,11 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
    */
   @Override
   protected byte[] doSerialize(Object object) throws Exception {
+    if (object instanceof CursorStreamProvider) {
+      try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
+        return SerializationUtils.serialize(toByteArray(cursor));
+      }
+    }
     validateForSerialization(object);
     return SerializationUtils.serialize((Serializable) object);
   }

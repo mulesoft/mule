@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.streaming.bytes;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_INCREMENT_SIZE;
@@ -39,11 +40,15 @@ public final class InMemoryCursorStreamConfig {
   /**
    * Creates a new instance
    *
-   * @param initialBufferSize   the buffer's initial size
-   * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded
+   * @param initialBufferSize   the buffer's initial size. Must be greater than zero bytes.
+   * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero bytes means no expansion.
+   *                            Cannot be negative byte size.
    * @param maxInMemorySize     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
    */
   public InMemoryCursorStreamConfig(DataSize initialBufferSize, DataSize bufferSizeIncrement, DataSize maxInMemorySize) {
+    checkArgument(initialBufferSize.toBytes() > 0, "initialBufferSize must be greater than zero bytes");
+    checkArgument(bufferSizeIncrement.toBytes() >= 0, "bufferSizeIncrement cannot be a negative byte size");
+
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
     this.maxInMemorySize = maxInMemorySize;

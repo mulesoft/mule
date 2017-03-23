@@ -11,25 +11,23 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.StreamingStatistics;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.MarvelExtension;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
 
-public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
+public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
   private static List<String> CASTED_SPELLS = new LinkedList<>();
@@ -41,7 +39,6 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private String data = randomAlphabetic(2048);
-  private StreamingManager streamingManager;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -50,18 +47,13 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "streaming-extension-config.xml";
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
+    return "bytes-streaming-extension-config.xml";
   }
 
   @Override
   protected void doTearDownAfterMuleContextDispose() throws Exception {
+    super.doTearDownAfterMuleContextDispose();
     CASTED_SPELLS.clear();
-    assertAllStreamingResourcesClosed();
   }
 
   @Test
@@ -107,6 +99,12 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
     doSeek("seekStreamTx");
   }
 
+  @Test
+  public void throwsBufferSizeExceededError() throws Exception {
+    Object value = flowRunner("toGreedyStream").withPayload(data).run().getMessage().getPayload().getValue();
+    assertThat(value, is("Too big!"));
+  }
+
   private void doSeek(String flowName) throws Exception {
     final int position = 10;
     Event result = flowRunner(flowName)
@@ -133,6 +131,17 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
     startSourceAndListenSpell("bytesCasterWithoutStreaming");
   }
 
+  @Test
+  public void streamProviderSerialization() throws Exception {
+    CursorStreamProvider provider = (CursorStreamProvider) flowRunner("toStream").keepStreamsOpen()
+        .withPayload(data)
+        .run().getMessage().getPayload().getValue();
+
+    byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
+    bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
+    assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
+  }
+
   private void startSourceAndListenSpell(String flowName) throws Exception {
     Flow flow = muleContext.getRegistry().get(flowName);
     flow.start();
@@ -140,15 +149,6 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
       synchronized (CASTED_SPELLS) {
         return CASTED_SPELLS.stream().anyMatch(s -> s.equals(BARGAIN_SPELL));
       }
-    }));
-  }
-
-  private void assertAllStreamingResourcesClosed() {
-    StreamingStatistics stats = streamingManager.getStreamingStatistics();
-    new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
-      assertThat("There're still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
-      assertThat("There're still open cursors", stats.getOpenCursorsCount(), is(0));
-      return true;
     }));
   }
 }

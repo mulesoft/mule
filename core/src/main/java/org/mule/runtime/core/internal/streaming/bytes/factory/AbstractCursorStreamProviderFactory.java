@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.CursorProviderHandle;
+import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 
@@ -57,7 +58,7 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
     Either<CursorStreamProvider, InputStream> value = resolve(inputStream, event);
     return value.mapLeft(provider -> {
       CursorProviderHandle handle = cursorManager.track(provider, event);
-      return new ManagedCursorStreamProvider(handle);
+      return new ManagedCursorStreamProvider(handle, cursorManager);
     });
   }
 
@@ -77,37 +78,15 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    */
   protected abstract Either<CursorStreamProvider, InputStream> resolve(InputStream inputStream, Event event);
 
-  private class ManagedCursorStreamProvider implements CursorStreamProvider {
+  private class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStream> implements CursorStreamProvider {
 
-    private final CursorStreamProvider delegate;
-    private final CursorProviderHandle cursorProviderHandle;
-
-    private ManagedCursorStreamProvider(CursorProviderHandle cursorProviderHandle) {
-      this.delegate = (CursorStreamProvider) cursorProviderHandle.getCursorProvider();
-      this.cursorProviderHandle = cursorProviderHandle;
+    protected ManagedCursorStreamProvider(CursorProviderHandle cursorProviderHandle, CursorManager cursorManager) {
+      super(cursorProviderHandle, cursorManager);
     }
 
     @Override
-    public CursorStream openCursor() {
-      CursorStream cursor = delegate.openCursor();
-      cursorManager.onOpen(cursor, cursorProviderHandle);
-
-      return new ManagedCursorDecorator(cursor, cursorProviderHandle);
-    }
-
-    @Override
-    public void releaseResources() {
-      delegate.releaseResources();
-    }
-
-    @Override
-    public void close() {
-      delegate.close();
-    }
-
-    @Override
-    public boolean isClosed() {
-      return delegate.isClosed();
+    protected CursorStream managedCursor(CursorStream cursor, CursorProviderHandle handle) {
+      return new ManagedCursorDecorator(cursor, handle);
     }
   }
 
@@ -138,16 +117,6 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
     @Override
     public void seek(long position) throws IOException {
       delegate.seek(position);
-    }
-
-    @Override
-    public boolean isFullyConsumed() {
-      return delegate.isFullyConsumed();
-    }
-
-    @Override
-    public boolean canBeReleased() {
-      return delegate.canBeReleased();
     }
 
     @Override

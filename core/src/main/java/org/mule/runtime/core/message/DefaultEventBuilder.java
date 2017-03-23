@@ -9,19 +9,18 @@ package org.mule.runtime.core.message;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -30,14 +29,12 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -262,19 +259,6 @@ public class DefaultEventBuilder implements Event.Builder {
       this.legacyCorrelationId = legacyCorrelationId;
 
       this.notificationsEnabled = notificationsEnabled;
-
-      resolveStreaming();
-    }
-
-    private void resolveStreaming() {
-      if (message == null || message.getPayload() == null) {
-        return;
-      }
-
-      Object payload = message.getPayload().getValue();
-      if (payload instanceof CursorStreamProvider || payload instanceof InputStream) {
-        context.streaming();
-      }
     }
 
     @Override

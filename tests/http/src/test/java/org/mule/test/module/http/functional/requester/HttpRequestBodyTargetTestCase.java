@@ -7,11 +7,8 @@
 package org.mule.test.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
@@ -49,14 +46,4 @@ public class HttpRequestBodyTargetTestCase extends AbstractHttpRequestTestCase {
     Event event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
     assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
-
-  @Test
-  public void responseBodyToCustomTarget() throws Exception {
-    Event event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
-    InternalMessage customTarget = (InternalMessage) event.getVariable("customTarget").getValue();
-    assertThat(customTarget, notNullValue());
-    assertThat(customTarget, hasPayload(equalTo(DEFAULT_RESPONSE)));
-    assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_MESSAGE));
-  }
-
 }

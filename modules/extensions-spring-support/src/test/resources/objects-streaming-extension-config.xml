@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
+
+    <marvel:dr-strange name="drStrange">
+        <marvel:mystic-connection />
+    </marvel:dr-strange>
+
+    <flow name="getStream">
+        <marvel:say-magic-words fetchSize="20" config-ref="drStrange" />
+        <flow-ref name="assertPayloadIsStreamProvider"/>
+        <marvel:read-object-stream/>
+    </flow>
+
+    <flow name="getStreamWithoutStreaming">
+        <marvel:say-magic-words fetchSize="20" config-ref="drStrange">
+            <non-repeatable-iterable/>
+        </marvel:say-magic-words>
+
+        <flow-ref name="assertPayloadIsNotStreamProvider"/>
+        <marvel:read-object-stream />
+    </flow>
+
+
+    <flow name="getStreamInTx">
+        <try transactionalAction="BEGIN_OR_JOIN">
+            <flow-ref name="getStream"/>
+        </try>
+    </flow>
+
+    <flow name="crashCar">
+        <marvel:say-magic-words fetchSize="20" config-ref="drStrange" />
+        <marvel:crash-car config-ref="drStrange" />
+    </flow>
+
+    <flow name="crashCarTx">
+        <try transactionalAction="BEGIN_OR_JOIN">
+            <marvel:say-magic-words fetchSize="20" config-ref="drStrange" />
+            <marvel:crash-car config-ref="drStrange" />
+        </try>
+    </flow>
+
+    <sub-flow name="assertPayloadIsStreamProvider">
+        <test:assert expression="#[mel:payload.getClass().getName().contains('CursorIteratorProvider')]"/>
+    </sub-flow>
+
+    <sub-flow name="assertPayloadIsNotStreamProvider">
+        <test:assert expression="#[mel:payload.getClass().getName().contains('CursorIteratorProvider') == false]"/>
+    </sub-flow>
+
+</mule>

@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static org.mule.runtime.core.internal.streaming.CursorManager.Status.DISPOSABLE;
-import static org.mule.runtime.core.internal.streaming.CursorManager.Status.NORMAL;
-import static org.mule.runtime.core.internal.streaming.CursorManager.Status.SURVIVOR;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -23,7 +19,6 @@ import com.google.common.cache.RemovalNotification;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,30 +85,24 @@ public class CursorManager {
   /**
    * Acknowledges that the given {@code cursor} has been closed
    *
-   * @param cursor         the closed cursor
+   * @param cursor the closed cursor
    * @param handle the handle for the provider that generated it
    */
   public void onClose(Cursor cursor, CursorProviderHandle handle) {
     final String eventId = handle.getOwnerContext().getId();
     EventStreamingState state = registry.getIfPresent(eventId);
 
-    if (state != null && state.removeCursor(handle.getCursorProvider(), cursor) == DISPOSABLE) {
+    if (state != null && state.removeCursor(handle.getCursorProvider(), cursor)) {
       state.dispose();
       registry.invalidate(eventId);
     }
   }
 
   private void terminated(EventContext rootContext) {
-    if (!rootContext.isStreaming()) {
-      return;
-    }
-
     EventStreamingState state = registry.getIfPresent(rootContext.getId());
     if (state != null) {
-      if (state.terminate() == DISPOSABLE) {
-        state.dispose();
-        registry.invalidate(rootContext.getId());
-      }
+      state.dispose();
+      registry.invalidate(rootContext.getId());
     }
   }
 
@@ -135,7 +124,6 @@ public class CursorManager {
 
   private class EventStreamingState {
 
-    private Status status = NORMAL;
     private boolean disposed = false;
 
     private final LoadingCache<CursorProvider, List<Cursor>> cursors = CacheBuilder.newBuilder()
@@ -151,42 +139,25 @@ public class CursorManager {
       cursors.getUnchecked(adapter);
     }
 
-    private Status terminate() {
-      if (cursors.size() == 0) {
-        status = DISPOSABLE;
-      } else {
-        boolean allCursorsCanBeReleased = true;
-        for (Map.Entry<CursorProvider, List<Cursor>> entry : cursors.asMap().entrySet()) {
-          closeProvider(entry.getKey());
-          final List<Cursor> cursors = entry.getValue();
-          if (!cursors.isEmpty()) {
-            allCursorsCanBeReleased = allCursorsCanBeReleased && cursors.stream().allMatch(Cursor::canBeReleased);
-          }
-        }
-        status = allCursorsCanBeReleased ? DISPOSABLE : SURVIVOR;
-      }
-      return status;
-    }
-
     private void addCursor(CursorProvider provider, Cursor cursor) {
       cursors.getUnchecked(provider).add(cursor);
     }
 
-    private Status removeCursor(CursorProvider provider, Cursor cursor) {
+    private boolean removeCursor(CursorProvider provider, Cursor cursor) {
       List<Cursor> openCursors = cursors.getUnchecked(provider);
       if (openCursors.remove(cursor)) {
         statistics.decrementOpenCursors();
       }
 
       if (openCursors.isEmpty()) {
-        if (provider.isClosed() || status == SURVIVOR) {
+        if (provider.isClosed()) {
           dispose();
-          status = DISPOSABLE;
           cursors.invalidate(provider);
+          return true;
         }
       }
 
-      return status;
+      return false;
     }
 
     private void dispose() {
@@ -199,7 +170,7 @@ public class CursorManager {
           closeProvider(provider);
           releaseAll(cursors);
         } finally {
-          LifecycleUtils.disposeIfNeeded(provider, LOGGER);
+          provider.releaseResources();
         }
       });
 
@@ -223,10 +194,5 @@ public class CursorManager {
         statistics.decrementOpenProviders();
       }
     }
-  }
-
-
-  enum Status {
-    NORMAL, SURVIVOR, DISPOSABLE
   }
 }

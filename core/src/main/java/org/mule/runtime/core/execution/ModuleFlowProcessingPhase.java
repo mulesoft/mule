@@ -24,7 +24,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -36,7 +35,6 @@ import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
-import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -65,12 +63,10 @@ public class ModuleFlowProcessingPhase
 
   private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
 
-  private final StreamingManager streamingManager;
   private final PolicyManager policyManager;
 
-  public ModuleFlowProcessingPhase(PolicyManager policyManager, StreamingManager streamingManager) {
+  public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
-    this.streamingManager = streamingManager;
   }
 
   @Override
@@ -97,10 +93,8 @@ public class ModuleFlowProcessingPhase
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
-        Reference<Event> eventReference = new Reference<>();
         just(templateEvent)
             .doOnNext(request -> {
-              eventReference.set(request);
               fireNotification(messageProcessContext.getMessageSource(), request,
                                messageProcessContext.getFlowConstruct(),
                                MESSAGE_RECEIVED);

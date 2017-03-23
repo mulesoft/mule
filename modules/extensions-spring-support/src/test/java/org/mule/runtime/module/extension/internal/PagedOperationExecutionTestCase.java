@@ -8,16 +8,17 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
-
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.streaming.objects.CursorIterator;
+import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+
+import java.util.Iterator;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,18 +47,16 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
 
   @Test
   public void basicPagedOperation() throws Exception {
-    Object payload = flowRunner("getPersonalInfo").run().getMessage().getPayload().getValue();
-    assertThat(payload, is(instanceOf(ConsumerIterator.class)));
-    ConsumerIterator consumerIterator = (ConsumerIterator) payload;
-    assertThat(consumerIterator.size(), is(11));
-    while (consumerIterator.hasNext()) {
-      assertThat(((PersonalInfo) consumerIterator.next()), isIn(INVOLVED_PEOPLE));
+    CursorIterator<PersonalInfo> streamingIterator = getCursor("getPersonalInfo");
+    assertThat(streamingIterator.size(), is(11));
+    while (streamingIterator.hasNext()) {
+      assertThat((streamingIterator.next()), isIn(INVOLVED_PEOPLE));
     }
   }
 
   @Test
   public void emptyPagedOperation() throws Exception {
-    ConsumerIterator iterator = (ConsumerIterator) flowRunner("emptyPagedOperation").run().getMessage().getPayload().getValue();
+    CursorIterator iterator = getCursor("emptyPagedOperation");
     assertThat(iterator.hasNext(), is(false));
     assertThat(iterator.size(), is(0));
   }
@@ -65,16 +64,20 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
   @Test
   public void pagedOperationException() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
-    ConsumerIterator iterator = (ConsumerIterator) flowRunner("failingPagedOperation").run().getMessage().getPayload().getValue();
-    iterator.next();
+    getCursor("failingPagedOperation").next();
   }
 
   @Test
   public void pagedOperationUsingConnection() throws Exception {
-    ConsumerIterator iterator =
-        (ConsumerIterator) flowRunner("pagedOperationUsingConnection").run().getMessage().getPayload().getValue();
-    while (iterator.hasNext()) {
-      assertThat(iterator.next().toString(), containsString(SAUL_NEW_NUMBER));
-    }
+    Iterator iterator = getCursor("pagedOperationUsingConnection");
+    assertThat(iterator.next().toString(), containsString(SAUL_NEW_NUMBER));
+  }
+
+  private <T> CursorIterator<T> getCursor(String flowName) throws Exception {
+    CursorIteratorProvider provider =
+        (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload()
+            .getValue();
+
+    return provider.openCursor();
   }
 }

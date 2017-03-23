@@ -53,7 +53,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   }
 
   protected ObjectStreamingManager createObjectStreamingManager() {
-    return new DefaultObjectStreamingManager();
+    return new DefaultObjectStreamingManager(cursorManager);
   }
 
   /**

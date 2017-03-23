@@ -185,7 +185,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                             getConfigurationForComponent(extensionModel,
                                                                                                          componentModel));
     if (!config.isPresent() && requiresConfig(extensionModel, componentModel)) {
-      throw new IllegalStateException("No config-ref was specified for component '%s' of extension '%s'. Please specify which to use");
+      throw new IllegalStateException(
+                                      format("No config-ref was specified for component '%s' of extension '%s'. Please specify which to use",
+                                             componentModel.getName(), extensionModel.getName()));
     }
 
     return config.map(c -> getConfigurationProvider(extensionModel, c)).orElse(empty());

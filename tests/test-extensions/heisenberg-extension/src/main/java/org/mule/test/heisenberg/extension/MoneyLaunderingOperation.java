@@ -44,14 +44,13 @@ public class MoneyLaunderingOperation {
   public PagingProvider<HeisenbergConnection, PersonalInfo> getPagedPersonalInfo() {
     return new PagingProvider<HeisenbergConnection, PersonalInfo>() {
 
-      private int accumulator = 1;
+      private int index = 0;
 
       @Override
       public List<PersonalInfo> getPage(HeisenbergConnection heisenbergConnection) {
         List<PersonalInfo> page = new ArrayList<>();
-        while (accumulator % 3 != 0 && INVOLVED_PEOPLE.size() >= accumulator) {
-          page.add(INVOLVED_PEOPLE.get(accumulator - 1));
-          accumulator++;
+        for (int i = 0; i < 2 && index < INVOLVED_PEOPLE.size(); i++) {
+          page.add(INVOLVED_PEOPLE.get(index++));
         }
         return page;
       }

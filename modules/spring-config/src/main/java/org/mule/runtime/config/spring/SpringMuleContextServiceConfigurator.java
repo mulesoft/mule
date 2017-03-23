@@ -52,6 +52,7 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
@@ -247,7 +248,7 @@ class SpringMuleContextServiceConfigurator {
 
   private void loadServiceConfigurators() {
     new SpiServiceRegistry()
-        .lookupProviders(ServiceConfigurator.class, Thread.currentThread().getContextClassLoader())
+        .lookupProviders(ServiceConfigurator.class, Service.class.getClassLoader())
         .forEach(customizer -> customizer.configure(customServiceRegistry));
   }
 

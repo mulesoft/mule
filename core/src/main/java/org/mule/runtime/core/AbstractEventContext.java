@@ -6,19 +6,14 @@
  */
 package org.mule.runtime.core;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.when;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.message.DefaultMessageBuilder;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,7 +37,6 @@ abstract class AbstractEventContext implements EventContext {
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
   private final List<EventContext> childContexts = new LinkedList<>();
-  private boolean streaming = false;
   private transient Mono<Void> completionCallback = empty();
 
   public AbstractEventContext() {
@@ -113,26 +107,6 @@ abstract class AbstractEventContext implements EventContext {
       LOGGER.debug(this + " response completed with error.");
       responseProcessor.onError(throwable);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void streaming() {
-    streaming = true;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isStreaming() {
-    if (streaming) {
-      return true;
-    }
-
-    return childContexts.isEmpty() ? false : childContexts.stream().anyMatch(EventContext::isStreaming);
   }
 
   @Override

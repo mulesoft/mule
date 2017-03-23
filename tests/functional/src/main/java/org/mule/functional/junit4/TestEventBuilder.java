@@ -8,13 +8,13 @@ package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -33,6 +33,7 @@ import javax.activation.DataHandler;
 
 import org.apache.commons.collections.Transformer;
 import org.mockito.Mockito;
+import org.reactivestreams.Publisher;
 
 /**
  * Provides a fluent API for building events for testing.
@@ -56,6 +57,8 @@ public class TestEventBuilder {
   private ReplyToHandler replyToHandler;
 
   private Transformer spyTransformer = input -> input;
+
+  private Publisher<Void> externalCompletionCallback = null;
 
   /**
    * Prepares the given data to be sent as the payload of the product.
@@ -96,7 +99,7 @@ public class TestEventBuilder {
   /**
    * Prepares a property with the given key and value to be sent as an inbound property of the product.
    *
-   * @param key the key of the inbound property to add
+   * @param key   the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
@@ -125,7 +128,7 @@ public class TestEventBuilder {
   /**
    * Prepares a property with the given key and value to be sent as an outbound property of the product.
    *
-   * @param key the key of the outbound property to add
+   * @param key   the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
@@ -140,7 +143,7 @@ public class TestEventBuilder {
   /**
    * Prepares an attachment with the given key and value to be sent in the product.
    *
-   * @param key the key of the attachment to add
+   * @param key   the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
@@ -155,10 +158,10 @@ public class TestEventBuilder {
   /**
    * Prepares an attachment with the given key and value to be sent in the product.
    *
-   * @param key the key of the attachment to add
-   * @param object the content of the attachment to add
+   * @param key         the key of the attachment to add
+   * @param object      the content of the attachment to add
    * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too i.e.
-   *        text/plain;charset=UTF-8
+   *                    text/plain;charset=UTF-8
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
@@ -172,7 +175,7 @@ public class TestEventBuilder {
   /**
    * Prepares an attachment with the given key and value to be sent in the product.
    *
-   * @param key the key of the attachment to add
+   * @param key   the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
@@ -187,7 +190,7 @@ public class TestEventBuilder {
   /**
    * Prepares a property with the given key and value to be sent as a session property of the product.
    *
-   * @param key the key of the session property to add
+   * @param key   the key of the session property to add
    * @param value the value of the session property to add
    * @return this {@link TestEventBuilder}
    * @deprecated Transport infrastructure is deprecated.
@@ -224,7 +227,7 @@ public class TestEventBuilder {
   /**
    * Prepares a flow variable with the given key and value to be set in the product.
    *
-   * @param key the key of the flow variable to put
+   * @param key   the key of the flow variable to put
    * @param value the value of the flow variable to put
    * @return this {@link TestEventBuilder}
    */
@@ -258,11 +261,16 @@ public class TestEventBuilder {
     return this;
   }
 
+  public TestEventBuilder setExternalCompletionCallback(Publisher<Void> externalCompletionCallback) {
+    this.externalCompletionCallback = externalCompletionCallback;
+    return this;
+  }
+
   /**
    * Produces an event with the specified configuration.
    *
    * @param muleContext the context of the mule application
-   * @param flow the recipient for the event to be built.
+   * @param flow        the recipient for the event to be built.
    * @return an event with the specified configuration.
    */
   public Event build(MuleContext muleContext, FlowConstruct flow) {
@@ -276,7 +284,14 @@ public class TestEventBuilder {
     }
     final InternalMessage muleMessage = messageBuilder.build();
 
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
+    EventContext eventContext;
+    if (externalCompletionCallback != null) {
+      eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId, externalCompletionCallback);
+    } else {
+      eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId);
+    }
+
+    Event event = Event.builder(eventContext)
         .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(variables).groupCorrelation(correlation)
         .flow(flow).replyToHandler(replyToHandler).build();
 
@@ -295,6 +310,7 @@ public class TestEventBuilder {
     Event addOutboundTo(Event event, String key);
   }
 
+
   private class DataHandlerAttachment implements Attachment {
 
     private DataHandler dataHandler;
@@ -310,6 +326,7 @@ public class TestEventBuilder {
     }
   }
 
+
   private class ObjectAttachment implements Attachment {
 
     private Object object;
@@ -324,7 +341,8 @@ public class TestEventBuilder {
     public Event addOutboundTo(Event event, String key) {
       try {
         return Event.builder(event).message(InternalMessage.builder(event.getMessage())
-            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType)).build()).build();
+            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType))
+            .build()).build();
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
       }

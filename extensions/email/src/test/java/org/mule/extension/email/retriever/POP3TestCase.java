@@ -10,8 +10,8 @@ package org.mule.extension.email.retriever;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.api.streaming.objects.CursorIterator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndRead() throws Exception {
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     int count = 0;
     while (messages.hasNext()) {
       assertBodyContent((String) messages.next().getOutput());

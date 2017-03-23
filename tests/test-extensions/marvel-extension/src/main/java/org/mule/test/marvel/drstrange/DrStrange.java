@@ -9,6 +9,7 @@ package org.mule.test.marvel.drstrange;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 
 /**
  * Default extension to test cursor streams and lists. Given Dr. Strange's ability to use the eye of Agamotto
@@ -17,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 @Configuration(name = "dr-strange")
 @Operations(DrStrangeOperations.class)
 @Sources(DrStrangeBytesSource.class)
+@ConnectionProviders(MysticConnectionProvider.class)
 public class DrStrange {
 
 }

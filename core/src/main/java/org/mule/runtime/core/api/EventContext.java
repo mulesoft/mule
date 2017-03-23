@@ -11,7 +11,6 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 import java.time.OffsetTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
@@ -115,17 +114,6 @@ public interface EventContext {
    * @return {@code this} context's parent or {@link Optional#empty()} if it doesn't have one
    */
   Optional<EventContext> getParentContext();
-
-  /**
-   * Indicates that the owning {@link Event} is involved in at least one streaming operation
-   */
-  void streaming();
-
-  /**
-   * @return Whether {@code this} context or any of its childs is taking part in a streaming operation
-   */
-  boolean isStreaming();
-
 
   /**
    * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext}.

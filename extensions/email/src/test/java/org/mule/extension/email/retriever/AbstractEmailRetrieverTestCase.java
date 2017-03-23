@@ -33,9 +33,10 @@ import static org.mule.extension.email.util.EmailTestUtils.testSession;
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.streaming.objects.CursorIterator;
+import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
@@ -82,7 +83,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveNothing() throws Exception {
     server.purgeEmailFromAllMailboxes();
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(paginationSize(messages), is(0));
   }
 
@@ -94,7 +95,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
       user.deliver(mimeMessage);
     }
 
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 2));
     assertThat(paginationSize(messages), is(pageSize));
   }
@@ -113,7 +114,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveEmailWithAttachments() throws Exception {
     server.purgeEmailFromAllMailboxes();
     user.deliver(getMultipartTestMessage());
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
     Result message = messages.next();
     assertThat(messages.hasNext(), is(false));
@@ -131,7 +132,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   @Test
   public void retrieveAndDelete() throws Exception {
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DELETE);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DELETE);
     assertThat(paginationSize(messages), is(pageSize));
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
   }
@@ -141,16 +142,18 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     sendNonMatchingEmails(pageSize);
     sendEmails(pageSize);
 
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 3));
     assertThat(paginationSize(messages), is(pageSize * 2));
   }
 
-  protected ConsumerIterator<Result> runFlowAndGetMessages(String flowName) throws Exception {
-    return (ConsumerIterator<Result>) flowRunner(flowName).run().getMessage().getPayload().getValue();
+  protected CursorIterator<Result> runFlowAndGetMessages(String flowName) throws Exception {
+    CursorIteratorProvider provider =
+        (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload().getValue();
+    return (CursorIterator<Result>) provider.openCursor();
   }
 
-  protected int paginationSize(ConsumerIterator<?> iterator) {
+  protected int paginationSize(CursorIterator<?> iterator) {
     int count = 0;
     while (iterator.hasNext()) {
       iterator.next();

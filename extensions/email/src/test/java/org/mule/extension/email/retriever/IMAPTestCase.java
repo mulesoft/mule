@@ -28,7 +28,7 @@ import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailNotFoundException;
-import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
+import org.mule.runtime.api.streaming.objects.CursorIterator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -75,7 +75,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndRead() throws Exception {
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     int size = 0;
     while (messages.hasNext()) {
       size++;
@@ -89,7 +89,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndDontRead() throws Exception {
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
+    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
     int count = 0;
     while (messages.hasNext()) {
       Result m = messages.next();
@@ -182,7 +182,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
       message.setFlag(flag, flagState);
     }
 
-    ConsumerIterator<Result> messages = runFlowAndGetMessages(flowName);
+    CursorIterator<Result> messages = runFlowAndGetMessages(flowName);
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
     int count = 0;
     while (messages.hasNext()) {

@@ -11,6 +11,8 @@ import static java.lang.Math.toIntExact;
 import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.ConcurrencyUtils.safeUnlock;
+import static org.mule.runtime.core.util.FuncUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.func.CheckedRunnable;
@@ -20,6 +22,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,12 +40,12 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   private static Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
 
   private final Lock bufferLock = new ReentrantLock();
+  private final AtomicBoolean closed = new AtomicBoolean(false);
+  private final ByteBufferManager bufferManager;
 
   private InputStream stream;
-  private final ByteBufferManager bufferManager;
   private ReadableByteChannel streamChannel;
   private ByteBuffer buffer;
-  private boolean closed = false;
   private Range bufferRange;
   private boolean streamFullyConsumed = false;
 
@@ -135,19 +138,23 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    */
   @Override
   public final void close() {
-    closed = true;
+    if (closed.compareAndSet(false, true)) {
+      acquireBufferLock();
+      try {
+        doClose();
+      } finally {
+        if (streamChannel != null) {
+          closeSafely(streamChannel::close);
+        }
 
-    doClose();
+        if (stream != null) {
+          closeSafely(stream::close);
+        }
 
-    if (streamChannel != null) {
-      safely(streamChannel::close);
+        deallocate(buffer);
+        releaseBufferLock();
+      }
     }
-
-    if (stream != null) {
-      safely(stream::close);
-    }
-
-    deallocate(buffer);
   }
 
   /**
@@ -173,7 +180,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    */
   @Override
   public final int get(ByteBuffer destination, long position, int length) {
-    checkState(!closed, "Buffer is closed");
+    checkState(!closed.get(), "Buffer is closed");
 
     return doGet(destination, position, length, true);
   }
@@ -237,11 +244,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    * Releases the lock obtained through {@link #acquireBufferLock()}
    */
   public void releaseBufferLock() {
-    try {
-      bufferLock.unlock();
-    } catch (IllegalMonitorStateException e) {
-      // lock was released early to improve performance and somebody else took it. This is fine
-    }
+    safeUnlock(bufferLock);
   }
 
   /**
@@ -303,7 +306,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
 
   protected void deallocate(ByteBuffer byteBuffer) {
     if (byteBuffer != null) {
-      safely(() -> bufferManager.deallocate(byteBuffer));
+      closeSafely(() -> bufferManager.deallocate(byteBuffer));
     }
   }
 
@@ -357,11 +360,7 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
     }
   }
 
-  private void safely(CheckedRunnable task) {
-    try {
-      task.run();
-    } catch (Exception e) {
-      LOGGER.debug("Found exception closing buffer", e);
-    }
+  private void closeSafely(CheckedRunnable task) {
+    safely(task, e -> LOGGER.debug("Found exception closing buffer", e));
   }
 }
