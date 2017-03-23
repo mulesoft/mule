@@ -10,7 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.extension.ws.WscTestUtils.SIMPLE_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.resourceAsString;
-import static org.mule.extension.ws.api.SoapVersion.SOAP11;
+import static org.mule.services.soap.api.SoapVersion.SOAP11;
 import org.mule.extension.ws.service.Mtom11Service;
 import org.mule.extension.ws.service.Mtom12Service;
 import org.mule.runtime.api.message.Message;

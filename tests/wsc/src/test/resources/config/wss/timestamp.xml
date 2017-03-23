@@ -25,6 +25,7 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 </mule>
 

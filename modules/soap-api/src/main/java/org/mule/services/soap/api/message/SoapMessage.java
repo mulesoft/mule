@@ -25,7 +25,7 @@ public interface SoapMessage extends WithContentType {
   /**
    * @return a set of Soap Headers.
    */
-  Map<String, String> getSoapHeaders();
+  List<SoapHeader> getSoapHeaders();
 
   /**
    * @return a set of Transport Specific Headers.

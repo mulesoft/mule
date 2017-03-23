@@ -44,7 +44,7 @@ public class SoapMessageBuilder {
   @Optional
   @NullSafe
   @Content
-  private Map<String, SoapAttachment> attachments;
+  private Map<String, WscSoapAttachment> attachments;
 
   public String getBody() {
     return body;
@@ -54,7 +54,7 @@ public class SoapMessageBuilder {
     return headers;
   }
 
-  public Map<String, SoapAttachment> getAttachments() {
+  public Map<String, WscSoapAttachment> getAttachments() {
     return attachments;
   }
 }

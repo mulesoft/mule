@@ -30,6 +30,7 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="getNoParams">
@@ -38,6 +39,7 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="getEchoHeadersMetadata">
@@ -46,6 +48,7 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="getEchoAccountMetadata">
@@ -62,6 +65,7 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="uploadAttachment">
@@ -78,6 +82,7 @@
                 <wsc:body>#[payload]</wsc:body>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
 
 </mule>

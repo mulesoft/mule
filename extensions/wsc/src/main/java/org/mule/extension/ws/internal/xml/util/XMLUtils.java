@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -28,17 +29,20 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 /**
@@ -47,16 +51,6 @@ import org.xml.sax.InputSource;
  * @since 4.0, Copied from the removed XML module.
  */
 public class XMLUtils {
-
-  /**
-   * Converts a DOM to an XML string.
-   * 
-   * @param dom the dome object to convert
-   * @return A string representation of the document
-   */
-  public static String toXml(Document dom) {
-    return new DOMReader().read(dom).asXML();
-  }
 
   /**
    * @return a new XSLT transformer
@@ -193,5 +187,15 @@ public class XMLUtils {
     } else {
       return new javax.xml.transform.stream.StreamSource(stream);
     }
+  }
+
+  public static String nodeToString(Node node) throws TransformerException {
+    StringWriter writer = new StringWriter();
+    DOMSource source = new DOMSource(node);
+    StreamResult result = new StreamResult(writer);
+    TransformerFactory idTransformer = new SaxonTransformerFactory();
+    Transformer transformer = idTransformer.newTransformer();
+    transformer.transform(source, result);
+    return writer.toString();
   }
 }

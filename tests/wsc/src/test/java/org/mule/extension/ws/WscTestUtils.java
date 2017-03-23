@@ -11,9 +11,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.extension.ws.api.SoapAttachment;
+import static org.mule.runtime.core.util.IOUtils.copy;
+import static org.mule.runtime.core.util.IOUtils.toInputStream;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.services.soap.api.message.SoapAttachment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +58,7 @@ public class WscTestUtils {
   public static final String HEADER_INOUT = "headerInOut";
   public static final String HEADER_IN = "headerIn";
   public static final String HEADER_OUT = "headerOut";
+  public static final String ATTACHMENT_CONTENT = "Some Content";
 
   public static void assertSoapResponse(String expectedResponseResourceName, String outputResponse) throws Exception {
     String expected = getResponseResource(expectedResponseResourceName);
@@ -74,7 +76,7 @@ public class WscTestUtils {
   public static String resourceAsString(final String resource) throws XMLStreamException, IOException {
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
     StringWriter writer = new StringWriter();
-    IOUtils.copy(is, writer);
+    copy(is, writer);
     return writer.toString();
   }
 
@@ -110,8 +112,8 @@ public class WscTestUtils {
   public static SoapAttachment getTestAttachment() {
     SoapAttachment attachment = mock(SoapAttachment.class);
     when(attachment.getId()).thenReturn("attachment-id");
-    when(attachment.getContent()).thenReturn("Some Content");
-    when(attachment.getContentType()).thenReturn(MediaType.TEXT);
+    when(attachment.getContent()).thenReturn(toInputStream(ATTACHMENT_CONTENT));
+    when(attachment.getContentType()).thenReturn(MediaType.BINARY);
     return attachment;
   }
 }

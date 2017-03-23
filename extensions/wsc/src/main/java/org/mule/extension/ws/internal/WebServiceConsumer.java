@@ -7,13 +7,13 @@
 package org.mule.extension.ws.internal;
 
 import org.mule.extension.ws.api.exception.WscErrors;
-import org.mule.extension.ws.api.security.SecurityStrategy;
-import org.mule.extension.ws.api.security.WssDecryptSecurityStrategy;
-import org.mule.extension.ws.api.security.WssEncryptSecurityStrategy;
-import org.mule.extension.ws.api.security.WssSignSecurityStrategy;
-import org.mule.extension.ws.api.security.WssTimestampSecurityStrategy;
-import org.mule.extension.ws.api.security.WssUsernameTokenSecurityStrategy;
-import org.mule.extension.ws.api.security.WssVerifySignatureSecurityStrategy;
+import org.mule.extension.ws.internal.security.SecurityStrategyAdapter;
+import org.mule.extension.ws.internal.security.WssDecryptSecurityStrategy;
+import org.mule.extension.ws.internal.security.WssEncryptSecurityStrategy;
+import org.mule.extension.ws.internal.security.WssSignSecurityStrategy;
+import org.mule.extension.ws.internal.security.WssTimestampSecurityStrategy;
+import org.mule.extension.ws.internal.security.WssUsernameTokenSecurityStrategy;
+import org.mule.extension.ws.internal.security.WssVerifySignatureSecurityStrategy;
 import org.mule.extension.ws.internal.connection.WscConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 @ErrorTypes(WscErrors.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(WscConnectionProvider.class)
-@SubTypeMapping(baseType = SecurityStrategy.class,
+@SubTypeMapping(baseType = SecurityStrategyAdapter.class,
     subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
         WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
 @Extension(name = "Web Service Consumer")

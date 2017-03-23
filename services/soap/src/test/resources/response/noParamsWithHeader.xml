@@ -1,0 +1,3 @@
+<ns2:noParamsWithHeaderResponse xmlns:ns2="http://service.soap.services.mule.org/">
+    <text>Header In Value</text>
+</ns2:noParamsWithHeaderResponse>

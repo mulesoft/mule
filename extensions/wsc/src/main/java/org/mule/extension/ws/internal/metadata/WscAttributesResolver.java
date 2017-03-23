@@ -7,7 +7,6 @@
 package org.mule.extension.ws.internal.metadata;
 
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.extension.ws.internal.introspection.OutputTypeIntrospecterDelegate;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -25,16 +24,10 @@ import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
  */
 public final class WscAttributesResolver extends BaseWscResolver implements AttributesTypeResolver<String> {
 
-  private final HeadersElementResolver outputHeadersResolver;
-
-  public WscAttributesResolver() {
-    this.outputHeadersResolver = new HeadersElementResolver(new OutputTypeIntrospecterDelegate());
-  }
-
   @Override
   public MetadataType getAttributesType(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
-    MetadataType soapHeadersType = outputHeadersResolver.getMetadata(context, operationName);
+    MetadataType soapHeadersType = getMetadataResolver(context).getOutputMetadata(operationName).getHeadersType();
     ObjectTypeBuilder attributes = context.getTypeBuilder().objectType();
     attributes.addField().key(HEADERS_FIELD).value(soapHeadersType);
     ObjectTypeBuilder protocolHeaders = attributes.addField().key("protocolHeaders").value().objectType();

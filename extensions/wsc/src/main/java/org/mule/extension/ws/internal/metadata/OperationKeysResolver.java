@@ -6,22 +6,19 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.extension.ws.internal.connection.WscConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.core.util.collection.ImmutableSetCollector;
+import org.mule.services.soap.api.client.SoapClient;
 
-import java.util.List;
 import java.util.Set;
 
 /**
- * {@link TypeKeysResolver} implementation for the {@link ConsumeOperation}, retrieves a metadata key for each
- * operation available to be performed for the given {@link WscConnection}.
+ * {@link TypeKeysResolver} implementation for the {@link ConsumeOperation}, retrieves a metadata key for each operation available
+ * to be performed for the given {@link SoapClient}.
  *
  * @since 4.0
  */
@@ -29,8 +26,6 @@ public class OperationKeysResolver extends BaseWscResolver implements TypeKeysRe
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    WscConnection connection = getConnection(context);
-    List<String> operations = connection.getWsdlIntrospecter().getOperationNames();
-    return operations.stream().map(ope -> newKey(ope).build()).collect(new ImmutableSetCollector<>());
+    return getMetadataResolver(context).getMetadataKeys();
   }
 }

@@ -11,7 +11,7 @@ import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.soap.api.SoapService;
-import org.mule.services.soap.impl.SoapServiceImplementation;
+import org.mule.services.soap.SoapServiceImplementation;
 
 import java.util.List;
 

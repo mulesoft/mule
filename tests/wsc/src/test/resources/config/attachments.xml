@@ -17,6 +17,7 @@
 
     <flow name="flowFalopa">
         <wsc:consume config-ref="con2" operation="GetCitiesByCountry"/>
+        <object-to-string-transformer/>
     </flow>
 
     <flow name="downloadAttachment">
@@ -32,10 +33,10 @@
             <wsc:message>
                 <wsc:body>#[payload]</wsc:body>
                 <wsc:attachments>
-                    #[{ attachment: { id: "SomeId", content: "Some Content" } as Object { class : "org.mule.extension.ws.api.SoapAttachment" } } ]
+                    #[{ attachment: { content: attachmentContent, contentType: mediaType} as Object { class : "org.mule.extension.ws.api.WscSoapAttachment" } } ]
                 </wsc:attachments>
             </wsc:message>
         </wsc:consume>
+        <object-to-string-transformer/>
     </flow>
-
 </mule>

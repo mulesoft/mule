@@ -13,17 +13,16 @@ import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.getRequestResource;
-import static org.mule.extension.ws.api.SoapVersion.SOAP11;
-import static org.mule.extension.ws.api.exception.WscErrors.BAD_REQUEST;
-import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
+import static org.mule.services.soap.api.SoapVersion.SOAP11;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
-import org.mule.extension.ws.api.exception.BadRequestException;
-import org.mule.extension.ws.api.exception.SoapFault;
-import org.mule.extension.ws.api.exception.SoapFaultException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.services.soap.api.exception.BadRequestException;
+import org.mule.services.soap.api.exception.SoapFaultException;
+import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -34,6 +33,10 @@ import ru.yandex.qatools.allure.annotations.Stories;
 public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
   private static final String FAIL_FLOW = "failOperation";
+
+  // TODO MULE-12038
+  private static final String SOAP_FAULT = "Soap Fault";
+  private static final String BAD_REQUEST = "Bad Request";
 
   @Override
   protected String getConfigurationFile() {
@@ -46,16 +49,14 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
     MessagingException me = flowRunner(FAIL_FLOW).withPayload(getRequestResource(FAIL)).runExpectingException();
     Error error = me.getEvent().getError().get();
 
-    assertThat(error.getErrorType(), is(errorType("WSC", SOAP_FAULT.getType())));
+    assertThat(error.getErrorType(), is(errorType("WSC", SOAP_FAULT)));
 
     Throwable causeException = error.getCause();
     assertThat(causeException, instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) causeException;
 
-    SoapFault fault = (SoapFault) sf.getErrorMessage().getPayload().getValue();
-
     // Receiver is for SOAP12. Server is for SOAP11
-    assertThat(fault.getFaultCode().getLocalPart(), isOneOf("Server", "Receiver"));
+    assertThat(sf.getFaultCode().getLocalPart(), isOneOf("Server", "Receiver"));
     assertThat(sf.getMessage(), containsString("Fail Message"));
   }
 
@@ -67,13 +68,12 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 
     Error error = me.getEvent().getError().get();
 
-    assertThat(error.getErrorType(), is(errorType("WSC", SOAP_FAULT.getType())));
+    assertThat(error.getErrorType(), Matchers.is(ErrorTypeMatcher.errorType("WSC", SOAP_FAULT)));
     assertThat(error.getCause(), instanceOf(SoapFaultException.class));
     SoapFaultException sf = (SoapFaultException) error.getCause();
-    SoapFault fault = (SoapFault) sf.getErrorMessage().getPayload().getValue();
 
     // Sender is for SOAP12. Client is for SOAP11
-    assertThat(fault.getFaultCode().getLocalPart(), isOneOf("Client", "Sender"));
+    assertThat(sf.getFaultCode().getLocalPart(), isOneOf("Client", "Sender"));
 
     String errorMessage;
     if (soapVersion.equals(SOAP11)) {
@@ -90,7 +90,7 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
     MessagingException me = flowRunner(FAIL_FLOW).withPayload("not a valid XML file").runExpectingException();
     Error error = me.getEvent().getError().get();
 
-    assertThat(error.getErrorType(), is(errorType("WSC", BAD_REQUEST.getType())));
+    assertThat(error.getErrorType(), is(errorType("WSC", BAD_REQUEST)));
     assertThat(error.getCause(), instanceOf(BadRequestException.class));
     assertThat(error.getCause().getMessage(), is("Error consuming the operation [fail], the request body is not a valid XML"));
   }

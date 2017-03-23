@@ -1,0 +1,3 @@
+<ns2:echoWithHeadersResponse xmlns:ns2="http://service.soap.services.mule.org/">
+    <text>test response</text>
+</ns2:echoWithHeadersResponse>

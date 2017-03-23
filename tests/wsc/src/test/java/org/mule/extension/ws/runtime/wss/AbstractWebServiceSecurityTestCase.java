@@ -8,13 +8,11 @@ package org.mule.extension.ws.runtime.wss;
 
 import static java.lang.String.format;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
-
+import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
-import org.mule.extension.ws.WscTestUtils;
 import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Description;
 
 public abstract class AbstractWebServiceSecurityTestCase extends AbstractSoapServiceTestCase {
@@ -41,6 +39,6 @@ public abstract class AbstractWebServiceSecurityTestCase extends AbstractSoapSer
   public void expectedSecuredRequest() throws Exception {
     Message message = runFlowWithRequest(security + "Flow", ECHO);
     String out = (String) message.getPayload().getValue();
-    WscTestUtils.assertSoapResponse(ECHO, out);
+    assertSoapResponse(ECHO, out);
   }
 }

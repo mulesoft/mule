@@ -6,16 +6,14 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
-import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
-import static org.mule.metadata.xml.XmlTypeLoader.XML;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.CONNECTION_FAILURE;
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.extension.ws.internal.connection.WscConnection;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
+import org.mule.services.soap.api.client.SoapClient;
+import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
 
 /**
  * Base class for all metadata resolvers of the {@link ConsumeOperation}.
@@ -24,7 +22,6 @@ import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
  */
 public abstract class BaseWscResolver implements NamedTypeResolver {
 
-  static final MetadataType NULL_TYPE = create(XML).nullType().build();
   private static final String WSC_CATEGORY = "WebServiceConsumerCategory";
   public static final String BODY_FIELD = "body";
   public static final String HEADERS_FIELD = "headers";
@@ -35,8 +32,9 @@ public abstract class BaseWscResolver implements NamedTypeResolver {
     return WSC_CATEGORY;
   }
 
-  protected WscConnection getConnection(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    return context.<WscConnection>getConnection()
+  protected SoapMetadataResolver getMetadataResolver(MetadataContext context)
+      throws MetadataResolvingException, ConnectionException {
+    return context.<SoapClient>getConnection().map(SoapClient::getMetadataResolver)
         .orElseThrow(() -> new MetadataResolvingException("Could not obtain connection to retrieve metadata",
                                                           CONNECTION_FAILURE));
   }

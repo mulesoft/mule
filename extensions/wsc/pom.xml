@@ -23,58 +23,6 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${dependency.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>analyze-dependencies-for-extension</id>
-                        <goals>
-                            <goal>analyze-only</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <skip>true</skip>
-                            <failOnWarning>true</failOnWarning>
-                            <verbose>true</verbose>
-                            <ignoredUsedUndeclaredDependencies>
-                                <!-- CXF transitive dependencies -->
-                                <ignoredUsedUndeclaredDependency>org.apache.cxf:cxf-rt-bindings-soap</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.apache.cxf:cxf-api:</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>wsdl4j:wsdl4j</ignoredUsedUndeclaredDependency>
-                                <!-- Mule XML Module transitive dependencies -->
-                                <ignoredUsedUndeclaredDependency>net.java.dev.stax-utils:stax-utils</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>xml-apis:xml-apis</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>net.sf.saxon:Saxon-HE</ignoredUsedUndeclaredDependency>
-
-                                <!-- COPIED CONFIGURATION FROM PARENT -->
-                                <!-- Mule dependencies are ignored -->
-                                <ignoredUsedUndeclaredDependency>org.mule*</ignoredUsedUndeclaredDependency>
-                                <!-- Testing dependencies are ignored -->
-                                <ignoredUsedUndeclaredDependency>org.hamcrest</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.mockito</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>commons-logging:commons-logging</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>org.apache.ftpserver:ftpserver-core</ignoredUsedUndeclaredDependency>
-                                <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
-                                <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>javax.inject:javax.inject</ignoredUsedUndeclaredDependency>
-                                <ignoredUsedUndeclaredDependency>javax.mail:mail</ignoredUsedUndeclaredDependency>
-                            </ignoredUsedUndeclaredDependencies>
-                            <ignoredUnusedDeclaredDependencies>
-                                <!-- Don't need to worry about this -->
-                                <ignoredUnusedDeclaredDependency>:::</ignoredUnusedDeclaredDependency>
-                            </ignoredUnusedDeclaredDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <!-- Runtime Dependencies-->
         <dependency>
@@ -120,7 +68,7 @@
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
+            <artifactId>mule-service-soap-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

@@ -6,6 +6,8 @@
  */
 package org.mule.services.soap.api.message;
 
+import org.mule.runtime.api.metadata.MediaType;
+
 import java.io.InputStream;
 
 /**
@@ -13,16 +15,34 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public interface SoapAttachment extends WithContentType {
+public class SoapAttachment implements WithContentType {
 
-  /**
-   * @return the content id of the attachment.
-   */
-  String getId();
+  private final MediaType contentType;
+  private final String id;
+  private final InputStream content;
 
-  /**
-   * @return the content of the attachment.
-   */
-  InputStream getContent();
+  public SoapAttachment(String id, MediaType contentType, InputStream content) {
+    this.contentType = contentType;
+    this.id = id;
+    this.content = content;
+  }
 
+  public SoapAttachment(String id, String contentType, InputStream content) {
+    this.contentType = MediaType.parse(contentType);
+    this.id = id;
+    this.content = content;
+  }
+
+  @Override
+  public MediaType getContentType() {
+    return contentType;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public InputStream getContent() {
+    return content;
+  }
 }

@@ -6,7 +6,10 @@
  */
 package org.mule.services.soap.api.client.metadata;
 
+import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+
+import java.util.Set;
 
 /**
  * An object that is in charge of resolving {@link SoapOperationMetadata} for different operations.
@@ -28,4 +31,10 @@ public interface SoapMetadataResolver {
    * @throws MetadataResolvingException in any error case.
    */
   SoapOperationMetadata getOutputMetadata(String operation) throws MetadataResolvingException;
+
+  /**
+   * @return a {@link Set} with the {@link MetadataKey} representing the available operations in the WSDL
+   * @throws MetadataResolvingException in any error case.
+   */
+  Set<MetadataKey> getMetadataKeys() throws MetadataResolvingException;
 }

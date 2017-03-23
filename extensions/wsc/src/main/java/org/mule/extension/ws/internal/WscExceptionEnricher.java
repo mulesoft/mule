@@ -11,14 +11,15 @@ import static org.mule.extension.ws.api.exception.WscErrors.BAD_RESPONSE;
 import static org.mule.extension.ws.api.exception.WscErrors.ENCODING;
 import static org.mule.extension.ws.api.exception.WscErrors.INVALID_WSDL;
 import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
-import org.mule.extension.ws.api.exception.BadRequestException;
-import org.mule.extension.ws.api.exception.BadResponseException;
-import org.mule.extension.ws.api.exception.InvalidWsdlException;
-import org.mule.extension.ws.api.exception.SoapFaultException;
+
 import org.mule.extension.ws.api.exception.WscEncodingException;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.services.soap.api.exception.BadRequestException;
+import org.mule.services.soap.api.exception.BadResponseException;
+import org.mule.services.soap.api.exception.InvalidWsdlException;
+import org.mule.services.soap.api.exception.SoapFaultException;
 
 /**
  * {@link ExceptionHandler} implementation to wrap unexpected exceptions thrown by the {@link ConsumeOperation} and if a
