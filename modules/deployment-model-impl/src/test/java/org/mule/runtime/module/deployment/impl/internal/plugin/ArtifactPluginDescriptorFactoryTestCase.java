@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.createTempFile;
 import static java.util.Collections.emptySet;
-import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -80,7 +79,7 @@ import org.junit.rules.TemporaryFolder;
 
 public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
-  private static final String PLUGIN_NAME = "testPlugin.jar";
+  private static final String PLUGIN_NAME = "testPlugin";
   private static final String INVALID_LOADER_ID = "INVALID";
   private static final String MIN_MULE_VERSION = "4.0.0";
 
@@ -240,7 +239,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         new ArtifactPluginFileBuilder(PLUGIN_NAME).tempFolder(pluginsTempFolder.newFolder())
             .describedBy(pluginModelBuilder.build());
 
-    File pluginJarLocation = createJarFileFromArtifactFile(pluginFileBuilder);
+    File pluginJarLocation = pluginFileBuilder.getArtifactFile();
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
@@ -248,14 +247,6 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
                                                       pluginModelBuilder.getClassLoaderModelDescriptorLoader()));
 
     descriptorFactory.create(pluginJarLocation);
-  }
-
-  private File createJarFileFromArtifactFile(ArtifactPluginFileBuilder pluginFileBuilder) throws IOException {
-    // TODO MULE-11456 - Once we moved everything to .jar, we won't need this hack
-    File artifactFile = pluginFileBuilder.getArtifactFile();
-    File pluginJarLocation = new File(artifactFile.getParent(), artifactFile.getName().replace(".zip", ""));
-    copyFile(artifactFile, pluginJarLocation);
-    return pluginJarLocation;
   }
 
   @Test
@@ -268,8 +259,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         new ArtifactPluginFileBuilder(PLUGIN_NAME).tempFolder(pluginsTempFolder.newFolder())
             .describedBy(pluginModelBuilder.build());
 
-    // TODO MULE-11456 - Once we moved everything to .jar, we won't need this hack
-    File pluginJarLocation = createJarFileFromArtifactFile(pluginFileBuilder);
+    File pluginJarLocation = pluginFileBuilder.getArtifactFile();
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
@@ -279,7 +269,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   }
 
   private File createPluginFile(ZipUtils.ZipResource... zipResources) {
-    final File pluginFile = new File(pluginsTempFolder.getRoot(), PLUGIN_NAME);
+    final File pluginFile = new File(pluginsTempFolder.getRoot(), PLUGIN_NAME + ".jar");
     compress(pluginFile, zipResources);
     return pluginFile;
   }
