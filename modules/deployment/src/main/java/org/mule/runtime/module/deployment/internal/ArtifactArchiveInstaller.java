@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.FileUtils;
@@ -49,7 +49,7 @@ public class ArtifactArchiveInstaller {
    * @throws IOException in case there was an error reading from the artifact or writing to the artifact folder.
    */
   public File installArtifact(final URL artifactUrl) throws IOException {
-    if (!artifactUrl.toString().toLowerCase().endsWith(ZIP_FILE_SUFFIX)) {
+    if (!artifactUrl.toString().toLowerCase().endsWith(JAR_FILE_SUFFIX)) {
       throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
     }
 

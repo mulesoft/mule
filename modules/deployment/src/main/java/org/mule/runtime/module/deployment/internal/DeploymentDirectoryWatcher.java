@@ -10,7 +10,7 @@ import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -62,7 +62,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
   public static final String CHANGE_CHECK_INTERVAL_PROPERTY = "mule.launcher.changeCheckInterval";
   public static final IOFileFilter ZIP_ARTIFACT_FILTER =
-      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
+      new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
@@ -149,10 +149,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
         for (String app : apps) {
           try {
-            File applicationFile = new File(appsDir, app + ZIP_FILE_SUFFIX);
+            File applicationFile = new File(appsDir, app + JAR_FILE_SUFFIX);
 
             if (applicationFile.exists() && applicationFile.isFile()) {
-              applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
+              applicationArchiveDeployer.deployPackagedArtifact(app + JAR_FILE_SUFFIX);
             } else {
               if (applicationArchiveDeployer.isUpdatedZombieArtifact(app)) {
                 applicationArchiveDeployer.deployExplodedArtifact(app);

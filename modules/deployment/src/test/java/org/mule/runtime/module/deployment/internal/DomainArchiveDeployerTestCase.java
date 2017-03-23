@@ -13,13 +13,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-
-import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +39,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   public static final String DOMAIN_ZIP_PATH = "someZipFile";
   public static final String DOMAIN_NAME = "domain-name";
-  public static final String ZIP_FILE_EXTENSION = ".zip";
+  public static final String JAR_FILE_EXTENSION = ".jar";
   public static final String MOCK_APPLICATION_1_NAME = "MOCK_APPLICATION1_NAME";
   public static final String MOCK_APPLICATION_2_NAME = "MOCK_APPLICATION2_NAME";
   public static final String NON_EXISTENT_DOMAIN_ID = "NonExistentDomainId";
@@ -148,7 +147,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   }
 
   private void verifyApplicationCopyToAppsFolder(String applicationName) {
-    assertThat(new File(appsFolder, applicationName + ZIP_FILE_EXTENSION).exists(), is(true));
+    assertThat(new File(appsFolder, applicationName + JAR_FILE_EXTENSION).exists(), is(true));
   }
 
   private void putApplicationInTestDomainAppsFolder(String appName) throws IOException {
@@ -156,7 +155,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
     domainDirectory.mkdirs();
     assertThat(FileUtils.createFile(new File(domainsFolder,
                                              DOMAIN_NAME + File.separator + DomainArchiveDeployer.DOMAIN_BUNDLE_APPS_FOLDER
-                                                 + File.separator + appName + ZIP_FILE_EXTENSION).getAbsolutePath())
+                                                 + File.separator + appName + JAR_FILE_EXTENSION).getAbsolutePath())
         .exists(), is(true));
   }
 }

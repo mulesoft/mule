@@ -58,7 +58,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     super(id);
     checkArgument(!isEmpty(id), "ID cannot be empty");
     this.id = id;
-    this.fileName = upperCaseInExtension ? (id + ".ZIP") : (id + ".zip");
+    this.fileName = upperCaseInExtension ? (id + getFileExtension().toUpperCase()) : (id + getFileExtension().toLowerCase());
   }
 
   /**
@@ -76,7 +76,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    * @return the file extension of the file name for the artifact.
    */
   protected String getFileExtension() {
-    return ".zip";
+    return ".jar";
   }
 
   /**

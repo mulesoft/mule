@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.api.exception.MuleException;
@@ -28,6 +29,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.temporary.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
@@ -255,7 +257,7 @@ public class FakeMuleServer {
 
   public void deploy(String resource) throws IOException {
     int lastSeparator = resource.lastIndexOf(File.separator);
-    String appName = StringUtils.removeEndIgnoreCase(resource.substring(lastSeparator + 1), ".zip");
+    String appName = StringUtils.removeEndIgnoreCase(resource.substring(lastSeparator + 1), JAR_FILE_SUFFIX);
     deploy(resource, appName);
   }
 
@@ -279,7 +281,7 @@ public class FakeMuleServer {
    * @throws IOException if the URL cannot be accessed
    */
   public void deploy(URL resource, String targetAppName) throws IOException {
-    addAppArchive(resource, targetAppName + ".zip");
+    addAppArchive(resource, targetAppName + JAR_FILE_SUFFIX);
     assertDeploymentSuccess(targetAppName);
   }
 
