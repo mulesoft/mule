@@ -7,10 +7,9 @@
 package org.mule.extension.ws.internal.xml.util;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
-
 import org.mule.extension.ws.internal.xml.stax.StaxSource;
 import org.mule.extension.ws.internal.xml.transformer.DelayedResult;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
