@@ -6,14 +6,18 @@
  */
 package org.mule.tck.junit4.rule;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static java.nio.file.StandardOpenOption.WRITE;
 
 /**
  * Finds available port numbers in a specified range.
@@ -25,8 +29,9 @@ public class FreePortFinder
 
     private final int minPortNumber;
     private final int portRange;
-    private final Set<Integer> selectedPorts = new HashSet<Integer>();
     private final Random random  = new Random();
+    private final String LOCK_FILE_EXTENSION = ".lock";
+    private final Map<Integer, FileLock> locks = new HashMap<>();
 
     public FreePortFinder(int minPortNumber, int maxPortNumber)
     {
@@ -38,24 +43,42 @@ public class FreePortFinder
     {
         for (int i = 0; i < portRange; i++)
         {
-            int port = minPortNumber + random.nextInt(portRange);
-
-            if (selectedPorts.contains(port))
+            try
             {
-                continue;
-            }
+                int port = minPortNumber + random.nextInt(portRange);
+                String portFile = String.valueOf(port) + LOCK_FILE_EXTENSION;
+                FileChannel channel = FileChannel.open(Paths.get(portFile), WRITE);
+                FileLock lock = channel.tryLock();
 
-            if (isPortFree(port))
+                if (isPortFree(port))
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Found free port: " + port);
+                    }
+
+                    locks.put(port, lock);
+                    return port;
+                } else {
+                    lock.release();
+                }
+            }
+            catch(OverlappingFileLockException e)
+            {
+                // The file is locked,
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Port selected already locked");
+                }
+            }
+            catch(IOException e)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Found free port: " + port);
+                    logger.debug("Error when trying to open port lock file, trying another port");
                 }
-
-                selectedPorts.add(port);
-
-                return port;
             }
+
         }
 
         throw new IllegalStateException("Unable to find an available port");
@@ -71,15 +94,20 @@ public class FreePortFinder
      */
     public synchronized void releasePort(int port)
     {
-        if (isPortFree(port))
+        if (isPortFree(port) && locks.containsKey(port))
         {
-            selectedPorts.remove(port);
+            FileLock lock = locks.get(port);
+            try {
+                lock.release();
+            } catch (IOException e) {
+                // Ignore
+            }
         }
         else
         {
             if (logger.isInfoEnabled())
             {
-                logger.info(String.format("Port %d was is not correctly released", port));
+                logger.info(String.format("Port %d was not correctly released", port));
             }
         }
     }
@@ -114,7 +142,7 @@ public class FreePortFinder
                 }
                 catch (IOException e)
                 {
-                    // ignore
+                    // Ignore
                 }
             }
         }
