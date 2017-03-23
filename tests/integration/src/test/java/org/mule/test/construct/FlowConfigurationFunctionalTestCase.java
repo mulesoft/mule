@@ -20,6 +20,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -166,7 +168,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
   @Test
   public void testSplitNoParts() throws Exception {
     String MESSAGE = "<Order></Order>";
-    InternalMessage result = flowRunner("split-no-parts").withPayload(MESSAGE).run().getMessage();
+    InternalMessage result = flowRunner("split-no-parts").withPayload(MESSAGE).withMediaType(APPLICATION_XML).run().getMessage();
 
     assertNotNull(result);
     assertEquals(result.getPayload().getValue(), MESSAGE);

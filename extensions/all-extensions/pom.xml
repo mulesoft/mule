@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.extensions</groupId>
@@ -15,9 +15,8 @@
         This is needed in our various distributions we publish.
     </description>
 
-    <!-- Dependencies included in modules with type zip must be excluded as their
-        are going to be included as zip in distro
-    -->
+    <!-- Dependencies included in modules with type zip must be excluded 
+        as their are going to be included as zip in distro -->
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -25,7 +24,7 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <!--TODO(gfernandes): remove this, see validation's comment -->
                 <exclusion>
                     <groupId>commons-collections</groupId>
                     <artifactId>commons-collections</artifactId>
@@ -50,7 +49,7 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <!--TODO(gfernandes): remove this, see validation's comment -->
                 <exclusion>
                     <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
@@ -85,7 +84,7 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <!--TODO(gfernandes): remove this, see validation's comment -->
                 <exclusion>
                     <groupId>commons-net</groupId>
                     <artifactId>commons-net</artifactId>
@@ -119,7 +118,7 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <!--TODO(gfernandes): remove this, see validation's comment -->
                 <exclusion>
                     <groupId>com.mchange</groupId>
                     <artifactId>c3p0</artifactId>
@@ -181,7 +180,7 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment-->
+                <!--TODO(gfernandes): remove this, see validation's comment -->
                 <exclusion>
                     <groupId>org.glassfish.grizzly</groupId>
                     <artifactId>grizzly-framework</artifactId>
@@ -226,7 +225,7 @@
             <artifactId>mule-module-oauth</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <!--TODO(gfernandes): remove this, see validation's comment-->
+            <!--TODO(gfernandes): remove this, see validation's comment -->
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
@@ -234,13 +233,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-wsc</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <!--TODO(gfernandes): remove this, see validation's comment-->
+            <!--TODO(gfernandes): remove this, see validation's comment -->
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
@@ -259,6 +258,14 @@
                     <artifactId>cxf-rt-frontend-simple</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>net.sf.saxon</groupId>
+                    <artifactId>Saxon-HE</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.java.dev.stax-utils</groupId>
+                    <artifactId>stax-utils</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
@@ -266,7 +273,7 @@
                     <groupId>commons-lang</groupId>
                     <artifactId>commons-lang</artifactId>
                 </exclusion>
-                <!--TODO remove MULE-10783-->
+                <!--TODO remove MULE-10783 -->
                 <exclusion>
                     <groupId>com.squareup.okhttp</groupId>
                     <artifactId>okhttp</artifactId>
@@ -279,7 +286,7 @@
             <artifactId>mule-module-jms</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <!--TODO(gfernandes): remove this, see validation's comment-->
+            <!--TODO(gfernandes): remove this, see validation's comment -->
             <exclusions>
                 <exclusion>
                     <groupId>javax.jms</groupId>
@@ -322,10 +329,9 @@
             <artifactId>mule-module-validation</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <!--TODO(gfernandes): https://www.mulesoft.org/jira/browse/MULE-9810
-                Remove explicit exclusions whenever this issue is fixed (this applies to all the zip type
-                dependencies
-            -->
+            <!--TODO(gfernandes): https://www.mulesoft.org/jira/browse/MULE-9810 
+                Remove explicit exclusions whenever this issue is fixed (this applies to 
+                all the zip type dependencies -->
             <exclusions>
                 <exclusion>
                     <groupId>commons-validator</groupId>

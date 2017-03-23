@@ -7,8 +7,8 @@
 package org.mule.services.soap.impl.util;
 
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
-import org.mule.runtime.module.xml.stax.StaxSource;
 import org.mule.services.soap.api.SoapService;
+import org.mule.services.soap.impl.xml.stax.StaxSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;

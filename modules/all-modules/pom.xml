@@ -87,11 +87,6 @@
             <artifactId>mule-module-tooling-support</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-xml</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         
         <!-- Services APIs -->
         <dependency>

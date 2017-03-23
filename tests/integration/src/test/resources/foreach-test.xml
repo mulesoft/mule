@@ -85,8 +85,8 @@
     </flow>
 
     <flow name="process-order-update">
-        <foreach collection="#[mel:xpath3('/PurchaseOrder/Items/Item')]">
-            <set-variable variableName="total" value="#[mel:counter]" />
+        <foreach collection="#[payload.PurchaseOrder.Items.Item]">
+            <set-variable variableName="total" value="#[counter]" />
         </foreach>
     </flow>
 

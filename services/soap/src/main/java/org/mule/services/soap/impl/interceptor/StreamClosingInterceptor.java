@@ -7,7 +7,8 @@
 package org.mule.services.soap.impl.interceptor;
 
 import static org.apache.cxf.phase.Phase.POST_STREAM;
-import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+
+import org.mule.services.soap.impl.xml.stax.DelegateXMLStreamReader;
 
 import java.io.IOException;
 import java.io.InputStream;

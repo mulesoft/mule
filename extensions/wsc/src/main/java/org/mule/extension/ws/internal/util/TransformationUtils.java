@@ -7,8 +7,8 @@
 package org.mule.extension.ws.internal.util;
 
 import org.mule.extension.ws.internal.WebServiceConsumer;
+import org.mule.extension.ws.internal.xml.stax.StaxSource;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
-import org.mule.runtime.module.xml.stax.StaxSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
@@ -24,11 +24,12 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+
+import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
 /**
  * Utility class for handling XML transformations in the {@link WebServiceConsumer}.

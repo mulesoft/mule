@@ -7,7 +7,8 @@
 package org.mule.extension.ws.internal.interceptor;
 
 import static org.apache.cxf.phase.Phase.POST_STREAM;
-import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
+
+import org.mule.extension.ws.internal.xml.stax.DelegateXMLStreamReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +34,7 @@ public class StreamClosingInterceptor extends AbstractPhaseInterceptor<Message> 
     addAfter(StaxInInterceptor.class.getName());
   }
 
+  @Override
   public void handleMessage(final Message message) throws Fault {
     XMLStreamReader xsr = message.getContent(XMLStreamReader.class);
     final InputStream is = message.getContent(InputStream.class);

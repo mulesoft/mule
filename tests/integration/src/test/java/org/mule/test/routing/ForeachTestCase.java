@@ -21,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -226,11 +228,11 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void xmlUpdate() throws Exception {
-    xpath(sampleXml);
+    xml(sampleXml);
   }
 
-  private void xpath(Object payload) throws Exception {
-    Event result = flowRunner("process-order-update").withPayload(payload).run();
+  private void xml(Object payload) throws Exception {
+    Event result = flowRunner("process-order-update").withPayload(payload).withMediaType(APPLICATION_XML).run();
     int total = (int) result.getVariable("total").getValue();
     assertThat(total, is(greaterThan(0)));
   }
@@ -238,7 +240,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
   @Ignore("MULE-9285")
   @Test
   public void xmlUpdateByteArray() throws Exception {
-    xpath(sampleXml.getBytes());
+    xml(sampleXml.getBytes());
   }
 
   @Test

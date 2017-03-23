@@ -10,11 +10,11 @@ import static java.lang.String.format;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.services.soap.impl.exception.InvalidWsdlException;
 import org.mule.services.soap.impl.metadata.OutputTypeIntrospecterDelegate;
 import org.mule.services.soap.impl.introspection.WsdlIntrospecter;
 import org.mule.services.soap.impl.util.SoapServiceMetadataTypeUtils;
+import org.mule.services.soap.impl.xml.util.XMLUtils;
 
 import java.util.List;
 

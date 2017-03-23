@@ -16,7 +16,7 @@ import org.mule.extension.ws.internal.introspection.WsdlIntrospecter;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
-import org.mule.runtime.module.xml.util.XMLUtils;
+import org.mule.extension.ws.internal.xml.util.XMLUtils;
 
 import java.util.List;
 

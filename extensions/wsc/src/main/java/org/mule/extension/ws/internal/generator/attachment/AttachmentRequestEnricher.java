@@ -7,7 +7,8 @@
 package org.mule.extension.ws.internal.generator.attachment;
 
 import static org.mule.extension.ws.internal.util.TransformationUtils.stringToDocument;
-import static org.mule.runtime.module.xml.util.XMLUtils.toXml;
+import static org.mule.extension.ws.internal.xml.util.XMLUtils.toXml;
+
 import org.mule.extension.ws.api.SoapAttachment;
 import org.mule.extension.ws.api.exception.WscException;
 import org.mule.extension.ws.internal.util.WscTransformationException;

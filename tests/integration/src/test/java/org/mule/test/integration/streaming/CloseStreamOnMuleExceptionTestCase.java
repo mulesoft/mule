@@ -7,27 +7,17 @@
 package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
-import org.mule.runtime.module.xml.stax.StaxSource;
-import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
-
 import org.junit.Test;
-import org.xml.sax.InputSource;
 
 public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestCase {
 
@@ -55,54 +45,6 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
 
     streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
     assertTrue(inputStream.isClosed());
-  }
-
-  @Test
-  public void testCloseXMLInputSourceOnComponentException() throws Exception {
-    InputSource stream = new InputSource(inputStream);
-
-    flowRunner("echo").withPayload(stream).dispatch();
-
-    streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
-    assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
-  }
-
-  @Test
-  public void testCloseXMLStreamSourceOnComponentException() throws Exception {
-    Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
-
-    flowRunner("echo").withPayload(stream).dispatch();
-
-    streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
-    assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
-  }
-
-  @Test
-  public void testCloseXMLStreamReaderOnComponentException() throws Exception {
-    TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(inputStream));
-
-    flowRunner("echo").withPayload(stream).dispatch();
-
-    streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
-    assertTrue(stream.isClosed());
-  }
-
-  @Test
-  public void testCloseSaxSourceOnComponentException() throws Exception {
-    SAXSource stream = new SAXSource(new InputSource(inputStream));
-
-    flowRunner("echo").withPayload(stream).dispatch();
-
-    verifyInputStreamIsClosed(((TestByteArrayInputStream) stream.getInputSource().getByteStream()));
-  }
-
-  @Test
-  public void testCloseStaxSourceOnComponentException() throws Exception {
-    StaxSource stream = new StaxSource(new TestXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(inputStream)));
-
-    flowRunner("echo").withPayload(stream).dispatch();
-
-    verifyInputStreamIsClosed(((TestXMLStreamReader) stream.getXMLStreamReader()));
   }
 
   @Test
@@ -155,27 +97,6 @@ public class CloseStreamOnMuleExceptionTestCase extends AbstractIntegrationTestC
       super.close();
       closed = true;
       inputStreamLatch.countDown();
-    }
-  }
-
-  static class TestXMLStreamReader extends DelegateXMLStreamReader implements ClosableInputStream {
-
-    private boolean closed;
-
-    @Override
-    public boolean isClosed() {
-      return closed;
-    }
-
-    public TestXMLStreamReader(XMLStreamReader reader) {
-      super(reader);
-    }
-
-    @Override
-    public void close() throws XMLStreamException {
-      super.close();
-      closed = true;
-      streamReaderLatch.countDown();
     }
   }
 }

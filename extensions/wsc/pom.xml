@@ -101,16 +101,32 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- XSLT and Xpath Support -->
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-xml</artifactId>
+            <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guavaVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -132,7 +148,6 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>${commonsLangVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -165,7 +180,6 @@
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
-            <version>${xmlUnitVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
