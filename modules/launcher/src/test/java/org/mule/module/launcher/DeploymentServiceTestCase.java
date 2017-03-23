@@ -831,11 +831,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
         assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
 
+        reset(applicationDeploymentListener);
         org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
         assertAppFolderIsDeleted(appName);
         assertUndeploymentSuccess(applicationDeploymentListener, appName);
 
-        assertNull(deploymentService.findApplication(appName));
         final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
         assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
     }
