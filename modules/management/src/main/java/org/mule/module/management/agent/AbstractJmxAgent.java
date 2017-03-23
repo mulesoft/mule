@@ -366,10 +366,11 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Model model : muleContext.getRegistry().lookupObjects(Model.class))
+        for (String registryName: muleContext.getRegistry().lookupByType(Model.class).keySet())
         {
+            Model model = muleContext.getRegistry().lookupObject(registryName);
             ModelServiceMBean service = new ModelService(model);
-            String rawName = service.getName() + "(" + service.getType() + ")";
+            String rawName = registryName + "(" + service.getType() + ")";
             String name = jmxSupport.escape(rawName);
             final String jmxName = String.format("%s:%s%s", jmxSupport.getDomainName(muleContext, !containerMode), ModelServiceMBean.DEFAULT_JMX_NAME_PREFIX, name);
             ObjectName on = jmxSupport.getObjectName(jmxName);
@@ -407,9 +408,8 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     protected void registerServiceServices() throws NotCompliantMBeanException, MBeanRegistrationException,
         InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Service service : muleContext.getRegistry().lookupObjects(Service.class))
+        for (String rawName : muleContext.getRegistry().lookupByType(Service.class).keySet())
         {
-            final String rawName = service.getName();
             final String escapedName = jmxSupport.escape(rawName);
             final String jmxName = String.format("%s:%s%s",
                                                  jmxSupport.getDomainName(muleContext, !containerMode),
@@ -427,9 +427,9 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     protected void registerFlowConstructServices() throws NotCompliantMBeanException, MBeanRegistrationException,
         InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (AbstractFlowConstruct flowConstruct : muleContext.getRegistry().lookupObjects(AbstractFlowConstruct.class))
+        for (String  rawName : muleContext.getRegistry().lookupByType(AbstractFlowConstruct.class).keySet())
         {
-            final String rawName = flowConstruct.getName();
+            AbstractFlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(rawName);
             final String name = jmxSupport.escape(rawName);
             final String jmxName = String.format("%s:type=%s,name=%s", jmxSupport.getDomainName(muleContext, !containerMode), flowConstruct.getConstructType(), name);
             ObjectName on = jmxSupport.getObjectName(jmxName);
@@ -460,8 +460,9 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
         InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
+        for (String connectorRawName : muleContext.getRegistry().lookupByType(Connector.class).keySet())
         {
+            Connector connector = muleContext.getRegistry().lookupObject(connectorRawName);
             if (connector instanceof AbstractConnector)
             {
                 for (MessageReceiver messageReceiver : ((AbstractConnector) connector).getReceivers().values())
@@ -470,7 +471,7 @@ public abstract class AbstractJmxAgent extends AbstractAgent
                     {
                         EndpointServiceMBean service = new EndpointService(messageReceiver);
 
-                        String fullName = buildFullyQualifiedEndpointName(service, connector);
+                        String fullName = buildFullyQualifiedEndpointName(service, connectorRawName);
                         if (logger.isInfoEnabled())
                         {
                             logger.info("Attempting to register service with name: " + fullName);
@@ -494,7 +495,7 @@ public abstract class AbstractJmxAgent extends AbstractAgent
         }
     }
 
-    protected String buildFullyQualifiedEndpointName(EndpointServiceMBean mBean, Connector connector)
+    protected String buildFullyQualifiedEndpointName(EndpointServiceMBean mBean, String connectorRawName)
     {
         String rawName = jmxSupport.escape(mBean.getName());
 
@@ -503,7 +504,7 @@ public abstract class AbstractJmxAgent extends AbstractAgent
         fullName.append(":type=Endpoint,service=");
         fullName.append(jmxSupport.escape(mBean.getComponentName()));
         fullName.append(",connector=");
-        fullName.append(connector.getName());
+        fullName.append(connectorRawName);
         fullName.append(",name=");
         fullName.append(rawName);
         return fullName.toString();
@@ -512,10 +513,10 @@ public abstract class AbstractJmxAgent extends AbstractAgent
     protected void registerConnectorServices() throws MalformedObjectNameException,
         NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException
     {
-        for (Connector connector : muleContext.getRegistry().lookupLocalObjects(Connector.class))
+        for (String rawName : muleContext.getRegistry().lookupByType(Connector.class).keySet())
         {
+            Connector connector = muleContext.getRegistry().lookupObject(rawName);
             ConnectorServiceMBean service = new ConnectorService(connector);
-            final String rawName = service.getName();
             final String name = jmxSupport.escape(rawName);
             final String jmxName = String.format("%s:%s%s", jmxSupport.getDomainName(muleContext, !containerMode), ConnectorServiceMBean.DEFAULT_JMX_NAME_PREFIX, name);
             if (logger.isDebugEnabled())
