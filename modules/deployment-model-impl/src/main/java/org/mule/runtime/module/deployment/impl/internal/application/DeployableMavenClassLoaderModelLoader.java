@@ -6,32 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.eclipse.aether.resolution.DependencyResult;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
-import org.mule.runtime.module.artifact.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.util.JarInfo;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -44,6 +18,32 @@ import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModelFolder;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
+import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarInfo;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoader;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
