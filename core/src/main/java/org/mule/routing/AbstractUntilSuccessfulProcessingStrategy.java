@@ -7,7 +7,6 @@
 package org.mule.routing;
 
 import static org.mule.util.ClassUtils.isConsumable;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
@@ -44,6 +43,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     protected MuleEvent processEvent(final MuleEvent event)
     {
         MuleEvent returnEvent;
+        boolean inputEventHasExceptionPayload = event.getMessage().getExceptionPayload() != null;
         try
         {
             returnEvent = untilSuccessfulConfiguration.getRoute().process(event);
@@ -66,12 +66,15 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
                                                        + event));
         }
 
-        final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(msg);
-        if (errorDetected)
+        if (!inputEventHasExceptionPayload || !untilSuccessfulConfiguration.isUsingDefaultExpression())
         {
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage("Failure expression positive when processing event: "
-                                                       + event));
+            final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(msg);
+            if (errorDetected)
+            {
+                throw new MuleRuntimeException(
+                        MessageFactory.createStaticMessage("Failure expression positive when processing event: "
+                                                           + event));
+            }
         }
         return returnEvent;
     }

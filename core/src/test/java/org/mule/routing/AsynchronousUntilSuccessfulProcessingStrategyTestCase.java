@@ -15,6 +15,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -23,7 +24,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -357,6 +357,46 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, mockEvent);
         verify(mockEvent.getMessage(), times(1)).setPayload(expressionEvalutaionResult);
         verify(mockEvent.getFlowConstruct().getExceptionListener(), never()).handleException(any(Exception.class), eq(mockEvent));
+    }
+
+    @Test
+    public void doNotUseDefaultFailureExpressionIfInputValueHasExceptionPayloadAndFailureExpressionNotConfigured() throws Exception
+    {
+        when(mockEvent.getMessage().getExceptionPayload()).thenReturn(mock(ExceptionPayload.class));
+        when(mockUntilSuccessfulConfiguration.isUsingDefaultExpression()).thenReturn(true);
+        executeUntilSuccessful();
+        waitUntilRouteIsExecuted();
+        verify(mockUntilSuccessfulConfiguration, never()).getFailureExpressionFilter();
+    }
+
+    @Test
+    public void useFailureExpressionIfInputValueHasExceptionPayloadAndFailureExpressionConfigured() throws Exception
+    {
+        when(mockEvent.getMessage().getExceptionPayload()).thenReturn(mock(ExceptionPayload.class));
+        when(mockUntilSuccessfulConfiguration.isUsingDefaultExpression()).thenReturn(false);
+        executeUntilSuccessful();
+        waitUntilRouteIsExecuted();
+        verify(mockUntilSuccessfulConfiguration, atLeast(1)).getFailureExpressionFilter();
+    }
+
+    @Test
+    public void useDefaultFailureExpressionIfInputValueDoesNotHaveExceptionPayload() throws Exception
+    {
+        when(mockEvent.getMessage().getExceptionPayload()).thenReturn(null);
+        when(mockUntilSuccessfulConfiguration.isUsingDefaultExpression()).thenReturn(true);
+        executeUntilSuccessful();
+        waitUntilRouteIsExecuted();
+        verify(mockUntilSuccessfulConfiguration, times(1)).getFailureExpressionFilter();
+    }
+
+    @Test
+    public void useFailureExpressionIfInputValueDoesNotHaveExceptionPayloadAndFailureExpressionNotConfigured() throws Exception
+    {
+        when(mockEvent.getMessage().getExceptionPayload()).thenReturn(null);
+        when(mockUntilSuccessfulConfiguration.isUsingDefaultExpression()).thenReturn(true);
+        executeUntilSuccessful();
+        waitUntilRouteIsExecuted();
+        verify(mockUntilSuccessfulConfiguration, times(1)).getFailureExpressionFilter();
     }
 
     private void executeUntilSuccessfulFailingRoute(FailCallback failCallback) throws Exception

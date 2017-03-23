@@ -44,6 +44,11 @@ public interface UntilSuccessfulConfiguration
     ExpressionFilter getFailureExpressionFilter();
 
     /**
+     * @return true if the {@code failureExpression} was not configured and a default failure expression is being used, false otherwise.
+     */
+    boolean isUsingDefaultExpression();
+
+    /**
      * @return the route to which the message should be routed to. Always returns a not null value.
      */
     MessageProcessor getRoute();
