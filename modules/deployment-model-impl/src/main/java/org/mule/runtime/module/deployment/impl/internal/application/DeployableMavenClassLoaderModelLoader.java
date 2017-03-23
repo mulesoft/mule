@@ -118,28 +118,31 @@ public class DeployableMavenClassLoaderModelLoader extends MavenClassLoaderModel
             plugins.stream().filter(plugin -> plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)
                 && plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)).findFirst();
         packagingPluginOptional.ifPresent(packagingPlugin -> {
-          Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) packagingPlugin.getConfiguration()).getChild("sharedLibraries");
-          if (sharedLibrariesDom != null) {
-            Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren("sharedLibrary");
-            if (sharedLibraries != null) {
-              FileJarExplorer fileJarExplorer = new FileJarExplorer();
-              for (Xpp3Dom sharedLibrary : sharedLibraries) {
-                String groupId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "groupId");
-                String artifactId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "artifactId");
-                Optional<BundleDependency> bundleDependencyOptional = dependencies.stream()
-                    .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(artifactId)
-                        && bundleDependency.getDescriptor().getGroupId().equals(groupId))
-                    .findFirst();
-                bundleDependencyOptional.map(bundleDependency -> {
-                  JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUrl());
-                  classLoaderModelBuilder.exportingPackages(jarInfo.getPackages());
-                  classLoaderModelBuilder.exportingResources(jarInfo.getResources());
-                  return bundleDependency;
-                }).orElseThrow(() -> new MuleRuntimeException(I18nMessageFactory
-                    .createStaticMessage(format(
-                                                "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
-                                                groupId,
-                                                artifactId, applicationFolder.getName()))));
+          Object configuration = packagingPlugin.getConfiguration();
+          if (configuration != null) {
+            Xpp3Dom sharedLibrariesDom = ((Xpp3Dom) configuration).getChild("sharedLibraries");
+            if (sharedLibrariesDom != null) {
+              Xpp3Dom[] sharedLibraries = sharedLibrariesDom.getChildren("sharedLibrary");
+              if (sharedLibraries != null) {
+                FileJarExplorer fileJarExplorer = new FileJarExplorer();
+                for (Xpp3Dom sharedLibrary : sharedLibraries) {
+                  String groupId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "groupId");
+                  String artifactId = getSharedLibraryAttribute(applicationFolder, sharedLibrary, "artifactId");
+                  Optional<BundleDependency> bundleDependencyOptional = dependencies.stream()
+                      .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(artifactId)
+                          && bundleDependency.getDescriptor().getGroupId().equals(groupId))
+                      .findFirst();
+                  bundleDependencyOptional.map(bundleDependency -> {
+                    JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUrl());
+                    classLoaderModelBuilder.exportingPackages(jarInfo.getPackages());
+                    classLoaderModelBuilder.exportingResources(jarInfo.getResources());
+                    return bundleDependency;
+                  }).orElseThrow(() -> new MuleRuntimeException(I18nMessageFactory
+                      .createStaticMessage(format(
+                                                  "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
+                                                  groupId,
+                                                  artifactId, applicationFolder.getName()))));
+                }
               }
             }
           }
