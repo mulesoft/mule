@@ -12,7 +12,7 @@ import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 public class InMemoryCursorStreamProviderObjectFactory
-    extends AbstractCursorStreamProviderObjectFactory<CursorStreamProviderFactory> {
+    extends AbstractCursorProviderObjectFactory<CursorStreamProviderFactory> {
 
   private final int initialBufferSize;
   private final int bufferSizeIncrement;
@@ -34,6 +34,6 @@ public class InMemoryCursorStreamProviderObjectFactory
                                                                        new DataSize(maxInMemorySize, dataUnit));
 
 
-    return streamingManager.forBytes().getInMemoryCursorStreamProviderFactory(config);
+    return streamingManager.forBytes().getInMemoryCursorProviderFactory(config);
   }
 }

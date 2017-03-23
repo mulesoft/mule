@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.ListIterator;
@@ -29,16 +29,16 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
 
   private final ListIterator<Result> delegate;
   private final MediaType mediaType;
-  private final CursorStreamProviderFactory cursorStreamProviderFactory;
+  private final CursorProviderFactory cursorProviderFactory;
   private final Event event;
 
   ResultToMessageListIterator(ListIterator<Result> delegate,
                               MediaType mediaType,
-                              CursorStreamProviderFactory cursorStreamProviderFactory,
+                              CursorProviderFactory cursorProviderFactory,
                               Event event) {
     this.delegate = delegate;
     this.mediaType = mediaType;
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    this.cursorProviderFactory = cursorProviderFactory;
     this.event = event;
   }
 
@@ -49,7 +49,7 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), mediaType, cursorStreamProviderFactory, event);
+    return toMessage(delegate.next(), mediaType, cursorProviderFactory, event);
   }
 
   @Override
@@ -59,7 +59,7 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
 
   @Override
   public Message previous() {
-    return toMessage(delegate.previous(), mediaType, cursorStreamProviderFactory, event);
+    return toMessage(delegate.previous(), mediaType, cursorProviderFactory, event);
   }
 
   @Override
@@ -88,6 +88,6 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
   }
 
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType, cursorStreamProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType, cursorProviderFactory, event)));
   }
 }

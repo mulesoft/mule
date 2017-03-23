@@ -8,7 +8,7 @@ package org.mule.test.marvel.drstrange;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import org.mule.runtime.api.streaming.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.Optional;

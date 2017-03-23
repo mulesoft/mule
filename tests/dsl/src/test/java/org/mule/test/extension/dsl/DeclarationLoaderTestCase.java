@@ -24,7 +24,7 @@ import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrate
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder.MAX_REDELIVERY_COUNT;
 import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder.USE_SECURE_HASH;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
@@ -211,7 +211,7 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                 .withParameter(TARGET_PARAMETER_NAME, "myVar")
                 .withParameter(STREAMING_STRATEGY_PARAMETER_NAME,
                                newObjectValue()
-                                   .ofType(REPEATABLE_IN_MEMORY_STREAM_ALIAS)
+                                   .ofType(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS)
                                    .withParameter("bufferSizeIncrement", "8")
                                    .withParameter("bufferUnit", "KB")
                                    .withParameter("initialBufferSize", "51")

@@ -77,7 +77,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -642,7 +642,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
     assertThat(operation.getModelProperty(PagedOperationModelProperty.class).isPresent(), is(true));
-    assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(PersonalInfo.class)));
+    assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
+    ArrayType outputType = (ArrayType) operation.getOutput().getType();
+    assertThat(outputType.getType(), is(TYPE_LOADER.load(PersonalInfo.class)));
     assertConnected(operation, true);
     assertTransactional(operation, false);
 

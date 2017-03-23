@@ -13,11 +13,11 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.execution.SourceResultAdapter;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -82,8 +82,8 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       return this;
     }
 
-    public Builder<T, A> setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
-      product.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    public Builder<T, A> setCursorStreamProviderFactory(CursorProviderFactory cursorProviderFactory) {
+      product.cursorProviderFactory = cursorProviderFactory;
       return this;
     }
 
@@ -95,7 +95,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       checkArgument(product.processContextSupplier, "processContextSupplier");
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
       checkArgument(product.sourceModel, "sourceModel");
-      checkArgument(product.cursorStreamProviderFactory, "cursorStreamProviderFactory");
+      checkArgument(product.cursorProviderFactory, "cursorStreamProviderFactory");
 
       return product;
     }
@@ -120,7 +120,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;
   private SourceCompletionHandlerFactory completionHandlerFactory;
-  private CursorStreamProviderFactory cursorStreamProviderFactory;
+  private CursorProviderFactory cursorProviderFactory;
   private boolean returnsListOfMessages = false;
 
   private DefaultSourceCallback() {}
@@ -140,7 +140,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   public void handle(Result<T, A> result, SourceCallbackContext context) {
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
-    SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorStreamProviderFactory, returnsListOfMessages);
+    SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorProviderFactory, returnsListOfMessages);
     Message message = Message.builder().payload(resultAdapter).build();
 
     messageProcessingManager.processMessage(new ModuleFlowProcessingTemplate(message,

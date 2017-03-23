@@ -20,9 +20,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STR
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_STREAM;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getId;
@@ -562,7 +562,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       case STREAMING_STRATEGY_PARAMETER_NAME:
         // TODO MULE-12001: switch to EE namespace
         findAnyMatchingChildById(declaredConfigs,
-                                 REPEATABLE_FILE_STORE_STREAM_ALIAS, REPEATABLE_IN_MEMORY_STREAM_ALIAS, NON_REPEATABLE_STREAM)
+                                 REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS,
+                                 NON_REPEATABLE_BYTE_STREAM_ALIAS)
                                      .ifPresent(config -> {
                                        ParameterObjectValue.Builder streaming = newObjectValue().ofType(config.getIdentifier());
                                        cloneAsDeclaration(config, streaming);

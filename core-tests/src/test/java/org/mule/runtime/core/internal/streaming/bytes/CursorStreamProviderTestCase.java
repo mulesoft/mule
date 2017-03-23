@@ -13,12 +13,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
-import org.mule.runtime.api.streaming.CursorStream;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.core.util.func.CheckedRunnable;
@@ -78,7 +76,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
                                        new DataSize(bufferSize / 2, BYTE),
                                        new DataSize(maxBufferSize, BYTE));
 
-    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, mock(Event.class));
+    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager);
   }
 
   @After
@@ -195,13 +193,13 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   }
 
   @Test
-  public void isClosed() throws Exception {
+  public void isFullyConsumed() throws Exception {
     withCursor(cursor -> {
-      assertThat(cursor.isClosed(), is(false));
+      assertThat(cursor.isFullyConsumed(), is(false));
       IOUtils.toString(cursor);
-      assertThat(cursor.isClosed(), is(true));
+      assertThat(cursor.isFullyConsumed(), is(true));
       cursor.seek(0);
-      assertThat(cursor.isClosed(), is(false));
+      assertThat(cursor.isFullyConsumed(), is(false));
     });
   }
 

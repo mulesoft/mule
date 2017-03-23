@@ -23,10 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.manifest.ExtensionManifestBuilder;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
@@ -60,7 +58,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
 
   private static final String JUNIT_MOCK_EXTENSION_MANIFEST_DESCRIPTION = "JUnit Mock Extension Manifest";
   private static final String VERSION = "4.0";
-  private static final String SNAPSHOT_VERSION = "4.0-SNAPSHOT";
+  private static final String SNAPSHOT_VERSION = "4.0.0-SNAPSHOT";
   private static final String PLUGIN_PROPERTIES = "plugin.properties";
 
   @Rule

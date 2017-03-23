@@ -7,18 +7,17 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import org.mule.runtime.api.streaming.CursorStream;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractCursorStreamProviderAdapter implements CursorStreamProviderAdapter {
+public abstract class AbstractCursorStreamProvider implements CursorStreamProvider {
 
   protected final InputStream wrappedStream;
 
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final Event creatorEvent;
   private final ByteBufferManager bufferManager;
 
   /**
@@ -26,12 +25,10 @@ public abstract class AbstractCursorStreamProviderAdapter implements CursorStrea
    *
    * @param wrappedStream the original stream to be decorated
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param event         the {@link Event} in which streaming is taking place
    */
-  public AbstractCursorStreamProviderAdapter(InputStream wrappedStream, ByteBufferManager bufferManager, Event event) {
+  public AbstractCursorStreamProvider(InputStream wrappedStream, ByteBufferManager bufferManager) {
     this.wrappedStream = wrappedStream;
     this.bufferManager = bufferManager;
-    this.creatorEvent = event;
   }
 
   /**
@@ -57,14 +54,6 @@ public abstract class AbstractCursorStreamProviderAdapter implements CursorStrea
   @Override
   public boolean isClosed() {
     return closed.get();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Event getCreatorEvent() {
-    return creatorEvent;
   }
 
   /**

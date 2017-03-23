@@ -46,11 +46,11 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -118,10 +118,10 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    ResolverSet resolverSet,
-                                   CursorStreamProviderFactory cursorStreamProviderFactory,
+                                   CursorProviderFactory cursorProviderFactory,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager) {
-    super(extensionModel, operationModel, configurationProvider, cursorStreamProviderFactory, extensionManager);
+    super(extensionModel, operationModel, configurationProvider, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.resolverSet = resolverSet;
@@ -212,8 +212,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
 
     return !isTargetPresent()
-        ? new ValueReturnDelegate(operationModel, getCursorStreamProviderFactory(), muleContext)
-        : new TargetReturnDelegate(target, operationModel, getCursorStreamProviderFactory(), muleContext);
+        ? new ValueReturnDelegate(operationModel, getCursorProviderFactory(), muleContext)
+        : new TargetReturnDelegate(target, operationModel, getCursorProviderFactory(), muleContext);
   }
 
   private boolean isTargetPresent() {

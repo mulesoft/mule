@@ -13,9 +13,9 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.util.TypesFactory.buildMessageType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.message.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -176,16 +176,20 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
 
     if (Message.class.getName().equals(typeId)) {
       resolvedType = wrapInMessageType(resolvedType, key, metadataContext);
+      return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
     }
 
-    return metadataContext.getTypeBuilder().arrayType().id(typeId).of(resolvedType).build();
+    return resolvedType;
   }
 
   private MetadataType wrapInMessageType(MetadataType type, Object key, MetadataContext context)
       throws MetadataResolvingException {
     MetadataResult<MetadataType> attributes = getOutputAttributesMetadata(context, key);
     if (attributes.isSuccess()) {
-      return buildMessageType(context.getTypeBuilder(), type, attributes.get());
+      return new MessageMetadataTypeBuilder()
+          .payload(type)
+          .attributes(attributes.get())
+          .build();
     } else {
       throw new MetadataResolvingException("Could not resolve attributes of List<Message> output",
                                            attributes.getFailures().stream()

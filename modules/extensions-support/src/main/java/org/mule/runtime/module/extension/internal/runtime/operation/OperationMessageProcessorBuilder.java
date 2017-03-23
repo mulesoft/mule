@@ -14,11 +14,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -35,7 +35,7 @@ public final class OperationMessageProcessorBuilder {
   private ConfigurationProvider configurationProvider;
   private Map<String, ?> parameters;
   private String target;
-  private CursorStreamProviderFactory cursorStreamProviderFactory;
+  private CursorProviderFactory cursorProviderFactory;
 
   public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
                                           OperationModel operationModel,
@@ -68,8 +68,8 @@ public final class OperationMessageProcessorBuilder {
     return this;
   }
 
-  public OperationMessageProcessorBuilder setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+  public OperationMessageProcessorBuilder setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
+    this.cursorProviderFactory = cursorProviderFactory;
     return this;
   }
 
@@ -82,15 +82,15 @@ public final class OperationMessageProcessorBuilder {
         ExtensionManager extensionManager = muleContext.getExtensionManager();
         if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
           processor = new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target,
-                                                                resolverSet, cursorStreamProviderFactory, extensionManager,
+                                                                resolverSet, cursorProviderFactory, extensionManager,
                                                                 policyManager);
         } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                 cursorStreamProviderFactory, extensionManager, policyManager);
+                                                 cursorProviderFactory, extensionManager, policyManager);
         } else {
           processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                    cursorStreamProviderFactory, extensionManager, policyManager);
+                                                    cursorProviderFactory, extensionManager, policyManager);
         }
         // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
         muleContext.getInjector().inject(processor);

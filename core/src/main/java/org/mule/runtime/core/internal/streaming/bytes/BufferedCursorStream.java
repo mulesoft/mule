@@ -7,7 +7,8 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
-import org.mule.runtime.api.streaming.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,7 +22,7 @@ import java.nio.ByteBuffer;
  * @see InputStreamBuffer
  * @since 4.0
  */
-public final class BufferedCursorStream extends BaseCursorStream {
+public final class BufferedCursorStream extends AbstractCursorStream {
 
   private final InputStreamBuffer streamBuffer;
   private final int localBufferSize;
@@ -39,12 +40,11 @@ public final class BufferedCursorStream extends BaseCursorStream {
    * @param streamBuffer    the buffer which provides data
    * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param localBufferSize The size of the intermediate buffer
-   * @param provider        the {@link CursorStreamProviderAdapter} which opened this cursor
    */
   public BufferedCursorStream(InputStreamBuffer streamBuffer,
+                              CursorStreamProvider provider,
                               ByteBufferManager bufferManager,
-                              int localBufferSize,
-                              CursorStreamProviderAdapter provider) {
+                              int localBufferSize) {
     super(provider);
     this.streamBuffer = streamBuffer;
     this.localBufferSize = localBufferSize;
@@ -124,7 +124,7 @@ public final class BufferedCursorStream extends BaseCursorStream {
    * {@inheritDoc}
    */
   @Override
-  protected void dispose() {
+  protected void doRelease() {
     bufferManager.deallocate(memoryBuffer);
   }
 }

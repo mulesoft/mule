@@ -329,6 +329,11 @@
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-message-metadata-model</artifactId>
+                <version>${muleMetadataModelVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-metadata-model-json</artifactId>
                 <version>${muleMetadataModelVersion}</version>
             </dependency>

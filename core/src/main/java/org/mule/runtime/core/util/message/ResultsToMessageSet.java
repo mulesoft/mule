@@ -9,7 +9,7 @@ package org.mule.runtime.core.util.message;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Set;
@@ -30,8 +30,8 @@ public final class ResultsToMessageSet extends ResultsToMessageCollection implem
    */
   public ResultsToMessageSet(Set<Result> delegate,
                              MediaType mediaType,
-                             CursorStreamProviderFactory cursorStreamProviderFactory,
+                             CursorProviderFactory cursorProviderFactory,
                              Event event) {
-    super(delegate, mediaType, cursorStreamProviderFactory, event);
+    super(delegate, mediaType, cursorProviderFactory, event);
   }
 }

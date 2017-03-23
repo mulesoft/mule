@@ -15,7 +15,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.lang.reflect.Field;

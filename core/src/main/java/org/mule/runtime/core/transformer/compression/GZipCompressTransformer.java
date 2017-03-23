@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformer.compression;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.streaming.CursorStreamProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.compression.GZipCompression;
 

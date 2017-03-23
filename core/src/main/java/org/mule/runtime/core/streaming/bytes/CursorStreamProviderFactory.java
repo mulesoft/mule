@@ -6,28 +6,26 @@
  */
 package org.mule.runtime.core.streaming.bytes;
 
-import org.mule.runtime.api.streaming.CursorStreamProvider;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 
 import java.io.InputStream;
 
 /**
- * Creates instances of {@link CursorStreamProvider}
+ * Specialization of {@link CursorStreamProvider} which creates {@link CursorStreamProvider} instances
+ * out of {@link InputStream} instances
  *
  * @since 4.0
  */
-public interface CursorStreamProviderFactory {
+public interface CursorStreamProviderFactory extends CursorProviderFactory<CursorStreamProvider, InputStream> {
 
   /**
-   * Optionally creates a new {@link CursorStreamProvider} to buffer the given {@code inputStream}.
-   * <p>
-   * Implementations might resolve that the given stream is/should not be buffered and thus
-   * it will return the same given stream. In that case, the stream will be unaltered.
+   * {@inheritDoc}
    *
-   * @param event       the event on which buffering is talking place
-   * @param inputStream the stream to be buffered
-   * @return {@link Either} a {@link CursorStreamProvider} or the same given {@code inputStream}
+   * @return {@code true} if the value is an {@link InputStream}
    */
-  Either<CursorStreamProvider, InputStream> of(Event event, InputStream inputStream);
+  @Override
+  default boolean accepts(Object value) {
+    return value instanceof InputStream;
+  }
 }

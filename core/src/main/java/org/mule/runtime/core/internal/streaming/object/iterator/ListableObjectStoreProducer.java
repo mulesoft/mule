@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.streaming.object;
+package org.mule.runtime.core.internal.streaming.object.iterator;
 
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;

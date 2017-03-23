@@ -5141,22 +5141,22 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!--===========-->
-    <!-- Streaming -->
-    <!--===========-->
+    <!--=================-->
+    <!-- Bytes Streaming -->
+    <!--=================-->
 
-    <xsd:element name="abstract-streaming-strategy" abstract="true">
+    <xsd:element name="abstract-byte-streaming-strategy" abstract="true">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a reconnection strategy element. Reconnection strategies define how Mule should attempt to handle a connection failure.
+                A placeholder for a bytes streaming strategy element. This element allows to configure repeatable streams behaviour
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-streaming-strategy">
+    <xsd:element name="repeatable-in-memory-stream" type="repeatableInMemoryStreamType" substitutionGroup="abstract-byte-streaming-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                This configuration uses an in-memory buffer to provide repeatable access to any input stream.
+                This strategy uses an in-memory buffer to provide repeatable access to any input stream.
                 It uses a buffer with an initial buffer size, which can be expanded up to a configurable threshold.
                 This is the most performant way of providing repeatable access, as long as the size of all the concurrent
                 stream contents fits into memory
@@ -5205,10 +5205,10 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="non-repeatable-stream" type="nonRepeatableStreamType" substitutionGroup="abstract-streaming-strategy">
+    <xsd:element name="non-repeatable-stream" type="nonRepeatableStreamType" substitutionGroup="abstract-byte-streaming-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                This configuration allows the input stream to be read only once. It will not allow to seek randomly
+                This strategy only allows the input stream to be read. It will not allow to seek randomly
                 which will limit the transformations that DW can perform on this stream.
                 Use this option for use cases which just require moving data around from one system to another to get optimum performance.
             </xsd:documentation>
@@ -5216,6 +5216,79 @@
     </xsd:element>
 
     <xsd:complexType name="nonRepeatableStreamType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType" />
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--===================-->
+    <!-- Objects Streaming -->
+    <!--===================-->
+
+    <xsd:element name="abstract-object-streaming-strategy" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for an object streaming strategy element. This element allows to configure repeatable streams behaviour
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="repeatable-in-memory-iterable" type="repeatableInMemoryIterableType" substitutionGroup="abstract-object-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                This strategy uses an in-memory buffer to provide repeatable access to the object stream. It uses a buffer
+                with an initial buffer size, which can be expanded up to a configurable threshold. This is the most performant way
+                of providing repeatable access, as long as the size of all the concurrent stream contents fits into memory.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="repeatableInMemoryIterableType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="initialBufferSize" type="substitutableInt" use="optional" default="100">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This is the amount of instances that will be initially be allowed to be kept in memory in order to
+                            consume the stream and provide random access to it. If the stream contains more data than can fit
+                            into this buffer, then it will be expanded according to the bufferSizeIncrement attribute, with an upper
+                            limit of maxInMemorySize. Default value is 100 instances.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="bufferSizeIncrement" type="substitutableInt" use="optional" default="100">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This is by how much will the buffer size by expanded if it exceeds its initial size. Setting a value of zero or
+                            lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised
+                            when the buffer gets full. Default value is 100 instances.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxInMemorySize" type="substitutableInt" use="optional" default="500">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This is the maximum amount of instances that will be kept in memory. If more than that are required,
+                            then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit.
+                            Default value is 500 instances.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="non-repeatable-iterable" type="nonRepeatableIterableType" substitutionGroup="abstract-object-streaming-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                This strategy only allows the stream to be read once. It will not allow to seek randomly
+                which will limit the transformations that DW can perform on this stream.
+                Use this option for use cases which just require moving data around from one system to another to get optimum performance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="nonRepeatableIterableType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType" />
         </xsd:complexContent>

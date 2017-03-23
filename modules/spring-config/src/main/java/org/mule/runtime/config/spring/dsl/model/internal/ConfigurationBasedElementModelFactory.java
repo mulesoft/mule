@@ -24,9 +24,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STR
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_STREAM;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -588,9 +588,11 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_STREAM, paramDsl.getPrefix());
-        ComponentIdentifier repeatableMemoryStream = newIdentifier(REPEATABLE_IN_MEMORY_STREAM_ALIAS, paramDsl.getPrefix());
-        ComponentIdentifier repeatableFileStream = newIdentifier(REPEATABLE_FILE_STORE_STREAM_ALIAS, paramDsl.getPrefix());
+        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, paramDsl.getNamespace());
+        ComponentIdentifier repeatableMemoryStream =
+            newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, paramDsl.getNamespace());
+        ComponentIdentifier repeatableFileStream =
+            newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, paramDsl.getNamespace());
 
         ComponentConfiguration streaming = null;
         if (nested.containsKey(inMemoryStream)) {

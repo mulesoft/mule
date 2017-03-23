@@ -10,7 +10,7 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -29,7 +29,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private final PolicyManager policyManager;
   private ConfigurationProvider configuration;
   private String target = EMPTY;
-  private CursorStreamProviderFactory cursorStreamProviderFactory;
+  private CursorProviderFactory cursorProviderFactory;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 OperationModel operationModel,
@@ -47,7 +47,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
         .setConfigurationProvider(configuration)
         .setParameters(parameters)
         .setTarget(target)
-        .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+        .setCursorProviderFactory(cursorProviderFactory)
         .build();
   }
 
@@ -59,7 +59,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
     this.target = target;
   }
 
-  public void setCursorStreamProviderFactory(CursorStreamProviderFactory cursorStreamProviderFactory) {
-    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+  public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
+    this.cursorProviderFactory = cursorProviderFactory;
   }
 }

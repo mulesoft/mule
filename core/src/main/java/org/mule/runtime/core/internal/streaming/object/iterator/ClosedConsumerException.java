@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.object;
+package org.mule.runtime.core.internal.streaming.object.iterator;
 
 /**
  * Exception to signal that a consumer you're trying to access is already closed
