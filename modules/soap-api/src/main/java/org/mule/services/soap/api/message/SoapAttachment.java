@@ -15,7 +15,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public class SoapAttachment {
+public class SoapAttachment implements WithContentType {
 
   private final MediaType contentType;
   private final String id;
@@ -33,6 +33,7 @@ public class SoapAttachment {
     this.content = content;
   }
 
+  @Override
   public MediaType getContentType() {
     return contentType;
   }
