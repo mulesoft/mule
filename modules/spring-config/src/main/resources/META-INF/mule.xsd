@@ -5879,14 +5879,16 @@
 
     <xsd:group name="propertiesGroup">
         <xsd:sequence>
-            <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Sets a Mule property. This is a name/value pair that can be set on components, services, etc., and which provide a generic way of configuring the system. Typically, you shouldn't need to use a generic property like this, since almost all functionality is exposed via dedicated elements.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element ref="properties" minOccurs="0"/>
+            <xsd:choice>
+                <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Sets a Mule property. This is a name/value pair that can be set on components, services, etc., and which provide a generic way of configuring the system. Typically, you shouldn't need to use a generic property like this, since almost all functionality is exposed via dedicated elements.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element ref="properties" minOccurs="0"/>
+            </xsd:choice>
         </xsd:sequence>
     </xsd:group>
 

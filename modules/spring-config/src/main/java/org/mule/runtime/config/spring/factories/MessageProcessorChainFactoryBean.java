@@ -9,10 +9,10 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 
 import java.util.List;
@@ -47,6 +47,7 @@ public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObject im
       }
     }
     MessageProcessorChain messageProcessorChain = builder.build();
+    messageProcessorChain.setMuleContext(muleContext);
     messageProcessorChain.setAnnotations(getAnnotations());
     return messageProcessorChain;
   }
