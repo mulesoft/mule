@@ -5228,7 +5228,7 @@
     <xsd:element name="abstract-object-streaming-strategy" abstract="true">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a object streaming strategy element. This element allows to configure repeatable streams behaviour
+                A placeholder for an object streaming strategy element. This element allows to configure repeatable streams behaviour
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
