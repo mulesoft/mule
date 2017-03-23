@@ -71,6 +71,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     private boolean synchronous = false;
     private ThreadingProfile threadingProfile;
     private UntilSuccessfulProcessingStrategy untilSuccessfulStrategy;
+    private boolean usingDefaultExpression;
 
     @Override
     public void initialise() throws InitialisationException
@@ -128,6 +129,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
         }
         else
         {
+            usingDefaultExpression = true;
             failureExpressionFilter = new ExpressionFilter("exception-type:");
         }
         failureExpressionFilter.setMuleContext(muleContext);
@@ -220,6 +222,11 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     protected MuleEvent route(final MuleEvent event) throws MessagingException
     {
         return untilSuccessfulStrategy.route(event);
+    }
+
+    public boolean isUsingDefaultExpression()
+    {
+        return usingDefaultExpression;
     }
 
     @Override
