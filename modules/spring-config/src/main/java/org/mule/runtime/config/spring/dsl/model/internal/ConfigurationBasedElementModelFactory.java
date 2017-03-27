@@ -588,11 +588,11 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, paramDsl.getNamespace());
+        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, paramDsl.getPrefix());
         ComponentIdentifier repeatableMemoryStream =
-            newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, paramDsl.getNamespace());
+            newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, paramDsl.getPrefix());
         ComponentIdentifier repeatableFileStream =
-            newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, paramDsl.getNamespace());
+            newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, paramDsl.getPrefix());
 
         ComponentConfiguration streaming = null;
         if (nested.containsKey(inMemoryStream)) {
