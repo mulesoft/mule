@@ -14,10 +14,11 @@ import java.net.ServerSocket;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
-import java.nio.file.Paths;
+import static java.nio.file.Paths.get;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -49,9 +50,14 @@ public class FreePortFinder
             try
             {
                 int port = minPortNumber + random.nextInt(portRange);
-                String portFile = String.valueOf(port) + LOCK_FILE_EXTENSION;
-                FileChannel channel = FileChannel.open(Paths.get(portFile), CREATE, WRITE);
+                String portFile = port + LOCK_FILE_EXTENSION;
+                FileChannel channel = FileChannel.open(get(portFile), CREATE, WRITE);
                 FileLock lock = channel.tryLock();
+                if (lock == null)
+                {
+                    // If the lock couldn't be acquired and tryLock didn't throw the exception, we throw it here
+                    throw new OverlappingFileLockException();
+                }
 
                 if (isPortFree(port))
                 {
