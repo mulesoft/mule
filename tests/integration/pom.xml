@@ -26,6 +26,9 @@
                 <configuration>
                     <!-- TODO: We should be able to remove the PermGen config after we fix MULE-10010 -->
                     <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
+                    <systemPropertyVariables>
+                        <javax.xml.transform.TransformerFactory>org.apache.xalan.processor.TransformerFactoryImpl</javax.xml.transform.TransformerFactory>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 		</plugins>
@@ -168,8 +171,13 @@
 			<artifactId>xapool</artifactId>
 			<version>${xaPoolVersion}</version>
 		</dependency>
-
-
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-spring-extras</artifactId>
@@ -215,5 +223,23 @@
             <artifactId>mule-tests-infrastructure</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>${xalanVersion}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>${xercesVersion}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>${xmlApisVersion}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
