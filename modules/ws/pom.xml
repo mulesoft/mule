@@ -12,6 +12,20 @@
     <name>Web Services</name>
     <description>Provides components for working with Web Services.</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <javax.xml.transform.TransformerFactory>org.apache.xalan.processor.TransformerFactoryImpl</javax.xml.transform.TransformerFactory>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -51,6 +65,31 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalanVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xercesVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xmlApisVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
