@@ -39,6 +39,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
@@ -136,6 +137,7 @@ import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
 import org.mule.runtime.core.config.QueueProfile;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
@@ -807,6 +809,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .withIgnoredConfigurationParameter(NAME)
         .build());
+
+    componentBuildingDefinitions.add(
+            baseDefinition.copy().withIdentifier("expression-component")
+            .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
+            .withSetterParameterDefinition("expression", fromTextContent().build())
+            .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
+            .build()
+    );
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());

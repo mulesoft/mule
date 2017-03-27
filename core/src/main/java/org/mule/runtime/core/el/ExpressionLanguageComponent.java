@@ -19,11 +19,13 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class ExpressionLanguageComponent extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, FlowConstructAware, Initialisable {
+    implements Processor, FlowConstructAware, Initialisable {
 
+  @Inject
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
   protected String expression;
@@ -57,7 +59,6 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject
     this.expressionFile = expressionFile;
   }
 
-  @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
