@@ -7,23 +7,24 @@
 
 package org.mule.module.ws.consumer;
 
+import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
+
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AbstractWSDLServerTestCase extends FunctionalTestCase
 {
@@ -75,34 +76,31 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
      */
     public static class TestServer
     {
-
         private int serverPort;
         private Server server;
 
-        public TestServer(int serverPort) { this.serverPort = serverPort; }
+        public TestServer(int serverPort)
+        {
+            this.serverPort = serverPort;
+        }
 
         public void start() throws Exception
         {
             server = new Server(serverPort);
-
             String contentsType = APPLICATION_XML_UTF_8.toString();
             String contents = IOUtils.toString(this.getClass().getResourceAsStream(WSDL_FILE_LOCATION), UTF_8.name());
             server.setHandler(new TestHandler(contentsType, contents));
-
             server.start();
-
         }
 
         public void stop() throws Exception
         {
             server.stop();
         }
-
     }
 
     public static class TestHandler extends AbstractHandler
     {
-
         private final String contentsType;
         private final String contents;
 
@@ -119,7 +117,6 @@ public class AbstractWSDLServerTestCase extends FunctionalTestCase
             response.setContentLength(contents.length());
             response.getWriter().write(contents);
         }
-
     }
 
 }
