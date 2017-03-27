@@ -147,7 +147,7 @@ final class ObjectTypeSchemaDelegate {
 
       if (typeDsl.isWrapped()) {
         objectElement.getComplexType()
-            .setSequence(builder.createTypeRefChoiceLocalOrGlobal(typeDsl, metadataType, ZERO, UNBOUNDED));
+            .setChoice(builder.createTypeRefChoiceLocalOrGlobal(typeDsl, metadataType, ZERO, UNBOUNDED));
 
       } else {
         ExplicitGroup sequence = new ExplicitGroup();

@@ -235,7 +235,7 @@ public class ComponentModel {
 
     parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
-    customAttributes.forEach(builder::addCustomAttribute);
+    customAttributes.forEach(builder::withProperty);
 
     return builder.build();
   }

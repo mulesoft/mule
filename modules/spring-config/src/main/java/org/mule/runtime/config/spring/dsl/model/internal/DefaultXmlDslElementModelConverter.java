@@ -4,13 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.model;
+package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
+import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -21,17 +27,13 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.config.spring.dsl.model.DslElementModel;
+import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -39,6 +41,7 @@ import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import java.util.List;
 import java.util.Optional;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -64,7 +67,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private final Document doc;
 
-  DefaultXmlDslElementModelConverter(Document owner) {
+  public DefaultXmlDslElementModelConverter(Document owner) {
     this.doc = owner;
   }
 
@@ -85,8 +88,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private String getPrefix(DslElementSyntax dsl, ComponentConfiguration configuration) {
-    return configuration.getCustomAttribute(DECLARED_PREFIX).isPresent()
-        ? configuration.getCustomAttribute(DECLARED_PREFIX).get().toString()
+    return configuration.getProperty(DECLARED_PREFIX).isPresent()
+        ? configuration.getProperty(DECLARED_PREFIX).get().toString()
         : dsl.getPrefix();
   }
 
@@ -142,8 +145,12 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Optional<String> getCustomizedValue(DslElementModel elementModel) {
-    Optional<String> defaultValue = getDefaultValue(elementModel.getDsl().getAttributeName(), elementModel.getModel());
     String value = (String) elementModel.getValue().get();
+    if (elementModel.isExplicitInDsl()) {
+      return Optional.of(value);
+    }
+
+    Optional<String> defaultValue = getDefaultValue(elementModel.getDsl().getAttributeName(), elementModel.getModel());
     if (!defaultValue.isPresent() || !defaultValue.get().equals(value)) {
       return Optional.of(value);
     }
@@ -172,7 +179,6 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
                                               "xmlns", CORE_NAMESPACE);
       return doc.createElementNS(CORE_NAMESPACE, name);
     }
-
   }
 
   private boolean isInfrastructure(DslElementModel elementModel) {
@@ -214,9 +220,16 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private Element createTLS(ComponentConfiguration config) {
     String namespaceURI = "http://www.mulesoft.org/schema/mule/tls";
-    doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
-                                            "xmlns:tls",
-                                            namespaceURI);
+    String tlsSchemaLocation = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
+
+    Attr schemaLocation = doc.getDocumentElement().getAttributeNode("xsi:schemaLocation");
+    if (schemaLocation != null && !schemaLocation.getValue().contains(namespaceURI)) {
+      doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
+                                              "xmlns:tls", namespaceURI);
+      doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                                              "xsi:schemaLocation",
+                                              schemaLocation.getValue() + " " + namespaceURI + " " + tlsSchemaLocation);
+    }
 
     Element nested = doc.createElementNS(namespaceURI, TLS_PREFIX + ":" + config.getIdentifier().getName());
     config.getParameters().forEach(nested::setAttribute);

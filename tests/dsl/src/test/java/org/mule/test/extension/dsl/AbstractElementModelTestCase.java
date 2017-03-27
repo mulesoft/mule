@@ -166,24 +166,23 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
   // Scaffolding
   protected ApplicationModel loadApplicationModel() throws Exception {
+    return loadApplicationModel(getConfigFile());
+  }
 
-    InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(getConfigFile());
+  protected ApplicationModel loadApplicationModel(String configFile) throws Exception {
+    InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFile);
     checkArgument(appIs != null, "The given application was not found as resource");
 
     Document document = new XmlConfigurationDocumentLoader()
-        .loadDocument(of(muleContext.getExtensionManager()), getConfigFile(), appIs);
+        .loadDocument(of(muleContext.getExtensionManager()), configFile, appIs);
 
-    ConfigLine configLine = new XmlApplicationParser(
-                                                     new XmlApplicationServiceRegistry(new SpiServiceRegistry(),
-                                                                                       DslResolvingContext.getDefault(muleContext
-                                                                                           .getExtensionManager()
-                                                                                           .getExtensions())))
-                                                                                               .parse(document
-                                                                                                   .getDocumentElement())
-                                                                                               .orElseThrow(() -> new Exception("Failed to load config"));
+    XmlApplicationServiceRegistry customRegistry = new XmlApplicationServiceRegistry(new SpiServiceRegistry(), dslContext);
+    ConfigLine configLine = new XmlApplicationParser(customRegistry)
+        .parse(document.getDocumentElement())
+        .orElseThrow(() -> new Exception("Failed to load config"));
 
     ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
-        .addConfigFile(new ConfigFile(getConfigFile(), singletonList(configLine)))
+        .addConfigFile(new ConfigFile(configFile, singletonList(configLine)))
         .build();
 
     return new ApplicationModel(artifactConfig, new ArtifactDeclaration());
@@ -198,7 +197,6 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
     DOMSource source = new DOMSource(doc);
-
     StringWriter writer = new StringWriter();
     transformer.transform(source, new StreamResult(writer));
     return writer.getBuffer().toString().replaceAll("\n|\r", "");

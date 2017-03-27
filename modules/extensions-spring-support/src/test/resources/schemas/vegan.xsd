@@ -77,8 +77,8 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
-                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
+                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
+                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
@@ -622,8 +622,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="food">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="0" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>

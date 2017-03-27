@@ -79,7 +79,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.spring.dsl.api.XmlArtifactDeclarationLoader;
+import org.mule.runtime.config.spring.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
@@ -178,7 +178,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
 
           List<ConfigLine> configComplexParameters = configLine.getChildren().stream()
-              .filter(config -> declareAsConnectionProvider(model, configurationDeclarer, config))
+              .filter(config -> declareAsConnectionProvider(ownerExtension, model, configurationDeclarer, config))
               .collect(toList());
 
 
@@ -189,11 +189,18 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         }
       }
 
-      private boolean declareAsConnectionProvider(ConfigurationModel model, ConfigurationElementDeclarer configurationDeclarer,
+      private boolean declareAsConnectionProvider(ExtensionModel ownerExtension,
+                                                  ConfigurationModel model, ConfigurationElementDeclarer configurationDeclarer,
                                                   ConfigLine config) {
         Optional<ConnectionProviderModel> connectionProvider = model.getConnectionProviders().stream()
             .filter(cp -> dsl.resolve(cp).getElementName().equals(config.getIdentifier()))
             .findFirst();
+
+        if (!connectionProvider.isPresent()) {
+          connectionProvider = ownerExtension.getConnectionProviders().stream()
+              .filter(cp -> dsl.resolve(cp).getElementName().equals(config.getIdentifier()))
+              .findFirst();
+        }
 
         if (!connectionProvider.isPresent()) {
           return true;
@@ -288,8 +295,15 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
           declareParameterizedComponent(model, elementDsl, scope, line.getConfigAttributes(), line.getChildren());
 
-          declareRoute(model.getRouteModel(), elementDsl, line, extensionElementsDeclarer, dsl)
-              .ifPresent(scope::withRoute);
+          RouteModel routeModel = model.getRouteModel();
+          RouteElementDeclarer route = extensionElementsDeclarer.newRoute(routeModel.getName());
+          line.getChildren().forEach(child -> {
+            ExtensionModel extensionModel = getExtensionModel(child);
+            getComponentDeclaringWalker(route::withComponent, child, forExtension(extensionModel.getName()), dsl)
+                .walk(extensionModel);
+          });
+
+          scope.withRoute(route.getDeclaration());
 
           declarationConsumer.accept(scope.getDeclaration());
           stop();

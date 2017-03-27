@@ -429,12 +429,12 @@ public final class SchemaBuilder {
     choice.setMaxOccurs(maxOccurs);
 
     QName refAbstract = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
-    TopLevelElement localAbstractElementRef = createRefElement(refAbstract, false);
+    TopLevelElement localAbstractElementRef = createRefElement(refAbstract, true);
     choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
 
     QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
                                 typeDsl.getPrefix());
-    TopLevelElement topLevelElementRef = createRefElement(refGlobal, false);
+    TopLevelElement topLevelElementRef = createRefElement(refGlobal, true);
     choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
 
     return choice;

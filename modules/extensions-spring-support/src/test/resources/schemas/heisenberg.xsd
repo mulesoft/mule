@@ -110,8 +110,8 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
                                 </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
@@ -122,8 +122,8 @@
                                 <xs:element minOccurs="0" maxOccurs="unbounded" name="investment-spin-off">
                                     <xs:complexType>
                                         <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                            <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
-                                            <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
                                         </xs:choice>
                                         <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
                                         <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
@@ -135,8 +135,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="investment-plan-b">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -342,8 +342,8 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
@@ -351,8 +351,8 @@
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                     </xs:choice>
                                 </xs:sequence>
                             </xs:complexType>
@@ -363,8 +363,8 @@
                                     <xs:element minOccurs="0" maxOccurs="unbounded" name="weapon-value-map">
                                         <xs:complexType>
                                             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                             </xs:choice>
                                             <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
                                             <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
@@ -818,8 +818,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="investment">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -1163,8 +1163,8 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                 </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
@@ -1188,8 +1188,8 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                 </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
@@ -1234,8 +1234,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -1423,8 +1423,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
@@ -1447,8 +1447,8 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                 </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
@@ -1472,8 +1472,8 @@
                         <xs:complexType>
                             <xs:sequence>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                                 </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
@@ -1496,8 +1496,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>

@@ -17,8 +17,8 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="required-extensible-pojo">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" minOccurs="0" maxOccurs="1" ref="global-pojo:abstract-extensible-owner"></xs:element>
-                                    <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" minOccurs="0" maxOccurs="1" ref="global-pojo:global-abstract-extensible-owner"></xs:element>
+                  <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" minOccurs="1" maxOccurs="1" ref="global-pojo:abstract-extensible-owner"></xs:element>
+                  <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" minOccurs="1" maxOccurs="1" ref="global-pojo:global-abstract-extensible-owner"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
