@@ -10,7 +10,11 @@ import static org.mule.runtime.api.component.location.Location.builder;
 
 import org.junit.Test;
 
-public class MetadataNoRefStaticConfigurationTestCase extends MetadataExtensionFunctionalTestCase {
+public class MetadataNoRefStaticConfigurationTestCase extends AbstractMetadataOperationTestCase {
+
+  public MetadataNoRefStaticConfigurationTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+  }
 
   @Override
   protected String getConfigFile() {

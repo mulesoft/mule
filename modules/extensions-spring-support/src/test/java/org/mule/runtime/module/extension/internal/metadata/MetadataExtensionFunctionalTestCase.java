@@ -32,7 +32,6 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -53,13 +52,14 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunctionalTestCase {
+public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel<T>> extends ExtensionFunctionalTestCase {
 
   protected static final String METADATA_TEST = "metadata-tests.xml";
   protected static final String DSQL_QUERY = "dsql:SELECT id FROM Circle WHERE (diameter < 18)";
@@ -116,16 +116,11 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected final static MetadataKey PERSON_METADATA_KEY = newKey(PERSON).build();
   protected static final MetadataKey CAR_KEY = newKey(CAR).build();
   protected static final MetadataKey LOCATION_MULTILEVEL_KEY =
-      PartAwareMetadataKeyBuilder.newKey(AMERICA, CONTINENT).withChild(PartAwareMetadataKeyBuilder.newKey(USA, COUNTRY)
-          .withChild(PartAwareMetadataKeyBuilder.newKey(SAN_FRANCISCO, CITY))).build();
+      MultilevelMetadataKeyBuilder.newKey(AMERICA, CONTINENT).withChild(MultilevelMetadataKeyBuilder.newKey(USA, COUNTRY)
+          .withChild(MultilevelMetadataKeyBuilder.newKey(SAN_FRANCISCO, CITY))).build();
 
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
-
-  private static final MetadataComponentDescriptorProvider<OperationModel> explicitMetadataResolver =
-      MetadataService::getOperationMetadata;
-  private static final MetadataComponentDescriptorProvider<OperationModel> dslMetadataResolver =
-      (metadataService, componentId, key) -> metadataService.getOperationMetadata(componentId);
 
   protected MetadataType personType;
   protected Location location;
@@ -133,10 +128,13 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected MetadataService metadataService;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
-  protected MetadataComponentDescriptorProvider provider;
+  protected MetadataComponentDescriptorProvider<T> provider;
 
-  @Parameterized.Parameter
-  public ResolutionType resolutionType;
+  protected ResolutionType resolutionType;
+
+  MetadataExtensionFunctionalTestCase(ResolutionType resolutionType) {
+    this.resolutionType = resolutionType;
+  }
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -156,22 +154,13 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     event = eventBuilder().message(InternalMessage.of("")).build();
     metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
-    setProvider();
-  }
-
-  protected void setProvider() {
-    if (resolutionType == EXPLICIT_RESOLUTION) {
-      provider = explicitMetadataResolver;
-    } else {
-      provider = dslMetadataResolver;
-    }
   }
 
   enum ResolutionType {
     EXPLICIT_RESOLUTION, DSL_RESOLUTION
   }
 
-  <T extends ComponentModel<T>> MetadataResult<ComponentMetadataDescriptor<T>> getComponentDynamicMetadata(MetadataKey key) {
+  MetadataResult<ComponentMetadataDescriptor<T>> getComponentDynamicMetadata(MetadataKey key) {
     checkArgument(location != null, "Unable to resolve Metadata. The location has not been configured.");
     return provider.resolveDynamicMetadata(metadataService, location, key);
   }
@@ -180,13 +169,21 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     return getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
   }
 
-  <T extends ComponentModel<T>> ComponentMetadataDescriptor<T> getSuccessComponentDynamicMetadata(MetadataKey key) {
+  ComponentMetadataDescriptor<T> getSuccessComponentDynamicMetadataWithKey(MetadataKey key) {
+    return getSuccessComponentDynamicMetadata(key, this::assertResolvedKey);
+  }
+
+  ComponentMetadataDescriptor<T> getSuccessComponentDynamicMetadata(MetadataKey key) {
+    return getSuccessComponentDynamicMetadata(key, (a, b) -> {
+    });
+  }
+
+  private ComponentMetadataDescriptor<T> getSuccessComponentDynamicMetadata(MetadataKey key,
+                                                                            BiConsumer<MetadataResult<ComponentMetadataDescriptor<T>>, MetadataKey> assertKeys) {
     MetadataResult<ComponentMetadataDescriptor<T>> componentMetadata = getComponentDynamicMetadata(key);
     String msg = componentMetadata.getFailures().stream().map(f -> "Failure: " + f.getMessage()).collect(joining(", "));
     assertThat(msg, componentMetadata.isSuccess(), is(true));
-    if (!key.getId().equals(NULL_METADATA_KEY.getId())) {
-      assertResolvedKey(componentMetadata, key);
-    }
+    assertKeys.accept(componentMetadata, key);
     return componentMetadata.get();
   }
 

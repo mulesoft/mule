@@ -21,7 +21,11 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import org.junit.Test;
 
-public class MetadataNoRefDynamicConfigurationTestCase extends MetadataExtensionFunctionalTestCase {
+public class MetadataNoRefDynamicConfigurationTestCase extends AbstractMetadataOperationTestCase {
+
+  public MetadataNoRefDynamicConfigurationTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+  }
 
   @Override
   protected String getConfigFile() {

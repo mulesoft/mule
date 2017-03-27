@@ -145,7 +145,7 @@ final class MetadataKeyIdObjectResolver {
    * @throws MetadataResolvingException
    */
   MetadataKey reconstructKeyFromType(Object resolvedKey) throws MetadataResolvingException {
-    if (isKeyLess()) {
+    if (isKeyLess() || resolvedKey == null) {
       return new NullMetadataKey();
     }
 
@@ -153,35 +153,30 @@ final class MetadataKeyIdObjectResolver {
       return newKey(valueOf(resolvedKey)).build();
     }
 
-    Reference<MetadataKeyBuilder> rootBuilder = new Reference<>();
-    Reference<MetadataKeyBuilder> childBuilder = new Reference<>();
-    Reference<MetadataResolvingException> exceptionReference = new Reference<>();
+    MetadataKeyBuilder rootBuilder = null;
+    MetadataKeyBuilder childBuilder = null;
 
-    keyParts.stream()
-        .filter(p -> p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
-        .forEach(p -> {
-          try {
-            MetadataKeyBuilder fieldBuilder =
-                getKeyFromField(resolvedKey, p.getModelProperty(DeclaringMemberModelProperty.class).get());
-            if (rootBuilder.get() == null) {
-              rootBuilder.set(fieldBuilder);
-              childBuilder.set(rootBuilder.get());
-            } else {
-              childBuilder.get().withChild(fieldBuilder);
-              childBuilder.set(fieldBuilder);
-            }
-          } catch (Exception e) {
-            exceptionReference
-                .set(new MetadataResolvingException("Could not construct Metadata Key part for parameter " + p.getName(),
-                                                    FailureCode.INVALID_METADATA_KEY, e));
+
+    for (ParameterModel p : keyParts) {
+      try {
+        if (p.getModelProperty(DeclaringMemberModelProperty.class).isPresent()) {
+          MetadataKeyBuilder fieldBuilder =
+              getKeyFromField(resolvedKey, p.getModelProperty(DeclaringMemberModelProperty.class).get());
+          if (rootBuilder == null) {
+            rootBuilder = fieldBuilder;
+            childBuilder = rootBuilder;
+          } else {
+            childBuilder.withChild(fieldBuilder);
+            childBuilder = fieldBuilder;
           }
-        });
-
-    if (exceptionReference.get() != null) {
-      throw exceptionReference.get();
+        }
+      } catch (Exception e) {
+        throw new MetadataResolvingException("Could not construct Metadata Key part for parameter " + p.getName(),
+                                             FailureCode.INVALID_METADATA_KEY, e);
+      }
     }
 
-    return rootBuilder.get().build();
+    return rootBuilder != null ? rootBuilder.build() : new NullMetadataKey();
   }
 
   private MetadataKeyIdModelProperty findMetadataKeyIdModelProperty(ComponentModel component)
@@ -257,7 +252,10 @@ final class MetadataKeyIdObjectResolver {
         .findAny();
   }
 
-  private boolean isKeyLess() {
+  /**
+   * @return whether the resolver needs a {@link MetadataKey} or not
+   */
+  public boolean isKeyLess() {
     return keyParts.isEmpty();
   }
 

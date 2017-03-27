@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
@@ -145,8 +146,13 @@ public final class MetadataMediator<T extends ComponentModel<T>> {
         keyValue = keyValueResult.get();
       }
 
+      if (keyValue == null && !keyIdObjectResolver.isKeyLess()) {
+        return failure(newFailure().withFailureCode(INVALID_METADATA_KEY).withMessage("MetadataKey resolved to null")
+            .onComponent());
+      }
+
       MetadataAttributes.MetadataAttributesBuilder builder = MetadataAttributes.builder();
-      if (keyValue != null) {
+      if (!keyIdObjectResolver.isKeyLess()) {
         builder.withKey(keyIdObjectResolver.reconstructKeyFromType(keyValue));
       }
 

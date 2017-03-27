@@ -16,21 +16,21 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
  *
  * @since 4.0
  */
-public class PartAwareMetadataKeyBuilder extends MetadataKeyBuilder {
+public class MultilevelMetadataKeyBuilder extends MetadataKeyBuilder {
 
-  private PartAwareMetadataKeyBuilder(String id, String partName) {
+  private MultilevelMetadataKeyBuilder(String id, String partName) {
     super(id);
     setPartName(partName);
   }
 
   /**
-   * Creates and returns new instance of a {@link PartAwareMetadataKeyBuilder}, to help building a new {@link MetadataKey}
+   * Creates and returns new instance of a {@link MultilevelMetadataKeyBuilder}, to help building a new {@link MetadataKey}
    * represented by the given {@param id}
    *
    * @param id of the {@link MetadataKey} to be created
-   * @return an initialized instance of {@link PartAwareMetadataKeyBuilder}
+   * @return an initialized instance of {@link MultilevelMetadataKeyBuilder}
    */
-  public static PartAwareMetadataKeyBuilder newKey(String id, String partName) {
-    return new PartAwareMetadataKeyBuilder(id, partName);
+  public static MultilevelMetadataKeyBuilder newKey(String id, String partName) {
+    return new MultilevelMetadataKeyBuilder(id, partName);
   }
 }

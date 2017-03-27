@@ -20,7 +20,11 @@ import org.mule.test.metadata.extension.model.animals.AnimalClade;
 
 import org.junit.Test;
 
-public class RuntimeMetadataTestCase extends MetadataExtensionFunctionalTestCase {
+public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
+
+  public RuntimeMetadataTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+  }
 
   @Override
   protected String getConfigFile() {

@@ -26,35 +26,20 @@ import org.mule.tck.message.StringAttributes;
 
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase {
+public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<SourceModel> {
 
-  private static final MetadataComponentDescriptorProvider<SourceModel> explicitMetadataResolver =
-      MetadataService::getSourceMetadata;
-
-  private static final MetadataComponentDescriptorProvider<SourceModel> dslMetadataResolver =
-      (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);
+  public SourceMetadataTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+    this.provider = resolutionType == EXPLICIT_RESOLUTION ? MetadataService::getSourceMetadata
+        : (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);
+    this.location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
+  }
 
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;
-  }
-
-  @Override
-  protected void setProvider() {
-    if (resolutionType == EXPLICIT_RESOLUTION) {
-      provider = explicitMetadataResolver;
-    } else {
-      provider = dslMetadataResolver;
-    }
-  }
-
-  @Before
-  public void setUp() throws Exception {
-    location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
-    setProvider();
   }
 
   @Test
