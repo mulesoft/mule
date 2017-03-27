@@ -19,7 +19,7 @@ public class RetryPolicyTemplateFactory extends AbstractAnnotatedObjectFactory<R
 
   @Override
   public RetryPolicyTemplate doGetObject() throws Exception {
-    RetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
+    RetryPolicyTemplate retryPolicyTemplate = getRetryPolicyTemplate();
     if (blocking) {
       return retryPolicyTemplate;
     } else {
@@ -37,5 +37,17 @@ public class RetryPolicyTemplateFactory extends AbstractAnnotatedObjectFactory<R
 
   public void setBlocking(boolean blocking) {
     this.blocking = blocking;
+  }
+
+  public int getFrequency() {
+    return frequency;
+  }
+
+  public int getCount() {
+    return count;
+  }
+
+  protected RetryPolicyTemplate getRetryPolicyTemplate() {
+    return new SimpleRetryPolicyTemplate(frequency, count);
   }
 }

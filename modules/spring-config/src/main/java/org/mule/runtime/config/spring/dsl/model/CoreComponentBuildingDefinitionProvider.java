@@ -171,7 +171,9 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
+import org.mule.runtime.core.retry.RetryForeverPolicyTemplateFactory;
 import org.mule.runtime.core.retry.RetryPolicyTemplateFactory;
+import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicy;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.routing.AggregationStrategy;
@@ -1629,6 +1631,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(RetryPolicyTemplateFactory.class)
         .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").withDefaultValue(true).build())
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build())
+        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-forever")
+        .withTypeDefinition(fromType(RetryPolicyTemplate.class))
+        .withObjectFactoryType(RetryForeverPolicyTemplateFactory.class)
+        .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").withDefaultValue(true).build())
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .build());
 
