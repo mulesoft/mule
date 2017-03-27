@@ -161,6 +161,7 @@ import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
+import org.mule.runtime.core.processor.InvokerMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
@@ -246,13 +247,7 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -817,6 +812,22 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
             .build()
     );
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("expression-component")
+        .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
+        .withSetterParameterDefinition("expression", fromTextContent().build())
+        .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("invoke")
+        .withTypeDefinition(fromType(InvokerMessageProcessor.class))
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("methodName", fromSimpleParameter("method").build())
+        .withSetterParameterDefinition("argumentExpressionsString",
+                                       fromSimpleParameter("methodArguments").build())
+        .withSetterParameterDefinition("object",
+                                       fromSimpleReferenceParameter("object-ref").build())
+        .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
