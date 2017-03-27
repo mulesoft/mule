@@ -41,8 +41,6 @@ public class ContainerClassLoaderFilterFactory {
 
   private Set<String> getExportedResourcePaths(List<MuleModule> muleModules) {
     Set<String> resources = new HashSet<>();
-    // Adds default SPI resource folder
-    resources.add("/META-INF/services");
 
     for (MuleModule muleModule : muleModules) {
       resources.addAll(muleModule.getExportedPaths());

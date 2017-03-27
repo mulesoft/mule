@@ -7,11 +7,13 @@
 
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.module.artifact.classloader.EnumerationMatcher;
+import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoaderTestCase;
 import org.mule.runtime.module.artifact.classloader.TestClassLoader;
@@ -20,14 +22,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.junit.Test;
 
 public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClassLoaderTestCase {
 
   @Override
-  protected FilteringArtifactClassLoader doCreateClassLoader() {
-    return new FilteringContainerClassLoader(artifactClassLoader, filter);
+  protected FilteringArtifactClassLoader doCreateClassLoader(List<ExportedService> exportedServices) {
+    return new FilteringContainerClassLoader(artifactClassLoader, filter, exportedServices);
   }
 
   public FilteringContainerClassLoaderTestCase(boolean verboseClassloadingLog) {
@@ -44,7 +47,7 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
     when(filter.exportsResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME)).thenReturn(true);
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     URL resource = filteringArtifactClassLoader.getResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME);
     assertThat(resource, equalTo(expectedResource));
@@ -60,7 +63,7 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
     when(filter.exportsResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME)).thenReturn(true);
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME);
     assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));

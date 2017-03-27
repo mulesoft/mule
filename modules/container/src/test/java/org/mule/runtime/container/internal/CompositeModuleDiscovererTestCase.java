@@ -7,6 +7,7 @@
 
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -26,11 +27,11 @@ public class CompositeModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void delegatesToComposedDiscovers() throws Exception {
     final ModuleDiscoverer discoverer1 = mock(ModuleDiscoverer.class);
-    MuleModule module1 = new MuleModule("module1", emptySet(), emptySet(), emptySet(), emptySet());
+    MuleModule module1 = new MuleModule("module1", emptySet(), emptySet(), emptySet(), emptySet(), emptyList());
     final List<MuleModule> modules1 = new ArrayList<>();
     modules1.add(module1);
     when(discoverer1.discover()).thenReturn(modules1);
-    MuleModule module2 = new MuleModule("module1", emptySet(), emptySet(), emptySet(), emptySet());
+    MuleModule module2 = new MuleModule("module1", emptySet(), emptySet(), emptySet(), emptySet(), emptyList());
     final List<MuleModule> modules2 = new ArrayList<>();
     modules2.add(module2);
     final ModuleDiscoverer discoverer2 = mock(ModuleDiscoverer.class);

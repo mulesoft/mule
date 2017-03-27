@@ -16,15 +16,16 @@
                     </scripting:component>
                 </processor-chain>
              </when>
-            <when expression="#[mel:flowVars['currency'] == 'GBP']">
-                <processor-chain>
-                    <scripting:component>
-                        <scripting:script file="greedy.py">
-                            <scripting:property key="currency" value="GBP"/>
-                        </scripting:script>
-                    </scripting:component>
-                </processor-chain>
-             </when>
+            <!--// TODO(pablo.kraan): MULE-12051: re-add once test runs with isolation-->
+            <!--<when expression="#[mel:flowVars['currency'] == 'GBP']">-->
+                <!--<processor-chain>-->
+                    <!--<scripting:component>-->
+                        <!--<scripting:script file="greedy.py">-->
+                            <!--<scripting:property key="currency" value="GBP"/>-->
+                        <!--</scripting:script>-->
+                    <!--</scripting:component>-->
+                <!--</processor-chain>-->
+             <!--</when>-->
         </choice>
     </flow>
 </mule>

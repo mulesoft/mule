@@ -8,10 +8,10 @@ package org.mule.runtime.module.scripting;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class GreedyTestCase extends FunctionalTestCase {
@@ -32,6 +32,7 @@ public class GreedyTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-12051: re-add once test is migrated to ue the isolated test runner")
   public void testPounds() throws Exception {
     runTest(1.28, "GBP", "[1 pounds, 1 twenty_pence, 1 five_pence, 1 two_pence, 1 pennies]");
   }

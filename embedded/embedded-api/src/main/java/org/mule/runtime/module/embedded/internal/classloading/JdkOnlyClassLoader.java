@@ -21,7 +21,8 @@ public class JdkOnlyClassLoader extends FilteringClassLoader {
                       "com.sun", "sun", "org.mule.mvel2",
                       "org.codehaus.groovy",
                       "org.aopalliance.aop",
-                      "com.yourkit");
+                      "com.yourkit",
+                      "jdk.nashorn.api.scripting");
 
   /**
    * Creates a new filtering classLoader that only loads jdk specific classes
