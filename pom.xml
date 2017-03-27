@@ -186,7 +186,7 @@
         <jschVersion>0.1.53</jschVersion>
         <jsonVersion>20140107</jsonVersion>
         <junitVersion>4.12</junitVersion>
-        <log4jVersion>2.5</log4jVersion>
+        <log4jVersion>2.8.1</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
@@ -205,7 +205,7 @@
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saxonVersion>9.7.0-15</saxonVersion>
-        <slf4jVersion>1.7.7</slf4jVersion>
+        <slf4jVersion>1.7.24</slf4jVersion>
         <springVersion>4.1.9.RELEASE</springVersion>
         <springSecurityVersion>4.0.4.RELEASE</springSecurityVersion>
         <sshCoreVersion>1.0.0</sshCoreVersion>
