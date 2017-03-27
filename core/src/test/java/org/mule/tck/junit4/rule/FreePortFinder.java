@@ -6,10 +6,11 @@
  */
 package org.mule.tck.junit4.rule;
 
+import static java.nio.channels.FileChannel.open;
+import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 import static java.nio.file.StandardOpenOption.WRITE;
-import static java.nio.channels.FileChannel.open;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +20,6 @@ import java.net.ServerSocket;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
-import static java.nio.file.Paths.get;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -49,10 +49,10 @@ public class FreePortFinder
     {
         for (int i = 0; i < portRange; i++)
         {
+            int port = minPortNumber + random.nextInt(portRange);
+            String portFile = port + LOCK_FILE_EXTENSION;
             try
             {
-                int port = minPortNumber + random.nextInt(portRange);
-                String portFile = port + LOCK_FILE_EXTENSION;
                 FileChannel channel = open(get(portFile), CREATE, WRITE, DELETE_ON_CLOSE);
                 FileLock lock = channel.tryLock();
                 if (lock == null)
@@ -110,7 +110,9 @@ public class FreePortFinder
         if (isPortFree(port) && locks.containsKey(port) && files.containsKey(port))
         {
             FileLock lock = locks.get(port);
+            locks.remove(port);
             FileChannel file = files.get(port);
+            files.remove(port);
             try {
                 lock.release();
                 file.close();
