@@ -122,6 +122,7 @@ import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
@@ -170,6 +171,9 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
+import org.mule.runtime.core.retry.RetryPolicyTemplateFactory;
+import org.mule.runtime.core.retry.policies.SimpleRetryPolicy;
+import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.CollectionSplitter;
@@ -828,6 +832,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("object",
                                        fromSimpleReferenceParameter("object-ref").build())
         .build());
+
+    componentBuildingDefinitions.addAll(getReconnectionDefinitions());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
@@ -1612,6 +1618,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("array-entry-point-resolver")
         .withTypeDefinition(fromType(ArrayEntryPointResolver.class))
         .build());
+    return buildingDefinitions;
+  }
+
+  private List<ComponentBuildingDefinition> getReconnectionDefinitions() {
+    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect")
+        .withTypeDefinition(fromType(RetryPolicyTemplate.class))
+        .withObjectFactoryType(RetryPolicyTemplateFactory.class)
+        .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").withDefaultValue(true).build())
+        .withSetterParameterDefinition("count", fromSimpleParameter("count").build())
+        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
+        .build());
+
     return buildingDefinitions;
   }
 
