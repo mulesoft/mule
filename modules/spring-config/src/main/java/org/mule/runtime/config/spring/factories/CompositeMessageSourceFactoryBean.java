@@ -6,20 +6,22 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class CompositeMessageSourceFactoryBean implements FactoryBean {
+public class CompositeMessageSourceFactoryBean implements FactoryBean<MessageSource> {
 
-  protected List<MessageSource> sources = Collections.<MessageSource>emptyList();
+  protected List<MessageSource> sources = emptyList();
 
-  public Class getObjectType() {
+  @Override
+  public Class<MessageSource> getObjectType() {
     return MessageSource.class;
   }
 
@@ -27,7 +29,8 @@ public class CompositeMessageSourceFactoryBean implements FactoryBean {
     this.sources = sources;
   }
 
-  public Object getObject() throws Exception {
+  @Override
+  public MessageSource getObject() throws Exception {
     CompositeMessageSource composite = new StartableCompositeMessageSource();
     for (MessageSource source : sources) {
       composite.addSource(source);
@@ -35,6 +38,7 @@ public class CompositeMessageSourceFactoryBean implements FactoryBean {
     return composite;
   }
 
+  @Override
   public boolean isSingleton() {
     return false;
   }
