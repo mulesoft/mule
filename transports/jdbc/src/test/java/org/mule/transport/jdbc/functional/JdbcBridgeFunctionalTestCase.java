@@ -8,6 +8,7 @@ package org.mule.transport.jdbc.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.sql.Connection;
 import java.util.Arrays;
@@ -19,10 +20,12 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
 
+    private static final Logger LOGGER = getLogger(JdbcBridgeFunctionalTestCase.class);
     private static final int TEST_ROWS = 10;
     
     public JdbcBridgeFunctionalTestCase(ConfigVariant variant, String configResources)
@@ -79,17 +82,17 @@ public class JdbcBridgeFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         while (true)
         {
             results = (List<?>) queryRunner.query(connection, "SELECT * FROM TEST_OUT", new ArrayListHandler());
-            logger.info("Results found: " + results.size());
+            LOGGER.info("Results found: " + results.size());
             if (results.size() >= TEST_ROWS)
             {
                 break;
             }
             results = (List<?>) queryRunner.query(connection, "SELECT * FROM TEST WHERE TYPE = 2", new ArrayListHandler());
-            logger.info("Locked records found: " + results.size());
+            LOGGER.info("Locked records found: " + results.size());
             assertTrue(TEST_ROWS >= results.size());            
             
             results = (List<?>) queryRunner.query(connection, "SELECT * FROM TEST WHERE TYPE = 1", new ArrayListHandler());
-            logger.info("Original records found: " + results.size());
+            LOGGER.info("Original records found: " + results.size());
             assertTrue(TEST_ROWS >= results.size());
             
             assertTrue(System.currentTimeMillis() - t0 < 20000);

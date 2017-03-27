@@ -8,6 +8,7 @@ package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -16,9 +17,12 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public abstract class AbstractStreamingDownloadMule1389TestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(AbstractStreamingCapacityTestCase.class);
+
     public AbstractStreamingDownloadMule1389TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -36,6 +40,6 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Abstract
         assertEquals(InputStreamSource.SIZE, result.getPayloadAsBytes().length);
         long then = System.currentTimeMillis();
         double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;
-        logger.info("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");
+        LOGGER.info("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");
     }
 }

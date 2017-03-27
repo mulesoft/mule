@@ -6,6 +6,9 @@
  */
 package org.mule.config.spring;
 
+import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
@@ -24,15 +27,17 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestCase
 {
 
     public static final String SEPARATOR = " ";
+
+    private static final Logger LOGGER = getLogger(AbstractSchemaValidationTestCase.class);
+
     protected Map schemas = new HashedMap();
 
     // we define these locally so that tests use the latest version rather than grabbing xsi:location
@@ -91,7 +96,7 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
         {
             String name = (String) keys.next();
             String location = (String) schemas.get(name);
-            logger.debug("checking " + location + " for " + name);
+            LOGGER.debug("checking " + location + " for " + name);
             InputStream stream = IOUtils.getResourceAsStream(location, getClass());
             assertNotNull("Cannot load " + location + " for " + name, stream);
             stream.close();

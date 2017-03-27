@@ -8,6 +8,7 @@ package org.mule.transport.tcp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -20,9 +21,11 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static Logger LOGGER = getLogger(TcpFunctionalTestCase.class);
     protected static String TEST_MESSAGE = "Test TCP Request";
 
     @Rule
@@ -77,6 +80,6 @@ public class TcpFunctionalTestCase extends AbstractServiceAndFlowTestCase
         }
         long later = System.currentTimeMillis();
         double speed = count * 1000.0 / (later - now);
-        logger.error(speed + " messages per second");
+        LOGGER.error(speed + " messages per second");
     }
 }

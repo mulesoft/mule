@@ -7,6 +7,7 @@
 package org.mule.transport.file.issues;
 
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -21,6 +22,7 @@ import org.mule.transport.file.AbstractFileFunctionalTestCase;
 import java.io.File;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 /**
  * This used to be part of FileFunctionalTest; moved here to allow isolation of
@@ -28,6 +30,8 @@ import org.junit.Test;
  */
 public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(IndirectReceiveMule1842TestCase.class);
+
     public IndirectReceiveMule1842TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -42,7 +46,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         Object relay = muleContext.getRegistry().lookupObject("relay");
         assertNotNull(relay);
         String url = fileToUrl(target) + "?connector=receiveConnector";
-        logger.debug(url);
+        LOGGER.debug(url);
 
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
 

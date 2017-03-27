@@ -10,6 +10,7 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MessagingException;
 import org.mule.construct.Flow;
@@ -38,12 +39,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
 {
-    private static Logger logger = LoggerFactory.getLogger(HttpRequestProxyConfigTestCase.class);
+    private static Logger LOGGER = getLogger(HttpRequestProxyConfigTestCase.class);
 
     private static final String PROXY_HOST = "localhost";
     private static final String PROXY_USERNAME = "theUsername";
@@ -182,7 +182,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
             catch (IOException e)
             {
                 /* Ignore */
-                logger.error("Exception while configuring MockProxy", e);
+                LOGGER.error("Exception while configuring MockProxy", e);
             }
             finally
             {
@@ -195,7 +195,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
                     catch (IOException e)
                     {
                         /* Ignore */
-                        logger.error("Exception while closing MockProxy", e);
+                        LOGGER.error("Exception while closing MockProxy", e);
                     }
                 }
             }

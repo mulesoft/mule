@@ -8,6 +8,7 @@ package org.mule.transport.tcp.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
@@ -27,9 +28,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(MultiStreamMule1692TestCase.class);
     public static final int TIMEOUT = 3000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String TEST_MESSAGE_2 = "Second test TCP Request";
@@ -75,7 +78,7 @@ public class MultiStreamMule1692TestCase extends AbstractServiceAndFlowTestCase
                 }
                 catch (Exception e)
                 {
-                    logger.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         };

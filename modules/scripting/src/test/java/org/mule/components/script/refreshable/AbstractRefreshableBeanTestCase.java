@@ -8,11 +8,13 @@ package org.mule.components.script.refreshable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.IOUtils;
+import org.slf4j.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,6 +23,8 @@ import java.net.URL;
 public abstract class AbstractRefreshableBeanTestCase extends AbstractServiceAndFlowTestCase
 {
     protected static final int WAIT_TIME = 1000;
+
+    private static final Logger LOGGER = getLogger(AbstractRefreshableBeanTestCase.class);
 
     public AbstractRefreshableBeanTestCase(ConfigVariant variant, String configResources)
     {
@@ -39,7 +43,7 @@ public abstract class AbstractRefreshableBeanTestCase extends AbstractServiceAnd
     {
         URL url = IOUtils.getResourceAsUrl(name, getClass());
         String path = url.getFile();
-        logger.info(url + " -> " + path);
+        LOGGER.info(url + " -> " + path);
         return path;
     }
 

@@ -7,11 +7,14 @@
 
 package org.mule.module.db.performance;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 /**
  * Not a real test, used to generate load and verify that there are no memory
@@ -21,6 +24,7 @@ import org.junit.Test;
 public class QueryPerformanceTestCase extends FunctionalTestCase
 {
 
+    private static final Logger LOGGER = getLogger(QueryPerformanceTestCase.class);
     private LoadGenerator loadGenerator = new LoadGenerator();
 
     @Override
@@ -84,7 +88,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         @Override
         public void execute(int messageId) throws Exception
         {
-            logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
+            LOGGER.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
             LocalMuleClient client = muleContext.getClient();
 
             client.send("vm://testRequestResponse", TEST_MESSAGE, null);
@@ -97,7 +101,7 @@ public class QueryPerformanceTestCase extends FunctionalTestCase
         @Override
         public void execute(int messageId) throws Exception
         {
-            logger.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
+            LOGGER.info("Thread: " + Thread.currentThread().getName() + " message: " + messageId);
             LocalMuleClient client = muleContext.getClient();
 
             client.dispatch("vm://testOneWay", TEST_MESSAGE, null);

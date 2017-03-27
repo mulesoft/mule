@@ -6,8 +6,11 @@
  */
 package org.mule.transport.jms;
 
-import org.apache.activemq.command.ActiveMQMessage;
-import org.mule.api.ExceptionPayload;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -29,10 +32,7 @@ import java.util.Collection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.slf4j.Logger;
 
 public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -41,6 +41,8 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
     protected static final String JMS_INPUT_QUEUE2 = "jms://in2?connector=jmsConnectorNoRedelivery";
     protected static final String JMS_DEAD_LETTER = "jms://dead.letter?connector=jmsConnectorNoRedelivery";
     protected final int timeout = getTestTimeoutSecs() * 1000 / 4;
+
+    private static final Logger LOGGER = getLogger(AbstractJmsRedeliveryTestCase.class);
 
     protected MuleClient client;
     protected Latch messageRedeliveryExceptionFired;
@@ -93,7 +95,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
         // purge the queue
         while (client.request(JMS_INPUT_QUEUE, 1000) != null)
         {
-            logger.warn("Destination " + JMS_INPUT_QUEUE + " isn't empty, draining it");
+            LOGGER.warn("Destination " + JMS_INPUT_QUEUE + " isn't empty, draining it");
         }
     }
 
@@ -115,7 +117,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends AbstractServiceAndFl
             public void eventReceived(MuleEventContext context, Object Component) throws Exception
             {
                 final int count = incCallbackCount();
-                logger.info("Message Delivery Count is: " + count);
+                LOGGER.info("Message Delivery Count is: " + count);
                 throw new FunctionalTestException();
             }
         };

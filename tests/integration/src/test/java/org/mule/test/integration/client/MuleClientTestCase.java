@@ -9,15 +9,19 @@ package org.mule.test.integration.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class MuleClientTestCase extends FunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(MuleClientTestCase.class);
+
     @Override
     protected String getConfigFile()
     {
@@ -89,7 +93,7 @@ public class MuleClientTestCase extends FunctionalTestCase
             client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
         }
         long time = System.currentTimeMillis() - start;
-        logger.debug(i + " took " + time + "ms to process");
+        LOGGER.debug(i + " took " + time + "ms to process");
         Thread.sleep(1000);
     }
 

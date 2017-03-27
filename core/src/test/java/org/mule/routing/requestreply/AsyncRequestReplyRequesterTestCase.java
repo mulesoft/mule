@@ -12,6 +12,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -34,14 +36,14 @@ import java.beans.ExceptionListener;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.resource.spi.work.Work;
-
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase
     implements ExceptionListener
 {
+    private static final Logger LOGGER = getLogger(AsyncRequestReplyRequesterTestCase.class);
 
     TestAsyncRequestReplyRequester asyncReplyMP;
 
@@ -248,7 +250,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                         assertEquals(event.getMessageAsString(), resultEvent.getMessageAsString());
                         assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
                         count.incrementAndGet();
-                        logger.debug("Finished " + count.get());
+                        LOGGER.debug("Finished " + count.get());
                     }
                     catch (Exception e)
                     {

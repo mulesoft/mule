@@ -6,30 +6,10 @@
  */
 package org.mule.tck.junit4;
 
-import static org.junit.Assume.assumeThat;
-import org.mule.RequestContext;
-import org.mule.tck.junit4.rule.WarningTimeout;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.MuleUrlStreamHandlerFactory;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -41,6 +21,27 @@ import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
+import org.mule.RequestContext;
+import org.mule.tck.junit4.rule.WarningTimeout;
+import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
+import org.mule.util.MuleUrlStreamHandlerFactory;
+import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assume.assumeThat;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This
@@ -87,7 +88,7 @@ public abstract class AbstractMuleTestCase
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     }
 
-    protected final transient Log logger = LogFactory.getLog(this.getClass());
+    private static final Logger LOGGER = getLogger(AbstractMuleTestCase.class);
 
     /**
      * Should be set to a string message describing any prerequisites not met.
@@ -250,7 +251,7 @@ public abstract class AbstractMuleTestCase
     {
         if (offline)
         {
-            logger.warn(StringMessageUtils.getBoilerPlate(
+            LOGGER.warn(StringMessageUtils.getBoilerPlate(
                     "Working offline cannot run test: " + method, '=', 80));
         }
 
@@ -424,7 +425,6 @@ public abstract class AbstractMuleTestCase
     }
 
     private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
-    private static final transient Log LOGGER = LogFactory.getLog(AbstractMuleTestCase.class);
 
     private static void logThreadsResult(String result)
     {

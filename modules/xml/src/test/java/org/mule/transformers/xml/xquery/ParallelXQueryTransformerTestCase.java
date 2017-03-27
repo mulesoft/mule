@@ -9,6 +9,7 @@ package org.mule.transformers.xml.xquery;
 import static java.lang.Runtime.getRuntime;
 import static org.junit.Assert.assertTrue;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
@@ -28,9 +29,11 @@ import java.util.concurrent.TimeUnit;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCase
 {
+    private static final Logger LOGGER = getLogger(ParallelXQueryTransformerTestCase.class);
     private static final int TIMEOUT_MILLIS = 30000;
     private String srcData;
     private String resultData;
@@ -109,9 +112,9 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
 
         checkResult();
 
-        if (logger.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
         {
-            logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
+            LOGGER.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
                          + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
         }
     }
