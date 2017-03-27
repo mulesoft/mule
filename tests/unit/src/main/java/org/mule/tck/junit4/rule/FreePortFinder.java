@@ -6,26 +6,37 @@
  */
 package org.mule.tck.junit4.rule;
 
+import static java.nio.channels.FileChannel.open;
+import static java.nio.file.Paths.get;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
+import static java.nio.file.StandardOpenOption.WRITE;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.HashSet;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Finds available port numbers in a specified range.
  */
 public class FreePortFinder {
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Log logger = LogFactory.getLog(getClass());
 
   private final int minPortNumber;
   private final int portRange;
-  private final Set<Integer> selectedPorts = new HashSet<Integer>();
   private final Random random = new Random();
+  private final String LOCK_FILE_EXTENSION = ".lock";
+  private final Map<Integer, FileLock> locks = new HashMap<>();
+  private final Map<Integer, FileChannel> files = new HashMap<>();
 
   public FreePortFinder(int minPortNumber, int maxPortNumber) {
     this.minPortNumber = minPortNumber;
@@ -35,20 +46,38 @@ public class FreePortFinder {
   public synchronized Integer find() {
     for (int i = 0; i < portRange; i++) {
       int port = minPortNumber + random.nextInt(portRange);
-
-      if (selectedPorts.contains(port)) {
-        continue;
-      }
-
-      if (isPortFree(port)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Found free port: " + port);
+      String portFile = port + LOCK_FILE_EXTENSION;
+      try {
+        FileChannel channel = open(get(portFile), CREATE, WRITE, DELETE_ON_CLOSE);
+        FileLock lock = channel.tryLock();
+        if (lock == null) {
+          // If the lock couldn't be acquired and tryLock didn't throw the exception, we throw it here
+          throw new OverlappingFileLockException();
         }
 
-        selectedPorts.add(port);
+        if (isPortFree(port)) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Found free port: " + port);
+          }
 
-        return port;
+          locks.put(port, lock);
+          files.put(port, channel);
+          return port;
+        } else {
+          lock.release();
+          channel.close();
+        }
+      } catch (OverlappingFileLockException e) {
+        // The file is locked,
+        if (logger.isDebugEnabled()) {
+          logger.debug("Port selected already locked");
+        }
+      } catch (IOException e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Error when trying to open port lock file, trying another port");
+        }
       }
+
     }
 
     throw new IllegalStateException("Unable to find an available port");
@@ -57,17 +86,25 @@ public class FreePortFinder {
   /**
    * Indicates that the port is free from the point of view of the caller.
    * <p/>
-   * Checks that the port was released, if it was not, then it would be marked as in use, so no other client receives the same
-   * port again.
+   * Checks that the port was released, if it was not, then it would be
+   * marked as in use, so no other client receives the same port again.
    *
    * @param port the port number to release.
    */
   public synchronized void releasePort(int port) {
-    if (isPortFree(port)) {
-      selectedPorts.remove(port);
+    if (isPortFree(port) && locks.containsKey(port) && files.containsKey(port)) {
+      FileLock lock = locks.remove(port);
+      FileChannel file = files.remove(port);
+      try {
+        lock.release();
+        file.close();
+
+      } catch (IOException e) {
+        // Ignore
+      }
     } else {
       if (logger.isInfoEnabled()) {
-        logger.info(String.format("Port %d was is not correctly released", port));
+        logger.info(String.format("Port %d was not correctly released", port));
       }
     }
   }
@@ -92,7 +129,7 @@ public class FreePortFinder {
         try {
           server.close();
         } catch (IOException e) {
-          // ignore
+          // Ignore
         }
       }
     }
