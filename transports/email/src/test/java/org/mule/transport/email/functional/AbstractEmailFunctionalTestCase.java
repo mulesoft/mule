@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -26,9 +27,7 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import org.junit.Rule;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -36,8 +35,9 @@ import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import org.junit.Rule;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -257,7 +257,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
         GreenMailUser gmUser = server.getManagers().getUserManager().getUser(user);
         assert null != gmUser;
         server.getManagers().getImapHostManager().createMailbox(
-                server.getManagers().getUserManager().getUser(DEFAULT_USER),
+                server.getManagers().getUserManager().getUser(user),
                 DEFAULT_PROCESSED_MAILBOX);
 
         server.start();
