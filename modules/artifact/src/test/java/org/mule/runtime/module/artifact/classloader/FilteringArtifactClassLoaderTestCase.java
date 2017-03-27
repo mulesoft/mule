@@ -19,6 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.module.artifact.classloader.EnumerationMatcher.equalTo;
 
 import org.mule.runtime.module.artifact.classloader.exception.NotExportedClassException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -114,7 +116,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
-    assertThat(resource, equalTo(null));
+    assertThat(resource, CoreMatchers.equalTo(null));
   }
 
   @Test
@@ -156,7 +158,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-    assertThat(resources, EnumerationMatcher.equalTo(Collections.EMPTY_LIST));
+    assertThat(resources, equalTo(Collections.EMPTY_LIST));
   }
 
   @Test
@@ -169,7 +171,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-    assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
+    assertThat(resources, equalTo(Collections.singletonList(resource)));
   }
 
   @Test
@@ -182,7 +184,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     URL resource = filteringArtifactClassLoader.getResource(SERVICE_RESOURCE_NAME);
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(SERVICE_RESOURCE_NAME);
-    assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
+    assertThat(resources, equalTo(Collections.singletonList(resource)));
 
     verify(filter, never()).exportsResource(SERVICE_RESOURCE_NAME);
     verify(artifactClassLoader, never()).findResources(SERVICE_RESOURCE_NAME);

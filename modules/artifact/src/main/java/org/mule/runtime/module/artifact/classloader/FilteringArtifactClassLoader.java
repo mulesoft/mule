@@ -24,6 +24,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,12 +79,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   @Override
   public URL getResource(String name) {
     if (isServiceResource(name)) {
-      String serviceInterface = getServiceInterfaceFromResource(name);
-
-      Optional<ExportedService> exportedService =
-          exportedServices.stream().filter(s -> serviceInterface.equals(s.getServiceInterface())).findFirst();
+      Optional<ExportedService> exportedService = getExportedServiceStream(name).findFirst();
 
       if (exportedService.isPresent()) {
+        logClassloadingTrace(format("Service resource '%s' found in classloader for '%s': '%s", name, getArtifactId(),
+                                    exportedService.get()));
         return exportedService.get().getResource();
       } else {
         logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
@@ -108,15 +108,14 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   @Override
   public Enumeration<URL> getResources(String name) throws IOException {
     if (isServiceResource(name)) {
-      String serviceInterface = getServiceInterfaceFromResource(name);
-
-      List<URL> exportedServiceProviders =
-          this.exportedServices.stream().filter(s -> serviceInterface.equals(s.getServiceInterface()))
-              .map(s -> s.getResource())
-              .collect(Collectors.toList());
+      List<URL> exportedServiceProviders = getExportedServiceStream(name).map(s -> s.getResource()).collect(Collectors.toList());
 
       if (exportedServiceProviders.isEmpty()) {
         logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+      } else {
+
+        logClassloadingTrace(format("Service resources '%s' found in classloader for '%s': '%s", name, getArtifactId(),
+                                    exportedServiceProviders));
       }
       return new EnumerationAdapter<>(exportedServiceProviders);
     } else if (filter.exportsResource(name)) {
@@ -126,6 +125,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
       logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
       return new EnumerationAdapter<>(emptyList());
     }
+  }
+
+  private Stream<ExportedService> getExportedServiceStream(String name) {
+    String serviceInterface = getServiceInterfaceFromResource(name);
+
+    return this.exportedServices.stream().filter(s -> serviceInterface.equals(s.getServiceInterface()));
   }
 
   private String getServiceInterfaceFromResource(String name) {

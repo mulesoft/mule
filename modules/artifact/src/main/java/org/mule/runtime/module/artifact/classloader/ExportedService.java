@@ -14,6 +14,8 @@ import java.net.URL;
 
 /**
  * Defines a service that will be exported by a module to other Mule artifacts via SPI.
+ *
+ * @since 4.0
  */
 public class ExportedService {
 
