@@ -98,7 +98,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
     registeredClassLoaders.add(
                                new RegisteredClassLoader(artifactClassLoader,
-                                                         new FilteringArtifactClassLoader(artifactClassLoader, filter), filter));
+                                                         new FilteringArtifactClassLoader(artifactClassLoader, filter,
+                                                                                          emptyList()),
+                                                         filter));
 
     filter.getExportedClassPackages().forEach(p -> packageMapping.put(p, artifactClassLoader));
 

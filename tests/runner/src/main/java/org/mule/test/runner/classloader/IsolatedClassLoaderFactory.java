@@ -10,6 +10,7 @@ package org.mule.test.runner.classloader;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
@@ -129,7 +130,7 @@ public class IsolatedClassLoaderFactory {
         ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification);
 
         pluginArtifactClassLoaderFilters.add(filter);
-        filteredPluginsArtifactClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter));
+        filteredPluginsArtifactClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter, emptyList()));
       }
     }
 
@@ -234,7 +235,7 @@ public class IsolatedClassLoaderFactory {
 
     logClassLoaderUrls("CONTAINER", artifactsUrlClassification.getContainerUrls());
     return testContainerClassLoaderFactory
-        .createContainerClassLoader(new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher));
+        .createContainerClassLoader(new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher, emptyList()));
   }
 
   /**

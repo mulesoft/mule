@@ -14,6 +14,7 @@ import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.EnumerationAdapter;
+import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
@@ -23,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -84,7 +86,9 @@ public class ContainerClassLoaderFactory {
                       // mule-module.properties (fails ClassInterceptorTestCase)
                       "org.aopalliance.aop",
                       // MULE-10194 Mechanism to add custom boot packages to be exported by the container
-                      "com.yourkit");
+                      "com.yourkit",
+                      // TODO(pablo.kraan): MULE-12049 - find a better way to export Nashorn without having to use a boot package
+                      "jdk.nashorn.api.scripting");
 
   private final ModuleRepository moduleRepository;
 
@@ -193,7 +197,19 @@ public class ContainerClassLoaderFactory {
   protected FilteringArtifactClassLoader createContainerFilteringClassLoader(List<MuleModule> muleModules,
                                                                              ArtifactClassLoader containerClassLoader) {
     return new FilteringContainerClassLoader(containerClassLoader,
-                                             new ContainerClassLoaderFilterFactory().create(getBootPackages(), muleModules));
+                                             new ContainerClassLoaderFilterFactory().create(getBootPackages(),
+                                                                                            muleModules),
+                                             getExportedServices(muleModules));
+  }
+
+  private List<ExportedService> getExportedServices(List<MuleModule> muleModules) {
+    List<ExportedService> exportedServices = new ArrayList<>();
+
+    for (MuleModule muleModule : muleModules) {
+      exportedServices.addAll(muleModule.getExportedServices());
+    }
+
+    return exportedServices;
   }
 
   /**

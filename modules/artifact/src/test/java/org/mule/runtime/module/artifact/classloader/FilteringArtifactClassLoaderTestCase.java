@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.classloader;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -17,6 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.module.artifact.classloader.EnumerationMatcher.equalTo;
 
 import org.mule.runtime.module.artifact.classloader.exception.NotExportedClassException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -27,7 +30,9 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +46,9 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   public static final String CLASS_NAME = "java.lang.Object";
   public static final String RESOURCE_NAME = "dummy.txt";
+  private static final String SERVICE_INTERFACE_NAME = "org.foo.Service";
+  public static final String SERVICE_RESOURCE_NAME = "META-INF/services/" + SERVICE_INTERFACE_NAME;
+
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -79,13 +87,13 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     }
 
     when(filter.exportsClass(CLASS_NAME)).thenReturn(false);
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     filteringArtifactClassLoader.loadClass(CLASS_NAME);
   }
 
-  protected FilteringArtifactClassLoader doCreateClassLoader() {
-    return new FilteringArtifactClassLoader(artifactClassLoader, filter);
+  protected FilteringArtifactClassLoader doCreateClassLoader(List<ExportedService> exportedServices) {
+    return new FilteringArtifactClassLoader(artifactClassLoader, filter, exportedServices);
   }
 
   @Test
@@ -97,7 +105,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
     Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
     assertThat(aClass, equalTo(expectedClass));
   }
@@ -105,10 +113,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
   @Test
   public void filtersResourceWhenNotExported() throws ClassNotFoundException {
     when(filter.exportsClass(RESOURCE_NAME)).thenReturn(false);
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
-    assertThat(resource, equalTo(null));
+    assertThat(resource, CoreMatchers.equalTo(null));
   }
 
   @Test
@@ -118,10 +126,24 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
     when(artifactClassLoader.findResource(RESOURCE_NAME)).thenReturn(expectedResource);
 
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
     assertThat(resource, equalTo(expectedResource));
+  }
+
+  @Test
+  public void loadsExportedService() throws ClassNotFoundException, IOException {
+    URL expectedResource = new URL("file:///app.txt");
+
+    filteringArtifactClassLoader =
+        doCreateClassLoader(singletonList(new ExportedService(SERVICE_INTERFACE_NAME, expectedResource)));
+
+    URL resource = filteringArtifactClassLoader.getResource(SERVICE_RESOURCE_NAME);
+
+    assertThat(resource, equalTo(expectedResource));
+    verify(filter, never()).exportsResource(SERVICE_RESOURCE_NAME);
+    verify(artifactClassLoader, never()).findResource(SERVICE_RESOURCE_NAME);
   }
 
   @Test
@@ -133,10 +155,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-    assertThat(resources, EnumerationMatcher.equalTo(Collections.EMPTY_LIST));
+    assertThat(resources, equalTo(Collections.EMPTY_LIST));
   }
 
   @Test
@@ -146,15 +168,31 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
     when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(Collections.singleton(resource)));
 
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-    assertThat(resources, EnumerationMatcher.equalTo(Collections.singletonList(resource)));
+    assertThat(resources, equalTo(Collections.singletonList(resource)));
+  }
+
+  @Test
+  public void loadsExportedServices() throws ClassNotFoundException, IOException {
+    URL expectedResource = new URL("file:///app.txt");
+
+    filteringArtifactClassLoader =
+        doCreateClassLoader(singletonList(new ExportedService(SERVICE_INTERFACE_NAME, expectedResource)));
+
+    URL resource = filteringArtifactClassLoader.getResource(SERVICE_RESOURCE_NAME);
+
+    Enumeration<URL> resources = filteringArtifactClassLoader.getResources(SERVICE_RESOURCE_NAME);
+    assertThat(resources, equalTo(Collections.singletonList(resource)));
+
+    verify(filter, never()).exportsResource(SERVICE_RESOURCE_NAME);
+    verify(artifactClassLoader, never()).findResources(SERVICE_RESOURCE_NAME);
   }
 
   @Test
   public void returnsCorrectClassLoader() throws Exception {
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     final ClassLoader classLoader = filteringArtifactClassLoader.getClassLoader();
 
@@ -163,7 +201,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void doesNotDisposesFilteredClassLoader() throws Exception {
-    filteringArtifactClassLoader = doCreateClassLoader();
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     filteringArtifactClassLoader.dispose();
 

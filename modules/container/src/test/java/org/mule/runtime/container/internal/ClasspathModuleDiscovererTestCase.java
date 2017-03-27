@@ -9,7 +9,9 @@ package org.mule.runtime.container.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.rules.ExpectedException.none;
@@ -63,6 +65,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
     assertThat(muleModule.getExportedPaths(), is(empty()));
     assertThat(muleModule.getPrivilegedExportedPackages(), is(empty()));
     assertThat(muleModule.getPrivilegedArtifacts(), is(empty()));
+    assertThat(muleModule.getExportedServices(), is(empty()));
   }
 
   @Test
@@ -77,9 +80,10 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
     MuleModule muleModule = muleModules.get(0);
     assertThat(muleModule.getName(), is("moduleResourcePackages"));
     assertThat(muleModule.getExportedPackages(), is(empty()));
-    assertThat(muleModule.getExportedPaths(), contains("META-INF/services", "META-INF/"));
+    assertThat(muleModule.getExportedPaths(), containsInAnyOrder("META-INF/module.xsd", "README.txt"));
     assertThat(muleModule.getPrivilegedExportedPackages(), is(empty()));
     assertThat(muleModule.getPrivilegedArtifacts(), is(empty()));
+    assertThat(muleModule.getExportedServices(), is(empty()));
   }
 
   @Test
@@ -97,6 +101,28 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
     assertThat(muleModule.getExportedPaths(), is(empty()));
     assertThat(muleModule.getPrivilegedExportedPackages(), contains("org.foo", "org.bar"));
     assertThat(muleModule.getPrivilegedArtifacts(), contains("privilegedArtifact1", "privilegedArtifact2"));
+    assertThat(muleModule.getExportedServices(), is(empty()));
+  }
+
+  @Test
+  public void discoversModuleWithExportedServices() throws Exception {
+    List<URL> moduleProperties = new ArrayList();
+    moduleProperties.add(getClass().getClassLoader().getResource("moduleExportedServices.properties"));
+    when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
+        .thenReturn(new EnumerationAdapter(moduleProperties));
+
+    List<MuleModule> muleModules = moduleDiscoverer.discover();
+    assertThat(muleModules, hasSize(1));
+    MuleModule muleModule = muleModules.get(0);
+    assertThat(muleModule.getName(), is("moduleExportedServices"));
+    assertThat(muleModule.getExportedPackages(), is(empty()));
+    assertThat(muleModule.getExportedPaths(), is(empty()));
+    assertThat(muleModule.getPrivilegedExportedPackages(), is(empty()));
+    assertThat(muleModule.getPrivilegedArtifacts(), is(empty()));
+    assertThat(muleModule.getExportedServices().size(), equalTo(3));
+    assertThat(muleModule.getExportedServices().get(0).getServiceInterface(), equalTo("org.foo.ServiceInterface"));
+    assertThat(muleModule.getExportedServices().get(1).getServiceInterface(), equalTo("org.foo.ServiceInterface"));
+    assertThat(muleModule.getExportedServices().get(2).getServiceInterface(), equalTo("org.bar.ServiceInterface"));
   }
 
   @Test

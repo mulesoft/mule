@@ -60,6 +60,6 @@ public class TestContainerModuleDiscoverer implements ModuleDiscoverer {
 
     return new MuleModule(discoveredModule.getName(), discoveredModule.getExportedPackages(),
                           discoveredModule.getExportedPaths(), discoveredModule.getPrivilegedExportedPackages(),
-                          privilegedArtifacts);
+                          privilegedArtifacts, discoveredModule.getExportedServices());
   }
 }
