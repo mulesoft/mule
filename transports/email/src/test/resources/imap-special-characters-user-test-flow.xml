@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:imap="http://www.mulesoft.org/schema/mule/imap"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd
+          http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+    <imap:connector name="imapConnector" />
+    <vm:connector name="vmConnector"/>
+
+    <flow name="relay">
+        <imap:inbound-endpoint user="%21%23bob%23%25" password="password" host="localhost" port="${port1}"/>
+        <vm:outbound-endpoint path="receive" exchange-pattern="one-way"/>
+    </flow>
+
+</mule>

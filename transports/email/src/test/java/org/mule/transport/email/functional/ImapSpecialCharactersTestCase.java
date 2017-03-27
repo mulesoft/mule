@@ -6,30 +6,35 @@
  */
 package org.mule.transport.email.functional;
 
+import static java.util.Arrays.asList;
+
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 public class ImapSpecialCharactersTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public ImapSpecialCharactersTestCase(ConfigVariant variant, String configResources)
+    public static final String SPECIAL_CHARACTER_USER = "%21%23bob%23%25";
+    public static final String SPECIAL_CHARACTER_PASSWORD = "*uawH*IDXlh2p%21xSPOx%23%25zLpL";
+
+    public ImapSpecialCharactersTestCase(ConfigVariant variant, String configResources, String user, String password)
     {
-        super(variant, STRING_MESSAGE, "imap", configResources, DEFAULT_EMAIL, DEFAULT_USER, DEFAULT_MESSAGE, "*uawH*IDXlh2p!xSPOx#%zLpL", null);
+        super(variant, STRING_MESSAGE, "imap", configResources, DEFAULT_EMAIL, user, DEFAULT_MESSAGE, password, null);
     }
 
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-                {ConfigVariant.FLOW, "imap-special-characters-test-flow.xml"}
+        return asList(new Object[][]{
+            {ConfigVariant.FLOW, "imap-special-characters-password-test-flow.xml", DEFAULT_USER, SPECIAL_CHARACTER_PASSWORD},
+            {ConfigVariant.FLOW, "imap-special-characters-user-test-flow.xml", SPECIAL_CHARACTER_USER, DEFAULT_PASSWORD},
         });
     }
 
     @Test
-    public void testRequest() throws Exception
+    public void requestWithSpecialCharacters() throws Exception
     {
         doRequest();
     }
