@@ -38,13 +38,11 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
     private static final String REQUEST_HEADER_INOUT = "<headerInOut xmlns=\"http://consumer.ws.module.mule.org/\">TEST_HEADER_2</headerInOut>";
 
     private static final String RESPONSE_HEADER_OUT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                                                      "<ns2:headerOut xmlns:ns2=\"http://consumer.ws.module.mule.org/\" " +
-                                                      "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                                                      "<ns2:headerOut xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                                                       "TEST_HEADER_1 OUT</ns2:headerOut>";
 
     private static final String RESPONSE_HEADER_INOUT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                                                        "<ns2:headerInOut xmlns:ns2=\"http://consumer.ws.module.mule.org/\" " +
-                                                        "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                                                        "<ns2:headerInOut xmlns:ns2=\"http://consumer.ws.module.mule.org/\">" +
                                                         "TEST_HEADER_2 INOUT</ns2:headerInOut>";
 
     @Rule
