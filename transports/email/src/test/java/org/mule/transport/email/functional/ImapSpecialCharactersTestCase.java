@@ -8,6 +8,9 @@ package org.mule.transport.email.functional;
 
 import static java.util.Arrays.asList;
 
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -18,6 +21,11 @@ public class ImapSpecialCharactersTestCase extends AbstractEmailFunctionalTestCa
 
     public static final String SPECIAL_CHARACTER_USER = "%21%23bob%23%25";
     public static final String SPECIAL_CHARACTER_PASSWORD = "*uawH*IDXlh2p%21xSPOx%23%25zLpL";
+
+    @Rule
+    public SystemProperty specialCharacterUser = new SystemProperty("specialCharacterUser", SPECIAL_CHARACTER_USER);
+    @Rule
+    public SystemProperty specialCharacterPassword = new SystemProperty("specialCharacterPassword", SPECIAL_CHARACTER_PASSWORD);
 
     public ImapSpecialCharactersTestCase(ConfigVariant variant, String configResources, String user, String password)
     {
