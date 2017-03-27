@@ -43,8 +43,14 @@ abstract class AbstractEventContext implements EventContext {
   private transient Disposable completionSubscriberDisposable;
   private final List<EventContext> childContexts = new LinkedList<>();
   private boolean streaming = false;
+  private transient Mono<Void> completionCallback = empty();
 
   public AbstractEventContext() {
+    this(empty());
+  }
+
+  public AbstractEventContext(Publisher<Void> completionCallback) {
+    this.completionCallback = from(completionCallback);
     initCompletionProcessor();
   }
 
@@ -53,7 +59,9 @@ abstract class AbstractEventContext implements EventContext {
     completionProcessor = MonoProcessor.create();
     completionProcessor.doFinally(e -> LOGGER.debug(this + " execution completed.")).subscribe();
     // When there are no child contexts response triggers completion directly.
-    completionSubscriberDisposable = responseProcessor.then().doOnEach(s -> s.accept(completionProcessor)).subscribe();
+    completionSubscriberDisposable = Mono.<Void>whenDelayError(completionCallback,
+                                                               responseProcessor.then())
+        .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   void addChildContext(EventContext childContext) {
@@ -62,8 +70,9 @@ abstract class AbstractEventContext implements EventContext {
       // When a new child is added dispose existing subscription that triggers completion processor and re-subscribe adding child
       // completion condition.
       completionSubscriberDisposable.dispose();
-      completionSubscriberDisposable = responseProcessor.otherwise(throwable -> empty()).and(getChildCompletionPublisher()).then()
-          .doOnEach(s -> s.accept(completionProcessor)).subscribe();
+      completionSubscriberDisposable =
+          responseProcessor.otherwise(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
+              .doOnEach(s -> s.accept(completionProcessor)).subscribe();
     }
   }
 
