@@ -6,6 +6,10 @@
  */
 package org.mule.tck.junit4.rule;
 
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.channels.FileChannel.open;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,10 +22,6 @@ import static java.nio.file.Paths.get;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.WRITE;
 
 /**
  * Finds available port numbers in a specified range.
@@ -51,7 +51,7 @@ public class FreePortFinder
             {
                 int port = minPortNumber + random.nextInt(portRange);
                 String portFile = port + LOCK_FILE_EXTENSION;
-                FileChannel channel = FileChannel.open(get(portFile), CREATE, WRITE);
+                FileChannel channel = open(get(portFile), CREATE, WRITE);
                 FileLock lock = channel.tryLock();
                 if (lock == null)
                 {
