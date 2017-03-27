@@ -15,16 +15,14 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
+import javax.mail.Authenticator;
+import javax.mail.Session;
+import javax.mail.URLName;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.mail.Authenticator;
-import javax.mail.Session;
-import javax.mail.URLName;
 
 /**
  * Abstract superclass for mail connectors. Provides Mule with an Authenticator
@@ -108,15 +106,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
 
         EndpointURI uri = endpoint.getEndpointURI();
         String user = uri.getUser();
-        if (user != null)
-        {
-            user = URLDecoder.decode(user, endpoint.getEncoding());
-        }
         String pass = uri.getPassword();
-        if (pass != null)
-        {
-            pass = URLDecoder.decode(pass, endpoint.getEncoding());
-        }
 
         return new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox, user, pass);
     }
