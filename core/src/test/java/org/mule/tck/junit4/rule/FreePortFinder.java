@@ -7,6 +7,7 @@
 package org.mule.tck.junit4.rule;
 
 import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static java.nio.channels.FileChannel.open;
 
@@ -36,6 +37,7 @@ public class FreePortFinder
     private final Random random  = new Random();
     private final String LOCK_FILE_EXTENSION = ".lock";
     private final Map<Integer, FileLock> locks = new HashMap<>();
+    private final Map<Integer, FileChannel> files = new HashMap<>();
 
     public FreePortFinder(int minPortNumber, int maxPortNumber)
     {
@@ -51,7 +53,7 @@ public class FreePortFinder
             {
                 int port = minPortNumber + random.nextInt(portRange);
                 String portFile = port + LOCK_FILE_EXTENSION;
-                FileChannel channel = open(get(portFile), CREATE, WRITE);
+                FileChannel channel = open(get(portFile), CREATE, WRITE, DELETE_ON_CLOSE);
                 FileLock lock = channel.tryLock();
                 if (lock == null)
                 {
@@ -67,9 +69,11 @@ public class FreePortFinder
                     }
 
                     locks.put(port, lock);
+                    files.put(port, channel);
                     return port;
                 } else {
                     lock.release();
+                    channel.close();
                 }
             }
             catch(OverlappingFileLockException e)
@@ -103,11 +107,14 @@ public class FreePortFinder
      */
     public synchronized void releasePort(int port)
     {
-        if (isPortFree(port) && locks.containsKey(port))
+        if (isPortFree(port) && locks.containsKey(port) && files.containsKey(port))
         {
             FileLock lock = locks.get(port);
+            FileChannel file = files.get(port);
             try {
                 lock.release();
+                file.close();
+
             } catch (IOException e) {
                 // Ignore
             }
