@@ -109,10 +109,8 @@ public class FreePortFinder
     {
         if (isPortFree(port) && locks.containsKey(port) && files.containsKey(port))
         {
-            FileLock lock = locks.get(port);
-            locks.remove(port);
-            FileChannel file = files.get(port);
-            files.remove(port);
+            FileLock lock = locks.remove(port);
+            FileChannel file = files.remove(port);
             try {
                 lock.release();
                 file.close();
