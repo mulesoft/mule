@@ -37,11 +37,15 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
+public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
 
   private static final MetadataKey CIRCLE_METADATA_KEY = newKey(CIRCLE).build();
   private static final Location QUERY_LOCATION =
       builder().globalName(QUERY_FLOW).addProcessorsPart().addIndexPart(0).build();
+
+  public QueryMetadataTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+  }
 
   @Override
   protected String getConfigFile() {

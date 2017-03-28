@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
@@ -121,41 +121,60 @@ public final class MetadataMediator<T extends ComponentModel<T>> {
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context, MetadataKey key) {
     try {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
-      return getMetadata(context, p -> resolvedKey, MetadataAttributes.builder().withKey(key));
+      return getMetadata(context, resolvedKey, MetadataAttributes.builder().withKey(key));
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).onComponent());
     }
   }
 
+  /**
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using the component
+   * {@link ParameterValueResolver} to resolve an object with the value of the {@link MetadataKey}.
+   *
+   * @param context current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
+   *         when the Metadata retrieval of any element fails for any reason
+   */
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context,
                                                                     ParameterValueResolver metadataKeyResolver) {
-    return getMetadata(context, metadataKeyResolver, MetadataAttributes.builder());
+    try {
+      Object keyValue;
+      MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
+      if (!keyValueResult.isSuccess()) {
+        return keyValueResult;
+      } else {
+        keyValue = keyValueResult.get();
+      }
+
+      if (keyValue == null && !keyIdObjectResolver.isKeyLess()) {
+        return failure(newFailure().withFailureCode(INVALID_METADATA_KEY).withMessage("MetadataKey resolved to null")
+            .onComponent());
+      }
+
+      MetadataAttributes.MetadataAttributesBuilder builder = MetadataAttributes.builder();
+      if (!keyIdObjectResolver.isKeyLess()) {
+        builder.withKey(keyIdObjectResolver.reconstructKeyFromType(keyValue));
+      }
+
+      return getMetadata(context, keyValue, builder);
+    } catch (MetadataResolvingException e) {
+      return failure(newFailure(e).onComponent());
+    }
   }
 
   /**
-   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using static and
-   * dynamic resolving of the Component parameters, attributes and output.
+   * Resolves the {@link ComponentMetadataDescriptor} for the associated {@code context} using static and dynamic resolving of the
+   * Component parameters, attributes and output.
    *
-   * @param context             current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
-   *                            {@link OutputTypeResolver}
-   * @param metadataKeyResolver {@link MetadataKey} of the type which's structure has to be resolved, used both for input and output types
+   * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver} and
+   *        {@link OutputTypeResolver}
+   * @param keyValue {@link Object} resolved {@link MetadataKey} object
    * @return Successful {@link MetadataResult} if the MetadataTypes are resolved without errors Failure {@link MetadataResult}
-   * when the Metadata retrieval of any element fails for any reason
+   *         when the Metadata retrieval of any element fails for any reason
    */
   private MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context,
-                                                                     ParameterValueResolver metadataKeyResolver,
+                                                                     Object keyValue,
                                                                      MetadataAttributes.MetadataAttributesBuilder attributesBuilder) {
-    Object keyValue;
-    MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
-    if (!keyValueResult.isSuccess()) {
-      return keyValueResult;
-    } else {
-      keyValue = keyValueResult.get();
-    }
-    //TODO MULE-11942 Missing information about metadata key when resolving operation metadata
-    if (keyValue != null) {
-      attributesBuilder.withKey(newKey(keyValue.toString()).build());
-    }
 
     MetadataResult<OutputMetadataDescriptor> output = outputDelegate.getOutputMetadataDescriptor(context, keyValue);
     MetadataResult<InputMetadataDescriptor> input = inputDelegate.getInputMetadataDescriptors(context, keyValue);

@@ -23,7 +23,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONEN
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.INPUT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.KEYS;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_ATTRIBUTES;
-import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
@@ -42,7 +42,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCase {
+public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase {
 
   private static final String NOT_A_METADATA_PROVIDER = "is not a MetadataProvider or MetadataEntityProvider";
   private static final String NO_OBJECT_FOUND = "No object found with location %s";
@@ -55,6 +55,10 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   private static final String CONFIGURATION_CANNOT_BE_DYNAMIC = "Configuration used for Metadata fetch cannot be dynamic";
   private static final String NO_DYNAMIC_KEY_AVAILABLE = "Component [%s] is not a MetadataKeyProvider";
   private static final String DYNAMIC_CONFIG = "dynamic-config";
+
+  public MetadataNegativeTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+  }
 
   @Override
   protected String getConfigFile() {

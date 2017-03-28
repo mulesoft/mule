@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -17,7 +16,11 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import org.junit.Test;
 
-public class MetadataImplicitDynamicConfigurationTestCase extends MetadataExtensionFunctionalTestCase {
+public class MetadataImplicitDynamicConfigurationTestCase extends AbstractMetadataOperationTestCase {
+
+  public MetadataImplicitDynamicConfigurationTestCase(ResolutionType resolutionType) {
+    super(resolutionType);
+  }
 
   @Override
   protected String getConfigFile() {
