@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,8 +23,11 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
@@ -35,7 +40,6 @@ import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.beans.ExceptionListener;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +51,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected TestListener target = new TestListener();
   protected Exception exceptionThrown;
   protected Latch latch = new Latch();
+  protected Latch asyncEntrylatch = new Latch();
 
   @Rule
   public ExpectedException expected;
@@ -73,10 +78,26 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void testProcessOneWay() throws Exception {
-    Event result = process(messageProcessor, testEvent());
+    Event request = testEvent();
 
-    assertThat(latch.await(10000, TimeUnit.MILLISECONDS), is(true));
+    Event result = process(messageProcessor, request);
+
+    // Complete parent context so we can assert event context completion based on async completion.
+    request.getContext().success(result);
+
+    assertCompletionNotDone(request.getContext());
+
+    // Permit async processing now we have already asserted that response alone is not enough to complete event context.
+    asyncEntrylatch.countDown();
+
+    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
+
+    // Block until async completes, not just target processor.
+    from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
+    assertCompletionDone(target.sensedEvent.getContext());
+    assertCompletionDone(request.getContext());
+
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertThat(testEvent(), not(sameInstance(target.sensedEvent)));
@@ -92,14 +113,28 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void testProcessRequestResponse() throws Exception {
+    Event request = testEvent();
     Event result = process(messageProcessor, testEvent());
 
-    latch.await(10000, TimeUnit.MILLISECONDS);
-    assertNotNull(target.sensedEvent);
+    // Complete parent context so we can assert event context completion based on async completion.
+    request.getContext().success(result);
+
+    assertCompletionNotDone(request.getContext());
+
+    // Permit async processing now we have already asserted that response alone is not enough to complete event context.
+    asyncEntrylatch.countDown();
+
+    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
+
+    // Block until async completes, not just target processor.
+    from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    assertThat(target.sensedEvent, notNullValue());
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
-    assertNotSame(testEvent(), target.sensedEvent);
+    assertNotSame(request, target.sensedEvent);
     assertEquals(testEvent().getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
+    assertCompletionDone(target.sensedEvent.getContext());
+    assertCompletionDone(request.getContext());
 
     assertSame(testEvent(), result);
     assertNull(exceptionThrown);
@@ -142,7 +177,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected void assertAsync(Processor processor, Event event) throws MuleException, InterruptedException {
     Event result = processor.process(event);
 
-    latch.await(10000, TimeUnit.MILLISECONDS);
+    latch.await(10000, MILLISECONDS);
     assertNotNull(target.sensedEvent);
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
@@ -165,6 +200,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     return mp;
   }
 
+  private void assertCompletionDone(EventContext parent) {
+    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
+  }
+
+  private void assertCompletionNotDone(EventContext child1) {
+    assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
+  }
+
   class TestListener implements Processor {
 
     Event sensedEvent;
@@ -172,6 +215,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
     @Override
     public Event process(Event event) throws MuleException {
+      try {
+        asyncEntrylatch.await(LOCK_TIMEOUT, MILLISECONDS);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
       sensedEvent = event;
       thread = Thread.currentThread();
       latch.countDown();
