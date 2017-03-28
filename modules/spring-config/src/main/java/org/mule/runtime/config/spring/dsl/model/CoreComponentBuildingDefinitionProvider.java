@@ -173,6 +173,7 @@ import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.retry.RetryForeverPolicyTemplateFactory;
 import org.mule.runtime.core.retry.RetryPolicyTemplateFactory;
+import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicy;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
@@ -1639,6 +1640,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(RetryForeverPolicyTemplateFactory.class)
         .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").withDefaultValue(true).build())
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-notifier")
+        .withTypeDefinition(fromType(ConnectNotifier.class))
         .build());
 
     return buildingDefinitions;
