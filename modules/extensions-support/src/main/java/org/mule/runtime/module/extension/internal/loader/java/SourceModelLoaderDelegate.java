@@ -101,10 +101,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     source
         .hasResponse(sourceType.isAnnotatedWith(EmitsResponse.class))
-        .requiresConnection(connectionParameter.isPresent())
-        .transactional(false) // TODO: MULE-10961
         .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
         .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
+
+    processComponentConnectivity(source, sourceType, sourceType);
 
     resolveOutputTypes(source, sourceGenerics);
 

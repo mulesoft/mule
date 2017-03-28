@@ -11,12 +11,15 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,6 +42,8 @@ import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -46,12 +51,11 @@ import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
-
-import java.util.Optional;
+import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
+import org.slf4j.Logger;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
+import java.util.Optional;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -126,13 +130,23 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
+  public Optional<ConfigurationInstance> getConfigurationInstance() {
+    return sourceAdapter.getConfigurationInstance();
+  }
+
+  public Optional<ConnectionHandler> getConnectionHandler() {
+    return sourceAdapter.getConnectionHandler();
+  }
+
   private SourceCallbackFactory createSourceCallbackFactory() {
     return completionHandlerFactory -> DefaultSourceCallback.builder()
         .setExceptionCallback(this)
         .setSourceModel(sourceModel)
+        .setSource(this)
         .setFlowConstruct(flowConstruct)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
+        .setMuleContext(muleContext)
         .setProcessContextSupplier(this::createProcessingContext)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
@@ -228,7 +242,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private MessageProcessContext createProcessingContext() {
+
     return new MessageProcessContext() {
+
+      private final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
 
       @Override
       public boolean supportsAsynchronousProcessing() {
@@ -252,7 +269,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       @Override
       public TransactionConfig getTransactionConfig() {
-        return null;
+        return sourceModel.isTransactional() ? buildTransactionConfig() : null;
       }
 
       @Override
@@ -264,6 +281,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       public ComponentIdentifier getSourceIdentifier() {
         return builder().withNamespace(getExtensionModel().getName().toLowerCase())
             .withName(sourceModel.getName()).build();
+      }
+
+      private TransactionConfig buildTransactionConfig() {
+        MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+        transactionConfig.setAction(getSourceTransactionalAction());
+        transactionConfig.setMuleContext(muleContext);
+
+        // TODO - MULE-12066 : Support XA transactions in SDK extensions at source level
+        transactionConfig.setFactory(TRANSACTION_FACTORY);
+
+        return transactionConfig;
       }
 
       @Override
@@ -343,6 +371,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       createSource();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
+    }
+  }
+
+  private byte getSourceTransactionalAction() {
+    try {
+      return toActionCode(sourceAdapter.getTransactionalAction());
+    } catch (MuleException e) {
+      LOGGER.error("An error occurred obtaining the Source Transactional Action, defaulting to [NONE]");
+      return ACTION_NONE;
     }
   }
 }

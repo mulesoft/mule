@@ -38,6 +38,27 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TransactionalSourceType" substitutionGroup="mule:abstract-message-source" name="transactional-source"></xs:element>
+    <xs:complexType name="TransactionalSourceType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" name="transactionalAction">
+                    <xs:annotation>
+                        <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetConnectionType" substitutionGroup="mule:abstract-operator" name="get-connection"></xs:element>
     <xs:complexType name="GetConnectionType">
         <xs:complexContent>
@@ -66,6 +87,26 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+                    <xs:annotation>
+                        <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="VerifySameConnectionType" substitutionGroup="mule:abstract-operator" name="verify-same-connection"></xs:element>
+    <xs:complexType name="VerifySameConnectionType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="transactional-message"></xs:element>
+                </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -141,4 +182,17 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:simpleType name="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType">
+        <xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="ALWAYS_BEGIN"></xs:enumeration>
+                    <xs:enumeration value="NONE"></xs:enumeration>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
 </xs:schema>

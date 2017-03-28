@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -59,7 +60,7 @@ public final class ConnectionInterceptor implements Interceptor {
     }
   }
 
-  private ConnectionHandler<?> getConnection(ExecutionContextAdapter operationContext)
+  private ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> operationContext)
       throws ConnectionException, TransactionException {
     return connectionAdapter.getConnection(operationContext);
   }

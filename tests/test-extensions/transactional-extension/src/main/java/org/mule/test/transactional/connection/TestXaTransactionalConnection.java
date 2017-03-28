@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.transactional;
+package org.mule.test.transactional.connection;
 
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.slf4j.Logger;
@@ -16,9 +16,11 @@ public class TestXaTransactionalConnection implements TestTransactionalConnectio
 
   private static final Logger logger = LoggerFactory.getLogger(TestXaTransactionalConnection.class);
   private DummyXaResource xaResource;
+  private double connectionId;
 
-  public TestXaTransactionalConnection(DummyXaResource xaResource) {
+  TestXaTransactionalConnection(DummyXaResource xaResource) {
     this.xaResource = xaResource;
+    this.connectionId = Math.random();
   }
 
   @Override
@@ -45,6 +47,11 @@ public class TestXaTransactionalConnection implements TestTransactionalConnectio
   @Override
   public void close() {
     logger.debug("Closing XA Transaction");
+  }
+
+  @Override
+  public double getConnectionId() {
+    return connectionId;
   }
 
   @Override

@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import com.google.common.base.Joiner;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -31,12 +32,9 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFa
 import org.mule.runtime.module.extension.internal.runtime.source.SourceConfigurer;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
-import com.google.common.base.Joiner;
-
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-
-import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} that produces instances of {@link ExtensionMessageSource}
@@ -113,6 +111,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                  source,
                                  configurationInstance,
                                  sourceCallbackFactory,
+                                 nonCallbackParameters,
                                  successCallbackParameters,
                                  errorCallbackParameters);
       } catch (Exception e) {

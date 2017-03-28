@@ -45,6 +45,17 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -61,13 +72,14 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
-import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -87,22 +99,8 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
-import java.io.IOException;
-import java.util.function.Supplier;
-
 import javax.resource.spi.work.Work;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import java.io.IOException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -131,7 +129,10 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private SourceCallbackFactory sourceCallbackFactory;
 
   @Mock
-  private Supplier<MessageProcessContext> processContextSupplier;
+  private MessageProcessContext messageProcessContext;
+
+  @Mock
+  private TransactionConfig transactionConfig;
 
   @Mock
   Scheduler ioScheduler;
@@ -203,7 +204,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         .setSourceModel(sourceModel)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
-        .setProcessContextSupplier(processContextSupplier)
+        .setProcessContextSupplier(() -> messageProcessContext)
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
@@ -250,6 +251,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class))
         .thenReturn(of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), METADATA_KEY)));
     when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
+
+    when(messageProcessContext.getTransactionConfig()).thenReturn(null);
 
     messageSource = getNewExtensionMessageSourceInstance();
   }
@@ -503,7 +506,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              source,
                              of(configurationInstance),
                              sourceCallbackFactory,
-                             callbackParameters,
+                             null, callbackParameters,
                              callbackParameters);
   }
 

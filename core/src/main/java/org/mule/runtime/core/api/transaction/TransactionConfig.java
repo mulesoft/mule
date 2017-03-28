@@ -61,7 +61,7 @@ public interface TransactionConfig {
    */
   byte ACTION_INDIFFERENT = 6;
 
-  /*
+  /**
    * Executes outside any existent transaction
    */
   byte ACTION_NOT_SUPPORTED = 7;

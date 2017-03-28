@@ -14,7 +14,7 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
  * ExecutionTemplate created should be used on a MessageProcessor that are previously wrapper by
- * TransactionalErrorHandlingExecutionTemplate or ErrorHandlingExecutionTemplate Should be used when: An outbound endpoint is
+ * {@link TransactionalErrorHandlingExecutionTemplate} or {@link ErrorHandlingExecutionTemplate} Should be used when: An outbound endpoint is
  * called An outbound router is called Any other MessageProcessor able to manage transactions is called Instance of
  * TransactionTemplate created by this method will: Resolve non xa transactions created before it if the TransactionConfig action
  * requires it Suspend-Resume xa transaction created before it if the TransactionConfig action requires it Start a transaction if

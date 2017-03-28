@@ -12,8 +12,10 @@ import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -21,6 +23,7 @@ import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
+import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
@@ -62,6 +65,7 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
@@ -76,8 +80,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RequireNa
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -355,6 +357,23 @@ public class MuleExtensionUtils {
         return ACTION_JOIN_IF_POSSIBLE;
       case NOT_SUPPORTED:
         return ACTION_NOT_SUPPORTED;
+    }
+
+    throw new IllegalArgumentException("Unsupported action: " + action.name());
+  }
+
+  /**
+   * Converts the given {@code action} to its equivalent transactional action as defined in {@link TransactionConfig}
+   *
+   * @param action a {@link SourceTransactionalAction}
+   * @return a byte transactional action
+   */
+  public static byte toActionCode(SourceTransactionalAction action) {
+    switch (action) {
+      case ALWAYS_BEGIN:
+        return ACTION_ALWAYS_BEGIN;
+      case NONE:
+        return ACTION_NONE;
     }
 
     throw new IllegalArgumentException("Unsupported action: " + action.name());

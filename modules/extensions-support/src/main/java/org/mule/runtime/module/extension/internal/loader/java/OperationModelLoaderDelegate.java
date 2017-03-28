@@ -22,15 +22,12 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.ExtensionOf;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
@@ -112,7 +109,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                                                          method)));
 
       loader.addExceptionEnricher(operationMethod, operation);
-      processOperationConnectivity(operation, operationMethod);
+      processComponentConnectivity(operation, operationMethod, operationMethod);
 
       if (!processNonBlockingOperation(operation, operationMethod)) {
 
@@ -137,23 +134,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                           new ParameterDeclarationContext(OPERATION, operation.getDeclaration()));
       calculateExtendedTypes(declaringClass, method, operation);
       operationDeclarers.put(operationMethod, operation);
-    }
-  }
-
-  private void processOperationConnectivity(OperationDeclarer operation, MethodElement operationMethod) {
-    final List<ExtensionParameter> connectionParameters = operationMethod.getParametersAnnotatedWith(Connection.class);
-    if (connectionParameters.isEmpty()) {
-      operation.requiresConnection(false).transactional(false);
-    } else if (connectionParameters.size() == 1) {
-      ExtensionParameter connectionParameter = connectionParameters.get(0);
-      operation.requiresConnection(true)
-          .transactional(TransactionalConnection.class.isAssignableFrom(connectionParameter.getType().getDeclaringClass()))
-          .withModelProperty(new ConnectivityModelProperty(connectionParameter.getType().getDeclaringClass()));
-    } else if (connectionParameters.size() > 1) {
-      throw new IllegalOperationModelDefinitionException(format(
-                                                                "Operation '%s' defines %d parameters annotated with @%s. Only one is allowed",
-                                                                operationMethod.getAlias(), connectionParameters.size(),
-                                                                Connection.class.getSimpleName()));
     }
   }
 

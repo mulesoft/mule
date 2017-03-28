@@ -14,13 +14,13 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.test.transactional.TestLocalTransactionalConnection;
+import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
 import org.mule.test.transactional.TransactionalExtension;
 
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
-public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase {
+public class TransactionalOperationTestCase extends ExtensionFunctionalTestCase {
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {

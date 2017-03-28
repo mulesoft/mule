@@ -8,6 +8,10 @@ package org.mule.test.transactional;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.test.transactional.connection.TestTransactionalConnection;
+
+import java.util.Objects;
 
 public class TransactionalOperations {
 
@@ -29,6 +33,12 @@ public class TransactionalOperations {
 
   public void verifyTransactionRolledback(@Connection TestTransactionalConnection connection) {
     checkState(connection.isTransactionRolledback(), "transaction not rolled back");
+  }
+
+  public void verifySameConnection(@Connection TestTransactionalConnection connection,
+                                   @Content TestTransactionalConnection transactionalMessage) {
+    checkState(Objects.equals(connection.getConnectionId(), transactionalMessage.getConnectionId()),
+               "The connection is not the same");
   }
 
   public void fail() {
