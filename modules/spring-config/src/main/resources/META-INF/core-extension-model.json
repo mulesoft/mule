@@ -8,7 +8,7 @@
   "xmlDsl": {
     "prefix": "mule",
     "namespace": "http://www.mulesoft.org/schema/mule/core",
-    "schemaLocation": "http://www.mulesoft.org/schema/mule/current/mule.xsd",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/core/current/mule.xsd",
     "schemaVersion": "4.0.0-SNAPSHOT",
     "xsdFileName": "mule.xsd"
   },
@@ -1394,9 +1394,9 @@
               "required": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
-              "role": "PRIMARY_CONTENT",
+              "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": true,
+                "allowsInlineDefinition": false,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
