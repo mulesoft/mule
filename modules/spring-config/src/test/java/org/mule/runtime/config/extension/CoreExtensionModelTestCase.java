@@ -91,7 +91,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getXmlDslModel().getPrefix(), is(CORE_PREFIX));
     assertThat(coreExtensionModel.getXmlDslModel().getNamespace(), is("http://www.mulesoft.org/schema/mule/core"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaLocation(),
-               is("http://www.mulesoft.org/schema/mule/current/mule.xsd"));
+               is("http://www.mulesoft.org/schema/mule/core/current/mule.xsd"));
     assertThat(coreExtensionModel.getXmlDslModel().getSchemaVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getXmlDslModel().getXsdFileName(), is("mule.xsd"));
   }
