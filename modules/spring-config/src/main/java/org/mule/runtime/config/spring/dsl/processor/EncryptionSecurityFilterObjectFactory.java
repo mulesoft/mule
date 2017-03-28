@@ -10,7 +10,9 @@ import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
 
 /**
- * Created by anafelisatti on 3/28/17.
+ * Object factory for {@link MuleEncryptionEndpointSecurityFilter}.
+ *
+ * @since 4.0
  */
 public class EncryptionSecurityFilterObjectFactory
     extends AbstractSecurityFilterObjectFactory<MuleEncryptionEndpointSecurityFilter> {

@@ -12,7 +12,9 @@ import org.mule.runtime.module.spring.security.AuthorizationFilter;
 import java.util.Collection;
 
 /**
- * Created by anafelisatti on 3/28/17.
+ * Object factory for {@link AuthorizationFilter}.
+ *
+ * @since 4.0
  */
 public class AuthorizationFilterObjectFactory extends AbstractSecurityFilterObjectFactory<AuthorizationFilter> {
 

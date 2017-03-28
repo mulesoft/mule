@@ -9,7 +9,9 @@ package org.mule.runtime.config.spring.dsl.processor;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 
 /**
+ * Object factory for {@link UsernamePasswordAuthenticationFilter}.
  *
+ * @since 4.0
  */
 public class UsernamePasswordFilterObjectFactory
     extends AbstractSecurityFilterObjectFactory<UsernamePasswordAuthenticationFilter> {

@@ -13,7 +13,9 @@ import org.mule.runtime.core.util.ClassUtils;
 import java.util.Map;
 
 /**
- * Created by anafelisatti on 3/27/17.
+ * Object factory for custom {@link SecurityFilter}.
+ *
+ * @since 4.0
  */
 public class CustomSecurityFilterObjectFactory extends AbstractSecurityFilterObjectFactory<SecurityFilter> {
 
