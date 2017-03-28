@@ -6,15 +6,17 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
-import org.junit.Ignore;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("MULE-4483")
@@ -62,7 +64,7 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
         {
             message = client.request(name, 2000L);
             assertNotNull(message);
-            XMLUnit.compareXML("<" + number + ">" + number + "</" + number + ">", message.getPayloadAsString());
+            assertThat(XMLUnit.compareXML("<" + number + ">" + number + "</" + number + ">", message.getPayloadAsString()).similar(), is(true));
         }
 
         assertNull(client.request(name, 1000L));

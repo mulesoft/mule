@@ -6,8 +6,10 @@
  */
 package org.mule.module.cxf;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -52,7 +54,7 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
+        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass()).replace("${port1}", dynamicPort.getValue());
         XMLUnit.setIgnoreWhitespace(true);
         try
         {
@@ -84,7 +86,9 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
-        XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
+        System.out.println(result.getPayloadAsString());
+        System.out.println(XMLUnit.compareXML(echoWsdl, result.getPayloadAsString()));
+        assertThat(XMLUnit.compareXML(echoWsdl, result.getPayloadAsString()).similar(), is(true));
         muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
     }
 
