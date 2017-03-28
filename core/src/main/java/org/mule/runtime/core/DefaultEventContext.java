@@ -144,10 +144,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param connectorName the name of the connector that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
    *        context, if available.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link EventContext} to depend on completion of source.
    */
   private DefaultEventContext(FlowConstruct flow, String connectorName, String correlationId,
-                              Publisher<Void> completionCallback) {
-    super(completionCallback);
+                              Publisher<Void> externalCompletionPublisher) {
+    super(externalCompletionPublisher);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.flowName = flow.getName();
