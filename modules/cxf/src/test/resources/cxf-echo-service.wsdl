@@ -1,104 +1,85 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://www.muleumo.org" xmlns:tns="http://www.muleumo.org" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc11="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenc12="http://www.w3.org/2003/05/soap-encoding" xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://simple.component.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="EchoComponent" targetNamespace="http://simple.component.mule.org/">
   <wsdl:types>
-<xsd:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.muleumo.org" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<xsd:element name="log">
-<xsd:complexType>
-<xsd:sequence>
-<xsd:element maxOccurs="1" minOccurs="1" name="message" nillable="true" type="xsd:string"/>
-</xsd:sequence>
-</xsd:complexType>
-</xsd:element>
-<xsd:element name="logResponse">
-<xsd:complexType/>
-</xsd:element>
-<xsd:element name="echo">
-<xsd:complexType>
-<xsd:sequence>
-<xsd:element maxOccurs="1" minOccurs="1" name="echo" nillable="true" type="xsd:string"/>
-</xsd:sequence>
-</xsd:complexType>
-</xsd:element>
-<xsd:element name="echoResponse">
-<xsd:complexType>
-<xsd:sequence>
-<xsd:element maxOccurs="1" minOccurs="1" name="out" nillable="true" type="xsd:string"/>
-</xsd:sequence>
-</xsd:complexType>
-</xsd:element>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://simple.component.mule.org/" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://simple.component.mule.org/">
+  <xsd:element name="echo" type="tns:echo"/>
+  <xsd:complexType name="echo">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="echo" nillable="true" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="echoResponse" type="tns:echoResponse"/>
+  <xsd:complexType name="echoResponse">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="return" nillable="true" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="log" type="tns:log"/>
+  <xsd:complexType name="log">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="message" nillable="true" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="logResponse" type="tns:logResponse"/>
+  <xsd:complexType name="logResponse">
+    <xsd:sequence/>
+  </xsd:complexType>
 </xsd:schema>
-
   </wsdl:types>
-  <wsdl:message name="echoResponse">
-    <wsdl:part name="parameters" element="tns:echoResponse"/>
-  </wsdl:message>
-  <wsdl:message name="logRequest">
-    <wsdl:part name="parameters" element="tns:log"/>
-  </wsdl:message>
   <wsdl:message name="logResponse">
-    <wsdl:part name="parameters" element="tns:logResponse"/>
+    <wsdl:part element="tns:logResponse" name="parameters">
+    </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="echoRequest">
-    <wsdl:part name="parameters" element="tns:echo"/>
+  <wsdl:message name="log">
+    <wsdl:part element="tns:log" name="parameters">
+    </wsdl:part>
   </wsdl:message>
-  <wsdl:portType name="echoServicePortType">
-    <wsdl:operation name="log">
-      <wsdl:input name="logRequest" message="tns:logRequest"/>
-      <wsdl:output name="logResponse" message="tns:logResponse"/>
-    </wsdl:operation>
+  <wsdl:message name="echoResponse">
+    <wsdl:part element="tns:echoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo">
+    <wsdl:part element="tns:echo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="EchoComponentPortType">
     <wsdl:operation name="echo">
-      <wsdl:input name="echoRequest" message="tns:echoRequest"/>
-      <wsdl:output name="echoResponse" message="tns:echoResponse"/>
+      <wsdl:input message="tns:echo" name="echo">
+    </wsdl:input>
+      <wsdl:output message="tns:echoResponse" name="echoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="log">
+      <wsdl:input message="tns:log" name="log">
+    </wsdl:input>
+      <wsdl:output message="tns:logResponse" name="logResponse">
+    </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:binding name="echoServiceLocalBinding" type="tns:echoServicePortType">
-    <wsdlsoap:binding style="document" transport="urn:cxf:transport:local"/>
-    <wsdl:operation name="log">
-      <wsdlsoap:operation soapAction=""/>
-      <wsdl:input name="logRequest">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="logResponse">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
+  <wsdl:binding name="EchoComponentSoapBinding" type="tns:EchoComponentPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="echo">
-      <wsdlsoap:operation soapAction=""/>
-      <wsdl:input name="echoRequest">
-        <wsdlsoap:body use="literal"/>
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echo">
+        <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="echoResponse">
-        <wsdlsoap:body use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="log">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="log">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="logResponse">
+        <soap:body use="literal"/>
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
-  <wsdl:binding name="echoServiceHttpBinding" type="tns:echoServicePortType">
-    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="log">
-      <wsdlsoap:operation soapAction=""/>
-      <wsdl:input name="logRequest">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="logResponse">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="echo">
-      <wsdlsoap:operation soapAction=""/>
-      <wsdl:input name="echoRequest">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="echoResponse">
-        <wsdlsoap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="echoService">
-    <wsdl:port name="echoServiceLocalPort" binding="tns:echoServiceLocalBinding">
-      <wsdlsoap:address location="http://localhost:81/services/echoService"/>
-    </wsdl:port>
-    <wsdl:port name="echoServiceMulePort" binding="tns:echoServiceHttpBinding">
-      <wsdlsoap:address location="http://localhost:81/services/echoService"/>
+  <wsdl:service name="EchoComponent">
+    <wsdl:port binding="tns:EchoComponentSoapBinding" name="EchoComponentPort">
+      <soap:address location="http://localhost:${port1}/services/Echo"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

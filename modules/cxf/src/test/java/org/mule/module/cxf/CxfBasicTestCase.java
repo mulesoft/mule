@@ -11,14 +11,16 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeThat;
-import static org.mule.module.http.api.HttpConstants.Methods;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.module.http.api.HttpConstants.Methods;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -70,7 +72,7 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
+        echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass()).replace("${port1}", dynamicPort.getValue());
         XMLUnit.setIgnoreWhitespace(true);
         try
         {
@@ -117,6 +119,6 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
-        XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
+        assertThat(XMLUnit.compareXML(echoWsdl, result.getPayloadAsString()).similar(), is(true));
     }
 }
