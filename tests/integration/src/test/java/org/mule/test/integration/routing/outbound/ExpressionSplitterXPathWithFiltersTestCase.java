@@ -6,8 +6,10 @@
  */
 package org.mule.test.integration.routing.outbound;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -60,7 +62,7 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
         {
             message = client.request(name, 2000L);
             assertNotNull(message);
-            XMLUnit.compareXML("<" + number + ">" + number + "</" + number + ">", message.getPayloadAsString());
+            assertThat(XMLUnit.compareXML("<" + number + ">" + number + "</" + number + ">", message.getPayloadAsString()).similar(), is(true));
         }
 
         assertNull(client.request(name, 1000L));
