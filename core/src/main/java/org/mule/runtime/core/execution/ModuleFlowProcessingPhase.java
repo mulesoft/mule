@@ -45,8 +45,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
@@ -89,8 +91,9 @@ public class ModuleFlowProcessingPhase
           getErrorConsumer(messageSource, template.getFailedExecutionResponseParametersFunction(),
                            messageProcessContext, template, phaseResultNotifier);
 
+      MonoProcessor<Void> responseCompletion = MonoProcessor.create();
 
-      Event templateEvent = createEvent(template, messageProcessContext, sourceIdentifier);
+      Event templateEvent = createEvent(template, messageProcessContext, sourceIdentifier, responseCompletion);
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
@@ -109,6 +112,7 @@ public class ModuleFlowProcessingPhase
             .doOnError(MessagingException.class, errorConsumer)
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                        throwable -> LOGGER.error("Unhandled exception processing request" + throwable))
+            .doAfterTerminate((event, throwable) -> responseCompletion.onComplete())
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
@@ -172,11 +176,11 @@ public class ModuleFlowProcessingPhase
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
-                            ComponentIdentifier sourceIdentifier)
+                            ComponentIdentifier sourceIdentifier, Publisher<Void> responseCompletion)
       throws MuleException {
     Message message = template.getMessage();
     Event templateEvent =
-        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace()))
+        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace(), null, responseCompletion))
             .message(message).build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {

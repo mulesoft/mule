@@ -22,6 +22,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import reactor.core.publisher.MonoProcessor;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -356,6 +357,67 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     parent.success();
 
+    assertCompletionDone(parent);
+  }
+
+  @Test
+  @Description("EventContext response publisher completes with value of result but the completion publisher only completes "
+      + " once the external publisher completes.")
+  public void externalCompletionSuccess() throws Exception {
+    MonoProcessor<Void> externalCompletion = MonoProcessor.create();
+    EventContext parent = create(getTestFlow(muleContext), "", null, externalCompletion);
+
+    Event event = testEvent();
+    assertCompletionNotDone(parent);
+    parent.success(event);
+
+    assertResponse(parent, event);
+    assertCompletionNotDone(parent);
+
+    externalCompletion.onComplete();
+    assertCompletionDone(parent);
+  }
+
+  @Test
+  @Description("EventContext response publisher completes with error but the completion publisher only completes "
+      + " once the external publisher completes.")
+  public void externalCompletionError() throws Exception {
+    MonoProcessor<Void> externalCompletion = MonoProcessor.create();
+    EventContext parent = create(getTestFlow(muleContext), "", null, externalCompletion);
+
+    RuntimeException exception = new RuntimeException();
+    assertCompletionNotDone(parent);
+    parent.error(exception);
+
+    assertCompletionNotDone(parent);
+
+    externalCompletion.onComplete();
+    assertCompletionDone(parent);
+  }
+
+  @Test
+  @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are " +
+      "complete and external completion completes.")
+  public void externalCompletionWithChild() throws Exception {
+    MonoProcessor<Void> externalCompletion = MonoProcessor.create();
+    EventContext parent = create(getTestFlow(muleContext), "", null, externalCompletion);
+    EventContext child = DefaultEventContext.child(parent);
+
+    Event event = testEvent();
+
+    child.success(event);
+
+    assertResponse(child, event);
+    assertCompletionDone(child);
+    // Child completion does not complete parent
+    assertCompletionNotDone(parent);
+
+    parent.success(event);
+
+    assertResponse(parent, event);
+    assertCompletionNotDone(parent);
+
+    externalCompletion.onComplete();
     assertCompletionDone(parent);
   }
 

@@ -23,6 +23,9 @@ import java.io.Serializable;
 import java.time.OffsetTime;
 import java.util.Optional;
 
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
+
 /**
  * Default immutable implementation of {@link EventContext}.
  *
@@ -48,9 +51,16 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param flow the flow that processes events of this context.
    * @param connectorName the name of the connector that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link EventContext} to depend on completion of source.
    */
+  public static EventContext create(FlowConstruct flow, String connectorName, String correlationId,
+                                    Publisher<Void> externalCompletionPublisher) {
+    return new DefaultEventContext(flow, connectorName, correlationId, externalCompletionPublisher);
+  }
+
   public static EventContext create(FlowConstruct flow, String connectorName, String correlationId) {
-    return new DefaultEventContext(flow, connectorName, correlationId);
+    return new DefaultEventContext(flow, connectorName, correlationId, Mono.empty());
   }
 
   /**
@@ -134,8 +144,12 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param connectorName the name of the connector that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
    *        context, if available.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link EventContext} to depend on completion of source.
    */
-  private DefaultEventContext(FlowConstruct flow, String connectorName, String correlationId) {
+  private DefaultEventContext(FlowConstruct flow, String connectorName, String correlationId,
+                              Publisher<Void> externalCompletionPublisher) {
+    super(externalCompletionPublisher);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.flowName = flow.getName();
@@ -157,6 +171,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final EventContext parent;
 
     private ChildEventContext(EventContext parent) {
+      super(Mono.empty());
       this.parent = parent;
     }
 
