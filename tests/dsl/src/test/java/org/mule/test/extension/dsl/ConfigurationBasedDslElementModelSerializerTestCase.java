@@ -46,7 +46,7 @@ public class ConfigurationBasedDslElementModelSerializerTestCase extends Abstrac
 
   @Override
   protected String getConfigFile() {
-    return "integration-multi-config-dsl-app.xml";
+    return "component-config-app-declaration.xml";
   }
 
   @Test

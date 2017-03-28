@@ -39,18 +39,21 @@ public class DslElementModel<T> {
   private final T model;
   private final String value;
   private final DslElementSyntax dsl;
+  private final boolean explicitInDsl;
   private final Set<DslElementModel> containedElements;
   private final ComponentConfiguration configuration;
   private final ComponentIdentifier identifier;
 
+
   private DslElementModel(T model, DslElementSyntax dsl, Set<DslElementModel> containedElements,
-                          ComponentConfiguration configuration, String value) {
+                          ComponentConfiguration configuration, String value, boolean explicitInDsl) {
     this.dsl = dsl;
     this.model = model;
     this.containedElements = containedElements;
     this.configuration = configuration;
     this.value = value;
     this.identifier = createIdentifier();
+    this.explicitInDsl = explicitInDsl;
   }
 
   /**
@@ -95,6 +98,14 @@ public class DslElementModel<T> {
    */
   public Optional<String> getValue() {
     return Optional.ofNullable(value);
+  }
+
+  /**
+   * @return {@code true} if the element represented by {@code this} {@link DslElementModel} has to be
+   * explicitly declared in the DSL, or if it's only present in the internal application representation.
+   */
+  public boolean isExplicitInDsl() {
+    return explicitInDsl;
   }
 
   /**
@@ -164,6 +175,7 @@ public class DslElementModel<T> {
     private DslElementSyntax dsl;
     private ComponentConfiguration configuration;
     private Set<DslElementModel> contained = new LinkedHashSet<>();
+    private boolean explicitInDsl = true;
 
     private Builder() {}
 
@@ -192,6 +204,11 @@ public class DslElementModel<T> {
       return this;
     }
 
+    public Builder<M> isExplicitInDsl(boolean explicit) {
+      this.explicitInDsl = explicit;
+      return this;
+    }
+
     public DslElementModel<M> build() {
       if (configuration != null) {
         Optional<String> configurationValue = configuration.getValue();
@@ -208,7 +225,7 @@ public class DslElementModel<T> {
         }
       }
 
-      return new DslElementModel<>(model, dsl, contained, configuration, value);
+      return new DslElementModel<>(model, dsl, contained, configuration, value, explicitInDsl);
     }
 
   }

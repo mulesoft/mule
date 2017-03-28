@@ -27,52 +27,158 @@ import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTy
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.extension.db.api.param.QueryDefinition;
+import org.mule.extensions.jms.api.connection.caching.NoCachingConfiguration;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
-import org.mule.runtime.api.app.declaration.FlowElementDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
-import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.config.spring.dsl.api.XmlArtifactDeclarationLoader;
-import org.mule.runtime.config.spring.dsl.model.DslElementModel;
-import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
+import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
+import org.mule.test.runner.RunnerDelegateTo;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Element;
+import org.junit.runners.Parameterized;
 
-public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
+@RunnerDelegateTo(Parameterized.class)
+public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelTestCase {
 
   private String expectedAppXml;
-  private ArtifactDeclaration applicationDeclaration;
 
-  @Before
-  public void setupArtifact() throws Exception {
-    createAppDeclaration();
-    createAppDocument();
+  @Parameterized.Parameter(0)
+  public String configFile;
+
+  @Parameterized.Parameter(1)
+  public ArtifactDeclaration applicationDeclaration;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+
+    return Arrays.asList(new Object[][] {
+        {"full-artifact-config-dsl-app.xml", createFullArtifactDeclaration()},
+        {"multi-flow-dsl-app.xml", createMultiFlowArtifactDeclaration()}
+    });
   }
 
   @Before
   public void loadExpectedResult() throws IOException {
-    expectedAppXml = getResourceAsString(getConfigFile(), getClass());
+    expectedAppXml = getResourceAsString(configFile, getClass());
+  }
+
+  @Before
+  public void setup() throws Exception {
+    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
+    String core = IOUtils
+        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
+    ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
+
+    dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
+        .addAll(extensions).add(coreModel).build());
+    modelResolver = DslElementModelFactory.getDefault(dslContext);
+  }
+
+  @Test
+  public void serialize() throws Exception {
+    String serializationResult = ArtifactDeclarationXmlSerializer.getDefault(dslContext).serialize(applicationDeclaration);
+    compareXML(expectedAppXml, serializationResult);
+  }
+
+  @Test
+  public void loadAndserialize() throws Exception {
+    InputStream configIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFile);
+    ArtifactDeclarationXmlSerializer serializer = ArtifactDeclarationXmlSerializer.getDefault(dslContext);
+
+    ArtifactDeclaration artifact = serializer.deserialize(configFile, configIs);
+
+    String serializationResult = serializer.serialize(artifact);
+    compareXML(expectedAppXml, serializationResult);
   }
 
   @Override
-  protected String getConfigFile() {
-    return "loading-artifact-config-dsl-app.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {};
   }
 
-  private void createAppDeclaration() {
+  private static ArtifactDeclaration createMultiFlowArtifactDeclaration() {
+    ElementDeclarer jms = ElementDeclarer.forExtension("JMS");
+    ElementDeclarer core = ElementDeclarer.forExtension("Mule Core");
+
+    return newArtifact().withConfig(jms.newConfiguration("config")
+        .withRefName("config")
+        .withConnection(jms.newConnection("active-mq-connection")
+            .withParameter("disableValidation", "true")
+            .withParameter("cachingStrategy",
+                           newObjectValue()
+                               .ofType(NoCachingConfiguration.class.getName())
+                               .build())
+            .getDeclaration())
+        .getDeclaration())
+        .withFlow(newFlow("send-payload")
+            .withComponent(jms.newOperation("publish")
+                .withConfig("config")
+                .withParameter("destination", "#[initialDestination]")
+                .withParameter("messageBuilder",
+                               newObjectValue()
+                                   .withParameter("body", "#[payload]")
+                                   .withParameter("properties", "#[{(initialProperty): propertyValue}]")
+                                   .build())
+                .getDeclaration())
+            .getDeclaration())
+        .withFlow(newFlow("bridge")
+            .withComponent(jms.newOperation("consume")
+                .withConfig("config")
+                .withParameter("destination", "#[initialDestination]")
+                .withParameter("maximumWait", "1000")
+                .getDeclaration())
+            .withComponent(core.newScope("foreach")
+                .withRoute(core.newRoute("body")
+                    .withComponent(jms.newOperation("publish")
+                        .withConfig("config")
+                        .withParameter("destination", "#[finalDestination]")
+                        .withParameter("messageBuilder",
+                                       newObjectValue()
+                                           .withParameter("jmsxProperties",
+                                                          "#[attributes.properties.jmsxProperties]")
+                                           .withParameter("body",
+                                                          "#[bridgePrefix ++ payload]")
+                                           .withParameter("properties",
+                                                          "#[attributes.properties.userProperties]")
+                                           .build())
+                        .getDeclaration())
+                    .withComponent(core.newOperation("logger")
+                        .withParameter("message", "Message Sent")
+                        .getDeclaration())
+                    .getDeclaration())
+                .getDeclaration())
+            .getDeclaration())
+        .withFlow(newFlow("bridge-receiver")
+            .withComponent(jms.newOperation("consume").withConfig("config")
+                .withParameter("destination", "#[finalDestination]")
+                .withParameter("maximumWait", "1000")
+                .getDeclaration())
+            .getDeclaration())
+        .getDeclaration();
+  }
+
+  private static ArtifactDeclaration createFullArtifactDeclaration() {
 
     ElementDeclarer db = ElementDeclarer.forExtension("Database");
     ElementDeclarer http = ElementDeclarer.forExtension("HTTP");
     ElementDeclarer sockets = ElementDeclarer.forExtension("Sockets");
     ElementDeclarer core = ElementDeclarer.forExtension("Mule Core");
+    ElementDeclarer wsc = ElementDeclarer.forExtension("Web Service Consumer");
 
-    applicationDeclaration = newArtifact()
+    return newArtifact()
         .withGlobalParameter(db.newGlobalParameter("query")
             .withRefName("selectQuery")
             .withValue(newObjectValue()
@@ -155,27 +261,36 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                 .withParameter("response",
                                newObjectValue()
                                    .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
+                                   .withParameter("body", "#[{'my': 'map'}]")
                                    .build())
                 .getDeclaration())
             .withComponent(core.newRouter("choice")
                 .withRoute(core.newRoute("when")
                     .withParameter("expression", "#[true]")
                     .withComponent(db.newOperation("bulkInsert")
-                        .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
+                        .withParameter("sql",
+                                       "INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)")
                         .withParameter("parameterTypes",
                                        newListValue()
                                            .withValue(newObjectValue()
                                                .withParameter("key", "name")
-                                               .withParameter("type", "VARCHAR").build())
+                                               .withParameter("type", "VARCHAR")
+                                               .build())
                                            .withValue(newObjectValue()
                                                .withParameter("key", "position")
-                                               .withParameter("type", "INTEGER").build())
+                                               .withParameter("type", "INTEGER")
+                                               .build())
                                            .build())
                         .getDeclaration())
                     .getDeclaration())
                 .withRoute(core.newRoute("otherwise")
-                    .withComponent(core.newOperation("logger")
-                        .withParameter("message", "#[payload]")
+                    .withComponent(core.newScope("foreach")
+                        .withParameter("collection", "#[myCollection]")
+                        .withRoute(core.newRoute("body")
+                            .withComponent(core.newOperation("logger")
+                                .withParameter("message", "#[payload]")
+                                .getDeclaration())
+                            .getDeclaration())
                         .getDeclaration())
                     .getDeclaration())
                 .getDeclaration())
@@ -198,7 +313,8 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                 .getDeclaration())
             .withComponent(db.newOperation("insert")
                 .withConfig("dbConfig")
-                .withParameter("sql", "INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)")
+                .withParameter("sql",
+                               "INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)")
                 .withParameter("parameterTypes",
                                newListValue()
                                    .withValue(newObjectValue()
@@ -218,64 +334,17 @@ public class DeclarationLoaderTestCase extends AbstractElementModelTestCase {
                                    .withParameter("maxInMemorySize", "1000")
                                    .build())
                 .getDeclaration())
+            .withComponent(wsc.newOperation("consume")
+                .withParameter("operation", "GetCitiesByCountry")
+                .withParameter("message", newObjectValue()
+                    .withParameter("attachments", "#[{}]")
+                    .withParameter("headers",
+                                   "#[{\"headers\": {con#headerIn: \"Header In Value\",con#headerInOut: \"Header In Out Value\"}]")
+                    .withParameter("body", "#[payload]")
+                    .build())
+                .getDeclaration())
             .getDeclaration())
         .getDeclaration();
-  }
-
-  @Test
-  public void serialize() throws Exception {
-    XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
-    serializeArtifact(applicationDeclaration, converter);
-    String serializationResult = write();
-    compareXML(expectedAppXml, serializationResult);
-  }
-
-  @Test
-  public void loadAndserialize() throws Exception {
-
-    InputStream configIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(getConfigFile());
-    ArtifactDeclaration artifact = XmlArtifactDeclarationLoader.getDefault(dslContext).load(getConfigFile(), configIs);
-    XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
-
-    serializeArtifact(artifact, converter);
-
-    String serializationResult = write();
-
-    compareXML(expectedAppXml, serializationResult);
-  }
-
-  private Element createFlowNode(FlowElementDeclaration flowDeclaration) {
-    Element flow = doc.createElement("flow");
-    flow.setAttribute("name", flowDeclaration.getName());
-    flow.setAttribute("initialState",
-                      ((ParameterSimpleValue) flowDeclaration.getParameters().get(0).getValue()).getValue());
-
-    doc.getDocumentElement().appendChild(flow);
-    return flow;
-  }
-
-  private void serializeArtifact(ArtifactDeclaration artifact, XmlDslElementModelConverter converter) {
-    artifact.getGlobalParameters()
-        .forEach(declaration -> {
-          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
-          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
-        });
-
-    artifact.getConfigs()
-        .forEach(declaration -> {
-          Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(declaration);
-          doc.getDocumentElement().appendChild(converter.asXml(e.orElse(null)));
-        });
-
-    artifact.getFlows()
-        .forEach(flowDeclaration -> {
-          Element flow = createFlowNode(flowDeclaration);
-          flowDeclaration.getComponents()
-              .forEach(component -> {
-                Optional<DslElementModel<ParameterizedModel>> e = modelResolver.create(component);
-                flow.appendChild(converter.asXml(e.orElse(null)));
-              });
-        });
   }
 
 }

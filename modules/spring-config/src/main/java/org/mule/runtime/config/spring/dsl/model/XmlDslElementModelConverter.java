@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import org.mule.runtime.config.spring.dsl.model.internal.DefaultXmlDslElementModelConverter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
