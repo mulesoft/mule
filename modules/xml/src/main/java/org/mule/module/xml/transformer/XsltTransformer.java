@@ -18,6 +18,7 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -365,6 +366,7 @@ public class XsltTransformer extends AbstractXmlTransformer
                 }
             }
 
+            XMLSecureFactories.createDefault().configureTransformerFactory(factory);
             factory.setURIResolver(getUriResolver());
 
             return factory.newTransformer(source);
