@@ -2,6 +2,11 @@
 
     <xsl:template match="/">
         <table>
+        <tr>
+            <th>Country</th>
+            <th>City List</th>
+            <th>Population</th>
+        </tr>
         <xsl:for-each-group select="cities/city" group-by="@country">
             <tr>
                 <td>
