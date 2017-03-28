@@ -30,8 +30,14 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
   private String username = "#[mel:message.inboundProperties.username]";
   private String password = "#[mel:message.inboundProperties.password]";
 
-  public UsernamePasswordAuthenticationFilter() {
+  public UsernamePasswordAuthenticationFilter(String username, String password) {
     super();
+    if (username != null) {
+      this.username = username;
+    }
+    if (password != null) {
+      this.password = password;
+    }
   }
 
   /**
@@ -89,16 +95,8 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     return username;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
   public String getPassword() {
     return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
   }
 
 }

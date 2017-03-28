@@ -33,7 +33,8 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
 
   private EncryptionStrategy strategy;
 
-  public MuleEncryptionEndpointSecurityFilter() {
+  public MuleEncryptionEndpointSecurityFilter(EncryptionStrategy strategy) {
+    this.strategy = strategy;
     setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
   }
 
@@ -74,14 +75,6 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
     if (strategy == null) {
       throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
     }
-  }
-
-  public EncryptionStrategy getStrategy() {
-    return strategy;
-  }
-
-  public void setStrategy(EncryptionStrategy strategy) {
-    this.strategy = strategy;
   }
 
 }

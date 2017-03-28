@@ -37,6 +37,10 @@ public class AuthorizationFilter extends AbstractSecurityFilter {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private Collection<String> requiredAuthorities = new HashSet<>();
 
+  public AuthorizationFilter(Collection<String> requiredAuthorities) {
+    this.requiredAuthorities = requiredAuthorities;
+  }
+
   @Override
   public Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
@@ -79,11 +83,4 @@ public class AuthorizationFilter extends AbstractSecurityFilter {
     return event;
   }
 
-  public Collection<String> getRequiredAuthorities() {
-    return requiredAuthorities;
-  }
-
-  public void setRequiredAuthorities(Collection<String> requiredAuthorities) {
-    this.requiredAuthorities = requiredAuthorities;
-  }
 }
