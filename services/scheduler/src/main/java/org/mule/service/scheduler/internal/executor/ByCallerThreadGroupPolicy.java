@@ -45,7 +45,7 @@ public final class ByCallerThreadGroupPolicy implements RejectedExecutionHandler
    * 
    * @param waitGroups the group of threads for which a {@link WaitPolicy} will be applied. For the rest, an {@link AbortPolicy}
    *        will be applied.
-   * @param parentGroup the {@link org.mule.runtime.core.api.scheduler.SchedulerService } parent {@link ThreadGroup}/
+   * @param parentGroup the {@link org.mule.runtime.core.api.scheduler.SchedulerService } parent {@link ThreadGroup}
    */
   public ByCallerThreadGroupPolicy(Set<ThreadGroup> waitGroups, ThreadGroup parentGroup) {
     this.waitGroups = unmodifiableSet(waitGroups);
