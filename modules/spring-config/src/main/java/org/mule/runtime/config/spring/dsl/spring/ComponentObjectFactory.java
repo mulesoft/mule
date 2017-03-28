@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
@@ -33,14 +34,14 @@ import java.util.Map;
  */
 public class ComponentObjectFactory extends AbstractAnnotatedObjectFactory<Component> {
 
-  private Class clazz;
-  private org.mule.runtime.core.api.object.ObjectFactory objectFactory;
-  private EntryPointResolverSet entryPointResolverSet = new LegacyEntryPointResolverSet();
-  private EntryPointResolver entryPointResolver;
-  private LifecycleAdapterFactory lifecycleAdapterFactory;
-  private boolean usePrototypeObjectFactory = true;
-  private String staticData;
-  private List<Interceptor> interceptors = new ArrayList<>();
+  protected Class clazz;
+  protected org.mule.runtime.core.api.object.ObjectFactory objectFactory;
+  protected EntryPointResolverSet entryPointResolverSet = new LegacyEntryPointResolverSet();
+  protected EntryPointResolver entryPointResolver;
+  protected LifecycleAdapterFactory lifecycleAdapterFactory;
+  protected boolean usePrototypeObjectFactory = true;
+  protected String staticData;
+  protected List<Interceptor> interceptors = new ArrayList<>();
 
   @Override
   public Component doGetObject() throws Exception {
@@ -60,17 +61,22 @@ public class ComponentObjectFactory extends AbstractAnnotatedObjectFactory<Compo
       entryPointResolverSet = new DefaultEntryPointResolverSet();
       entryPointResolverSet.addEntryPointResolver(entryPointResolver);
     }
-    DefaultJavaComponent component;
-    if (objectFactory != null) {
-      component = new DefaultJavaComponent(objectFactory, entryPointResolverSet);
-    } else {
-      component = new DefaultJavaComponent();
-    }
+    AbstractJavaComponent component = createComponent();
     if (lifecycleAdapterFactory != null) {
       component.setLifecycleAdapterFactory(lifecycleAdapterFactory);
     }
     component.setInterceptors(interceptors);
     component.setAnnotations(this.getAnnotations());
+    return component;
+  }
+
+  protected AbstractJavaComponent createComponent() {
+    DefaultJavaComponent component;
+    if (this.objectFactory != null) {
+      component = new DefaultJavaComponent(this.objectFactory, this.entryPointResolverSet);
+    } else {
+      component = new DefaultJavaComponent();
+    }
     return component;
   }
 

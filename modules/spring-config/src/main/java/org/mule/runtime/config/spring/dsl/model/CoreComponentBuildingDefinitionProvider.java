@@ -1179,33 +1179,28 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private List<ComponentBuildingDefinition> getComponentsDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
-    buildingDefinitions.add(baseDefinition
+    final ComponentBuildingDefinition.Builder componentDefinition = baseDefinition.copy()
+        .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
+        .withSetterParameterDefinition("objectFactory",
+                                       fromChildConfiguration(org.mule.runtime.core.api.object.ObjectFactory.class).build())
+        .withSetterParameterDefinition("entryPointResolverSet", fromChildConfiguration(EntryPointResolverSet.class).build())
+        .withSetterParameterDefinition("entryPointResolver", fromChildConfiguration(EntryPointResolver.class).build())
+        .withSetterParameterDefinition("lifecycleAdapterFactory", fromChildConfiguration(LifecycleAdapterFactory.class).build())
+        .withSetterParameterDefinition("interceptors", fromChildCollectionConfiguration(Interceptor.class).build());
+
+    buildingDefinitions.add(componentDefinition
         .copy()
         .withIdentifier("component")
         .withTypeDefinition(fromType(DefaultJavaComponent.class))
         .withObjectFactoryType(ComponentObjectFactory.class)
-        .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
-        .withSetterParameterDefinition("objectFactory",
-                                       fromChildConfiguration(org.mule.runtime.core.api.object.ObjectFactory.class).build())
-        .withSetterParameterDefinition("entryPointResolverSet", fromChildConfiguration(EntryPointResolverSet.class).build())
-        .withSetterParameterDefinition("entryPointResolver", fromChildConfiguration(EntryPointResolver.class).build())
-        .withSetterParameterDefinition("lifecycleAdapterFactory", fromChildConfiguration(LifecycleAdapterFactory.class).build())
-        .withSetterParameterDefinition("interceptors", fromChildCollectionConfiguration(Interceptor.class).build())
         .build());
 
-    buildingDefinitions.add(baseDefinition
+    buildingDefinitions.add(componentDefinition
         .copy()
         .withIdentifier("pooled-component")
         .withTypeDefinition(fromType(PooledJavaComponent.class))
         .withObjectFactoryType(PooledComponentObjectFactory.class)
-        .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
-        .withSetterParameterDefinition("objectFactory",
-                                       fromChildConfiguration(org.mule.runtime.core.api.object.ObjectFactory.class).build())
-        .withSetterParameterDefinition("entryPointResolverSet", fromChildConfiguration(EntryPointResolverSet.class).build())
-        .withSetterParameterDefinition("entryPointResolver", fromChildConfiguration(EntryPointResolver.class).build())
-        .withSetterParameterDefinition("lifecycleAdapterFactory", fromChildConfiguration(LifecycleAdapterFactory.class).build())
         .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build())
-        .withSetterParameterDefinition("interceptors", fromChildCollectionConfiguration(Interceptor.class).build())
         .build());
 
     buildingDefinitions.add(baseDefinition
