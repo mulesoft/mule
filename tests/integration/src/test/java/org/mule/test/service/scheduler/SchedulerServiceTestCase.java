@@ -23,16 +23,19 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.concurrent.ExecutionException;
@@ -88,13 +91,17 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
       flowRunner("delaySchedule").run();
     }
 
-    MessagingException exception = flowRunner("delaySchedule").runExpectingException();
+    Scheduler scheduler = muleContext.getSchedulerService().cpuLightScheduler();
+
+    MessagingException exception =
+        flowRunner("delaySchedule").withScheduler(scheduler).runExpectingException();
 
     assertThat(exception.getEvent().getError().isPresent(), is(true));
     assertThat(exception.getEvent().getError().get().getErrorType().getIdentifier(), is("OVERLOAD"));
     assertThat(exception.getCause(), instanceOf(SchedulerBusyException.class));
 
     WaitingProcessor.latch.countDown();
+    scheduler.shutdownNow();
   }
 
   @Rule
@@ -103,7 +110,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Test
   @Description("Tests that an OVERLOAD error is handled only by the message source."
       + " This assumes org.mule.test.integration.exceptions.ErrorHandlerTestCase#criticalNotHandled")
-  public void overloadErrorHandlingFromSource() throws Exception {
+  public void overloadErrorHandlingFromSource() throws Throwable {
     FlowConstruct delayScheduleFlow = getFlowConstruct("delaySchedule");
     MessageSource messageSource = ((Flow) delayScheduleFlow).getMessageSource();
 
@@ -112,7 +119,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
           .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).build());
     }
 
-    expected.expect(instanceOf(MessagingException.class));
+    expected.expect(MessagingException.class);
     expected.expect(new TypeSafeMatcher<MessagingException>() {
 
       private String errorTypeId;
@@ -130,12 +137,17 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     });
     expected.expectCause(instanceOf(SchedulerBusyException.class));
 
+    Scheduler scheduler = muleContext.getSchedulerService().cpuLightScheduler();
     try {
-      ((SkeletonSource) messageSource).getListener()
+      scheduler.submit(() -> ((SkeletonSource) messageSource).getListener()
           .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null))
-              .build());
+              .build()))
+          .get();
+    } catch (ExecutionException executionException) {
+      throw executionException.getCause();
     } finally {
       WaitingProcessor.latch.countDown();
+      scheduler.shutdownNow();
     }
   }
 

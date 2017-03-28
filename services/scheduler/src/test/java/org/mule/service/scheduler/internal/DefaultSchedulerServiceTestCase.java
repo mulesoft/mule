@@ -91,9 +91,10 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   @Description("Tests that dispatching a task to a throttled scheduler already running its maximum tasks throws the appropriate exception.")
-  public void executorRejects() throws MuleException {
+  public void executorRejects() throws MuleException, ExecutionException, InterruptedException {
     final Latch latch = new Latch();
 
+    final Scheduler cpuLight = service.customScheduler(config().withMaxConcurrentTasks(1));
     final Scheduler custom = service.customScheduler(config().withMaxConcurrentTasks(1));
 
     custom.execute(() -> {
@@ -104,15 +105,18 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
       }
     });
 
-    expected.expect(SchedulerBusyException.class);
+    expected.expect(ExecutionException.class);
+    expected.expectCause(instanceOf(SchedulerBusyException.class));
 
     final Runnable task = () -> {
     };
-    try {
-      custom.submit(task);
-    } finally {
-      assertThat(custom.shutdownNow(), not(hasItem(task)));
-    }
+    cpuLight.submit(() -> {
+      try {
+        custom.submit(task);
+      } finally {
+        assertThat(custom.shutdownNow(), not(hasItem(task)));
+      }
+    }).get();
   }
 
   @Test
@@ -334,9 +338,14 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
     Future<Object> submit = sourceExecutor.submit(threadsConsumer(targetScheduler, latch));
 
-    expected.expect(ExecutionException.class);
-    expected.expectCause(instanceOf(SchedulerBusyException.class));
-    submit.get(DEFAULT_TEST_TIMEOUT_SECS, SECONDS);
+    try {
+      submit.get(1, SECONDS);
+      fail();
+    } catch (TimeoutException te) {
+    }
+
+    latch.countDown();
+    submit.get(5, SECONDS);
   }
 
   private Callable<Object> threadsConsumer(Scheduler targetScheduler, Latch latch) {

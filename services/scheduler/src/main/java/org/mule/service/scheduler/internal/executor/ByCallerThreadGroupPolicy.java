@@ -18,7 +18,8 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 /**
  * Dynamically determines the {@link RejectedExecutionHandler} implementation to use according to the {@link ThreadGroup} of the
- * current thread.
+ * current thread. If the current thread is not a {@link org.mule.runtime.core.api.scheduler.SchedulerService} managed thread then
+ * {@link WaitPolicy} is used.
  * 
  * @see AbortPolicy
  * @see WaitPolicy
@@ -37,25 +38,43 @@ public final class ByCallerThreadGroupPolicy implements RejectedExecutionHandler
   private final WaitPolicy wait = new WaitPolicy();
 
   private final Set<ThreadGroup> waitGroups;
+  private final ThreadGroup parentGroup;
 
   /**
    * Builds a new {@link ByCallerThreadGroupPolicy} with the given {@code waitGroups}.
    * 
    * @param waitGroups the group of threads for which a {@link WaitPolicy} will be applied. For the rest, an {@link AbortPolicy}
    *        will be applied.
+   * @param parentGroup the {@link org.mule.runtime.core.api.scheduler.SchedulerService } parent {@link ThreadGroup}
    */
-  public ByCallerThreadGroupPolicy(Set<ThreadGroup> waitGroups) {
+  public ByCallerThreadGroupPolicy(Set<ThreadGroup> waitGroups, ThreadGroup parentGroup) {
     this.waitGroups = unmodifiableSet(waitGroups);
+    this.parentGroup = parentGroup;
   }
 
   @Override
   public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-    if (currentThread().getThreadGroup() != null && waitGroups.contains(currentThread().getThreadGroup())) {
+    ThreadGroup currentThreadGroup = currentThread().getThreadGroup();
+    if (!isSchedulerThread(currentThreadGroup) || waitGroups.contains(currentThreadGroup)) {
       // MULE-11460 Make CPU-intensive pool a ForkJoinPool - keep the parallelism when waiting.
       wait.rejectedExecution(r, executor);
     } else {
       abort.rejectedExecution(r, executor);
     }
   }
+
+  private boolean isSchedulerThread(ThreadGroup threadGroup) {
+    if (threadGroup != null) {
+      while (threadGroup.getParent() != null) {
+        if (threadGroup.equals(parentGroup)) {
+          return true;
+        } else {
+          threadGroup = threadGroup.getParent();
+        }
+      }
+    }
+    return false;
+  }
+
 
 }

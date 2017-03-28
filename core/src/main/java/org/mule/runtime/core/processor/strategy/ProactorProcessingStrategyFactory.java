@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -97,13 +98,11 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     }
   }
 
-  static class ProactorProcessingStrategy extends RingBufferProcessingStrategy implements Startable, Stoppable {
+  static class ProactorProcessingStrategy extends ReactorProcessingStrategy implements Startable, Stoppable {
 
-    private Supplier<Scheduler> cpuLightSchedulerSupplier;
     private Supplier<Scheduler> blockingSchedulerSupplier;
     private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
     private Consumer<Scheduler> schedulerStopper;
-    private Scheduler cpuLightScheduler;
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
     private int maxConcurrency;
@@ -118,8 +117,8 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
                                       int subscriberCount,
                                       String waitStrategy,
                                       MuleContext muleContext) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, muleContext);
-      this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
+      super(cpuLightSchedulerSupplier, schedulerStopper, ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy,
+            muleContext);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
       this.schedulerStopper = schedulerStopper;
@@ -128,30 +127,20 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
 
     @Override
     public void start() throws MuleException {
-      this.cpuLightScheduler = cpuLightSchedulerSupplier.get();
+      super.start();
       this.blockingScheduler = blockingSchedulerSupplier.get();
       this.cpuIntensiveScheduler = cpuIntensiveSchedulerSupplier.get();
     }
 
     @Override
     public void stop() throws MuleException {
-      if (cpuLightScheduler != null) {
-        schedulerStopper.accept(cpuLightScheduler);
-      }
       if (blockingScheduler != null) {
         schedulerStopper.accept(blockingScheduler);
       }
       if (cpuIntensiveScheduler != null) {
         schedulerStopper.accept(cpuIntensiveScheduler);
       }
-    }
-
-    @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
-      return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
-          .transform(pipelineFunction);
+      super.stop();
     }
 
     @Override
@@ -170,7 +159,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
                                                                   Scheduler scheduler) {
       // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(scheduler)))
-          .transform(processorFunction).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)));
+          .transform(processorFunction).publishOn(fromExecutorService(getExecutorService(getCpuLightScheduler())));
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {
@@ -186,12 +175,6 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
       return scheduler -> false;
     }
 
-
-    @Override
-    public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
-      return new StreamPerEventSink(function, createOnEventConsumer());
-    }
   }
 
 }
