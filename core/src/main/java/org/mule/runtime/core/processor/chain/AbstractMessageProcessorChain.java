@@ -21,7 +21,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -275,7 +274,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(getMessageProcessorsForLifecycle());
+    initialiseIfNeeded(getMessageProcessorsForLifecycle(), true, muleContext);
   }
 
   @Override

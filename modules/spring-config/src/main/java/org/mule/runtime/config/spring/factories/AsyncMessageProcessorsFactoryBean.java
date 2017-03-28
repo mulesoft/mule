@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
@@ -26,7 +25,6 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   protected MuleContext muleContext;
 
   protected List messageProcessors;
-  protected ProcessingStrategyFactory processingStrategyFactory;
   protected String name;
 
   @Override
@@ -52,7 +50,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
         throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
     }
-    AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(), processingStrategyFactory, name);
+    AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(), name);
     delegate.setAnnotations(getAnnotations());
     return delegate;
   }
@@ -75,9 +73,5 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setProcessingStrategy(ProcessingStrategyFactory processingStrategyFactory) {
-    this.processingStrategyFactory = processingStrategyFactory;
   }
 }

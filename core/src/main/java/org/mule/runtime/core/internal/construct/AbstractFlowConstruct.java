@@ -13,9 +13,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
@@ -23,8 +25,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -254,7 +254,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   }
 
   protected void initialiseIfInitialisable(Object candidate) throws InitialisationException {
-    initialiseIfNeeded(candidate);
+    initialiseIfNeeded(candidate, true, muleContext);
   }
 
   protected void startIfStartable(Object candidate) throws MuleException {

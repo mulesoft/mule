@@ -17,8 +17,10 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
@@ -88,7 +90,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
     asyncMP.setFlowConstruct(builder("flowName", muleContext).build());
-    asyncMP.initialise();
+    initialiseIfNeeded(asyncMP, true, muleContext);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
@@ -108,7 +110,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     target.setWaitTime(30000);
     AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
     asyncMP.setFlowConstruct(builder("flowName", muleContext).build());
-    asyncMP.initialise();
+    initialiseIfNeeded(asyncMP, true, muleContext);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());

@@ -212,7 +212,7 @@
 
     <flow name="async">
         <test:assert-intercepting responseSameTask="false" responseExpression="#[mel:assertPayload()]"/>
-        <async processingStrategy="asynchronous">
+        <async>
             <test:assert-intercepting responseSameTask="false" responseExpression="#[mel:assertPayload()]"/>
             <test:non-blocking-processor/>
         </async>

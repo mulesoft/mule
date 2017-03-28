@@ -9,19 +9,20 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 
 import java.util.List;
 
@@ -76,7 +77,7 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
         ((MessagingExceptionHandlerAware) object).setMessagingExceptionHandler(messagingExceptionHandler);
       }
     }
-    initialiseIfNeeded(getOwnedObjects());
+    initialiseIfNeeded(getOwnedObjects(), true, muleContext);
   }
 
   @Override

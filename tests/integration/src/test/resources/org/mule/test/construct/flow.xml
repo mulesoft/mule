@@ -49,7 +49,7 @@
     </flow>    
 
     <flow name="asynchronousAsync" processingStrategy="synchronous">
-        <async processingStrategy="asynchronous">
+        <async>
             <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
             <test:queue name="asynchronous-async-out"/>
         </async>
@@ -199,7 +199,7 @@
 
     <flow name="async-oneway">
         <append-string-transformer message="a" />
-        <async processingStrategy="asynchronous">
+        <async>
             <append-string-transformer message="b" />
             <test:queue name="async-async-oneway-out"/>
         </async>    

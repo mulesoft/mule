@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -19,21 +20,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -65,7 +65,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected void doSetUp() throws Exception {
     super.doSetUp();
     messageProcessor = createAsyncDelegatMessageProcessor(target);
-    messageProcessor.initialise();
     messageProcessor.start();
   }
 
@@ -77,7 +76,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   }
 
   @Test
-  public void testProcessOneWay() throws Exception {
+  public void process() throws Exception {
     Event request = testEvent();
 
     Event result = process(messageProcessor, request);
@@ -105,63 +104,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
     assertThat(testEvent(), sameInstance(result));
     assertThat(exceptionThrown, nullValue());
-    assertThat(target.thread, not(sameInstance(Thread.currentThread())));
-
-    messageProcessor.stop();
-    messageProcessor.dispose();
+    assertThat(target.thread, not(sameInstance(currentThread())));
   }
 
   @Test
-  public void testProcessRequestResponse() throws Exception {
-    Event request = testEvent();
-    Event result = process(messageProcessor, testEvent());
-
-    // Complete parent context so we can assert event context completion based on async completion.
-    request.getContext().success(result);
-
-    assertCompletionNotDone(request.getContext());
-
-    // Permit async processing now we have already asserted that response alone is not enough to complete event context.
-    asyncEntrylatch.countDown();
-
-    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
-
-    // Block until async completes, not just target processor.
-    from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
-    assertThat(target.sensedEvent, notNullValue());
-    // Event is not the same because it gets copied in
-    // AbstractMuleEventWork#run()
-    assertNotSame(request, target.sensedEvent);
-    assertEquals(testEvent().getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
-    assertCompletionDone(target.sensedEvent.getContext());
-    assertCompletionDone(request.getContext());
-
-    assertSame(testEvent(), result);
-    assertNull(exceptionThrown);
-    assertNotSame(Thread.currentThread(), target.thread);
-
-    messageProcessor.stop();
-    messageProcessor.dispose();
-  }
-
-  @Test
-  public void testProcessOneWayWithTx() throws Exception {
-    Transaction transaction = new TestTransaction(muleContext);
-    TransactionCoordination.getInstance().bindTransaction(transaction);
-
-    try {
-      process(messageProcessor, testEvent());
-      fail("Exception expected");
-    } catch (Exception e) {
-      assertThat(e, instanceOf(RoutingException.class));
-      assertNull(target.sensedEvent);
-    } finally {
-      TransactionCoordination.getInstance().unbindTransaction(transaction);
-    }
-  }
-
-  @Test
-  public void testProcessRequestResponseWithTx() throws Exception {
+  public void processWithTx() throws Exception {
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -169,6 +116,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
       assertAsync(messageProcessor, process(messageProcessor, testEvent()));
       fail("Exception expected");
     } catch (Exception e) {
+      assertThat(e, instanceOf(RoutingException.class));
+      assertThat(target.sensedEvent, nullValue());
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
@@ -189,14 +138,13 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   }
 
   protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(Processor listener) throws Exception {
-    AsyncDelegateMessageProcessor mp =
-        new AsyncDelegateMessageProcessor(MessageProcessors.newChain(listener), new LegacyAsynchronousProcessingStrategyFactory(),
-                                          "thread");
-    mp.setMuleContext(muleContext);
+    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
+
     final Flow flowConstruct = builder("flow", muleContext).build();
     flowConstruct.initialise();
     mp.setFlowConstruct(flowConstruct);
-    mp.initialise();
+    initialiseIfNeeded(mp, true, muleContext);
+
     return mp;
   }
 
@@ -221,7 +169,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
         throw new RuntimeException(e);
       }
       sensedEvent = event;
-      thread = Thread.currentThread();
+      thread = currentThread();
       latch.countDown();
       return event;
     }
