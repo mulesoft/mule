@@ -100,6 +100,7 @@ import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorIterator
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
+import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
@@ -287,6 +288,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String RESPONSE = "response";
   private static final String MESSAGE_FILTER = "message-filter";
   private static final String FLOW = "flow";
+  private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
   private static final String SCATTER_GATHER = "scatter-gather";
   private static final String WIRE_TAP = "wire-tap";
@@ -495,6 +497,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(PROCESSING_STRATEGY_FACTORY_ATTRIBUTE,
                                            fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
             .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FLOW_REF)
+        .withTypeDefinition(fromType(Processor.class))
+        .withObjectFactoryType(FlowRefFactoryBean.class)
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SCATTER_GATHER)
         .withTypeDefinition(fromType(ScatterGatherRouter.class)).withObjectFactoryType(ScatterGatherRouterFactoryBean.class)
         .withSetterParameterDefinition("parallel", fromSimpleParameter("parallel").build())
