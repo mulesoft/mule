@@ -130,6 +130,7 @@ import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
@@ -215,7 +216,10 @@ import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionType;
+import org.mule.runtime.core.transaction.XaTransaction;
+import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JRunTransactionManagerLookupFactory;
@@ -843,13 +847,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromSimpleReferenceParameter("object-ref").build())
         .build());
 
-    componentBuildingDefinitions.addAll(getReconnectionDefinitions());
-
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
     componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
     componentBuildingDefinitions.addAll(getStreamingDefinitions());
     componentBuildingDefinitions.addAll(getFiltersDefinitions());
+    componentBuildingDefinitions.addAll(getReconnectionDefinitions());
+    componentBuildingDefinitions.addAll(getTransactionDefinitions());
     return componentBuildingDefinitions;
   }
 
@@ -1651,6 +1655,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-notifier")
         .withTypeDefinition(fromType(ConnectNotifier.class))
+        .build());
+
+    return buildingDefinitions;
+  }
+
+  private List<ComponentBuildingDefinition> getTransactionDefinitions() {
+    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("xa-transaction")
+        .withTypeDefinition(fromType(MuleTransactionConfig.class))
+        .withSetterParameterDefinition("factory", fromFixedValue(new XaTransactionFactory()).build())
+        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+        .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
+        .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
         .build());
 
     return buildingDefinitions;
