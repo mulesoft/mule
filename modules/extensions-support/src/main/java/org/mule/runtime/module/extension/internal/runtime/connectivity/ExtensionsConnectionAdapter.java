@@ -7,31 +7,24 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
-import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionalResource;
-import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionalConnectionHandler;
-import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
-
-import java.util.Optional;
+import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides
@@ -56,13 +49,39 @@ public class ExtensionsConnectionAdapter {
    * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
-  public ConnectionHandler<?> getConnection(ExecutionContextAdapter<ComponentModel> executionContext)
+  public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
       throws ConnectionException, TransactionException {
     return executionContext.getTransactionConfig().isPresent()
         ? getTransactedConnectionHandler(executionContext, executionContext.getTransactionConfig().get())
         : getTransactionlessConnectionHandler(executionContext);
   }
 
+  private <T extends TransactionalConnection> ConnectionHandler<T> getTransactedConnectionHandler(
+                                                                                                  ExecutionContextAdapter<? extends ComponentModel> executionContext,
+                                                                                                  TransactionConfig transactionConfig)
+      throws ConnectionException, TransactionException {
+
+    if (!transactionConfig.isTransacted()) {
+      return getTransactionlessConnectionHandler(executionContext);
+    }
+
+    ExtensionModel extensionModel = executionContext.getExtensionModel();
+    ComponentModel componentModel = executionContext.getComponentModel();
+
+    ConfigurationInstance configuration = executionContext.getConfiguration()
+        .orElseThrow(() -> new IllegalStateException(format(
+                                                            "%s '%s' of extension '%s' cannot participate in a transaction because it doesn't have a config",
+                                                            getComponentModelTypeName(componentModel),
+                                                            componentModel.getName(),
+                                                            extensionModel.getName())));
+
+
+    final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
+
+    TransactionBindingDelegate transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
+    return transactionBindingDelegate.bindResource(transactionConfig, txKey,
+                                                   () -> getTransactionlessConnectionHandler(executionContext));
+  }
 
   private <T> ConnectionHandler<T> getTransactionlessConnectionHandler(ExecutionContext executionContext)
       throws ConnectionException {
@@ -86,66 +105,5 @@ public class ExtensionsConnectionAdapter {
     }
 
     return connectionManager.getConnection(configuration.get().getValue());
-  }
-
-  private <T extends TransactionalConnection> ConnectionHandler<T> getTransactedConnectionHandler(
-                                                                                                  ExecutionContextAdapter<ComponentModel> executionContext,
-                                                                                                  TransactionConfig transactionConfig)
-      throws ConnectionException, TransactionException {
-
-    if (transactionConfig.getAction() == ACTION_NOT_SUPPORTED) {
-      return getTransactionlessConnectionHandler(executionContext);
-    }
-
-    ConfigurationInstance configuration = executionContext.getConfiguration()
-        .orElseThrow(() -> new IllegalStateException(format(
-                                                            "Operation '%s' of extension '%s' cannot participate in a transaction because it doesn't have a config",
-                                                            executionContext.getComponentModel().getName(),
-                                                            executionContext.getExtensionModel().getName())));
-
-
-    final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
-    final Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
-
-    if (currentTx != null) {
-      if (currentTx.hasResource(txKey)) {
-        return new TransactionalConnectionHandler((ExtensionTransactionalResource) currentTx.getResource(txKey));
-      }
-
-      ConnectionHandler<T> connectionHandler = getTransactionlessConnectionHandler(executionContext);
-      T connection = connectionHandler.getConnection();
-      ExtensionTransactionalResource<T> txResource = createTransactionalResource(currentTx, connectionHandler, connection);
-      boolean bound = false;
-      try {
-        if (currentTx.supports(txKey, txResource)) {
-          currentTx.bindResource(txKey, txResource);
-          bound = true;
-          return new TransactionalConnectionHandler(txResource);
-        } else if (transactionConfig.isTransacted()) {
-          throw new TransactionException(
-                                         createStaticMessage(format("%s '%s' of extension '%s' uses a transactional connection '%s', but the current transaction "
-                                             + "doesn't support it and could not being bound",
-                                                                    getComponentModelTypeName(executionContext
-                                                                        .getComponentModel()),
-                                                                    executionContext.getComponentModel().getName(),
-                                                                    executionContext.getExtensionModel().getName(),
-                                                                    connection.getClass().getName())));
-        }
-      } finally {
-        if (!bound) {
-          connectionHandler.release();
-        }
-      }
-    }
-
-    return getTransactionlessConnectionHandler(executionContext);
-  }
-
-  private <T extends TransactionalConnection> ExtensionTransactionalResource<T> createTransactionalResource(Transaction currentTx,
-                                                                                                            ConnectionHandler<T> connectionHandler,
-                                                                                                            T connection) {
-    return connection instanceof XATransactionalConnection
-        ? new XAExtensionTransactionalResource((XATransactionalConnection) connection, connectionHandler, currentTx)
-        : new ExtensionTransactionalResource<>(connection, connectionHandler, currentTx);
   }
 }

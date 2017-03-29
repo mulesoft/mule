@@ -7,14 +7,21 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+import org.apache.commons.collections.CollectionUtils;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -23,8 +30,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.util.func.CheckedRunnable;
@@ -35,21 +40,20 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
+import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -66,6 +70,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
   private final Optional<FieldSetter<Object, Object>> configurationSetter;
   private final Optional<FieldSetter<Object, Object>> connectionSetter;
   private final SourceCallbackFactory sourceCallbackFactory;
+  private final ResolverSet nonCallbackParameters;
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
 
@@ -82,6 +87,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
                        Source source,
                        Optional<ConfigurationInstance> configurationInstance,
                        SourceCallbackFactory sourceCallbackFactory,
+                       ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
                        ResolverSet errorCallbackParameters) {
     this.extensionModel = extensionModel;
@@ -89,6 +95,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
     this.source = source;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
+    this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
 
@@ -225,6 +232,14 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
     }
   }
 
+  Optional<ConfigurationInstance> getConfigurationInstance() {
+    return configurationInstance;
+  }
+
+  Optional<ConnectionHandler> getConnectionHandler() {
+    return ofNullable(connectionHandler);
+  }
+
   private void releaseConnection() {
     if (connectionHandler != null) {
       try {
@@ -238,7 +253,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
   private <T> Optional<FieldSetter<Object, T>> fetchField(Class<? extends Annotation> annotation) {
     Set<Field> fields = getAllFields(source.getClass(), withAnnotation(annotation));
     if (CollectionUtils.isEmpty(fields)) {
-      return Optional.empty();
+      return empty();
     }
 
     if (fields.size() > 1) {
@@ -259,6 +274,22 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
 
   public Source getDelegate() {
     return source;
+  }
+
+  public SourceTransactionalAction getTransactionalAction() {
+    ValueResolver valueResolver = nonCallbackParameters.getResolvers().get(TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    Object transactionalAction;
+
+    try {
+      transactionalAction = valueResolver.resolve(getInitialiserEvent(muleContext));
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage("Unable to get the Transactional Action value for Message Source"), e);
+    }
+
+    if (!(transactionalAction instanceof SourceTransactionalAction)) {
+      throw new IllegalStateException("The resolved value is not a Transactional Action");
+    }
+    return (SourceTransactionalAction) transactionalAction;
   }
 
   @Override

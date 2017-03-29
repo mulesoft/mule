@@ -14,6 +14,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
+import org.junit.Test;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -27,8 +28,6 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensio
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.transaction.TransactionManager;
-
-import org.junit.Test;
 
 public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTestCase {
 
@@ -64,6 +63,7 @@ public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTest
 
     TransactionConfig transactionConfig = mock(TransactionConfig.class);
     when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_JOIN);
+    when(transactionConfig.isTransacted()).thenReturn(true);
     when(operationContext.getTransactionConfig()).thenReturn(of(transactionConfig));
 
     muleContext.getRegistry().lookupObject(ConnectionManager.class).bind(config, connectionProvider);

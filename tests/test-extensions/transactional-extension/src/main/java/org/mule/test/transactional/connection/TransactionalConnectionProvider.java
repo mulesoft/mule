@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.transactional;
+package org.mule.test.transactional.connection;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -13,7 +13,7 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-public class LocalTransactionProvider implements PoolingConnectionProvider<TestTransactionalConnection> {
+public class TransactionalConnectionProvider implements PoolingConnectionProvider<TestTransactionalConnection> {
 
   private DummyXaResource dummyXaResource = new DummyXaResource();
 

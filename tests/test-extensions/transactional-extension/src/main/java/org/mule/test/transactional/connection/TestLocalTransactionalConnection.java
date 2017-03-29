@@ -4,12 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.transactional;
+package org.mule.test.transactional.connection;
 
 public class TestLocalTransactionalConnection implements TestTransactionalConnection {
 
   private boolean transactionBegun, transactionCommited, transactionRolledback = false;
   private boolean connected = true;
+  private double connectionId;
+
+  public TestLocalTransactionalConnection() {
+    connectionId = Math.random();
+  }
 
   @Override
   public void begin() throws Exception {
@@ -24,6 +29,11 @@ public class TestLocalTransactionalConnection implements TestTransactionalConnec
   @Override
   public void rollback() throws Exception {
     transactionRolledback = true;
+  }
+
+  @Override
+  public double getConnectionId() {
+    return connectionId;
   }
 
   @Override

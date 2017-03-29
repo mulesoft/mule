@@ -9,7 +9,6 @@ package org.mule.runtime.core.execution;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -18,11 +17,10 @@ import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This phase routes the message through the flow.
@@ -48,8 +46,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
           TransactionalErrorHandlingExecutionTemplate transactionTemplate =
               createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
                                           messageProcessContext.getFlowConstruct(),
-                                          (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
-                                              : messageProcessContext.getTransactionConfig()),
+                                          messageProcessContext.getTransactionConfig().orElse(new MuleTransactionConfig()),
                                           messageProcessContext.getFlowConstruct().getExceptionListener());
           Event response = transactionTemplate.execute(() -> {
             try {
