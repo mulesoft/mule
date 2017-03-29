@@ -199,6 +199,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(SUBFLOW_ELEMENT).build();
   public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(REDELIVERY_POLICY_ELEMENT).build();
+  public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =
+      builder().withNamespace(CORE_PREFIX).withName(GLOBAL_PROPERTY).build();
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
