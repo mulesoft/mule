@@ -114,6 +114,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
         if (tf != null)
         {
+            XMLSecureFactories.createDefault().configureTransformerFactory(tf);
             return tf.newTransformer();
         }
         else
@@ -536,7 +537,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     private static String getOuterXml(XMLStreamReader xmlr) throws TransformerFactoryConfigurationError, TransformerException
     {
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
         StringWriter stringWriter = new StringWriter();
         transformer.transform(new StaxSource(xmlr), new StreamResult(stringWriter));
         return stringWriter.toString();

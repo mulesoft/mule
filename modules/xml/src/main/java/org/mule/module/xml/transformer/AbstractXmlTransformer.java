@@ -28,7 +28,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
@@ -263,7 +262,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
 
-        Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
+        Transformer idTransformer = XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
         if (outputEncoding != null)
         {
             idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
