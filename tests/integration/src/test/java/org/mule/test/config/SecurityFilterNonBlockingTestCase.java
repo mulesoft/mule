@@ -23,8 +23,11 @@ import org.junit.Test;
 public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCase {
 
   @Override
-  protected String getConfigFile() {
-    return "org/mule/test/config/security-filter-config-nb.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {
+        "org/mule/test/config/security-filter-nb-beans.xml",
+        "org/mule/test/config/security-filter-config-nb.xml"
+    };
   }
 
   @Test

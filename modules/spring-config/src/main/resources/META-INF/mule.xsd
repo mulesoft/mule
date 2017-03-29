@@ -2703,16 +2703,13 @@
     <xsd:complexType name="customSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractSecurityFilterType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the security filter to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -7,10 +7,6 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.core.util.BeanUtils;
-import org.mule.runtime.core.util.ClassUtils;
-
-import java.util.Map;
 
 /**
  * Object factory for custom {@link SecurityFilter}.
@@ -19,25 +15,15 @@ import java.util.Map;
  */
 public class CustomSecurityFilterObjectFactory extends AbstractSecurityFilterObjectFactory<SecurityFilter> {
 
-  private final Class<? extends SecurityFilter> clazz;
-  private final Map properties;
+  private final SecurityFilter filter;
 
-  public CustomSecurityFilterObjectFactory(Class<? extends SecurityFilter> clazz, Map properties) {
-    this.clazz = clazz;
-    this.properties = properties;
+  public CustomSecurityFilterObjectFactory(SecurityFilter filter) {
+    this.filter = filter;
   }
 
   @Override
   public SecurityFilter getFilter() {
-    try {
-      SecurityFilter securityFilter = ClassUtils.instanciateClass(clazz);
-      if (properties != null) {
-        BeanUtils.populateWithoutFail(securityFilter, properties, false);
-      }
-      return securityFilter;
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
+    return filter;
   }
 
 }

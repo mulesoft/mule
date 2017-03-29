@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:ss="http://www.springframework.org/schema/security"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
+
+    <spring:beans>
+        <spring:bean class="org.mule.runtime.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
+
+        <spring:bean class="org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter" name="customFilter">
+            <spring:property name="password" value="#[mel:message.inboundProperties.pass]"/>
+        </spring:bean>
+
+        <ss:authentication-manager alias="authenticationManager">
+            <ss:authentication-provider>
+                <ss:user-service id="userService">
+                    <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+                    <ss:user name="anon" password="anon" authorities="ROLE_ANON" />
+                </ss:user-service>
+            </ss:authentication-provider>
+        </ss:authentication-manager>
+    </spring:beans>
+
+</mule>

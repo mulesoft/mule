@@ -21,7 +21,14 @@ public class UsernamePasswordFilterObjectFactory
 
   @Override
   public UsernamePasswordAuthenticationFilter getFilter() {
-    return new UsernamePasswordAuthenticationFilter(username, password);
+    UsernamePasswordAuthenticationFilter filter = new UsernamePasswordAuthenticationFilter();
+    if (username != null) {
+      filter.setUsername(username);
+    }
+    if (password != null) {
+      filter.setPassword(password);
+    }
+    return filter;
   }
 
   public void setUsername(String username) {

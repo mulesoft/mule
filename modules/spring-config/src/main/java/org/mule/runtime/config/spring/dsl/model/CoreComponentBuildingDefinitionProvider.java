@@ -728,8 +728,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-security-filter")
         .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
         .withObjectFactoryType(CustomSecurityFilterObjectFactory.class)
-        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE, stringToClassConverter()).build())
-        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
         .withIgnoredConfigurationParameter(NAME)
         .build());
 

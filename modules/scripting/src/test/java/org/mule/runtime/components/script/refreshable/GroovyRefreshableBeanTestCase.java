@@ -31,8 +31,11 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
   }
 
   @Override
-  protected String getConfigFile() {
-    return "groovy-refreshable-config-flow.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {
+        "groovy-refreshable-beans.xml",
+        "groovy-refreshable-config-flow.xml"
+    };
   }
 
   @Test
