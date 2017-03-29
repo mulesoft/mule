@@ -833,6 +833,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromSimpleReferenceParameter("object-ref").build())
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("custom-source")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .asPrototype()
+        .build());
+
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
     componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
