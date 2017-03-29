@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
+import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
 import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
@@ -28,13 +29,13 @@ import java.util.List;
  */
 public class PooledComponentObjectFactory extends AbstractAnnotatedObjectFactory<Component> {
 
-  private Class clazz;
-  private org.mule.runtime.core.api.object.ObjectFactory objectFactory = new PrototypeObjectFactory();
-  private EntryPointResolverSet entryPointResolverSet;
-  private EntryPointResolver entryPointResolver;
-  private PoolingProfile poolingProfile = new PoolingProfile();
-  private LifecycleAdapterFactory lifecycleAdapterFactory;
-  private List<Interceptor> interceptors = new ArrayList<>();
+  protected Class clazz;
+  protected org.mule.runtime.core.api.object.ObjectFactory objectFactory = new PrototypeObjectFactory();
+  protected EntryPointResolverSet entryPointResolverSet;
+  protected EntryPointResolver entryPointResolver;
+  protected PoolingProfile poolingProfile = new PoolingProfile();
+  protected LifecycleAdapterFactory lifecycleAdapterFactory;
+  protected List<Interceptor> interceptors = new ArrayList<>();
 
   @Override
   public Component doGetObject() throws Exception {
@@ -45,6 +46,13 @@ public class PooledComponentObjectFactory extends AbstractAnnotatedObjectFactory
       entryPointResolverSet = new DefaultEntryPointResolverSet();
       entryPointResolverSet.addEntryPointResolver(entryPointResolver);
     }
+    AbstractJavaComponent pooledJavaComponent = createComponent();
+    pooledJavaComponent.setInterceptors(interceptors);
+    pooledJavaComponent.setAnnotations(getAnnotations());
+    return pooledJavaComponent;
+  }
+
+  protected AbstractJavaComponent createComponent() {
     PooledJavaComponent pooledJavaComponent;
     if (objectFactory != null) {
       pooledJavaComponent = new PooledJavaComponent(objectFactory, poolingProfile, entryPointResolverSet);
@@ -52,8 +60,6 @@ public class PooledComponentObjectFactory extends AbstractAnnotatedObjectFactory
     } else {
       pooledJavaComponent = new PooledJavaComponent();
     }
-    pooledJavaComponent.setInterceptors(interceptors);
-    pooledJavaComponent.setAnnotations(getAnnotations());
     return pooledJavaComponent;
   }
 
