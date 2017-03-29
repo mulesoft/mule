@@ -28,6 +28,25 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Bytes-casterType" substitutionGroup="mule:abstract-message-source" name="bytes-caster"></xs:element>
+    <xs:complexType name="Bytes-casterType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:substitutableLong" use="required" name="castFrequencyInMillis"></xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="spell"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CrashCarType" substitutionGroup="mule:abstract-operator" name="crash-car"></xs:element>
     <xs:complexType name="CrashCarType">
         <xs:complexContent>
@@ -201,20 +220,6 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionBoolean" use="optional" name="alive"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Bytes-casterType" substitutionGroup="mule:abstract-message-source" name="bytes-caster"></xs:element>
-    <xs:complexType name="Bytes-casterType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:substitutableLong" use="required" name="castFrequencyInMillis"></xs:attribute>
-                <xs:attribute type="xs:string" use="required" name="spell"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

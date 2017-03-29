@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -367,5 +368,12 @@ public final class ExtensionsTestUtils {
     return new InMemoryCursorStreamProviderFactory(mock(CursorManager.class),
                                                    new SimpleByteBufferManager(),
                                                    InMemoryCursorStreamConfig.getDefault());
+  }
+
+  public static void assertType(MetadataType metadataType, Class<?> expectedRawType,
+                                Class<? extends MetadataType> typeQualifier) {
+    assertThat(metadataType, is(instanceOf(typeQualifier)));
+    assertThat(expectedRawType.isAssignableFrom(getType(metadataType)), is(true));
+
   }
 }

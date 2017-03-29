@@ -140,8 +140,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String KILL_WITH_RICINS = "killWithRicins";
   private static final String KILL_WITH_MULTIPLES_WEAPONS = "killWithMultiplesWeapons";
   private static final String KILL_WITH_MULTIPLE_WILDCARD_WEAPONS = "killWithMultipleWildCardWeapons";
-  private static final String GET_PAYMENT_FROM_EVENT_OPERATION = "getPaymentFromEvent";
-  private static final String GET_PAYMENT_FROM_MESSAGE_OPERATION = "getPaymentFromMessage";
   private static final String GET_PAGED_PERSONAL_INFO_OPERATION = "getPagedPersonalInfo";
   private static final String EMPTY_PAGED_OPERATION = "emptyPagedOperation";
   private static final String FAILING_PAGED_OPERATION = "failingPagedOperation";

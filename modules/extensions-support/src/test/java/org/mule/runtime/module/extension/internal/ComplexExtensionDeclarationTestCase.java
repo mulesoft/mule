@@ -27,13 +27,12 @@ import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VEND
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VERSION;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -103,27 +102,24 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
   public void listenerSource() {
     SourceModel source =
         extensionModel.getConfigurationModel(LISTENER_CONFIG_NAME).get().getSourceModel(LISTEN_MESSAGE_SOURCE).get();
-    assertDataType(source.getOutput().getType(), InputStream.class, BinaryType.class);
-    assertDataType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
+    assertType(source.getOutput().getType(), InputStream.class, BinaryType.class);
+    assertType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
 
     List<ParameterModel> parameters = source.getAllParameterModels();
-    assertThat(parameters, hasSize(4));
+    assertThat(parameters, hasSize(3));
 
     ParameterModel parameter = parameters.get(0);
     assertThat(parameter.getName(), is(REDELIVERY_POLICY_PARAMETER_NAME));
     assertThat(parameter.getType(), equalTo(new RedeliveryPolicyTypeBuilder().buildRedeliveryPolicyType()));
 
     parameter = parameters.get(1);
-    assertStreamingStrategyParameter(parameter);
-
-    parameter = parameters.get(2);
     assertThat(parameter.getName(), is(RECONNECTION_STRATEGY_PARAMETER_NAME));
     assertThat(parameter.getType(), equalTo(new ReconnectionStrategyTypeBuilder().buildReconnectionStrategyType()));
 
-    parameter = parameters.get(3);
+    parameter = parameters.get(2);
     assertThat(parameter.getName(), is(PORT));
     assertThat(parameter.isRequired(), is(false));
-    assertDataType(parameter.getType(), Integer.class, NumberType.class);
+    assertType(parameter.getType(), Integer.class, NumberType.class);
   }
 
   @Test
@@ -140,44 +136,35 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     OperationModel operation =
         extensionModel.getConfigurationModel(REQUESTER_CONFIG_NAME).get().getOperationModel(REQUEST_OPERATION_NAME).get();
     assertThat(operation.getName(), is(REQUEST_OPERATION_NAME));
-    assertDataType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
-    assertThat(operation.getAllParameterModels(), hasSize(3));
+    assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
+    assertThat(operation.getAllParameterModels(), hasSize(2));
 
     ParameterModel parameter = operation.getAllParameterModels().get(0);
-    assertStreamingStrategyParameter(parameter);
-
-    parameter = operation.getAllParameterModels().get(1);
     assertTargetParameter(parameter);
 
-    parameter = operation.getAllParameterModels().get(2);
+    parameter = operation.getAllParameterModels().get(1);
     assertThat(parameter.getName(), is(PATH));
-    assertDataType(parameter.getType(), String.class, StringType.class);
+    assertType(parameter.getType(), String.class, StringType.class);
   }
 
   private void assertTargetParameter(ParameterModel parameter) {
     assertThat(parameter.getName(), is(TARGET_PARAMETER_NAME));
-    assertDataType(parameter.getType(), String.class, StringType.class);
-  }
-
-  private void assertStreamingStrategyParameter(ParameterModel parameter) {
-    assertThat(parameter.getName(), is(STREAMING_STRATEGY_PARAMETER_NAME));
-    assertDataType(parameter.getType(), Object.class, UnionType.class);
+    assertType(parameter.getType(), String.class, StringType.class);
   }
 
   @Test
   public void staticResourceOperation() {
     OperationModel operation = extensionModel.getOperationModel(STATIC_RESOURCE_OPERATION_NAME).get();
     assertThat(operation.getName(), is(STATIC_RESOURCE_OPERATION_NAME));
-    assertDataType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
+    assertType(operation.getOutput().getType(), InputStream.class, BinaryType.class);
     final List<ParameterModel> parameters = operation.getAllParameterModels();
-    assertThat(parameters, hasSize(3));
+    assertThat(parameters, hasSize(2));
 
-    assertStreamingStrategyParameter(parameters.get(0));
-    assertTargetParameter(parameters.get(1));
+    assertTargetParameter(parameters.get(0));
 
-    ParameterModel parameter = parameters.get(2);
+    ParameterModel parameter = parameters.get(1);
     assertThat(parameter.getName(), is(PATH));
-    assertDataType(parameter.getType(), String.class, StringType.class);
+    assertType(parameter.getType(), String.class, StringType.class);
   }
 
   @Test
