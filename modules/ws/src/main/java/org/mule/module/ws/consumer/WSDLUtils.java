@@ -7,6 +7,7 @@
 package org.mule.module.ws.consumer;
 
 import org.mule.util.StringUtils;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -29,7 +30,6 @@ import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -182,7 +182,7 @@ public class WSDLUtils
     public static String schemaToString(Schema schema) throws TransformerException
     {
         StringWriter writer = new StringWriter();
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
         transformer.transform(new DOMSource(schema.getElement()), new StreamResult(writer));
         return writer.toString();
     }

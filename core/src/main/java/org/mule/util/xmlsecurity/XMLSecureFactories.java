@@ -11,6 +11,9 @@ import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 /**
  * Provide XML parser factories configured to avoid XXE and BL attacks according to global configuration (safe by default)
@@ -69,5 +72,25 @@ public class XMLSecureFactories
     public XMLInputFactory getXMLInputFactory()
     {
         return XMLSecureFactoriesCache.getInstance().getXMLInputFactory(externalEntities, expandEntities);
+    }
+
+    public TransformerFactory getTransformerFactory()
+    {
+        return XMLSecureFactoriesCache.getInstance().getTransformerFactory(externalEntities, expandEntities);
+    }
+
+    public void configureTransformerFactory(TransformerFactory factory)
+    {
+        DefaultXMLSecureFactories.configureTransformerFactory(externalEntities, expandEntities, factory);
+    }
+
+    public void configureSchemaFactory(SchemaFactory factory)
+    {
+        DefaultXMLSecureFactories.configureSchemaFactory(externalEntities, expandEntities, factory);
+    }
+
+    public void configureValidator(Validator validator)
+    {
+        DefaultXMLSecureFactories.configureValidator(externalEntities, expandEntities, validator);
     }
 }

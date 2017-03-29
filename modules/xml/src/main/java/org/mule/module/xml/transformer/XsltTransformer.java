@@ -18,6 +18,7 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -350,18 +351,19 @@ public class XsltTransformer extends AbstractXmlTransformer
 
                 factory = (TransformerFactory) ClassUtils.instanciateClass(factoryClassName,
                         ClassUtils.NO_ARGS, this.getClass());
+                XMLSecureFactories.createDefault().configureTransformerFactory(factory);
             }
             else
             {
                 // fall back to JDK default
                 try
                 {
-                    factory = TransformerFactory.newInstance();
+                    factory = XMLSecureFactories.createDefault().getTransformerFactory();
                 }
                 catch (TransformerFactoryConfigurationError e)
                 {
                     System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
-                    factory = TransformerFactory.newInstance();
+                    factory = XMLSecureFactories.createDefault().getTransformerFactory();
                 }
             }
 

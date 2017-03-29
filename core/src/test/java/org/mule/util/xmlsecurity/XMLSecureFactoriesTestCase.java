@@ -26,6 +26,7 @@ public class XMLSecureFactoriesTestCase
         assertThat(xmlSecureFactories.getDocumentBuilderFactory(), notNullValue());
         assertThat(xmlSecureFactories.getSAXParserFactory(), notNullValue());
         assertThat(xmlSecureFactories.getXMLInputFactory(), notNullValue());
+        assertThat(xmlSecureFactories.getTransformerFactory(), notNullValue());
     }
 
     @Test
