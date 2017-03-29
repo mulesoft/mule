@@ -12,7 +12,7 @@ import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.ConcurrencyUtils.safeUnlock;
-import static org.mule.runtime.core.util.FuncUtils.safely;
+import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.func.CheckedRunnable;

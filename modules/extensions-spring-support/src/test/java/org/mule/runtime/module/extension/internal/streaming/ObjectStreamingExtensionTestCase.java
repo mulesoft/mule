@@ -15,7 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Streaming")
+@Stories("Object Streaming")
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;
@@ -36,26 +41,31 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   }
 
   @Test
+  @Description("Consume an object stream")
   public void getObjectStream() throws Exception {
     assertStreamMatchesData("getStream");
   }
 
   @Test
+  @Description("Operation is configured not to stream")
   public void operationWithDisabledStreaming() throws Exception {
     assertStreamMatchesData("getStreamWithoutStreaming");
   }
 
   @Test
+  @Description("Consume a stream generated in a transaction")
   public void getStreamInTx() throws Exception {
     assertStreamMatchesData("getStreamInTx");
   }
 
   @Test(expected = Exception.class)
+  @Description("All cursors closed when the flow fails")
   public void allStreamsClosedInCaseOfException() throws Exception {
     flowRunner("crashCar").withPayload(data).run();
   }
 
   @Test(expected = Exception.class)
+  @Description("All cursors closed when the flow fails in a transaction")
   public void allStreamsClosedInCaseOfExceptionInTx() throws Exception {
     flowRunner("crashCarTx").withPayload(data).run();
   }

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class FuncUtils {
+public class FunctionalUtils {
 
   /**
    * Executes the given task, ignoring thrown exceptions. <b>Use with care</b>

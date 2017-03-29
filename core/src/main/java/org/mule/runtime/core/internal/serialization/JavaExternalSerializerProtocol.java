@@ -53,6 +53,7 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
    */
   @Override
   protected byte[] doSerialize(Object object) throws Exception {
+    //TODO: MULE-11939
     if (object instanceof CursorStreamProvider) {
       try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
         return SerializationUtils.serialize(toByteArray(cursor));

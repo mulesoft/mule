@@ -34,9 +34,14 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 @RunWith(Parameterized.class)
 @SmallTest
+@Features("Streaming")
+@Stories("Object Streaming")
 public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestCase {
 
   private static final int DATA_SIZE = 500;
@@ -78,11 +83,13 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   @Test
+  @Description("fully consume stream in a single thread")
   public void readFullyWithInSingleCursor() throws IOException {
     withCursor(cursor -> checkEquals(data, cursor));
   }
 
   @Test
+  @Description("Partially consume the stream, rewind back to zero and consume fully")
   public void rewindWhileStreamNotFullyConsumed() throws Exception {
     withCursor(cursor -> {
       List<String> read = read(cursor, halfDataLength);
@@ -94,7 +101,9 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
     });
   }
 
+
   @Test
+  @Description("Consume the stream, go back to two different positions and consume again (each)")
   public void randomSeekWithOneOpenCursor() throws Exception {
     withCursor(cursor -> {
       // read fully
@@ -109,6 +118,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   @Test
+  @Description("Two open cursors consume the same stream, one after the other in the same thread")
   public void twoOpenCursorsConsumingTheStreamInSingleThread() throws Exception {
     withCursor(cursor1 -> withCursor(cursor2 -> {
       seekAndAssert(cursor1, 0, data.size());
@@ -117,6 +127,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   @Test
+  @Description("Two open cursors consume different ends of the same stream, one after the other in the same thread")
   public void twoOpenCursorsReadingOppositeEndsOfTheStreamInSingleThread() throws Exception {
     withCursor(cursor1 -> withCursor(cursor2 -> {
       seekAndAssert(cursor1, 0, data.size() / 2);
@@ -125,18 +136,21 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   @Test
+  @Description("Two open cursors consume the same stream concurrently, each on its own thread")
   public void twoOpenCursorsConsumingTheStreamConcurrently() throws Exception {
     withCursor(cursor1 -> withCursor(cursor2 -> doAsync(() -> seekAndAssert(cursor1, 0, data.size()),
                                                         () -> seekAndAssert(cursor2, 0, data.size()))));
   }
 
   @Test
+  @Description("Two open cursors consume different ends of same stream concurrently, each on its own thread")
   public void twoOpenCursorsReadingOppositeEndsOfTheStreamConcurrently() throws Exception {
     withCursor(cursor1 -> withCursor(cursor2 -> doAsync(() -> seekAndAssert(cursor1, 0, data.size() / 2),
                                                         () -> seekAndAssert(cursor2, halfDataLength, halfDataLength))));
   }
 
   @Test
+  @Description("Seek different positions and verify that getPosition() is consistent")
   public void getPosition() throws Exception {
     withCursor(cursor -> {
       assertThat(cursor.getPosition(), is(0L));
@@ -146,16 +160,17 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
 
       cursor.seek(0);
       assertThat(cursor.getPosition(), is(0L));
-
     });
   }
 
   @Test
+  @Description("Get the size of a stream")
   public void size() throws Exception {
     withCursor(cursor -> assertThat(cursor.size(), is(data.size())));
   }
 
   @Test(expected = StreamingBufferSizeExceededException.class)
+  @Description("Exceed the maxBufferSize and expect exception")
   public void bufferSizeExceeded() throws Exception {
     data.add("I don't fit");
     streamProvider.close();
@@ -165,6 +180,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   @Test
+  @Description("Direct access to the last two items of the stream without traversing the whole cursor")
   public void getLastTwoItems() throws Exception {
     withCursor(cursor -> {
       int size = data.size();
@@ -178,6 +194,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   @Test(expected = NoSuchElementException.class)
+  @Description("Move the cursor to a non existing position")
   public void outOfBoundsHasNext() throws Exception {
     withCursor(cursor -> {
       cursor.seek(data.size() + 100);

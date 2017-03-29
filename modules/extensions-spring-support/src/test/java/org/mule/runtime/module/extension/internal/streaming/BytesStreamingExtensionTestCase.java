@@ -26,7 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features("Streaming")
+@Stories("Bytes Streaming")
 public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
@@ -57,12 +62,14 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   }
 
   @Test
+  @Description("Fully consume a cursor stream")
   public void consumeGeneratedCursorAndCloseIt() throws Exception {
     Object value = flowRunner("consumeGeneratedStream").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(data));
   }
 
   @Test
+  @Description("Operation with disabled streaming")
   public void operationWithDisabledStreaming() throws Exception {
     Object value = flowRunner("toSimpleStream").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(instanceOf(InputStream.class)));
@@ -70,21 +77,25 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   }
 
   @Test(expected = Exception.class)
+  @Description("If the flow fails, all cursors should be closed")
   public void allStreamsClosedInCaseOfException() throws Exception {
     flowRunner("crashCar").withPayload(data).run();
   }
 
   @Test(expected = Exception.class)
+  @Description("If a cursor is open in a transaction, it should be closed if the flow fails")
   public void allStreamsClosedInCaseOfExceptionInTx() throws Exception {
     flowRunner("crashCarTx").withPayload(data).run();
   }
 
   @Test
+  @Description("Read a stream from a random position")
   public void seek() throws Exception {
     doSeek("seekStream");
   }
 
   @Test
+  @Description("Rewing a stream and consume it twice")
   public void rewind() throws Exception {
     Event result = flowRunner("rewind").withPayload(data).run();
     Message firstRead = (Message) result.getVariable("firstRead").getValue();
@@ -95,11 +106,13 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   }
 
   @Test
+  @Description("Read from a random position inside a transaction")
   public void seekInTx() throws Exception {
     doSeek("seekStreamTx");
   }
 
   @Test
+  @Description("When the max buffer size is exceeded, the correct type of error is mapped")
   public void throwsBufferSizeExceededError() throws Exception {
     Object value = flowRunner("toGreedyStream").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is("Too big!"));
@@ -117,21 +130,25 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   }
 
   @Test
+  @Description("A source generates a cursor stream")
   public void sourceStreaming() throws Exception {
     startSourceAndListenSpell("bytesCaster");
   }
 
   @Test
+  @Description("A source generates a cursor in a transaction")
   public void sourceStreamingInTx() throws Exception {
     startSourceAndListenSpell("bytesCasterInTx");
   }
 
   @Test
+  @Description("A source is configured not to stream")
   public void sourceWithoutStreaming() throws Exception {
     startSourceAndListenSpell("bytesCasterWithoutStreaming");
   }
 
   @Test
+  @Description("A stream provider is serialized as a byte[]")
   public void streamProviderSerialization() throws Exception {
     CursorStreamProvider provider = (CursorStreamProvider) flowRunner("toStream").keepStreamsOpen()
         .withPayload(data)

@@ -9,6 +9,7 @@ package org.mule.runtime.core.streaming;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
@@ -27,9 +28,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Features("Streaming")
+@Stories("Object Streaming")
 public class StreamingIteratorTestCase {
 
   private static final int PAGE_SIZE = 100;
@@ -57,6 +63,7 @@ public class StreamingIteratorTestCase {
   };
 
   @Test
+  @Description("Fully consume the iterator")
   public void iterateStreaming() throws Exception {
     StreamingIterator<String> it = this.newIterator();
 
@@ -66,11 +73,12 @@ public class StreamingIteratorTestCase {
       count++;
     }
 
-    Assert.assertEquals(count, TOP);
+    assertEquals(count, TOP);
     it.close();
   }
 
   @Test
+  @Description("A closed iterator doesn't have next")
   public void closedIterator() throws Exception {
     StreamingIterator<String> it = this.newIterator();
     it.close();
@@ -78,6 +86,7 @@ public class StreamingIteratorTestCase {
   }
 
   @Test
+  @Description("Iterator doesn't have next if consumer is closed")
   public void closedConsumer() throws Exception {
     Consumer<String> consumer = new ListConsumer<>(producer);
     StreamingIterator<String> it = new StreamingIterator<>(consumer);
@@ -86,6 +95,7 @@ public class StreamingIteratorTestCase {
   }
 
   @Test
+  @Description("iterator has size")
   public void size() throws Exception {
     StreamingIterator<String> it = this.newIterator();
     assertThat(it.size(), is(TOP));
