@@ -7,16 +7,17 @@
 
 package org.mule.module.ws.consumer;
 
+import static org.mule.tck.util.TestUtils.loadConfiguration;
+
+import org.mule.api.config.ConfigurationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.ExternalResource;
-import org.mule.api.config.ConfigurationException;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-
-import static org.mule.tck.util.TestUtils.loadConfiguration;
 
 /**
  * This tests "mocks" an HTTPS server through which a wsdl file is served. The initialization of the ws consumer involved
@@ -27,8 +28,8 @@ public class WSConsumerInsecureTlsFailureTestCase extends AbstractMuleContextTes
     @ClassRule
     public static DynamicPort port = new DynamicPort("port");
 
-    @Rule
-    public ExternalResource myServer = new AbstractWSDLServerTlsTestCase.ServerResource(port);
+    @ClassRule
+    public static ExternalResource myServer = new AbstractWSDLServerTlsTestCase.ServerResource(port);
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
