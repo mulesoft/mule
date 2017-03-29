@@ -6,33 +6,33 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static org.mule.runtime.api.metadata.DataType.CURSOR_STREAM_PROVIDER;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import static org.mule.runtime.api.metadata.DataType.CURSOR_ITERATOR_PROVIDER;
+import static org.mule.runtime.api.metadata.DataType.ITERATOR;
+import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
-import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 /**
- * Transforms a {@link CursorStreamProvider} to an {@link InputStream} by getting a cursor from it
+ * Transforms a {@link CursorIteratorProvider} to an {@link Iterator} by getting a cursor from it
  *
  * @since 4.0
  */
-public class CursorStreamProviderToInputStream extends AbstractTransformer implements DiscoverableTransformer {
+public class CursorIteratorProviderToIterator extends AbstractTransformer implements DiscoverableTransformer {
 
   private int priorityWeighting = DEFAULT_PRIORITY_WEIGHTING;
 
-  public CursorStreamProviderToInputStream() {
-    registerSourceType(CURSOR_STREAM_PROVIDER);
-    setReturnDataType(INPUT_STREAM);
+  public CursorIteratorProviderToIterator() {
+    registerSourceType(CURSOR_ITERATOR_PROVIDER);
+    setReturnDataType(ITERATOR);
   }
 
   @Override
   protected Object doTransform(Object src, Charset enc) throws TransformerException {
-    return ((CursorStreamProvider) src).openCursor();
+    return ((CursorIteratorProvider) src).openCursor();
   }
 
   /**
@@ -50,5 +50,4 @@ public class CursorStreamProviderToInputStream extends AbstractTransformer imple
   public void setPriorityWeighting(int weighting) {
     priorityWeighting = weighting;
   }
-
 }

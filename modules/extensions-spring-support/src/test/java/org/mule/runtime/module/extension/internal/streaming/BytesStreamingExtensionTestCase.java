@@ -11,25 +11,28 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.streaming.StreamingStatistics;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.MarvelExtension;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
+@Features("Streaming")
+@Stories("Bytes Streaming")
+public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
   private static List<String> CASTED_SPELLS = new LinkedList<>();
@@ -41,7 +44,6 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private String data = randomAlphabetic(2048);
-  private StreamingManager streamingManager;
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
@@ -50,27 +52,24 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "streaming-extension-config.xml";
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
+    return "bytes-streaming-extension-config.xml";
   }
 
   @Override
   protected void doTearDownAfterMuleContextDispose() throws Exception {
+    super.doTearDownAfterMuleContextDispose();
     CASTED_SPELLS.clear();
-    assertAllStreamingResourcesClosed();
   }
 
   @Test
+  @Description("Fully consume a cursor stream")
   public void consumeGeneratedCursorAndCloseIt() throws Exception {
     Object value = flowRunner("consumeGeneratedStream").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(data));
   }
 
   @Test
+  @Description("Operation with disabled streaming")
   public void operationWithDisabledStreaming() throws Exception {
     Object value = flowRunner("toSimpleStream").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(instanceOf(InputStream.class)));
@@ -78,21 +77,25 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test(expected = Exception.class)
+  @Description("If the flow fails, all cursors should be closed")
   public void allStreamsClosedInCaseOfException() throws Exception {
     flowRunner("crashCar").withPayload(data).run();
   }
 
   @Test(expected = Exception.class)
+  @Description("If a cursor is open in a transaction, it should be closed if the flow fails")
   public void allStreamsClosedInCaseOfExceptionInTx() throws Exception {
     flowRunner("crashCarTx").withPayload(data).run();
   }
 
   @Test
+  @Description("Read a stream from a random position")
   public void seek() throws Exception {
     doSeek("seekStream");
   }
 
   @Test
+  @Description("Rewing a stream and consume it twice")
   public void rewind() throws Exception {
     Event result = flowRunner("rewind").withPayload(data).run();
     Message firstRead = (Message) result.getVariable("firstRead").getValue();
@@ -103,8 +106,16 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test
+  @Description("Read from a random position inside a transaction")
   public void seekInTx() throws Exception {
     doSeek("seekStreamTx");
+  }
+
+  @Test
+  @Description("When the max buffer size is exceeded, the correct type of error is mapped")
+  public void throwsBufferSizeExceededError() throws Exception {
+    Object value = flowRunner("toGreedyStream").withPayload(data).run().getMessage().getPayload().getValue();
+    assertThat(value, is("Too big!"));
   }
 
   private void doSeek(String flowName) throws Exception {
@@ -119,18 +130,33 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
   }
 
   @Test
+  @Description("A source generates a cursor stream")
   public void sourceStreaming() throws Exception {
     startSourceAndListenSpell("bytesCaster");
   }
 
   @Test
+  @Description("A source generates a cursor in a transaction")
   public void sourceStreamingInTx() throws Exception {
     startSourceAndListenSpell("bytesCasterInTx");
   }
 
   @Test
+  @Description("A source is configured not to stream")
   public void sourceWithoutStreaming() throws Exception {
     startSourceAndListenSpell("bytesCasterWithoutStreaming");
+  }
+
+  @Test
+  @Description("A stream provider is serialized as a byte[]")
+  public void streamProviderSerialization() throws Exception {
+    CursorStreamProvider provider = (CursorStreamProvider) flowRunner("toStream").keepStreamsOpen()
+        .withPayload(data)
+        .run().getMessage().getPayload().getValue();
+
+    byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
+    bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
+    assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
   }
 
   private void startSourceAndListenSpell(String flowName) throws Exception {
@@ -140,15 +166,6 @@ public class StreamingExtensionTestCase extends ExtensionFunctionalTestCase {
       synchronized (CASTED_SPELLS) {
         return CASTED_SPELLS.stream().anyMatch(s -> s.equals(BARGAIN_SPELL));
       }
-    }));
-  }
-
-  private void assertAllStreamingResourcesClosed() {
-    StreamingStatistics stats = streamingManager.getStreamingStatistics();
-    new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
-      assertThat("There're still open cursor providers", stats.getOpenCursorProvidersCount(), is(0));
-      assertThat("There're still open cursors", stats.getOpenCursorsCount(), is(0));
-      return true;
     }));
   }
 }

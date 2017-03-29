@@ -13,6 +13,11 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Base class for {@link CursorStreamProvider} implementations.
+ *
+ * @since 4.0
+ */
 public abstract class AbstractCursorStreamProvider implements CursorStreamProvider {
 
   protected final InputStream wrappedStream;

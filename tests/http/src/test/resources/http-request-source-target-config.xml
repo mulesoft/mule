@@ -32,10 +32,4 @@
         <httpn:request config-ref="config" path="test" method="POST"/>
         <object-to-string-transformer />
     </flow>
-
-    <flow name="customTargetFlow">
-        <httpn:request config-ref="config" path="test" method="POST" target="customTarget"/>
-        <object-to-string-transformer />
-    </flow>
-
 </mule>

@@ -46,6 +46,21 @@
         <marvel:to-stream />
     </flow>
 
+    <flow name="toGreedyStream">
+        <try>
+            <marvel:to-stream>
+                <repeatable-in-memory-stream maxInMemorySize="1" initialBufferSize="1" bufferSizeIncrement="1" bufferUnit="BYTE" />
+            </marvel:to-stream>
+            <flow-ref name="readStream" />
+            <object-to-string-transformer />
+            <error-handler>
+                <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+                    <set-payload value="Too big!" />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
     <flow name="toSimpleStream">
         <marvel:to-stream>
             <non-repeatable-stream />
@@ -96,7 +111,7 @@
 
     <sub-flow name="castSpell">
         <expression-component>mel:
-            org.mule.runtime.module.extension.internal.streaming.StreamingExtensionTestCase.addSpell(payload)
+            org.mule.runtime.module.extension.internal.streaming.BytesStreamingExtensionTestCase.addSpell(payload)
         </expression-component>
     </sub-flow>
 

@@ -14,18 +14,18 @@ public class InMemoryCursorIteratorProviderObjectFactory
 
   private final int initialBufferSize;
   private final int bufferSizeIncrement;
-  private final int maxInMemorySize;
+  private final int maxInMemoryInstances;
 
-  public InMemoryCursorIteratorProviderObjectFactory(int initialBufferSize, int bufferSizeIncrement, int maxInMemorySize) {
+  public InMemoryCursorIteratorProviderObjectFactory(int initialBufferSize, int bufferSizeIncrement, int maxInMemoryInstances) {
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
-    this.maxInMemorySize = maxInMemorySize;
+    this.maxInMemoryInstances = maxInMemoryInstances;
   }
 
   @Override
   public CursorIteratorProviderFactory doGetObject() throws Exception {
     InMemoryCursorIteratorConfig config =
-        new InMemoryCursorIteratorConfig(initialBufferSize, bufferSizeIncrement, maxInMemorySize);
+        new InMemoryCursorIteratorConfig(initialBufferSize, bufferSizeIncrement, maxInMemoryInstances);
 
     return streamingManager.forObjects().getInMemoryCursorProviderFactory(config);
   }

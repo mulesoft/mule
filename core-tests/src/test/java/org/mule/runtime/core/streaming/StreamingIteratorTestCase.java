@@ -9,8 +9,9 @@ package org.mule.runtime.core.streaming;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -27,10 +28,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ConsumerIteratorTestCase {
+@Features("Streaming")
+@Stories("Object Streaming")
+public class StreamingIteratorTestCase {
 
   private static final int PAGE_SIZE = 100;
   private static final int TOP = 3000;
@@ -57,8 +63,9 @@ public class ConsumerIteratorTestCase {
   };
 
   @Test
+  @Description("Fully consume the iterator")
   public void iterateStreaming() throws Exception {
-    ConsumerIterator<String> it = this.newIterator();
+    StreamingIterator<String> it = this.newIterator();
 
     int count = 0;
     while (it.hasNext()) {
@@ -66,34 +73,37 @@ public class ConsumerIteratorTestCase {
       count++;
     }
 
-    Assert.assertEquals(count, TOP);
+    assertEquals(count, TOP);
     it.close();
   }
 
   @Test
+  @Description("A closed iterator doesn't have next")
   public void closedIterator() throws Exception {
-    ConsumerIterator<String> it = this.newIterator();
+    StreamingIterator<String> it = this.newIterator();
     it.close();
     Assert.assertFalse(it.hasNext());
   }
 
   @Test
+  @Description("Iterator doesn't have next if consumer is closed")
   public void closedConsumer() throws Exception {
     Consumer<String> consumer = new ListConsumer<>(producer);
-    ConsumerIterator<String> it = new ConsumerIterator<>(consumer);
+    StreamingIterator<String> it = new StreamingIterator<>(consumer);
     consumer.close();
     assertThat(it.hasNext(), is(false));
   }
 
   @Test
+  @Description("iterator has size")
   public void size() throws Exception {
-    ConsumerIterator<String> it = this.newIterator();
+    StreamingIterator<String> it = this.newIterator();
     assertThat(it.size(), is(TOP));
   }
 
-  private ConsumerIterator<String> newIterator() {
+  private StreamingIterator<String> newIterator() {
     Consumer<String> consumer = new ListConsumer<>(producer);
-    return new ConsumerIterator<>(consumer);
+    return new StreamingIterator<>(consumer);
   }
 
   public class TestPagingProvider implements PagingProvider<Object, String> {

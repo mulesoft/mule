@@ -44,8 +44,8 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        {"Fits into memory", KB_256, MB_1, MB_1},
-        {"Doesn't fit in memory", MB_1, KB_256, MB_2},
+        {"Doesn't require expansion", KB_256, MB_1, MB_1},
+        {"Requires expansion", MB_1, KB_256, MB_2},
     });
   }
 
@@ -189,17 +189,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
       cursor.seek(0);
       assertThat(cursor.getPosition(), is(0L));
 
-    });
-  }
-
-  @Test
-  public void isFullyConsumed() throws Exception {
-    withCursor(cursor -> {
-      assertThat(cursor.isFullyConsumed(), is(false));
-      IOUtils.toString(cursor);
-      assertThat(cursor.isFullyConsumed(), is(true));
-      cursor.seek(0);
-      assertThat(cursor.isFullyConsumed(), is(false));
     });
   }
 

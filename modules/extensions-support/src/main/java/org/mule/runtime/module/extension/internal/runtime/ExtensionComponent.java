@@ -54,6 +54,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -127,7 +128,9 @@ public abstract class ExtensionComponent<T extends ComponentModel<T>> extends Ab
   @Override
   public final void initialise() throws InitialisationException {
     if (cursorProviderFactory == null) {
-      cursorProviderFactory = streamingManager.forBytes().getDefaultCursorProviderFactory();
+      cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
+          .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
+          .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
     }
     withContextClassLoader(classLoader, () -> {
       validateConfigurationProviderIsNotExpression();

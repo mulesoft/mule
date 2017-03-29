@@ -11,7 +11,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.streaming.StreamingManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,9 +30,6 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
 
   @Inject
   private PolicyManager policyManager;
-
-  @Inject
-  private StreamingManager streamingManager;
 
   @Override
   public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {
@@ -56,7 +52,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
     messageProcessPhaseList.add(new ValidationPhase());
     messageProcessPhaseList.add(new FlowProcessingPhase());
     messageProcessPhaseList.add(new AsyncResponseFlowProcessingPhase());
-    messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager, streamingManager));
+    messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager));
     Collections.sort(messageProcessPhaseList, (messageProcessPhase, messageProcessPhase2) -> {
       int compareValue = 0;
       if (messageProcessPhase instanceof Comparable) {

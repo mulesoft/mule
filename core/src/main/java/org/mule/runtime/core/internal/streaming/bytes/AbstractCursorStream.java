@@ -23,7 +23,6 @@ abstract class AbstractCursorStream extends CursorStream {
 
   private final CursorStreamProvider provider;
   private long mark = 0;
-  private boolean fullyConsumed = false;
   private boolean released = false;
   protected long position = 0;
 
@@ -45,24 +44,7 @@ abstract class AbstractCursorStream extends CursorStream {
   @Override
   public void seek(long position) throws IOException {
     assertNotDisposed();
-    fullyConsumed = false;
     this.position = position;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isFullyConsumed() {
-    return fullyConsumed;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean canBeReleased() {
-    return fullyConsumed || released;
   }
 
   /**
@@ -117,7 +99,7 @@ abstract class AbstractCursorStream extends CursorStream {
   @Override
   public final int read() throws IOException {
     assertNotDisposed();
-    return handleFullyConsumed(doRead());
+    return doRead();
   }
 
   /**
@@ -134,7 +116,7 @@ abstract class AbstractCursorStream extends CursorStream {
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
     assertNotDisposed();
-    return handleFullyConsumed(doRead(b, off, len));
+    return doRead(b, off, len);
   }
 
   /**
@@ -187,13 +169,5 @@ abstract class AbstractCursorStream extends CursorStream {
 
   protected int unsigned(int value) {
     return value & 0xff;
-  }
-
-  private int handleFullyConsumed(int read) {
-    if (read < 0) {
-      fullyConsumed = true;
-    }
-
-    return read;
   }
 }

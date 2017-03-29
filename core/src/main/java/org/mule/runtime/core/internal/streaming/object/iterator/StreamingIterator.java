@@ -8,6 +8,8 @@
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
 
+import org.mule.runtime.api.streaming.Sized;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
@@ -23,11 +25,11 @@ import java.util.Iterator;
  *
  * @since 3.5.0
  */
-public class ConsumerIterator<T> implements Iterator<T>, Closeable, ProvidesTotalHint {
+public class StreamingIterator<T> implements Iterator<T>, Closeable, Sized {
 
   private Consumer<T> consumer;
 
-  public ConsumerIterator(Consumer<T> consumer) {
+  public StreamingIterator(Consumer<T> consumer) {
     this.consumer = consumer;
   }
 

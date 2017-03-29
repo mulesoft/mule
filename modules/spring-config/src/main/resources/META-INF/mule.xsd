@@ -5238,7 +5238,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="maxInMemorySize" type="substitutableInt" use="optional" default="500">
+                <xsd:attribute name="maxInMemoryInstances" type="substitutableInt" use="optional" default="500">
                     <xsd:annotation>
                         <xsd:documentation>
                             This is the maximum amount of instances that will be kept in memory. If more than that are required,

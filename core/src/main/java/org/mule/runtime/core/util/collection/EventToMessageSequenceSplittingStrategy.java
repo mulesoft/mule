@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util.collection;
 
+import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.util.Copiable;
@@ -37,11 +38,11 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
     }
     if (payload instanceof Collection) {
       return new CollectionMessageSequence(copyCollection((Collection) payload));
-    }
-    if (payload instanceof Iterable<?>) {
+    } else if (payload instanceof CursorIteratorProvider) {
+      return new IteratorMessageSequence(((CursorIteratorProvider) payload).openCursor());
+    } else if (payload instanceof Iterable<?>) {
       return new IteratorMessageSequence(((Iterable<Object>) payload).iterator());
-    }
-    if (payload instanceof Object[]) {
+    } else if (payload instanceof Object[]) {
       return new ArrayMessageSequence((Object[]) payload);
     } else if (payload instanceof NodeList) {
       return new NodeListMessageSequence((NodeList) payload);

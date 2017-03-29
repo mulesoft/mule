@@ -23,8 +23,8 @@ import java.io.IOException;
 public abstract class AbstractCursorIterator<T> implements CursorIterator<T> {
 
   private final CursorIteratorProvider provider;
-  private boolean fullyConsumed = false;
   private boolean released = false;
+  private boolean closed = false;
   private long position = 0;
 
   /**
@@ -35,6 +35,20 @@ public abstract class AbstractCursorIterator<T> implements CursorIterator<T> {
   public AbstractCursorIterator(CursorIteratorProvider provider) {
     checkArgument(provider != null, "provider cannot be null");
     this.provider = provider;
+  }
+
+  protected abstract T doNext(long position);
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final T next() {
+    assertNotClosed();
+    T item = doNext(position);
+    position++;
+
+    return item;
   }
 
   /**
@@ -50,33 +64,45 @@ public abstract class AbstractCursorIterator<T> implements CursorIterator<T> {
    */
   @Override
   public void seek(long position) throws IOException {
-    assertNotDisposed();
-    setFullyConsumed(false);
+    assertNotClosed();
     this.position = position;
   }
 
+  @Override
+  public final void close() throws IOException {
+    if (!closed) {
+      closed = true;
+      doClose();
+    }
+  }
+
+  protected abstract void doClose() throws IOException;
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean isFullyConsumed() {
-    return fullyConsumed;
+  public boolean isReleased() {
+    return released;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean canBeReleased() {
-    return fullyConsumed || released;
+  public CursorIteratorProvider getProvider() {
+    return provider;
   }
 
-  protected void assertNotDisposed() {
+  protected void assertNotClosed() {
     checkState(!released, "Stream is closed");
   }
 
-  protected void setFullyConsumed(boolean fullyConsumed) {
-    this.fullyConsumed = fullyConsumed;
+  /**
+   * @throws UnsupportedOperationException Removing from a stream is not supported
+   */
+  @Override
+  public void remove() {
+    throw new UnsupportedOperationException("Removing from a stream is not supported");
   }
-
 }
