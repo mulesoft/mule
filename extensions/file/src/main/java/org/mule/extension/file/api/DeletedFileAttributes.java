@@ -37,6 +37,9 @@ public class DeletedFileAttributes extends ListenerFileAttributes {
     super(path, DELETE);
   }
 
+  @Override
+  protected void initAttributes(Path path) {}
+
   /**
    * @throws IllegalStateException
    */
