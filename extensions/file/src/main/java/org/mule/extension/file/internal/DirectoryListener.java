@@ -20,7 +20,6 @@ import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -40,8 +39,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -297,7 +296,14 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
       return;
     }
 
-    ListenerFileAttributes attributes = new ListenerFileAttributes(path, FileEventType.of(kind));
+    FileEventType eventType = FileEventType.of(kind);
+    ListenerFileAttributes attributes;
+    if (eventType.equals(DELETE)) {
+      attributes = new DeletedFileAttributes(path);
+    } else {
+      attributes = new ListenerFileAttributes(path, eventType);
+    }
+
     if (!matcher.test(attributes)) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER

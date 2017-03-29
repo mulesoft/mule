@@ -6,8 +6,8 @@
  */
 package org.mule.extension.ftp.api.ftp;
 
-import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.file.common.api.AbstractFileAttributes;
+import org.mule.extension.ftp.api.FtpFileAttributes;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -21,7 +21,12 @@ import org.apache.commons.net.ftp.FTPFile;
  */
 public class ClassicFtpFileAttributes extends AbstractFileAttributes implements FtpFileAttributes {
 
-  private final FTPFile ftpFile;
+  private LocalDateTime timestamp;
+  private String name;
+  private long size;
+  private boolean regularFile;
+  private boolean directory;
+  private boolean symbolicLink;
 
   /**
    * Creates a new instance
@@ -31,7 +36,12 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   public ClassicFtpFileAttributes(Path path, FTPFile ftpFile) {
     super(path);
-    this.ftpFile = ftpFile;
+    timestamp = asDateTime(ftpFile.getTimestamp().toInstant());
+    name = ftpFile.getName();
+    size = ftpFile.getSize();
+    regularFile = ftpFile.isFile();
+    directory = ftpFile.isDirectory();
+    symbolicLink = ftpFile.isSymbolicLink();
   }
 
   /**
@@ -39,7 +49,7 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   @Override
   public LocalDateTime getTimestamp() {
-    return asDateTime(ftpFile.getTimestamp().toInstant());
+    return timestamp;
   }
 
   /**
@@ -47,7 +57,7 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   @Override
   public String getName() {
-    return ftpFile.getName();
+    return name;
   }
 
   /**
@@ -55,7 +65,7 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   @Override
   public long getSize() {
-    return ftpFile.getSize();
+    return size;
   }
 
   /**
@@ -63,7 +73,7 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   @Override
   public boolean isRegularFile() {
-    return ftpFile.isFile();
+    return regularFile;
   }
 
   /**
@@ -71,7 +81,7 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   @Override
   public boolean isDirectory() {
-    return ftpFile.isDirectory();
+    return directory;
   }
 
   /**
@@ -79,6 +89,6 @@ public class ClassicFtpFileAttributes extends AbstractFileAttributes implements 
    */
   @Override
   public boolean isSymbolicLink() {
-    return ftpFile.isSymbolicLink();
+    return symbolicLink;
   }
 }

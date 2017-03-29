@@ -6,8 +6,8 @@
  */
 package org.mule.extension.ftp.api.sftp;
 
-import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.file.common.api.AbstractFileAttributes;
+import org.mule.extension.ftp.api.FtpFileAttributes;
 
 import com.jcraft.jsch.SftpATTRS;
 
@@ -22,7 +22,11 @@ import java.util.Date;
  */
 public class SftpFileAttributes extends AbstractFileAttributes implements FtpFileAttributes {
 
-  private final SftpATTRS attrs;
+  private LocalDateTime timestamp;
+  private long size;
+  private boolean regularSize;
+  private boolean directory;
+  private boolean symbolicLink;
 
   /**
    * Creates a new instance
@@ -32,7 +36,13 @@ public class SftpFileAttributes extends AbstractFileAttributes implements FtpFil
    */
   public SftpFileAttributes(Path path, SftpATTRS attrs) {
     super(path);
-    this.attrs = attrs;
+
+    Date timestamp = new Date(((long) attrs.getMTime()) * 1000L);
+    this.timestamp = asDateTime(timestamp.toInstant());
+    this.size = attrs.getSize();
+    this.regularSize = attrs.isReg();
+    this.directory = attrs.isDir();
+    this.symbolicLink = attrs.isLink();
   }
 
   /**
@@ -40,8 +50,7 @@ public class SftpFileAttributes extends AbstractFileAttributes implements FtpFil
    */
   @Override
   public LocalDateTime getTimestamp() {
-    Date timestamp = new Date(((long) attrs.getMTime()) * 1000L);
-    return asDateTime(timestamp.toInstant());
+    return timestamp;
   }
 
   /**
@@ -49,7 +58,7 @@ public class SftpFileAttributes extends AbstractFileAttributes implements FtpFil
    */
   @Override
   public long getSize() {
-    return attrs.getSize();
+    return size;
   }
 
   /**
@@ -57,7 +66,7 @@ public class SftpFileAttributes extends AbstractFileAttributes implements FtpFil
    */
   @Override
   public boolean isRegularFile() {
-    return attrs.isReg();
+    return regularSize;
   }
 
   /**
@@ -65,7 +74,7 @@ public class SftpFileAttributes extends AbstractFileAttributes implements FtpFil
    */
   @Override
   public boolean isDirectory() {
-    return attrs.isDir();
+    return directory;
   }
 
   /**
@@ -73,6 +82,6 @@ public class SftpFileAttributes extends AbstractFileAttributes implements FtpFil
    */
   @Override
   public boolean isSymbolicLink() {
-    return attrs.isLink();
+    return symbolicLink;
   }
 }

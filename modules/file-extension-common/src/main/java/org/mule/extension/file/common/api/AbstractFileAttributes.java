@@ -20,7 +20,8 @@ import java.time.ZoneId;
  */
 public abstract class AbstractFileAttributes extends BaseAttributes implements FileAttributes {
 
-  protected final Path path;
+  protected final String path;
+  private String fileName;
 
   /**
    * Creates a new instance
@@ -28,7 +29,8 @@ public abstract class AbstractFileAttributes extends BaseAttributes implements F
    * @param path a {@link Path} pointing to the represented file
    */
   protected AbstractFileAttributes(Path path) {
-    this.path = path;
+    this.path = path.toString();
+    this.fileName = path.getFileName().toString();
   }
 
   /**
@@ -36,7 +38,7 @@ public abstract class AbstractFileAttributes extends BaseAttributes implements F
    */
   @Override
   public String getPath() {
-    return path.toString();
+    return path;
   }
 
   /**
@@ -44,7 +46,7 @@ public abstract class AbstractFileAttributes extends BaseAttributes implements F
    */
   @Override
   public String getName() {
-    return path.getFileName().toString();
+    return fileName;
   }
 
   protected LocalDateTime asDateTime(Instant instant) {
