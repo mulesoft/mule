@@ -238,8 +238,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerMuleBeanDefinitionParser("queue-store", new ParentDefinitionParser())
         .addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "queue-store");
     registerMuleBeanDefinitionParser("custom-queue-store", new QueueStoreDefinitionParser()).addIgnored("name");
-    registerBeanDefinitionParser("default-in-memory-queue-store",
-                                 new QueueStoreDefinitionParser(DefaultMemoryQueueStoreFactoryBean.class));
+    //registerBeanDefinitionParser("default-in-memory-queue-store",
+    //                             new QueueStoreDefinitionParser(DefaultMemoryQueueStoreFactoryBean.class));
     registerBeanDefinitionParser("default-persistent-queue-store",
                                  new QueueStoreDefinitionParser(DefaultPersistentQueueStoreFactoryBean.class));
 

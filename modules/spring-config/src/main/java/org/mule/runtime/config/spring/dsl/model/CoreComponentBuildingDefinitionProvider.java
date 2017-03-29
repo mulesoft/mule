@@ -34,6 +34,7 @@ import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedReference;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -106,6 +107,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
@@ -123,14 +125,14 @@ import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.api.store.QueueStoreObjectFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
@@ -852,6 +854,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.addAll(getFiltersDefinitions());
     componentBuildingDefinitions.addAll(getReconnectionDefinitions());
     componentBuildingDefinitions.addAll(getTransactionDefinitions());
+    componentBuildingDefinitions.addAll(getQueueStoreDefinitions());
     return componentBuildingDefinitions;
   }
 
@@ -1699,6 +1702,24 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("custom-transaction-manager")
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .asPrototype()
+        .build());
+
+    return buildingDefinitions;
+  }
+
+  public List<ComponentBuildingDefinition> getQueueStoreDefinitions() {
+    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("default-persistent-queue-store")
+        .withTypeDefinition(fromType(QueueStore.class))
+        .withObjectFactoryType(QueueStoreObjectFactory.class)
+        .withConstructorParameterDefinition(fromFixedReference(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME).build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("default-in-memory-queue-store")
+        .withTypeDefinition(fromType(QueueStore.class))
+        .withObjectFactoryType(QueueStoreObjectFactory.class)
+        .withConstructorParameterDefinition(fromFixedReference(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME).build())
         .build());
 
     return buildingDefinitions;
