@@ -839,6 +839,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asPrototype()
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("custom-agent")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .asPrototype()
+        .build());
+
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
     componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
