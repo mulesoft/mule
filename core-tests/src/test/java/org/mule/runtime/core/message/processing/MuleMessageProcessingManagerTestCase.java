@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.message.processing;
 
+import static java.util.Optional.empty;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -13,13 +14,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.execution.EndPhaseTemplate;
 import org.mule.runtime.core.execution.FlowProcessingPhase;
 import org.mule.runtime.core.execution.FlowProcessingPhaseTemplate;
@@ -36,16 +46,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.AbstractMuleTestCase {
@@ -56,6 +56,11 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
   private TestMessageProcessTemplateAndContext completeMessageProcessTemplateAndContext;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SystemExceptionHandler mockExceptionListener;
+
+  @Before
+  public void setUp() {
+    when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
+  }
 
   @Test
   public void nullMessageProcessPhaseInRegistry() throws Exception {

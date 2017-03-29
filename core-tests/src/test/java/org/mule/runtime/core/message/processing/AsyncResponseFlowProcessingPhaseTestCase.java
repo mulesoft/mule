@@ -82,6 +82,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   @Before
   public void before() {
     phase.setMuleContext(mock(MuleContext.class));
+    when(mockContext.getTransactionConfig()).thenReturn(empty());
     when(mockMuleEvent.getError()).thenReturn(empty());
   }
 

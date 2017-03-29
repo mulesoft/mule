@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.message.processing;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -19,14 +20,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.FlowProcessingPhase;
 import org.mule.runtime.core.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.MessageProcessContext;
@@ -37,15 +46,6 @@ import org.mule.runtime.core.execution.ResponseDispatchException;
 import org.mule.runtime.core.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -81,6 +81,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     phase.setMuleContext(mock(MuleContext.class));
+    when(mockContext.getTransactionConfig()).thenReturn(empty());
   }
 
   @Test
