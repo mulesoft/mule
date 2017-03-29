@@ -10,9 +10,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
-import javax.xml.transform.TransformerFactory;
-import javax.xml.validation.SchemaFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +20,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
+
+import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.SchemaFactory;
 
 public class TransformerInputs
 {
@@ -94,11 +96,12 @@ public class TransformerInputs
         {
             // Create a factory we know to be STAX-compliant
             transformerFactory = (TransformerFactory) Class.forName(PREFERRED_TRANSFORMATION_FACTORY_CLASS_NAME).newInstance();
+            XMLSecureFactories.createDefault().configureTransformerFactory(transformerFactory);
         }
         catch (Exception ex)
         {
             // Fall back to default factory
-            transformerFactory = TransformerFactory.newInstance();
+            transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
         }
 
         return transformerFactory;
@@ -120,7 +123,8 @@ public class TransformerInputs
             schemaFactory = SchemaFactory.newInstance(schemaLanguage);
         }
 
-        System.out.println(schemaFactory.getClass());
+        XMLSecureFactories.createDefault().configureSchemaFactory(schemaFactory);
+
         return schemaFactory;
     }
 
