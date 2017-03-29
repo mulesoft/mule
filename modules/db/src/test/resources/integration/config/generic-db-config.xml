@@ -5,5 +5,5 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-     <db:generic-config name="dbConfig" user="userTest" password="passwordTest" url="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true;create=true" driverClassName="org.apache.derby.jdbc.EmbeddedDriver"/>
+     <db:generic-config name="dbConfig" user="userTest" password="passwordTest" url="jdbc:derby:target/muleEmbeddedDB;sql.enforce_strict_size=true;create=true" driverClassName="org.apache.derby.jdbc.EmbeddedDriver"/>
 </mule>

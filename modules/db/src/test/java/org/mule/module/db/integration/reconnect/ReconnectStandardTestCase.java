@@ -77,7 +77,7 @@ public class ReconnectStandardTestCase extends AbstractDbIntegrationTestCase
                 DbConfigResolver dbConfigResolver = muleContext.getRegistry().get("badDbConfig");
                 DbConfig config = dbConfigResolver.resolve(null);
                 StandardDataSource dataSource = (StandardDataSource) config.getDataSource();
-                dataSource.setUrl("jdbc:derby:muleEmbeddedDB;create=true");
+                dataSource.setUrl("jdbc:derby:target/muleEmbeddedDB;create=true");
             }
         }
 

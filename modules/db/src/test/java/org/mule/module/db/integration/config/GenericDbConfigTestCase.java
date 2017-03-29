@@ -27,7 +27,7 @@ public class GenericDbConfigTestCase extends AbstractDbIntegrationTestCase
 {
 
     private static final String EXPECTED_DRIVER_CLASSNAME = "org.apache.derby.jdbc.EmbeddedDriver";
-    private static final String EXPECTED_URL = "jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true;create=true";
+    private static final String EXPECTED_URL = "jdbc:derby:target/muleEmbeddedDB;sql.enforce_strict_size=true;create=true";
     private static final String EXPECTED_PASSWORD = "passwordTest";
     private static final String EXPECTED_USER = "userTest";
 
