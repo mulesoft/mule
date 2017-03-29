@@ -7,6 +7,7 @@
 
 package org.mule.security.oauth.processor;
 
+import static org.mule.utils.IdUtils.padId;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -97,7 +98,7 @@ public abstract class BaseOAuth2AuthorizeMessageProcessor<T extends OAuth2Manage
 
     private void setState(Map<String, String> extraParameters, MuleEvent event)
     {
-        String state = String.format(OAuthProperties.EVENT_STATE_TEMPLATE, event.getId());
+        String state = padId(event.getId());
 
         if (this.getState() != null)
         {

@@ -6,7 +6,9 @@
  */
 package org.mule.security.oauth.processor;
 
+import static org.mule.DefaultMuleEvent.DEFAULT_LENGTH_MULE_EVENT_ID;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_QUERY_PARAMS;
+import static org.mule.utils.IdUtils.removePadding;
 
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
@@ -26,7 +28,6 @@ import org.mule.util.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,6 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
 {
 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2FetchAccessTokenMessageProcessor.class);
-    private static final Pattern EVENT_ID_PATTERN = Pattern.compile("<<MULE_EVENT_ID=([\\w-]*)>>");
-    private static final Pattern ORIGINAL_STATE_PATTERN = Pattern.compile("<<MULE_EVENT_ID=[\\w-]*>>(.*)");
 
     private OAuth2Manager<OAuth2Adapter> oauthManager;
 
@@ -99,15 +98,16 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         return restoredEvent;
     }
 
-    private MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
+    protected MuleEvent restoreOriginalEvent(MuleEvent event) throws MuleException
     {
         String state = getState(event);
+
         if (StringUtils.isEmpty(state))
         {
             return event;
         }
 
-        String eventId = StringUtils.match(EVENT_ID_PATTERN, state, 1);
+        String eventId = removePadding(getEventId(state));
 
         if (StringUtils.isBlank(eventId))
         {
@@ -142,7 +142,7 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
         }
 
         InboundPropertiesDelegate properties = getPropertiesDelegate(restoredEvent);
-        String cleanedState = StringUtils.match(ORIGINAL_STATE_PATTERN, state, 1);
+        String cleanedState = getOriginalId(state);
 
         if (cleanedState != null)
         {
@@ -211,6 +211,22 @@ public class OAuth2FetchAccessTokenMessageProcessor extends FetchAccessTokenMess
             parameters.put(key, value);
         }
     }
+
+    private String getEventId(String state)
+    {
+
+        return state.length() >= DEFAULT_LENGTH_MULE_EVENT_ID ? state.substring(0, DEFAULT_LENGTH_MULE_EVENT_ID) : null;
+
+    }
+
+    private String getOriginalId(String state)
+    {
+
+        return state.length() >= DEFAULT_LENGTH_MULE_EVENT_ID ? state.substring(DEFAULT_LENGTH_MULE_EVENT_ID) : null;
+
+    }
+
+
 
     private class OldHttpTransport implements InboundPropertiesDelegate
     {

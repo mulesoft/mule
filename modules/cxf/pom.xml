@@ -82,6 +82,9 @@
                     <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
+                    <systemPropertyVariables>
+                        <javax.xml.transform.TransformerFactory>org.apache.xalan.processor.TransformerFactoryImpl</javax.xml.transform.TransformerFactory>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
@@ -659,17 +662,14 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>${springVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>${springVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${springVersion}</version>
         </dependency>
 
         <!-- Unit tests -->
@@ -786,17 +786,30 @@
             <artifactId>xalan</artifactId>
             <version>${xalanVersion}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
             <version>${xalanVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xercesVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xmlApisVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

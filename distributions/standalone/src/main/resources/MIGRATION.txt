@@ -5,6 +5,8 @@ The following is a list of changes you have to execute to migrate from Mule Runt
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
 Migration changes from 3.8.x to 3.9.x
+MULE-12017: log4j was updated from 2.5 to 2.8.1 and slf4j from 1.7.7 to 1.7.24. There is a minor incompatibility with code using logger.error(null, "message", e), in which case the first null argument should be omitted.
+MULE-11948: Saxon was upgraded from 9.6.0-7 to 9.6.0-10
 MULE-10720: xml-to-dom-transformer now transforms to org.w3c.dom.Document instead of byte[] by default.
 MULE-9931: Transaction log files size are now restricted by size, using a default size of 500 mb. The configured size is just an approximated value which may be exceeded based on the size of the record store by the transaction. This is configurable using the attribute queueTransactionFilesSize of the <configuration> element.
     The size restriction applies to the set of transaction log files for local transactions and XA transactions independently meaning that if both types of transactions are used for queue the set of tx files will use up to 1 gb.
@@ -13,6 +15,7 @@ MULE-10306: XML entity expansion in XML transformers is now disabled by default 
 MULE-10686: XML entity expansion in Jersey is now disabled by default because it allows DoS attacks. To restore previous behaviour use the mule.xml.expandInternalEntities=true property.
 MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
 MULE-11118: The HTTP listener now replies with status code 503 when the thread pool is exhausted (and poolExhaustedAction="ABORT") instead of closing the socket.
+MULE-11825: In a DB template query, to set a DB param with the null value, you can use the "NULL" literal value. For example: <db:in-param name="name" defaultValue="NULL"/>
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
@@ -290,4 +293,3 @@ MULE-7524: Encoded mule expressions in dynamic endpoints address components are 
 MULE-7546: Implementations of org.mule.api.MuleMessage now need to implement clearAttachments() which was added to the interface. Implementations that extend org.mule.el.context.AbstractMapContext must now implement clear() given this method has been removed from the abstract implementation.
 MULE-7612: maps returned by queries using the Database connector can have different keys as now column's aliases are used instead of column's names.
 MULE-8066: Since 3.6 MuleClient uses the new HTTP module for processing HTTP URLs. To use the previous behaviour use the attribute 'useTransportForUris' in the http:config  element that's located inside the mule configuration element. You can also set this globally by using the system property 'mule.http.useTransportForUris'.
-MULE-11825: In a DB template query, to set a DB param with the null value, you can use the "NULL" literal value. For example: <db:in-param name="name" defaultValue="NULL"/>

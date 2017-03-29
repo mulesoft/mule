@@ -137,6 +137,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private final ApplicationFileBuilder dummyDomainApp3FileBuilder = new ApplicationFileBuilder("dummy-domain-app3").definedBy("bad-app-config.xml").deployedWith("domain", "dummy-domain");
     private final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a").definedBy("shared-http-a-app-config.xml").deployedWith("domain", "shared-http-domain");
     private final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b").definedBy("shared-http-b-app-config.xml").deployedWith("domain", "shared-http-domain");
+    private final ApplicationFileBuilder badConfigAppFileBuilder = new ApplicationFileBuilder("bad-config-app").definedBy("bad-app-config.xml");
 
     // Domain file builders
     private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -810,6 +811,33 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
+    }
+
+    @Test
+    public void removesZombieFilesAfterFailedAppIsDeleted() throws Exception
+    {
+        final String appName = "bad-config-app";
+
+        addPackedAppFromBuilder(badConfigAppFileBuilder);
+        deploymentService.start();
+
+        assertDeploymentFailure(applicationDeploymentListener, appName);
+        assertAppsDir(new String[] {}, new String[] {appName}, true);
+
+        final Map<URL, Long> startZombieMap = deploymentService.getZombieApplications();
+        assertEquals("Should be a zombie file for the app's broken XML config", 1, startZombieMap.size());
+
+        final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
+        assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
+        assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
+
+        reset(applicationDeploymentListener);
+        org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
+        assertAppFolderIsDeleted(appName);
+        assertUndeploymentSuccess(applicationDeploymentListener, appName);
+
+        final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
+        assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
     }
 
     @Test
