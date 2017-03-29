@@ -12,6 +12,7 @@ import static org.mule.module.http.internal.request.HttpAuthenticationType.BASIC
 import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
@@ -24,16 +25,14 @@ import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 
 import java.io.InputStream;
-import java.net.URL;
 
-import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 
 
 /**
  * A wsdl retriever strategy implementation to get the wsdl through a proxy.
  */
-public class HttpRequesterWsdlRetrieverStrategy extends AbstractInputStreamStrategy
+public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
 {
 
     private static final int MINIMUM_KERNEL_MAX_POOL_SIZE = 1;
@@ -55,53 +54,64 @@ public class HttpRequesterWsdlRetrieverStrategy extends AbstractInputStreamStrat
     private TlsContextFactory tlsContextFactory = null;
     private ProxyConfig proxyConfig = null;
     private MuleContext context = null;
-    private String url = null;
+    private GrizzlyHttpClient httpClient;
 
-    public HttpRequesterWsdlRetrieverStrategy(String url, TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, MuleContext context)
+    public HttpRequesterWsdlRetrieverStrategy(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, MuleContext context)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
         this.context = context;
-        this.url = url;
+    }
+
+    /**
+     * Starts the grizzly client to retrieve the WSDL
+     * 
+     * @throws MuleException
+     */
+    public void startHttpClient() throws MuleException
+    {
+        String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(context), WSDL_RETRIEVER);
+
+        HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
+                                                                                     .setTlsContextFactory(tlsContextFactory)
+                                                                                     .setProxyConfig(proxyConfig)
+                                                                                     .setClientSocketProperties(socketProperties)
+                                                                                     .setMaxConnections(DEFAULT_CONNECTIONS)
+                                                                                     .setUsePersistentConnections(DEFAULT_USE_PERSISTENT_CONNECTION)
+                                                                                     .setConnectionIdleTimeout(DEFAULT_CONNECTION_IDLE_TIMEOUT)
+                                                                                     .setThreadNamePrefix(threadNamePrefix)
+                                                                                     .setOwnerName(WSDL_RETRIEVER)
+                                                                                     .setMaxWorkerPoolSize(MINIMUM_WORKER_MAX_POOL_SIZE)
+                                                                                     .setWorkerCoreSize(MINIMUM_WORKER_CORE_SIZE)
+                                                                                     .setMaxKernelPoolSize(MINIMUM_KERNEL_MAX_POOL_SIZE)
+                                                                                     .setKernelCoreSize(MINIMUM_KERNEL_CORE_SIZE)
+                                                                                     .build();
+
+
+        httpClient = new GrizzlyHttpClient(configuration);
+        httpClient.start();
+    }
+
+    /**
+     * Stops the client that retrieved the WSDL
+     */
+    public void stopHttpClient()
+    {
+        httpClient.stop();
     }
 
     @Override
-    public Definition retrieveWsdl() throws WSDLException
+    public InputStream retrieveWsdlResource(String url) throws WSDLException
     {
         try
         {
-            Definition wsdlDefinition = null;
             InputStream responseStream = null;
-            String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(context), WSDL_RETRIEVER);
-
-            HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-                                                                                         .setTlsContextFactory(tlsContextFactory)
-                                                                                         .setProxyConfig(proxyConfig)
-                                                                                         .setClientSocketProperties(socketProperties)
-                                                                                         .setMaxConnections(DEFAULT_CONNECTIONS)
-                                                                                         .setUsePersistentConnections(DEFAULT_USE_PERSISTENT_CONNECTION)
-                                                                                         .setConnectionIdleTimeout(DEFAULT_CONNECTION_IDLE_TIMEOUT)
-                                                                                         .setThreadNamePrefix(threadNamePrefix)
-                                                                                         .setOwnerName(WSDL_RETRIEVER)
-                                                                                         .setMaxWorkerPoolSize(MINIMUM_WORKER_MAX_POOL_SIZE)
-                                                                                         .setWorkerCoreSize(MINIMUM_WORKER_CORE_SIZE)
-                                                                                         .setMaxKernelPoolSize(MINIMUM_KERNEL_MAX_POOL_SIZE)
-                                                                                         .setKernelCoreSize(MINIMUM_KERNEL_CORE_SIZE)
-                                                                                         .build();
-
-            GrizzlyHttpClient httpClient = new GrizzlyHttpClient(configuration);
-            httpClient.start();
-
-            HttpRequest request = new DefaultHttpRequest(url.toString(), null, HTTP_METHOD_WSDL_RETRIEVAL, new ParameterMap(),
+            HttpRequest request = new DefaultHttpRequest(url, null, HTTP_METHOD_WSDL_RETRIEVAL, new ParameterMap(),
                     new ParameterMap(), null);
             responseStream = httpClient.sendAndReceiveInputStream(request, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_FOLLOW_REDIRECTS,
                     basicAuthentication);
 
-            wsdlDefinition = getWsdlDefinition(url, responseStream);
-            httpClient.stop();
-            responseStream.close();
-
-            return wsdlDefinition;
+            return responseStream;
         }
         catch (Exception e)
         {

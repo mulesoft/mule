@@ -22,36 +22,28 @@ import javax.wsdl.WSDLException;
 /**
  * A wsdl retriever strategy implementation to get the wsdl directly.
  */
-public class URLRetrieverStrategy extends AbstractInputStreamStrategy
+public class URLRetrieverStrategy implements WsdlRetrieverStrategy
 {
 
-    private URL url;
-
-    public URLRetrieverStrategy(String url)
-    {
-        this.url = IOUtils.getResourceAsUrl(url, getClass());
-    }
 
     @Override
-    public Definition retrieveWsdl() throws WSDLException
+    public InputStream retrieveWsdlResource(String url) throws WSDLException
     {
         try
         {
             InputStream responseStream = null;
-            Definition wsdlDefinition = null;
 
-            URLConnection urlConnection = url.openConnection();
+            URL location = IOUtils.getResourceAsUrl(url, getClass());
+            URLConnection urlConnection = location.openConnection();
 
-            if (url.getUserInfo() != null)
+            if (location.getUserInfo() != null)
             {
-                urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(url.getUserInfo().getBytes()));
+                urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(location.getUserInfo().getBytes()));
             }
 
             responseStream = urlConnection.getInputStream();
 
-            wsdlDefinition = getWsdlDefinition(url.toString(), responseStream);
-            responseStream.close();
-            return wsdlDefinition;
+            return responseStream;
         }
         catch (Exception e)
         {

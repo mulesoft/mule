@@ -7,7 +7,8 @@
 
 package org.mule.module.ws.consumer;
 
-import javax.wsdl.Definition;
+import java.io.InputStream;
+
 import javax.wsdl.WSDLException;
 
 /**
@@ -17,5 +18,5 @@ import javax.wsdl.WSDLException;
  */
 public interface WsdlRetrieverStrategy 
 {
-	Definition retrieveWsdl() throws WSDLException;
+	InputStream retrieveWsdlResource(String url) throws WSDLException;
 }
