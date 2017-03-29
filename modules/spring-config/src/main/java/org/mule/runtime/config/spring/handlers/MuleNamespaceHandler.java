@@ -11,12 +11,10 @@ import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
-import org.mule.runtime.config.spring.factories.FileQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
-import org.mule.runtime.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
@@ -186,10 +184,7 @@ import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
-import org.mule.runtime.core.util.store.ManagedObjectStore;
 import org.mule.runtime.core.util.store.TextFileObjectStore;
-
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -248,9 +243,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
                                  new QueueStoreDefinitionParser(DefaultMemoryQueueStoreFactoryBean.class));
     registerBeanDefinitionParser("default-persistent-queue-store",
                                  new QueueStoreDefinitionParser(DefaultPersistentQueueStoreFactoryBean.class));
-    registerBeanDefinitionParser("simple-in-memory-queue-store",
-                                 new QueueStoreDefinitionParser(SimpleMemoryQueueStoreFactoryBean.class));
-    registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileQueueStoreFactoryBean.class));
 
     registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
     registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
@@ -471,9 +463,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
     registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
     registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
-    registerBeanDefinitionParser("spring-object-store",
-                                 (BeanDefinitionParser) new ParentDefinitionParser().addAlias("ref", "store"));
-    registerBeanDefinitionParser("managed-store", new ChildDefinitionParser("store", ManagedObjectStore.class));
 
     // Routing: Intercepting Message Processors
     registerMuleBeanDefinitionParser("idempotent-message-filter",
