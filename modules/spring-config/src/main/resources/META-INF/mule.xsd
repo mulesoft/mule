@@ -2703,16 +2703,13 @@
     <xsd:complexType name="customSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractSecurityFilterType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Spring-style property element for custom configuration.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the security filter to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -3632,30 +3629,6 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-
-    <xsd:element name="value-extractor-transformer" type="valueExtractorTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                Extracts values from a given source using regular expressions and uses that values to enrich the mule message.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="valueExtractorTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:sequence>
-                    <xsd:element name="extract" type="extractValueExtractorTemplateType" minOccurs="1" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="source" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An expression used to extract the value that will be matched against each regular expression. If an expression is not specified then the payload of the message is used.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:complexType name="extractValueExtractorTemplateType">
         <xsd:attributeGroup ref="valueExtractorTemplateAttributes"/>
@@ -4629,7 +4602,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="baseSplitterType">
-                    <xsd:attributeGroup ref="expressionAttributes"/>
+                <xsd:attributeGroup ref="expressionAttributes"/>
             </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

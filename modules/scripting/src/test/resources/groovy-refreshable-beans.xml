@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:lang="http://www.springframework.org/schema/lang"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+       http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.1.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <spring:beans>
+        <lang:groovy id="groovy_class_changeInterfaces" refresh-check-delay="100"
+                     script-source="classpath:groovy-dynamic-script.groovy"/>
+        <lang:groovy id="groovy_class_callable" refresh-check-delay="100"
+                     script-source="classpath:groovy-dynamic-script-callable.groovy"/>
+        <lang:groovy id="groovy_class_bean" refresh-check-delay="100"
+                     script-source="classpath:groovy-dynamic-script-bean.groovy"/>
+    </spring:beans>
+
+</mule>

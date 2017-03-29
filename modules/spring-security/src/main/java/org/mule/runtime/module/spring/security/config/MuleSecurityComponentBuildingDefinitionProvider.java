@@ -14,12 +14,12 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.module.spring.security.config.MuleSecurityXmlNamespaceInfoProvider.MULE_SS_NAMESPACE;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.module.spring.security.AuthorizationFilter;
+import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.spring.security.SpringProviderAdapter;
 
 import java.util.ArrayList;
@@ -63,10 +63,11 @@ public class MuleSecurityComponentBuildingDefinitionProvider implements Componen
             .withConstructorParameterDefinition(fromSimpleParameter("value").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("authorization-filter")
-        .withTypeDefinition(fromType(AuthorizationFilter.class))
-        .withSetterParameterDefinition("requiredAuthorities",
-                                       fromSimpleParameter("requiredAuthorities", (value) -> asList(((String) value).split(","))
-                                           .stream().map(String::trim).collect(toList())).build())
+        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withObjectFactoryType(AuthorizationFilterObjectFactory.class)
+        .withConstructorParameterDefinition(fromSimpleParameter("requiredAuthorities",
+                                                                (value) -> asList(((String) value).split(",")).stream()
+                                                                    .map(String::trim).collect(toList())).build())
         .build());
     return componentBuildingDefinitions;
   }

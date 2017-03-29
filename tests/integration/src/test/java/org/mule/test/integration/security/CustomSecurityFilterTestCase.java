@@ -8,12 +8,11 @@ package org.mule.test.integration.security;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.Event;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.api.exception.ExceptionHelper;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -28,8 +27,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 public class CustomSecurityFilterTestCase extends AbstractIntegrationTestCase {
 
   @Override
-  protected String getConfigFile() {
-    return "org/mule/test/integration/security/custom-security-filter-test.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {
+        "org/mule/test/integration/security/custom-security-filter-beans.xml",
+        "org/mule/test/integration/security/custom-security-filter-test.xml"
+    };
   }
 
   @Test

@@ -68,6 +68,8 @@ import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigurator;
+import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
@@ -75,6 +77,7 @@ import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
 import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
+import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
@@ -85,6 +88,7 @@ import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
+import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
@@ -129,6 +133,7 @@ import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.component.simple.LogComponent;
 import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
+import org.mule.runtime.core.config.QueueProfile;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
@@ -154,6 +159,7 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
+import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
@@ -163,14 +169,17 @@ import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.CollectionSplitter;
+import org.mule.runtime.core.routing.ExpressionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.MapSplitter;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.MessageProcessorFilterPair;
+import org.mule.runtime.core.routing.Resequencer;
 import org.mule.runtime.core.routing.RoundRobin;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.SimpleCollectionAggregator;
@@ -224,6 +233,7 @@ import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -564,6 +574,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("message-chunk-splitter")
         .withTypeDefinition(fromType(MessageChunkSplitter.class))
         .withSetterParameterDefinition("messageSize", fromSimpleParameter("messageSize").build()).build());
+
     ComponentBuildingDefinition.Builder baseAggregatorDefinition = baseDefinition.copy()
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("failOnTimeout", fromSimpleParameter("failOnTimeout").build())
@@ -577,11 +588,33 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("message-chunk-aggregator")
         .withTypeDefinition(fromType(MessageChunkAggregator.class)).build());
 
+    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("collection-aggregator")
+        .withTypeDefinition(fromType(SimpleCollectionAggregator.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("resequencer")
+        .withTypeDefinition(fromType(Resequencer.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("custom-aggregator")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .build());
+
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("collection-splitter")
         .withTypeDefinition(fromType(CollectionSplitter.class)).build());
 
-    componentBuildingDefinitions.add(baseAggregatorDefinition.copy().withIdentifier("collection-aggregator")
-        .withTypeDefinition(fromType(SimpleCollectionAggregator.class))
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("splitter")
+        .withTypeDefinition(fromType(ExpressionSplitter.class))
+        .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("map-splitter")
+        .withTypeDefinition(fromType(MapSplitter.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-splitter")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REQUEST_REPLY)
@@ -683,6 +716,77 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ListenerSubscriptionPair.class))
         .withSetterParameterDefinition("listener", fromSimpleReferenceParameter("ref").build())
         .withSetterParameterDefinition("subscription", fromSimpleParameter("subscription").build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("username-password-filter")
+        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withObjectFactoryType(UsernamePasswordFilterObjectFactory.class)
+        .withSetterParameterDefinition("username", fromSimpleParameter("username").build())
+        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
+        .withIgnoredConfigurationParameter(NAME)
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-security-filter")
+        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withObjectFactoryType(CustomSecurityFilterObjectFactory.class)
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
+        .withIgnoredConfigurationParameter(NAME)
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("encryption-security-filter")
+        .withTypeDefinition(fromType(SecurityFilterMessageProcessor.class))
+        .withObjectFactoryType(EncryptionSecurityFilterObjectFactory.class)
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
+        .withIgnoredConfigurationParameter(NAME)
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("queue-profile")
+        .withTypeDefinition(fromType(QueueProfile.class))
+        .withObjectFactoryType(QueueProfileFactoryBean.class)
+        .withSetterParameterDefinition("maxOutstandingMessages", fromSimpleParameter("maxOutstandingMessages").build())
+        .withSetterParameterDefinition("queueStore", fromChildConfiguration(QueueStore.class).build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
+        .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
+        .withSetterParameterDefinition("deadLetterQueue", fromChildConfiguration(Processor.class).build())
+        .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
+        .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
+        .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
+        .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
+        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-router")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("singleton-object")
+        .withTypeDefinition(fromType(SingletonObjectFactory.class))
+        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE).build())
+        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("prototype-object")
+        .withTypeDefinition(fromType(PrototypeObjectFactory.class))
+        .withConstructorParameterDefinition(fromSimpleParameter(CLASS_ATTRIBUTE).build())
+        .withConstructorParameterDefinition(fromChildConfiguration(Map.class).withDefaultValue(new HashMap<>()).build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("pooling-profile")
+        .withTypeDefinition(fromType(PoolingProfile.class))
+        .withSetterParameterDefinition("maxActive", fromSimpleParameter("maxActive").build())
+        .withSetterParameterDefinition("maxIdle", fromSimpleParameter("maxIdle").build())
+        .withSetterParameterDefinition("exhaustedAction", fromSimpleParameter("exhaustedAction",
+                                                                              PoolingProfile.POOL_EXHAUSTED_ACTIONS::get).build())
+        .withSetterParameterDefinition("maxWait", fromSimpleParameter("maxWait").build())
+        .withSetterParameterDefinition("evictionCheckIntervalMillis", fromSimpleParameter("evictionCheckIntervalMillis").build())
+        .withSetterParameterDefinition("minEvictionMillis", fromSimpleParameter("minEvictionMillis").build())
+        .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
+        .withSetterParameterDefinition("initialisationPolicy", fromSimpleParameter("initialisationPolicy",
+                                                                                   PoolingProfile.POOL_INITIALISATION_POLICIES::get)
+                                                                                       .build())
+        .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
     componentBuildingDefinitions.addAll(getComponentsDefinitions());
