@@ -242,6 +242,7 @@ import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.core.util.store.TextFileObjectStore;
@@ -1624,14 +1625,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
     ComponentBuildingDefinition.Builder baseReconnectDefinition = baseDefinition.copy()
-            .withTypeDefinition(fromType(RetryPolicyTemplate.class)).withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)
-            .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
-            .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
+        .withTypeDefinition(fromType(RetryPolicyTemplate.class)).withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)
+        .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
+        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
 
     buildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
-            .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
+        .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
     buildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
-            .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
+        .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
 
     buildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("reconnect-custom-strategy")
@@ -1644,10 +1645,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     buildingDefinitions.add(baseDefinition.copy()
-            .withIdentifier("reconnect-custom-notifier")
-            .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-            .asPrototype()
-            .build());
+        .withIdentifier("reconnect-custom-notifier")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .asPrototype()
+        .build());
 
     return buildingDefinitions;
   }
@@ -1661,6 +1662,31 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
         .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-transaction")
+        .withTypeDefinition(fromType(MuleTransactionConfig.class))
+        .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
+        .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", new TypeConverter() {
+
+          @Override
+          public Object convert(Object o) {
+            try {
+              return ClassUtils.instanciateClass((String) o);
+            } catch (Exception e) {
+              return null;
+            }
+          }
+        }).build())
+        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+        .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
+        .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
+        .build());
+
+    buildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("custom-transaction-manager")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .asPrototype()
         .build());
 
     return buildingDefinitions;
