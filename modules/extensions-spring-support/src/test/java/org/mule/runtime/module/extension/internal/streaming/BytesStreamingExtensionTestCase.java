@@ -11,7 +11,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
@@ -24,6 +30,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -157,6 +164,39 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
     bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
     assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
+  }
+
+  @Test
+  @Description("Streaming operation has a streaming strategy parameter")
+  public void streamingStrategyParameterInOperation() throws Exception {
+    ParameterModel streamingParameter =
+        getStreamingStrategyParameterModel(() -> getConfigurationModel().getOperationModel("toStream").get());
+    assertStreamingStrategyParameter(streamingParameter);
+  }
+
+  @Test
+  @Description("Streaming source has a streaming strategy parameter")
+  public void streamingStrategyParameterInSource() throws Exception {
+    ParameterModel streamingParameter =
+        getStreamingStrategyParameterModel(() -> getConfigurationModel().getSourceModel("bytes-caster").get());
+    assertStreamingStrategyParameter(streamingParameter);
+  }
+
+  private ParameterModel getStreamingStrategyParameterModel(Supplier<ParameterizedModel> model) {
+    return model.get().getAllParameterModels().stream()
+        .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
+        .findFirst()
+        .get();
+  }
+
+  private ConfigurationModel getConfigurationModel() {
+    return getExtensionModel("Marvel")
+        .map(extension -> extension.getConfigurationModel("dr-strange").get())
+        .get();
+  }
+
+  private void assertStreamingStrategyParameter(ParameterModel parameter) {
+    assertType(parameter.getType(), Object.class, UnionType.class);
   }
 
   private void startSourceAndListenSpell(String flowName) throws Exception {

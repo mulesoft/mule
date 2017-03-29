@@ -23,6 +23,7 @@ import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.OTHE
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.VENDOR;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.VERSION;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.WHEN_ROUTE_NAME;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.Stereotype;
@@ -93,7 +94,7 @@ public class CoreExtensionDeclarationTestCase extends AbstractJavaExtensionDecla
     ParameterModel parameter = foreach.getAllParameterModels().get(0);
 
     assertThat(parameter.getName(), is(FOREACH_EXPRESSION_PARAMETER_NAME));
-    assertDataType(parameter.getType(), String.class, StringType.class);
+    assertType(parameter.getType(), String.class, StringType.class);
 
     assertRoute(foreach.getRouteModel(), FOREACH_ROUTE_NAME, 1, 1, FOREACH_STEREOTYPE);
   }

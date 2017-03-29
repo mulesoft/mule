@@ -15,6 +15,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -36,6 +37,9 @@ public class DrStrangeBytesSource extends Source<InputStream, NullAttributes> {
 
   @Parameter
   private String spell;
+
+  @UseConfig
+  private DrStrange config;
 
   @Override
   public void onStart(SourceCallback<InputStream, NullAttributes> sourceCallback) throws MuleException {

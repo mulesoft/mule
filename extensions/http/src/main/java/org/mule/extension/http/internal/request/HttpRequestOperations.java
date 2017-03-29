@@ -27,6 +27,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -68,6 +69,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpRequestMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
+  @Streaming
   public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
                       @Placement(order = 2) @Optional(defaultValue = "GET") String method,
                       @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,

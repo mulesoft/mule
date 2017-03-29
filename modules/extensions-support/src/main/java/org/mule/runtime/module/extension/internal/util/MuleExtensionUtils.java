@@ -23,7 +23,6 @@ import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
-import com.google.common.collect.ImmutableList;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
@@ -80,6 +79,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RequireNa
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -296,9 +297,9 @@ public class MuleExtensionUtils {
    * @param operationDeclaration a {@link OperationDeclaration}
    * @return A {@link Method} or {@code null} if the {@code operationDeclaration} was defined by other means
    */
-  public static Method getImplementingMethod(OperationDeclaration operationDeclaration) {
+  public static java.util.Optional<Method> getImplementingMethod(OperationDeclaration operationDeclaration) {
     return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class)
-        .map(ImplementingMethodModelProperty::getMethod).orElse(null);
+        .map(ImplementingMethodModelProperty::getMethod);
   }
 
   /**

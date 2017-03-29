@@ -7,12 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.apache.commons.collections.CollectionUtils.find;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -72,11 +67,4 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   protected ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
     return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
   }
-
-  protected void assertDataType(MetadataType metadataType, Class<?> expectedRawType,
-                                Class<? extends MetadataType> typeQualifier) {
-    assertThat(metadataType, is(instanceOf(typeQualifier)));
-    assertThat(expectedRawType.isAssignableFrom(getType(metadataType)), is(true));
-  }
-
 }
