@@ -131,7 +131,6 @@ import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.QueueStore;
 import org.mule.runtime.core.api.store.QueueStoreObjectFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -256,7 +255,13 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.*;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -1711,13 +1716,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("default-persistent-queue-store")
-        .withTypeDefinition(fromType(QueueStore.class))
+        .withTypeDefinition(fromType(org.mule.runtime.core.api.store.QueueStore.class))
         .withObjectFactoryType(QueueStoreObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedReference(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME).build())
         .build());
 
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("default-in-memory-queue-store")
-        .withTypeDefinition(fromType(QueueStore.class))
+        .withTypeDefinition(fromType(org.mule.runtime.core.api.store.QueueStore.class))
         .withObjectFactoryType(QueueStoreObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedReference(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME).build())
         .build());
