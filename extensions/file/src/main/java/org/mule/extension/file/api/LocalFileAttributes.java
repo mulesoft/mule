@@ -7,9 +7,9 @@
 package org.mule.extension.file.api;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.extension.file.common.api.AbstractFileAttributes;
 import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,34 +26,52 @@ import java.time.ZoneId;
  */
 public class LocalFileAttributes extends AbstractFileAttributes {
 
-  private BasicFileAttributes attributes = null;
+  private LocalDateTime lastModifiedTime;
+  private LocalDateTime lastAccessTime;
+  private LocalDateTime creationTime;
+  private long size;
+  private boolean regularFile;
+  private boolean directory;
+  private boolean symbolicLink;
 
   /**
    * {@inheritDoc}
    */
   public LocalFileAttributes(Path path) {
     super(path);
+    initAttributes(path);
+  }
+
+  protected void initAttributes(Path path) {
+    BasicFileAttributes attributes = getAttributes(path);
+    this.lastModifiedTime = asDateTime(attributes.lastModifiedTime());
+    this.lastAccessTime = asDateTime(attributes.lastAccessTime());
+    this.creationTime = asDateTime(attributes.creationTime());
+    this.size = attributes.size();
+    this.regularFile = attributes.isRegularFile();
+    this.directory = attributes.isDirectory();
+    this.symbolicLink = Files.isSymbolicLink(Paths.get(getPath()));
   }
 
   /**
    * @return The last time the file was modified
    */
   public LocalDateTime getLastModifiedTime() {
-    return asDateTime(getAttributes().lastModifiedTime());
+    return lastModifiedTime;
   }
 
   /**
    * @return The last time the file was accessed
    */
   public LocalDateTime getLastAccessTime() {
-    return asDateTime(getAttributes().lastAccessTime());
+    return lastAccessTime;
   }
 
   /**
    * @return the time at which the file was created
    */
   public LocalDateTime getCreationTime() {
-    return asDateTime(getAttributes().creationTime());
+    return creationTime;
   }
 
   /**
@@ -61,7 +79,7 @@ public class LocalFileAttributes extends AbstractFileAttributes {
    */
   @Override
   public long getSize() {
-    return getAttributes().size();
+    return size;
   }
 
   /**
@@ -69,7 +87,7 @@ public class LocalFileAttributes extends AbstractFileAttributes {
    */
   @Override
   public boolean isRegularFile() {
-    return getAttributes().isRegularFile();
+    return regularFile;
   }
 
   /**
@@ -77,7 +95,7 @@ public class LocalFileAttributes extends AbstractFileAttributes {
    */
   @Override
   public boolean isDirectory() {
-    return getAttributes().isDirectory();
+    return directory;
   }
 
   /**
@@ -85,19 +103,15 @@ public class LocalFileAttributes extends AbstractFileAttributes {
    */
   @Override
   public boolean isSymbolicLink() {
-    return Files.isSymbolicLink(Paths.get(getPath()));
+    return symbolicLink;
   }
 
-  private synchronized BasicFileAttributes getAttributes() {
-    if (attributes == null) {
-      try {
-        attributes = Files.readAttributes(path, BasicFileAttributes.class);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not read attributes for file " + path), e);
-      }
+  private BasicFileAttributes getAttributes(Path path) {
+    try {
+      return Files.readAttributes(path, BasicFileAttributes.class);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not read attributes for file " + path), e);
     }
-
-    return attributes;
   }
 
   private LocalDateTime asDateTime(FileTime fileTime) {
