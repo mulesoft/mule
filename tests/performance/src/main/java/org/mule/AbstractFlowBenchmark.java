@@ -30,6 +30,7 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
+
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
@@ -80,7 +81,6 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   protected TriggerableMessageSource source;
 
   @Param({
-      "org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory"

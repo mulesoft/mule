@@ -15,14 +15,6 @@
         <echo-component />
     </flow>
 
-    <flow name="asynchronousFlow" processingStrategy="asynchronous">
-        <echo-component />
-    </flow>
-
-    <flow name="nonBlockingFlow" processingStrategy="non-blocking">
-        <echo-component />
-    </flow>
-
     <flow name="customProcessingStrategyFlow" processingStrategy="customStrategy">
         <echo-component />
     </flow>

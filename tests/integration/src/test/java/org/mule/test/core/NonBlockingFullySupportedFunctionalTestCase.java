@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -45,11 +44,8 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
   }
 
   @Parameters
-  public static Collection<Object[]> parameters() {
-    return asList(new Object[][] {
-        {new DefaultFlowProcessingStrategyFactory()},
-        {new LegacyNonBlockingProcessingStrategyFactory()}
-    });
+  public static Collection<Object> parameters() {
+    return asList(new Object[] {new DefaultFlowProcessingStrategyFactory()});
   }
 
   @Override

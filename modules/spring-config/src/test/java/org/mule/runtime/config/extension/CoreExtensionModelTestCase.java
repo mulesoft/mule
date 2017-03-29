@@ -12,7 +12,6 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -25,6 +24,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductDescription;
 import static org.mule.runtime.core.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
@@ -443,12 +443,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertOutputSameAsInput(asyncModel);
 
-    assertThat(asyncModel.getAllParameterModels(), hasSize(1));
-
-    assertThat(asyncModel.getAllParameterModels().get(0).getName(), is("processingStrategy"));
-    assertThat(asyncModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(asyncModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
-    assertThat(asyncModel.getAllParameterModels().get(0).isRequired(), is(false));
+    assertThat(asyncModel.getAllParameterModels(), hasSize(0));
   }
 
   /**

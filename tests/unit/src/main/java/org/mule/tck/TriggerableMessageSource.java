@@ -7,15 +7,16 @@
 package org.mule.tck;
 
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.NonBlockingMessageSource;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
 
 import org.reactivestreams.Publisher;
 
-public class TriggerableMessageSource implements NonBlockingMessageSource {
+public class TriggerableMessageSource implements MessageSource {
 
   protected Processor listener;
 
@@ -27,6 +28,7 @@ public class TriggerableMessageSource implements NonBlockingMessageSource {
     return just(event).transform(listener);
   }
 
+  @Override
   public void setListener(Processor listener) {
     this.listener = listener;
   }

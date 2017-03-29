@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:util="http://www.springframework.org/schema/util"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:mgmt="http://www.mulesoft.org/schema/mule/management"
       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-current.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <flow name="appleComponent2" processingStrategy="asynchronous">
+    <flow name="appleComponent2">
         <pooled-component class="org.mule.tck.testmodels.fruit.Apple">
             <pooling-profile maxActive="9" maxIdle="6" maxWait="4002"
                              exhaustedAction="WHEN_EXHAUSTED_FAIL" initialisationPolicy="INITIALISE_ALL"/>

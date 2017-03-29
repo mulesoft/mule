@@ -7,7 +7,7 @@
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <flow name="messagePerRecordOneWay" processingStrategy="asynchronous">
+    <flow name="messagePerRecordOneWay">
         <db:stored-procedure config-ref="dbConfig" streaming="true">
             <db:parameterized-query>{ call getTestRecords(:resultSet1) }</db:parameterized-query>
             <db:out-param name="resultSet1" type="CURSOR"/>

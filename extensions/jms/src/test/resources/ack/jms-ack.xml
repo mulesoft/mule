@@ -40,7 +40,7 @@
         </choice>
     </flow>
     
-    <flow name="saveMessage" processingStrategy="asynchronous">
+    <flow name="saveMessage">
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>
 

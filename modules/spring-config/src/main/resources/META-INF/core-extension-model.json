@@ -1839,36 +1839,7 @@
       "requiresConnection": false,
       "parameterGroupModels": [
         {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "asynchronous",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "name": "processingStrategy",
-              "description": "Strategy used to process the configured message processors when exchange pattern is 'one-way'. This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.",
-              "modelProperties": {}
-            }
-          ]
+          "parameters": []
         }
       ],
       "description": "Processes the nested list of message processors asynchronously using a thread pool",

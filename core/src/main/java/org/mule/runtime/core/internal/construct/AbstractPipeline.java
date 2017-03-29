@@ -6,21 +6,18 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.selectRejected;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
-import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
-import static org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory.LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -31,7 +28,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.ConnectException;
-import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
@@ -46,7 +42,6 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
@@ -55,10 +50,6 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyDefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
@@ -75,6 +66,7 @@ import java.util.function.Function;
 
 import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -256,14 +248,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          if (processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE) {
-            return from(publisher).handle(nullSafeMap(checkedFunction(request -> pipeline.process(request))));
-          } else {
-            return from(publisher)
-                .doOnNext(assertStarted())
-                .doOnNext(event -> sink.accept(event))
-                .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
-          }
+          return from(publisher)
+              .doOnNext(assertStarted())
+              .doOnNext(event -> sink.accept(event))
+              .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
         }
       });
     }
@@ -311,32 +299,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         throw new IllegalArgumentException(
                                            "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
-    }
-  }
-
-  @Override
-  public void validateConstruct() throws FlowConstructInvalidException {
-    super.validateConstruct();
-
-    // Ensure that inbound endpoints are compatible with processing strategy.
-    boolean userConfiguredProcessingStrategy = !(getProcessingStrategyFactory() instanceof DefaultFlowProcessingStrategyFactory);
-    boolean userConfiguredAsyncProcessingStrategy =
-        getProcessingStrategyFactory() instanceof LegacyAsynchronousProcessingStrategyFactory && userConfiguredProcessingStrategy;
-
-    boolean isCompatibleWithAsync = sourceCompatibleWithAsync.evaluate(messageSource);
-    if (userConfiguredAsyncProcessingStrategy
-        && (!(messageSource == null || isCompatibleWithAsync))) {
-      throw new FlowConstructInvalidException(CoreMessages
-          .createStaticMessage("One of the message sources configured on this Flow is not "
-              + "compatible with an asynchronous processing strategy.  Either "
-              + "because it is request-response, has a transaction defined, or " + "messaging redelivered is configured."), this);
-    }
-
-    if (getProcessingStrategyFactory() instanceof LegacyNonBlockingProcessingStrategyFactory && messageSource != null
-        && !(messageSource instanceof NonBlockingMessageSource)) {
-      throw new FlowConstructInvalidException(CoreMessages
-          .createStaticMessage(format("The non-blocking processing strategy (%s) currently only supports non-blocking messages sources (source is %s).",
-                                      getProcessingStrategyFactory().toString(), messageSource.toString())), this);
     }
   }
 
@@ -413,17 +375,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * <ol>
    * <li>If a transaction is active and a processing strategy supporting transactions is configured. (synchronous or default
    * strategies)</li>
-   * <li>If {@link LegacySynchronousProcessingStrategyFactory} is configured as the processing strategy.</li>
+   * <li>If {@link SynchronousProcessingStrategyFactory} is configured as the processing strategy.</li>
    * </ol>
    * 
    * @return true if blocking synchronous code path should be used, false otherwise.
    */
   protected boolean useBlockingCodePath() {
-    return (isTransactionActive() &&
+    return isTransactionActive() &&
         (processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory
-            || processingStrategyFactory instanceof LegacyDefaultFlowProcessingStrategyFactory
-            || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory))
-        || processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+            || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory);
   }
 
   @Override

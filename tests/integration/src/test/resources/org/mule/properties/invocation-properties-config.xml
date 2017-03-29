@@ -108,7 +108,7 @@
         <flow-ref name="FlowRef-3" />
         <test:assert expression="#[mel:flowVars.P4]" message="I failed" />
     </flow>
-    <flow name="FlowRef-2" processingStrategy="asynchronous">
+    <flow name="FlowRef-2">
         <test:assert expression="#[mel:P1]" />
         <test:assert expression="#[mel:P2]" />
         <processor ref="addP3" />

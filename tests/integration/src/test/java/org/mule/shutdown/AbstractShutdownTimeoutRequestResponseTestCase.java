@@ -6,20 +6,20 @@
  */
 package org.mule.shutdown;
 
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class AbstractShutdownTimeoutRequestResponseTestCase extends AbstractIntegrationTestCase {
 
-  protected static int WAIT_TIME = 2000;
+  protected static int WAIT_TIME = 20000;
   protected static Latch waitLatch;
 
   @Rule

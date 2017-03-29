@@ -11,7 +11,6 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Sink;
 
@@ -43,20 +42,6 @@ public interface ProcessingStrategy {
    */
   default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-    return onPipeline(flowConstruct, pipelineFunction, flowConstruct.getExceptionListener());
-  }
-
-  /**
-   * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
-   *
-   * @param flowConstruct pipeline instance.
-   * @param pipelineFunction pipeline function.
-   * @param messagingExceptionHandler exception handle to use.
-   * @return enriched pipeline function
-   */
-  default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                  Function<Publisher<Event>, Publisher<Event>> pipelineFunction,
-                                                                  MessagingExceptionHandler messagingExceptionHandler) {
     return publisher -> from(publisher).transform(pipelineFunction);
   }
 

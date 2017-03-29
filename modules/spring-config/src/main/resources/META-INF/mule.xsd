@@ -2005,21 +2005,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
-                    <xsd:enumeration value="non-blocking">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Processes message processors in the calling thread, but supported non components will release the calling thread once a request has been sent.  Once a response is available the Flow will continue processing a worker thread.  In order to configure the thread pool used you can configure a custom 'non-blocking-processing-strategy' global element and reference it by name.
-                                NOTE: This processing strategy is currently only supported with a  a single 'HTTP Listener’ or when there is no message source configured.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="asynchronous">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Uses a thread pool to process the pipeline of message processors asynchronously.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
