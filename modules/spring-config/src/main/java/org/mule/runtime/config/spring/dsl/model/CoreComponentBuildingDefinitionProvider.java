@@ -173,12 +173,7 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.retry.RetryForeverPolicyTemplateFactory;
-import org.mule.runtime.core.retry.RetryPolicyTemplateFactory;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
-import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
-import org.mule.runtime.core.retry.policies.SimpleRetryPolicy;
-import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.CollectionSplitter;
@@ -218,7 +213,6 @@ import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionType;
-import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
@@ -651,15 +645,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());
 
-    ComponentBuildingDefinition.Builder baseReconnectDefinition = baseDefinition.copy()
-        .withTypeDefinition(fromType(RetryPolicyTemplate.class)).withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)
-        .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
-        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
-
-    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
-        .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
-    componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
-        .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
@@ -1638,20 +1623,23 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private List<ComponentBuildingDefinition> getReconnectionDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect")
-        .withTypeDefinition(fromType(RetryPolicyTemplate.class))
-        .withObjectFactoryType(RetryPolicyTemplateFactory.class)
-        .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").withDefaultValue(true).build())
-        .withSetterParameterDefinition("count", fromSimpleParameter("count").build())
-        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
+    ComponentBuildingDefinition.Builder baseReconnectDefinition = baseDefinition.copy()
+            .withTypeDefinition(fromType(RetryPolicyTemplate.class)).withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)
+            .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
+            .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
+
+    buildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
+            .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
+    buildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
+            .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
+
+    buildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("reconnect-custom-strategy")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .asPrototype()
         .build());
 
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-forever")
-        .withTypeDefinition(fromType(RetryPolicyTemplate.class))
-        .withObjectFactoryType(RetryForeverPolicyTemplateFactory.class)
-        .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").withDefaultValue(true).build())
-        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
-        .build());
+
 
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("reconnect-notifier")
         .withTypeDefinition(fromType(ConnectNotifier.class))
