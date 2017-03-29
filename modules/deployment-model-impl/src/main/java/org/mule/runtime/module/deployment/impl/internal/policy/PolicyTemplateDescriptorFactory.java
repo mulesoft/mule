@@ -12,7 +12,9 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
@@ -38,7 +40,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
   @Override
   public PolicyTemplateDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
-    final File policyJsonFile = new File(artifactFolder, META_INF + separator + MULE_POLICY_JSON);
+    final File policyJsonFile = new File(artifactFolder, META_INF + separator + MULE_ARTIFACT + separator + MULE_POLICY_JSON);
     if (!policyJsonFile.exists()) {
       throw new ArtifactDescriptorCreateException(MISSING_POLICY_DESCRIPTOR_ERROR);
     }
