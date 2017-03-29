@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.tx.TransactionException;
@@ -21,7 +22,6 @@ import org.mule.test.transactional.TransactionalSource;
 import org.mule.test.transactional.connection.MessageStorage;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BooleanSupplier;
 
 public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
@@ -36,10 +36,15 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
     return "source-transaction-config.xml";
   }
 
+  @Before
+  public void setUp() {
+    MessageStorage.clean();
+    TransactionalSource.isSuccess = null;
+  }
+
   @After
   public void tearDown() {
-    MessageStorage.messages = new ConcurrentLinkedQueue<>();
-    MessageStorage.exception = null;
+    MessageStorage.clean();
     TransactionalSource.isSuccess = null;
   }
 

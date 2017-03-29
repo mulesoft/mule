@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 
@@ -26,26 +27,31 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class TransactionBindDelegate {
+public class TransactionBindingDelegate {
+
+  private final ExtensionModel extensionModel;
+  private final ComponentModel componentModel;
+
+  public TransactionBindingDelegate(ExtensionModel extensionModel, ComponentModel componentModel) {
+
+    this.extensionModel = extensionModel;
+    this.componentModel = componentModel;
+  }
 
   /**
-   * @param componentModel model of the component to enter to the transaction
-   * @param extensionModel model of the current extension
    * @param transactionConfig given transaction config
    * @param txKey the transaction key
-   * @param currentTx current transaction
    * @param connectionHandlerSupplier {@link Supplier} to get the {@link ConnectionHandler} of the current component
    * @return The {@link ConnectionHandler} that has be bound to the transaction.
    * @throws ConnectionException if a problem occurred retrieving the {@link ConnectionHandler}
    * @throws TransactionException if the connection could not be bound to the current transaction
    */
-  public <T extends TransactionalConnection> ConnectionHandler<T> bindResource(ComponentModel componentModel,
-                                                                               ExtensionModel extensionModel,
-                                                                               TransactionConfig transactionConfig,
+  public <T extends TransactionalConnection> ConnectionHandler<T> bindResource(TransactionConfig transactionConfig,
                                                                                ExtensionTransactionKey txKey,
-                                                                               Transaction currentTx,
                                                                                ConnectionSupplier<ConnectionHandler<T>> connectionHandlerSupplier)
       throws ConnectionException, TransactionException {
+
+    final Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
     if (currentTx != null) {
 
       if (currentTx.hasResource(txKey)) {
@@ -64,7 +70,7 @@ public class TransactionBindDelegate {
           return new TransactionalConnectionHandler(txResource);
         } else if (transactionConfig.isTransacted()) {
           throw new TransactionException(createStaticMessage(format("%s '%s' of extension '%s' uses a transactional connection '%s', but the current transaction "
-                                             + "doesn't support it and could not being bound",
+              + "doesn't support it and could not be bound",
                                                                     getComponentModelTypeName(componentModel),
                                                                     componentModel.getName(),
                                                                     extensionModel.getName(),
@@ -87,6 +93,7 @@ public class TransactionBindDelegate {
         : new ExtensionTransactionalResource((TransactionalConnection) connection, connectionHandler, currentTx);
   }
 
+  @FunctionalInterface
   public interface ConnectionSupplier<T> {
 
     T get() throws ConnectionException;

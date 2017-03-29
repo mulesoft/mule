@@ -7,11 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -268,8 +269,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
 
       @Override
-      public TransactionConfig getTransactionConfig() {
-        return sourceModel.isTransactional() ? buildTransactionConfig() : null;
+      public Optional<TransactionConfig> getTransactionConfig() {
+        return sourceModel.isTransactional() ? of(buildTransactionConfig()) : empty();
       }
 
       @Override
@@ -285,7 +286,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       private TransactionConfig buildTransactionConfig() {
         MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-        transactionConfig.setAction(getSourceTransactionalAction());
+        transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
         transactionConfig.setMuleContext(muleContext);
 
         // TODO - MULE-12066 : Support XA transactions in SDK extensions at source level
@@ -371,15 +372,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       createSource();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
-    }
-  }
-
-  private byte getSourceTransactionalAction() {
-    try {
-      return toActionCode(sourceAdapter.getTransactionalAction());
-    } catch (MuleException e) {
-      LOGGER.error("An error occurred obtaining the Source Transactional Action, defaulting to [NONE]");
-      return ACTION_NONE;
     }
   }
 }

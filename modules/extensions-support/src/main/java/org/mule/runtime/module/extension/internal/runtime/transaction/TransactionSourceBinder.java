@@ -8,16 +8,12 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 /**
@@ -28,17 +24,23 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
  */
 public class TransactionSourceBinder {
 
-  private TransactionBindDelegate transactionBindDelegate = new TransactionBindDelegate();
+  private final ExtensionModel extensionModel;
+  private final ComponentModel componentModel;
+  private final TransactionBindingDelegate transactionBindingDelegate;
 
-  public void bindToTransaction(ComponentModel componentModel,
-                                ExtensionModel extensionModel,
-                                TransactionConfig transactionConfig,
+  public TransactionSourceBinder(ExtensionModel extensionModel, ComponentModel componentModel) {
+    this.extensionModel = extensionModel;
+    this.componentModel = componentModel;
+    transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
+  }
+
+  public void bindToTransaction(TransactionConfig transactionConfig,
                                 ConfigurationInstance configurationInstance,
                                 ConnectionHandler connectionHandler)
 
       throws ConnectionException, TransactionException {
 
-    if (shouldBeBound(transactionConfig)) {
+    if (!transactionConfig.isTransacted()) {
       return;
     }
 
@@ -49,12 +51,6 @@ public class TransactionSourceBinder {
                                                             extensionModel.getName())));
 
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
-    final Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
-    transactionBindDelegate.bindResource(componentModel, extensionModel, transactionConfig, txKey, currentTx,
-                                         () -> connectionHandler);
-  }
-
-  private boolean shouldBeBound(TransactionConfig transactionConfig) {
-    return transactionConfig.getAction() == ACTION_NOT_SUPPORTED || transactionConfig.getAction() == ACTION_NONE;
+    transactionBindingDelegate.bindResource(transactionConfig, txKey, () -> connectionHandler);
   }
 }

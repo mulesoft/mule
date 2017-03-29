@@ -30,4 +30,9 @@ public class MessageStorage implements Callable {
       return null;
     }
   }
+
+  public static void clean() {
+    exception = null;
+    messages = new ConcurrentLinkedQueue<>();
+  }
 }

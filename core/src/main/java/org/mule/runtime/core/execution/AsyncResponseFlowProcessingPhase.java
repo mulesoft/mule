@@ -49,8 +49,8 @@ public class AsyncResponseFlowProcessingPhase
           TransactionalErrorHandlingExecutionTemplate transactionTemplate =
               createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
                                           messageProcessContext.getFlowConstruct(),
-                                          (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
-                                              : messageProcessContext.getTransactionConfig()),
+                                          (messageProcessContext.getTransactionConfig().isPresent()
+                                              ? messageProcessContext.getTransactionConfig().get() : new MuleTransactionConfig()),
                                           exceptionHandler);
           final Event response = transactionTemplate.execute(() -> {
             Event muleEvent = template.getEvent();

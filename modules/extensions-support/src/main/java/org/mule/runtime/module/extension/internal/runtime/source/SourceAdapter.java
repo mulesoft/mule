@@ -87,7 +87,8 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
                        Source source,
                        Optional<ConfigurationInstance> configurationInstance,
                        SourceCallbackFactory sourceCallbackFactory,
-                       ResolverSet nonCallbackParameters, ResolverSet successCallbackParameters,
+                       ResolverSet nonCallbackParameters,
+                       ResolverSet successCallbackParameters,
                        ResolverSet errorCallbackParameters) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -275,14 +276,15 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
     return source;
   }
 
-  public SourceTransactionalAction getTransactionalAction() throws MuleException {
+  public SourceTransactionalAction getTransactionalAction() {
     ValueResolver valueResolver = nonCallbackParameters.getResolvers().get(TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    Object transactionalAction;
 
-    if (valueResolver.isDynamic()) {
-      throw new IllegalStateException("Transactional Action can't be dynamic");
+    try {
+      transactionalAction = valueResolver.resolve(getInitialiserEvent(muleContext));
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage("Unable to get the Transactional Action value for Message Source"), e);
     }
-
-    Object transactionalAction = valueResolver.resolve(getInitialiserEvent(muleContext));
 
     if (!(transactionalAction instanceof SourceTransactionalAction)) {
       throw new IllegalStateException("The resolved value is not a Transactional Action");

@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -45,8 +46,8 @@ import java.util.function.Supplier;
  */
 class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T, A> {
 
-  private static final String UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE = "Unable to start a transaction from the Source '%s' of the extension '%s' with out a %s";
-  private final TransactionSourceBinder transactionSourceInitializer = new TransactionSourceBinder();
+  private static final String UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE =
+      "Unable to start a transaction from the Source '%s' of the extension '%s' without a %s";
 
   /**
    * A Builder to create instance of {@link DefaultSourceCallback}
@@ -120,6 +121,11 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
       checkArgument(product.sourceModel, "sourceModel");
       checkArgument(product.cursorProviderFactory, "cursorStreamProviderFactory");
+      checkArgument(product.messageSource, "messageSource");
+      checkArgument(product.muleContext, "muleContext");
+
+      product.transactionSourceBinder =
+          new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel);
 
       return product;
     }
@@ -148,6 +154,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
   private SourceCompletionHandlerFactory completionHandlerFactory;
   private CursorProviderFactory cursorProviderFactory;
   private boolean returnsListOfMessages = false;
+  private TransactionSourceBinder transactionSourceBinder;
 
   private DefaultSourceCallback() {}
 
@@ -169,12 +176,12 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorProviderFactory, returnsListOfMessages);
     Message message = Message.builder().payload(resultAdapter).build();
 
-    TransactionConfig transactionConfig = messageProcessContext.getTransactionConfig();
+    Optional<TransactionConfig> transactionConfig = messageProcessContext.getTransactionConfig();
 
-    if (transactionConfig == null) {
-      executeFlow(context, messageProcessContext, message);
+    if (transactionConfig.isPresent()) {
+      executeFlowTransactionally(context, messageProcessContext, message, transactionConfig.get());
     } else {
-      executeFlowTransactionally(context, messageProcessContext, message, transactionConfig);
+      executeFlow(context, messageProcessContext, message);
     }
   }
 
@@ -183,17 +190,21 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     ExecutionTemplate<Event> executionTemplate = createMainExecutionTemplate(muleContext, flowConstruct, transactionConfig);
 
     ConnectionHandler connectionHandler = messageSource.getConnectionHandler()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE, sourceModel.getName(), messageSource.getExtensionModel().getName(), "connection"))));
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE,
+                                                                               sourceModel.getName(),
+                                                                               messageSource.getExtensionModel().getName(),
+                                                                               "connection"))));
     ConfigurationInstance configurationInstance = messageSource.getConfigurationInstance()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE, sourceModel.getName(), messageSource.getExtensionModel().getName(), "configuration"))));
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE,
+                                                                               sourceModel.getName(),
+                                                                               messageSource.getExtensionModel().getName(),
+                                                                               "configuration"))));
 
     try {
       executionTemplate.execute(() -> {
-        transactionSourceInitializer.bindToTransaction(sourceModel,
-                                                       messageSource.getExtensionModel(),
-                                                       transactionConfig,
-                                                       configurationInstance,
-                                                       connectionHandler);
+        transactionSourceBinder.bindToTransaction(transactionConfig,
+                                                  configurationInstance,
+                                                  connectionHandler);
 
         executeFlow(context, messageProcessContext, message);
         return null;

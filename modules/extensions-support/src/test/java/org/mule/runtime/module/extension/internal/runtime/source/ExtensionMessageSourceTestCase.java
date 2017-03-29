@@ -199,18 +199,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(muleContext);
 
-    sourceCallback = spy(DefaultSourceCallback.builder()
-        .setFlowConstruct(flowConstruct)
-        .setSourceModel(sourceModel)
-        .setProcessingManager(messageProcessingManager)
-        .setListener(messageProcessor)
-        .setProcessContextSupplier(() -> messageProcessContext)
-        .setCompletionHandlerFactory(completionHandlerFactory)
-        .setExceptionCallback(exceptionCallback)
-        .setCursorStreamProviderFactory(cursorStreamProviderFactory)
-        .build());
-
-    when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
     sourceAdapter = createSourceAdapter();
 
     when(sourceAdapterFactory.createAdapter(any(), any())).thenReturn(sourceAdapter);
@@ -252,9 +240,24 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
         .thenReturn(of(new MetadataKeyIdModelProperty(typeLoader.load(String.class), METADATA_KEY)));
     when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
 
-    when(messageProcessContext.getTransactionConfig()).thenReturn(null);
+    when(messageProcessContext.getTransactionConfig()).thenReturn(empty());
 
     messageSource = getNewExtensionMessageSourceInstance();
+
+    sourceCallback = spy(DefaultSourceCallback.builder()
+        .setFlowConstruct(flowConstruct)
+        .setSourceModel(sourceModel)
+        .setProcessingManager(messageProcessingManager)
+        .setListener(messageProcessor)
+        .setSource(messageSource)
+        .setMuleContext(muleContext)
+        .setProcessContextSupplier(() -> messageProcessContext)
+        .setCompletionHandlerFactory(completionHandlerFactory)
+        .setExceptionCallback(exceptionCallback)
+        .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+        .build());
+
+    when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
   }
 
   @After
