@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_TAB_NA
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_ABSTRACT_BYTE_STREAMING_STRATEGY_QNAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_ABSTRACT_OBJECT_STREAMING_STRATEGY_QNAME;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingMethod;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -22,6 +23,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -61,15 +63,20 @@ public class StreamingDeclarationEnricher extends InfrastructureDeclarationEnric
   }
 
   private boolean enrichByteStreaming(ComponentDeclaration declaration) {
-    if (InputStream.class.getName().equals(getId(declaration.getOutput().getType()))) {
+    boolean streaming = InputStream.class.getName().equals(getId(declaration.getOutput().getType()));
+    if (!streaming && declaration instanceof OperationDeclaration) {
+      streaming = getImplementingMethod((OperationDeclaration) declaration)
+          .map(method -> method.getAnnotation(Streaming.class) != null)
+          .orElse(false);
+    }
+
+    if (streaming) {
       addStreamingParameter(declaration,
                             new StreamingStrategyTypeBuilder().getByteStreamingStrategyType(),
                             MULE_ABSTRACT_BYTE_STREAMING_STRATEGY_QNAME);
-
-      return true;
     }
 
-    return false;
+    return streaming;
   }
 
   private boolean enrichObjectStreaming(ComponentDeclaration declaration) {

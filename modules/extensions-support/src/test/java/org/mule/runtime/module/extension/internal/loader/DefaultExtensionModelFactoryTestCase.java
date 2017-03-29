@@ -10,13 +10,16 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
@@ -37,6 +40,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -147,6 +151,21 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
         assertExternalLibraries(model);
       }
     }.walk(extensionModel);
+  }
+
+  @Test
+  public void streamingHint() throws Exception {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    OperationModel operationModel = extensionModel.getConfigurationModels().get(0).getOperationModel("sayMyName").get();
+    ParameterModel streamingParameter = operationModel.getAllParameterModels().stream()
+        .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
+        .findFirst()
+        .get();
+
+    assertThat(streamingParameter.getType(), equalTo(new StreamingStrategyTypeBuilder().getByteStreamingStrategyType()));
+    assertThat(streamingParameter.isRequired(), is(false));
+    assertThat(streamingParameter.getDefaultValue(), is(nullValue()));
+    assertThat(streamingParameter.getExpressionSupport(), is(NOT_SUPPORTED));
   }
 
   private void assertExternalLibraries(HasExternalLibraries model) {

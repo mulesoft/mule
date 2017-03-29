@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -48,12 +49,13 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
-import javax.inject.Inject;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 
 public class HeisenbergOperations implements Disposable {
@@ -78,6 +80,7 @@ public class HeisenbergOperations implements Disposable {
   private ExtensionManager extensionManager;
 
   @DataTypeParameters
+  @Streaming
   public String sayMyName(@UseConfig HeisenbergExtension config) {
     return config.getPersonalInfo().getName();
   }

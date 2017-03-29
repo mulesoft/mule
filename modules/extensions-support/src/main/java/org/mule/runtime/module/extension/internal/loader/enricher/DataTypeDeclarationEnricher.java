@@ -25,8 +25,6 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
-import java.lang.reflect.Method;
-
 /**
  * Enriches operations which were defined in methods annotated with {@link DataTypeParameters} so that parameters
  * {@link ExtensionProperties#MIME_TYPE_PARAMETER_NAME} and {@link ExtensionProperties#ENCODING_PARAMETER_NAME}. are added Both
@@ -45,8 +43,7 @@ public final class DataTypeDeclarationEnricher extends AbstractAnnotatedDeclarat
 
       @Override
       protected void onOperation(OperationDeclaration declaration) {
-        Method method = getImplementingMethod(declaration);
-        if (method != null) {
+        getImplementingMethod(declaration).ifPresent(method -> {
           DataTypeParameters annotation = method.getAnnotation(DataTypeParameters.class);
           if (annotation != null) {
             if (isVoid(method)) {
@@ -62,7 +59,7 @@ public final class DataTypeDeclarationEnricher extends AbstractAnnotatedDeclarat
             declaration.getParameterGroup(DEFAULT_GROUP_NAME)
                 .addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
           }
-        }
+        });
       }
     }.walk(declaration);
   }
