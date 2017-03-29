@@ -225,6 +225,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
             }
             
             SchemaFactory schemaFactory = SchemaFactory.newInstance(getSchemaLanguage());
+            XMLSecureFactories.createDefault().configureSchemaFactory(schemaFactory);
 
             if (logger.isInfoEnabled())
             {
@@ -275,6 +276,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
     public Validator createValidator() throws SAXException
     {
         Validator validator = getSchemaObject().newValidator();
+        XMLSecureFactories.createDefault().configureValidator(validator);
 
         if (this.validatorFeatures != null)
         {

@@ -6,12 +6,18 @@
  */
 package org.mule.util.xmlsecurity;
 
+import static java.lang.String.format;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +42,7 @@ public class DefaultXMLSecureFactories
         }
         catch (Exception e)
         {
-            logger.warn("Can't configure XML entity expansion for DocumentBuilderFactory, this could introduce XXE and BL vulnerabilities");
+            logWarning("DocumentBuilderFactory", factory.getClass().getName());
         }
 
         return factory;
@@ -54,7 +60,7 @@ public class DefaultXMLSecureFactories
         }
         catch (Exception e)
         {
-            logger.warn("Can't configure XML entity expansion for SAXParserFactory, this could introduce XXE and BL vulnerabilities");
+            logWarning("SAXParserFactory", factory.getClass().getName());
         }
 
         return factory;
@@ -68,5 +74,67 @@ public class DefaultXMLSecureFactories
         factory.setProperty(SUPPORT_DTD, expandEntities);
 
         return factory;
+    }
+
+    public static TransformerFactory createTransformerFactory(Boolean externalEntities, Boolean expandEntities)
+    {
+        TransformerFactory factory = TransformerFactory.newInstance();
+
+        configureTransformerFactory(externalEntities, expandEntities, factory);
+
+        return factory;
+    }
+
+    public static void configureTransformerFactory(Boolean externalEntities, Boolean expandEntities, TransformerFactory factory)
+    {
+        if (!externalEntities && !expandEntities)
+        {
+            try
+            {
+                factory.setAttribute(ACCESS_EXTERNAL_STYLESHEET, "");
+                factory.setAttribute(ACCESS_EXTERNAL_DTD, "");
+            }
+            catch (Exception e)
+            {
+                logWarning("TransformerFactory", factory.getClass().getName());
+            }
+        }
+    }
+
+    public static void configureSchemaFactory(Boolean externalEntities, Boolean expandEntities, SchemaFactory factory)
+    {
+        if (!externalEntities && !expandEntities)
+        {
+            try
+            {
+                factory.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
+                factory.setProperty(ACCESS_EXTERNAL_DTD, "");
+            }
+            catch (Exception e)
+            {
+                logWarning("SchemaFactory", factory.getClass().getName());
+            }
+        }
+    }
+
+    public static void configureValidator(Boolean externalEntities, Boolean expandEntities, Validator validator)
+    {
+        if (!externalEntities && !expandEntities)
+        {
+            try
+            {
+                validator.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
+                validator.setProperty(ACCESS_EXTERNAL_DTD, "");
+            }
+            catch (Exception e)
+            {
+                logWarning("Validator", validator.getClass().getName());
+            }
+        }
+    }
+
+    protected static void logWarning(String interfaceName, String implementationName)
+    {
+        logger.warn(format("Can't configure XML entity expansion for %s (%s), this could introduce XXE and BL vulnerabilities", interfaceName, implementationName));
     }
 }
