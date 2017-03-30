@@ -28,6 +28,7 @@ import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
 import org.mule.test.runner.utils.AnnotationUtils;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
 import java.io.File;
@@ -147,13 +148,18 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
         .buildRunner(AnnotationUtils.getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"),
                      isolatedTestClass);
 
-    if (!staticFieldsInjected) {
-      injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-      injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-      injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
-      staticFieldsInjected = true;
-    }
-
+    withContextClassLoader(artifactClassLoaderHolder.getApplicationClassLoader().getClassLoader(), () -> {
+      try {
+        if (!staticFieldsInjected) {
+          injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+          injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+          injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+          staticFieldsInjected = true;
+        }
+      } catch (Throwable t) {
+        throw Throwables.propagate(t);
+      }
+    });
   }
 
   private void checkConfiguration(Class<?> klass) {
