@@ -59,7 +59,7 @@ public class DefaultRepositoryService implements RepositoryService {
       return artifactResult.getArtifact().getFile();
     } catch (ArtifactResolutionException e) {
       if (e.getCause() instanceof ArtifactNotFoundException) {
-        throw new BundleNotFoundException("Couldn't find bundle " + bundleDependency.toString(), e);
+        throw new BundleNotFoundException(e);
       } else {
         throw new RepositoryConnectionException("There was a problem connecting to one of the repositories", e);
 

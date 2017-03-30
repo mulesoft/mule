@@ -16,7 +16,7 @@ public class BundleNotFoundException extends RuntimeException {
   /**
    * {@inheritDoc}
    */
-  public BundleNotFoundException(String message, Throwable cause) {
-    super(message, cause);
+  public BundleNotFoundException(Throwable cause) {
+    super(cause);
   }
 }

@@ -6,22 +6,26 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilder;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
-import org.mule.runtime.module.artifact.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 
 /**
  * Default implementation for {@code ConnectivityTestingServiceBuilder}.
@@ -30,47 +34,41 @@ import java.util.List;
  */
 class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingServiceBuilder {
 
-  private static final String JAR_BUNDLE_TYPE = "jar";
-  private final RepositoryService repositoryService;
-  private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
-  private ServiceRegistry serviceRegistry;
-  private List<BundleDependency> bundleDependencies = new ArrayList<>();
-  private List<BundleDependency> extensionsBundleDependencies = new ArrayList<>();
+  private final DefaultApplicationFactory defaultApplicationFactory;
   private ArtifactDeclaration artifactDeclaration;
-  private TemporaryArtifact temporaryArtifact;
+  private Model model;
 
-  DefaultConnectivityTestingServiceBuilder(RepositoryService repositoryService,
-                                           TemporaryArtifactBuilderFactory artifactBuilderFactory,
-                                           ServiceRegistry serviceRegistry) {
-    this.artifactBuilderFactory = artifactBuilderFactory;
-    this.repositoryService = repositoryService;
-    this.serviceRegistry = serviceRegistry;
+  DefaultConnectivityTestingServiceBuilder(DefaultApplicationFactory defaultApplicationFactory) {
+    this.defaultApplicationFactory = defaultApplicationFactory;
+    createTempMavenModel();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion) {
-    BundleDescriptor bundleDescriptor =
-        new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
-            .setType(JAR_BUNDLE_TYPE).build();
-    this.bundleDependencies
-        .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
+  public ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion,
+                                                         String classifier, String type) {
+    Dependency dependency = new Dependency();
+    dependency.setGroupId(groupId);
+    dependency.setArtifactId(artifactId);
+    dependency.setVersion(artifactVersion);
+    dependency.setType(type);
+    dependency.setClassifier(classifier);
+    if (!ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER.equals(classifier)) {
+      addSharedLibraryDependency(model, dependency);
+    }
+    model.getDependencies().add(dependency);
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion) {
-    BundleDescriptor bundleDescriptor =
-        new BundleDescriptor.Builder().setGroupId(groupId).setArtifactId(artifactId).setVersion(artifactVersion)
-            .setType(JAR_BUNDLE_TYPE).setClassifier(MULE_PLUGIN_CLASSIFIER).build();
-    this.extensionsBundleDependencies
-        .add(new BundleDependency.Builder().setDescriptor(bundleDescriptor).build());
-    return this;
+  private void createTempMavenModel() {
+    model = new Model();
+    model.setArtifactId("temp-artifact-id");
+    model.setGroupId("temp-group-id");
+    model.setVersion("temp-version");
+    model.setDependencies(new ArrayList<>());
+    model.setModelVersion("4.0.0");
   }
 
   /**
@@ -87,28 +85,20 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
   @Override
   public ConnectivityTestingService build() {
     checkState(artifactDeclaration != null, "artifact configuration cannot be null");
-    checkState(!extensionsBundleDependencies.isEmpty(), "no extensions were configured");
-    TemporaryArtifact temporaryArtifact = buildArtifact();
-    return new TemporaryArtifactConnectivityTestingService(temporaryArtifact);
-  }
-
-  private TemporaryArtifact buildArtifact() {
-    if (temporaryArtifact != null) {
-      return temporaryArtifact;
-    }
-
-    TemporaryArtifactBuilder temporaryArtifactBuilder = artifactBuilderFactory.newBuilder()
-        .setArtifactDeclaration(artifactDeclaration);
-
-    extensionsBundleDependencies.stream()
-        .forEach(bundleDescriptor -> temporaryArtifactBuilder
-            .addArtifactPluginFile(repositoryService.lookupBundle(bundleDescriptor)));
-    bundleDependencies.stream()
-        .forEach(bundleDescriptor -> temporaryArtifactBuilder
-            .addArtifactLibraryFile(repositoryService.lookupBundle(bundleDescriptor)));
-    temporaryArtifact = temporaryArtifactBuilder.build();
-
-    return temporaryArtifact;
+    return new TemporaryArtifactConnectivityTestingService(() -> {
+      String applicationName = UUID.getUUID() + "-connectivity-testing-temp-app";
+      File applicationFolder = new File(getExecutionFolder(), applicationName);
+      ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName);
+      applicationDescriptor.setArtifactDeclaration(artifactDeclaration);
+      applicationDescriptor.setConfigResourcesFile(new File[0]);
+      applicationDescriptor.setConfigResources(emptyList());
+      applicationDescriptor.setAbsoluteResourcePaths(new String[0]);
+      applicationDescriptor.setArtifactLocation(applicationFolder);
+      createDeployablePomFile(applicationFolder, model);
+      updateArtifactPom(applicationFolder, model);
+      applicationDescriptor.setClassLoaderModel(new DeployableMavenClassLoaderModelLoader().load(applicationFolder, model));
+      return defaultApplicationFactory.createAppFrom(applicationDescriptor);
+    });
   }
 
 }

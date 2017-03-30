@@ -11,6 +11,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
@@ -44,6 +45,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   private Map<String, String> appProperties = new HashMap<String, String>();
   private File logConfigFile;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
+  private ArtifactDeclaration artifactDeclaration;
 
   /**
    * Creates a new application descriptor
@@ -123,5 +125,19 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
    */
   public void setPlugins(Set<ArtifactPluginDescriptor> plugins) {
     this.plugins = plugins;
+  }
+
+  /**
+   * @return programmatic definition of the application configuration.
+   */
+  public ArtifactDeclaration getArtifactDeclaration() {
+    return artifactDeclaration;
+  }
+
+  /**
+   * @param artifactDeclaration programmatic definition of the application configuration.
+   */
+  public void setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
+    this.artifactDeclaration = artifactDeclaration;
   }
 }
