@@ -107,7 +107,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(defaultMessagingExceptionHandler, times(0)).apply(any(MessagingException.class));
-    verify(mockTestExceptionStrategy2, times(1)).apply(eq(mockException));
+    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(Event.class));
   }
 
   @Test(expected = MuleRuntimeException.class)

@@ -31,6 +31,7 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import org.reactivestreams.Publisher;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 /**
@@ -42,6 +43,7 @@ import reactor.core.publisher.Mono;
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, GlobalNameableObject {
 
+  private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default exception strategy must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
 
@@ -59,24 +61,37 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Override
   public Event handleException(MessagingException exception, Event event) {
-    return from(apply(exception)).block();
+    event = addExceptionPayload(exception, event);
+    if (isCriticalException(exception)) {
+      return event;
+    }
+    for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+      if (exceptionListener.accept(event)) {
+        return exceptionListener.handleException(exception, event);
+      }
+    }
+    throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
   }
 
   @Override
   public Publisher<Event> apply(MessagingException exception) {
-    Event event = Event.builder(exception.getEvent())
-        .message(InternalMessage.builder(exception.getEvent().getMessage())
-            .exceptionPayload(new DefaultExceptionPayload(exception)).build())
-        .build();
     if (isCriticalException(exception)) {
-      return just(event);
-    }
-    for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
-      if (exceptionListener.accept(event)) {
-        return exceptionListener.apply(new MessagingException(event, exception));
+      return error(exception);
+    } else {
+      Event event = addExceptionPayload(exception, exception.getEvent());
+      for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+        if (exceptionListener.accept(event)) {
+          return exceptionListener.apply(new MessagingException(event, exception));
+        }
       }
+      return error(new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE)));
     }
-    return error(new MuleRuntimeException(createStaticMessage("Default exception strategy must accept any event.")));
+  }
+
+  private Event addExceptionPayload(MessagingException exception, Event event) {
+    return Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+        .build();
   }
 
   private boolean isCriticalException(MessagingException exception) {
