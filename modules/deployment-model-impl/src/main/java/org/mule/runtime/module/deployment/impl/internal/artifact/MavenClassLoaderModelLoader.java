@@ -10,6 +10,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
@@ -28,9 +29,9 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenUtils.getMavenLocalRepository;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModelFromJar;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomUrlFromJar;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getMavenLocalRepository;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomUrlFromJar;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.isStandalone;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -146,6 +147,11 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
   public final ClassLoaderModel load(File artifactFile, Map<String, Object> attributes)
       throws InvalidDescriptorLoaderException {
     Model model = loadPomModel(artifactFile);
+    return createClassLoaderModel(artifactFile, attributes, model);
+  }
+
+  private ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes, Model model)
+      throws InvalidDescriptorLoaderException {
     final ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder();
     classLoaderModelBuilder
         .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
@@ -158,6 +164,18 @@ public abstract class MavenClassLoaderModelLoader implements ClassLoaderModelLoa
     classLoaderModelBuilder.dependingOn(dependencies);
     loadUrls(artifactFile, classLoaderModelBuilder, dependencyResult, nlg, dependencies);
     return classLoaderModelBuilder.build();
+  }
+
+  /**
+   * Loads the {@link ClassLoaderModel} from an artifact with the provided maven pom model.
+   * 
+   * @param artifactFile the artifact folder
+   * @param mavenModel the pom model
+   * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
+   * @throws InvalidDescriptorLoaderException
+   */
+  public final ClassLoaderModel load(File artifactFile, Model mavenModel) throws InvalidDescriptorLoaderException {
+    return createClassLoaderModel(artifactFile, emptyMap(), mavenModel);
   }
 
   /**

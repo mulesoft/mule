@@ -44,7 +44,6 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPl
 import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
-import org.mule.runtime.module.deployment.impl.internal.temporary.TemporaryArtifactClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.FileSystemServiceProviderDiscoverer;
@@ -68,7 +67,6 @@ public class MuleArtifactResourcesRegistry {
   private final TemporaryApplicationFactory temporaryApplicationFactory;
   private final DefaultArtifactPluginRepository artifactPluginRepository;
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
-  private final TemporaryArtifactClassLoaderBuilderFactory temporaryArtifactClassLoaderBuilderFactory;
   private final ArtifactClassLoader containerClassLoader;
   private final MuleServiceManager serviceManager;
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
@@ -173,10 +171,6 @@ public class MuleArtifactResourcesRegistry {
                                                                   pluginDependenciesResolver,
                                                                   artifactPluginDescriptorLoader);
 
-    temporaryArtifactClassLoaderBuilderFactory =
-        new TemporaryArtifactClassLoaderBuilderFactory(artifactPluginClassLoaderFactory,
-                                                       applicationClassLoaderFactory,
-                                                       pluginDependenciesResolver);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
@@ -235,13 +229,6 @@ public class MuleArtifactResourcesRegistry {
    */
   public ArtifactClassLoaderFactory<ArtifactPluginDescriptor> getArtifactPluginClassLoaderFactory() {
     return artifactPluginClassLoaderFactory;
-  }
-
-  /**
-   * @return factory for creating a builder instance for configuring and instantiate a temporary artifact
-   */
-  public TemporaryArtifactClassLoaderBuilderFactory getTemporaryArtifactClassLoaderBuilderFactory() {
-    return temporaryArtifactClassLoaderBuilderFactory;
   }
 
   /**

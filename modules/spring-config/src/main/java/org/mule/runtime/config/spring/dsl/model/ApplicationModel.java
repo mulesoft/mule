@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -26,7 +25,7 @@ import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SO
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
-import com.google.common.collect.ImmutableSet;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -40,9 +39,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +54,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -358,12 +360,20 @@ public class ApplicationModel {
       DslElementModelFactory elementFactory = DslElementModelFactory
           .getDefault(DslResolvingContext.getDefault(extensionManager.get().getExtensions()));
 
+      ComponentModel rootComponent = new ComponentModel.Builder()
+          .setIdentifier(ComponentIdentifier.builder().withNamespace("mule").withName("mule").build()).build();
+      this.muleComponentModels.add(rootComponent);
+
       artifactDeclaration.getConfigs().stream()
           .map(elementFactory::create)
           .filter(Optional::isPresent)
           .map(e -> e.get().getConfiguration())
           .forEach(config -> config
-              .ifPresent(c -> this.muleComponentModels.add(convertComponentConfiguration(c, true))));
+              .ifPresent(c -> {
+                ComponentModel componentModel = convertComponentConfiguration(c, true);
+                componentModel.setParent(rootComponent);
+                rootComponent.getInnerComponents().add(componentModel);
+              }));
     }
   }
 
@@ -382,8 +392,11 @@ public class ApplicationModel {
 
     componentConfiguration.getValue().ifPresent(builder::setTextContent);
 
-    return builder.build();
-
+    ComponentModel componentModel = builder.build();
+    for (ComponentModel childComponent : componentModel.getInnerComponents()) {
+      childComponent.setParent(componentModel);
+    }
+    return componentModel;
   }
 
 

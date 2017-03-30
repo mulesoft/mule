@@ -185,6 +185,7 @@ public class DefaultMuleApplication implements Application {
               .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
+              .setArtifactDeclaration(descriptor.getArtifactDeclaration())
               .setPolicyProvider(policyManager);
 
       Domain domain = domainRepository.getDomain(descriptor.getDomain());

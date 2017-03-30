@@ -5,16 +5,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.plugin;
+package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.util.FileUtils.createFile;
 import static org.mule.runtime.core.util.JarUtils.getUrlWithinJar;
 import static org.mule.runtime.core.util.JarUtils.getUrlsWithinJar;
 import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
+import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -24,23 +29,36 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
 
 /**
  * Provides utility methods to wrk with Maven
  */
 public class MavenUtils {
+
+  private static final Logger LOGGER = getLogger(MavenUtils.class);
+  private static final String USER_HOME = "user.home";
+  private static final String M2_REPO = "/.m2/repository";
+  private static final String SHARED_LIBRARIES_ELEMENT = "sharedLibraries";
+  private static String userHome = getProperty(USER_HOME);
 
   /**
    * Returns the {@link Model} from a given artifact folder
@@ -127,6 +145,27 @@ public class MavenUtils {
     }
   }
 
+  /**
+   * Creates the pom file for a deployable artifact inside the artifact exploded folder
+   *
+   * @param artifactFolder the deployable artifact folder
+   * @param model the pom model
+   */
+  public static void createDeployablePomFile(File artifactFolder, Model model) {
+    File pomFileLocation =
+        new File(artifactFolder, Paths.get("META-INF", "maven", model.getGroupId(), model.getArtifactId(), "pom.xml").toString());
+    try {
+      createFile(pomFileLocation.getAbsolutePath());
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+    try (FileWriter fileWriter = new FileWriter(pomFileLocation)) {
+      new MavenXpp3Writer().write(fileWriter, model);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
 
   private static File lookupPomFromMavenLocation(File artifactFolder) {
     File mulePluginPom = null;
@@ -153,6 +192,73 @@ public class MavenUtils {
                                                          artifactFolder.getName()));
     }
     return mulePluginPom;
+  }
+
+  // TODO - MULE-11910 - Improve aether maven repository configuration
+
+  /**
+   * @return a file pointing to the user local maven repository.
+   */
+  public static File getMavenLocalRepository() {
+    String localRepositoryProperty = getProperty("localRepository");
+    if (localRepositoryProperty == null) {
+      localRepositoryProperty = userHome + M2_REPO;
+      LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);
+    }
+
+    LOGGER.debug("Using Maven localRepository: '{}'", localRepositoryProperty);
+    File mavenLocalRepositoryLocation = new File(localRepositoryProperty);
+    if (!mavenLocalRepositoryLocation.exists()) {
+      throw new IllegalArgumentException("Maven repository location couldn't be found, please check your configuration");
+    }
+    return mavenLocalRepositoryLocation;
+  }
+
+  /**
+   * Adds a shared library to the pom model. If the plugin does not exists yet in the model then it will create it.
+   * 
+   * @param model the pom model
+   * @param dependency the descriptor of the dependency
+   */
+  public static void addSharedLibraryDependency(Model model, Dependency dependency) {
+    Build build = model.getBuild();
+    if (build == null) {
+      build = new Build();
+      model.setBuild(build);
+    }
+    List<Plugin> plugins = build.getPlugins();
+    if (plugins == null) {
+      plugins = new ArrayList<>();
+      build.setPlugins(plugins);
+    }
+    Optional<Plugin> pluginOptional = plugins.stream().filter(plugin -> plugin.getGroupId().equals(MULE_MAVEN_PLUGIN_GROUP_ID)
+        && plugin.getArtifactId().equals(MULE_MAVEN_PLUGIN_ARTIFACT_ID)).findFirst();
+    List<Plugin> finalPlugins = plugins;
+    Plugin plugin = pluginOptional.orElseGet(() -> {
+      Plugin muleMavenPlugin = new Plugin();
+      muleMavenPlugin.setGroupId(MULE_MAVEN_PLUGIN_GROUP_ID);
+      muleMavenPlugin.setArtifactId(MULE_MAVEN_PLUGIN_ARTIFACT_ID);
+      finalPlugins.add(muleMavenPlugin);
+      return muleMavenPlugin;
+    });
+    Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
+    if (configuration == null) {
+      configuration = new Xpp3Dom("configuration");
+      plugin.setConfiguration(configuration);
+    }
+    Xpp3Dom sharedLibrariesDom = configuration.getChild(SHARED_LIBRARIES_ELEMENT);
+    if (sharedLibrariesDom == null) {
+      sharedLibrariesDom = new Xpp3Dom(SHARED_LIBRARIES_ELEMENT);
+      configuration.addChild(sharedLibrariesDom);
+    }
+    Xpp3Dom sharedLibraryDom = new Xpp3Dom("sharedLibrary");
+    sharedLibrariesDom.addChild(sharedLibraryDom);
+    Xpp3Dom groupIdDom = new Xpp3Dom("groupId");
+    groupIdDom.setValue(dependency.getGroupId());
+    sharedLibraryDom.addChild(groupIdDom);
+    Xpp3Dom artifactIdDom = new Xpp3Dom("artifactId");
+    artifactIdDom.setValue(dependency.getArtifactId());
+    sharedLibraryDom.addChild(artifactIdDom);
   }
 
 }
