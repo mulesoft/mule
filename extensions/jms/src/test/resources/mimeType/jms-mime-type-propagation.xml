@@ -34,7 +34,7 @@
 
     <flow name="listener" initialState="stopped">
         <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO"/>
-        <logger level="ERROR" message="#[payload]"/>
+        <logger level="DEBUG" message="#[payload]"/>
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>
 
@@ -44,8 +44,16 @@
 
     <flow name="listener-with-override" initialState="stopped">
         <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO" contentType="text/json" encoding="US-ASCII"/>
-        <logger level="ERROR" message="#[payload]"/>
+        <logger level="DEBUG" message="#[payload]"/>
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>
+
+    <flow name="publisher-without-mimeType-propagation">
+        <jms:publish config-ref="config" destination="${destination}">
+            <jms:message-builder sendContentType="false" sendEncoding="false"/>
+        </jms:publish>
+        <logger level="DEBUG" message="#[payload]"/>
+    </flow>
+
 
 </mule>
