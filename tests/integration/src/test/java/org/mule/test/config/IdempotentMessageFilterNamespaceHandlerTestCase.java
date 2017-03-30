@@ -83,11 +83,6 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractInt
     assertEquals(StringAppendTransformer.class, filter.getUnacceptedMessageProcessor().getClass());
   }
 
-
-  public void testBeanObjectStore() throws Exception {
-    testPojoObjectStore("beanObjectStore");
-  }
-
   private void testPojoObjectStore(final String flowName) throws Exception {
     final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow(flowName);
 

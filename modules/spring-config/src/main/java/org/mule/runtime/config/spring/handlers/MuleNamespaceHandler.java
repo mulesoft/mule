@@ -7,18 +7,16 @@
 package org.mule.runtime.config.spring.handlers;
 
 import org.mule.runtime.config.spring.factories.AggregationStrategyDefinitionParser;
-import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
-import org.mule.runtime.config.spring.factories.FileQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
-import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
-import org.mule.runtime.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
+import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
+import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -70,7 +68,6 @@ import org.mule.runtime.config.spring.parsers.specific.RegExFilterDefinitionPars
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.RetryNotifierDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.RetryPolicyDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SimpleComponentDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.SplitterDefinitionParser;
@@ -82,6 +79,14 @@ import org.mule.runtime.config.spring.parsers.specific.TypedPropertyMapEntryDefi
 import org.mule.runtime.config.spring.parsers.specific.XaTransactionDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -107,14 +112,6 @@ import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.CallableEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.DefaultEntryPointResolverSet;
-import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
-import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
@@ -130,9 +127,6 @@ import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.routing.CollectionSplitter;
-import org.mule.runtime.core.routing.DynamicAll;
-import org.mule.runtime.core.routing.DynamicFirstSuccessful;
-import org.mule.runtime.core.routing.DynamicRoundRobin;
 import org.mule.runtime.core.routing.ExpressionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
@@ -190,10 +184,7 @@ import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
-import org.mule.runtime.core.util.store.ManagedObjectStore;
 import org.mule.runtime.core.util.store.TextFileObjectStore;
-
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -252,9 +243,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
                                  new QueueStoreDefinitionParser(DefaultMemoryQueueStoreFactoryBean.class));
     registerBeanDefinitionParser("default-persistent-queue-store",
                                  new QueueStoreDefinitionParser(DefaultPersistentQueueStoreFactoryBean.class));
-    registerBeanDefinitionParser("simple-in-memory-queue-store",
-                                 new QueueStoreDefinitionParser(SimpleMemoryQueueStoreFactoryBean.class));
-    registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileQueueStoreFactoryBean.class));
 
     registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
     registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
@@ -475,9 +463,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
     registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
     registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
-    registerBeanDefinitionParser("spring-object-store",
-                                 (BeanDefinitionParser) new ParentDefinitionParser().addAlias("ref", "store"));
-    registerBeanDefinitionParser("managed-store", new ChildDefinitionParser("store", ManagedObjectStore.class));
 
     // Routing: Intercepting Message Processors
     registerMuleBeanDefinitionParser("idempotent-message-filter",
@@ -520,11 +505,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
     registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
     registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
-    registerBeanDefinitionParser("dynamic-round-robin", new RouterDefinitionParser(DynamicRoundRobin.class));
-    registerBeanDefinitionParser("dynamic-first-successful", new RouterDefinitionParser(DynamicFirstSuccessful.class));
-    registerBeanDefinitionParser("dynamic-all", new RouterDefinitionParser(DynamicAll.class));
-    registerMuleBeanDefinitionParser("custom-route-resolver", new ParentDefinitionParser())
-        .addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "dynamicRouteResolver");
     registerMuleBeanDefinitionParser("dead-letter-queue", new ParentDefinitionParser()).addAlias("messageProcessor",
                                                                                                  "deadLetterQueue");
 

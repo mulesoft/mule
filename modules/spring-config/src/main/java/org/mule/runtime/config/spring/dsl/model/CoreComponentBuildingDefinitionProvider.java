@@ -234,6 +234,7 @@ import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.queue.QueueStore;
+import org.mule.runtime.core.util.store.TextFileObjectStore;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -786,6 +787,26 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("initialisationPolicy", fromSimpleParameter("initialisationPolicy",
                                                                                    PoolingProfile.POOL_INITIALISATION_POLICIES::get)
                                                                                        .build())
+        .build());
+
+    ComponentBuildingDefinition.Builder baseObjectStoreDefinition = baseDefinition.copy()
+        .withSetterParameterDefinition("maxEntries", fromSimpleParameter("maxEntries").build())
+        .withSetterParameterDefinition("entryTTL", fromSimpleParameter("entryTTL").build())
+        .withSetterParameterDefinition("expirationInterval", fromSimpleParameter("expirationInterval").build())
+        .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build());
+
+    componentBuildingDefinitions.add(baseObjectStoreDefinition.copy().withIdentifier("simple-text-file-store")
+        .withTypeDefinition(fromType(TextFileObjectStore.class))
+        .withSetterParameterDefinition("directory", fromSimpleParameter("directory").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-object-store")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-queue-store")
+        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
+        .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());

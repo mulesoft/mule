@@ -377,24 +377,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="simple-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: simple-in-memory-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-in-memory-queue-store instead.
-                A simple in-memeory queue store.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="file-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                DEPRECATED: file-queue-store is deprecated since Mule 3.5 and will be removed in Mule 4.0. Use default-persistent-queue-store instead.
-                A simple file-based queue store.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>
@@ -4056,64 +4038,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="managed-store" type="managedObjectStoreType"
-		substitutionGroup="abstract-object-store">
-		<xsd:annotation>
-			<xsd:documentation>
-				Managed Object Store
-            </xsd:documentation>
-		</xsd:annotation>
-	</xsd:element>
-
-	<xsd:complexType name="managedObjectStoreType">
-		<xsd:complexContent>
-			<xsd:extension base="abstractObjectStoreType">
-				<xsd:attribute name="storeName" type="xsd:string" use="required">
-					<xsd:annotation>
-						<xsd:documentation>
-							The ID used to retrieve the ObjectStore from the ObjectStoreManager
-    					</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="persistent" type="xsd:boolean">
-					<xsd:annotation>
-						<xsd:documentation>
-							Defines if this store should be persistent or not
-    					</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="maxEntries" type="substitutableInt">
-					<xsd:annotation>
-						<xsd:documentation>
-							The maximum number of entries that this store keeps around. Specify
-							'-1' if the store is supposed to be "unbounded".
-						</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="entryTTL" type="substitutableInt">
-					<xsd:annotation>
-						<xsd:documentation>
-							The time-to-live for each message ID, specified in milliseconds, or '-1'
-							for entries that should never expire. DO NOT combine this with an
-							unbounded store!
-                        </xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="expirationInterval" type="substitutableInt">
-					<xsd:annotation>
-						<xsd:documentation>
-							The interval for periodic bounded size enforcement and entry
-							expiration, specified in milliseconds. Arbitrary positive values
-							between one second and several hours or days are possible, but
-							should be chosen carefully according to the expected message rate
-							to prevent OutOfMemory conditions.
-                        </xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-
     <xsd:complexType name="abstractMonitoredObjectStoreType">
         <xsd:complexContent>
             <xsd:extension base="abstractObjectStoreType">
@@ -4174,29 +4098,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             An implementation of the ObjectStore interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
-    <xsd:element name="spring-object-store" type="springObjectStoreType"
-                 substitutionGroup="abstract-object-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                A Spring bean that implements the ObjectStore interface.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="springObjectStoreType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractObjectStoreType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the ObjectStore bean to use.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -5023,57 +4924,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="dynamic-round-robin" substitutionGroup="abstract-routing-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Sends each message received to the next message processor in the circular list of targets. The list of message processors is obtained dynamically using the configured route resolver
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractDynamicRoutingMessageProcessor"/>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="dynamic-all" substitutionGroup="abstract-routing-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Sends the same message to multiple message processors. The list of message processors is obtained dynamically using the configured route resolver
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractDynamicRoutingMessageProcessor">
-                    <xsd:sequence>
-                        <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="dynamic-first-successful" substitutionGroup="abstract-routing-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                Sends a message to a list of message processors until one processes it successfully. The list of message processors is obtained dynamically using the configured route resolver
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractDynamicRoutingMessageProcessor">
-                    <xsd:attribute name="failureExpression" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:complexType name="abstractDynamicRoutingMessageProcessor">
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
@@ -5091,28 +4941,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
-    <xsd:element name="custom-route-resolver" type="customRouterResolverType"
-                 substitutionGroup="abstract-dynamic-route-resolver">
-        <xsd:annotation>
-            <xsd:documentation>
-                A mechanism to lookup routes from the service registry specifying service name and service version.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customRouterResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="ref" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to a bean definition of a DynamicRouteResolver.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!--=================-->
     <!-- Bytes Streaming -->
