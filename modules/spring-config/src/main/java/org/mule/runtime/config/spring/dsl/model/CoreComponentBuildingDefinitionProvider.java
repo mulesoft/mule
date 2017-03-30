@@ -211,7 +211,7 @@ import org.mule.runtime.core.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
+import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionType;
 import org.mule.runtime.core.transaction.XaTransactionFactory;

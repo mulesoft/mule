@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import org.mule.runtime.api.streaming.objects.CursorIterator;
-import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 
 import java.io.IOException;
 

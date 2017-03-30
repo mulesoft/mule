@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.objects;
+package org.mule.runtime.core.internal.streaming.object;
 
 import static java.lang.Math.toIntExact;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
@@ -13,10 +13,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
-import org.mule.runtime.api.streaming.objects.CursorIterator;
-import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
-import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
-import org.mule.runtime.core.streaming.objects.InMemoryCursorIteratorConfig;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.core.util.func.CheckedRunnable;
 import org.mule.tck.size.SmallTest;
@@ -31,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,13 +44,13 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories("Object Streaming")
 public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestCase {
 
-  private static final int DATA_SIZE = 500;
+  protected static final int DATA_SIZE = 500;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        {"Doesn't require expansion", DATA_SIZE, new InMemoryCursorIteratorConfig(DATA_SIZE, 00, DATA_SIZE)},
-        {"Requires expansion", DATA_SIZE, new InMemoryCursorIteratorConfig(100, 50, DATA_SIZE)},
+        {"Doesn't require expansion", DATA_SIZE, DATA_SIZE, 0, DATA_SIZE},
+        {"Requires expansion", DATA_SIZE, 100, 50, DATA_SIZE}
     });
   }
 
@@ -62,17 +62,21 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
 
-  public CursorIteratorProviderTestCase(String name, int dataSize, InMemoryCursorIteratorConfig config) {
+  public CursorIteratorProviderTestCase(String name, int dataSize, int initialBufferSize, int bufferSizeIncrement,
+                                        int maxBufferSize) {
     super(dataSize);
-    this.config = config;
+    this.config = new InMemoryCursorIteratorConfig(initialBufferSize, bufferSizeIncrement, maxBufferSize);
     executorService = newScheduledThreadPool(2);
     halfDataLength = data.size() / 2;
-
-    streamProvider = createStreamProvider(data);
     resetLatches();
   }
 
-  protected CursorIteratorProvider createStreamProvider(List<String> data) {
+  @Before
+  public void before() {
+    streamProvider = createStreamProvider(data);
+  }
+
+  protected CursorIteratorProvider createStreamProvider(List<Object> data) {
     return new InMemoryCursorIteratorProvider(toStreamingIterator(data), config);
   }
 
@@ -92,7 +96,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   @Description("Partially consume the stream, rewind back to zero and consume fully")
   public void rewindWhileStreamNotFullyConsumed() throws Exception {
     withCursor(cursor -> {
-      List<String> read = read(cursor, halfDataLength);
+      List<Object> read = read(cursor, halfDataLength);
       checkEquals(read, data.subList(0, halfDataLength));
 
       cursor.seek(0);
@@ -100,7 +104,6 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
       checkEquals(read, data);
     });
   }
-
 
   @Test
   @Description("Consume the stream, go back to two different positions and consume again (each)")
@@ -237,9 +240,9 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
 
-  private void seekAndAssert(CursorIterator<String> cursor, long position, int size) throws Exception {
+  private void seekAndAssert(CursorIterator<Object> cursor, long position, int size) throws Exception {
     cursor.seek(position);
-    List<String> read = read(cursor, size);
+    List<Object> read = read(cursor, size);
     checkEquals(read, data.subList(toIntExact(position), toIntExact(position + size)));
   }
 

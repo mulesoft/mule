@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.streaming.object;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.object.factory.InMemoryCursorIteratorProviderFactory;
 import org.mule.runtime.core.internal.streaming.object.factory.NullCursorIteratorProviderFactory;
-import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
-import org.mule.runtime.core.streaming.objects.InMemoryCursorIteratorConfig;
-import org.mule.runtime.core.streaming.objects.ObjectStreamingManager;
+import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
+import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
 
 /**
  * Default implementation of {@link ObjectStreamingManager}
@@ -48,5 +48,9 @@ public class DefaultObjectStreamingManager implements ObjectStreamingManager {
   @Override
   public CursorIteratorProviderFactory getDefaultCursorProviderFactory() {
     return getInMemoryCursorProviderFactory(InMemoryCursorIteratorConfig.getDefault());
+  }
+
+  protected CursorManager getCursorManager() {
+    return cursorManager;
   }
 }

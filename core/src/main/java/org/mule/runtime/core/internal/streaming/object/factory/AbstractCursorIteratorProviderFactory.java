@@ -8,15 +8,15 @@ package org.mule.runtime.core.internal.streaming.object.factory;
 
 import static org.mule.runtime.core.api.functional.Either.left;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.objects.CursorIterator;
-import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.CursorProviderHandle;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
-import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
+import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
 
 import java.io.IOException;
 import java.util.Iterator;

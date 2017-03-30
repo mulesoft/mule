@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.core.util.func.CheckedSupplier;
+
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -25,6 +27,24 @@ public class ConcurrencyUtils {
       lock.unlock();
     } catch (IllegalMonitorStateException e) {
       // lock was released early to improve performance and somebody else took it. This is fine
+    }
+  }
+
+  /**
+   * Returns the value of the given {@code supplier} between the boundaries of
+   * the given {@code lock}. It guarantees that the lock is released
+   *
+   * @param lock     a {@link Lock}
+   * @param supplier a {@link CheckedSupplier}
+   * @param <T>      the generic type of the returned value
+   * @return the supplied value
+   */
+  public static <T> T withLock(Lock lock, CheckedSupplier<T> supplier) {
+    lock.lock();
+    try {
+      return supplier.get();
+    } finally {
+      safeUnlock(lock);
     }
   }
 

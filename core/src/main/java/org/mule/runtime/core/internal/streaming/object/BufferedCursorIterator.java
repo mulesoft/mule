@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
-import org.mule.runtime.api.streaming.objects.CursorIterator;
-import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.AbstractCursorIterator;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 /**
  * A {@link CursorIterator} which pulls its data from an {@link ObjectStreamBuffer}.
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class BufferedCursorIterator<T> extends AbstractCursorIterator<T> {
 
   private final ObjectStreamBuffer<T> buffer;
+  private Bucket<T> bucket = null;
 
   public BufferedCursorIterator(ObjectStreamBuffer<T> buffer, CursorIteratorProvider provider) {
     super(provider);
@@ -39,16 +41,26 @@ public class BufferedCursorIterator<T> extends AbstractCursorIterator<T> {
    * {@inheritDoc}
    */
   @Override
-  protected T doNext(long position) {
-    return buffer.get(position);
+  protected T doNext(long p) {
+    Position position = buffer.toPosition(p);
+    if (bucket == null || !bucket.contains(position)) {
+      bucket = buffer.getBucketFor(position).orElse(bucket);
+    }
+
+    if (bucket != null) {
+      return bucket.get(position.getItemIndex()).orElseThrow(NoSuchElementException::new);
+    } else {
+      throw new NoSuchElementException();
+    }
   }
 
   /**
    * {@inheritDoc}
-   * This implementation does nothing since the {@link #buffer} contains all the state.
    */
   @Override
-  public void release() {}
+  public void release() {
+    bucket = null;
+  }
 
   /**
    * {@inheritDoc}

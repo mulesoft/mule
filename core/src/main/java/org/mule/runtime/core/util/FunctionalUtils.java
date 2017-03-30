@@ -8,7 +8,9 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.util.func.CheckedRunnable;
 
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Utilities for functional programming
@@ -39,6 +41,36 @@ public class FunctionalUtils {
       task.run();
     } catch (Exception e) {
       exceptionHandler.accept(e);
+    }
+  }
+
+  /**
+   * If the given {@code optional} is not present, then it returns the optional
+   * provided by the {@code orElse} supplier
+   *
+   * @param optional an {@link Optional}
+   * @param orElse   a {@link Supplier} that provides the return value in case the {@code optional} is empty
+   * @param <T>      the generic type of the optional item
+   * @return an {@link Optional}
+   */
+  public static <T> Optional<T> or(Optional<T> optional, Supplier<Optional<T>> orElse) {
+    return optional.isPresent() ? optional : orElse.get();
+  }
+
+  /**
+   * If the {@code optional} is present, it executes the {@code ifPresent} consumer. Otherwise,
+   * it executes the {@code orElse} runnable
+   *
+   * @param optional  an {@link Optional} value
+   * @param ifPresent the consumer to execute if the value is present
+   * @param orElse    a fallback runnable in case the optional is empty.
+   * @param <T>       the generic type of the optional's value.
+   */
+  public static <T> void ifPresent(Optional<T> optional, Consumer<? super T> ifPresent, Runnable orElse) {
+    if (optional.isPresent()) {
+      ifPresent.accept(optional.get());
+    } else {
+      orElse.run();
     }
   }
 }

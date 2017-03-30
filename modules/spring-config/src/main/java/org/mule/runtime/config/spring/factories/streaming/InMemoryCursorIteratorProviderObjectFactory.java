@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.spring.factories.streaming;
 
-import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
-import org.mule.runtime.core.streaming.objects.InMemoryCursorIteratorConfig;
+import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
+import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
 
 public class InMemoryCursorIteratorProviderObjectFactory
     extends AbstractCursorProviderObjectFactory<CursorIteratorProviderFactory> {

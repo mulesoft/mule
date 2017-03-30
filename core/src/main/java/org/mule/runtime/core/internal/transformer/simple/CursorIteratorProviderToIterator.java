@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.CURSOR_ITERATOR_PROVIDER;
 import static org.mule.runtime.api.metadata.DataType.ITERATOR;
-import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
