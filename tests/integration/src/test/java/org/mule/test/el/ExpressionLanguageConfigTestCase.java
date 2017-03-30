@@ -6,6 +6,8 @@
  */
 package org.mule.test.el;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -58,6 +60,11 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
   @Test
   public void testExpressionLanguageGlobalFunctionFromFile() {
     assertEquals("hi", evaluate("echo2('hi')"));
+  }
+
+  @Test
+  public void testExpressionLanguageGlobalFunctionNotOverriden() {
+    assertThat(evaluate("helloNotOverriden()"), equalTo("Hello " + muleContext.getConfiguration().getId() + "!"));
   }
 
   @Test

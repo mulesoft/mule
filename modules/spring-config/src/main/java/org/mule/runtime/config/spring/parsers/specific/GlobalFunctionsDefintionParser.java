@@ -8,7 +8,8 @@ package org.mule.runtime.config.spring.parsers.specific;
 
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.generic.TextDefinitionParser;
-
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -27,4 +28,23 @@ public class GlobalFunctionsDefintionParser extends TextDefinitionParser {
       assembler.getTarget().getPropertyValues().add("globalFunctionsFile", element.getAttribute(FUNCTION_FILE_ATTRIBUTE_NAME));
     }
   }
+
+  @Override
+  protected void addPropertyValue(String aValue, MutablePropertyValues aTempPropertyValues) {
+    PropertyValue tempCurrentPropertyValue = aTempPropertyValues.getPropertyValue(setterMethod);
+
+    if (tempCurrentPropertyValue != null) {
+      Object tempCurrentValue = tempCurrentPropertyValue.getValue();
+      if (logger.isDebugEnabled()) {
+        logger.debug("Concat " + setterMethod + " " + tempCurrentValue + " with " + aValue);
+      }
+      super.addPropertyValue(tempCurrentValue + "\n" + aValue, aTempPropertyValues);
+    } else {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Set " + setterMethod + " with " + aValue);
+      }
+      super.addPropertyValue(aValue, aTempPropertyValues);
+    }
+  }
+
 }
