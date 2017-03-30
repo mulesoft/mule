@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
@@ -108,11 +109,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   @Override
   public Event process(Event event) throws MuleException {
-    try {
-      return Mono.just(event).transform(this).block();
-    } catch (Throwable throwable) {
-      throw rxExceptionToMuleException(throwable);
-    }
+    return processToApply(event, this);
   }
 
   private void assertMorethanOneRoute() throws RoutePathNotFoundException {

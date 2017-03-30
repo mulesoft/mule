@@ -10,13 +10,11 @@ package org.mule.runtime.core.internal.construct;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.fromCallable;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -32,7 +30,6 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -186,11 +183,7 @@ public class DefaultFlowBuilder implements Builder {
       if (useBlockingCodePath()) {
         return processBlockingSynchronous(event);
       } else {
-        try {
-          return just(event).transform(this).otherwise(EventDroppedException.class, ede -> empty()).block();
-        } catch (Exception e) {
-          throw rxExceptionToMuleException(e);
-        }
+        return processToApply(event, this);
       }
     }
 

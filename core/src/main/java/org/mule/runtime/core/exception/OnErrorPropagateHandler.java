@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.core.exception;
 
+import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.processor.Processor;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.api.processor.Processor;
+import org.reactivestreams.Publisher;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -77,26 +81,19 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Event route(Event event, MessagingException t) throws MessagingException {
-    Event resultEvent = event;
+  protected Publisher<Event> routeAsync(Event event, MessagingException t) {
+    Publisher<Event> eventPublisher = just(event);
     if (isRedeliveryExhausted(t)) {
       if (redeliveryExceeded != null) {
         markExceptionAsHandled(t);
-        try {
-          resultEvent = redeliveryExceeded.process(event);
-        } catch (MuleException e) {
-          if (e instanceof MessagingException) {
-            throw (MessagingException) e;
-          }
-          throw new MessagingException(event, e);
-        }
+        eventPublisher = redeliveryExceeded.apply(eventPublisher);
       } else {
         logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
       }
     } else {
-      resultEvent = super.route(event, t);
+      eventPublisher = super.routeAsync(event, t);
     }
-    return resultEvent;
+    return eventPublisher;
   }
 
   @Override

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Flux.from;
@@ -37,11 +38,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
   @Override
   public Event process(Event event) throws MuleException {
-    try {
-      return Mono.just(event).transform(this).block();
-    } catch (Throwable e) {
-      throw rxExceptionToMuleException(e);
-    }
+    return processToApply(event, this);
   }
 
   @Override

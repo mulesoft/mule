@@ -6,9 +6,16 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.*;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 
@@ -84,6 +91,14 @@ public class MessageProcessors {
       return (MessageProcessorChain) processors.get(0);
     } else {
       return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    }
+  }
+
+  public static Event processToApply(Event event, Processor processor) throws MuleException {
+    try {
+      return just(event).transform(processor).otherwise(Exceptions.EventDroppedException.class, ede -> empty()).block();
+    } catch (Exception e) {
+      throw rxExceptionToMuleException(e);
     }
   }
 

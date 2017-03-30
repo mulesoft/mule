@@ -8,9 +8,9 @@ package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
@@ -107,11 +107,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public Event process(Event event) throws MuleException {
-    try {
-      return Mono.just(event).transform(this).block();
-    } catch (Throwable e) {
-      throw rxExceptionToMuleException(e);
-    }
+    return processToApply(event, this);
   }
 
   private void assertNotTransactional(Event event) throws RoutingException {

@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
@@ -136,11 +137,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   @Override
   public Event process(Event event) throws MuleException {
-    try {
-      return just(event).transform(this).block();
-    } catch (Exception e) {
-      throw rxExceptionToMuleException(e);
-    }
+    return processToApply(event, this);
   }
 
   @Override

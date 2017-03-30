@@ -86,6 +86,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     }
 
     flow = getTestFlow(muleContext);
+    flow.initialise();
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setMuleContext(mockMuleContext);
     onErrorContinueHandler.setFlowConstruct(flow);

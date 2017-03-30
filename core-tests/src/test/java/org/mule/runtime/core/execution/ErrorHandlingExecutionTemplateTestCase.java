@@ -169,7 +169,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     configureExceptionListener(null, "org.mule.runtime.core.exception.MessagingException");
     try {
-      executionTemplate.execute(getFailureTransactionCallback(new MessagingException(mockEvent, null)));
+      executionTemplate.execute(getFailureTransactionCallback(new MessagingException(mockEvent, (Throwable) null)));
       fail("MessagingException must be thrown");
     } catch (MessagingException e) {
     }

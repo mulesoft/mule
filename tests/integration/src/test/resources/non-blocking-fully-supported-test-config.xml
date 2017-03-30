@@ -229,10 +229,29 @@
         <error-handler>
             <on-error-continue>
                 <test:assert-intercepting responseSameTask="false" responseExpression="#[mel:assertPayload()]"/>
-                <set-variable variableName="beforeThread" value="#[mel:Thread.currentThread()]"/>
                 <test:non-blocking-processor/>
-                <test:assert count="1" expression="#[mel:Thread.currentThread()!=beforeThread  and assertPayload()]"/>
             </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="rollbackExceptionStrategy">
+        <test:assert-intercepting responseSameTask="false" responseExpression="#[mel:assertPayload()]"/>
+        <flow-ref name="rollbackExceptionStrategyChild"/>
+        <test:assert expression="#[mel:assertPayload()]"/>
+    </flow>
+    <flow name="rollbackExceptionStrategyChild">
+        <flow-ref name="rollbackExceptionStrategyGrandChild"/>
+        <test:assert count="0"/>
+        <error-handler>
+            <on-error-continue/>
+        </error-handler>
+    </flow>
+    <flow name="rollbackExceptionStrategyGrandChild">
+        <test:component throwException="true"/>
+        <error-handler>
+            <on-error-propagate>
+                <test:non-blocking-processor/>
+            </on-error-propagate>
         </error-handler>
     </flow>
 
