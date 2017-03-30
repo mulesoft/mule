@@ -15,9 +15,8 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
-import java.net.DatagramSocket;
-
 import javax.inject.Inject;
+import java.net.DatagramSocket;
 
 /**
  * Provides fields and behaviour common to UDP connections
@@ -55,7 +54,7 @@ public abstract class AbstractUdpConnection extends AbstractSocketConnection {
     try {
       return new DatagramSocket(connectionSettings.getInetSocketAddress());
     } catch (Exception e) {
-      throw new ConnectionException(format("Could not bind UDP Socket to address %s", connectionSettings.toString(), e));
+      throw new ConnectionException(format("Could not bind UDP Socket to address %s", connectionSettings.toString()), e);
     }
   }
 }

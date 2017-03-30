@@ -12,6 +12,8 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
@@ -33,8 +35,9 @@ import org.mule.extension.ftp.internal.ftp.command.FtpMoveCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpReadCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpRenameCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpWriteCommand;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
+import org.slf4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,10 +47,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
-import org.slf4j.Logger;
 
 /**
  * Implementation of {@link FtpFileSystem} for files residing on a FTP server
@@ -141,12 +140,12 @@ public final class ClassicFtpFileSystem extends FtpFileSystem {
   public void setTransferMode(FtpTransferMode mode) {
     try {
       if (!client.setFileType(mode.getCode())) {
-        throw new IOException(String.format("Failed to set %s transfer type. FTP reply code is: ", mode.getDescription(),
+        throw new IOException(String.format("Failed to set %s transfer type. FTP reply code is: %s", mode.getDescription(),
                                             client.getReplyCode()));
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(String.format(
-                                                                       "Found exception trying to change transfer mode to %s. FTP reply code is: ",
+                                                                       "Found exception trying to change transfer mode to %s. FTP reply code is: %s",
                                                                        mode.getClass(), client.getReplyCode())));
     }
   }

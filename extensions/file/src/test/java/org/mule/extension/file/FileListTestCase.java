@@ -14,16 +14,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
 import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
+import org.junit.Test;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
-import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.junit.Test;
 
 public class FileListTestCase extends FileConnectorTestCase {
 
@@ -83,7 +81,7 @@ public class FileListTestCase extends FileConnectorTestCase {
   @Test
   public void notExistingPath() throws Exception {
     expectedError.expectError(NAMESPACE, ILLEGAL_PATH, IllegalPathException.class, "doesn't exists");
-    doList(String.format("whatever", 0), false);
+    doList("whatever", false);
   }
 
   @Test

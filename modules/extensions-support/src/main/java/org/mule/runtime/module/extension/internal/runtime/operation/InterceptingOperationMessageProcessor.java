@@ -163,7 +163,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
 
       Event resultEvent = next.process(interceptedEvent);
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Intercepting operation '%s' executed intercepted chain and got the following event back: ",
+        LOGGER.debug(format("Intercepting operation '%s' executed intercepted chain and got the following event back: %s",
                             operationContext.getComponentModel().getName(), resultEvent));
       }
 

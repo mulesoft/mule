@@ -210,7 +210,7 @@ public class MuleMetadataService implements MetadataService, Initialisable {
                                                            COMPONENT_NOT_FOUND));
   }
 
-  private <T extends ComponentModel<T>> MetadataProvider<T> findMetadataProvider(Location location)
+  private <T extends ComponentModel> MetadataProvider<T> findMetadataProvider(Location location)
       throws InvalidComponentIdException {
     try {
       return (MetadataProvider<T>) findComponent(location);
@@ -229,13 +229,13 @@ public class MuleMetadataService implements MetadataService, Initialisable {
     }
   }
 
-  private <T extends ComponentModel<T>> MetadataResult<ComponentMetadataDescriptor<T>> getComponentMetadata(Location location) {
+  private <T extends ComponentModel> MetadataResult<ComponentMetadataDescriptor<T>> getComponentMetadata(Location location) {
     return exceptionHandledMetadataFetch(() -> ((MetadataProvider<T>) findMetadataProvider(location))
         .getMetadata(), format(EXCEPTION_RESOLVING_COMPONENT_METADATA, location));
   }
 
-  private <T extends ComponentModel<T>> MetadataResult<ComponentMetadataDescriptor<T>> getComponentMetadataWithKey(Location location,
-                                                                                                                   MetadataKey key) {
+  private <T extends ComponentModel> MetadataResult<ComponentMetadataDescriptor<T>> getComponentMetadataWithKey(Location location,
+                                                                                                                MetadataKey key) {
     return exceptionHandledMetadataFetch(() -> ((MetadataProvider<T>) findMetadataProvider(location))
         .getMetadata(key), format(EXCEPTION_RESOLVING_COMPONENT_METADATA, location));
   }

@@ -58,7 +58,7 @@ public final class FtpCopyCommand extends ClassicFtpCommand implements CopyComma
       try {
         files = client.listFiles();
       } catch (IOException e) {
-        throw exception(format("Could not list contents of directory '%s' while trying to copy it to ", sourcePath, target), e);
+        throw exception(format("Could not list contents of directory '%s' while trying to copy it to %s", sourcePath, target), e);
       }
 
       for (FTPFile file : files) {

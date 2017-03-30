@@ -262,7 +262,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
                                                 format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
                                                     + "Only one field in the class can bare such annotation",
                                                        source.getClass().getName(),
-                                                       annotation.getClass().getSimpleName()));
+                                                       annotation.getSimpleName()));
     }
 
     return Optional.of(new FieldSetter<>(fields.iterator().next()));
