@@ -6,7 +6,6 @@
  */
 package org.mule.test.core;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -19,33 +18,18 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.test.runner.RunnerDelegateTo;
-
-import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunnerDelegateTo(Parameterized.class)
 public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegrationTestCase {
 
   public static String FOO = "foo";
-  private ProcessingStrategyFactory processingStrategyFactory;
+  private ProcessingStrategyFactory processingStrategyFactory = new DefaultFlowProcessingStrategyFactory();
 
   @Override
   protected String getConfigFile() {
     return "non-blocking-fully-supported-test-config.xml";
-  }
-
-  public NonBlockingFullySupportedFunctionalTestCase(ProcessingStrategyFactory processingStrategyFactory) {
-    this.processingStrategyFactory = processingStrategyFactory;
-  }
-
-  @Parameters
-  public static Collection<Object> parameters() {
-    return asList(new Object[] {new DefaultFlowProcessingStrategyFactory()});
   }
 
   @Override

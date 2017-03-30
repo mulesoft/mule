@@ -125,10 +125,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return from(publisher)
         .doOnNext(checkedConsumer(event -> assertNotTransactional(event)))
         .doOnNext(request -> just(request)
-            .map(event -> updateEventForAsync(request))
-            .transform(publisher1 -> from(publisher1)
+            .map(event -> asyncEvent(request))
+            .transform(innerPublisher -> from(innerPublisher)
                 .doOnNext(fireAsyncScheduledNotification(flowConstruct))
-                .doOnNext(request1 -> just(request1)
+                .doOnNext(asyncRequest -> just(asyncRequest)
                     .publishOn(fromExecutorService(scheduler))
                     .transform(delegate)
                     .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
@@ -140,8 +140,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                                                          exception))
                     // Even though no response is ever used with this processor, complete the EventContext anyway, so
                     // parent context completes when async processing is complete.
-                    .doOnNext(event -> request1.getContext().success(event))
-                    .doOnError(throwable -> request1.getContext().error(throwable))
+                    .doOnNext(event -> asyncRequest.getContext().success(event))
+                    .doOnError(throwable -> asyncRequest.getContext().error(throwable))
                     .subscribe()))
             .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
@@ -149,12 +149,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             .subscribe());
   }
 
-  private Event updateEventForAsync(Event event) {
+  private Event asyncEvent(Event event) {
     // Clone event, make it async and remove ReplyToHandler
-    Event newEvent = Event.builder(DefaultEventContext.child(event.getContext()), event)
+    return Event.builder(DefaultEventContext.child(event.getContext()), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
-    return newEvent;
   }
 
   private Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {

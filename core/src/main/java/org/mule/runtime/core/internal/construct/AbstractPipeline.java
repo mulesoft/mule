@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static org.apache.commons.collections.CollectionUtils.selectRejected;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
@@ -23,7 +22,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -40,7 +38,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
-import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -64,7 +61,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.collections.Predicate;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
@@ -90,20 +86,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private boolean canProcessMessage = false;
   private Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
   protected Sink sink;
-
-  private static final Predicate sourceCompatibleWithAsync = new Predicate() {
-
-    @Override
-    public boolean evaluate(Object messageSource) {
-      if (messageSource instanceof LegacyInboundEndpoint) {
-        return ((LegacyInboundEndpoint) messageSource).isCompatibleWithAsync();
-      } else if (messageSource instanceof CompositeMessageSource) {
-        return selectRejected(((CompositeMessageSource) messageSource).getSources(), this).isEmpty();
-      } else {
-        return true;
-      }
-    }
-  };
 
   public AbstractPipeline(String name, MuleContext muleContext) {
     super(name, muleContext);
@@ -331,14 +313,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
-  private String getExceptionStrategyGlobalName() {
-    String globalName = null;
-    if (exceptionListener instanceof GlobalNameableObject) {
-      globalName = ((GlobalNameableObject) exceptionListener).getGlobalName();
-    }
-    return globalName;
-  }
-
   public Consumer<Event> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
@@ -381,9 +355,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * @return true if blocking synchronous code path should be used, false otherwise.
    */
   protected boolean useBlockingCodePath() {
-    return isTransactionActive() &&
-        (processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory
-            || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory);
+    return (isTransactionActive() && processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory)
+        || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory;
   }
 
   @Override

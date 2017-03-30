@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -35,7 +36,6 @@ import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -233,17 +233,6 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
    */
   protected Event createEventToRoute(Event routedEvent, InternalMessage message) {
     return Event.builder(routedEvent).message(message).build();
-  }
-
-  /**
-   * Creates a fresh copy of a {@link Message} ensuring that the payload can be cloned (i.e. is not consumable).
-   *
-   * @param event The {@link Event} to clone the message from.
-   * @return The fresh copy of the {@link Message}.
-   * @throws MessagingException If the message can't be cloned because it carries a consumable payload.
-   */
-  protected InternalMessage cloneMessage(Event event, InternalMessage message) throws MuleException {
-    return AbstractRoutingStrategy.cloneMessage(message);
   }
 
   @Override
